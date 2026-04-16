@@ -1,0 +1,2247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EverTutor Studio — Bhanu Kowshik</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
+
+    /* ─── TOKENS ─────────────────────────────────────────────── */
+    :root {
+      --secondary:    #252525;
+      --bg:           #FFFCF8;
+      --white:        #FFFFFF;
+      --grey:         #9C9C9C;
+      --border:       #EFEFEF;
+      --font-heading: 'Montserrat', sans-serif;
+      --font-mono:    'JetBrains Mono', monospace;
+    }
+
+    /* smooth scroll handled by JS for proper easing */
+
+    /* ─── BODY — dot-grid fixed (doesn't scroll) ────────────── */
+    body {
+      background-color: var(--bg);
+      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
+      background-size: 19px 19px;
+      background-attachment: fixed;   /* ← grid stays put */
+      min-height: 100vh;
+      font-family: var(--font-heading);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ─── CUSTOM CURSOR ──────────────────────────────────────── */
+    #customCursor {
+      position: fixed;
+      width: 17px;
+      height: 17px;
+      background: #252525;          /* solid on dot-grid background */
+      mix-blend-mode: normal;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      will-change: left, top;
+      transition: width 0.18s ease, height 0.18s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #customCursor.hovered   { width: 26px; height: 26px; }
+    /* Over the white card: invert so it reads against dark text */
+    #customCursor.on-card {
+      background: #FFFFFF;
+      mix-blend-mode: difference;
+    }
+    #customCursor.drag-mode {
+      width: 64px;
+      height: 64px;
+      background: #252525;
+      mix-blend-mode: normal;
+    }
+
+    /* "Hold & Drag" label — flex child, centered by parent */
+    #dragLabel {
+      pointer-events: none;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500; /* JetBrains Mono only loads 300/400/500 — 700 was synthesized */
+      color: #FFFCF8;
+      text-align: center;
+      line-height: 1.3;
+      white-space: nowrap;
+      padding: 8px;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      flex-shrink: 0;
+    }
+    #dragLabel.visible { opacity: 1; }
+
+    /* ─── NAV — Figma 191:14841 ──────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      background: rgba(255, 252, 248, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0px 1px 0px 0px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 40px;
+      height: 54px;
+      transform: translateY(0);
+      transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav.nav-hidden {
+      transform: translateY(-100%);
+    }
+    .nav-home {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      flex-shrink: 0;
+      cursor: pointer !important;
+    }
+    .nav-home img {
+      width: 38px;
+      height: 38px;
+      display: block;
+      transform: rotate(200deg);
+      transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .nav-home:hover img {
+      transform: rotate(180deg);
+    }
+    .nav-home span {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--secondary);
+      white-space: nowrap;
+    }
+    .nav-sections {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 15px;
+      border-radius: 5px;
+      border: none;
+      background: transparent;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 12px;
+      color: var(--secondary);
+      text-transform: uppercase;
+      text-decoration: none;
+      white-space: nowrap;
+      cursor: pointer !important;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .nav-btn:hover:not(.active) {
+      background: #F2F2F2;
+    }
+    .nav-btn.active {
+      background: var(--secondary);
+      color: var(--white);
+    }
+
+    /* ─── PAGE — same structure as portfolio ─────────────────── */
+    .page {
+      display: flex;
+      justify-content: center;
+      padding: 94px 40px 90px; /* 54px nav + 40px gap, 40px sides */
+    }
+
+    /* ─── CARD — same as portfolio ───────────────────────────── */
+    .card {
+      background: var(--white);
+      width: 1200px;
+      max-width: 100%;
+      border-radius: 30px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      overflow: hidden;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── HERO — Figma 191:14423 ─────────────────────────────── */
+    .cs-hero {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 36px 30px 48px;
+    }
+
+    /* Designation pills — Figma 191:14424 */
+    .designation-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+    }
+    .designation-row.visible {
+      animation: fade-in 0.55s cubic-bezier(0.22,0.61,0.36,1) both;
+    }
+    .desig-pill {
+      background: rgba(247,247,247,0.95);
+      padding: 5px 20px;
+      border-radius: 100px;
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 12px;
+      color: var(--secondary);
+      white-space: nowrap;
+    }
+
+    /* Main heading — Figma: Montserrat Bold 40px, lh 55px */
+    .cs-heading {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 40px;
+      line-height: 55px;
+      color: var(--secondary);
+    }
+    /* Italic part — "100+ hours to 4." */
+    .cs-heading em {
+      font-style: italic;
+      font-weight: 600;
+    }
+    /* Each word is wrapped by JS for animation */
+    .cs-heading .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(22px);
+      will-change: opacity, transform;
+    }
+    .cs-heading .word.visible {
+      animation: word-rise 0.55s cubic-bezier(0.22,0.61,0.36,1) both;
+    }
+
+    /* Subtitle — Figma: Montserrat Bold 25px, lh 55px */
+    .cs-subtitle {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 25px;
+      line-height: 55px;
+      color: var(--secondary);
+      opacity: 0;
+    }
+    .cs-subtitle.visible {
+      animation: fade-in 0.6s cubic-bezier(0.22,0.61,0.36,1) both;
+    }
+
+    @keyframes word-rise {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ─── CAROUSEL SECTION ───────────────────────────────────── */
+    .cs-carousel-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 0 0 56px;
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    .cs-carousel-section.visible {
+      animation: section-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    /* Carousel viewport — overflow:visible lets card shadow bleed out without being clipped */
+    .carousel-viewport {
+      width: 100%;
+      position: relative;
+      height: 387px;
+      overflow: visible;
+      cursor: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /*
+      Card sized to Studio Core Features master image ratio:
+      534.57 ÷ 347 = 1.541
+      560 ÷ 1.541 = 363px height
+      object-fit:contain → master image fills card perfectly, no cropping.
+      Lesson images (different ratio) get a subtle white BG fill — acceptable.
+    */
+    .fan-card {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 560px;
+      height: 363px;
+      border-radius: 17px;
+      overflow: hidden;
+      background: #FFFFFF;
+      box-shadow: 0px 4px 14px rgba(37,37,37,0.08);
+      will-change: transform, opacity, filter;
+    }
+    .fan-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;   /* no cropping on any image */
+      background: #FFFFFF;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* Caption */
+    .carousel-caption {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 12px;
+      color: #515151;
+      text-align: center;
+    }
+
+    /* ─── SECTION SEPARATOR WRAPPER ─────────────────────────── */
+    .cs-section-wrap {
+      padding: 0 40px 40px;
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    .cs-section-wrap.triggered {
+      /* wrapper becomes visible instantly once threshold hit — children handle their own stagger */
+      opacity: 1;
+      transform: translateY(0);
+      transition: none;
+    }
+
+    /* Each animatable child starts hidden, rises in on .visible */
+    .tr-anim {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    .tr-anim.visible {
+      animation: section-rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes section-rise {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── TEAM & ROLE CARD ───────────────────────────────────── */
+    .tr-card {
+      border: 1px solid #efefef;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      background: #fff;
+      box-shadow: inset 0px 0px 4px 0px rgba(0,0,0,0.08);
+    }
+
+    /* Top row: image + text */
+    .tr-top {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+    .tr-image-frame {
+      width: 100px;
+      height: 150px;
+      border-radius: 10px 0 0 0;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      background: #fff;
+    }
+    /* B&W + film-grain noise */
+    .tr-image-frame img {
+      position: absolute;
+      left: -29px;
+      top: 0;
+      width: 152px;
+      height: 152px;
+      object-fit: cover;
+      filter: grayscale(1) contrast(1.08);
+    }
+    .tr-image-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.28;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+    .tr-top-text {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+    .tr-label {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 15px;
+      color: #515151;
+    }
+    .tr-desc {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 30px;
+      color: var(--secondary);
+    }
+
+    /* Bullet items */
+    .tr-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .tr-bullet-wrap {
+      display: flex;
+      align-items: center;
+      padding: 7px 0;
+      flex-shrink: 0;
+    }
+    .tr-bullet {
+      width: 10px;
+      height: 10px;
+      background: var(--secondary);
+      flex-shrink: 0;
+    }
+
+    /* Vertical connecting line — used in Design Approach section */
+    .tr-items-connected {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      position: relative;
+    }
+    .tr-items-connected::before {
+      content: '';
+      position: absolute;
+      /* center of the 10px bullet = 5px; centering 1px line: left = 4px */
+      left: 4px;
+      /* top: bullet-wrap top-padding (11px) + half bullet (5px) = 16px */
+      top: 16px;
+      bottom: 16px;
+      width: 1px;
+      background: rgba(37, 37, 37, 0.14);
+    }
+    @media (max-width: 767px) {
+      .tr-items-connected { gap: 18px; }
+      /* mobile bullet is 8px → center at 4px, padding 8px → top/bottom 12px */
+      .tr-items-connected::before { left: 3px; top: 12px; bottom: 12px; }
+    }
+
+    .tr-item-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Highlight label — left-to-right sweep, only as wide as the text */
+    .tr-highlight {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 1;           /* line box = font-size exactly, no extra leading */
+      color: var(--secondary);
+      background: linear-gradient(#e6f28d, #e6f28d) no-repeat left center / 0% 100%;
+      padding: 0;
+      transition: background-size 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .tr-highlight.revealed {
+      background-size: 100% 100%;
+    }
+
+    /* Row containing highlight + avatar — min-height matches tr-mixed line-height so bullet aligns */
+    .tr-highlight-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 25px;
+    }
+
+    /* Circular avatar — colour always */
+    .tr-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      cursor: none;
+    }
+
+    /* Subtle green status dot — very gentle opacity breathe only */
+    .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: #16a34a;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: middle;
+      animation: dot-breathe 3s ease-in-out infinite;
+    }
+    @keyframes dot-breathe {
+      0%, 100% { opacity: 1;   }
+      50%       { opacity: 0.65; }
+    }
+
+    /* All descriptions: JetBrains Mono Regular #515151 */
+    .tr-item-desc {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 25px;
+      color: #515151;
+    }
+    /* Label part: Montserrat SemiBold */
+    .tr-mixed {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 30px;
+      color: var(--secondary);
+    }
+    /* Description part: JetBrains Mono Regular #515151 */
+    .tr-mixed-mono {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 20px;
+      line-height: 32px;
+      color: #515151;
+    }
+
+    /* Next footer */
+    .tr-next {
+      font-family: var(--font-mono);
+      font-weight: 500; /* JetBrains Mono only loads 300/400/500 */
+      font-size: 12px;
+      color: var(--secondary);
+    }
+    .tr-next .tr-next-text {
+      font-weight: 400;
+      color: #515151;
+    }
+
+    /* Arrow bobs once (500ms) then pauses for 1.5s — 2s total cycle */
+    @keyframes arrow-bob {
+      0%   { transform: translateY(0); }
+      25%  { transform: translateY(-4px); }
+      50%  { transform: translateY(0); }
+      100% { transform: translateY(0); }
+    }
+    .tr-arrow {
+      display: inline-block;
+      animation: arrow-bob 2s ease-in-out infinite;
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+
+    /* Hide custom cursor on touch devices */
+    @media (hover: none) {
+      #customCursor, #dragLabel { display: none; }
+      body { cursor: auto; }
+      a, button { cursor: pointer; }
+      .carousel-viewport { cursor: grab; }
+    }
+
+    /* Tablet (768px – 1024px) */
+    @media (max-width: 1024px) {
+      .page { padding: 74px 20px 60px; }
+      .nav { padding: 8px 24px; }
+      .nav-btn { font-size: 11px; padding: 5px 10px; }
+    }
+
+    /* ─── HAMBURGER + MOBILE MENU ───────────────────────────── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 36px;
+      height: 36px;
+      padding: 6px;
+      background: none;
+      border: none;
+      cursor: none;
+      flex-shrink: 0;
+    }
+    .nav-hamburger span {
+      display: block;
+      height: 2px;
+      background: var(--secondary);
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease;
+      transform-origin: center;
+    }
+    /* Animate to × when open */
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile menu — slides in from right */
+    .mobile-menu {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: 78vw;
+      max-width: 320px;
+      z-index: 490;
+      background: var(--bg);
+      box-shadow: -8px 0 32px rgba(0,0,0,0.10);
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 80px 32px 48px;
+      gap: 4px;
+      display: flex;
+      transform: translateX(100%);
+      transition: transform 0.38s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+    /* Dim overlay behind the panel */
+    .mobile-menu-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 489;
+      background: rgba(37,37,37,0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.38s ease;
+    }
+    .mobile-menu-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .mobile-menu a {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 13px;
+      text-transform: uppercase;
+      color: var(--secondary);
+      text-decoration: none;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      width: 100%;
+      letter-spacing: 0.06em;
+      opacity: 0;
+      transform: translateX(16px);
+      transition: opacity 0.3s ease, transform 0.3s ease, color 0.15s ease;
+    }
+    .mobile-menu.open a {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    /* Stagger each link */
+    .mobile-menu a:nth-child(1) { transition-delay: 0.08s; }
+    .mobile-menu a:nth-child(2) { transition-delay: 0.13s; }
+    .mobile-menu a:nth-child(3) { transition-delay: 0.18s; }
+    .mobile-menu a:nth-child(4) { transition-delay: 0.23s; }
+    .mobile-menu a:nth-child(5) { transition-delay: 0.28s; }
+    .mobile-menu a:nth-child(6) { transition-delay: 0.33s; }
+    .mobile-menu a:nth-child(7) { transition-delay: 0.38s; }
+    .mobile-menu a.active { font-weight: 700; }
+
+    /* Mobile (≤ 767px) */
+    @media (max-width: 767px) {
+      /* Nav — hide section links, show hamburger */
+      .nav { padding: 8px 16px; height: 50px; }
+      .nav-sections { display: none; }
+      .nav-hamburger { display: flex; }
+
+      /* Page */
+      .page { padding: 60px 10px 50px; }
+
+      /* Card */
+      .card { border-radius: 16px; }
+
+      /* Hero */
+      .cs-hero { padding: 24px 18px 20px; gap: 12px; }
+      .designation-row { flex-wrap: wrap; gap: 6px; }
+      .desig-pill { font-size: 10px; padding: 4px 10px; }
+      .cs-heading { font-size: 22px; line-height: 32px; }
+      .cs-subtitle { font-size: 14px; line-height: 22px; }
+
+      /* Carousel */
+      .cs-carousel-section { padding: 0 0 32px; }
+      .carousel-viewport { height: 210px; }
+      .fan-card { width: 260px; height: 169px; border-radius: 12px; }
+      .carousel-caption { font-size: 10px; padding: 0 16px; }
+
+      /* Section wrapper */
+      .cs-section-wrap { padding: 0 10px 20px; }
+
+      /* Team & Role card */
+      .tr-card { gap: 18px; padding: 14px; }
+      .tr-top { flex-direction: row; gap: 14px; align-items: flex-start; }
+      .tr-image-frame { width: 72px; height: 90px; flex-shrink: 0; }
+      .tr-image-frame img { width: 110px; height: 110px; left: -19px; }
+      .tr-label { font-size: 11px; }
+      .tr-desc { font-size: 14px; line-height: 22px; }
+      .tr-bullet { width: 8px; height: 8px; }
+      .tr-bullet-wrap { padding: 8px 0; }
+      .tr-highlight { font-size: 14px; line-height: 20px; }
+      .tr-item-desc { font-size: 13px; line-height: 20px; } /* mobile keeps compact */
+      .tr-mixed { font-size: 13px; line-height: 20px; }
+      .tr-mixed-mono { font-size: 13px; line-height: 20px; }
+    }
+
+    /* ─── IMPACT SECTION ─────────────────────────────────────── */
+    .imp-card {
+      border: 1px solid #efefef;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      background: #fff;
+      box-shadow: inset 0px 0px 4px 0px rgba(0,0,0,0.08);
+    }
+
+    /* Top header row */
+    .imp-top {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    .imp-header {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+    .imp-image-frame {
+      width: 100px;
+      height: 150px;
+      border-radius: 10px 0 0 0;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      background: #fff;
+    }
+    .imp-image-frame img {
+      position: absolute;
+      left: -85px;
+      top: -4px;
+      width: 270px;
+      height: 154px;
+      object-fit: cover;
+      filter: grayscale(1) contrast(1.08);
+    }
+    .imp-image-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.28;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+    .imp-header-text {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+    .imp-label {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 15px;
+      color: #515151;
+    }
+    .imp-desc {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 30px;
+      color: var(--secondary);
+    }
+
+    /* Metrics grid */
+    .imp-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    .imp-row {
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
+    }
+    .imp-metric {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+    .imp-num {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 20px;
+      color: #515151;
+    }
+    /* Inline metric title — highlighted part + plain part side by side */
+    .imp-title {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    .imp-title-plain {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 30px;
+      color: var(--secondary);
+      white-space: nowrap;
+    }
+    /* Highlight span — same sweep pattern as tr-highlight */
+    .imp-hl {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 1;
+      color: var(--secondary);
+      white-space: nowrap;
+      background: linear-gradient(#e6f28d, #e6f28d) no-repeat left center / 0% 100%;
+      transition: background-size 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .imp-hl.revealed { background-size: 100% 100%; }
+
+    .imp-body {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 25px;
+      color: #515151;
+    }
+    .imp-footnote {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-style: italic;
+      font-size: 12px;
+      line-height: 25px;
+      color: rgba(147,147,147,0.6);
+    }
+
+    @media (max-width: 900px) {
+      /* Impact: image stays LEFT, just smaller at tablet/narrow sizes */
+      .imp-image-frame { width: 72px; height: 90px; }
+      .imp-image-frame img { left: -18px; top: -8px; width: 140px; height: 140px; }
+    }
+    @media (max-width: 767px) {
+      /* Image stays LEFT on phone too — even smaller */
+      .imp-image-frame { width: 60px; height: 75px; }
+      .imp-image-frame img { left: -14px; top: -6px; width: 110px; height: 110px; }
+      .imp-row { flex-direction: column; gap: 24px; }
+      .imp-label { font-size: 11px; }
+      .imp-desc { font-size: 14px; line-height: 22px; }
+      .imp-num { font-size: 15px; }
+      .imp-title-plain, .imp-hl { font-size: 16px; white-space: normal; }
+      .imp-body { font-size: 13px; line-height: 22px; }
+    }
+
+    /* ─── USERS & GOALS SECTION ──────────────────────────────── */
+    .ug-card {
+      border: 1px solid #efefef;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      background: #fff;
+      box-shadow: inset 0px 0px 4px 0px rgba(0,0,0,0.08);
+      /* Prevent flex children from expanding beyond card width */
+      overflow: hidden;
+      min-width: 0;
+    }
+    /* All direct flex children of ug-card must be constrained */
+    .ug-card > * { min-width: 0; width: 100%; }
+
+    /* Shared image frame pattern */
+    .ug-image-frame {
+      width: 100px;
+      height: 150px;
+      border-radius: 10px 0 0 0;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      background: #fff;
+    }
+    .ug-image-frame img {
+      position: absolute;
+      left: -91px; top: -10px;
+      width: 258px; height: 258px;
+      object-fit: cover;
+      filter: grayscale(1) contrast(1.08);
+    }
+    .ug-image-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.28;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+
+    .ug-header { display: flex; gap: 30px; align-items: center; }
+    .ug-header-text { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .ug-label { font-family: var(--font-mono); font-weight: 500; font-size: 15px; color: #515151; }
+    .ug-desc  { font-family: var(--font-heading); font-weight: 700; font-size: 20px; line-height: 30px; color: var(--secondary); }
+
+    .ug-subtitle {
+      font-family: var(--font-heading);
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 25px;
+      color: #000;
+    }
+
+    /* Two-column user role grid */
+    .ug-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 30px;
+      width: 100%;      /* grid must not exceed its parent */
+      min-width: 0;
+    }
+    /* Grid cells must not expand beyond their track */
+    .ug-cols > * { min-width: 0; overflow-wrap: break-word; word-break: break-word; }
+
+    /* Role header */
+    .ug-role-header { display: flex; flex-direction: column; gap: 5px; }
+    .ug-role-label {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 20px;
+      color: #515151;
+    }
+    .ug-role-goal {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 30px;
+      color: var(--secondary);
+    }
+
+    /* Pain / gain blocks */
+    .ug-block { display: flex; flex-direction: column; gap: 5px; }
+    .ug-tag {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 1.4;
+      color: var(--secondary);
+      padding: 0;
+      align-self: flex-start;
+    }
+    /* Pink pain highlight */
+    .ug-tag-pain {
+      background: linear-gradient(#f0cecf, #f0cecf) no-repeat left center / 0% 100%;
+      transition: background-size 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .ug-tag-pain.revealed { background-size: 100% 100%; }
+    /* Yellow gain highlight */
+    .ug-tag-gain {
+      background: linear-gradient(#e6f28d, #e6f28d) no-repeat left center / 0% 100%;
+      transition: background-size 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .ug-tag-gain.revealed { background-size: 100% 100%; }
+
+    .ug-body {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 25px;
+      color: #515151;
+    }
+
+    /* Arrow between pain → gain */
+    .ug-arrow {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      color: var(--secondary);
+      line-height: 1;
+    }
+
+    /* Collapse to 1 column on tablets + phones (≤ 900px)
+       Re-order grid items so full Educators story comes first,
+       then full Content Designers story — not interleaved by row. */
+    @media (max-width: 900px) {
+      /* Switch grid → flex column so CSS order works */
+      .ug-cols {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      /* ── EDUCATORS block (order 1–4) ── */
+      .ug-cols > *:nth-child(1) { order: 1; } /* Educators header  */
+      .ug-cols > *:nth-child(3) { order: 2; } /* Educators pain    */
+      .ug-cols > *:nth-child(5) { order: 3; } /* Educators arrow   */
+      .ug-cols > *:nth-child(7) { order: 4; } /* Educators gain    */
+      /* ── CONTENT DESIGNERS block (order 5–8) ── */
+      .ug-cols > *:nth-child(2) { order: 5; } /* CD header         */
+      .ug-cols > *:nth-child(4) { order: 6; } /* CD pain           */
+      .ug-cols > *:nth-child(6) { order: 7; } /* CD arrow          */
+      .ug-cols > *:nth-child(8) { order: 8; } /* CD gain           */
+      /* Image stays LEFT of heading — just smaller */
+      .ug-image-frame { width: 72px; height: 90px; border-radius: 10px 0 0 0; }
+      .ug-image-frame img { left: -20px; top: -10px; width: 140px; height: 140px; }
+    }
+    /* Additional type-scale reductions on phones only (≤ 767px) */
+    @media (max-width: 767px) {
+      .ug-card { padding: 16px; gap: 20px; }
+      .ug-desc { font-size: 15px; line-height: 22px; }
+      .ug-subtitle { font-size: 14px; }
+      .ug-role-goal { font-size: 15px; line-height: 22px; }
+      .ug-role-label { font-size: 11px; }
+      .ug-tag { font-size: 14px; }
+      .ug-body { font-size: 13px; line-height: 20px; }
+    }
+    /* ─── CONSTRAINTS & DESIGN APPROACH ─────────────────────── */
+    .cd-image-frame {
+      width: 100px;
+      height: 150px;
+      border-radius: 10px 0 0 0;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      background: #fff;
+    }
+    .cd-image-frame img {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(1) contrast(1.08);
+    }
+    .cd-image-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.28;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+
+    /* Arrow insight line: → highlighted phrase + plain rest */
+    .cd-insight {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 25px;
+      color: #515151;
+    }
+    .cd-hl {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 1;
+      color: var(--secondary);
+      background: linear-gradient(#e6f28d, #e6f28d) no-repeat left center / 0% 100%;
+      transition: background-size 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .cd-hl.revealed { background-size: 100% 100%; }
+
+    /* Design Approach quote block */
+    .cd-blockquote {
+      background: #F7F7F7;
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 25px;
+      color: #515151;
+      font-style: italic;
+    }
+
+    @media (max-width: 767px) {
+      .cd-image-frame { width: 72px; height: 90px; }
+      .cd-blockquote { font-size: 13px; line-height: 22px; padding: 12px 14px; }
+      .cd-insight { font-size: 13px; }
+    }
+
+    /* ─── OUTCOMES SECTION ───────────────────────────────────── */
+    .oc-card {
+      border: 1px solid #efefef;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      background: #fff;
+      box-shadow: inset 0px 0px 4px 0px rgba(0,0,0,0.08);
+    }
+    .oc-image-frame {
+      width: 100px;
+      height: 150px;
+      border-radius: 10px 0 0 0;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      background: #fff;
+    }
+    .oc-image-frame img {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(1) contrast(1.08);
+    }
+    .oc-image-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.28;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+    .oc-header { display: flex; gap: 30px; align-items: center; }
+    .oc-header-text { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .oc-label {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 15px;
+      color: #515151;
+    }
+    .oc-desc {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 30px;
+      color: var(--secondary);
+    }
+
+    /* 2×2 metrics grid */
+    .oc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px 40px;
+    }
+    .oc-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .oc-metric-label {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 15px;
+      color: #515151;
+    }
+    .oc-metric-value {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 1;
+      color: var(--secondary);
+      background: linear-gradient(#e6f28d, #e6f28d) no-repeat left center / 0% 100%;
+      transition: background-size 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+      align-self: flex-start;
+      padding: 2px 0;
+    }
+    .oc-metric-value.revealed { background-size: 100% 100%; }
+    .oc-metric-body {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 25px;
+      color: #515151;
+    }
+
+    /* Testimonials — infinite RTL auto-scroll strip */
+    .oc-section-title {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 15px;
+      color: #515151;
+    }
+    .oc-testimonials-strip {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    .oc-testimonials-track {
+      display: flex;
+      gap: 20px;
+      will-change: transform;
+    }
+    .oc-testimonial {
+      flex-shrink: 0;
+      width: 500px;
+      border: 1px solid #efefef;
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: #fff;
+    }
+    .oc-author {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .oc-author-name {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--secondary);
+    }
+    .oc-author-role {
+      font-family: var(--font-heading);
+      font-weight: 400;
+      font-size: 13px;
+      color: #515151;
+    }
+    .oc-quote {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 13px;
+      line-height: 22px;
+      color: #515151;
+      font-style: italic;
+    }
+
+    @media (max-width: 900px) {
+      /* Outcomes: image stays LEFT, smaller */
+      .oc-image-frame { width: 72px; height: 90px; }
+    }
+    @media (max-width: 767px) {
+      /* Image stays LEFT on phone */
+      .oc-image-frame { width: 60px; height: 75px; }
+      .oc-grid { grid-template-columns: 1fr; gap: 24px; }
+      .oc-testimonial { width: 300px; }
+      .oc-desc { font-size: 14px; line-height: 22px; }
+      .oc-metric-value { font-size: 16px; }
+      .oc-metric-label, .oc-metric-body { font-size: 13px; }
+    }
+
+    /* ─── THANK YOU BAR ─────────────────────────────────────── */
+    .cs-thankyou {
+      background: #E6F28D;
+      width: 100%;
+      padding: 10px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cs-thankyou-text {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      color: var(--secondary);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── CURSOR ────────────────────────────────────────────── -->
+  <div id="customCursor">
+    <div id="dragLabel">Hold &amp;<br>Drag</div>
+  </div>
+
+  <!-- ── NAV — 191:14841 ───────────────────────────────────── -->
+  <nav class="nav">
+    <a href="index.html" class="nav-home">
+      <img src="cs-nav-logo.svg" alt="" />
+      <span>EverTutor Studio</span>
+    </a>
+    <div class="nav-sections">
+      <a href="#overview"    class="nav-btn active" data-section="overview">OVERVIEW</a>
+      <a href="#team-role"   class="nav-btn"         data-section="team-role">Team &amp; Role</a>
+      <a href="#impact"      class="nav-btn"         data-section="impact">IMPACT</a>
+      <a href="#users-goals" class="nav-btn"         data-section="users-goals">Users &amp; Goals</a>
+      <a href="#constraints" class="nav-btn"         data-section="constraints">Constraints &amp; Design Tradeoffs</a>
+      <a href="#design"      class="nav-btn"         data-section="design">Design Approach</a>
+      <a href="#outcomes"    class="nav-btn"         data-section="outcomes">OUTCOMES</a>
+    </div>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ── MOBILE MENU ────────────────────────────────────────── -->
+  <div class="mobile-menu-backdrop" id="menuBackdrop"></div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#overview"    data-section="overview">Overview</a>
+    <a href="#team-role"   data-section="team-role">Team &amp; Role</a>
+    <a href="#impact"      data-section="impact">Impact</a>
+    <a href="#users-goals" data-section="users-goals">Users &amp; Goals</a>
+    <a href="#constraints" data-section="constraints">Constraints &amp; Design Tradeoffs</a>
+    <a href="#design"      data-section="design">Design Approach</a>
+    <a href="#outcomes"    data-section="outcomes">Outcomes</a>
+  </div>
+
+  <!-- ── PAGE (dot-grid shows around the card) ─────────────── -->
+  <div class="page">
+    <div class="card">
+
+      <section id="overview">
+
+        <!-- ── Frame 1: Hero Section and Designation Frame ── -->
+        <div class="cs-hero">
+          <div class="designation-row" id="desigRow">
+            <span class="desig-pill">Lead Product Designer</span>
+            <span class="desig-pill">Lead Curriculum Designer</span>
+            <span class="desig-pill"><span class="status-dot"></span>2025 - Present</span>
+          </div>
+
+          <!-- Word-by-word animated heading -->
+          <div class="cs-heading" id="csHeading">
+            Architected a system that reduced lesson creation from <em>100+ hours to 4 hours.</em>
+          </div>
+
+          <!-- Subtitle (Montserrat Bold 25px per Figma) -->
+          <p class="cs-subtitle" id="csSubtitle">
+            Enabling non-technical educators to build structured AI Tutor experiences at scale.
+          </p>
+        </div>
+
+        <!-- ── Frame 2: Carousel Frame — drag fan carousel ── -->
+        <div class="cs-carousel-section" id="csCarouselSection">
+          <div class="carousel-viewport" id="carouselViewport">
+            <!-- fan cards injected by JS -->
+          </div>
+          <p class="carousel-caption">Images of Core Studio Experience &amp; Lessons created on studio</p>
+        </div>
+
+      </section>
+
+      <!-- ── Team & Role ─────────────────────────────────────── -->
+      <section id="team-role">
+        <div class="cs-section-wrap" id="teamRoleWrap">
+          <div class="tr-card">
+
+            <!-- Top: image + label + description -->
+            <div class="tr-top tr-anim">
+              <div class="tr-image-frame">
+                <img src="cs-team-image.jpg" alt="Team" />
+              </div>
+              <div class="tr-top-text">
+                <p class="tr-label">Team &amp; Role</p>
+                <p class="tr-desc">Led the design and development of Studio as a 0→1 system in a lean team, taking ownership across product, pedagogy, and execution to make AI-powered lesson creation work end-to-end.</p>
+              </div>
+            </div>
+
+            <!-- Bullet 1: Lead Product & Curriculum Designer -->
+            <div class="tr-item tr-anim">
+              <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+              <div class="tr-item-content">
+                <div class="tr-highlight-row">
+                  <span class="tr-highlight" id="trHighlight">Lead Product &amp; Curriculum Designer (Me)</span>
+                  <img class="tr-avatar" src="photo.jpg" alt="Bhanu" />
+                </div>
+                <p class="tr-mixed-mono">Defined the core system architecture and end-to-end product experience, and validated it by creating real lessons used in production.</p>
+              </div>
+            </div>
+
+            <!-- Bullet 2: Engineers -->
+            <div class="tr-item tr-anim">
+              <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+              <div class="tr-item-content">
+                <p class="tr-mixed">Engineers (2–3) - <span class="tr-mixed-mono">Built the Studio platform and AI Tutor system enabling real-time lesson delivery</span></p>
+              </div>
+            </div>
+
+            <!-- Bullet 3: Product Manager -->
+            <div class="tr-item tr-anim">
+              <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+              <div class="tr-item-content">
+                <p class="tr-mixed">Product Manager / Founder - <span class="tr-mixed-mono">Drove product direction and pilot rollout with schools</span></p>
+              </div>
+            </div>
+
+            <!-- Next footer -->
+            <p class="tr-next tr-anim"><span class="tr-arrow">↓</span> Next <span class="tr-next-text">The impact we delivered at scale</span></p>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Impact ─────────────────────────────────────────── -->
+      <section id="impact">
+        <div class="cs-section-wrap" id="impactWrap">
+          <div class="imp-card">
+
+            <!-- Header -->
+            <div class="imp-top">
+              <div class="imp-header tr-anim">
+                <div class="imp-image-frame">
+                  <img src="cs-impact-image.jpg" alt="Impact" />
+                </div>
+                <div class="imp-header-text">
+                  <p class="imp-label">IMPACT</p>
+                  <p class="imp-desc">Reduced lesson creation from ~100+ hours to 4, enabling rapid content production and giving educators direct control over how the AI Tutor teaches.</p>
+                </div>
+              </div>
+
+              <!-- Metrics grid -->
+              <div class="imp-grid">
+                <!-- Row 1 -->
+                <div class="imp-row tr-anim">
+                  <div class="imp-metric">
+                    <p class="imp-num">01</p>
+                    <div class="imp-title">
+                      <span class="imp-hl">96% faster</span>
+                      <span class="imp-title-plain">lesson creation</span>
+                    </div>
+                    <p class="imp-body">Reduced creation time from ~100 hours to ~4 hours by replacing fragmented tools with a single, structured system.</p>
+                  </div>
+                  <div class="imp-metric">
+                    <p class="imp-num">02</p>
+                    <div class="imp-title">
+                      <span class="imp-hl">95% faster</span>
+                      <span class="imp-title-plain">onboarding</span>
+                    </div>
+                    <p class="imp-body">Content designers ramped in ~2 hours vs 40–50 hours, enabled by familiar, low-friction interactions.</p>
+                    <p class="imp-footnote">Calculated first creation to publish time</p>
+                  </div>
+                  <div class="imp-metric">
+                    <p class="imp-num">03</p>
+                    <div class="imp-title">
+                      <span class="imp-title-plain">Designed to scale</span>
+                      <span class="imp-hl">from day 1</span>
+                    </div>
+                    <p class="imp-body">Enabled new features and lesson types without redesigning core workflows, reducing long-term product complexity.</p>
+                  </div>
+                </div>
+                <!-- Row 2 -->
+                <div class="imp-row tr-anim">
+                  <div class="imp-metric">
+                    <p class="imp-num">04</p>
+                    <div class="imp-title">
+                      <span class="imp-title-plain">Gave control</span>
+                      <span class="imp-hl">back to educators</span>
+                    </div>
+                    <p class="imp-body">Teachers could define how the AI Tutor teaches—controlling pacing, explanations, and scaffolding.</p>
+                  </div>
+                  <div class="imp-metric">
+                    <p class="imp-num">05</p>
+                    <div class="imp-title">
+                      <span class="imp-hl">Helped secure</span>
+                      <span class="imp-title-plain">early school pilots</span>
+                    </div>
+                    <p class="imp-body">Improved ease of lesson creation helped secure ~10 school pilots, driven by strong teacher adoption and control over instruction.</p>
+                  </div>
+                  <div class="imp-metric">
+                    <p class="imp-num">06</p>
+                    <div class="imp-title">
+                      <span class="imp-title-plain">Established a</span>
+                      <span class="imp-hl">defensible moat</span>
+                    </div>
+                    <p class="imp-body">Enabled granular control over AI Tutor behavior, moving beyond static EdTech experiences.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Next footer -->
+            <p class="tr-next tr-anim"><span class="tr-arrow">↓</span> Next <span class="tr-next-text">These outcomes came from "understanding what educators are trying to achieve". Here's how we defined those goals.</span></p>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Users & Goals ──────────────────────────────────── -->
+      <section id="users-goals">
+        <div class="cs-section-wrap" id="usersGoalsWrap">
+          <div class="ug-card">
+
+            <!-- Header -->
+            <div class="ug-header tr-anim">
+              <div class="ug-image-frame">
+                <img src="cs-users-image.jpg" alt="Users & Goals" />
+              </div>
+              <div class="ug-header-text">
+                <p class="ug-label">USERS &amp; GOALS</p>
+                <p class="ug-desc">To achieve this impact, we focused on what educators and content designers are actually trying to accomplish, not just the tools they use. These goals shaped how the system needed to behave.</p>
+              </div>
+            </div>
+
+            <!-- Subtitle + columns -->
+            <div class="tr-anim">
+              <p class="ug-subtitle" style="margin-bottom:20px">Two user roles, one system</p>
+              <div class="ug-cols">
+
+                <!-- Row 1: Role headers -->
+                <div class="ug-role-header">
+                  <p class="ug-role-label">EDUCATORS</p>
+                  <p class="ug-role-goal">Personalize instruction for every student</p>
+                </div>
+                <div class="ug-role-header">
+                  <p class="ug-role-label">CONTENT DESIGNERS</p>
+                  <p class="ug-role-goal">Design and teach content in one place</p>
+                </div>
+
+                <!-- Row 2: Pain blocks -->
+                <div class="ug-block">
+                  <span class="ug-tag ug-tag-pain">Rigid, predefined content</span>
+                  <p class="ug-body">Teachers are limited to fixed lesson structures that don't adapt to individual student needs, restricting control over pacing, explanation, and scaffolding.</p>
+                </div>
+                <div class="ug-block">
+                  <span class="ug-tag ug-tag-pain">Fragmented tooling &amp; costly iteration</span>
+                  <p class="ug-body">Creating and updating lessons required switching across tools—where even small changes meant reworking multiple touch points, with limited support for math-specific content.</p>
+                </div>
+
+                <!-- Row 3: Arrows -->
+                <p class="ug-arrow">↓</p>
+                <p class="ug-arrow">↓</p>
+
+                <!-- Row 4: Gain blocks -->
+                <div class="ug-block">
+                  <span class="ug-tag ug-tag-gain">Granular control over teaching</span>
+                  <p class="ug-body">Educators can define how the AI Tutor teaches—personalizing instruction, pacing, and support to meet each student where they are.</p>
+                </div>
+                <div class="ug-block">
+                  <span class="ug-tag ug-tag-gain">Unified creation system</span>
+                  <p class="ug-body">A single place to design and teach lessons, where changes are made once and reflected everywhere, with built-in math support and simple, curriculum-specific tools.</p>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Next footer -->
+            <p class="tr-next tr-anim"><span class="tr-arrow">↓</span> Next <span class="tr-next-text">These goals came with real constraints. Here's how they shaped the system.</span></p>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Constraints & Design Tradeoffs ───────────────────── -->
+      <section id="constraints">
+        <div class="cs-section-wrap" id="constraintsWrap">
+          <div class="tr-card">
+
+            <div class="tr-top tr-anim">
+              <div class="cd-image-frame">
+                <img src="cs-constraints-image.jpg" alt="Constraints" />
+              </div>
+              <div class="tr-top-text">
+                <p class="tr-label">Constraints &amp; Design Tradeoffs</p>
+                <p class="tr-desc">When we started designing Studio, we initially aimed to support even the most complex lessons, but real constraints forced us to make deliberate tradeoffs.</p>
+              </div>
+            </div>
+
+            <div class="tr-item tr-anim">
+              <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+              <div class="tr-item-content">
+                <p class="tr-mixed">Extreme production time vs need for scale</p>
+                <p class="tr-item-desc">Creating a single lesson took ~110 hours end-to-end—making it impossible to scale. To support real classrooms, this needed to be reduced to &lt;5 hours per lesson—without compromising pedagogy.</p>
+                <p class="cd-insight">→ <span class="cd-hl">Design for speed</span> without breaking instructional quality</p>
+              </div>
+            </div>
+
+            <div class="tr-item tr-anim">
+              <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+              <div class="tr-item-content">
+                <p class="tr-mixed">Aggressive timeline driven by real demand</p>
+                <p class="tr-item-desc">Early prototypes generated strong interest from schools, creating immediate demand to support real curriculum. For V0, we had ~12 hours from initial collaborative sketching to developer handoff.</p>
+                <p class="cd-insight">→ <span class="cd-hl">Focus on what must work,</span> not everything that could</p>
+              </div>
+            </div>
+
+            <div class="tr-item tr-anim">
+              <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+              <div class="tr-item-content">
+                <p class="tr-mixed">Need for deep control without increasing complexity</p>
+                <p class="tr-item-desc">We wanted to give educators and content designers full control over lessons, but increasing flexibility risked making the system harder to use.</p>
+                <p class="cd-insight">→ <span class="cd-hl">Balance flexibility</span> with structured simplicity</p>
+              </div>
+            </div>
+
+            <div class="tr-item tr-anim">
+              <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+              <div class="tr-item-content">
+                <p class="tr-mixed">Gap between lesson creation and how it is taught</p>
+                <p class="tr-item-desc">Designing lessons wasn&apos;t enough—the system also needed to ensure the AI Tutor delivers instruction as intended.</p>
+                <p class="cd-insight">→ <span class="cd-hl">Align how lessons are created</span> with how they are taught</p>
+              </div>
+            </div>
+
+            <div class="tr-item tr-anim">
+              <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+              <div class="tr-item-content">
+                <p class="tr-mixed">Lack of support for math-specific content creation</p>
+                <p class="tr-item-desc">Supporting fractions, algebra, geometry, and more introduced challenges that typical content tools like PowerPoint, Google Slides, Canva and more don&apos;t handle effectively.</p>
+                <p class="cd-insight">→ <span class="cd-hl">Build native support</span> for math content</p>
+              </div>
+            </div>
+
+            <p class="tr-next tr-anim"><span class="tr-arrow">↓</span> Next <span class="tr-next-text">How I approached the design to turn these constraints into a working system.</span></p>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Design Approach ────────────────────────────────────── -->
+      <section id="design">
+        <div class="cs-section-wrap" id="designWrap">
+          <div class="tr-card">
+
+            <div class="tr-top tr-anim">
+              <div class="cd-image-frame">
+                <img src="cs-design-image.jpg" alt="Design Approach" />
+              </div>
+              <div class="tr-top-text">
+                <p class="tr-label">Design Approach</p>
+                <p class="tr-desc">Given these constraints, the goal was to design a system that could scale lesson creation from ~110 hrs → &lt;5 hrs, without compromising pedagogy or increasing complexity.</p>
+              </div>
+            </div>
+
+            <div class="tr-items-connected">
+
+              <div class="tr-item tr-anim">
+                <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+                <div class="tr-item-content">
+                  <p class="tr-mixed">Learn from real teaching, not assumptions</p>
+                  <p class="tr-item-desc">Worked directly with tutors, took live lessons, and learned how effective lessons are structured and delivered.</p>
+                  <p class="cd-insight">→ <span class="cd-hl">Mapped real teaching</span> behavior into the system</p>
+                </div>
+              </div>
+
+              <div class="tr-item tr-anim">
+                <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+                <div class="tr-item-content">
+                  <p class="tr-mixed">Borrow familiar interaction patterns</p>
+                  <p class="tr-item-desc">Took inspiration from tools like Canva to reduce cognitive load and make the system intuitive.</p>
+                  <p class="cd-insight">→ <span class="cd-hl">Enabled fast onboarding</span> with minimal training</p>
+                </div>
+              </div>
+
+              <div class="tr-item tr-anim">
+                <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+                <div class="tr-item-content">
+                  <p class="tr-mixed">Design a flow-based lesson system</p>
+                  <p class="tr-item-desc">Designed a structured flow system where each step controls how the AI Tutor behaves and progresses.</p>
+                  <div class="cd-blockquote">"Instead of static slides, lessons were structured using an "appearance order" system, allowing educators to control what the AI Tutor says, how it behaves, and how content unfolds step-by-step during instruction."</div>
+                  <p class="cd-insight">→ <span class="cd-hl">Turned lessons into structured,</span> controllable systems</p>
+                </div>
+              </div>
+
+              <div class="tr-item tr-anim">
+                <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+                <div class="tr-item-content">
+                  <p class="tr-mixed">Validate with real users early</p>
+                  <p class="tr-item-desc">Tested with tutors and content designers by creating real lessons and identifying friction points.</p>
+                  <p class="cd-insight">→ <span class="cd-hl">Refined usability</span> and pedagogy early</p>
+                </div>
+              </div>
+
+              <div class="tr-item tr-anim">
+                <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
+                <div class="tr-item-content">
+                  <p class="tr-mixed">Dogfood to uncover real bottlenecks</p>
+                  <p class="tr-item-desc">Created 15+ lessons end-to-end to stress-test the system and identify bottlenecks in reducing creation time.</p>
+                  <p class="cd-insight">→ <span class="cd-hl">Removed friction</span> and simplified the creation workflow</p>
+                </div>
+              </div>
+
+            </div><!-- /tr-items-connected -->
+
+            <p class="tr-next tr-anim"><span class="tr-arrow">↓</span> Next <span class="tr-next-text">The measurable impact on lesson creation speed and scalability</span></p>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Outcomes ───────────────────────────────────────────── -->
+      <section id="outcomes">
+        <div class="cs-section-wrap" id="outcomesWrap">
+          <div class="oc-card">
+
+            <div class="oc-header tr-anim">
+              <div class="oc-image-frame">
+                <img src="cs-outcomes-image.jpg" alt="Outcomes" />
+              </div>
+              <div class="oc-header-text">
+                <p class="oc-label">Outcomes</p>
+                <p class="oc-desc">Studio didn&apos;t just reduce lesson creation time, it changed how lessons are designed, taught, and scaled across classrooms.</p>
+              </div>
+            </div>
+
+            <div class="oc-grid tr-anim">
+              <div class="oc-metric">
+                <p class="oc-metric-label">Lesson creation time</p>
+                <span class="oc-metric-value">~110 hrs → ~4 hrs</span>
+                <p class="oc-metric-body">Most of the time previously spent building lessons was eliminated—shifting effort from manual creation to refining instruction.</p>
+              </div>
+              <div class="oc-metric">
+                <p class="oc-metric-label">Content production at scale</p>
+                <span class="oc-metric-value">~700 lessons in ~3,128 hours</span>
+                <p class="oc-metric-body">What was previously infeasible became repeatable—validating the system&apos;s ability to scale content creation in real conditions.</p>
+              </div>
+              <div class="oc-metric">
+                <p class="oc-metric-label">Control over pedagogy</p>
+                <span class="oc-metric-value">Restored control to educators</span>
+                <p class="oc-metric-body">Teachers can now define how the AI Tutor teaches—controlling explanation, pacing, and scaffolding in real time.</p>
+              </div>
+              <div class="oc-metric">
+                <p class="oc-metric-label">System flexibility</p>
+                <span class="oc-metric-value">Subject-agnostic by design</span>
+                <p class="oc-metric-body">Validated across pilots in English and Physics—proving the system can scale beyond math without redesigning workflows.</p>
+              </div>
+            </div>
+
+            <div class="tr-anim">
+              <p class="oc-section-title" style="margin-bottom:16px">What educators &amp; designers say</p>
+              <div class="oc-testimonials-strip" id="testimonialsStrip">
+                <div class="oc-testimonials-track" id="testimonialsTrack"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Thank You bar ──────────────────────────────────── -->
+      <div class="cs-thankyou">
+        <span class="cs-thankyou-text">✦ THANK_YOU</span>
+      </div>
+
+    </div><!-- /card -->
+  </div><!-- /page -->
+
+
+  <script>
+  /* ═══════════════════════════════════════════════════════════
+     CUSTOM CURSOR
+  ═══════════════════════════════════════════════════════════ */
+  const cursor    = document.getElementById('customCursor');
+  const dragLabel = document.getElementById('dragLabel');
+
+  const mainCard = document.querySelector('.card');
+  document.addEventListener('mousemove', e => {
+    // Snap directly — no lerp lag
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+    // Switch between solid (#252525) on dot-bg and difference on white card
+    if (!cursor.classList.contains('drag-mode')) {
+      const r = mainCard.getBoundingClientRect();
+      const over = e.clientX >= r.left && e.clientX <= r.right &&
+                   e.clientY >= r.top  && e.clientY <= r.bottom;
+      cursor.classList.toggle('on-card', over);
+    }
+  });
+
+  // Hide custom cursor only when directly over a clickable nav element (pointer takes over)
+  // The empty space between logo and nav items keeps the dot cursor visible
+  document.querySelectorAll('.nav-btn, .nav-home').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.opacity = '0';
+      cursor.style.transition = 'none';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transition = '';
+      cursor.style.opacity = '1';
+    });
+  });
+
+  document.querySelectorAll('a, button').forEach(el => {
+    // Skip nav clickable elements — they use native pointer cursor
+    if (el.closest('.nav-btn') || el.closest('.nav-home') || el.classList.contains('nav-btn')) return;
+    el.addEventListener('mouseenter', () => { if (!cursor.classList.contains('drag-mode')) cursor.classList.add('hovered'); });
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+  });
+
+  const carouselViewport = document.getElementById('carouselViewport');
+  carouselViewport.addEventListener('mouseenter', () => {
+    cursor.classList.remove('hovered');
+    cursor.classList.add('drag-mode');
+    dragLabel.classList.add('visible');
+  });
+  carouselViewport.addEventListener('mouseleave', () => {
+    if (!isDragging) {
+      cursor.classList.remove('drag-mode');
+      dragLabel.classList.remove('visible');
+    }
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     WORD-BY-WORD ANIMATION
+     Splits heading text nodes into .word spans, preserving <em>
+  ═══════════════════════════════════════════════════════════ */
+  function splitWords(el) {
+    const nodes = Array.from(el.childNodes);
+    el.innerHTML = '';
+    nodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        node.textContent.split(/(\s+)/).forEach(chunk => {
+          if (/^\s+$/.test(chunk)) {
+            el.appendChild(document.createTextNode(chunk));
+          } else if (chunk) {
+            const s = document.createElement('span');
+            s.className = 'word'; s.textContent = chunk;
+            el.appendChild(s);
+          }
+        });
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        // preserve <em> — split its words too
+        const em = node.cloneNode(false);
+        node.textContent.trim().split(/\s+/).forEach((w, i, a) => {
+          const s = document.createElement('span');
+          s.className = 'word'; s.textContent = w;
+          em.appendChild(s);
+          if (i < a.length - 1) em.appendChild(document.createTextNode(' '));
+        });
+        el.appendChild(em);
+      }
+    });
+  }
+
+  const csHeading  = document.getElementById('csHeading');
+  const csSubtitle = document.getElementById('csSubtitle');
+  const desigRow   = document.getElementById('desigRow');
+  const carouselSec = document.getElementById('csCarouselSection');
+
+  splitWords(csHeading);
+  const allWords = csHeading.querySelectorAll('.word');
+
+  // Stagger: pills → words → subtitle → carousel
+  setTimeout(() => desigRow.classList.add('visible'), 80);
+  allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 260 + i * 52));
+  const afterWords = 260 + allWords.length * 52 + 60;
+  setTimeout(() => csSubtitle.classList.add('visible'),  afterWords);
+  setTimeout(() => carouselSec.classList.add('visible'), afterWords + 280);
+
+  /* ═══════════════════════════════════════════════════════════
+     FAN CAROUSEL — infinite loop, one image per drag gesture
+     ─────────────────────────────────────────────────────────
+     Infinite-loop trick: animate floatOffset to ±1, then after
+     the transition silently rotate the images[] array and reset
+     floatOffset to 0. The "hidden" outer slots (±3) absorb the
+     jump invisibly because they're fully transparent.
+  ═══════════════════════════════════════════════════════════ */
+
+  // Mutable circular buffer — rotate on each snap so center is always slot HALF
+  // Center image must be at index HALF (= 3) — that is the slot render() maps to position 0
+  let images = [
+    'cs-slide-04.jpg',        // slot 0  (−3 from center, nearly transparent)
+    'cs-slide-05.jpg',        // slot 1  (−2)
+    'cs-slide-06.jpg',        // slot 2  (−1)
+    'cs-overlay-center.jpg',  // slot 3  (CENTER = HALF)
+    'cs-slide-01.jpg',        // slot 4  (+1)
+    'cs-slide-02.jpg',        // slot 5  (+2)
+    'cs-slide-03.jpg',        // slot 6  (+3, nearly transparent)
+  ];
+
+  const N           = images.length; // 7
+  const HALF        = Math.floor(N / 2); // 3 — center slot index
+  const isMobile    = window.innerWidth < 768;
+  const GAP         = isMobile ? 155 : 210;   // center-to-center px
+  const SCALE_STEP  = 0.165;
+  const MIN_SCALE   = 0.55;
+  const DRAG_THR    = 55;    // min px to commit a snap
+
+  function levelOpacity(absRel) {
+    if (absRel < 0.01) return 1;
+    if (absRel <= 1)   return 1 - absRel * 0.5;
+    if (absRel <= 2)   return 0.5 - (absRel - 1) * 0.2;
+    return Math.max(0, 0.3 - (absRel - 2) * 0.3);
+  }
+  function levelBlur(absRel) {
+    if (absRel < 0.01) return 0;
+    if (absRel <= 1)   return absRel * 4;
+    return 4 + (absRel - 1) * 5;
+  }
+
+  // Build N DOM card elements (slot i always shows images[i])
+  const viewport  = document.getElementById('carouselViewport');
+  const fanCards  = images.map((src, i) => {
+    const div = document.createElement('div');
+    div.className = 'fan-card';
+    const img = document.createElement('img');
+    img.src = src; img.alt = ''; img.draggable = false;
+    div.appendChild(img);
+    viewport.appendChild(div);
+    return div;
+  });
+
+  let floatOffset = 0;    // visual offset in slot-units (0 = no drag)
+  let isDragging  = false;
+  let isAnimating = false;
+  let pointerStartX = 0;
+  let lastDragX   = 0;
+  const ANIM_MS   = 400;  // must match CSS transition duration
+
+  function refreshImages() {
+    fanCards.forEach((card, i) => {
+      card.querySelector('img').src = images[i];
+    });
+  }
+
+  function render(animated) {
+    fanCards.forEach((card, slot) => {
+      const rel    = (slot - HALF) - floatOffset;
+      const absRel = Math.abs(rel);
+      const scale  = Math.max(MIN_SCALE, 1 - absRel * SCALE_STEP);
+      const tx     = rel * GAP;
+      const op     = levelOpacity(absRel);
+      const blur   = levelBlur(absRel);
+      const z      = 10 - Math.round(absRel);
+
+      card.style.transition = animated
+        ? `transform ${ANIM_MS}ms cubic-bezier(0.22,0.61,0.36,1), opacity ${ANIM_MS}ms ease, filter ${ANIM_MS}ms ease`
+        : 'none';
+      card.style.transform = `translateX(calc(-50% + ${tx}px)) translateY(-50%) scale(${scale})`;
+      card.style.opacity   = String(op);
+      card.style.filter    = blur > 0 ? `blur(${blur.toFixed(1)}px)` : '';
+      card.style.zIndex    = String(Math.max(0, z));
+    });
+  }
+
+  /*
+    snapBy(delta): advance +1 or -1 image
+    Phase 1 — animate cards sliding by delta units
+    Phase 2 — after transition: rotate images[], reset offset, re-render instantly
+  */
+  function snapBy(delta) {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    floatOffset = delta;   // e.g. +1: cards slide left by 1 GAP
+    render(true);          // CSS transition kicks in
+
+    setTimeout(() => {
+      // Rotate the images circular buffer (so slot HALF always = center)
+      if (delta > 0) {
+        // advanced forward: push front image to back
+        images.push(images.shift());
+      } else {
+        // went backward: bring back image to front
+        images.unshift(images.pop());
+      }
+      floatOffset = 0;   // reset offset — instant, same visual positions
+      refreshImages();   // update srcs on newly-positioned slots
+      render(false);     // apply positions instantly (no transition)
+      isAnimating = false;
+    }, ANIM_MS + 10);
+  }
+
+  function snapBack() {
+    floatOffset = 0;
+    render(true);
+  }
+
+  /* ── Pointer / Touch events ─────────────────────────────── */
+  function onDragStart(px) {
+    if (isAnimating) return;
+    isDragging    = true;
+    pointerStartX = px;
+    lastDragX     = px;
+  }
+
+  function onDragMove(px) {
+    if (!isDragging) return;
+    lastDragX   = px;
+    floatOffset = -(px - pointerStartX) / GAP; // neg drag = positive offset = advance
+    render(false);
+  }
+
+  function onDragEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    const dragPx = lastDragX - pointerStartX;
+
+    if (dragPx < -DRAG_THR) {
+      snapBy(+1);  // dragged left → next image
+    } else if (dragPx > DRAG_THR) {
+      snapBy(-1);  // dragged right → previous image
+    } else {
+      snapBack();  // small drag → snap back
+    }
+
+    if (!viewport.matches(':hover')) {
+      cursor.classList.remove('drag-mode');
+      dragLabel.classList.remove('visible');
+    }
+  }
+
+  /* Mouse */
+  viewport.addEventListener('mousedown', e => { onDragStart(e.clientX); e.preventDefault(); });
+  document.addEventListener('mousemove', e => { if (isDragging) onDragMove(e.clientX); });
+  document.addEventListener('mouseup',   () => onDragEnd());
+
+  /* Touch */
+  viewport.addEventListener('touchstart', e => onDragStart(e.touches[0].clientX), { passive: true });
+  viewport.addEventListener('touchmove',  e => { if (isDragging) onDragMove(e.touches[0].clientX); }, { passive: true });
+  viewport.addEventListener('touchend',   () => onDragEnd());
+
+  /* Mobile auto-play — advances one image every 3s, pauses on touch, resumes after */
+  if (isMobile) {
+    let autoPlay;
+    const startAuto = () => {
+      autoPlay = setInterval(() => {
+        if (!isDragging && !isAnimating) snapBy(+1);
+      }, 3000);
+    };
+    startAuto();
+    viewport.addEventListener('touchstart', () => clearInterval(autoPlay), { passive: true });
+    viewport.addEventListener('touchend',   () => { setTimeout(startAuto, 1500); });
+  }
+
+  /* Initial render */
+  render(false);
+
+  /* ═══════════════════════════════════════════════════════════
+     SECTION ENTRANCE ANIMATIONS (staggered fade + rise)
+  ═══════════════════════════════════════════════════════════ */
+  // Wrapper observer — just reveals the container so no empty card flashes
+  const wrapObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('triggered');
+      wrapObs.unobserve(e.target);
+    });
+  }, { threshold: 0.10 }); // low threshold — just enough to unhide the shell
+  document.querySelectorAll('.cs-section-wrap').forEach(el => wrapObs.observe(el));
+
+  // Child observer — each .tr-anim fires individually as it enters view
+  const childObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      el.classList.add('visible');
+
+      // Sweep highlights inside this specific element once it's visible
+      if (el.id === 'trHighlight' || el.closest('#teamRoleWrap')) {
+        const hl = document.getElementById('trHighlight');
+        if (hl && el.contains(hl)) setTimeout(() => hl.classList.add('revealed'), 550);
+      }
+      el.querySelectorAll('.imp-hl').forEach((hl, i) => {
+        setTimeout(() => hl.classList.add('revealed'), 400 + i * 100);
+      });
+      el.querySelectorAll('.ug-tag-pain').forEach((tag, i) => {
+        setTimeout(() => tag.classList.add('revealed'), 300 + i * 150);
+      });
+      el.querySelectorAll('.ug-tag-gain').forEach((tag, i) => {
+        setTimeout(() => tag.classList.add('revealed'), 550 + i * 150);
+      });
+      el.querySelectorAll('.cd-hl').forEach((hl, i) => {
+        setTimeout(() => hl.classList.add('revealed'), 400 + i * 100);
+      });
+      el.querySelectorAll('.oc-metric-value').forEach((v, i) => {
+        setTimeout(() => v.classList.add('revealed'), 300 + i * 150);
+      });
+
+      childObs.unobserve(el);
+    });
+  }, { threshold: 0.30 });
+  document.querySelectorAll('.tr-anim').forEach(el => childObs.observe(el));
+
+  /* ═══════════════════════════════════════════════════════════
+     HAMBURGER MENU
+  ═══════════════════════════════════════════════════════════ */
+  const hamburger  = document.getElementById('navHamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const backdrop   = document.getElementById('menuBackdrop');
+
+  function toggleMenu(force) {
+    const open = force !== undefined ? force : !hamburger.classList.contains('open');
+    hamburger.classList.toggle('open', open);
+    mobileMenu.classList.toggle('open', open);
+    backdrop.classList.toggle('open', open);
+  }
+
+  hamburger.addEventListener('click', () => toggleMenu());
+  backdrop.addEventListener('click', () => toggleMenu(false));
+
+  // Close on link click then smooth scroll
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      toggleMenu(false);
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) setTimeout(() => smoothScrollTo(target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight, 900), 400);
+    });
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     SMOOTH ANCHOR SCROLL — ease-in-out via JS
+  ═══════════════════════════════════════════════════════════ */
+  // Ease-out-expo: starts fast, decelerates smoothly — feels liquid not rigid
+  function easeOutExpo(t) {
+    return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
+  }
+  function smoothScrollTo(targetY, duration) {
+    const startY = window.scrollY;
+    const dist   = targetY - startY;
+    const start  = performance.now();
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      window.scrollTo(0, startY + dist * easeOutExpo(t));
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      const offset = target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight;
+      smoothScrollTo(offset, 900);
+    });
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     NAV AUTO-HIDE — hides on scroll-down, reappears on any scroll-up
+  ═══════════════════════════════════════════════════════════ */
+  const nav = document.querySelector('.nav');
+  let lastY = window.scrollY;
+  let upwardAccum = 0; // accumulated upward scroll distance
+
+  window.addEventListener('scroll', () => {
+    const currentY = window.scrollY;
+    const delta    = currentY - lastY;
+
+    // Ignore tiny jitter (< 4px)
+    if (Math.abs(delta) < 4) { lastY = currentY; return; }
+
+    if (delta > 0 && currentY > 60) {
+      // Scrolling down past the hero → hide & reset upward accumulator
+      nav.classList.add('nav-hidden');
+      upwardAccum = 0;
+    } else if (delta < 0) {
+      // Accumulate upward scroll; only reveal after 50% of viewport scrolled up
+      upwardAccum += Math.abs(delta);
+      if (upwardAccum >= window.innerHeight * 0.5) {
+        nav.classList.remove('nav-hidden');
+        upwardAccum = 0;
+      }
+    }
+
+    lastY = currentY;
+  }, { passive: true });
+
+  /* ═══════════════════════════════════════════════════════════
+     NAV SCROLL SPY
+  ═══════════════════════════════════════════════════════════ */
+  /* ═══════════════════════════════════════════════════════════
+     TESTIMONIALS — rAF-driven RTL infinite scroll (same as homepage skills bar)
+     Track layout: [COPY1][COPY2]  each = halfWidth
+     pos starts at 0, moves left each frame, resets at -halfW
+  ═══════════════════════════════════════════════════════════ */
+  const testimonials = [
+    {
+      name: 'Adam J. Stich (A.J.)',
+      role: 'Founding principal of The Greater Dayton School',
+      quote: '"Before this, our teachers had to follow fixed lesson structures, even when students struggled with specific concepts. Now, they can adjust how the AI Tutor explains things in real time. In one case, a student was stuck on fractions, and the teacher slowed down the lesson and added step-by-step guidance immediately. That flexibility has made a noticeable difference in how students stay engaged."'
+    },
+    {
+      name: 'Ushma',
+      role: 'Content Designer at SigIQ.ai',
+      quote: '"Before Studio, creating lessons meant switching between multiple tools, and even small updates took a lot of time. Now, I can build and refine everything in one place. For example, when a lesson didn\'t land well with students, I was able to adjust the flow and reteach approach the same day without reworking everything. That speed has completely changed how we iterate on content."'
+    },
+    {
+      name: 'AnuShree',
+      role: 'Content Designer at SigIQ.ai',
+      quote: '"What stood out to me was how clearly I can define how the AI Tutor behaves. Instead of writing static content, I can control how each step unfolds — what the tutor says, how it responds, and how the lesson progresses. It feels much closer to designing an actual teaching experience rather than just creating slides."'
+    },
+    {
+      name: 'Shaini',
+      role: 'Content Designer at SigIQ.ai',
+      quote: '"The biggest shift for me is iteration speed. If something doesn\'t work, I don\'t have to rebuild the lesson — I can quickly update the flow and test it again. That makes it much easier to improve lessons based on real student feedback."'
+    },
+  ];
+
+  const tTrack = document.getElementById('testimonialsTrack');
+  const tStrip = document.getElementById('testimonialsStrip');
+
+  if (tTrack && tStrip) {
+    // Build two identical copies for seamless loop
+    let tHtml = '';
+    for (let pass = 0; pass < 2; pass++) {
+      testimonials.forEach(t => {
+        tHtml += `<div class="oc-testimonial">
+          <div class="oc-author">
+            <p class="oc-author-name">${t.name}</p>
+            <p class="oc-author-role">${t.role}</p>
+          </div>
+          <p class="oc-quote">${t.quote}</p>
+        </div>`;
+      });
+    }
+    tTrack.innerHTML = tHtml;
+
+    requestAnimationFrame(() => {
+      const halfW     = tTrack.scrollWidth / 2;
+      const DURATION  = 66;   // seconds per full cycle (another 25% slower)
+      const FPS       = 60;
+      const BASE_SPD  = halfW / (DURATION * FPS);
+      const SLOW_SPD  = BASE_SPD / 12;
+      let tPos  = 0;
+      let tSpd  = BASE_SPD;
+
+      tStrip.addEventListener('mouseenter', () => {
+        const ease = setInterval(() => {
+          tSpd = Math.max(SLOW_SPD, tSpd * 0.85);
+          if (tSpd <= SLOW_SPD + 0.0001) { tSpd = SLOW_SPD; clearInterval(ease); }
+        }, 16);
+      });
+      tStrip.addEventListener('mouseleave', () => {
+        const ease = setInterval(() => {
+          tSpd = Math.min(BASE_SPD, tSpd * 1.15);
+          if (tSpd >= BASE_SPD - 0.0001) { tSpd = BASE_SPD; clearInterval(ease); }
+        }, 16);
+      });
+
+      let tRaf;
+      function animateT() {
+        tPos -= tSpd;
+        if (tPos <= -halfW) tPos += halfW;
+        tTrack.style.transform = `translateX(${tPos}px)`;
+        tRaf = requestAnimationFrame(animateT);
+      }
+      tRaf = requestAnimationFrame(animateT);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) cancelAnimationFrame(tRaf);
+        else tRaf = requestAnimationFrame(animateT);
+      });
+    });
+  }
+
+  const navBtns = document.querySelectorAll('.nav-btn[data-section]');
+  const spyObs  = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      navBtns.forEach(b => b.classList.toggle('active', b.dataset.section === e.target.id));
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('section[id]').forEach(s => spyObs.observe(s));
+  </script>
+
+</body>
+</html>

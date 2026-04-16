@@ -6,7 +6,7 @@
   <title>Bhanu — Product Designer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;1,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;1,600&family=JetBrains+Mono:wght@400;500;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 
   <style>
@@ -31,9 +31,9 @@
     /* ─── PAGE — denser, finer dot-grid ─────────────────────── */
     body {
       background-color: var(--bg);
-      /* smaller dots (0.8 px) on a tighter 19 px grid = more dots */
       background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
       background-size: 19px 19px;
+      background-attachment: fixed;   /* grid stays put as page scrolls */
       min-height: 100vh;
       font-family: var(--font-heading);
       overflow-x: hidden;
@@ -43,29 +43,33 @@
     .page {
       display: flex;
       justify-content: center;
-      padding: 70px 24px 90px;
+      padding: 94px 24px 90px; /* 54px fixed nav + 40px gap, matches case study */
     }
 
     /* ─── MAIN CARD ──────────────────────────────────────────── */
     .card {
+      position: relative;
       background: var(--white);
       width: 1200px;
       max-width: 100%;
       border-radius: 30px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
+      overflow: clip;
       display: flex;
       flex-direction: column;
       gap: 30px;
-      padding-top: 40px;
+      padding-top: 0;       /* hero gets its own top padding via .hero padding-top */
+      padding-bottom: 50px;
     }
 
     /* ─── HERO SECTION ───────────────────────────────────────── */
     .hero {
-      padding: 0 40px;
+      padding: 40px 40px 0;
       display: flex;
       flex-direction: column;
       gap: 20px;
+      /* no min-height — sections flow naturally with card gap: 30px */
+      justify-content: flex-start;
     }
 
     /* ─── GREETING / TYPING LINE ─────────────────────────────── */
@@ -144,7 +148,7 @@
       font-family: var(--font-mono);
       font-weight: 500;
       font-size: 15px;
-      line-height: 25px;
+      line-height: 30px;
       color: var(--grey);
       max-width: 717px;
     }
@@ -216,24 +220,7 @@
       user-select: none;
     }
 
-    /* ─── HEY-THERE BUBBLE ───────────────────────────────────── */
-    #heyBubble {
-      position: fixed;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.18s ease;
-      z-index: 1000;
-      background: var(--white);
-      border-radius: 40px 40px 40px 2px;   /* bottom-left sharp = tail */
-      padding: 12px 18px;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 15px;
-      color: var(--secondary);
-      white-space: nowrap;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
-      transform: translate(12px, -110%);
-    }
+    /* #heyBubble and #customCursor removed — handled by #ccPill in the unified cursor system */
 
     /* ─── SKILLS BAR ─────────────────────────────────────────── */
     .skills-bar {
@@ -329,33 +316,397 @@
       filter: grayscale(0);
     }
 
-    /* ─── CUSTOM CURSOR ─────────────────────────────────────────
-       mix-blend-mode: difference on a #252525 circle inverts
-       whatever colour sits beneath it — exactly like the reference  */
-    * { cursor: none !important; }
-
-    #customCursor {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #252525;
-      pointer-events: none;
-      z-index: 99999;
-      mix-blend-mode: difference;
-      transform: translate(-50%, -50%);
-      transition: transform 0.12s cubic-bezier(0.22, 0.61, 0.36, 1),
-                  width    0.18s cubic-bezier(0.22, 0.61, 0.36, 1),
-                  height   0.18s cubic-bezier(0.22, 0.61, 0.36, 1);
-      will-change: transform;
+    /* ─── SECTION DIVIDER — refined design-canvas selection state ─
+       White frame, muted gray guides, #AEBC48 selection border,
+       soft measurement pills. Measurement logic unchanged.
+    ──────────────────────────────────────────────────────────── */
+    .section-divider {
+      position: relative;
+      margin: 0 40px;
+      height: 160px;
+      background: #ffffff;
+      border: 1px solid #EBEBEB;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
 
-    /* Slightly larger when hovering interactive elements */
-    #customCursor.hover {
-      width: 44px;
-      height: 44px;
+    /* Full-width horizontal dashed guide */
+    .sd-guide-h {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 0;
+      border-top: 1px dashed rgba(180, 180, 180, 0.65);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Full-height vertical dashed guide */
+    .sd-guide-v {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      border-left: 1px dashed rgba(180, 180, 180, 0.65);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Selected object — centered label, prominent #AEBC48 border */
+    .sd-selected {
+      position: relative;
+      z-index: 2;
+      padding: 14px 36px;
+      border: 2px solid #AEBC48;
+      border-radius: 5px;
+      background: #ffffff;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: 0.01em;
+      color: #252525;
+      white-space: nowrap;
+    }
+
+    /* Selection handles — 11×11px squares, clearly visible, #AEBC48 */
+    .sd-handle {
+      position: absolute;
+      width: 11px;
+      height: 11px;
+      background: #ffffff;
+      border: 2px solid #AEBC48;
+      border-radius: 0;
+    }
+    .sd-handle.tl { top: -6px;  left: -6px; }
+    .sd-handle.tr { top: -6px;  right: -6px; }
+    .sd-handle.bl { bottom: -6px; left: -6px; }
+    .sd-handle.br { bottom: -6px; right: -6px; }
+
+    /* Measurement pill labels — muted, low-contrast */
+    .sd-measure {
+      position: absolute;
+      top: 50%;
+      background: #F2F2F2;
+      color: #AAAAAA;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    /* Legacy #customCursor removed — unified cursor system uses #cc */
+
+    /* ─── TOP NAV — exact same system as EverTutor Studio nav ──── */
+    .top-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      background: rgba(255, 252, 248, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0px 1px 0px 0px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 40px;
+      height: 54px;
+    }
+    .nav-logo {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--secondary);
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .nav-work {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 15px;
+      border-radius: 5px;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 12px;
+      color: var(--secondary);
+      text-decoration: none;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+    .nav-work:hover {
+      background: #F2F2F2;
+    }
+
+    /* ─── FEATURED WORK HEADER ──────────────────────────────────── */
+    .fw-header {
+      padding: 0 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .fw-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 22px;
+      color: var(--secondary);
+    }
+    .fw-desc {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 26px;
+      color: var(--grey);
+      max-width: 900px;
+    }
+
+    /* ─── CASE STUDY CARD ────────────────────────────────────────── */
+    .case-study-card {
+      margin: 0 40px;
+      background: #fff;
+      border: 1px solid rgba(37,37,37,0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Product media area — dark studio gradient, Figma spec: 1120 × 400 */
+    .product-area {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      /* Figma spec: vivid green bleeds up from the bottom ~55% of the frame;
+         upper portion is near-black.
+         Ellipse 115% wide × 95% tall centred at the bottom edge gives the
+         wide, high green spread seen in the Figma reference.              */
+      background:
+        radial-gradient(ellipse 120% 155% at 50% 116%,
+          #20f567 0%,
+          #00d050 10%,
+          #00a838 22%,
+          #005c1e 38%,
+          #002410 55%,
+          transparent 73%),
+        linear-gradient(to top, #001a08 0%, #000603 40%, #000000 65%),
+        #000000;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* Legacy img fallback (hidden when video present) */
+    .product-area img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+    }
+
+    /* Product recording — ambient media layer, NOT a player
+       pointer-events:none removes all click/hover affordance   */
+    .product-video {
+      position: absolute;
+      top: 45px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 59%;
+      height: auto;
+      display: block;
+      border-radius: 10px;
+      pointer-events: none;   /* kill play/pause on click, no controls UI  */
+      /* green ambient glow + depth */
+      box-shadow:
+        0 0 80px rgba(0, 180, 70, 0.30),
+        0 20px 60px rgba(0, 0, 0, 0.55);
+      /* starts below + invisible — JS slides it up after card reveal */
+      opacity: 0;
+      transform: translateX(-50%) translateY(28px);
+    }
+    /* Nuke any browser-injected pseudo-element overlays */
+    .product-video::-webkit-media-controls { display: none !important; }
+    .product-video::--moz-media-controls   { display: none !important; }
+
+    /* .product-sparkle removed */
+    .product-sparkle {
+      display: none;
+      user-select: none;
+    }
+
+    /* Scrolling tags bar overlaid at top of product area */
+    .tags-bar-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 26px;
+      background: rgba(255,255,255,0.12);
+      overflow: hidden;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+    }
+    .tags-bar-track {
+      display: inline-flex;
+      align-items: center;
+      gap: 20px;
+      white-space: nowrap;
+      will-change: transform;
+      padding-left: 20px;
+    }
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .tag-star {
+      width: 11px;
+      height: 11px;
+      flex-shrink: 0;
+      display: block;
+    }
+    .tag-text {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.85);
+      white-space: nowrap;
+    }
+    /* Left/right fade edges on the tags bar */
+    .tags-bar-overlay::before,
+    .tags-bar-overlay::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 52px;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .tags-bar-overlay::before {
+      left: 0;
+      background: linear-gradient(to right, rgba(0, 8, 3, 0.95), transparent);
+    }
+    .tags-bar-overlay::after {
+      right: 0;
+      background: linear-gradient(to left, rgba(0, 8, 3, 0.95), transparent);
+    }
+
+    /* Bottom content area */
+    .case-study-bottom {
+      padding: 20px 40px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .case-study-caption {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 500;
+      color: #868686;
+      line-height: 30px;
+    }
+    .case-study-hl-row {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .case-study-headline {
+      flex: 1;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 25px;
+      line-height: 40px;
+      color: var(--secondary);
+    }
+    .explore-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--secondary);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 15px;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 15px;
+      line-height: 30px;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity 0.18s;
+    }
+    .explore-btn:hover { opacity: 0.8; }
+
+    /* ─── METRIC CARDS (white, Figma-accurate) ───────────────────── */
+    .metric-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .metric-row {
+      display: flex;
+      gap: 20px;
+    }
+    .metric-card {
+      flex: 1;
+      background: #fff;
+      border: 1px solid #ececec;
+      border-radius: 10px;
+      padding: 10px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .metric-value {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--secondary);
+      min-height: 27px;
+    }
+    @keyframes mark-sweep {
+      from { background-size: 0% 100%; }
+      to   { background-size: 110% 100%; }
+    }
+
+    .metric-value mark {
+      /* Solid colour sweep left → right on scroll-in */
+      background-image: linear-gradient(var(--primary), var(--primary));
+      background-size: 0% 100%;
+      background-repeat: no-repeat;
+      background-position: left center;
+      background-color: transparent;
+      color: var(--secondary);
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .metric-card.visible .metric-value mark {
+      animation: mark-sweep 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+      animation-delay: 0.3s;
+    }
+    .metric-desc {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 14px;
+      color: #868686;
+      line-height: 25px;
     }
 
     /* ─── RESPONSIVE ─────────────────────────────────────────── */
@@ -366,11 +717,550 @@
       .photo-wrapper { width: 100%; height: 260px; }
       .card          { width: 100%; }
       .current-badge { white-space: normal; }
+      .top-nav       { padding: 8px 20px; }
+      .proj-bottom-row { flex-direction: column; }
+      .metric-cards  { grid-template-columns: 1fr; }
+    }
+
+    /* ─── FOOTER ────────────────────────────────────────────────── */
+    .site-footer {
+      background: #1A1917;
+      padding: 22px 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .site-footer a.footer-email {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      color: #ffffff;
+      text-decoration: none;
+      text-transform: lowercase;
+      transition: opacity 0.2s ease;
+    }
+    .site-footer a.footer-email:hover {
+      opacity: 0.75;
+    }
+    .site-footer .footer-tagline {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.10em;
+      color: #ffffff;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ─── CUSTOM CURSOR — desktop fine-pointer only ────────────── */
+    @media (pointer: fine) and (hover: hover) {
+      html.cc-active,
+      html.cc-active * { cursor: none !important; }
+    }
+
+    /* ── Cursor 1: Frosted glass ring cursor ────────────────────── *
+     * Single state — glass blur circle with clockwise-spinning ring.
+     * Size and position set by JS; blend mode always normal.
+     * ──────────────────────────────────────────────────────────────── */
+    #cursorBlend {
+      position: fixed;
+      top: 0; left: 0;
+      width: 88px; height: 88px;
+      border-radius: 9999px;
+      pointer-events: none;
+      z-index: 13000;
+      will-change: transform;
+      opacity: 0;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Ring SVG — centred inside the cursor */
+    #cursorRing {
+      position: absolute;
+      top: 50%; left: 50%;
+      /* JS writes: transform = translate(-50%,-50%) rotate(Ndeg) */
+    }
+    #cursorRing text {
+      font-family: 'Poppins', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      fill: rgb(10, 10, 10);
+    }
+
+    /* ── Cursor 2: contextual pill (Hi there / See projects) ─────── */
+    #cursorPill {
+      position: fixed;
+      top: 0; left: 0;
+      width: auto;
+      min-width: 80px;
+      padding: 0 16px;
+      height: 29px;
+      border-radius: 7px;
+      background: rgb(255, 255, 255);
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 13000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      will-change: transform;
+      transition: opacity 0.2s ease-out;
+    }
+    #cursorPill.pill-visible { opacity: 1; }
+
+    #cursorPillText {
+      font-size: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 400;
+      color: rgb(0, 0, 0);
+      white-space: nowrap;
+      transform: translateY(100%);
+      transition: transform 0.2s ease-out;
+    }
+    #cursorPill.pill-visible #cursorPillText { transform: translateY(0); }
+
+    /* ── Cursor 3: speech bubble — photo hover ───────────────────── */
+    #cursorBubble {
+      position: fixed;
+      top: 0; left: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 20px;
+      background: #ffffff;
+      /* bottom-left corner tight = speech-bubble tail pointing down-left */
+      border-radius: 22px 22px 22px 5px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+      pointer-events: none;
+      z-index: 13000;
+      white-space: nowrap;
+      will-change: transform;
+      opacity: 0;
+      transition: opacity 0.22s ease-out;
+    }
+    #cursorBubble.bubble-visible { opacity: 1; }
+
+    #cursorBubbleEmoji {
+      font-size: 20px;
+      line-height: 1;
+      /* slight slide-in from below */
+      transform: translateY(5px);
+      opacity: 0;
+      transition: transform 0.25s ease-out 0.05s, opacity 0.25s ease-out 0.05s;
+    }
+    #cursorBubbleText {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1A1917;
+      letter-spacing: -0.01em;
+      transform: translateY(5px);
+      opacity: 0;
+      transition: transform 0.25s ease-out 0.08s, opacity 0.25s ease-out 0.08s;
+    }
+    #cursorBubble.bubble-visible #cursorBubbleEmoji,
+    #cursorBubble.bubble-visible #cursorBubbleText {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ══════════════════════════════════════════  INTRO LOADER
+       Design-tool / canvas aesthetic — white, light, precise.
+       Duration: 10 s
+       Exit: whole canvas slides upward off-screen
+    ══════════════════════════════════════════════════════════════════ */
+
+    /* Loader root — same dot-grid as portfolio so exit is seamless */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      pointer-events: all;
+      background-color: #FFFCF8;
+      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
+      background-size: 19px 19px;
+      background-attachment: fixed;
+      /* Slide the whole canvas up on exit */
+      transition: transform 0.78s cubic-bezier(0.76, 0, 0.24, 1) 0.22s;
+    }
+    #loader.ld-exit { transform: translateY(-100%); }
+
+    /* Content wrapper — fades first, then loader slides */
+    #ldContent {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+    #loader.ld-exit #ldContent { opacity: 0; }
+
+    /* ── Center guide lines (dashed, Figma-style) ──────────────────── */
+    #ldGH { display: none; }   /* horizontal guide removed */
+    #ldGV { display: none; }   /* vertical guide removed   */
+
+    /* ── Frame wrap — absolutely centred on canvas ─────────────────── */
+    #ldFW {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: clamp(340px, 58vw, 680px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;              /* label centred above frame */
+    }
+
+    /* ── Layer-name label (Figma chip above top-left of frame) ────── */
+    #ldLabel {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 9px;
+      padding: 3px 10px 3px 8px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(160,158,150,0.35);
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.65px;               /* +15% from 11px */
+      font-weight: 500;
+      color: rgba(28, 26, 20, 0.68);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(5px);
+      transition: opacity 0.4s ease 1.2s, transform 0.4s ease 1.2s;
+    }
+    #ldLabelDot {
+      width: 7px; height: 7px;
+      border-radius: 2px;
+      background: #8FAF00;
+      flex-shrink: 0;
+    }
+    #loader.ld-go #ldLabel { opacity: 1; transform: translateY(0); }
+
+    /* ── Selection frame ────────────────────────────────────────────── */
+    #ldFrame {
+      position: relative;
+      width: 100%;
+      padding: 28px 34px 32px;
+      border: 1.5px solid transparent;
+      transition: border-color 0.35s ease 1.0s;
+    }
+    #loader.ld-go #ldFrame { border-color: #8FAF00; }
+
+    /* Handles — 4 corners + 4 midpoints, Figma-style */
+    .ldh {
+      position: absolute;
+      background: #FAFAF7;
+      border: 1.5px solid #8FAF00;
+      border-radius: 1.5px;
+      opacity: 0;
+      transition: opacity 0.2s ease 1.15s;
+    }
+    #loader.ld-go .ldh { opacity: 1; }
+    /* Corner handles — square */
+    .ldh.c-tl, .ldh.c-tr, .ldh.c-bl, .ldh.c-br { width: 7px; height: 7px; }
+    .ldh.c-tl { top:    -4px; left:  -4px; }
+    .ldh.c-tr { top:    -4px; right: -4px; }
+    .ldh.c-bl { bottom: -4px; left:  -4px; }
+    .ldh.c-br { bottom: -4px; right: -4px; }
+    /* Midpoint handles — rectangular */
+    .ldh.m-t, .ldh.m-b { width: 13px; height: 5px; }
+    .ldh.m-l, .ldh.m-r { width: 5px;  height: 13px; }
+    .ldh.m-t { top:    -3px;   left: 50%; transform: translateX(-50%); }
+    .ldh.m-b { bottom: -3px;   left: 50%; transform: translateX(-50%); }
+    .ldh.m-l { left:   -3px;   top:  50%; transform: translateY(-50%); }
+    .ldh.m-r { right:  -3px;   top:  50%; transform: translateY(-50%); }
+
+    /* ── Text clip reveals ──────────────────────────────────────────── */
+    #ldT1W, #ldT2W { overflow: hidden; line-height: 1.05; }
+
+    #ldT1, #ldT2 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: clamp(26px, 4vw, 48px);   /* ~20% smaller */
+      color: #1A1917;
+      letter-spacing: -0.025em;
+      text-align: center;
+      width: 100%;
+      transform: translateY(108%);
+    }
+    #ldT1 { transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.35s; }
+    #ldT2 { transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.48s; }
+    #loader.ld-go #ldT1,
+    #loader.ld-go #ldT2 { transform: translateY(0); }
+
+    /* ── Measurement lines (Figma pink) ─────────────────────────────── */
+    #ldML, #ldMR {
+      position: absolute;
+      height: 1px;
+      background: #1A73E8;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease 1.85s;
+    }
+    #loader.ld-go #ldML,
+    #loader.ld-go #ldMR { opacity: 1; }
+
+    /* Arrowheads — both ends of both lines */
+    #ldML::before, #ldMR::after {     /* outer tips (→ viewport edges) */
+      content: '';
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 0; height: 0;
+      border-top: 3.5px solid transparent;
+      border-bottom: 3.5px solid transparent;
+    }
+    #ldML::before { left:  0; border-right: 5px solid #1A73E8; }
+    #ldMR::after  { right: 0; border-left:  5px solid #1A73E8; }
+    #ldML::after, #ldMR::before {     /* inner tips (→ frame edges) */
+      content: '';
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 0; height: 0;
+      border-top: 3.5px solid transparent;
+      border-bottom: 3.5px solid transparent;
+    }
+    #ldML::after  { right: 0; border-left:  5px solid #1A73E8; }
+    #ldMR::before { left:  0; border-right: 5px solid #1A73E8; }
+
+    /* Pixel-distance labels */
+    #ldMLPx, #ldMRPx {
+      position: absolute;
+      top: -19px;
+      left: 50%; transform: translateX(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      color: #1A73E8;
+      white-space: nowrap;
+      background: #FAFAF7;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    /* ── Page fade-in after loader ─────────────────────────────────────
+       .card starts hidden. After the loader exits JS adds .page-ready
+       which triggers this transition, fading all content into view.
+    ──────────────────────────────────────────────────────────────────── */
+    .card {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.75s ease, transform 0.75s ease;
+    }
+    .card.page-ready {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Corner label — year ────────────────────────────────────────── */
+    #ldYear {
+      position: absolute;
+      top: 38px;
+      right: 44px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 500;
+      color: rgba(40, 38, 30, 0.30);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.9s ease 0.1s;
+    }
+    #loader.ld-go #ldYear { opacity: 1; }
+
+    /* ── Progress bar ────────────────────────────────────────────────── */
+    #ldProgress {
+      position: absolute;
+      bottom: 52px;
+      left: 44px;
+      right: 44px;             /* full width between margins */
+      height: 3px;
+      background: rgba(0, 0, 0, 0.08);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    #ldFill {
+      height: 100%;
+      width: 0%;
+      background: #8FAF00;
+      border-radius: 3px;
+    }
+
+    /* ── Counter — large, centred below the bar ─────────────────────── */
+    #ldCount {
+      position: absolute;
+      bottom: 14px;
+      left: 0; right: 0;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 26px;
+      font-weight: 700;
+      color: rgba(28, 26, 18, 0.55);
+      letter-spacing: 0.05em;
     }
   </style>
 </head>
 
 <body>
+
+  <!-- ══════════════════════════  INTRO LOADER ══════════════════════ -->
+  <div id="loader" aria-hidden="true">
+    <div id="ldContent">
+
+      <!-- Dashed center guides -->
+      <div id="ldGH"></div>
+      <div id="ldGV"></div>
+
+      <!-- Measurement lines — left and right of frame (positioned by JS) -->
+      <div id="ldML"><span id="ldMLPx"></span></div>
+      <div id="ldMR"><span id="ldMRPx"></span></div>
+
+      <!-- Central selected frame -->
+      <div id="ldFW">
+
+        <!-- Layer-name chip (Figma-style label above frame) -->
+        <div id="ldLabel">
+          <div id="ldLabelDot"></div>
+          Bhanu Kowshik
+        </div>
+
+        <!-- The selection frame -->
+        <div id="ldFrame">
+          <!-- 4 corner handles -->
+          <div class="ldh c-tl"></div>
+          <div class="ldh c-tr"></div>
+          <div class="ldh c-bl"></div>
+          <div class="ldh c-br"></div>
+          <!-- 4 midpoint handles -->
+          <div class="ldh m-t"></div>
+          <div class="ldh m-b"></div>
+          <div class="ldh m-l"></div>
+          <div class="ldh m-r"></div>
+
+          <!-- Text: clips up from bottom -->
+          <div id="ldT1W"><div id="ldT1">Senior Systems</div></div>
+          <div id="ldT2W"><div id="ldT2">Product Designer</div></div>
+        </div>
+
+      </div><!-- /ldFW -->
+
+      <!-- Corner label — year only -->
+      <span id="ldYear">2026</span>
+
+      <!-- Progress bar + counter -->
+      <div id="ldProgress"><div id="ldFill"></div></div>
+      <div id="ldCount">0%</div>
+
+    </div><!-- /ldContent -->
+  </div>
+
+  <script>
+  /* ── Loader orchestration ──────────────────────────────────────────
+     Total: 7 000 ms
+     0     ms : scroll locked, canvas visible
+     dbl-rAF  : ld-go fires → all CSS transitions begin
+     ~400  ms : measurement lines positioned by JS
+       800 ms : progress bar starts (5 200 ms to reach 100)
+     6 200 ms : ld-exit → content fades (0.22s), loader slides up (0.78s)
+     7 100 ms : loader removed, scroll unlocked
+  ──────────────────────────────────────────────────────────────────── */
+  (function () {
+    const loader  = document.getElementById('loader');
+    const fill    = document.getElementById('ldFill');
+    const counter = document.getElementById('ldCount');
+    if (!loader) return;
+
+    /* Lock scroll */
+    document.documentElement.style.overflow = 'hidden';
+
+    /* ── Phase 1: trigger CSS animation cascade ─────────────────── */
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      loader.classList.add('ld-go');
+
+      /* Position measurement lines once frame is painted */
+      setTimeout(() => {
+        const frame = document.getElementById('ldFrame');
+        if (!frame) return;
+        const r   = frame.getBoundingClientRect();
+        const vw  = window.innerWidth;
+        const midY = r.top + r.height * 0.5 - 0.5;
+
+        const ml    = document.getElementById('ldML');
+        const mr    = document.getElementById('ldMR');
+        const mlPx  = document.getElementById('ldMLPx');
+        const mrPx  = document.getElementById('ldMRPx');
+
+        const leftGap  = Math.round(r.left);
+        const rightGap = Math.round(vw - r.right);
+
+        /* Left line: from 44 px margin to frame left edge */
+        ml.style.top   = midY + 'px';
+        ml.style.left  = '44px';
+        ml.style.width = Math.max(0, r.left - 44 - 6) + 'px';
+        mlPx.textContent = leftGap + ' px';
+
+        /* Right line: from frame right edge to 44 px margin */
+        mr.style.top   = midY + 'px';
+        mr.style.left  = (r.right + 6) + 'px';
+        mr.style.width = Math.max(0, vw - r.right - 44 - 6) + 'px';
+        mrPx.textContent = rightGap + ' px';
+      }, 400);
+    }));
+
+    /* ── Phase 2: progress bar (starts 800 ms, runs 5 200 ms) ──── */
+    const BAR_START    = 800;
+    const BAR_DURATION = 5200;
+    let barRafId;
+
+    setTimeout(() => {
+      let t0 = null;
+      function stepBar(ts) {
+        if (!t0) t0 = ts;
+        const progress = Math.min((ts - t0) / BAR_DURATION, 1);
+        const eased    = 1 - Math.pow(1 - progress, 1.6); /* gentle ease-out */
+        const pct      = Math.floor(eased * 100);
+
+        fill.style.width    = pct + '%';
+        counter.textContent = pct + '%';
+
+        if (progress < 1) barRafId = requestAnimationFrame(stepBar);
+      }
+      barRafId = requestAnimationFrame(stepBar);
+    }, BAR_START);
+
+    /* ── Phase 3: exit ──────────────────────────────────────────── */
+    setTimeout(() => {
+      cancelAnimationFrame(barRafId);
+      fill.style.width    = '100%';
+      counter.textContent = '100%';
+      loader.classList.add('ld-exit');   /* canvas slides up */
+
+      /* Fade the main card in as the loader lifts away */
+      requestAnimationFrame(() => {
+        const card = document.querySelector('.card');
+        if (card) card.classList.add('page-ready');
+      });
+    }, 6200);
+
+    setTimeout(() => {
+      loader.remove();
+      document.documentElement.style.overflow = '';
+    }, 7100);
+  })();
+  </script>
+  <!-- ══════════════════════════  END LOADER ════════════════════════ -->
+
+  <!-- TOP NAV — same system as EverTutor Studio, sits above canvas -->
+  <nav class="top-nav">
+    <span class="nav-logo">Bhanu Kowshik</span>
+    <a class="nav-work" href="#s2Section">WORK</a>
+  </nav>
+
   <div class="page">
     <div class="card">
 
@@ -418,87 +1308,157 @@
         <div class="skills-track" id="skillsTrack"></div>
       </div>
 
+      <!-- ── SECTION DIVIDER — Figma canvas selection state ──── -->
+      <div class="section-divider" id="sdFrame">
+        <!-- Dashed alignment guides -->
+        <div class="sd-guide-h"></div>
+        <div class="sd-guide-v"></div>
+        <!-- Selected object -->
+        <div class="sd-selected" id="sdSelected">
+          <span class="sd-handle tl"></span>
+          <span class="sd-handle tr"></span>
+          <span class="sd-handle bl"></span>
+          <span class="sd-handle br"></span>
+          Work Across Systems &amp; Scales
+        </div>
+        <!-- Measurement pill labels (left / right spacing) -->
+        <div class="sd-measure" id="sdMeasureL"></div>
+        <div class="sd-measure" id="sdMeasureR"></div>
+      </div>
+
+      <!-- ── FEATURED WORK: EverTutor header ──────────────────── -->
+      <div class="fw-header reveal">
+        <h2 class="fw-title">1. EverTutor</h2>
+        <p class="fw-desc">As a Lead Product Designer, I led and co-led design and curriculum direction across three platforms, Studio (create), Live (serve), and Analytics (measure), building a cohesive AI tutoring platform that connects content creation, delivery, and mastery tracking to enable personalized learning at scale.</p>
+      </div>
+
+      <!-- ── CASE STUDY CARD ────────────────────────────────────── -->
+      <div class="case-study-card reveal">
+
+        <!-- Product recording with scrolling tags bar -->
+        <div class="product-area">
+
+          <!-- scrolling tags strip at top -->
+          <div class="tags-bar-overlay">
+            <div class="tags-bar-track" id="tagsBarTrack"></div>
+          </div>
+
+          <!-- ambient recording — NOT an interactive player
+               muted + playsinline are required for browser autoplay policy -->
+          <video
+            id="productVid"
+            class="product-video"
+            src="./et-studio-recording.mov"
+            muted
+            loop
+            playsinline
+            disablepictureinpicture
+            disableremoteplayback
+            preload="metadata"
+          ></video>
+
+        </div>
+
+        <!-- Caption + headline + CTA + metrics -->
+        <div class="case-study-bottom">
+          <p class="case-study-caption reveal">1.1 EverTutor Studio (AI Tutor Creation Platform)</p>
+
+          <div class="case-study-hl-row reveal">
+            <p class="case-study-headline">Architected a 0→1 AI Tutor Creation System That Reduced Lesson Design from 100+ hrs to ~4 hrs</p>
+            <a class="explore-btn" href="./evertutor-studio.html">Explore the system ↗</a>
+          </div>
+
+          <div class="metric-cards">
+            <div class="metric-row">
+              <div class="metric-card reveal">
+                <p class="metric-value">Reduced lesson creation from <mark>100+ hrs → ~4 hrs</mark></p>
+                <p class="metric-desc">Replaced fragmented tools with a structured lesson system</p>
+              </div>
+              <div class="metric-card reveal">
+                <p class="metric-value"><mark>700+ lessons</mark> produced in 3,128 hrs</p>
+                <p class="metric-desc">Proven at scale across real classroom pilots and multiple subjects</p>
+              </div>
+            </div>
+            <div class="metric-row">
+              <div class="metric-card reveal">
+                <p class="metric-value"><mark>40–50 hrs → ~2 hrs</mark> onboarding for content designers</p>
+                <p class="metric-desc">Enabled non-technical educators to create lessons within hours</p>
+              </div>
+              <div class="metric-card reveal">
+                <p class="metric-value"><mark>Full control</mark> over AI Tutor behavior</p>
+                <p class="metric-desc">Real-time control of pacing, explanations, and scaffolding</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /case-study-card -->
+
     </div><!-- /card -->
   </div><!-- /page -->
 
-  <div id="heyBubble">🙏 Hi there</div>
-  <div id="customCursor"></div>
+  <footer class="site-footer">
+    <a href="mailto:kowshikbhanu1000@gmail.com" class="footer-email">kowshikbhanu1000@gmail.com</a>
+    <span class="footer-tagline">Designed by me, built with Claude &mdash; &sim;1M tokens later</span>
+  </footer>
 
   <script>
     /* ═══════════════════════════════════════════════════════════
-       CUSTOM CURSOR — follows mouse, inverts colour via blend mode
-       Grows slightly when hovering links / buttons / images
-       ═══════════════════════════════════════════════════════════ */
-    const cursor = document.getElementById('customCursor');
-    let cx = window.innerWidth / 2;
-    let cy = window.innerHeight / 2;
-
-    // Smoothly lerp cursor to mouse position each frame
-    let mx = cx, my = cy;
-
-    document.addEventListener('mousemove', e => {
-      mx = e.clientX;
-      my = e.clientY;
-    });
-
-    (function animateCursor() {
-      cx += (mx - cx) * 0.18;
-      cy += (my - cy) * 0.18;
-      cursor.style.left = cx + 'px';
-      cursor.style.top  = cy + 'px';
-      requestAnimationFrame(animateCursor);
-    })();
-
-    // Grow cursor on interactive / hoverable elements
-    const hoverTargets = 'a, button, [role="button"], .current-badge, .photo-wrapper, .skill-item, h1, .hero-heading, .greeting';
-    document.querySelectorAll(hoverTargets).forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-    });
-
-    // Hide cursor when it leaves the window
-    document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
-    document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
-
-    /* ═══════════════════════════════════════════════════════════
-       0. STAGGERED REVEAL
-       — .reveal      → slide up + fade (for mid-card elements)
-       — .reveal-fade → fade only       (for edge-flush elements)
-       — photo        → slide up + fade, but gated on image.decode()
-         so animation always coincides with pixels being ready
+       0. SCROLL-TRIGGERED REVEAL
+       — .reveal      → slide up 32 px + fade in
+       — .reveal-fade → fade in only (safe inside overflow:hidden)
+       — All elements observed; hero elements fire immediately
+         since they're already in the viewport on load.
+       — Below-fold elements (case study section) fire when
+         they scroll into view — same animation, same easing.
+       — Photo is gated on image.decode() so pixels are ready
+         before the transition starts.
        ═══════════════════════════════════════════════════════════ */
 
-    // All .reveal and .reveal-fade elements in DOM order
+    const STAGGER = 110; // ms between items entering in the same batch
+
+    // ── General reveal observer ──────────────────────────────────
     const revealEls = [...document.querySelectorAll('.reveal, .reveal-fade')];
-    const STAGGER   = 180;   // ms between each element
-    const BASE_DELAY = 150;
 
-    revealEls.forEach((el, i) => {
-      setTimeout(() => el.classList.add('visible'), BASE_DELAY + i * STAGGER);
+    const revealObs = new IntersectionObserver((entries) => {
+      // Grab all newly-intersecting items; sort top→bottom for natural stagger
+      const entering = entries
+        .filter(e => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+      entering.forEach((entry, i) => {
+        setTimeout(() => entry.target.classList.add('visible'), i * STAGGER);
+        revealObs.unobserve(entry.target); // animate once only
+      });
+    }, {
+      threshold:   0.12,
+      rootMargin: '0px 0px -40px 0px'  // fire slightly before element reaches edge
     });
 
-    // Photo — slide up + fade, but only once the image is decoded
+    revealEls.forEach(el => revealObs.observe(el));
+
+    // ── Photo — same reveal but gated on image.decode() ──────────
     const photoWrapper = document.getElementById('photoWrapper');
     const photoImg     = photoWrapper.querySelector('img.photo');
 
-    // Start it hidden (matches .reveal initial state)
-    photoWrapper.style.opacity  = '0';
-    photoWrapper.style.transform = 'translateY(32px)';
+    photoWrapper.style.opacity    = '0';
+    photoWrapper.style.transform  = 'translateY(32px)';
     photoWrapper.style.transition = 'none';
 
-    // Compute when the last staggered reveal fires so the photo
-    // joins the sequence at the right moment (index = revealEls.length)
-    const photoDelay = BASE_DELAY + revealEls.length * STAGGER;
+    const photoObs = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting) return;
+      photoObs.disconnect();
+      // Wait for pixel data before transitioning — avoids flash of empty img
+      photoImg.decode().catch(() => {}).then(() => {
+        photoWrapper.style.transition =
+          'opacity 0.65s cubic-bezier(0.22,0.61,0.36,1), ' +
+          'transform 0.65s cubic-bezier(0.22,0.61,0.36,1)';
+        photoWrapper.style.opacity   = '1';
+        photoWrapper.style.transform = 'translateY(0)';
+      });
+    }, { threshold: 0.2 });
 
-    Promise.all([
-      photoImg.decode().catch(() => {}),          // wait for pixels to be ready
-      new Promise(r => setTimeout(r, photoDelay)) // keep stagger rhythm
-    ]).then(() => {
-      // Trigger the reveal-up transition
-      photoWrapper.style.transition = 'opacity 0.65s cubic-bezier(0.22,0.61,0.36,1), transform 0.65s cubic-bezier(0.22,0.61,0.36,1)';
-      photoWrapper.style.opacity    = '1';
-      photoWrapper.style.transform  = 'translateY(0)';
-    });
+    photoObs.observe(photoWrapper);
 
     /* ═══════════════════════════════════════════════════════════
        1. TYPING ANIMATION  +  LOTTIE WAVE
@@ -575,20 +1535,7 @@
 
 
     /* ═══════════════════════════════════════════════════════════
-       2. MOUSE-TRACKED "HEY THERE" BUBBLE
-       ═══════════════════════════════════════════════════════════ */
-    const heyBubble    = document.getElementById('heyBubble');
-
-    photoWrapper.addEventListener('mouseenter', () => heyBubble.style.opacity = '1');
-    photoWrapper.addEventListener('mouseleave', () => heyBubble.style.opacity = '0');
-    document.addEventListener('mousemove', e => {
-      heyBubble.style.left = e.clientX + 'px';
-      heyBubble.style.top  = e.clientY + 'px';
-    });
-
-
-    /* ═══════════════════════════════════════════════════════════
-       3. SKILLS BAR — rAF-driven LEFT-TO-RIGHT infinite scroll
+       2. SKILLS BAR — rAF-driven LEFT-TO-RIGHT infinite scroll
           ─────────────────────────────────────────────────────
           Track layout: [COPY1][COPY2]  (each = halfWidth)
           pos starts at 0 (viewport shows COPY1)
@@ -631,7 +1578,7 @@
     requestAnimationFrame(() => {
       const totalW   = track.scrollWidth;      // full track width
       const halfW    = totalW / 2;             // one copy width
-      const DURATION = 30;                     // seconds for one full cycle (50% slower)
+      const DURATION = 60;                     // seconds for one full cycle
       const FPS      = 60;
       const BASE_SPEED = halfW / (DURATION * FPS);  // px per frame at normal speed
       const SLOW_SPEED = BASE_SPEED / 12;           // ~12× slower on hover
@@ -664,6 +1611,476 @@
 
       animate();
     });
+
+
+    /* ═══════════════════════════════════════════════════════════
+       4. CASE STUDY TAGS BAR — 10s loop, left-to-right marquee
+       ═══════════════════════════════════════════════════════════ */
+    const csTags = [
+      "10 min read",
+      "End-to-End Product Design",
+      "System Thinking",
+      "0 → 1 Product Build",
+      "Cross-Functional Execution",
+      "Voice + Multimodal UX",
+    ];
+
+    const tagStarSVG = `<svg class="tag-star" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path fill="rgba(255,255,255,0.5)" d="M10.042,2.826 Q11.000,1.800 11.958,2.826 Q12.915,3.852 14.258,3.442 Q15.600,3.033 15.916,4.400 Q16.233,5.767 17.600,6.084 Q18.967,6.400 18.558,7.742 Q18.148,9.085 19.174,10.042 Q20.200,11.000 19.174,11.958 Q18.148,12.915 18.558,14.258 Q18.967,15.600 17.600,15.916 Q16.233,16.233 15.916,17.600 Q15.600,18.967 14.258,18.558 Q12.915,18.148 11.958,19.174 Q11.000,20.200 10.042,19.174 Q9.085,18.148 7.742,18.558 Q6.400,18.967 6.084,17.600 Q5.767,16.233 4.400,15.916 Q3.033,15.600 3.442,14.258 Q3.852,12.915 2.826,11.958 Q1.800,11.000 2.826,10.042 Q3.852,9.085 3.442,7.742 Q3.033,6.400 4.400,6.084 Q5.767,5.767 6.084,4.400 Q6.400,3.033 7.742,3.442 Q9.085,3.852 10.042,2.826 Z"/>
+    </svg>`;
+
+    const tagsBarTrack = document.getElementById('tagsBarTrack');
+    if (tagsBarTrack) {
+      let tagsHtml = '';
+      for (let pass = 0; pass < 2; pass++) {
+        csTags.forEach(tag => {
+          tagsHtml += `<span class="tag-pill">${tagStarSVG}<span class="tag-text">${tag}</span></span>`;
+        });
+      }
+      tagsBarTrack.innerHTML = tagsHtml;
+
+      requestAnimationFrame(() => {
+        const halfW = tagsBarTrack.scrollWidth / 2;
+        const speed = halfW / (60 * 60); // 60s loop at 60fps — matches skills bar
+        let pos = 0;
+        function animateTags() {
+          pos -= speed;
+          if (pos <= -halfW) pos += halfW;
+          tagsBarTrack.style.transform = `translateX(${pos}px)`;
+          requestAnimationFrame(animateTags);
+        }
+        animateTags();
+      });
+    }
+
+    /* ── PRODUCT VIDEO — viewport-gated play + JS-driven fade ──────────
+       The card's reveal-up animation controls the card's own opacity
+       (parent). If we relied on a CSS transition on the video triggered
+       by a class, the video's opacity would be visually masked by the
+       parent's animating opacity and look like it "pops in" when the
+       parent animation finishes.
+
+       Fix: drive the video fade entirely from JS, fired on `animationend`
+       of the card — by then the card opacity is already 1, so the video
+       transition is fully visible and clean.
+
+       Play is also gated: video only starts once the product-area is
+       ≥ 85 % visible AND the reveal animation has completed.
+    ─────────────────────────────────────────────────────────────────── */
+    (function () {
+      const vid  = document.getElementById('productVid');
+      const area = vid && vid.closest('.product-area');
+      const card = vid && vid.closest('.case-study-card');
+      if (!vid) return;
+
+      vid.muted        = true;
+      vid.defaultMuted = true;
+
+      let playing   = false;
+      let firstPlay = true;
+
+      function tryPlay() {
+        if (playing) return;
+        const p = vid.play();
+        if (p instanceof Promise) {
+          p.then(() => { playing = true; }).catch(() => {});
+        } else {
+          playing = true;
+        }
+      }
+
+      /* Slide-up + fade after the card's opacity animation settles at 1. */
+      function fadeVideoIn() {
+        vid.style.transition =
+          'opacity 0.75s cubic-bezier(0.22, 0.61, 0.36, 1), ' +
+          'transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1)';
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            vid.style.opacity   = '1';
+            vid.style.transform = 'translateX(-50%) translateY(0)';
+          });
+        });
+      }
+
+      if ('IntersectionObserver' in window && area) {
+        const obs = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) {
+            if (firstPlay) {
+              firstPlay = false;
+              let fired = false;
+
+              const onReady = () => {
+                if (fired) return;
+                fired = true;
+                fadeVideoIn(); // smooth fade after card reveal finishes
+                tryPlay();
+              };
+
+              if (card) {
+                card.addEventListener('animationend', onReady, { once: true });
+              }
+              /* Safety fallback — animationend may not fire if animation
+                 was skipped (prefers-reduced-motion, already visible, etc.) */
+              setTimeout(onReady, 750);
+            } else {
+              /* Returning to viewport — just resume, video already visible */
+              tryPlay();
+            }
+          } else {
+            vid.pause();
+            playing = false;
+          }
+        }, { threshold: 0.85 });
+        obs.observe(area);
+      } else {
+        /* No IntersectionObserver support */
+        fadeVideoIn();
+        vid.addEventListener('canplay', tryPlay, { once: true });
+      }
+
+      /* Interaction fallback for strict autoplay policies */
+      const onInteract = () => { tryPlay(); };
+      document.addEventListener('click',      onInteract, { once: true, passive: true });
+      document.addEventListener('touchstart', onInteract, { once: true, passive: true });
+      document.addEventListener('keydown',    onInteract, { once: true, passive: true });
+    })();
+
+    /* ── SECTION DIVIDER — live measurement labels ─────────────── */
+    (function () {
+      const frame    = document.getElementById('sdFrame');
+      const selected = document.getElementById('sdSelected');
+      const labelL   = document.getElementById('sdMeasureL');
+      const labelR   = document.getElementById('sdMeasureR');
+      if (!frame || !selected) return;
+
+      function update() {
+        const fR = frame.getBoundingClientRect();
+        const sR = selected.getBoundingClientRect();
+
+        const leftSpacing  = Math.round(sR.left  - fR.left);
+        const rightSpacing = Math.round(fR.right  - sR.right);
+
+        // Label text
+        labelL.textContent = leftSpacing  + ' px';
+        labelR.textContent = rightSpacing + ' px';
+
+        // Position labels at midpoint of each gap (relative to frame)
+        const midLPct  = ((sR.left  - fR.left)  / 2);
+        const midRPct  = fR.width - ((fR.right - sR.right) / 2);
+
+        labelL.style.left = midLPct  + 'px';
+        labelR.style.left = midRPct  + 'px';
+        labelL.style.transform = 'translateX(-50%) translateY(-50%)';
+        labelR.style.transform = 'translateX(-50%) translateY(-50%)';
+      }
+
+      // Run once after layout
+      requestAnimationFrame(update);
+
+      // Keep live on resize
+      if (window.ResizeObserver) {
+        new ResizeObserver(update).observe(frame);
+        new ResizeObserver(update).observe(selected);
+      }
+      window.addEventListener('resize', update);
+    })();
+
+  </script>
+
+  <!-- ── CUSTOM CURSOR SYSTEM ──────────────────────────────────── -->
+  <script>
+  (function initCursor() {
+    if (!window.matchMedia('(pointer: fine) and (hover: hover)').matches) return;
+
+    const NS   = 'http://www.w3.org/2000/svg';
+    const HALF = 44;
+    const POS_K = 300, POS_B = 40;
+
+    /* ─── Rotation constants ─────────────────────────────────── */
+    const ROT_IDLE  = 0.38;            // deg/frame at idle
+    const ROT_INTRO = ROT_IDLE * 1.4;  // 40 % faster during entry sweep
+    const INTRO_MS  = 500;             // intro duration ms
+
+    /* ─── SVG geometry ───────────────────────────────────────── */
+    // SVG matches the 88px glass disc exactly — text lives INSIDE the glass.
+    // R=30 keeps letters comfortably within the disc (disc radius = 44).
+    const SVG_SZ  = 88;
+    const R       = 38;                // ~6px inside the 44px glass edge
+    const CX      = SVG_SZ / 2;       // 44
+    const STAR_SZ = 5;
+    const STAR_H  = STAR_SZ / 2;      // 2.5
+
+    /* ─── Build DOM ──────────────────────────────────────────── */
+    const blend = document.createElement('div');
+    blend.id = 'cursorBlend';
+    blend.setAttribute('aria-hidden', 'true');
+
+    const svg = document.createElementNS(NS, 'svg');
+    svg.id = 'cursorRing';
+    svg.setAttribute('viewBox', `0 0 ${SVG_SZ} ${SVG_SZ}`);
+    svg.setAttribute('width',  SVG_SZ);
+    svg.setAttribute('height', SVG_SZ);
+    /* overflow default (visible) — text stays within the 88px disc */
+
+    /* ── Defs: star symbol only (no textPath arc needed) ───────── */
+    const defs = document.createElementNS(NS, 'defs');
+    const starSym = document.createElementNS(NS, 'symbol');
+    starSym.id = 'crStar';
+    starSym.setAttribute('viewBox', '0 0 512 512');
+    const starPath = document.createElementNS(NS, 'path');
+    starPath.setAttribute('d',
+      'm256 16c-10.7 220.5-19.5 229.3-240 240 220.5 10.7 ' +
+      '229.3 19.5 240 240 10.7-220.5 19.5-229.3 240-240-' +
+      '220.5-10.7-229.3-19.5-240-240z'
+    );
+    starSym.appendChild(starPath);
+    defs.appendChild(starSym);
+    svg.appendChild(defs);
+
+    /* ── Individual character placement ─────────────────────────
+       Each letter / star gets its own <g> rotated around the SVG
+       centre. No textPath, no lengthAdjust — zero distortion.
+
+       14 items → 360/14 ≈ 25.71° per slot.
+       START_ANGLE = 1 slot offset so stars land at exactly
+       12-o'clock (0°) and 6-o'clock (180°).
+    ────────────────────────────────────────────────────────────── */
+    const RING_ITEMS  = ['S','C','R','O','L','L', null, 'S','C','R','O','L','L', null];
+    const SLOT_ANGLE  = 360 / RING_ITEMS.length;   // ≈ 25.714°
+    const START_ANGLE = SLOT_ANGLE;                 // first 'S' one slot past 12 o'clock
+
+    RING_ITEMS.forEach((item, i) => {
+      const angle = START_ANGLE + i * SLOT_ANGLE;
+      const g = document.createElementNS(NS, 'g');
+      g.setAttribute('transform', `rotate(${angle.toFixed(3)}, ${CX}, ${CX})`);
+
+      if (item === null) {
+        /* ── Star icon ── */
+        const use = document.createElementNS(NS, 'use');
+        use.setAttribute('href', '#crStar');
+        use.setAttribute('x', (CX - STAR_H).toFixed(1));
+        use.setAttribute('y', (CX - R - STAR_H).toFixed(1));
+        use.setAttribute('width',  STAR_SZ);
+        use.setAttribute('height', STAR_SZ);
+        use.setAttribute('fill', 'rgb(10,10,10)');
+        g.appendChild(use);
+      } else {
+        /* ── Letter — centred on the arc, upright in rotated frame ── */
+        const t = document.createElementNS(NS, 'text');
+        t.setAttribute('x', CX);
+        t.setAttribute('y', CX - R);
+        t.setAttribute('text-anchor', 'middle');
+        t.setAttribute('dominant-baseline', 'central');
+        t.textContent = item;
+        g.appendChild(t);
+      }
+
+      svg.appendChild(g);
+    });
+
+    blend.appendChild(svg);
+    document.body.appendChild(blend);
+
+    /* ── Pill — "See projects" ───────────────────────────────── */
+    const pill     = document.createElement('div');
+    pill.id = 'cursorPill';
+    const pillText = document.createElement('span');
+    pillText.id = 'cursorPillText';
+    pillText.textContent = 'See projects';
+    pill.appendChild(pillText);
+    document.body.appendChild(pill);
+
+    /* ── Speech bubble — "Hi there" on photo hover ───────────── */
+    const bubble      = document.createElement('div');
+    bubble.id = 'cursorBubble';
+    const bubbleEmoji = document.createElement('span');
+    bubbleEmoji.id = 'cursorBubbleEmoji';
+    bubbleEmoji.textContent = '🙏';
+    const bubbleText  = document.createElement('span');
+    bubbleText.id = 'cursorBubbleText';
+    bubbleText.textContent = 'Hi there';
+    bubble.appendChild(bubbleEmoji);
+    bubble.appendChild(bubbleText);
+    document.body.appendChild(bubble);
+
+    document.documentElement.classList.add('cc-active');
+
+    /* ─── Sweep clip helper ──────────────────────────────────────
+       Clockwise pie-slice from 12-o'clock, covering p×360°.
+       Applied to #cursorBlend (88×88) — clips both the glass disc
+       and the ring text together so they reveal as one unit.
+    ────────────────────────────────────────────────────────────── */
+    function sweepClip(p) {
+      if (p >= 1) return 'none';
+      if (p <= 0) return 'circle(0px at 44px 44px)';
+
+      const cx = 44, cy = 44, BIG = 66; // covers 88px ring — BIG > √(44²+44²) ≈ 62
+      const deg   = p * 360;
+      const toRad = d => (d - 90) * Math.PI / 180; // 0° = 12-o'clock, CW
+
+      const pts = [[cx, cy], [cx, cy - BIG]];
+      for (const cd of [90, 180, 270]) {
+        if (deg > cd) {
+          const r = toRad(cd);
+          pts.push([cx + BIG * Math.cos(r), cy + BIG * Math.sin(r)]);
+        }
+      }
+      const er = toRad(deg);
+      pts.push([cx + BIG * Math.cos(er), cy + BIG * Math.sin(er)]);
+      return `polygon(${pts.map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(', ')})`;
+    }
+
+    /* ─── State ──────────────────────────────────────────────── */
+    let mx = -300, my = -300;
+    let rx = -300, ry = -300;
+    let vx = 0, vy = 0;
+    let rot      = 0;
+    let visible  = false;
+    let lastNow  = 0;
+
+    // Cursor mode: 'default' | 'hi-there' | 'see-projects'
+    let cursorState  = 'default';
+    let introActive  = false;
+    let introElapsed = 0;
+    let needsIntro   = true;   // true = play intro on next default-state entry
+
+    /* ─── Scroll-direction rotation ─────────────────────────── */
+    let rotDirTarget = 1;      // +1 CW (default), -1 CCW (scroll up)
+    let rotDir       = 1;      // smoothly interpolated
+    let scrollTimer  = null;
+
+    window.addEventListener('wheel', e => {
+      rotDirTarget = e.deltaY >= 0 ? 1 : -1;
+      clearTimeout(scrollTimer);
+      // After 800 ms of no scroll, ease back to CW idle
+      scrollTimer = setTimeout(() => { rotDirTarget = 1; }, 800);
+    }, { passive: true });
+
+    /* ─── Intro trigger ──────────────────────────────────────── */
+    function triggerIntro() {
+      svg.style.opacity          = '0';
+      blend.style.clipPath       = sweepClip(0);
+      blend.style.webkitClipPath = sweepClip(0);
+      introActive  = true;
+      introElapsed = 0;
+      needsIntro   = false;
+    }
+
+    /* ─── State machine ──────────────────────────────────────── */
+    function enterState(state) {
+      if (state === cursorState) return;
+      cursorState = state;
+
+      // Always hide both contextual elements first
+      pill.classList.remove('pill-visible');
+      bubble.classList.remove('bubble-visible');
+
+      if (state === 'default') {
+        // Return to ring cursor — replay intro animation
+        blend.style.opacity = visible ? '1' : '0';
+        triggerIntro();
+      } else {
+        // Hide ring disc
+        introActive = false;
+        needsIntro  = true;
+        blend.style.clipPath       = 'circle(0px at 44px 44px)';
+        blend.style.webkitClipPath = 'circle(0px at 44px 44px)';
+        blend.style.opacity        = '0';
+        svg.style.opacity          = '0';
+
+        if (state === 'hi-there') {
+          bubble.classList.add('bubble-visible');
+        } else {
+          // 'see-projects' — small pill
+          pill.classList.add('pill-visible');
+        }
+      }
+    }
+
+    /* ─── Mouse events ───────────────────────────────────────── */
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+
+      if (!visible) {
+        visible = true;
+        rx = mx; ry = my;
+        vx = 0;  vy = 0;
+        // First entry in default state → play intro if pending
+        if (cursorState === 'default') {
+          blend.style.opacity = '1';
+          if (needsIntro) triggerIntro();
+        }
+      }
+
+      // Priority: photo > featured work > default
+      let target = 'default';
+      if (e.target.closest('#photoWrapper, .photo-wrapper')) {
+        target = 'hi-there';
+      } else if (e.target.closest('.case-study-card, .product-area, .fw-header, .case-study-bottom')) {
+        target = 'see-projects';
+      }
+      enterState(target);
+    }, { passive: true });
+
+    document.addEventListener('mouseleave', () => {
+      visible = false;
+      blend.style.opacity = '0';
+      pill.classList.remove('pill-visible');
+      bubble.classList.remove('bubble-visible');
+      // Reset state fully so re-entry is always clean
+      introActive  = false;
+      cursorState  = 'default';
+      needsIntro   = true;
+    });
+
+    /* ─── RAF render loop ────────────────────────────────────── */
+    function tick(now) {
+      const dt = lastNow ? Math.min((now - lastNow) / 1000, 0.05) : 0;
+      lastNow  = now;
+
+      /* Position spring */
+      vx += ((mx - rx) * POS_K - vx * POS_B) * dt;
+      vy += ((my - ry) * POS_K - vy * POS_B) * dt;
+      rx += vx * dt;
+      ry += vy * dt;
+
+      /* Smooth scroll-direction blend — ease factor 5/s */
+      rotDir += (rotDirTarget - rotDir) * Math.min(dt * 5, 1);
+
+      /* ── Intro animation ───────────────────────────────────── */
+      let rotStep = ROT_IDLE;
+
+      if (introActive) {
+        introElapsed += dt * 1000;
+        const p    = Math.min(introElapsed / INTRO_MS, 1);
+        const ease = 1 - Math.pow(1 - p, 3);            // cubic ease-out
+
+        blend.style.clipPath       = sweepClip(ease);
+        blend.style.webkitClipPath = sweepClip(ease);
+        svg.style.opacity          = Math.min(p * 1.6, 1).toFixed(3);
+        rotStep = ROT_INTRO - (ROT_INTRO - ROT_IDLE) * ease;
+
+        if (p >= 1) {
+          introActive                = false;
+          blend.style.clipPath       = 'none';
+          blend.style.webkitClipPath = 'none';
+          svg.style.opacity          = '1';
+        }
+      }
+
+      // Scroll direction modulates rotation; during intro always CW
+      rot += rotStep * (introActive ? 1 : rotDir);
+
+      blend.style.transform = `translate3d(${rx - HALF}px,${ry - HALF}px,0)`;
+      svg.style.transform   = `translate(-50%,-50%) rotate(${rot}deg)`;
+      pill.style.transform   = `translate(${rx + 14}px,${ry + 10}px)`;
+      // Bubble: bottom-left corner sits at cursor tip — extends up and right
+      bubble.style.transform = `translate(${rx + 10}px,${ry - 78}px)`;
+
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
   </script>
 </body>
 </html>
