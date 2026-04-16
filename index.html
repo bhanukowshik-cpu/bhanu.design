@@ -1184,7 +1184,13 @@
       loader.remove();
       document.documentElement.style.overflow = '';
       const card = document.querySelector('.card');
-      if (card) card.classList.add('page-ready');
+      if (card) {
+        /* No transition — make content immediately visible */
+        card.style.transition = 'none';
+        card.style.opacity    = '1';
+        card.style.transform  = 'translateY(0)';
+        card.classList.add('page-ready');
+      }
       return;
     }
     sessionStorage.setItem('loaderPlayed', '1');
