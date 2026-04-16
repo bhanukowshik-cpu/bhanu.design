@@ -758,6 +758,10 @@
     @media (pointer: fine) and (hover: hover) {
       html.cc-active,
       html.cc-active * { cursor: none !important; }
+      /* CTAs restore native pointer so the hand cursor appears */
+      html.cc-active a[href],
+      html.cc-active button,
+      html.cc-active [role="button"] { cursor: pointer !important; }
     }
 
     /* ── Cursor 1: Frosted glass ring cursor ────────────────────── *
@@ -1174,6 +1178,16 @@
     const fill    = document.getElementById('ldFill');
     const counter = document.getElementById('ldCount');
     if (!loader) return;
+
+    /* ── Skip loader on return visits within the same session ───── */
+    if (sessionStorage.getItem('loaderPlayed')) {
+      loader.remove();
+      document.documentElement.style.overflow = '';
+      const card = document.querySelector('.card');
+      if (card) card.classList.add('page-ready');
+      return;
+    }
+    sessionStorage.setItem('loaderPlayed', '1');
 
     /* Lock scroll */
     document.documentElement.style.overflow = 'hidden';
@@ -1980,7 +1994,7 @@
         blend.style.opacity = visible ? '1' : '0';
         triggerIntro();
       } else {
-        // Hide ring disc
+        // Hide ring disc for all non-default states
         introActive = false;
         needsIntro  = true;
         blend.style.clipPath       = 'circle(0px at 44px 44px)';
@@ -1990,10 +2004,10 @@
 
         if (state === 'hi-there') {
           bubble.classList.add('bubble-visible');
-        } else {
-          // 'see-projects' — small pill
+        } else if (state === 'see-projects') {
           pill.classList.add('pill-visible');
         }
+        // 'cta-pointer': ring hidden, native pointer CSS takes over — nothing extra needed
       }
     }
 
@@ -2012,10 +2026,12 @@
         }
       }
 
-      // Priority: photo > featured work > default
+      // Priority: photo > CTA pointer > featured work > default
       let target = 'default';
       if (e.target.closest('#photoWrapper, .photo-wrapper')) {
         target = 'hi-there';
+      } else if (e.target.closest('a[href], button, [role="button"]')) {
+        target = 'cta-pointer';
       } else if (e.target.closest('.case-study-card, .product-area, .fw-header, .case-study-bottom')) {
         target = 'see-projects';
       }

@@ -11,6 +11,8 @@
   <style>
     /* ─── RESET ─────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
+    /* CTAs restore native pointer hand over the custom dot cursor */
+    a[href], button, [role="button"] { cursor: pointer !important; }
 
     /* ─── TOKENS ─────────────────────────────────────────────── */
     :root {
@@ -418,7 +420,7 @@
     .tr-bullet-wrap {
       display: flex;
       align-items: center;
-      padding: 7px 0;
+      padding: 10px 0 0;       /* top-pad = (line-height − bullet) / 2 = (30−10)/2 = 10px */
       flex-shrink: 0;
     }
     .tr-bullet {
@@ -440,16 +442,16 @@
       position: absolute;
       /* center of the 10px bullet = 5px; centering 1px line: left = 4px */
       left: 4px;
-      /* top: bullet-wrap top-padding (11px) + half bullet (5px) = 16px */
-      top: 16px;
-      bottom: 16px;
+      /* top: bullet-wrap top-padding (10px) + half bullet (5px) = 15px */
+      top: 15px;
+      bottom: 15px;
       width: 1px;
       background: rgba(37, 37, 37, 0.14);
     }
     @media (max-width: 767px) {
       .tr-items-connected { gap: 18px; }
       /* mobile bullet is 8px → center at 4px, padding 8px → top/bottom 12px */
-      .tr-items-connected::before { left: 3px; top: 12px; bottom: 12px; }
+      .tr-items-connected::before { left: 3px; top: 10px; bottom: 10px; }
     }
 
     .tr-item-content {
@@ -702,7 +704,7 @@
       .tr-label { font-size: 11px; }
       .tr-desc { font-size: 14px; line-height: 22px; }
       .tr-bullet { width: 8px; height: 8px; }
-      .tr-bullet-wrap { padding: 8px 0; }
+      .tr-bullet-wrap { padding: 6px 0 0; }   /* (20−8)/2 = 6px aligns with mobile line-height:20 */
       .tr-highlight { font-size: 14px; line-height: 20px; }
       .tr-item-desc { font-size: 13px; line-height: 20px; } /* mobile keeps compact */
       .tr-mixed { font-size: 13px; line-height: 20px; }
@@ -1755,24 +1757,17 @@
     }
   });
 
-  // Hide custom cursor only when directly over a clickable nav element (pointer takes over)
-  // The empty space between logo and nav items keeps the dot cursor visible
-  document.querySelectorAll('.nav-btn, .nav-home').forEach(el => {
+  // All CTAs: hide the dot cursor so native pointer hand shows through
+  document.querySelectorAll('a[href], button, [role="button"]').forEach(el => {
     el.addEventListener('mouseenter', () => {
-      cursor.style.opacity = '0';
+      cursor.classList.remove('hovered', 'drag-mode');
       cursor.style.transition = 'none';
+      cursor.style.opacity = '0';
     });
     el.addEventListener('mouseleave', () => {
       cursor.style.transition = '';
       cursor.style.opacity = '1';
     });
-  });
-
-  document.querySelectorAll('a, button').forEach(el => {
-    // Skip nav clickable elements — they use native pointer cursor
-    if (el.closest('.nav-btn') || el.closest('.nav-home') || el.classList.contains('nav-btn')) return;
-    el.addEventListener('mouseenter', () => { if (!cursor.classList.contains('drag-mode')) cursor.classList.add('hovered'); });
-    el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
   });
 
   const carouselViewport = document.getElementById('carouselViewport');
