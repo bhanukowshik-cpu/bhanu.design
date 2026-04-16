@@ -1060,6 +1060,13 @@
       opacity: 1;
       transform: translateY(0);
     }
+    /* When loader is skipped (return visit) show card instantly via CSS —
+       no JS timing needed, class is on <html> before body is parsed */
+    html.loader-skip .card {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      transition: none !important;
+    }
 
     /* ── Corner label — year ────────────────────────────────────────── */
     #ldYear {
@@ -1183,16 +1190,10 @@
     if (sessionStorage.getItem('loaderPlayed')) {
       loader.remove();
       document.documentElement.style.overflow = '';
-      /* .card is parsed later in the body — wait for full DOM before showing it */
-      document.addEventListener('DOMContentLoaded', () => {
-        const card = document.querySelector('.card');
-        if (card) {
-          card.style.transition = 'none';
-          card.style.opacity    = '1';
-          card.style.transform  = 'translateY(0)';
-          card.classList.add('page-ready');
-        }
-      });
+      /* Add class to <html> NOW — before .card is parsed — so the CSS rule
+         html.loader-skip .card { opacity:1 } applies the moment the card
+         element exists. No DOMContentLoaded timing needed. */
+      document.documentElement.classList.add('loader-skip');
       return;
     }
     sessionStorage.setItem('loaderPlayed', '1');
