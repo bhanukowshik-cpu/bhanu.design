@@ -1183,14 +1183,16 @@
     if (sessionStorage.getItem('loaderPlayed')) {
       loader.remove();
       document.documentElement.style.overflow = '';
-      const card = document.querySelector('.card');
-      if (card) {
-        /* No transition — make content immediately visible */
-        card.style.transition = 'none';
-        card.style.opacity    = '1';
-        card.style.transform  = 'translateY(0)';
-        card.classList.add('page-ready');
-      }
+      /* .card is parsed later in the body — wait for full DOM before showing it */
+      document.addEventListener('DOMContentLoaded', () => {
+        const card = document.querySelector('.card');
+        if (card) {
+          card.style.transition = 'none';
+          card.style.opacity    = '1';
+          card.style.transform  = 'translateY(0)';
+          card.classList.add('page-ready');
+        }
+      });
       return;
     }
     sessionStorage.setItem('loaderPlayed', '1');
