@@ -543,6 +543,37 @@
       user-select: none;
     }
 
+    /* EverTutor Live card — same green gradient as Studio */
+    .product-area-live {
+      background:
+        radial-gradient(ellipse 120% 155% at 50% 116%,
+          #20f567 0%,
+          #00d050 10%,
+          #00a838 22%,
+          #005c1e 38%,
+          #002410 55%,
+          transparent 73%),
+        linear-gradient(to top, #001a08 0%, #000603 40%, #000000 65%),
+        #000000;
+    }
+    .product-area .product-img-live {
+      position: absolute;
+      top: 45px;
+      left: 20.5%;   /* (100% - 59%) / 2 — centers a 59%-wide element */
+      width: 59%;
+      height: auto;
+      object-fit: initial;
+      object-position: initial;
+      display: block;
+      border-radius: 10px;
+      pointer-events: none;
+      box-shadow:
+        0 0 80px rgba(0, 180, 70, 0.30),
+        0 20px 60px rgba(0, 0, 0, 0.55);
+      transform: translateY(28px);
+      opacity: 0;
+    }
+
     /* Scrolling tags bar overlaid at top of product area */
     .tags-bar-overlay {
       position: absolute;
@@ -650,6 +681,18 @@
     }
     .explore-btn:hover { opacity: 0.8; }
 
+    .connect-frame {
+      background: #F7F7F7;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--secondary);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
     /* ─── METRIC CARDS (white, Figma-accurate) ───────────────────── */
     .metric-cards {
       display: flex;
@@ -709,51 +752,286 @@
       line-height: 25px;
     }
 
+    /* ─── MORE WORK CTA + ANALYTICS CARD ───────────────────────── */
+    .more-work-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .more-work-section {
+      display: flex;
+      justify-content: center;
+    }
+    .more-work-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      border: 1.5px solid var(--secondary);
+      border-radius: 100px;
+      background: transparent;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--secondary);
+      cursor: pointer !important;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .more-work-btn:hover { background: var(--secondary); color: #fff; }
+    .mw-chevron {
+      display: inline-block;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .more-work-btn.open .mw-chevron { transform: rotate(90deg); }
+
+    .analytics-card-wrapper {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.75s cubic-bezier(0.22,0.61,0.36,1),
+                  padding-top 0.4s ease;
+      padding-top: 0;
+    }
+    .analytics-card-wrapper.open {
+      max-height: 3000px;
+      padding-top: 30px;
+    }
+
+    /* Stressie product area — warm orange glow */
+    .product-area-stressie {
+      background:
+        radial-gradient(ellipse 120% 155% at 50% 116%,
+          #FF8C2A 0%, #E06010 10%, #BF5010 22%,
+          #7A2E00 38%, #3A1000 55%, transparent 73%),
+        linear-gradient(to top, #2A0E00 0%, #0F0400 40%, #000000 65%),
+        #000000;
+    }
+    .product-area .product-img-stressie {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(28px);
+      width: 22%;
+      height: auto;
+      object-fit: initial;
+      display: block;
+      border-radius: 28px;
+      pointer-events: none;
+      box-shadow:
+        0 0 80px rgba(191, 98, 18, 0.40),
+        0 20px 60px rgba(0, 0, 0, 0.55);
+      opacity: 0;
+    }
+
+    /* Analytics product area — same green as Studio/Live */
+    .product-area-analytics {
+      background:
+        radial-gradient(ellipse 120% 155% at 50% 116%,
+          #20f567 0%, #00d050 10%, #00a838 22%,
+          #005c1e 38%, #002410 55%, transparent 73%),
+        linear-gradient(to top, #001a08 0%, #000603 40%, #000000 65%),
+        #000000;
+    }
+    .product-area .product-img-analytics {
+      position: absolute;
+      top: 45px;
+      left: 20.5%;
+      width: 59%;
+      height: auto;
+      object-fit: initial;
+      object-position: initial;
+      display: block;
+      border-radius: 10px;
+      pointer-events: none;
+      box-shadow:
+        0 0 80px rgba(0, 180, 70, 0.30),
+        0 20px 60px rgba(0, 0, 0, 0.55);
+      transform: translateY(28px);
+      opacity: 0;
+    }
+
     /* ─── RESPONSIVE ─────────────────────────────────────────── */
-    @media (max-width: 900px) {
-      .hero-content  { flex-direction: column; align-items: center; }
-      .hero-heading  { font-size: 28px; line-height: 40px; }
-      .hero-left     { max-width: 100%; }
-      .photo-wrapper { width: 100%; height: 260px; }
-      .card          { width: 100%; }
-      .current-badge { white-space: normal; }
-      .top-nav       { padding: 8px 20px; }
-      .proj-bottom-row { flex-direction: column; }
-      .metric-cards  { grid-template-columns: 1fr; }
+
+    /* ── Tablet: 768px – 1023px ──────────────────────────────── */
+    @media (max-width: 1023px) {
+      .top-nav             { padding: 8px 24px; }
+      .page                { padding: 74px 20px 70px; }
+      .card                { gap: 24px; padding-bottom: 36px; border-radius: 20px; }
+      .hero                { padding: 30px 32px 0; }
+      .hero-content        { gap: 30px; }
+      .hero-heading        { font-size: 30px; line-height: 44px; }
+      .photo-wrapper       { width: 260px; height: 250px; }
+      .section-divider     { margin: 0 32px; height: 130px; }
+      .fw-header           { padding: 0 32px; }
+      .case-study-card     { margin: 0 32px; }
+      .case-study-bottom   { padding: 18px 32px 26px; }
+      .case-study-headline { font-size: 22px; line-height: 34px; }
+    }
+
+    /* ── Mobile: up to 767px ─────────────────────────────────── */
+    @media (max-width: 767px) {
+      .top-nav              { padding: 8px 16px; height: 50px; }
+      .page                 { padding: 60px 12px 56px; }
+      .card                 { gap: 20px; padding-bottom: 28px; border-radius: 16px; }
+      .hero                 { padding: 22px 20px 0; gap: 16px; }
+      .greeting             { font-size: 16px; }
+      .hero-content         { flex-direction: column; align-items: stretch; gap: 22px; }
+      .hero-left            { max-width: 100%; }
+      .hero-heading         { font-size: 26px; line-height: 38px; }
+      .hero-subtext         { font-size: 13px; line-height: 24px; }
+      .current-badge        { white-space: normal; font-size: 13px; padding: 12px 16px; }
+      .photo-wrapper        { width: 100%; height: 200px; border-radius: 16px; }
+      .photo-wrapper img.photo { border-radius: 16px; }
+      .section-divider      { margin: 0 12px; height: 90px; }
+      .sd-selected          { font-size: 12px; padding: 10px 18px; white-space: normal; text-align: center; }
+      .fw-header            { padding: 0 20px; gap: 8px; }
+      .fw-title             { font-size: 18px; }
+      .fw-desc              { font-size: 13px; line-height: 23px; }
+      .case-study-card      { margin: 0 12px; }
+      .product-area         { height: 260px; }
+      .product-area .product-img-live,
+      .product-area .product-img-analytics { width: 80%; left: 10%; top: 28px; }
+      .product-video        { width: 80%; top: 28px; }
+      .case-study-bottom    { padding: 16px 18px 22px; gap: 14px; }
+      .case-study-caption   { font-size: 12px; line-height: 22px; }
+      .case-study-hl-row    { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .case-study-hl-row .explore-btn,
+      .case-study-hl-row .connect-frame { align-self: flex-start; }
+      .case-study-headline  { font-size: 20px; line-height: 30px; }
+      .explore-btn          { font-size: 14px; padding: 10px 14px; }
+      .metric-row           { flex-direction: column; gap: 12px; }
+      .metric-value         { font-size: 14px; }
+      .metric-desc          { font-size: 12px; line-height: 21px; }
+      .more-work-btn        { font-size: 12px; padding: 10px 20px; }
+      .analytics-card-wrapper.open { padding-top: 20px; }
+      .site-footer          { padding: 20px 16px; }
+    }
+
+    /* ── Small mobile: up to 480px ───────────────────────────── */
+    @media (max-width: 480px) {
+      .hero-heading         { font-size: 22px; line-height: 33px; }
+      .product-area         { height: 220px; }
+      .product-area .product-img-live,
+      .product-area .product-img-analytics { width: 88%; left: 6%; top: 22px; }
+      .product-video        { width: 88%; top: 22px; }
+      .case-study-headline  { font-size: 18px; line-height: 28px; }
+      #ldFWPass             { width: calc(100vw - 32px); min-width: 0; }
+      #ldFramePass          { padding: 28px 20px 22px; }
+      #ldContacts           { flex-direction: column; gap: 10px; align-items: center; }
+      .ld-contact-sep       { display: none; }
     }
 
     /* ─── FOOTER ────────────────────────────────────────────────── */
     .site-footer {
       background: #1A1917;
-      padding: 22px 44px;
+      padding: 26px 44px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-    }
-    .site-footer a.footer-email {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: 0.06em;
-      color: #ffffff;
-      text-decoration: none;
-      text-transform: lowercase;
-      transition: opacity 0.2s ease;
-    }
-    .site-footer a.footer-email:hover {
-      opacity: 0.75;
+      justify-content: center;
     }
     .site-footer .footer-tagline {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 400;
       letter-spacing: 0.10em;
-      color: #ffffff;
+      color: rgba(255,255,255,0.4);
       text-transform: uppercase;
-      white-space: nowrap;
+    }
+    .footer-label { color: rgba(255,255,255,0.4); }
+    .footer-divider {
+      width: 1px; height: 12px;
+      background: rgba(255,255,255,0.15);
+      flex-shrink: 0;
+    }
+    .site-footer a.footer-email {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: #ffffff;
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+    .site-footer a.footer-email:hover { opacity: 0.6; }
+    .footer-copy-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin-left: 5px;
+      cursor: pointer !important;
+      opacity: 0.75;
+      transition: opacity 0.15s;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+    .footer-copy-btn:hover { opacity: 1; }
+    .footer-copy-btn .icon-clipboard,
+    .footer-copy-btn .icon-check {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      transition: opacity 0.18s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .footer-copy-btn .icon-check { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+    .footer-copy-btn.copied .icon-clipboard { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+    .footer-copy-btn.copied .icon-check { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .check-draw {
+      stroke-dasharray: 22;
+      stroke-dashoffset: 22;
+    }
+    .footer-copy-btn.copied .check-draw {
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.32s cubic-bezier(0.22,0.61,0.36,1) 0.08s;
     }
 
+    /* modern pill toast */
+    #copyToast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px) scale(0.96);
+      z-index: 9999;
+      background: rgba(12, 12, 12, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 100px;
+      padding: 9px 16px 9px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: rgba(255,255,255,0.88);
+      white-space: nowrap;
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
+                  opacity 0.22s ease;
+      pointer-events: none;
+    }
+    #copyToast.toast-show {
+      transform: translateX(-50%) translateY(0) scale(1);
+      opacity: 1;
+    }
+    .toast-icon {
+      width: 18px; height: 18px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
     /* ─── CUSTOM CURSOR — desktop fine-pointer only ────────────── */
     @media (pointer: fine) and (hover: hover) {
       html.cc-active,
@@ -762,6 +1040,11 @@
       html.cc-active a[href],
       html.cc-active button,
       html.cc-active [role="button"] { cursor: pointer !important; }
+      /* Password gate: restore native cursor — ring cursor not yet visible on load */
+      html.cc-active #loader,
+      html.cc-active #loader * { cursor: auto !important; }
+      html.cc-active #loader input  { cursor: text !important; }
+      html.cc-active #loader button { cursor: pointer !important; }
     }
 
     /* ── Cursor 1: Frosted glass ring cursor ────────────────────── *
@@ -1114,6 +1397,38 @@
       color: rgba(28, 26, 18, 0.55);
       letter-spacing: 0.05em;
     }
+
+    /* ── Animation section wrapper ───────────────────────────────────── */
+    #ldAnimSection {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    /* ── Toast ───────────────────────────────────────────────────────── */
+    #ldToast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: #E6F28D;
+      color: #252525;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 9px 20px;
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      pointer-events: none;
+      z-index: 100000;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    #ldToast.ld-toast-show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
 
@@ -1123,157 +1438,201 @@
   <div id="loader" aria-hidden="true">
     <div id="ldContent">
 
-      <!-- Dashed center guides -->
-      <div id="ldGH"></div>
-      <div id="ldGV"></div>
+      <!-- ── LOADER ANIMATION ──────────────────────────────────────────── -->
+      <div id="ldAnimSection">
 
-      <!-- Measurement lines — left and right of frame (positioned by JS) -->
-      <div id="ldML"><span id="ldMLPx"></span></div>
-      <div id="ldMR"><span id="ldMRPx"></span></div>
+        <div id="ldGH"></div>
+        <div id="ldGV"></div>
 
-      <!-- Central selected frame -->
-      <div id="ldFW">
+        <div id="ldML"><span id="ldMLPx"></span></div>
+        <div id="ldMR"><span id="ldMRPx"></span></div>
 
-        <!-- Layer-name chip (Figma-style label above frame) -->
-        <div id="ldLabel">
-          <div id="ldLabelDot"></div>
-          Bhanu Kowshik
+        <div id="ldFW">
+          <div id="ldLabel">
+            <div id="ldLabelDot"></div>
+            Bhanu Kowshik
+          </div>
+          <div id="ldFrame">
+            <div class="ldh c-tl"></div>
+            <div class="ldh c-tr"></div>
+            <div class="ldh c-bl"></div>
+            <div class="ldh c-br"></div>
+            <div class="ldh m-t"></div>
+            <div class="ldh m-b"></div>
+            <div class="ldh m-l"></div>
+            <div class="ldh m-r"></div>
+            <div id="ldT1W"><div id="ldT1">Senior Systems</div></div>
+            <div id="ldT2W"><div id="ldT2">Product Designer</div></div>
+          </div>
         </div>
 
-        <!-- The selection frame -->
-        <div id="ldFrame">
-          <!-- 4 corner handles -->
-          <div class="ldh c-tl"></div>
-          <div class="ldh c-tr"></div>
-          <div class="ldh c-bl"></div>
-          <div class="ldh c-br"></div>
-          <!-- 4 midpoint handles -->
-          <div class="ldh m-t"></div>
-          <div class="ldh m-b"></div>
-          <div class="ldh m-l"></div>
-          <div class="ldh m-r"></div>
+        <span id="ldYear">2026</span>
+        <div id="ldProgress"><div id="ldFill"></div></div>
+        <div id="ldCount">0%</div>
 
-          <!-- Text: clips up from bottom -->
-          <div id="ldT1W"><div id="ldT1">Senior Systems</div></div>
-          <div id="ldT2W"><div id="ldT2">Product Designer</div></div>
-        </div>
+      </div><!-- /ldAnimSection -->
 
-      </div><!-- /ldFW -->
-
-      <!-- Corner label — year only -->
-      <span id="ldYear">2026</span>
-
-      <!-- Progress bar + counter -->
-      <div id="ldProgress"><div id="ldFill"></div></div>
-      <div id="ldCount">0%</div>
+      <!-- Toast notification -->
+      <div id="ldToast" aria-live="polite"></div>
 
     </div><!-- /ldContent -->
   </div>
 
   <script>
-  /* ── Loader orchestration ──────────────────────────────────────────
-     Total: 7 000 ms
-     0     ms : scroll locked, canvas visible
-     dbl-rAF  : ld-go fires → all CSS transitions begin
-     ~400  ms : measurement lines positioned by JS
-       800 ms : progress bar starts (5 200 ms to reach 100)
-     6 200 ms : ld-exit → content fades (0.22s), loader slides up (0.78s)
-     7 100 ms : loader removed, scroll unlocked
-  ──────────────────────────────────────────────────────────────────── */
   (function () {
-    const loader  = document.getElementById('loader');
-    const fill    = document.getElementById('ldFill');
-    const counter = document.getElementById('ldCount');
+    const loader = document.getElementById('loader');
     if (!loader) return;
 
-    /* ── Skip loader on return visits within the same session ───── */
-    if (sessionStorage.getItem('loaderPlayed')) {
+    /* ── Skip loader if already shown this session ────────────────── */
+    if (sessionStorage.getItem('loaderShown')) {
       loader.remove();
       document.documentElement.style.overflow = '';
-      /* Add class to <html> NOW — before .card is parsed — so the CSS rule
-         html.loader-skip .card { opacity:1 } applies the moment the card
-         element exists. No DOMContentLoaded timing needed. */
       document.documentElement.classList.add('loader-skip');
       return;
     }
-    sessionStorage.setItem('loaderPlayed', '1');
 
     /* Lock scroll */
     document.documentElement.style.overflow = 'hidden';
 
-    /* ── Phase 1: trigger CSS animation cascade ─────────────────── */
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      loader.classList.add('ld-go');
+    /* ── Rotating title — cycles via localStorage ────────────────── */
+    const TITLES = [
+      ['Senior Systems', 'Product Designer'],
+      ['0→1 Product',    'Builder'],
+      ['AI Product',     'Designer'],
+    ];
+    const stored = parseInt(localStorage.getItem('bkTitleIdx') || '0', 10);
+    const idx    = isNaN(stored) ? 0 : ((stored % TITLES.length) + TITLES.length) % TITLES.length;
+    localStorage.setItem('bkTitleIdx', String((idx + 1) % TITLES.length));
+    const t1El = document.getElementById('ldT1');
+    const t2El = document.getElementById('ldT2');
+    if (t1El) t1El.textContent = TITLES[idx][0];
+    if (t2El) t2El.textContent = TITLES[idx][1];
 
-      /* Position measurement lines once frame is painted */
-      setTimeout(() => {
-        const frame = document.getElementById('ldFrame');
-        if (!frame) return;
-        const r   = frame.getBoundingClientRect();
-        const vw  = window.innerWidth;
-        const midY = r.top + r.height * 0.5 - 0.5;
+    /* ── Elements ────────────────────────────────────────────────── */
+    const toast       = document.getElementById('ldToast');
+    const fill        = document.getElementById('ldFill');
+    const counter     = document.getElementById('ldCount');
 
-        const ml    = document.getElementById('ldML');
-        const mr    = document.getElementById('ldMR');
-        const mlPx  = document.getElementById('ldMLPx');
-        const mrPx  = document.getElementById('ldMRPx');
+    /* Start loader immediately */
+    startLoader();
 
-        const leftGap  = Math.round(r.left);
-        const rightGap = Math.round(vw - r.right);
-
-        /* Left line: from 44 px margin to frame left edge */
-        ml.style.top   = midY + 'px';
-        ml.style.left  = '44px';
-        ml.style.width = Math.max(0, r.left - 44 - 6) + 'px';
-        mlPx.textContent = leftGap + ' px';
-
-        /* Right line: from frame right edge to 44 px margin */
-        mr.style.top   = midY + 'px';
-        mr.style.left  = (r.right + 6) + 'px';
-        mr.style.width = Math.max(0, vw - r.right - 44 - 6) + 'px';
-        mrPx.textContent = rightGap + ' px';
-      }, 400);
-    }));
-
-    /* ── Phase 2: progress bar (starts 800 ms, runs 5 200 ms) ──── */
-    const BAR_START    = 800;
-    const BAR_DURATION = 5200;
-    let barRafId;
-
-    setTimeout(() => {
-      let t0 = null;
-      function stepBar(ts) {
-        if (!t0) t0 = ts;
-        const progress = Math.min((ts - t0) / BAR_DURATION, 1);
-        const eased    = 1 - Math.pow(1 - progress, 1.6); /* gentle ease-out */
-        const pct      = Math.floor(eased * 100);
-
-        fill.style.width    = pct + '%';
-        counter.textContent = pct + '%';
-
-        if (progress < 1) barRafId = requestAnimationFrame(stepBar);
-      }
-      barRafId = requestAnimationFrame(stepBar);
-    }, BAR_START);
-
-    /* ── Phase 3: exit ──────────────────────────────────────────── */
-    setTimeout(() => {
-      cancelAnimationFrame(barRafId);
-      fill.style.width    = '100%';
-      counter.textContent = '100%';
-      loader.classList.add('ld-exit');   /* canvas slides up */
-
-      /* Fade the main card in as the loader lifts away */
-      requestAnimationFrame(() => {
-        const card = document.querySelector('.card');
-        if (card) card.classList.add('page-ready');
+    /* ── Copy buttons (email + phone, each independent) ─────────── */
+    document.querySelectorAll('.ld-copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const value    = btn.dataset.value;
+        const toastMsg = btn.dataset.toast;
+        const onCopied = () => { showToast(toastMsg); showTick(btn); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(value).then(onCopied, onCopied);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = value;
+          ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (_) {}
+          document.body.removeChild(ta);
+          onCopied();
+        }
       });
-    }, 6200);
+    });
 
-    setTimeout(() => {
-      loader.remove();
-      document.documentElement.style.overflow = '';
-    }, 7100);
+    function showToast(msg) {
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('ld-toast-show');
+      setTimeout(() => toast.classList.remove('ld-toast-show'), 2600);
+    }
+
+    function showTick(btn) {
+      const copyIcon = btn.querySelector('.ld-ci');
+      const tickIcon = btn.querySelector('.ld-ti');
+      if (!copyIcon || !tickIcon) return;
+      copyIcon.style.display = 'none';
+      tickIcon.style.display = 'block';
+      tickIcon.classList.remove('tick-animate');
+      void tickIcon.offsetWidth;
+      tickIcon.classList.add('tick-animate');
+      setTimeout(() => {
+        tickIcon.style.display = 'none';
+        copyIcon.style.display = 'block';
+      }, 2600);
+    }
+
+    /* ── Loader animation sequence ───────────────────────────────── */
+    function startLoader() {
+      let barRafId;
+
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        loader.classList.add('ld-go');
+
+        /* Position measurement lines after frame paints */
+        setTimeout(() => {
+          const frame = document.getElementById('ldFrame');
+          if (!frame) return;
+          const r    = frame.getBoundingClientRect();
+          const vw   = window.innerWidth;
+          const midY = r.top + r.height * 0.5 - 0.5;
+
+          const ml   = document.getElementById('ldML');
+          const mr   = document.getElementById('ldMR');
+          const mlPx = document.getElementById('ldMLPx');
+          const mrPx = document.getElementById('ldMRPx');
+          if (!ml || !mr) return;
+
+          const leftGap  = Math.round(r.left);
+          const rightGap = Math.round(vw - r.right);
+
+          ml.style.top   = midY + 'px';
+          ml.style.left  = '44px';
+          ml.style.width = Math.max(0, r.left - 44 - 6) + 'px';
+          mlPx.textContent = leftGap + ' px';
+
+          mr.style.top   = midY + 'px';
+          mr.style.left  = (r.right + 6) + 'px';
+          mr.style.width = Math.max(0, vw - r.right - 44 - 6) + 'px';
+          mrPx.textContent = rightGap + ' px';
+        }, 400);
+      }));
+
+      /* Progress bar: starts 800 ms, runs 5 200 ms */
+      const BAR_START    = 800;
+      const BAR_DURATION = 5200;
+
+      setTimeout(() => {
+        let t0 = null;
+        function stepBar(ts) {
+          if (!t0) t0 = ts;
+          const progress = Math.min((ts - t0) / BAR_DURATION, 1);
+          const eased    = 1 - Math.pow(1 - progress, 1.6);
+          const pct      = Math.floor(eased * 100);
+          if (fill)    fill.style.width    = pct + '%';
+          if (counter) counter.textContent = pct + '%';
+          if (progress < 1) barRafId = requestAnimationFrame(stepBar);
+        }
+        barRafId = requestAnimationFrame(stepBar);
+      }, BAR_START);
+
+      /* Exit at 6 200 ms */
+      setTimeout(() => {
+        cancelAnimationFrame(barRafId);
+        if (fill)    fill.style.width    = '100%';
+        if (counter) counter.textContent = '100%';
+        loader.classList.add('ld-exit');
+
+        requestAnimationFrame(() => {
+          const card = document.querySelector('.card');
+          if (card) card.classList.add('page-ready');
+        });
+      }, 6200);
+
+      setTimeout(() => {
+        sessionStorage.setItem('loaderShown', '1');
+        loader.remove();
+        document.documentElement.style.overflow = '';
+      }, 7100);
+    }
+
   })();
   </script>
   <!-- ══════════════════════════  END LOADER ════════════════════════ -->
@@ -1295,13 +1654,13 @@
         <div class="hero-content">
           <div class="hero-left">
             <h1 class="hero-heading reveal">
-              I'm a Senior Product Designer solving complex system problems
+              I'm a Senior Product Designer translating complex system problems
               into scalable, intuitive products through
               <em>first-principles thinking</em>.
             </h1>
 
             <p class="hero-subtext reveal">
-              With over 5+ years designing and scaling products across Fintech,
+              With 5+ years designing and scaling products across Fintech,
               B2B SaaS, B2B2C, and EdTech—owning complex systems end-to-end,
               from concept to production, with a focus on clarity, usability,
               and impact.
@@ -1312,7 +1671,7 @@
                 <div class="dot-ring"></div>
                 <div class="dot-core"></div>
               </div>
-              Currently redefining traditional tutoring / learning&nbsp; at Sigiq.ai
+              Currently redefining traditional tutoring and learning at Sigiq.ai
             </div>
           </div>
 
@@ -1352,7 +1711,7 @@
       <!-- ── FEATURED WORK: EverTutor header ──────────────────── -->
       <div class="fw-header reveal">
         <h2 class="fw-title">1. EverTutor</h2>
-        <p class="fw-desc">As a Lead Product Designer, I led and co-led design and curriculum direction across three platforms, Studio (create), Live (serve), and Analytics (measure), building a cohesive AI tutoring platform that connects content creation, delivery, and mastery tracking to enable personalized learning at scale.</p>
+        <p class="fw-desc">As a Lead Product Designer, I led design and curriculum direction across three platforms — Studio (create), Live (serve), and Analytics (measure) — building a cohesive AI tutoring platform that connects content creation, delivery, and mastery tracking to enable personalized learning at scale.</p>
       </div>
 
       <!-- ── CASE STUDY CARD ────────────────────────────────────── -->
@@ -1417,13 +1776,192 @@
 
       </div><!-- /case-study-card -->
 
+      <!-- ── CASE STUDY CARD 2 — EverTutor Live ──────────────────── -->
+      <div class="case-study-card reveal" id="csCardLive">
+
+        <!-- Product area with scrolling tags bar -->
+        <div class="product-area product-area-live">
+          <div class="tags-bar-overlay">
+            <div class="tags-bar-track" id="tagsBarTrackLive"></div>
+          </div>
+          <img
+            id="productImgLive"
+            class="product-img-live"
+            src="ET Live Case Study/Section 1 Images/New Student home page.png"
+            alt="EverTutor Live UI"
+          />
+        </div>
+
+        <!-- Caption + headline + CTA + metrics -->
+        <div class="case-study-bottom">
+          <p class="case-study-caption reveal">1.2 EverTutor Live (AI Tutor Experience Platform)</p>
+
+          <div class="case-study-hl-row reveal">
+            <p class="case-study-headline">Designed a 0→1 AI Tutor System Operationalizing Bloom's 2 Sigma, Scaling 1:1 Learning Across 8+ Schools and ~2,000 Students</p>
+            <a class="explore-btn" href="./evertutor-live.html">Explore the system ↗</a>
+          </div>
+
+          <div class="metric-cards">
+            <div class="metric-row">
+              <div class="metric-card reveal">
+                <p class="metric-value">Operationalized <mark>Bloom's 2 Sigma</mark> at scale</p>
+                <p class="metric-desc">Personalized 1:1 tutoring with measurable learning outcome alignment (~97%)</p>
+              </div>
+              <div class="metric-card reveal">
+                <p class="metric-value"><mark>~300+ active tutoring hours</mark> daily</p>
+                <p class="metric-desc">Continuous real-time AI Tutor interactions across live classrooms</p>
+              </div>
+            </div>
+            <div class="metric-row">
+              <div class="metric-card reveal">
+                <p class="metric-value">From static lessons → <mark>adaptive instruction</mark></p>
+                <p class="metric-desc">Real-time personalization based on student responses</p>
+              </div>
+              <div class="metric-card reveal">
+                <p class="metric-value"><mark>Multimodal</mark> interaction model</p>
+                <p class="metric-desc">Voice-first system extended with multimodal inputs to support diverse student interaction preferences</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /case-study-card-live -->
+
+      <!-- ── MORE WORK CTA + ANALYTICS CARD ──────────────────────── -->
+      <div class="more-work-wrap">
+
+        <div class="more-work-section">
+          <button class="more-work-btn" id="moreWorkBtn">
+            More work from EverTutor <span class="mw-chevron">≫</span>
+          </button>
+        </div>
+
+        <div class="analytics-card-wrapper" id="analyticsWrapper">
+          <div class="case-study-card" id="csCardAnalytics">
+
+            <div class="product-area product-area-analytics">
+              <div class="tags-bar-overlay">
+                <div class="tags-bar-track" id="tagsBarTrackAnalytics"></div>
+              </div>
+              <img
+                id="productImgAnalytics"
+                class="product-img-analytics"
+                src="ET Live Case Study/Current Dashboard Experience.png"
+                alt="EverTutor Analytics Dashboard"
+              />
+            </div>
+
+            <div class="case-study-bottom">
+              <p class="case-study-caption">1.3 EverTutor Analytics (AI Tutor Analytics Platform)</p>
+
+              <div class="case-study-hl-row">
+                <p class="case-study-headline">Designed a 0→1 Analytics Platform for AI Tutoring, Turning Student Behavior Into Actionable Insights for Educators</p>
+                <div class="connect-frame">Connect for details</div>
+              </div>
+            </div>
+
+          </div><!-- /csCardAnalytics -->
+        </div><!-- /analyticsWrapper -->
+
+      </div><!-- /more-work-wrap -->
+
+      <!-- ── SECTION DIVIDER — Stressie ────────────────────────── -->
+      <div class="section-divider" id="sdFrameStressie">
+        <div class="sd-guide-h"></div>
+        <div class="sd-guide-v"></div>
+        <div class="sd-selected">
+          <span class="sd-handle tl"></span>
+          <span class="sd-handle tr"></span>
+          <span class="sd-handle bl"></span>
+          <span class="sd-handle br"></span>
+          Health &amp; Wellness · Startup · 0→1
+        </div>
+        <div class="sd-measure" id="sdMeasureStressieL"></div>
+        <div class="sd-measure" id="sdMeasureStressieR"></div>
+      </div>
+
+      <!-- ── FEATURED WORK: Stressie header ─────────────────────── -->
+      <div class="fw-header reveal">
+        <h2 class="fw-title">2. Stressie</h2>
+        <p class="fw-desc">As the Founding Product Designer, I built Stressie's product experience from the ground up — leading design strategy, running pilot research, and shipping a full redesign informed by real user data. The app is incubated at Harvard Innovation Labs and is actively piloting at Amazon and InKind.</p>
+      </div>
+
+      <!-- ── CASE STUDY CARD — Stressie ─────────────────────────── -->
+      <div class="case-study-card reveal" id="csCardStressie">
+
+        <div class="product-area product-area-stressie">
+          <div class="tags-bar-overlay">
+            <div class="tags-bar-track" id="tagsBarTrackStressie"></div>
+          </div>
+          <img
+            id="productImgStressie"
+            class="product-img-stressie"
+            src="Stressie%20Case%20Study%20Updated%20Materials/Summary%20of%20the%20project/Home%20Screen%20Image.png"
+            alt="Stressie app"
+          />
+        </div>
+
+        <div class="case-study-bottom">
+          <p class="case-study-caption reveal">2.1 Stressie (Workplace Stress Management Platform)</p>
+
+          <div class="case-study-hl-row reveal">
+            <p class="case-study-headline">Redesigned a Workplace Stress App From the Ground Up — From Pilot Insights to a Harvard-Incubated Product Piloting at Amazon &amp; InKind</p>
+            <a class="explore-btn" href="./stressie-studio.html">Explore the case study ↗</a>
+          </div>
+
+          <div class="metric-cards">
+            <div class="metric-row">
+              <div class="metric-card reveal">
+                <p class="metric-value"><mark>17.4%</mark> engagement rate vs ~2% industry average</p>
+                <p class="metric-desc">Measured across the Version 1 pilot with 50 Austin Police Department officers</p>
+              </div>
+              <div class="metric-card reveal">
+                <p class="metric-value">Incubating at <mark>Harvard Innovation Labs</mark></p>
+                <p class="metric-desc">Selected and supported by one of the world's leading startup incubators</p>
+              </div>
+            </div>
+            <div class="metric-row">
+              <div class="metric-card reveal">
+                <p class="metric-value">Piloting at <mark>Amazon &amp; InKind</mark></p>
+                <p class="metric-desc">Active enterprise pilots validating the redesigned experience with real workplace users</p>
+              </div>
+              <div class="metric-card reveal">
+                <p class="metric-value"><mark>Full redesign</mark> from V1 pilot research</p>
+                <p class="metric-desc">Rebuilt IA, visual language, and onboarding based on structured pilot feedback from 50 users</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /csCardStressie -->
+
     </div><!-- /card -->
   </div><!-- /page -->
 
   <footer class="site-footer">
-    <a href="mailto:kowshikbhanu1000@gmail.com" class="footer-email">kowshikbhanu1000@gmail.com</a>
-    <span class="footer-tagline">Designed by me, built with Claude &mdash; &sim;1M tokens later</span>
+    <span class="footer-tagline">
+      <span class="footer-label">Connect with me</span>
+      <span class="footer-divider"></span>
+      <a href="mailto:kowshikbhanu1000@gmail.com" class="footer-email">kowshikbhanu1000@gmail.com</a>
+      <button class="footer-copy-btn" data-copy="kowshikbhanu1000@gmail.com" data-toast="mail" aria-label="Copy email">
+        <svg class="icon-clipboard" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <svg class="icon-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="4 12 9 17 20 7"/></svg>
+      </button>
+      <span class="footer-divider"></span>
+      <a href="tel:+15128448316" class="footer-email">+1 (512) 844-8316</a>
+      <button class="footer-copy-btn" data-copy="+15128448316" data-toast="phone" aria-label="Copy phone">
+        <svg class="icon-clipboard" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <svg class="icon-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="4 12 9 17 20 7"/></svg>
+      </button>
+    </span>
   </footer>
+
+  <div id="copyToast">
+    <div class="toast-icon">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <span id="copyToastMsg">Mail copied</span>
+  </div>
 
   <script>
     /* ═══════════════════════════════════════════════════════════
@@ -1642,14 +2180,14 @@
     const csTags = [
       "10 min read",
       "End-to-End Product Design",
-      "System Thinking",
+      "Systems Thinking",
       "0 → 1 Product Build",
       "Cross-Functional Execution",
       "Voice + Multimodal UX",
     ];
 
-    const tagStarSVG = `<svg class="tag-star" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
-      <path fill="rgba(255,255,255,0.5)" d="M10.042,2.826 Q11.000,1.800 11.958,2.826 Q12.915,3.852 14.258,3.442 Q15.600,3.033 15.916,4.400 Q16.233,5.767 17.600,6.084 Q18.967,6.400 18.558,7.742 Q18.148,9.085 19.174,10.042 Q20.200,11.000 19.174,11.958 Q18.148,12.915 18.558,14.258 Q18.967,15.600 17.600,15.916 Q16.233,16.233 15.916,17.600 Q15.600,18.967 14.258,18.558 Q12.915,18.148 11.958,19.174 Q11.000,20.200 10.042,19.174 Q9.085,18.148 7.742,18.558 Q6.400,18.967 6.084,17.600 Q5.767,16.233 4.400,15.916 Q3.033,15.600 3.442,14.258 Q3.852,12.915 2.826,11.958 Q1.800,11.000 2.826,10.042 Q3.852,9.085 3.442,7.742 Q3.033,6.400 4.400,6.084 Q5.767,5.767 6.084,4.400 Q6.400,3.033 7.742,3.442 Q9.085,3.852 10.042,2.826 Z"/>
+    const tagStarSVG = `<svg class="tag-star" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path fill="rgba(255,255,255,0.85)" d="M12 2C12 2 12.7 8.7 15.3 11.3C17.9 13.9 24 12 24 12C24 12 17.9 10.1 15.3 12.7C12.7 15.3 12 22 12 22C12 22 11.3 15.3 8.7 12.7C6.1 10.1 0 12 0 12C0 12 6.1 13.9 8.7 11.3C11.3 8.7 12 2 12 2Z"/>
     </svg>`;
 
     const tagsBarTrack = document.getElementById('tagsBarTrack');
@@ -1673,6 +2211,38 @@
           requestAnimationFrame(animateTags);
         }
         animateTags();
+      });
+    }
+
+    /* ── EverTutor Live tags bar ──────────────────────────────── */
+    const csTagsLive = [
+      "8 min read",
+      "Cross-Team Collaboration",
+      "Systems Thinking",
+      "0 → 1 Product Build",
+      "Cross-Functional Execution",
+      "Voice + Multimodal UX",
+    ];
+    const tagsBarTrackLive = document.getElementById('tagsBarTrackLive');
+    if (tagsBarTrackLive) {
+      let tagsHtmlLive = '';
+      for (let pass = 0; pass < 2; pass++) {
+        csTagsLive.forEach(tag => {
+          tagsHtmlLive += `<span class="tag-pill">${tagStarSVG}<span class="tag-text">${tag}</span></span>`;
+        });
+      }
+      tagsBarTrackLive.innerHTML = tagsHtmlLive;
+      requestAnimationFrame(() => {
+        const halfW = tagsBarTrackLive.scrollWidth / 2;
+        const speed = halfW / (60 * 60);
+        let pos = 0;
+        function animateTagsLive() {
+          pos -= speed;
+          if (pos <= -halfW) pos += halfW;
+          tagsBarTrackLive.style.transform = `translateX(${pos}px)`;
+          requestAnimationFrame(animateTagsLive);
+        }
+        animateTagsLive();
       });
     }
 
@@ -1768,6 +2338,159 @@
       document.addEventListener('keydown',    onInteract, { once: true, passive: true });
     })();
 
+    /* ── EverTutor Live card image fade-in ─────────────────────── */
+    (function () {
+      const img  = document.getElementById('productImgLive');
+      const area = img && img.closest('.product-area');
+      const card = img && img.closest('.case-study-card');
+      if (!img) return;
+
+      function fadeImgIn() {
+        img.style.transition =
+          'opacity 0.75s cubic-bezier(0.22, 0.61, 0.36, 1), ' +
+          'transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1)';
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            img.style.opacity   = '1';
+            img.style.transform = 'translateY(0)';
+          });
+        });
+      }
+
+      if ('IntersectionObserver' in window && area) {
+        const obs = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) {
+            let fired = false;
+            const onReady = () => { if (fired) return; fired = true; fadeImgIn(); };
+            if (card) card.addEventListener('animationend', onReady, { once: true });
+            setTimeout(onReady, 750);
+            obs.unobserve(area);
+          }
+        }, { threshold: 0.85 });
+        obs.observe(area);
+      } else {
+        fadeImgIn();
+      }
+    })();
+
+    /* ── Analytics tags bar ───────────────────────────────────── */
+    const csTagsAnalytics = [
+      "Systems Thinking",
+      "Data-Driven Design",
+      "Analytics & Insights",
+      "0 → 1 Product Build",
+      "Cross-Functional Execution",
+      "Product Strategy",
+      "Voice + Multimodal UX",
+    ];
+    const tagsBarTrackAnalytics = document.getElementById('tagsBarTrackAnalytics');
+    if (tagsBarTrackAnalytics) {
+      let tagsHtmlA = '';
+      for (let pass = 0; pass < 2; pass++) {
+        csTagsAnalytics.forEach(tag => {
+          tagsHtmlA += `<span class="tag-pill">${tagStarSVG}<span class="tag-text">${tag}</span></span>`;
+        });
+      }
+      tagsBarTrackAnalytics.innerHTML = tagsHtmlA;
+      requestAnimationFrame(() => {
+        const halfW = tagsBarTrackAnalytics.scrollWidth / 2;
+        const speed = halfW / (60 * 60);
+        let pos = 0;
+        function animateTagsAnalytics() {
+          pos -= speed;
+          if (pos <= -halfW) pos += halfW;
+          tagsBarTrackAnalytics.style.transform = `translateX(${pos}px)`;
+          requestAnimationFrame(animateTagsAnalytics);
+        }
+        animateTagsAnalytics();
+      });
+    }
+
+    /* ── Stressie tags bar ───────────────────────────────────── */
+    const csTagsStressie = [
+      "Founding Product Designer",
+      "0 → 1 Product Build",
+      "Health & Wellness",
+      "Pilot Research",
+      "Harvard Innovation Labs",
+      "Enterprise Pilots",
+      "Startup UX",
+    ];
+    const tagsBarTrackStressie = document.getElementById('tagsBarTrackStressie');
+    if (tagsBarTrackStressie) {
+      let tagsHtmlS = '';
+      for (let pass = 0; pass < 2; pass++) {
+        csTagsStressie.forEach(tag => {
+          tagsHtmlS += `<span class="tag-pill">${tagStarSVG}<span class="tag-text">${tag}</span></span>`;
+        });
+      }
+      tagsBarTrackStressie.innerHTML = tagsHtmlS;
+      requestAnimationFrame(() => {
+        const halfW = tagsBarTrackStressie.scrollWidth / 2;
+        const speed = halfW / (60 * 60);
+        let pos = 0;
+        function animateTagsStressie() {
+          pos -= speed;
+          if (pos <= -halfW) pos += halfW;
+          tagsBarTrackStressie.style.transform = `translateX(${pos}px)`;
+          requestAnimationFrame(animateTagsStressie);
+        }
+        animateTagsStressie();
+      });
+    }
+
+    /* ── Stressie phone image fade-in ────────────────────────── */
+    (function () {
+      const img  = document.getElementById('productImgStressie');
+      const area = img && img.closest('.product-area');
+      const card = img && img.closest('.case-study-card');
+      if (!img) return;
+
+      function fadeImgIn() {
+        img.style.transition =
+          'opacity 0.75s cubic-bezier(0.22, 0.61, 0.36, 1), ' +
+          'transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1)';
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            img.style.opacity   = '1';
+            img.style.transform = 'translateX(-50%) translateY(0)';
+          });
+        });
+      }
+
+      if ('IntersectionObserver' in window && area) {
+        const obs = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) {
+            let fired = false;
+            const onReady = () => { if (fired) return; fired = true; fadeImgIn(); };
+            if (card) card.addEventListener('animationend', onReady, { once: true });
+            setTimeout(onReady, 750);
+            obs.unobserve(area);
+          }
+        }, { threshold: 0.85 });
+        obs.observe(area);
+      } else {
+        fadeImgIn();
+      }
+    })();
+
+    /* ── More work CTA toggle ──────────────────────────────────── */
+    (function () {
+      const btn     = document.getElementById('moreWorkBtn');
+      const wrapper = document.getElementById('analyticsWrapper');
+      if (!btn || !wrapper) return;
+
+      btn.addEventListener('click', () => {
+        wrapper.classList.add('open');
+        btn.style.transition = 'opacity 0.25s ease';
+        btn.style.opacity = '0';
+        setTimeout(() => { btn.style.display = 'none'; }, 260);
+        setTimeout(() => {
+          wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }, { once: true });
+    })();
+
     /* ── SECTION DIVIDER — live measurement labels ─────────────── */
     (function () {
       const frame    = document.getElementById('sdFrame');
@@ -1801,6 +2524,35 @@
       requestAnimationFrame(update);
 
       // Keep live on resize
+      if (window.ResizeObserver) {
+        new ResizeObserver(update).observe(frame);
+        new ResizeObserver(update).observe(selected);
+      }
+      window.addEventListener('resize', update);
+    })();
+
+    /* ── Stressie section divider measurement labels ────────────── */
+    (function () {
+      const frame    = document.getElementById('sdFrameStressie');
+      const selected = frame && frame.querySelector('.sd-selected');
+      const labelL   = document.getElementById('sdMeasureStressieL');
+      const labelR   = document.getElementById('sdMeasureStressieR');
+      if (!frame || !selected) return;
+
+      function update() {
+        const fR = frame.getBoundingClientRect();
+        const sR = selected.getBoundingClientRect();
+        const leftSpacing  = Math.round(sR.left  - fR.left);
+        const rightSpacing = Math.round(fR.right  - sR.right);
+        labelL.textContent = leftSpacing  + ' px';
+        labelR.textContent = rightSpacing + ' px';
+        labelL.style.left = ((sR.left - fR.left) / 2) + 'px';
+        labelR.style.left = (fR.width - (fR.right - sR.right) / 2) + 'px';
+        labelL.style.transform = 'translateX(-50%) translateY(-50%)';
+        labelR.style.transform = 'translateX(-50%) translateY(-50%)';
+      }
+
+      requestAnimationFrame(update);
       if (window.ResizeObserver) {
         new ResizeObserver(update).observe(frame);
         new ResizeObserver(update).observe(selected);
@@ -2014,6 +2766,10 @@
         if (state === 'hi-there') {
           bubble.classList.add('bubble-visible');
         } else if (state === 'see-projects') {
+          pillText.textContent = 'See projects';
+          pill.classList.add('pill-visible');
+        } else if (state === 'connect-details') {
+          pillText.textContent = 'Connect for details';
           pill.classList.add('pill-visible');
         }
         // 'cta-pointer': ring hidden, native pointer CSS takes over — nothing extra needed
@@ -2035,10 +2791,12 @@
         }
       }
 
-      // Priority: photo > CTA pointer > featured work > default
+      // Priority: photo > connect-frame > CTA pointer > featured work > default
       let target = 'default';
       if (e.target.closest('#photoWrapper, .photo-wrapper')) {
         target = 'hi-there';
+      } else if (e.target.closest('.connect-frame')) {
+        target = 'connect-details';
       } else if (e.target.closest('a[href], button, [role="button"]')) {
         target = 'cta-pointer';
       } else if (e.target.closest('.case-study-card, .product-area, .fw-header, .case-study-bottom')) {
@@ -2105,6 +2863,35 @@
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
+  })();
+  </script>
+
+  <script>
+  /* ── Footer copy buttons + shadcn-style toast ──────────────── */
+  (function () {
+    const toast    = document.getElementById('copyToast');
+    const toastMsg = document.getElementById('copyToastMsg');
+    let hideTimer;
+
+    function showToast(msg) {
+      clearTimeout(hideTimer);
+      toastMsg.textContent = msg;
+      toast.classList.add('toast-show');
+      hideTimer = setTimeout(() => toast.classList.remove('toast-show'), 2800);
+    }
+
+    document.querySelectorAll('.footer-copy-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const text  = btn.dataset.copy;
+        const label = btn.dataset.toast === 'mail' ? 'Mail copied' : 'Phone copied';
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(label);
+          btn.classList.add('copied');
+          setTimeout(() => btn.classList.remove('copied'), 2200);
+        });
+      });
+    });
   })();
   </script>
 </body>

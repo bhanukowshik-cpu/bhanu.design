@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EverTutor Live — Bhanu Kowshik</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=JetBrains+Mono:wght@300;400;500&family=Shantell+Sans:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
+    a[href], button, [role="button"] { cursor: pointer !important; }
+
+    /* ─── TOKENS ─────────────────────────────────────────────── */
+    :root {
+      --secondary:    #252525;
+      --bg:           #FFFCF8;
+      --white:        #FFFFFF;
+      --grey:         #9C9C9C;
+      --border:       #EFEFEF;
+      --green:        #1C9C6D;
+      --font-heading: 'Montserrat', sans-serif;
+      --font-mono:    'JetBrains Mono', monospace;
+    }
+
+    /* ─── BODY ───────────────────────────────────────────────── */
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--bg);
+      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
+      background-size: 19px 19px;
+      background-attachment: fixed;
+      min-height: 100vh;
+      font-family: var(--font-heading);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ─── CUSTOM CURSOR ──────────────────────────────────────── */
+    #customCursor {
+      position: fixed;
+      width: 17px; height: 17px;
+      background: #252525;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      will-change: left, top;
+      transition: width 0.18s ease, height 0.18s ease;
+    }
+    #customCursor.hovered { opacity: 0; }
+    #customCursor.on-card { background: #FFF; mix-blend-mode: difference; }
+
+    /* ─── NAV ────────────────────────────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      background: rgba(255,252,248,0.82);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0px 1px 0px 0px rgba(0,0,0,0.06);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 40px; height: 54px;
+      transform: translateY(0);
+      transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+    }
+    .nav.nav-hidden { transform: translateY(-100%); }
+    .nav-home {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; flex-shrink: 0; cursor: pointer !important;
+    }
+    .nav-home img { width: 38px; height: 38px; display: block; transform: rotate(200deg); transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1); }
+    .nav-home:hover img { transform: rotate(180deg); }
+    .nav-home span { font-family: var(--font-heading); font-weight: 600; font-size: 15px; color: var(--secondary); white-space: nowrap; }
+    .nav-sections { display: flex; align-items: center; gap: 4px; }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      padding: 5px 15px; border-radius: 5px; border: none; background: transparent;
+      font-family: var(--font-mono); font-weight: 500; font-size: 12px;
+      color: var(--secondary); text-transform: uppercase; text-decoration: none;
+      white-space: nowrap; cursor: pointer !important;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .nav-btn:hover:not(.active) { background: #F2F2F2; }
+    .nav-btn.active { background: var(--secondary); color: var(--white); }
+
+    /* ─── PAGE / CARD ────────────────────────────────────────── */
+    .page { display: flex; justify-content: center; padding: 94px 40px 90px; }
+    .card {
+      background: var(--white); width: 1200px; max-width: 100%;
+      border-radius: 30px; box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+
+    /* ─── HERO SECTION ───────────────────────────────────────── */
+    .cs-hero { display: flex; flex-direction: column; gap: 24px; padding: 36px 40px 0; }
+
+    /* Designation pills */
+    .designation-row { display: flex; align-items: center; gap: 10px; opacity: 0; }
+    .designation-row.visible { animation: fade-in 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
+    .desig-pill {
+      background: rgba(247,247,247,0.95); padding: 5px 20px; border-radius: 100px;
+      font-family: var(--font-mono); font-weight: 400; font-size: 12px;
+      color: var(--secondary); white-space: nowrap; display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Live dot */
+    .pulse-wrap { position: relative; width: 8px; height: 8px; flex-shrink: 0; }
+    .pulse-wrap .dot-core { position: absolute; inset: 0; border-radius: 50%; background: #1C9C6D; z-index: 1; }
+    .pulse-wrap .dot-ring { position: absolute; inset: 0; border-radius: 50%; background: #1C9C6D; animation: pulse-subtle 2.4s ease-out infinite; z-index: 0; }
+    @keyframes pulse-subtle { 0% { transform: scale(1); opacity: 0.45; } 100% { transform: scale(1.9); opacity: 0; } }
+
+    /* Main heading */
+    .cs-heading { font-family: var(--font-heading); font-weight: 700; font-size: 40px; line-height: 55px; color: var(--secondary); }
+    .cs-heading .word { display: inline-block; opacity: 0; transform: translateY(22px); will-change: opacity, transform; }
+    .cs-heading .word.visible { animation: word-rise 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
+
+    @keyframes word-rise  { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fade-in    { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes section-rise { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── HERO FRAME — uses actual background + screen images ── */
+    .et-live-frame {
+      width: 100%; height: 420px;
+      position: relative; overflow: hidden; border-radius: 10px;
+      display: flex; justify-content: center; align-items: flex-start;
+      padding-top: 12px;
+      opacity: 0; transform: translateY(40px);
+    }
+    .et-live-frame.visible { animation: section-rise 1.1s cubic-bezier(0.16,1,0.3,1) both; }
+
+    .et-bg-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; display: block; pointer-events: none; z-index: 0;
+    }
+    .et-screen-img {
+      position: relative; z-index: 1;
+      width: 68%;
+      height: auto; display: block;
+      border-radius: 10px 10px 0 0;
+      box-shadow: 0 -14px 60px rgba(0,0,0,0.45);
+    }
+
+    /* ─── SECTION WRAPPER ────────────────────────────────────── */
+    .cs-section-wrap { padding: 30px 40px; opacity: 0; transform: translateY(40px); }
+    .cs-section-wrap.triggered { opacity: 1; transform: translateY(0); transition: none; }
+    .tr-anim { opacity: 0; transform: translateY(40px); }
+    .tr-anim.visible { animation: section-rise 1.1s cubic-bezier(0.16,1,0.3,1) both; }
+
+    /* ─── PROBLEM CARD ───────────────────────────────────────── */
+    .problem-card {
+      border: 1px solid #EFEFEF; border-radius: 20px; padding: 20px;
+      background: white; box-shadow: inset 0 0 4px rgba(0,0,0,0.08);
+      display: flex; flex-direction: column; gap: 30px;
+    }
+    .problem-top { display: flex; gap: 30px; align-items: flex-start; }
+    .problem-img { width: 100px; height: 150px; flex-shrink: 0; border-radius: 10px 0 0 0; overflow: hidden; }
+    .problem-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .problem-header { flex: 1; display: flex; flex-direction: column; gap: 10px; padding-top: 15px; }
+    .section-label { font-family: var(--font-mono); font-weight: 500; font-size: 15px; color: #515151; }
+    .problem-statement { font-family: var(--font-heading); font-weight: 700; font-size: 20px; line-height: 30px; color: var(--secondary); }
+
+    /* Middle row */
+    .problem-mid { display: flex; gap: 30px; align-items: flex-start; }
+    .graph-wrap { flex: 0 0 42%; }
+    #bloomsGraph { width: 100%; height: auto; display: block; }
+
+    /* Graph curve styles — no initial dash, clipping handles reveal */
+    .bloom-curve { fill: none; stroke: #252525; stroke-width: 1.5; }
+    .bloom-fill { opacity: 0; transition: opacity 0.9s ease; }
+    .bloom-fill.visible { opacity: 1; }
+    .bloom-label { opacity: 0; transition: opacity 0.45s ease; }
+    .bloom-label.visible { opacity: 1; }
+
+    .problem-points { flex: 1; display: flex; flex-direction: column; gap: 20px; padding-top: 4px; }
+    .prob-bullet { display: flex; gap: 10px; align-items: flex-start; }
+    .prob-dot { width: 10px; height: 10px; background: var(--secondary); flex-shrink: 0; margin-top: 9px; }
+    .prob-bullet-content { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .prob-title { font-family: var(--font-heading); font-weight: 700; font-size: 18px; line-height: 27px; color: var(--secondary); }
+    .prob-body { font-family: var(--font-mono); font-weight: 500; font-size: 14px; line-height: 25px; color: #515151; }
+
+    .insight-box { background: #F9F9F9; border-radius: 10px; padding: 20px; }
+    .insight-box p { font-family: var(--font-mono); font-weight: 500; font-style: italic; font-size: 14px; line-height: 25px; color: #515151; }
+
+    /* Bottom — "What if" */
+    .problem-bottom { display: flex; flex-direction: column; gap: 15px; }
+    .what-if-header { font-family: var(--font-heading); font-weight: 700; font-size: 15px; line-height: 25px; color: var(--secondary); }
+    .what-if-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .what-if-card { background: white; border: 1px solid #F0F0F0; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+    .what-if-title { font-family: var(--font-mono); font-weight: 700; font-size: 14px; line-height: 25px; color: var(--secondary); }
+    .et-hl {
+      background: linear-gradient(#E6F28D, #E6F28D) no-repeat left center / 0% 100%;
+      transition: background-size 0.55s cubic-bezier(0.22,0.61,0.36,1);
+      border-radius: 3px; padding: 1px 3px;
+    }
+    .et-hl.revealed { background-size: 100% 100%; }
+    .what-if-body { font-family: var(--font-mono); font-weight: 500; font-size: 14px; line-height: 25px; color: #515151; }
+
+    /* ─── CHALLENGES CARD ──────────────────────────────────── */
+    .challenges-card {
+      border: 1px solid #EFEFEF; border-radius: 20px; padding: 20px;
+      background: white; box-shadow: inset 0 0 4px rgba(0,0,0,0.08);
+      display: flex; flex-direction: column; gap: 30px;
+    }
+    .chal-top { display: flex; gap: 30px; align-items: flex-start; }
+    .chal-img { width: 100px; height: 150px; flex-shrink: 0; border-radius: 10px 0 0 0; overflow: hidden; }
+    .chal-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .chal-header { flex: 1; display: flex; flex-direction: column; gap: 10px; padding-top: 15px; }
+    .chal-items { display: flex; flex-direction: column; gap: 40px; }
+    .chal-item { display: flex; gap: 10px; align-items: flex-start; }
+    .chal-item-content { flex: 1; display: flex; flex-direction: column; }
+    .chal-item-content .chal-statement { margin-top: 10px; }
+    .chal-item-content .chal-body { margin-top: 15px; }
+    .chal-title { font-family: var(--font-heading); font-weight: 600; font-size: 20px; line-height: 28px; color: var(--secondary); }
+    .chal-statement { font-family: var(--font-mono); font-weight: 500; font-size: 18px; line-height: 28px; color: var(--secondary); }
+    .chal-body { font-family: var(--font-mono); font-weight: 400; font-size: 15px; line-height: 25px; color: #515151; }
+    .chal-next { font-family: var(--font-mono); font-size: 12px; line-height: 20px; }
+    .chal-next strong { font-weight: 700; color: #252525; }
+    .chal-next span { font-weight: 400; color: #515151; }
+
+    /* ─── SYSTEM SECTION ────────────────────────────────── */
+    .system-card {
+      border: 1px solid #EFEFEF; border-radius: 20px; padding: 20px;
+      background: white; box-shadow: inset 0 0 4px rgba(0,0,0,0.08);
+      display: flex; flex-direction: column; gap: 30px;
+    }
+    /* Phase tabs */
+    .phase-tabs-wrap {
+      border: 1px solid rgba(37,37,37,0.05); border-radius: 10px; padding: 10px;
+      box-shadow: inset 0 0 5px rgba(37,37,37,0.15); background: white;
+    }
+    .phase-tabs { display: flex; gap: 0; }
+    .phase-tab {
+      flex: 1; height: 30px; border-radius: 5px; border: none; cursor: pointer;
+      font-family: var(--font-mono); font-weight: 700; font-size: 12px; line-height: 30px;
+      background: white; color: var(--secondary); text-align: center;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .phase-tab.active { background: var(--secondary); color: white; }
+    /* Phase panels */
+    @keyframes phaseFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .phase-panel { display: none; flex-direction: column; gap: 30px; }
+    .phase-panel > div > .phase-desc { margin-top: 15px; }
+    .phase-panel.active { display: flex; animation: phaseFadeIn 0.35s cubic-bezier(0.16,1,0.3,1) both; }
+    .phase-heading { font-family: var(--font-heading); font-weight: 700; font-size: 20px; line-height: 30px; color: var(--secondary); }
+    .phase-desc { font-family: var(--font-mono); font-weight: 500; font-size: 15px; line-height: 25px; color: #515151; }
+    /* Core caps label */
+    .caps-label {
+      display: inline-block; background: #E6F28D; padding: 2px 0;
+      font-family: var(--font-mono); font-weight: 600; font-size: 18px; color: var(--secondary);
+    }
+    /* Carousel */
+    .sys-carousel { overflow: hidden; padding-top: 8px; margin-top: -8px; }
+    .sys-carousel-track { display: flex; gap: 20px; transition: transform 0.45s cubic-bezier(0.16,1,0.3,1); }
+    .sys-card {
+      flex: 0 0 calc((100% - 30px) / 2.5); padding: 20px;
+      display: flex; flex-direction: column; gap: 15px;
+      background: white; border-radius: 10px;
+    }
+    .sys-card-img {
+      width: 100%; aspect-ratio: 350 / 258; border-radius: 10px;
+      overflow: hidden; box-shadow: 0 0 5px 0 rgba(37,37,37,0.05); background: #f0f0f0;
+    }
+    .sys-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Phase 4 — 2 cards split full width */
+    [data-phase="4"] .sys-card { flex: 0 0 calc((100% - 20px) / 2); }
+    [data-phase="4"] .sys-card-img { aspect-ratio: 500 / 258; }
+    .sys-card-body { display: flex; flex-direction: column; gap: 10px; }
+    .sys-card-title { font-family: var(--font-mono); font-weight: 700; font-size: 18px; line-height: 27px; color: var(--secondary); }
+    .sys-card-desc { font-family: var(--font-mono); font-weight: 400; font-size: 15px; line-height: 25px; color: #515151; }
+    /* Carousel controls */
+    .sys-carousel-footer { display: flex; flex-direction: column; gap: 20px; }
+    .sys-carousel-controls { display: flex; justify-content: flex-end; }
+    .sys-nav {
+      display: inline-flex; align-items: center; gap: 20px;
+      padding: 10px 15px; border: 1px solid rgba(37,37,37,0.05); border-radius: 10px;
+      background: white; box-shadow: inset 0 0 5px rgba(37,37,37,0.15);
+    }
+    .sys-arrow {
+      width: 20px; height: 20px; border: none; background: none; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: opacity 0.15s ease;
+    }
+    .sys-arrow svg { width: 20px; height: 20px; display: block; }
+    .sys-arrow.disabled { opacity: 0.2; pointer-events: none; }
+    .sys-progress { background: #F2F2F2; border-radius: 100px; height: 5px; overflow: hidden; }
+    .sys-progress-fill { height: 100%; background: #D2D2D2; border-radius: 100px; transition: width 0.45s cubic-bezier(0.16,1,0.3,1); }
+    /* Outcomes & trade-offs */
+    .out-section { display: flex; flex-direction: column; gap: 15px; }
+    .out-title-row { display: flex; gap: 15px; align-items: center; }
+    .out-title-row .prob-dot { margin-top: 0; }
+    .out-section-title { font-family: var(--font-mono); font-weight: 700; font-size: 18px; line-height: 27px; color: var(--secondary); }
+    .out-item { display: flex; gap: 10px; font-family: var(--font-mono); font-size: 15px; font-weight: 500; line-height: 25px; color: var(--secondary); }
+    .out-item-arrow { flex-shrink: 0; }
+    .out-item p { flex: 1; }
+    .out-item strong { font-weight: 600; }
+    .out-item .dim { font-weight: 400; color: #515151; }
+    .out-divider { height: 1px; background: rgba(37,37,37,0.08); }
+    .cs-link { color: var(--secondary); text-decoration: underline; text-decoration-color: rgba(37,37,37,0.35); text-underline-offset: 2px; white-space: nowrap; }
+    .cs-link .cs-link-arrow { display: inline-block; transition: transform 0.2s cubic-bezier(0.16,1,0.3,1); }
+    .cs-link:hover .cs-link-arrow { transform: translate(3px, -3px); }
+    /* Secondary CTA button on cards */
+    .card-cta {
+      display: inline-flex; align-items: center; gap: 5px; align-self: flex-start;
+      margin-top: 4px; padding: 10px;
+      border: 1px solid rgba(37,37,37,0.2); border-radius: 8px;
+      font-family: var(--font-mono); font-weight: 700; font-size: 12px;
+      color: var(--secondary); background: transparent;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .card-cta:hover { background: rgba(37,37,37,0.05); border-color: rgba(37,37,37,0.4); }
+    .card-cta .cta-arrow { display: inline-block; transition: transform 0.2s cubic-bezier(0.16,1,0.3,1); }
+    .card-cta:hover .cta-arrow { transform: translate(2px, -2px); }
+
+    /* ─── IMPACT SECTION ────────────────────────────────── */
+    .impact-card {
+      border: 1px solid #EFEFEF; border-radius: 20px; padding: 20px;
+      background: white; box-shadow: inset 0 0 4px rgba(0,0,0,0.08);
+      display: flex; flex-direction: column; gap: 30px;
+    }
+    .impact-stats-grid { display: flex; flex-direction: column; gap: 30px; }
+    .impact-stats-row  { display: flex; gap: 30px; }
+    .impact-stat       { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .impact-stat-num   { font-family: var(--font-mono); font-weight: 400; font-size: 20px; color: #515151; }
+    .impact-stat-headline { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+    .impact-stat-hl    { font-family: var(--font-heading); font-weight: 600; font-size: 20px; line-height: 27px; color: var(--secondary); }
+    .impact-stat-hl.hi { background: #E6F28D; }
+    .impact-stat-desc  { font-family: var(--font-mono); font-weight: 400; font-size: 15px; line-height: 25px; color: #515151; }
+
+    /* ─── TEAM & ROLE SECTION ────────────────────────────── */
+    .team-card {
+      border: 1px solid #EFEFEF; border-radius: 20px; padding: 20px;
+      background: white; box-shadow: inset 0 0 4px rgba(0,0,0,0.08);
+      display: flex; flex-direction: column; gap: 30px;
+    }
+    .team-items { display: flex; flex-direction: column; gap: 20px; }
+    .team-item  { display: flex; gap: 10px; align-items: flex-start; }
+    .team-item-dot { width: 10px; height: 10px; background: var(--secondary); flex-shrink: 0; margin-top: 10px; }
+    .team-item-content { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .team-role-hl   { display: inline-block; align-self: flex-start; background: #E6F28D; font-family: var(--font-heading); font-weight: 600; font-size: 20px; line-height: 27px; color: var(--secondary); }
+    .team-role-body { font-family: var(--font-mono); font-weight: 500; font-size: 15px; line-height: 25px; color: var(--secondary); }
+    .team-role-body .dim { color: #515151; font-weight: 500; }
+
+    /* ─── THANK YOU FOOTER ───────────────────────────────── */
+    .team-role-hl-wrap { display: flex; align-items: center; gap: 8px; align-self: flex-start; }
+    .team-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+
+    .thankyou-footer {
+      width: 100%; background: #E6F28D;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 14px 0;
+      border-radius: 0 0 20px 20px;
+    }
+    .thankyou-footer .ty-text {
+      font-family: var(--font-mono); font-weight: 500; font-size: 15px;
+      color: var(--secondary); letter-spacing: 0.04em;
+    }
+
+    /* ─── HAMBURGER ─────────────────────────────────────────── */
+    .nav-hamburger {
+      display: none; flex-direction: column; justify-content: center; gap: 5px;
+      width: 36px; height: 36px; padding: 6px;
+      background: none; border: none;
+      cursor: none; flex-shrink: 0;
+    }
+    .nav-hamburger span {
+      display: block; height: 2px;
+      background: var(--secondary); border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Slide-in panel from right */
+    .mobile-menu {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 78vw; max-width: 320px; z-index: 490;
+      background: var(--bg);
+      box-shadow: -8px 0 32px rgba(0,0,0,0.10);
+      display: flex; flex-direction: column; justify-content: center;
+      align-items: flex-start; padding: 80px 32px 48px; gap: 4px;
+      transform: translateX(100%);
+      transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1);
+    }
+    .mobile-menu.open { transform: translateX(0); }
+    .mobile-menu-backdrop {
+      position: fixed; inset: 0; z-index: 489;
+      background: rgba(37,37,37,0.35);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.38s ease;
+    }
+    .mobile-menu-backdrop.open { opacity: 1; pointer-events: auto; }
+    .mobile-menu a {
+      font-family: var(--font-mono); font-weight: 500; font-size: 13px;
+      text-transform: uppercase; color: var(--secondary); text-decoration: none;
+      padding: 14px 0; border-bottom: 1px solid var(--border); width: 100%;
+      letter-spacing: 0.06em;
+      opacity: 0; transform: translateX(16px);
+      transition: opacity 0.3s ease, transform 0.3s ease, color 0.15s ease;
+    }
+    .mobile-menu.open a { opacity: 1; transform: translateX(0); }
+    .mobile-menu a:nth-child(1) { transition-delay: 0.08s; }
+    .mobile-menu a:nth-child(2) { transition-delay: 0.13s; }
+    .mobile-menu a:nth-child(3) { transition-delay: 0.18s; }
+    .mobile-menu a:nth-child(4) { transition-delay: 0.23s; }
+    .mobile-menu a:nth-child(5) { transition-delay: 0.28s; }
+    .mobile-menu a:nth-child(6) { transition-delay: 0.33s; }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a.active { font-weight: 700; }
+
+    /* ── Tablet: 768px – 1023px ──────────────────────────────── */
+    @media (max-width: 1023px) {
+      /* Hamburger replaces inline nav */
+      .nav-sections   { display: none; }
+      .nav-hamburger  { display: flex; }
+      .nav                { padding: 8px 24px; }
+      .page               { padding: 74px 20px 60px; }
+      .cs-hero            { padding: 28px 28px 0; gap: 20px; }
+      .cs-heading         { font-size: 32px; line-height: 46px; }
+      .et-live-frame      { height: 300px; }
+      .et-screen-img      { width: 72%; }
+      .problem-card,
+      .challenge-card,
+      .system-card,
+      .impact-card,
+      .team-card          { padding: 18px; }
+      .prob-stat          { font-size: 28px; }
+      .sys-card           { flex: 0 0 calc((100% - 20px) / 2); }
+    }
+
+    /* ── Mobile: up to 767px ─────────────────────────────────── */
+    @media (max-width: 767px) {
+      .nav                { padding: 8px 16px; }
+      .page               { padding: 60px 12px 40px; }
+      .card               { border-radius: 16px; }
+
+      /* Hero */
+      .cs-hero            { padding: 22px 18px 0; gap: 14px; }
+      .designation-row    { flex-wrap: wrap; gap: 8px; }
+      .cs-heading         { font-size: 22px; line-height: 33px; }
+      .et-live-frame      { height: 220px; padding-top: 8px; }
+      .et-screen-img      { width: 82%; }
+
+      /* Problem card */
+      .problem-card       { padding: 16px; gap: 20px; }
+      .problem-top        { flex-direction: column; gap: 16px; }
+      .problem-img        { display: none; }
+      .problem-mid        { flex-direction: column; gap: 16px; }
+      .problem-statement  { font-size: 16px; line-height: 26px; }
+      .prob-stat          { font-size: 24px; }
+      .prob-stat-label    { font-size: 11px; }
+      .what-if-grid       { grid-template-columns: 1fr; gap: 12px; }
+      .what-if-card       { padding: 12px; }
+
+      /* System/challenge */
+      .system-card,
+      .challenge-card     { padding: 16px; gap: 20px; }
+      .chal-top           { flex-direction: column; gap: 16px; }
+      .chal-img           { display: none; }
+      .phase-tab          { font-size: 9px; padding: 0 6px; height: 28px; }
+      .sys-card           { flex: 0 0 calc((100% - 10px) / 1.3); padding: 14px; }
+      .sys-card-img       { border-radius: 8px; }
+      .sys-nav            { gap: 12px; }
+
+      /* Impact */
+      .impact-card        { padding: 16px; gap: 20px; }
+      .impact-stats-row   { flex-direction: column; gap: 16px; }
+      .imp-stat-value     { font-size: 28px; }
+
+      /* Team */
+      .team-card          { padding: 16px; gap: 20px; }
+      .team-items         { gap: 14px; }
+
+      /* Section headings */
+      .section-label      { font-size: 10px; }
+      .section-heading    { font-size: 20px; line-height: 30px; }
+
+      /* Footer */
+      .thankyou-footer    { padding: 12px 16px; font-size: 12px; }
+    }
+
+    /* ── Small mobile: up to 480px ───────────────────────────── */
+    @media (max-width: 480px) {
+      .cs-heading         { font-size: 20px; line-height: 30px; }
+      .et-live-frame      { height: 190px; }
+      .et-screen-img      { width: 90%; }
+      .problem-statement  { font-size: 14px; line-height: 24px; }
+      .section-heading    { font-size: 18px; line-height: 28px; }
+      .sys-card           { flex: 0 0 calc(100% - 10px); }
+    }
+
+    /* ── Case Study Password Gate ──────────────────────────────── */
+    #csGate {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background-color: #FFFCF8;
+      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
+      background-size: 19px 19px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.35s ease, transform 0.55s cubic-bezier(0.76,0,0.24,1);
+    }
+    #csGate.gate-exit {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+    #csGateFW {
+      width: clamp(300px, 90vw, 520px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #csGateLabel {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      padding: 3px 10px 3px 8px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(160,158,150,0.35);
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(28,26,20,0.68);
+      letter-spacing: 0.04em;
+    }
+    #csGateDot {
+      width: 7px; height: 7px;
+      border-radius: 2px;
+      background: #8FAF00;
+      flex-shrink: 0;
+    }
+    #csGateFrame {
+      position: relative;
+      width: 100%;
+      padding: 36px 28px 29px;
+      border: 1.5px solid #8FAF00;
+      background: #ffffff;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.09), 0 1px 6px rgba(0,0,0,0.05);
+    }
+    /* Figma corner handles */
+    #csGateFrame::before, #csGateFrame::after,
+    #csGateTL, #csGateTR, #csGateBL, #csGateBR {
+      content: '';
+      position: absolute;
+      width: 7px; height: 7px;
+      background: #ffffff;
+      border: 1.5px solid #8FAF00;
+      border-radius: 1.5px;
+    }
+    #csGateTL { top: -4px; left: -4px; }
+    #csGateTR { top: -4px; right: -4px; }
+    #csGateBL { bottom: -4px; left: -4px; }
+    #csGateBR { bottom: -4px; right: -4px; }
+    #csGateHeader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 24px;
+      color: rgba(28,26,20,0.40);
+    }
+    #csGateTitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 500;
+      color: rgba(28,26,20,0.38);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: center;
+      margin: 0;
+    }
+    #csGateInput {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 500;
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid rgba(0,0,0,0.10);
+      border-radius: 9px;
+      background: #FAFAF8;
+      color: #1A1917;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      letter-spacing: 0.07em;
+      text-align: center;
+    }
+    #csGateInput::placeholder {
+      color: rgba(28,26,20,0.25);
+      font-size: 12.5px;
+      letter-spacing: 0.04em;
+      font-weight: 400;
+    }
+    #csGateInput:focus {
+      border-color: #8FAF00;
+      box-shadow: 0 0 0 3px rgba(143,175,0,0.10);
+    }
+    #csGateInput.gate-error {
+      border-color: #E53E3E;
+      box-shadow: 0 0 0 3px rgba(229,62,62,0.08);
+      animation: gateShake 0.42s ease;
+    }
+    @keyframes gateShake {
+      0%,100% { transform: translateX(0); }
+      18%     { transform: translateX(-7px); }
+      36%     { transform: translateX(7px); }
+      54%     { transform: translateX(-5px); }
+      72%     { transform: translateX(5px); }
+    }
+    #csGateCapsWarn {
+      margin-top: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #B06000;
+      display: none;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+    #csGateErrorMsg {
+      margin-top: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #C53030;
+      display: none;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+    #csGateBtn {
+      width: 100%;
+      margin-top: 14px;
+      padding: 11px 16px;
+      background: #1A1917;
+      color: #ffffff;
+      border: none;
+      border-radius: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+    }
+    #csGateBtn:hover { opacity: 0.78; }
+    #csGateDivider {
+      height: 1px;
+      background: rgba(0,0,0,0.06);
+      margin: 22px 0 17px;
+    }
+    #csGateNote {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      color: rgba(37,37,37,0.7);
+      text-align: center;
+      line-height: 1.8;
+    }
+    #csGateNote strong {
+      color: #252525;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Case Study Password Gate ──────────────────────────────── -->
+  <div id="csGate">
+    <div id="csGateFW">
+      <div id="csGateLabel"><div id="csGateDot"></div>Bhanu Kowshik</div>
+      <div id="csGateFrame">
+        <span id="csGateTL"></span><span id="csGateTR"></span>
+        <span id="csGateBL"></span><span id="csGateBR"></span>
+        <div id="csGateHeader">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <p id="csGateTitle">Access Required</p>
+        </div>
+        <input type="text" id="csGateInput" placeholder="enter the password" autocomplete="off" spellcheck="false"/>
+        <div id="csGateCapsWarn">⚠ Caps Lock is on — this may cause issues</div>
+        <div id="csGateErrorMsg">✗ Incorrect password — try again</div>
+        <button id="csGateBtn" type="button">View EverTutor Live →</button>
+        <div id="csGateDivider"></div>
+        <div id="csGateNote">
+          Don't have the password? Reach out at<br>
+          <strong>kowshikbhanu1000@gmail.com</strong> · <strong>+1 (512) 844-8316</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="customCursor"></div>
+
+  <nav class="nav" id="mainNav">
+    <a href="index.html" class="nav-home">
+      <img src="cs-nav-logo.svg" alt="" />
+      <span>EverTutor Live</span>
+    </a>
+    <div class="nav-sections">
+      <a href="#overview"    class="nav-btn active" data-section="overview">OVERVIEW</a>
+      <a href="#problem"     class="nav-btn"        data-section="problem">THE PROBLEM</a>
+      <a href="#challenges"  class="nav-btn"        data-section="challenges">CHALLENGES</a>
+      <a href="#system"      class="nav-btn"        data-section="system">SYSTEM</a>
+      <a href="#impact"      class="nav-btn"        data-section="impact">IMPACT</a>
+      <a href="#team"        class="nav-btn"        data-section="team">TEAM</a>
+    </div>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="mobile-menu-backdrop" id="menuBackdrop"></div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#overview"   data-section="overview">Overview</a>
+    <a href="#problem"    data-section="problem">The Problem</a>
+    <a href="#challenges" data-section="challenges">Challenges</a>
+    <a href="#system"     data-section="system">System</a>
+    <a href="#impact"     data-section="impact">Impact</a>
+    <a href="#team"       data-section="team">Team</a>
+  </div>
+
+  <div class="page">
+    <div class="card">
+
+      <!-- ══ OVERVIEW ══════════════════════════════════════════ -->
+      <section class="cs-hero" id="overview">
+
+        <div class="designation-row" id="desigRow">
+          <div class="desig-pill">Lead Product Designer</div>
+          <div class="desig-pill">Lead Curriculum Designer</div>
+          <div class="desig-pill">
+            <div class="pulse-wrap"><div class="dot-core"></div><div class="dot-ring"></div></div>
+            2025 - Present
+          </div>
+        </div>
+
+        <h1 class="cs-heading" id="csHeading">Designed a 0→1 AI Tutor experience, from prototypes to live classrooms across 8+ schools, serving ~2,000+ students in real time.</h1>
+
+        <!-- Hero frame: real background + real screen UI image -->
+        <div class="et-live-frame" id="liveFrame">
+          <img id="etBgImg"     class="et-bg-img"    alt="" />
+          <img id="etScreenImg" class="et-screen-img" alt="" />
+        </div>
+
+      </section>
+
+
+      <!-- ══ THE PROBLEM ════════════════════════════════════════ -->
+      <div class="cs-section-wrap" id="problem">
+        <div class="problem-card">
+
+          <!-- Top -->
+          <div class="problem-top tr-anim">
+            <div class="problem-img">
+              <img src="https://www.figma.com/api/mcp/asset/d06308f3-2b65-4949-a3a2-6ab7f5bb0d4d" alt="" />
+            </div>
+            <div class="problem-header">
+              <span class="section-label">The Problem</span>
+              <p class="problem-statement">1:1 tutoring drives significantly better outcomes. But modern classrooms and ed-tech systems rely on fixed, linear instruction, failing to adapt to individual learners and creating a gap between time spent and true mastery.</p>
+            </div>
+          </div>
+
+          <!-- Middle: graph + bullets -->
+          <div class="problem-mid tr-anim" id="problemMid">
+            <div class="graph-wrap">
+              <svg id="bloomsGraph" viewBox="0 0 600 420" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="tutorGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#1C9C6D" stop-opacity="0.40"/>
+                    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+                  </linearGradient>
+                  <clipPath id="clipConv">  <rect id="crConv"  x="0" y="0" width="0" height="460"/></clipPath>
+                  <clipPath id="clipMast">  <rect id="crMast"  x="0" y="0" width="0" height="460"/></clipPath>
+                  <clipPath id="clipTutor"> <rect id="crTutor" x="0" y="0" width="0" height="460"/></clipPath>
+                </defs>
+
+                <!-- Y axis -->
+                <line x1="55" y1="360" x2="55" y2="15" stroke="#333" stroke-width="1.2"/>
+                <polygon points="55,9 51,19 59,19" fill="#333"/>
+                <!-- X axis -->
+                <line x1="55" y1="360" x2="565" y2="360" stroke="#333" stroke-width="1.2"/>
+                <polygon points="571,360 561,356 561,364" fill="#333"/>
+
+                <!-- X-axis tick marks -->
+                <g stroke="#999" stroke-width="1">
+                  <line x1="55"  y1="360" x2="55"  y2="367"/>
+                  <line x1="157" y1="360" x2="157" y2="367"/>
+                  <line x1="259" y1="360" x2="259" y2="367"/>
+                  <line x1="361" y1="360" x2="361" y2="367"/>
+                  <line x1="463" y1="360" x2="463" y2="367"/>
+                  <line x1="565" y1="360" x2="565" y2="367"/>
+                </g>
+                <!-- X-axis label -->
+                <text x="310" y="390" text-anchor="middle"
+                      font-family="Shantell Sans, cursive" font-size="10.5" fill="#515151">Summative Achievement Scores (Teacher student ratio)</text>
+
+                <!-- Gradient fill for 1:1 tutoring -->
+                <path id="bloomFill" class="bloom-fill" fill="url(#tutorGrad)" d=""/>
+
+                <!-- Bell curves -->
+                <path id="curveConventional" class="bloom-curve" clip-path="url(#clipConv)"  d=""/>
+                <path id="curveMastery"      class="bloom-curve" clip-path="url(#clipMast)"  d=""/>
+                <path id="curveTutor"        class="bloom-curve" clip-path="url(#clipTutor)" d=""/>
+
+                <!-- Labels: top-left of each peak -->
+                <g id="lblConventional" class="bloom-label">
+                  <text x="270" y="178" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="12" font-weight="500" fill="#252525">Conventional</text>
+                  <text x="270" y="191" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#515151">(1:30)</text>
+                </g>
+                <g id="lblMastery" class="bloom-label">
+                  <text x="350" y="138" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="12" font-weight="500" fill="#252525">Mastery Learning</text>
+                  <text x="350" y="151" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#515151">(1:30)</text>
+                </g>
+                <g id="lblTutor" class="bloom-label">
+                  <text x="452" y="98" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="12" font-weight="500" fill="#252525">1:1 Tutoring</text>
+                  <text x="452" y="111" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#515151">(1:1)</text>
+                </g>
+              </svg>
+            </div>
+
+            <div class="problem-points">
+              <div class="prob-bullet">
+                <div class="prob-dot"></div>
+                <div class="prob-bullet-content">
+                  <span class="prob-title">We already know what works, 1:1 tutoring</span>
+                  <p class="prob-body">Students receiving 1:1 tutoring perform ~2 standard deviations better, with the average student outperforming ~98% of their peers.</p>
+                </div>
+              </div>
+              <div class="prob-bullet">
+                <div class="prob-dot"></div>
+                <div class="prob-bullet-content">
+                  <span class="prob-title">But it doesn't scale</span>
+                  <p class="prob-body">At ~$50–$250 per session, scaling this level of personalized instruction is infeasible.</p>
+                </div>
+              </div>
+              <div class="insight-box">
+                <p>So the real challenge isn't improving learning outcomes, it's making them scalable.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom -->
+          <div class="problem-bottom tr-anim">
+            <p class="what-if-header">What if we could make 1:1 tutoring scalable?</p>
+            <div class="what-if-grid">
+              <div class="what-if-card">
+                <div class="what-if-title"><span class="et-hl">Voice-first,</span> conversational interaction</div>
+                <p class="what-if-body">Enabling real-time, back-and-forth learning—mirroring how students learn with human tutors.</p>
+              </div>
+              <div class="what-if-card">
+                <div class="what-if-title"><span class="et-hl">Real-time adaptive instruction</span> to student's responses</div>
+                <p class="what-if-body">Providing real-time, 1:1 guidance at the moment of confusion.</p>
+              </div>
+              <div class="what-if-card">
+                <div class="what-if-title"><span class="et-hl">Continuous, per-step mastery</span> tracking and adaptation</div>
+                <p class="what-if-body">At a per-step level—rather than evaluated only at the end.</p>
+              </div>
+              <div class="what-if-card">
+                <div class="what-if-title"><span class="et-hl">The outcomes of 1:1 tutoring</span> (~2σ improvement)</div>
+                <p class="what-if-body">Are made scalable—without the cost constraints of human tutors.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ CHALLENGES ═════════════════════════════════════════ -->
+      <div class="cs-section-wrap" id="challenges">
+        <div class="challenges-card tr-anim">
+
+          <div class="chal-top">
+            <div class="chal-img"><img id="etChalImg" alt="Challenges" /></div>
+            <div class="chal-header">
+              <div class="section-label">Challenges</div>
+              <div class="problem-statement">To make 1:1 tutoring scalable, we had to rethink how teaching works across classroom dynamics, interaction patterns, content design, and system behavior from ground up.</div>
+            </div>
+          </div>
+
+          <div class="chal-items">
+
+            <div class="chal-item tr-anim">
+              <div class="prob-dot"></div>
+              <div class="chal-item-content">
+                <div class="chal-title">Earning student trust</div>
+                <div class="chal-statement"><span class="et-hl">Students don't naturally engage</span> with a new interface as they would with a tutor.</div>
+                <p class="chal-body">The experience had to quickly feel approachable and responsive—especially in classrooms where hesitation, awkwardness, or lack of confidence can break engagement within seconds.</p>
+              </div>
+            </div>
+
+            <div class="chal-item tr-anim">
+              <div class="prob-dot"></div>
+              <div class="chal-item-content">
+                <div class="chal-title">Designing voice-first interaction from first principles</div>
+                <div class="chal-statement"><span class="et-hl">There were no well-established patterns</span> for designing real-time, conversational AI Tutors.</div>
+                <p class="chal-body">We had to define how students speak, listen, interrupt, recover from mistakes, and stay oriented—all while keeping the interaction natural and low-friction.</p>
+              </div>
+            </div>
+
+            <div class="chal-item tr-anim">
+              <div class="prob-dot"></div>
+              <div class="chal-item-content">
+                <div class="chal-title">From linear content to dynamic teaching behavior</div>
+                <div class="chal-statement">Traditional content design is <span class="et-hl">built for rigid, linear instruction.</span></div>
+                <p class="chal-body">Designing for a voice-first AI Tutor required rethinking how content is created—so it can drive real-time, conversational teaching instead of static delivery.</p>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="chal-next tr-anim">
+            <strong>↓ Next</strong> <span>How I approached the design to turn these constraints into decisions</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ SYSTEM ══════════════════════════════════════════════ -->
+      <div class="cs-section-wrap" id="system">
+        <div class="system-card tr-anim">
+
+          <!-- Section header -->
+          <div class="chal-top">
+            <div class="chal-img"><img id="etSysImg" alt="System" /></div>
+            <div class="chal-header">
+              <div class="section-label">System</div>
+              <div class="problem-statement">Evolution of the AI Tutor System: Designing, Scaling, and Learning in Real Classrooms.</div>
+            </div>
+          </div>
+
+          <!-- Phase tabs -->
+          <div class="phase-tabs-wrap">
+            <div class="phase-tabs">
+              <button class="phase-tab active" data-phase="1">Phase 1</button>
+              <button class="phase-tab" data-phase="2">Phase 2</button>
+              <button class="phase-tab" data-phase="3">Phase 3</button>
+              <button class="phase-tab" data-phase="4">Phase 4</button>
+            </div>
+          </div>
+
+          <!-- ── PHASE 1 ──────────────────────────────────────── -->
+          <div class="phase-panel active" data-phase="1">
+            <div>
+              <div class="phase-heading">Establishing Trust &amp; Validating the Experience</div>
+              <p class="phase-desc">Translating 1:1 tutoring into a scalable product required rethinking how interaction, feedback, and instruction work together in real time.</p>
+            </div>
+            <div><span class="caps-label">Core System Capabilities:</span></div>
+            <!-- Carousel -->
+            <div class="sys-carousel-wrap">
+              <div class="sys-carousel">
+                <div class="sys-carousel-track" id="carousel-p1">
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p1c1" alt="Designing for Human-Like Tutoring" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">Designing for Human-Like Tutoring</div>
+                      <p class="sys-card-desc">Whiteboard-style interface with handwritten visuals to mimic how tutors explain concepts step-by-step.</p>
+                    </div>
+                  </div>
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p1c2" alt="Driving Engagement Through Progress" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">Driving Engagement Through Progress</div>
+                      <p class="sys-card-desc">Added a simple progress-based interaction layer that advances on correct responses to reinforce momentum and participation.</p>
+                    </div>
+                  </div>
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p1c3" alt="Enabling Natural, Low-Friction Interaction" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">Enabling Natural, Low-Friction Interaction</div>
+                      <p class="sys-card-desc">Refined voice interaction with a "hold to speak" mechanism, making it easier and more natural for students to talk to the tutor.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="sys-carousel-footer">
+                <div class="sys-carousel-controls">
+                  <div class="sys-nav">
+                    <button class="sys-arrow sys-arrow-prev disabled" data-phase="1" aria-label="Previous card">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="#252525" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button class="sys-arrow sys-arrow-next" data-phase="1" aria-label="Next card">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#252525" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="sys-progress"><div class="sys-progress-fill" id="prog-p1" style="width:33.33%"></div></div>
+              </div>
+            </div>
+            <!-- Outcomes -->
+            <div class="out-section">
+              <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Outcomes:</div></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Validated with ed-tech leaders</strong><span class="dim"> through early demos of the core experience.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Voice-first interaction consistently stood out</strong><span class="dim"> for its ease of use and intuitiveness.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>~25% higher completion rates observed</strong><span class="dim"> in controlled sessions, with students reporting higher engagement.</span></p></div>
+            </div>
+
+            <!-- Trade-offs -->
+            <div class="out-section">
+              <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Trade-offs &amp; Learnings:</div></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Progress indicators showed limited impact,</strong><span class="dim"> and were deprioritized in favor of higher-impact interaction improvements.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Content creation was highly time-intensive (~104 hours for 30 minutes),</strong><span class="dim"> exposing a scalability gap and leading to the creation of Studio.</span> <a href="evertutor-studio.html" class="cs-link">Case-study here<span class="cs-link-arrow"> ↗</span></a></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Increased flexibility introduced complexity,</strong><span class="dim"> making it harder for content designers and highlighting the need for better tooling.</span></p></div>
+            </div>
+          </div>
+
+          <!-- ── PHASE 2 ──────────────────────────────────────── -->
+          <div class="phase-panel" data-phase="2">
+            <div>
+              <div class="phase-heading">Scaling Voice Personalisation &amp; Content Production</div>
+              <p class="phase-desc">With the core experience validated, the focus shifted to making the AI tutor feel more personal—and making content creation fast enough to scale across subjects.</p>
+            </div>
+            <div><span class="caps-label">Core System Capabilities:</span></div>
+            <div class="sys-carousel-wrap">
+              <div class="sys-carousel">
+                <div class="sys-carousel-track" id="carousel-p2">
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p2c1" alt="Enabling Personalisation Through Voice" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">Enabling Personalisation Through Voice</div>
+                      <p class="sys-card-desc">Gave students the ability to connect with their AI tutor through a personalised voice, increasing sense of ownership and lowering engagement barriers.</p>
+                    </div>
+                  </div>
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p2c2" alt="Expanding Selection of Voices" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">Expanding Selection of Voices</div>
+                      <p class="sys-card-desc">Introduced a wider range of voice options, allowing schools to select the tutor voice that best matched their classroom culture and student preferences.</p>
+                    </div>
+                  </div>
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p2c3" alt="From Manual Creation to Scalable Production" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">From Manual Creation to Scalable Production (~104 hrs to ~4 hrs)</div>
+                      <p class="sys-card-desc">Redesigned the content creation workflow from manual authoring to a tool-assisted pipeline, significantly reducing production time per topic.</p>
+                      <a href="evertutor-studio.html" class="card-cta">View Case Study <span class="cta-arrow">↗</span></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="sys-carousel-footer">
+                <div class="sys-carousel-controls">
+                  <div class="sys-nav">
+                    <button class="sys-arrow sys-arrow-prev disabled" data-phase="2" aria-label="Previous card">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="#252525" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button class="sys-arrow sys-arrow-next" data-phase="2" aria-label="Next card">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#252525" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="sys-progress"><div class="sys-progress-fill" id="prog-p2" style="width:33.33%"></div></div>
+              </div>
+            </div>
+            <div class="out-section">
+              <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Outcomes:</div></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Personalised voice selection increased student engagement</strong><span class="dim"> and session return rate.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Voice variety improved adoption across diverse classrooms,</strong><span class="dim"> with teachers gaining meaningful control over the tutor's persona.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Content production time reduced significantly,</strong><span class="dim"> enabling faster curriculum expansion across subjects.</span></p></div>
+            </div>
+
+            <div class="out-section">
+              <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Trade-offs &amp; Learnings:</div></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Voice preference data required thoughtful opt-in UX</strong><span class="dim"> to collect without friction.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Not all voices performed equally across subject types,</strong><span class="dim"> requiring ongoing curation and quality control.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Tool-assisted production still required curriculum expertise,</strong><span class="dim"> limiting full self-service content creation.</span></p></div>
+            </div>
+          </div>
+
+          <!-- ── PHASE 3 ──────────────────────────────────────── -->
+          <div class="phase-panel" data-phase="3">
+            <div>
+              <div class="phase-heading">Deepening Safety, Familiarity &amp; Pedagogical Rigour</div>
+              <p class="phase-desc">As deployment scaled, the system needed guardrails, familiar classroom patterns, and tighter pedagogical feedback loops to hold quality at scale.</p>
+            </div>
+            <div><span class="caps-label">Core System Capabilities:</span></div>
+            <div class="sys-carousel-wrap">
+              <div class="sys-carousel">
+                <div class="sys-carousel-track" id="carousel-p3">
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p3c1" alt="Introducing Guardrail-Controlled Progression" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">Introducing Guardrail-Controlled Progression</div>
+                      <p class="sys-card-desc">Added mastery-gated progression that prevents students from advancing without demonstrated understanding—enforcing mastery step-by-step.</p>
+                    </div>
+                  </div>
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p3c2" alt="Strengthening AI Response Quality" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">Strengthening AI Response Quality</div>
+                      <p class="sys-card-desc">Improved the consistency and quality of AI tutor responses through tighter curriculum alignment and iterative refinement based on live classroom feedback.</p>
+                    </div>
+                  </div>
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p3c3" alt="Aligning with Familiar Learning Behaviors" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">Aligning with Familiar Learning Behaviors</div>
+                      <p class="sys-card-desc">Introduced patterns students already recognise from classrooms—pacing cues, structured prompts—to lower cognitive friction and ease the transition.</p>
+                    </div>
+                  </div>
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p3c4" alt="Making Learning Progress Visible" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">Making Learning Progress Visible</div>
+                      <p class="sys-card-desc">Built real-time progress indicators into the student experience, helping learners track mastery trajectory and reducing anxiety about performance.</p>
+                    </div>
+                  </div>
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p3c5" alt="Evolving Pedagogy with Teacher Collaboration" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">Evolving Pedagogy with Teacher Collaboration</div>
+                      <p class="sys-card-desc">Co-developed instructional sequences with teachers in the loop, incorporating direct classroom observations into the AI tutor's pedagogical approach.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="sys-carousel-footer">
+                <div class="sys-carousel-controls">
+                  <div class="sys-nav">
+                    <button class="sys-arrow sys-arrow-prev disabled" data-phase="3" aria-label="Previous card">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="#252525" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button class="sys-arrow sys-arrow-next" data-phase="3" aria-label="Next card">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#252525" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="sys-progress"><div class="sys-progress-fill" id="prog-p3" style="width:20%"></div></div>
+              </div>
+            </div>
+            <div class="out-section">
+              <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Outcomes:</div></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Guardrail-controlled progression significantly reduced skip-through behaviour</strong><span class="dim"> across sessions.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Teacher collaboration led to measurably higher instructional quality</strong><span class="dim"> and classroom fit.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Progress visibility improved student confidence</strong><span class="dim"> and reduced mid-session drop-off rates.</span></p></div>
+            </div>
+
+            <div class="out-section">
+              <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Trade-offs &amp; Learnings:</div></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Guardrails occasionally frustrated students</strong><span class="dim"> who found gated pacing too restrictive.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Teacher collaboration cycles added lead time</strong><span class="dim"> to content updates and new topic rollouts.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Progress UI required careful calibration</strong><span class="dim"> to motivate without generating performance anxiety.</span></p></div>
+            </div>
+          </div>
+
+          <!-- ── PHASE 4 ──────────────────────────────────────── -->
+          <div class="phase-panel" data-phase="4">
+            <div>
+              <div class="phase-heading">Operational Scale &amp; Classroom Automation</div>
+              <p class="phase-desc">With the experience deeply validated, the final phase focused on removing operational friction—automating classroom flow and introducing a flexible spatial canvas for complex content.</p>
+            </div>
+            <div><span class="caps-label">Core System Capabilities:</span></div>
+            <div class="sys-carousel-wrap">
+              <div class="sys-carousel">
+                <div class="sys-carousel-track" id="carousel-p4">
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p4c1" alt="Auto Ingress & Egress" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">Auto Ingress &amp; Egress</div>
+                      <p class="sys-card-desc">Designed an automated student join/leave system that eliminated manual teacher intervention, reducing session setup time and enabling seamless classroom transitions.</p>
+                    </div>
+                  </div>
+                  <div class="sys-card">
+                    <div class="sys-card-img"><img id="p4c2" alt="Canvas-Style Layout" /></div>
+                    <div class="sys-card-body">
+                      <div class="sys-card-title">Canvas-Style Layout</div>
+                      <p class="sys-card-desc">Introduced a canvas-based spatial layout for tutoring sessions, enabling flexible concept explanation and multi-step problem solving beyond linear instruction.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="sys-carousel-footer">
+                <div class="sys-carousel-controls">
+                  <div class="sys-nav">
+                    <button class="sys-arrow sys-arrow-prev disabled" data-phase="4" aria-label="Previous card">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="#252525" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button class="sys-arrow sys-arrow-next" data-phase="4" aria-label="Next card">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#252525" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="sys-progress"><div class="sys-progress-fill" id="prog-p4" style="width:50%"></div></div>
+              </div>
+            </div>
+            <div class="out-section">
+              <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Outcomes:</div></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Auto ingress reduced average session setup time from ~5 minutes to under 30 seconds.</strong></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Canvas layout improved complex problem-solving sessions,</strong><span class="dim"> especially in multi-step STEM topics.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Teachers reported significantly reduced operational overhead</strong><span class="dim"> during live classroom sessions.</span></p></div>
+            </div>
+
+            <div class="out-section">
+              <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Trade-offs &amp; Learnings:</div></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Auto ingress exposed edge cases in low-bandwidth environments,</strong><span class="dim"> requiring fallback mechanisms.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Canvas flexibility increased design complexity,</strong><span class="dim"> requiring new content creation guidelines.</span></p></div>
+              <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Greater automation reduced teacher visibility into session flow,</strong><span class="dim"> surfacing a need for new oversight tooling.</span></p></div>
+            </div>
+          </div>
+
+          <!-- Section footer -->
+          <div class="chal-next">
+            <strong>↓ Next</strong> <span>These outcomes came from understanding what educators are trying to achieve. Here's how we defined those goals.</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ IMPACT ══════════════════════════════════════════════ -->
+      <div class="cs-section-wrap" id="impact">
+        <div class="impact-card tr-anim">
+
+          <div class="chal-top">
+            <div class="chal-img"><img id="etImpactImg" alt="Impact" /></div>
+            <div class="chal-header">
+              <div class="section-label">Impact</div>
+              <div class="problem-statement">Delivered classroom-comparable learning outcomes while unlocking scalable deployment, accelerating school adoption, and establishing a foundation for AI-native education.</div>
+            </div>
+          </div>
+
+          <div class="impact-stats-grid">
+            <div class="impact-stats-row">
+              <div class="impact-stat">
+                <div class="impact-stat-num">01</div>
+                <div class="impact-stat-headline">
+                  <span class="impact-stat-hl hi">~97%</span>
+                  <span class="impact-stat-hl">of classroom performance</span>
+                </div>
+                <p class="impact-stat-desc">Students reached performance levels comparable to traditional classroom learning after system redesign, closing the gap between AI tutoring and real-world instruction.</p>
+              </div>
+              <div class="impact-stat">
+                <div class="impact-stat-num">02</div>
+                <div class="impact-stat-headline">
+                  <span class="impact-stat-hl">Validated in</span>
+                  <span class="impact-stat-hl hi">real classrooms</span>
+                </div>
+                <p class="impact-stat-desc">Moved from controlled environments to live classroom deployments, testing the system under real-world constraints and student behaviors.</p>
+              </div>
+              <div class="impact-stat">
+                <div class="impact-stat-num">03</div>
+                <div class="impact-stat-headline">
+                  <span class="impact-stat-hl">Scaled to</span>
+                  <span class="impact-stat-hl hi">2,000+ learners</span>
+                </div>
+                <p class="impact-stat-desc">Expanded across multiple schools, grade levels, and subjects maintaining consistent learning outcomes and engagement patterns.</p>
+              </div>
+            </div>
+            <div class="impact-stats-row">
+              <div class="impact-stat">
+                <div class="impact-stat-num">04</div>
+                <div class="impact-stat-headline">
+                  <span class="impact-stat-hl hi">Accelerated</span>
+                  <span class="impact-stat-hl">school partnerships</span>
+                </div>
+                <p class="impact-stat-desc">Improved outcomes and system robustness helped secure and expand pilots across schools, increasing pipeline momentum and go-to-market traction.</p>
+              </div>
+              <div class="impact-stat">
+                <div class="impact-stat-num">05</div>
+                <div class="impact-stat-headline">
+                  <span class="impact-stat-hl hi">Enabled</span>
+                  <span class="impact-stat-hl">AI-Native Tutoring</span>
+                </div>
+                <p class="impact-stat-desc">Transitioned from static content delivery to adaptive, real-time tutoring—differentiating the product in a competitive EdTech landscape.</p>
+              </div>
+              <div class="impact-stat">
+                <div class="impact-stat-num">06</div>
+                <div class="impact-stat-headline">
+                  <span class="impact-stat-hl">Established a</span>
+                  <span class="impact-stat-hl hi">defensible moat</span>
+                </div>
+                <p class="impact-stat-desc">Combined pedagogy, real-time interaction, and system intelligence to create a learning experience difficult to replicate with traditional EdTech solutions.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="chal-next">
+            <strong>↓ Next</strong> <span>Here's who built this and what each person owned.</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ TEAM & ROLE ═══════════════════════════════════════ -->
+      <div class="cs-section-wrap" id="team">
+        <div class="team-card tr-anim">
+
+          <div class="chal-top">
+            <div class="chal-img"><img id="etTeamImg" alt="Team" /></div>
+            <div class="chal-header">
+              <div class="section-label">Team &amp; Role</div>
+              <div class="problem-statement">Led the design and curriculum strengthening of the AI Tutor (Live) system in a lean team partnering closely with the founder and PM, leading content designers to deliver a real-time, voice-first tutoring experience in classrooms.</div>
+            </div>
+          </div>
+
+          <div class="team-items">
+            <div class="team-item">
+              <div class="team-item-dot"></div>
+              <div class="team-item-content">
+                <div class="team-role-hl-wrap">
+                  <span class="team-role-hl">Lead Product &amp; Curriculum Designer (Me)</span>
+                  <img class="team-avatar" src="photo.jpg" alt="Bhanu" />
+                </div>
+                <p class="team-role-body">Owned the end-to-end student learning experience—defining interaction patterns, and instructional flow, while guiding content designers and validating improvements through live classroom pilots.</p>
+              </div>
+            </div>
+            <div class="team-item">
+              <div class="team-item-dot"></div>
+              <div class="team-item-content">
+                <p class="team-role-body"><strong>Engineers (2–3)</strong><span class="dim"> — Built the AI Tutor system, enabling real-time voice interaction, adaptive tutoring, and scalable classroom deployment.</span></p>
+              </div>
+            </div>
+            <div class="team-item">
+              <div class="team-item-dot"></div>
+              <div class="team-item-content">
+                <p class="team-role-body"><strong>Product Manager / Founder</strong><span class="dim"> — Drove product direction and led pilot rollout with partner schools.</span></p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    <footer class="thankyou-footer">
+      <span class="ty-text">✦ Thank_you</span>
+    </footer>
+
+    </div>
+  </div>
+
+  <script>
+    /* ── IMAGES — set src via JS to handle spaces in filenames ── */
+    document.getElementById('etBgImg').src     = 'ET Live Case Study/Section 1 Images/Backgorund.png';
+    document.getElementById('etScreenImg').src = 'ET Live Case Study/Section 1 Images/New Student home page.png';
+    document.getElementById('etChalImg').src   = 'ET Live Case Study/Section 3 Images/Section hero image.png';
+    document.getElementById('etSysImg').src    = 'ET Live Case Study/Section 4 Images/Section Heading.png';
+    document.getElementById('etImpactImg').src = 'ET Live Case Study/Section 5 (Impact)/Section Image.png';
+    document.getElementById('etTeamImg').src   = 'ET Live Case Study/Section 6 (Team and Role)/Section Heading.png';
+    /* System section card images */
+    const sysImgs = {
+      p1c1: 'ET Live Case Study/Section 4 Images/Phase 1 Card Images/Card 1 (Designing for Human like tutoring).png',
+      p1c2: 'ET Live Case Study/Section 4 Images/Phase 1 Card Images/Card 2 (Driving Engagement through progress).png',
+      p1c3: 'ET Live Case Study/Section 4 Images/Phase 1 Card Images/Card 3 (Enabling Natural, Low-Friction Interaction).png',
+      p2c1: 'ET Live Case Study/Section 4 Images/Phase 2 Cards/Card 1 (Enabling Personalization through voice).png',
+      p2c2: 'ET Live Case Study/Section 4 Images/Phase 2 Cards/Card 2 (Expanding Selection of voices).png',
+      p2c3: 'ET Live Case Study/Section 4 Images/Phase 2 Cards/Card 3 (From manual Creation to scalable production).png',
+      p3c1: 'ET Live Case Study/Section 4 Images/Phase 3 Cards/Card 1 (Introducing Guardrail Controlled Progression).png',
+      p3c2: 'ET Live Case Study/Section 4 Images/Phase 3 Cards/Card 2 (Strengtning).png',
+      p3c3: 'ET Live Case Study/Section 4 Images/Phase 3 Cards/Card 3 (Aligning with Familiar Learning Behaviors).png',
+      p3c4: 'ET Live Case Study/Section 4 Images/Phase 3 Cards/Card 4 (Making Learning Progress Visible).png',
+      p3c5: 'ET Live Case Study/Section 4 Images/Phase 3 Cards/Card 5 (Evolving Pedagogy with teacher collaboration).png',
+      p4c1: 'ET Live Case Study/Section 4 Images/Phase 4 Cards/Card 1 (Auto Ingress & E-gress).png',
+      p4c2: 'ET Live Case Study/Section 4 Images/Phase 4 Cards/Card 2 (Canvas style).png',
+    };
+    Object.entries(sysImgs).forEach(([id, src]) => {
+      const el = document.getElementById(id);
+      if (el) el.src = src;
+    });
+
+    /* ── CUSTOM CURSOR ───────────────────────────────────────── */
+    const cursor = document.getElementById('customCursor');
+    const mainCard = document.querySelector('.card');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+      if (mainCard) {
+        const r = mainCard.getBoundingClientRect();
+        cursor.classList.toggle('on-card',
+          e.clientX >= r.left && e.clientX <= r.right &&
+          e.clientY >= r.top  && e.clientY <= r.bottom);
+      }
+    });
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+    });
+
+    /* ── HAMBURGER ───────────────────────────────────────────── */
+    const hamburger  = document.getElementById('navHamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const backdrop   = document.getElementById('menuBackdrop');
+
+    function toggleMenu(force) {
+      const open = force !== undefined ? force : !hamburger.classList.contains('open');
+      hamburger.classList.toggle('open', open);
+      mobileMenu.classList.toggle('open', open);
+      backdrop.classList.toggle('open', open);
+    }
+    hamburger.addEventListener('click', () => toggleMenu());
+    backdrop.addEventListener('click', () => toggleMenu(false));
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        toggleMenu(false);
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) setTimeout(() => {
+          const top = target.getBoundingClientRect().top + window.scrollY - document.getElementById('mainNav').offsetHeight;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }, 400);
+      });
+    });
+
+    /* ── NAV AUTO-HIDE ───────────────────────────────────────── */
+    const nav = document.getElementById('mainNav');
+    let lastY = window.scrollY, upAcc = 0;
+    window.addEventListener('scroll', () => {
+      const cy = window.scrollY, delta = cy - lastY;
+      if (Math.abs(delta) < 4) { lastY = cy; return; }
+      if (delta > 0 && cy > 60) { nav.classList.add('nav-hidden'); upAcc = 0; }
+      else if (delta < 0) {
+        upAcc += Math.abs(delta);
+        if (upAcc >= window.innerHeight * 0.5) { nav.classList.remove('nav-hidden'); upAcc = 0; }
+      }
+      lastY = cy;
+    }, { passive: true });
+
+    /* ── SMOOTH SCROLL ───────────────────────────────────────── */
+    function easeOutExpo(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
+    function smoothScrollTo(y, dur) {
+      const startY = window.scrollY, dist = y - startY, t0 = performance.now();
+      (function step(now) {
+        const t = Math.min((now - t0) / dur, 1);
+        window.scrollTo(0, startY + dist * easeOutExpo(t));
+        if (t < 1) requestAnimationFrame(step);
+      })(t0);
+    }
+    document.querySelectorAll('.nav-btn[href^="#"]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        const el = document.getElementById(btn.getAttribute('href').slice(1));
+        if (el) smoothScrollTo(el.getBoundingClientRect().top + window.scrollY - 70, 800);
+      });
+    });
+
+    /* ── NAV ACTIVE ──────────────────────────────────────────── */
+    const navBtns = document.querySelectorAll('.nav-btn[data-section], .mobile-menu a[data-section]');
+    const navObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        navBtns.forEach(b => b.classList.toggle('active', b.dataset.section === e.target.id));
+      });
+    }, { threshold: 0.35 });
+    document.querySelectorAll('#overview, #problem, #challenges, #system, #impact, #team').forEach(el => navObs.observe(el));
+
+    /* ── WORD-BY-WORD HEADING ────────────────────────────────── */
+    function splitWords(el) {
+      el.innerHTML = el.innerHTML.split(/(\s+)/).map(chunk => {
+        if (/^\s+$/.test(chunk)) return chunk;
+        if (!chunk) return '';
+        return `<span class="word">${chunk}</span>`;
+      }).join('');
+    }
+    const heading = document.getElementById('csHeading');
+    splitWords(heading);
+    const words = heading.querySelectorAll('.word');
+
+    setTimeout(() => document.getElementById('desigRow').classList.add('visible'), 80);
+    words.forEach((w, i) => {
+      setTimeout(() => {
+        w.classList.add('visible');
+        w.addEventListener('animationend', () => {
+          w.style.opacity = '1';
+          w.style.transform = 'none';
+          w.style.animation = 'none';
+          w.style.willChange = 'auto';
+        }, { once: true });
+      }, 260 + i * 44);
+    });
+    setTimeout(() => document.getElementById('liveFrame').classList.add('visible'),
+               260 + words.length * 44 + 160);
+
+    /* ── BLOOM'S 2-SIGMA GRAPH ───────────────────────────────── */
+
+    /* Generate a bell curve path as SVG path data */
+    function bellPath(cx, sigma, amp, baseline, xMin, xMax) {
+      let d = '';
+      const steps = 400;
+      for (let i = 0; i <= steps; i++) {
+        const x = xMin + (xMax - xMin) * i / steps;
+        const y = baseline - amp * Math.exp(-0.5 * Math.pow((x - cx) / sigma, 2));
+        d += (i === 0 ? 'M ' : ' L ') + x.toFixed(2) + ' ' + y.toFixed(2);
+      }
+      return d;
+    }
+
+    const BL = 360;
+    /* X-axis 0–100 scale → SVG x: origin x=55, scale 5.1px/unit
+       Each curve has its own start x (mapped from scale) and all end at x=100 (SVG x=565).
+       Peak (cx) = midpoint of [start, 100].
+       σ ≈ (half-range)/3 so the curve reaches near-zero at both ends (±3σ).
+       Conventional: start=30 → x=208  peak midpoint=(30+100)/2=65 → cx=387  σ=(65-30)/3*5.1=61
+       Mastery:      start=50 → x=310  peak midpoint=(50+100)/2=75 → cx=438  σ=(75-50)/3*5.1=43
+       1:1 Tutoring: start=70 → x=412  peak midpoint=(70+100)/2=85 → cx=489  σ=(85-70)/3*5.1=26 */
+    const X_END = 565; /* SVG x for scale value 100 (x=55 + 100*5.1) */
+    const CURVES = [
+      /* start=20 → xMin=55+20*5.1=157  peak=(20+100)/2=60 → cx=361  σ=(60-20)/3*5.1=68 */
+      { id: 'curveConventional', cx: 361, sigma: 68, amp: 155, xMin: 157, crId: 'crConv',  lblId: 'lblConventional' },
+      /* start=50 → xMin=310            peak=(50+100)/2=75 → cx=438  σ=(75-50)/3*5.1=43 */
+      { id: 'curveMastery',      cx: 438, sigma: 43, amp: 195, xMin: 310, crId: 'crMast',  lblId: 'lblMastery'      },
+      /* start=75 → xMin=55+75*5.1=438  peak=(75+100)/2=87.5 → cx=501  σ=(87.5-75)/3*5.1=21 */
+      { id: 'curveTutor',        cx: 501, sigma: 21, amp: 235, xMin: 438, crId: 'crTutor', lblId: 'lblTutor', hasFill: true },
+    ];
+    const SVG_W = 600;
+
+    CURVES.forEach(c => {
+      document.getElementById(c.id).setAttribute('d',
+        bellPath(c.cx, c.sigma, c.amp, BL, c.xMin, X_END));
+    });
+    const fp = CURVES[2];
+    document.getElementById('bloomFill').setAttribute('d',
+      bellPath(fp.cx, fp.sigma, fp.amp, BL, fp.xMin, X_END)
+      + ` L ${X_END} ${BL} L ${fp.xMin} ${BL} Z`);
+
+    /* Animate clip rect from width=0 → SVG_W using RAF for left→right reveal */
+    function revealClip(rectId, delay, duration) {
+      setTimeout(() => {
+        const rect = document.getElementById(rectId);
+        const t0 = performance.now();
+        function step(now) {
+          const t = Math.min((now - t0) / duration, 1);
+          /* ease-in-out cubic */
+          const eased = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+          rect.setAttribute('width', (SVG_W * eased).toFixed(2));
+          if (t < 1) requestAnimationFrame(step);
+          else rect.setAttribute('width', SVG_W);
+        }
+        requestAnimationFrame(step);
+      }, delay);
+    }
+
+    const DUR = 1100, GAP = 30, START = 200;
+    let graphDone = false;
+
+    function runGraph() {
+      if (graphDone) return;
+      graphDone = true;
+
+      CURVES.forEach((c, i) => {
+        const drawStart = START + i * (DUR + GAP);
+        revealClip(c.crId, drawStart, DUR);
+
+        /* Label appears 120ms after curve finishes */
+        setTimeout(() => {
+          document.getElementById(c.lblId).classList.add('visible');
+          if (c.hasFill) {
+            /* Gradient fill fades in after 1:1 curve is drawn */
+            document.getElementById('bloomFill').classList.add('visible');
+          }
+        }, drawStart + DUR + 120);
+      });
+    }
+
+    /* ── SECTION REVEAL + HIGHLIGHTS ────────────────────────── */
+    const wrapObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('triggered');
+        wrapObs.unobserve(e.target);
+      });
+    }, { threshold: 0.06 });
+    document.querySelectorAll('.cs-section-wrap').forEach(el => wrapObs.observe(el));
+
+    const childObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        el.classList.add('visible');
+        if (el.id === 'problemMid') runGraph();
+        el.querySelectorAll('.et-hl').forEach((hl, i) =>
+          setTimeout(() => hl.classList.add('revealed'), 480 + i * 130)
+        );
+        childObs.unobserve(el);
+      });
+    }, { threshold: 0.18 });
+    document.querySelectorAll('.tr-anim').forEach(el => {
+      childObs.observe(el);
+      el.addEventListener('animationend', () => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+        el.style.animation = 'none';
+        el.style.willChange = 'auto';
+      }, { once: true });
+    });
+
+    /* ── PHASE TABS ─────────────────────────────────────── */
+    const carouselUpdaters = {};
+    document.querySelectorAll('.phase-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const ph = tab.dataset.phase;
+        document.querySelectorAll('.phase-tab').forEach(t =>
+          t.classList.toggle('active', t.dataset.phase === ph));
+        document.querySelectorAll('.phase-panel').forEach(p =>
+          p.classList.toggle('active', p.dataset.phase === ph));
+        /* Re-run update now that panel is visible so maxIdx is correct */
+        requestAnimationFrame(() => { if (carouselUpdaters[ph]) carouselUpdaters[ph](); });
+      });
+    });
+
+    /* ── CAROUSELS ──────────────────────────────────────── */
+    [
+      { phase: '1', total: 3 },
+      { phase: '2', total: 3 },
+      { phase: '3', total: 5 },
+      { phase: '4', total: 2 },
+    ].forEach(({ phase, total }) => {
+      const track    = document.getElementById(`carousel-p${phase}`);
+      const prev     = document.querySelector(`.sys-arrow-prev[data-phase="${phase}"]`);
+      const next     = document.querySelector(`.sys-arrow-next[data-phase="${phase}"]`);
+      const progFill = document.getElementById(`prog-p${phase}`);
+      let idx = 0;
+      let maxIdx = 0;
+
+      function update() {
+        const cardW    = track.firstElementChild ? track.firstElementChild.offsetWidth : 0;
+        const carouselEl = track.closest('.sys-carousel');
+        const viewW    = carouselEl ? carouselEl.clientWidth : 0;
+        if (!cardW || !viewW) return;
+
+        const visible = viewW / (cardW + 20);
+        maxIdx = Math.max(0, total - Math.floor(visible));
+        idx    = Math.min(idx, maxIdx);
+
+        const tx = idx >= maxIdx
+          ? Math.max(0, total * cardW + (total - 1) * 20 - viewW)
+          : idx * (cardW + 20);
+
+        track.style.transform = `translateX(-${tx}px)`;
+        prev.classList.toggle('disabled', idx === 0);
+        next.classList.toggle('disabled', idx >= maxIdx);
+        if (progFill)
+          progFill.style.width = `${Math.min(((idx + visible) / total) * 100, 100)}%`;
+      }
+
+      prev.addEventListener('click', () => { if (idx > 0)       { idx--; update(); } });
+      next.addEventListener('click', () => { if (idx < maxIdx)  { idx++; update(); } });
+
+      track.parentElement.setAttribute('tabindex', '0');
+      track.parentElement.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft'  && idx > 0)      { idx--; update(); }
+        if (e.key === 'ArrowRight' && idx < maxIdx) { idx++; update(); }
+      });
+
+      const phasePanel = track.closest('.phase-panel');
+      let swipeCooldown = false;
+      phasePanel.addEventListener('wheel', e => {
+        if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return;
+        e.preventDefault();
+        if (swipeCooldown) return;
+        if (e.deltaX > 30 && idx < maxIdx) { idx++; update(); swipeCooldown = true; }
+        else if (e.deltaX < -30 && idx > 0) { idx--; update(); swipeCooldown = true; }
+        if (swipeCooldown) setTimeout(() => { swipeCooldown = false; }, 500);
+      }, { passive: false });
+
+      let touchStartX = 0, touchStartY = 0;
+      phasePanel.addEventListener('touchstart', e => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+      phasePanel.addEventListener('touchend', e => {
+        const dx = touchStartX - e.changedTouches[0].clientX;
+        const dy = touchStartY - e.changedTouches[0].clientY;
+        if (Math.abs(dx) < Math.abs(dy)) return; /* vertical scroll — ignore */
+        if (dx > 20 && idx < maxIdx)  { idx++; update(); }
+        if (dx < -20 && idx > 0)      { idx--; update(); }
+      }, { passive: true });
+
+      carouselUpdaters[phase] = update;
+      window.addEventListener('resize', update);
+      update();
+    });
+  </script>
+
+  <script>
+  /* ── Case Study Password Gate ─────────────────────────────────── */
+  (function () {
+    const PASSWORD = 'design&build';
+    const gate     = document.getElementById('csGate');
+    if (!gate) return;
+
+    /* Already verified this session — remove gate instantly */
+    if (sessionStorage.getItem('csVerified')) {
+      gate.remove();
+      return;
+    }
+
+    /* Lock scroll while gate is visible */
+    document.documentElement.style.overflow = 'hidden';
+
+    const input    = document.getElementById('csGateInput');
+    const btn      = document.getElementById('csGateBtn');
+    const errMsg   = document.getElementById('csGateErrorMsg');
+    const capsWarn = document.getElementById('csGateCapsWarn');
+
+    if (input) setTimeout(() => input.focus(), 80);
+
+    /* Caps Lock */
+    if (input && capsWarn) {
+      const checkCaps = e => {
+        capsWarn.style.display = e.getModifierState && e.getModifierState('CapsLock') ? 'block' : 'none';
+      };
+      input.addEventListener('keydown', checkCaps);
+      input.addEventListener('keyup',   checkCaps);
+    }
+
+    if (btn)   btn.addEventListener('click', validate);
+    if (input) input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { validate(); }
+      else if (errMsg) errMsg.style.display = 'none';
+    });
+
+    function validate() {
+      if (!input) return;
+      if (input.value === PASSWORD) {
+        sessionStorage.setItem('csVerified', '1');
+        gate.classList.add('gate-exit');
+        document.documentElement.style.overflow = '';
+        setTimeout(() => gate.remove(), 600);
+      } else {
+        if (errMsg) errMsg.style.display = 'block';
+        input.classList.remove('gate-error');
+        void input.offsetWidth;
+        input.classList.add('gate-error');
+        input.value = '';
+        setTimeout(() => {
+          input.classList.remove('gate-error');
+          if (errMsg) errMsg.style.display = 'none';
+        }, 3200);
+      }
+    }
+  })();
+  </script>
+
+</body>
+</html>

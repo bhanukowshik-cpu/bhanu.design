@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stressie — Bhanu Kowshik</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
+    a[href], button, [role="button"] { cursor: pointer !important; }
+
+    /* ─── TOKENS ─────────────────────────────────────────────── */
+    :root {
+      --secondary:    #454545;
+      --bg:           #FFFCF8;
+      --white:        #FFFFFF;
+      --grey:         #9C9C9C;
+      --border:       #EFEFEF;
+      --orange:       #BF6212;
+      --orange-light: #FFF7E9;
+      --font-display: 'Playfair Display', serif;
+      --font-heading: 'Poppins', sans-serif;
+      --font-mono:    'JetBrains Mono', monospace;
+
+      /* ── Font scale ── */
+      --fs-xs:   11px;   /* eyebrow labels */
+      --fs-sm:   13px;   /* tags, small meta */
+      --fs-base: 15px;   /* body copy */
+      --fs-md:   18px;   /* subtitle, card sub-labels */
+      --fs-lg:   22px;   /* section titles, card headings */
+    }
+
+    /* ─── BODY — dot-grid fixed ──────────────────────────────── */
+    body {
+      background-color: var(--bg);
+      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
+      background-size: 19px 19px;
+      background-attachment: fixed;
+      min-height: 100vh;
+      font-family: var(--font-heading);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ─── CUSTOM CURSOR ──────────────────────────────────────── */
+    #customCursor {
+      position: fixed;
+      width: 17px; height: 17px;
+      background: #454545;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      will-change: left, top;
+      transition: width 0.18s ease, height 0.18s ease, opacity 0.18s ease;
+    }
+    #customCursor.on-card { background: #FFFFFF; mix-blend-mode: difference; }
+
+    /* ─── NAV ────────────────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 900;
+      background: rgba(255,252,248,0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0px 1px 0px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 40px;
+      height: 54px;
+      transform: translateY(0);
+      transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+    }
+    .nav.nav-hidden { transform: translateY(-100%); }
+
+    .nav-home {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; flex-shrink: 0; cursor: pointer !important;
+    }
+    .nav-home img {
+      width: 38px; height: 38px; display: block;
+      transform: rotate(200deg);
+      transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .nav-home:hover img { transform: rotate(180deg); }
+    .nav-home span {
+      font-family: var(--font-heading);
+      font-weight: 600; font-size: 15px;
+      color: var(--secondary); white-space: nowrap;
+    }
+
+    .nav-sections { display: flex; align-items: center; gap: 2px; }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      padding: 5px 10px;
+      border-radius: 5px; border: none; background: transparent;
+      font-family: var(--font-heading); font-weight: 500; font-size: 11px;
+      color: var(--secondary);
+      text-decoration: none; white-space: nowrap;
+      cursor: pointer !important;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .nav-btn:hover:not(.active) { background: #F2F2F2; }
+    .nav-btn.active { background: var(--secondary); color: var(--white); }
+
+    /* ─── HAMBURGER ──────────────────────────────────────────── */
+    .nav-hamburger {
+      display: none; flex-direction: column; justify-content: center;
+      gap: 5px; width: 36px; height: 36px; padding: 6px;
+      background: none; border: none; cursor: none; flex-shrink: 0;
+    }
+    .nav-hamburger span {
+      display: block; height: 2px; background: var(--secondary);
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ─── MOBILE MENU ────────────────────────────────────────── */
+    .mobile-menu-backdrop {
+      position: fixed; inset: 0;
+      z-index: 489;
+      background: rgba(37,37,37,0.35);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.38s ease;
+    }
+    .mobile-menu-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .mobile-menu {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 78vw; max-width: 320px;
+      z-index: 490;
+      background: var(--bg);
+      box-shadow: -8px 0 32px rgba(0,0,0,0.10);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 80px 32px 48px; gap: 4px;
+      transform: translateX(100%);
+      transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1);
+    }
+    .mobile-menu.open { transform: translateX(0); }
+
+    .mobile-menu a {
+      font-family: var(--font-mono);
+      font-weight: 500; font-size: 13px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--secondary); text-decoration: none;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      width: 100%;
+      opacity: 0; transform: translateX(16px);
+      transition: opacity 0.3s ease, transform 0.3s ease, color 0.15s ease;
+    }
+    .mobile-menu.open a { opacity: 1; transform: translateX(0); }
+    .mobile-menu a:nth-child(1) { transition-delay: 0.07s; }
+    .mobile-menu a:nth-child(2) { transition-delay: 0.11s; }
+    .mobile-menu a:nth-child(3) { transition-delay: 0.15s; }
+    .mobile-menu a:nth-child(4) { transition-delay: 0.19s; }
+    .mobile-menu a:nth-child(5) { transition-delay: 0.23s; }
+    .mobile-menu a:nth-child(6) { transition-delay: 0.27s; }
+    .mobile-menu a:nth-child(7) { transition-delay: 0.31s; }
+    .mobile-menu a:nth-child(8) { transition-delay: 0.35s; }
+    .mobile-menu a.active { font-weight: 700; color: var(--orange); }
+
+    /* ─── PAGE + CARD ────────────────────────────────────────── */
+    .page {
+      display: flex; justify-content: center;
+      padding: 94px 40px 90px;
+    }
+    .card {
+      background: var(--white);
+      width: 1200px; max-width: 100%;
+      border-radius: 30px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+
+    /* ─── HERO ───────────────────────────────────────────────── */
+    .cs-hero {
+      display: flex; flex-direction: column;
+      gap: 24px; padding: 44px 48px 56px;
+    }
+
+    /* ── Pills + date row ── */
+    .hero-top-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      opacity: 0;
+    }
+    .hero-top-row.visible { animation: fade-in 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
+
+    .hero-pills { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+    /* Border-only pill — matches Figma style */
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 0.8px solid rgba(191,98,18,0.55);
+      padding: 10px 22px; border-radius: 50px;
+      font-family: var(--font-heading); font-weight: 600; font-size: var(--fs-sm);
+      color: var(--secondary); white-space: nowrap; text-decoration: none;
+      cursor: pointer !important;
+      transition: background 0.15s ease;
+    }
+    .hero-pill:hover { background: rgba(191,98,18,0.06); }
+
+    /* Plain external link — no pill, arrow indicator */
+    .hero-link-plain {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--font-heading); font-weight: 500; font-size: var(--fs-sm);
+      color: var(--orange); text-decoration: none; white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .hero-link-plain:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .hero-link-plain .link-arrow {
+      display: inline-flex;
+      transition: transform 0.15s ease;
+    }
+    .hero-link-plain:hover .link-arrow { transform: translate(2px, -2px); }
+
+    .hero-date {
+      font-family: var(--font-heading); font-weight: 400; font-size: 13px;
+      color: #7A6848; white-space: nowrap; flex-shrink: 0;
+    }
+
+    /* ── Heading — mixed Playfair (orange) + Poppins (dark) ── */
+    .cs-heading {
+      font-size: 54px; line-height: 75px;
+      color: var(--secondary);
+    }
+    /* Word-by-word animation spans */
+    .cs-heading .word {
+      display: inline-block; opacity: 0; transform: translateY(22px);
+      will-change: opacity, transform;
+    }
+    .cs-heading .word.visible { animation: word-rise 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
+
+    /* Orange stat portion — Playfair Display */
+    .heading-orange {
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--orange);
+    }
+    /* Dark continuation — Poppins SemiBold */
+    .heading-dark {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      color: var(--secondary);
+    }
+
+    /* ── Subtitle ── */
+    .cs-subtitle {
+      font-family: var(--font-heading); font-weight: 500;
+      font-size: var(--fs-md); line-height: 1.65;
+      color: rgba(37,37,37,0.72);
+      max-width: 700px; opacity: 0;
+    }
+    .cs-subtitle.visible { animation: fade-in 0.6s cubic-bezier(0.22,0.61,0.36,1) both; }
+
+    /* ── Citation pills — warm cream, matches Figma ── */
+    .hero-citations {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      opacity: 0;
+    }
+    .hero-citations.visible { animation: fade-in 0.6s cubic-bezier(0.22,0.61,0.36,1) both; }
+
+    .citation-pill {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--orange-light);
+      padding: 8px 8px 8px 16px; border-radius: 12px;
+      font-family: var(--font-heading); font-weight: 500; font-size: var(--fs-sm);
+      color: var(--secondary); text-decoration: none;
+      cursor: pointer !important;
+      transition: filter 0.15s ease;
+    }
+    .citation-pill:hover { filter: brightness(0.97); }
+    .citation-icon-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; flex-shrink: 0;
+      background: var(--orange); border-radius: 8px;
+    }
+    .citation-arrow {
+      color: var(--orange); font-size: 13px; font-weight: 700;
+    }
+
+    /* ── Dark hero card ── */
+    .hero-dark-card {
+      border-radius: 30px; padding: 44px 40px;
+      display: flex; gap: 48px; align-items: center;
+      background:
+        radial-gradient(ellipse at 74% 30%, rgba(190,100,20,0.48) 0%, rgba(140,68,14,0.22) 36%, transparent 60%),
+        #1A0F06;
+      opacity: 0; transform: translateY(32px);
+    }
+    .hero-dark-card.visible { animation: card-rise 0.85s cubic-bezier(0.16,1,0.3,1) both; }
+
+    .hero-phone {
+      width: 196px; flex-shrink: 0;
+      border-radius: 32px; overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 6px 20px rgba(0,0,0,0.45);
+    }
+    .hero-phone img { width: 100%; display: block; }
+
+    .hero-card-right {
+      display: flex; flex-direction: column; gap: 36px; flex: 1; min-width: 0;
+    }
+
+    .hero-card-pitch {
+      font-family: var(--font-heading); font-weight: 500;
+      font-size: var(--fs-lg); line-height: 1.58;
+      color: rgba(255,250,240,0.40);
+    }
+    .hero-card-pitch strong {
+      color: rgba(255,250,240,0.95); font-weight: 700;
+    }
+    .pitch-orange { color: var(--orange); font-weight: 700; }
+
+    .hero-badges-wrap { position: relative; }
+    .hero-badges {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .hero-badge {
+      background: rgba(255,252,248,0.07);
+      border: 1px solid rgba(255,252,248,0.10);
+      border-radius: 16px; padding: 15px 18px;
+      font-family: var(--font-heading); font-weight: 400; font-size: var(--fs-sm);
+      line-height: 1.55; color: rgba(255,252,248,0.60);
+    }
+    .hero-badge strong { color: rgba(255,252,248,0.92); font-weight: 500; }
+
+    .star-tr {
+      position: absolute; top: -16px; right: 4px;
+      font-size: 22px; pointer-events: none; user-select: none;
+    }
+    .star-mr {
+      position: absolute; top: 50%; right: -4px;
+      transform: translateY(-50%);
+      font-size: 17px; pointer-events: none; user-select: none;
+    }
+
+    /* ─── OVERVIEW SUMMARY ROW ───────────────────────────────── */
+    .overview-summary {
+      padding: 0 48px 64px;
+      opacity: 0; transform: translateY(40px);
+    }
+    .overview-summary.triggered { opacity: 1; transform: translateY(0); transition: none; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .summary-cell {
+      background: var(--orange-light);
+      border-radius: 20px;
+      padding: 28px 30px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+
+    .summary-label {
+      font-family: var(--font-heading);
+      font-weight: 400; font-size: var(--fs-xs);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: #9C8B70;
+    }
+
+    .summary-value {
+      font-family: var(--font-heading);
+      font-weight: 700; font-size: var(--fs-lg);
+      line-height: 1.3; color: var(--secondary);
+    }
+
+    .summary-desc {
+      font-family: var(--font-heading);
+      font-weight: 400; font-size: var(--fs-sm);
+      line-height: 1.75; color: #7A6848;
+    }
+
+    /* ─── SECTION HEADER (future sections) ───────────────────── */
+    .section-header {
+      display: flex; align-items: center; gap: 0;
+      margin: 0 48px 32px;
+    }
+    .section-badge {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--orange);
+      padding: 14px 24px; border-radius: 14px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .section-num {
+      font-family: var(--font-heading); font-weight: 500;
+      font-size: var(--fs-lg); color: rgba(255,248,230,0.65);
+    }
+    .section-title-text {
+      font-family: var(--font-heading); font-weight: 500;
+      font-size: var(--fs-lg); color: #FFFCF8;
+    }
+    .section-line {
+      flex: 1; height: 1px; background: rgba(37,37,37,0.12);
+    }
+
+    /* ─── SECTION WRAPPERS ────────────────────────────────────── */
+    .cs-section-wrap {
+      padding: 0 48px 56px;
+      opacity: 0; transform: translateY(40px);
+    }
+    .cs-section-wrap.triggered { opacity: 1; transform: translateY(0); transition: none; }
+
+    .tr-anim { opacity: 0; transform: translateY(40px); }
+    .tr-anim.visible { animation: section-rise 1.1s cubic-bezier(0.16,1,0.3,1) both; }
+
+    /* ─── THANK YOU BAR ──────────────────────────────────────── */
+    .cs-thankyou {
+      background: var(--orange);
+      width: 100%;
+      padding: 12px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cs-thankyou-text {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      color: var(--bg);
+    }
+
+    /* ─── KEYFRAMES ──────────────────────────────────────────── */
+    @keyframes word-rise {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fade-in {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes card-rise {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes section-rise {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+    @media (hover: none) {
+      #customCursor { display: none; }
+      body { cursor: auto; }
+      a, button { cursor: pointer; }
+    }
+
+    /* ── Tablet ── */
+    @media (max-width: 1024px) {
+      .page              { padding: 74px 20px 60px; }
+      .nav               { padding: 8px 24px; }
+      .nav-sections      { display: none; }
+      .nav-hamburger     { display: flex; }
+      .cs-hero           { padding: 28px 28px 40px; gap: 20px; }
+      .cs-heading        { font-size: 44px; line-height: 62px; }
+      .hero-dark-card    { padding: 32px 28px; gap: 32px; }
+      .overview-summary  { padding-left: 28px; padding-right: 28px; }
+      .cs-section-wrap   { padding-left: 28px; padding-right: 28px; }
+      .section-header    { margin-left: 28px; margin-right: 28px; }
+    }
+
+    /* ── 2-col summary below 860px ── */
+    @media (max-width: 860px) {
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .summary-cell:last-child { grid-column: 1 / -1; }
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 767px) {
+      .cs-hero           { padding: 22px 18px 28px; gap: 16px; }
+      .cs-heading        { font-size: 30px; line-height: 48px; }
+      .cs-subtitle       { font-size: 15px; }
+      .hero-pill         { font-size: 12px; padding: 8px 16px; }
+      .hero-date         { font-size: 11px; }
+      .hero-dark-card    { flex-direction: column; padding: 28px 22px; gap: 24px; align-items: flex-start; border-radius: 22px; }
+      .hero-phone        { width: 148px; align-self: center; border-radius: 24px; }
+      .hero-badges       { grid-template-columns: 1fr; }
+      .hero-card-pitch   { font-size: 17px; }
+      .overview-summary  { padding: 0 18px 44px; }
+      .summary-grid      { grid-template-columns: 1fr; gap: 12px; }
+      .summary-cell:last-child { grid-column: auto; }
+      .summary-cell      { padding: 22px 22px; border-radius: 16px; }
+      .summary-value     { font-size: 17px; }
+      .section-badge     { padding: 12px 16px; }
+      .section-num, .section-title-text { font-size: 18px; }
+    }
+
+    /* ── Small mobile ── */
+    @media (max-width: 480px) {
+      .cs-heading        { font-size: 24px; line-height: 40px; }
+      .hero-pills        { gap: 8px; }
+      .hero-top-row      { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .hero-date         { padding-left: 2px; }
+    }
+    /* ─── 01 · OVERVIEW OF THE PROJECT ─────────────────────── */
+    .ov-wrap { padding: 0 48px 60px; }
+
+    .ov-grid {
+      display: grid;
+      grid-template-columns: 1fr 358px;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    /* Left card */
+    .ov-left {
+      background: var(--orange-light);
+      border-radius: 20px;
+      padding: 28px 30px 32px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+
+    .ov-card-label {
+      font-family: var(--font-heading);
+      font-style: normal; font-weight: 500;
+      font-size: var(--fs-lg); color: var(--orange);
+    }
+
+    .ov-card-body {
+      font-family: var(--font-heading);
+      font-weight: 400; font-size: var(--fs-base); line-height: 1.75;
+      color: var(--secondary);
+    }
+    .ov-card-body strong { font-weight: 700; }
+
+    /* Skill groups */
+    .skill-divider { height: 1px; background: rgba(191,98,18,0.15); margin: 4px 0; }
+
+    .skill-groups { display: flex; flex-direction: column; gap: 18px; }
+
+    .skill-group { display: flex; flex-direction: column; gap: 10px; }
+
+    .skill-group-label {
+      font-family: var(--font-heading); font-weight: 600;
+      font-size: var(--fs-xs); text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--orange);
+    }
+
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .skill-tag {
+      display: inline-flex; align-items: center;
+      background: #FFFFFF;
+      border: 1px solid rgba(191,98,18,0.22);
+      border-radius: 8px; padding: 7px 14px;
+      font-family: var(--font-heading); font-weight: 500; font-size: var(--fs-sm);
+      color: var(--secondary);
+    }
+
+    /* Right column */
+    .ov-right { display: flex; flex-direction: column; gap: 16px; height: 100%; }
+    .ov-right .ov-info-card:last-child { flex: 1; }
+
+    .ov-info-card {
+      background: var(--orange-light);
+      border-radius: 20px; padding: 24px 26px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+
+    .ov-info-label {
+      font-family: var(--font-heading);
+      font-style: normal; font-weight: 500;
+      font-size: var(--fs-lg); color: var(--orange);
+    }
+
+    .timeline-val {
+      font-family: var(--font-heading);
+      font-weight: 400; font-size: var(--fs-sm); color: #9C8B70;
+    }
+    .timeline-val strong {
+      font-weight: 800; font-size: 28px;
+      color: var(--secondary);
+      display: block; margin-top: 4px; line-height: 1.2;
+    }
+
+    /* Team */
+    .team-list { display: flex; flex-direction: column; gap: 14px; }
+
+    .team-member { display: flex; align-items: center; gap: 12px; }
+
+    .team-avatar {
+      width: 46px; height: 46px; border-radius: 50%;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-heading); font-weight: 700; font-size: 17px;
+      color: #FFFCF8; overflow: hidden;
+    }
+    .team-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .team-avatar.nda { font-size: 20px; }
+
+    .team-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+
+    .team-name {
+      font-family: var(--font-heading); font-weight: 700;
+      font-size: var(--fs-base); color: var(--secondary);
+    }
+    .team-name.nda-badge { color: #9C8B70; }
+
+    .team-role {
+      font-family: var(--font-heading); font-weight: 400;
+      font-size: var(--fs-sm); color: #7A6848;
+    }
+
+    .team-linkedin {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; flex-shrink: 0; cursor: pointer !important;
+      transition: opacity 0.15s ease;
+    }
+    .team-linkedin:hover { opacity: 0.7; }
+    .team-linkedin img { width: 25px; height: 25px; display: block; }
+
+    .team-divider { height: 1px; background: rgba(191,98,18,0.12); }
+
+    /* Responsive — overview grid */
+    @media (max-width: 1024px) {
+      .ov-wrap { padding-left: 28px; padding-right: 28px; }
+      .ov-grid { grid-template-columns: 1fr 320px; gap: 16px; }
+    }
+    @media (max-width: 860px) {
+      .ov-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 767px) {
+      .ov-wrap            { padding: 0 18px 44px; }
+      .ov-left            { padding: 20px 20px; border-radius: 16px; }
+      .ov-info-card       { padding: 20px 20px; border-radius: 16px; }
+      .ov-card-label      { font-size: 17px; }
+      .ov-info-label      { font-size: 16px; }
+      .resp-pill          { font-size: 12px; padding: 8px 14px; }
+      .team-avatar        { width: 40px; height: 40px; font-size: 15px; }
+      .team-name          { font-size: 13px; }
+      .timeline-val strong { font-size: 22px; }
+    }
+    /* ─── 02 · PILOT FINDINGS ───────────────────────────── */
+    .pf-heading { font-size: 26px; line-height: 1.7; margin-bottom: 32px; font-weight: 600; }
+
+    /* Two-column layout: balanced 50/50 split */
+    .pf-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .pf-col { display: flex; flex-direction: column; gap: 24px; }
+    /* Right col: last card stretches to fill remaining height */
+    .pf-col:last-child { height: 100%; }
+    .pf-col:last-child .pf-card:last-child { flex: 1; }
+
+    .pf-card {
+      background: var(--orange-light);
+      border-radius: 20px; padding: 17px 24px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+
+    .pf-card-title {
+      font-family: var(--font-heading);
+      font-style: normal; font-weight: 500;
+      font-size: var(--fs-lg); color: var(--orange);
+    }
+
+    .pf-card-body {
+      font-family: var(--font-heading);
+      font-weight: 400; font-size: var(--fs-base); line-height: 1.7;
+      color: var(--secondary);
+    }
+    .pf-card-body strong { font-weight: 700; }
+
+    /* Stat chips — 3 in a row, hug sizing */
+    .pf-stat-row { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .pf-stat-chip {
+      background: #FFF9F0;
+      border: 0.5px solid #FFBB81;
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: inline-flex; align-items: center; gap: 10px;
+      box-shadow: 2px 2px 0px 0px #FFBB81;
+      flex-shrink: 0;
+    }
+
+    .pf-arc-wrap { position: relative; width: 60px; height: 60px; flex-shrink: 0; }
+    .pf-arc-wrap svg { display: block; width: 60px; height: 60px; }
+    .pf-arc-pct {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-heading); font-weight: 700;
+      font-size: 11px; color: var(--secondary);
+      line-height: 1; white-space: nowrap;
+    }
+    .pf-arc-track { fill: none; stroke: rgba(191,98,18,0.18); stroke-width: 12; stroke-linecap: round; }
+    .pf-arc-fill  {
+      fill: none; stroke: var(--orange); stroke-width: 12; stroke-linecap: round;
+      transition: stroke-dasharray 1s cubic-bezier(0.16,1,0.3,1);
+    }
+    /* circumference for r=30 = 188.5 */
+    .pf-arc-fill[data-pct] { stroke-dasharray: 0 188.5; }
+    .pf-arc-fill[data-pct].arc-animated { stroke-dasharray: var(--arc-filled) var(--arc-gap); }
+
+    .pf-stat-name {
+      font-family: var(--font-heading); font-weight: 600;
+      font-size: var(--fs-base); color: var(--secondary);
+    }
+
+    /* Bullet list */
+    .pf-bullets { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+    .pf-bullets li {
+      font-family: var(--font-heading);
+      font-weight: 400; font-size: var(--fs-base); line-height: 1.6;
+      color: var(--secondary);
+      padding-left: 16px; position: relative;
+    }
+    .pf-bullets li::before { content: '•'; position: absolute; left: 0; color: var(--orange); font-weight: 700; }
+    .pf-bullets li strong { font-weight: 700; }
+
+    .pf-footnote {
+      font-family: var(--font-display); font-style: italic; font-weight: 400;
+      font-size: var(--fs-sm); color: rgba(191,98,18,0.65); margin-top: 4px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      .pf-heading { font-size: 22px; }
+    }
+    /* Stack to single column below 860px */
+    @media (max-width: 860px) {
+      .pf-grid     { grid-template-columns: 1fr; }
+      .pf-stat-row { gap: 16px; }
+    }
+    @media (max-width: 767px) {
+      .pf-heading   { font-size: 19px; line-height: 1.65; margin-bottom: 24px; }
+      .pf-card      { padding: 14px 16px; border-radius: 16px; gap: 10px; }
+      .pf-col       { gap: 16px; }
+      .pf-stat-row  { gap: 10px; }
+      .pf-stat-chip { padding: 10px 12px; gap: 8px; }
+      .pf-arc-wrap  { width: 52px; height: 52px; }
+      .pf-arc-wrap svg { width: 52px; height: 52px; }
+      .pf-stat-name { font-size: 14px; }
+    }
+    @media (max-width: 480px) {
+      .pf-stat-row  { gap: 8px; }
+      .pf-stat-chip { padding: 8px 10px; gap: 6px; }
+      .pf-arc-wrap  { width: 46px; height: 46px; }
+      .pf-arc-wrap svg { width: 46px; height: 46px; }
+    }
+
+    /* ─── 03 · STRATEGY ─────────────────────────────────── */
+    .st-intro-text {
+      font-family: var(--font-heading);
+      font-size: 26px; line-height: 1.65; font-weight: 700;
+      color: var(--secondary);
+    }
+    .st-orange-italic {
+      font-family: var(--font-display);
+      font-style: italic; font-weight: 800;
+      color: var(--orange);
+    }
+
+    /* Equal-height two-column grid — same pattern as pf-grid */
+    .st-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .st-col { display: flex; flex-direction: column; }
+    .st-card {
+      background: var(--orange-light);
+      border-radius: 20px;
+      padding: 22px 24px;
+      display: flex; flex-direction: column; gap: 18px;
+      flex: 1;
+    }
+
+    .st-card-title {
+      font-family: var(--font-heading);
+      font-style: normal; font-weight: 500;
+      font-size: var(--fs-md); color: var(--orange);
+    }
+
+    /* ── Conversation list ── */
+    .conv-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .conv-item { display: flex; align-items: flex-start; gap: 12px; }
+
+    .conv-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      object-fit: cover; flex-shrink: 0;
+    }
+
+    .conv-bubble { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+
+    .conv-name {
+      font-family: var(--font-heading);
+      font-weight: 500; font-size: var(--fs-xs);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--orange);
+    }
+
+    .conv-text {
+      font-family: var(--font-heading);
+      font-weight: 400; font-size: var(--fs-base);
+      line-height: 1.7; color: var(--secondary);
+    }
+    .conv-text strong { font-weight: 700; }
+
+    .conv-divider { height: 1px; background: rgba(191,98,18,0.13); }
+
+    /* ── Approach ── */
+    .approach-intro {
+      font-family: var(--font-heading);
+      font-weight: 400; font-size: var(--fs-base);
+      line-height: 1.75; color: var(--secondary);
+    }
+    .approach-intro strong { font-weight: 700; }
+
+    .principle-list { display: flex; flex-direction: column; gap: 22px; }
+
+    .principle-item { display: flex; align-items: flex-start; gap: 16px; }
+
+    .principle-icon {
+      width: 64px; height: 64px;
+      object-fit: contain; flex-shrink: 0; border-radius: 12px;
+    }
+
+    .principle-body { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+
+    .principle-title {
+      font-family: var(--font-heading);
+      font-weight: 700; font-size: var(--fs-lg);
+      color: var(--orange);
+    }
+
+    .principle-text {
+      font-family: var(--font-heading);
+      font-weight: 400; font-size: var(--fs-base);
+      line-height: 1.7; color: var(--secondary);
+    }
+    .principle-text strong { font-weight: 700; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .st-intro-text { font-size: 22px; }
+    }
+    @media (max-width: 860px) {
+      .st-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 767px) {
+      .st-intro-text  { font-size: 18px; }
+      .st-card        { padding: 16px 18px; border-radius: 16px; gap: 14px; }
+      .conv-avatar    { width: 36px; height: 36px; }
+      .principle-icon { width: 52px; height: 52px; }
+      .principle-title { font-size: 18px; }
+    }
+
+    /* ─── 04 · EXPERIENCES — phone grid ─────────────────── */
+    .exp-phones-outer { /* no centering wrapper needed in grid */ }
+    .exp-phones-wrap  { /* no scrolling */ }
+
+    /* 3-up top row, 2-up centered bottom row (6-col ghost grid) */
+    .exp-phones {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 18px;
+      align-items: end;
+    }
+    .exp-phone:nth-child(1),
+    .exp-phone:nth-child(2),
+    .exp-phone:nth-child(3) { grid-column: span 2; }
+    /* phones 4 & 5 sit in cols 2-3 and 4-5 → visually centered */
+    .exp-phone:nth-child(4) { grid-column: 2 / 4; }
+    .exp-phone:nth-child(5) { grid-column: 4 / 6; }
+
+    .exp-phone {
+      border-radius: 30px;
+      overflow: hidden;
+    }
+    .exp-phone img { width: 100%; display: block; }
+
+    @media (max-width: 767px) {
+      .exp-phones {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .exp-phone:nth-child(1),
+      .exp-phone:nth-child(2),
+      .exp-phone:nth-child(3) { grid-column: span 1; }
+      .exp-phone:nth-child(4) { grid-column: 1 / 2; }
+      .exp-phone:nth-child(5) { grid-column: 3 / 4; }
+      .exp-phone { border-radius: 22px; }
+    }
+    @media (max-width: 480px) {
+      .exp-phones { gap: 10px; }
+      .exp-phone { border-radius: 18px; }
+    }
+
+    /* ─── ONBOARDING SUB-SECTION ────────────────────────── */
+    .ob-wrap {
+      padding: 0 48px 56px;
+      opacity: 0; transform: translateY(40px);
+    }
+    .ob-wrap.triggered { opacity: 1; transform: translateY(0); transition: none; }
+
+    .ob-card {
+      background: var(--orange-light);
+      border-radius: 20px;
+      padding: 28px 32px 32px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    .ob-label {
+      font-family: var(--font-heading);
+      font-style: normal; font-weight: 500;
+      font-size: var(--fs-lg); color: var(--orange);
+      display: block;
+    }
+
+    .ob-desc {
+      font-family: var(--font-heading);
+      font-weight: 400; font-size: var(--fs-base);
+      line-height: 1.75; color: var(--secondary);
+    }
+    .ob-desc strong { font-weight: 700; }
+
+    @media (max-width: 1024px) {
+      .ob-wrap { padding-left: 28px; padding-right: 28px; }
+    }
+    @media (max-width: 767px) {
+      .ob-wrap  { padding: 0 18px 40px; }
+      .ob-card  { padding: 20px 20px 24px; border-radius: 16px; gap: 18px; }
+      .ob-label { font-size: 18px; }
+      .ob-desc  { font-size: 14px; }
+    }
+
+    /* ─── 05 · WHAT USERS LOVED ─────────────────────────── */
+    .test-intro-text {
+      font-family: var(--font-heading);
+      font-size: 26px; line-height: 1.7; font-weight: 600;
+      color: var(--secondary);
+    }
+
+    /* 6-column grid: row1 = 3×span-2, row2 = 2×span-3 (auto-centered) */
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 16px;
+    }
+    .test-card:nth-child(1),
+    .test-card:nth-child(2),
+    .test-card:nth-child(3) { grid-column: span 2; }
+    .test-card:nth-child(4),
+    .test-card:nth-child(5) { grid-column: span 3; }
+
+    .test-card {
+      background: var(--orange-light);
+      border-radius: 20px;
+      padding: 24px 24px 20px;
+      display: flex; flex-direction: column;
+      justify-content: space-between; gap: 20px;
+    }
+
+    .test-quote {
+      font-family: var(--font-heading);
+      font-weight: 400; font-size: var(--fs-base);
+      line-height: 1.75; color: var(--secondary); flex: 1;
+    }
+    .test-quote strong { font-weight: 700; }
+
+    .test-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%; object-fit: cover;
+    }
+
+    @media (max-width: 1024px) {
+      .test-intro-text { font-size: 22px; }
+    }
+    @media (max-width: 860px) {
+      .test-grid { grid-template-columns: repeat(2, 1fr); }
+      .test-card:nth-child(n) { grid-column: span 1; }
+      /* Center any lone last card in a 2-column grid */
+      .test-card:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+        max-width: calc(50% - 8px);
+        margin: 0 auto;
+      }
+    }
+    @media (max-width: 540px) {
+      .test-grid { grid-template-columns: 1fr; }
+      .test-card:last-child:nth-child(odd) { max-width: 100%; }
+      .test-intro-text { font-size: 19px; }
+    }
+
+    /* ─── INDIVIDUAL ELEMENT ENTRANCE ──────────────────── */
+    .el-anim {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity 0.55s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.65s cubic-bezier(0.16,1,0.3,1);
+    }
+    .el-anim.el-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── 07 · CURRENT WORK ─────────────────────────── */
+    .cw-intro {
+      font-family: var(--font-heading);
+      font-size: 28px; line-height: 1.65; font-weight: 600;
+      color: var(--secondary);
+    }
+    .cw-orange { color: var(--orange); }
+
+    .cw-images {
+      display: flex;
+      gap: 16px;
+      height: 320px;
+      align-items: stretch;
+    }
+    .cw-img {
+      border-radius: 20px;
+      overflow: hidden;
+      flex: 1;
+      min-width: 0;
+    }
+    .cw-img:first-child { flex: 1.8; }
+    .cw-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+
+    @media (max-width: 1024px) {
+      .cw-intro { font-size: 24px; }
+      .cw-images { height: 280px; }
+    }
+    @media (max-width: 860px) {
+      .cw-images { height: 240px; gap: 10px; }
+    }
+    @media (max-width: 640px) {
+      .cw-images {
+        flex-direction: column;
+        height: auto;
+      }
+      .cw-img,
+      .cw-img:first-child { flex: none; height: 220px; }
+      .cw-intro { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── CURSOR ─────────────────────────────────────────────── -->
+  <div id="customCursor"></div>
+
+  <!-- ── NAV ───────────────────────────────────────────────── -->
+  <nav class="nav">
+    <a href="index.html" class="nav-home">
+      <img src="cs-nav-logo.svg" alt="" />
+      <span>Stressie</span>
+    </a>
+    <div class="nav-sections">
+      <a href="#summary"        class="nav-btn active" data-section="summary">Summary</a>
+      <a href="#overview"       class="nav-btn"        data-section="overview">Overview</a>
+      <a href="#pilot-findings" class="nav-btn"        data-section="pilot-findings">V1 Pilot Findings</a>
+      <a href="#strategy"       class="nav-btn"        data-section="strategy">My Strategy</a>
+      <a href="#experiences"    class="nav-btn"        data-section="experiences">Approach</a>
+      <a href="#users-loved"    class="nav-btn"        data-section="users-loved">Users Liked</a>
+      <a href="#frustrations"   class="nav-btn"        data-section="frustrations">Frustrations</a>
+      <a href="#current-work"   class="nav-btn"        data-section="current-work">Current Work</a>
+    </div>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ── MOBILE MENU ────────────────────────────────────────── -->
+  <div class="mobile-menu-backdrop" id="menuBackdrop"></div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#summary">Summary</a>
+    <a href="#overview">Overview</a>
+    <a href="#pilot-findings">V1 Pilot Findings</a>
+    <a href="#strategy">My Strategy</a>
+    <a href="#experiences">Approach</a>
+    <a href="#users-loved">Users Liked</a>
+    <a href="#frustrations">Frustrations</a>
+    <a href="#current-work">Current Work</a>
+  </div>
+
+  <!-- ── PAGE ───────────────────────────────────────────────── -->
+  <div class="page">
+    <div class="card">
+
+      <!-- ══ SUMMARY (hero) ══════════════════════════════════ -->
+      <section id="summary" data-has-content="true">
+
+        <div class="cs-hero">
+
+          <!-- Pills + site link row -->
+          <div class="hero-top-row" id="heroTopRow">
+            <div class="hero-pills">
+              <span class="hero-pill">Founding Product Designer</span>
+              <span class="hero-pill">June 2024 – Dec 2024</span>
+              <span class="hero-pill">Health and Wellness</span>
+            </div>
+            <a href="https://www.stressieapp.com" class="hero-link-plain" target="_blank" rel="noopener">
+              www.StressieApp.com
+              <span class="link-arrow">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                  <path d="M2 11L11 2M11 2H4.5M11 2V8.5" stroke="#BF6212" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </a>
+          </div>
+
+          <!-- Headline — word-by-word animation -->
+          <div class="cs-heading" id="csHeading"><span class="heading-orange">Workplace stress affects 83% of U.S. employees</span><span class="heading-dark"> and costs businesses $300 billion annually in lost productivity and turnover.</span></div>
+
+          <!-- Subtitle -->
+          <p class="cs-subtitle" id="csSubtitle">Yet, most companies lack the tools to address stress effectively.</p>
+
+          <!-- Citations -->
+          <div class="hero-citations" id="heroCitations">
+            <a href="https://www.osha.gov/workplace-stress/" class="citation-pill" target="_blank" rel="noopener">
+              OSHA.gov
+              <span class="citation-icon-btn">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                  <path d="M2 11L11 2M11 2H4.5M11 2V8.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </a>
+          </div>
+
+          <!-- Dark hero card -->
+          <div class="hero-dark-card" id="heroDarkCard">
+
+            <!-- Phone mockup -->
+            <div class="hero-phone">
+              <img src="Stressie%20Case%20Study%20Updated%20Materials/Summary%20of%20the%20project/Home%20Screen%20Image.png" alt="Stressie app" />
+            </div>
+
+            <!-- Right: pitch + badges -->
+            <div class="hero-card-right">
+              <p class="hero-card-pitch">
+                That's exactly the problem <span class="pitch-orange">Stressie</span> is
+                <strong>solving—helping organizations uncover real employee stressors and deliver personalized, actionable solutions</strong>
+                that foster healthier, more productive workplaces.
+              </p>
+
+              <div class="hero-badges-wrap">
+                <div class="hero-badges">
+                  <div class="hero-badge">Incubating at <strong>Harvard Innovation Labs</strong></div>
+                  <div class="hero-badge"><strong>Currently piloting</strong> at InKind &amp; Amazon</div>
+                  <div class="hero-badge"><strong>Users say</strong> they feel de-stressed after using the app</div>
+                  <div class="hero-badge"><strong>Companies say</strong> the data insights are highly actionable</div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /hero-dark-card -->
+
+        </div><!-- /cs-hero -->
+
+      </section>
+
+      <!-- ══ OVERVIEW ═══════════════════════════════════════════ -->
+      <section id="overview" data-has-content="true">
+
+        <!-- ── 01 · Overview of the project ───────────────────── -->
+        <div class="section-header tr-anim" id="overviewSummary">
+          <div class="section-badge">
+            <span class="section-num">01.</span>
+            <span class="section-title-text">Overview of the project</span>
+          </div>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="ov-wrap cs-section-wrap tr-anim" style="padding-top:0;animation-delay:0.08s">
+          <div class="ov-grid">
+
+            <!-- Left: role + responsibilities -->
+            <div class="ov-left">
+              <span class="ov-card-label">My Role</span>
+              <p class="ov-card-body">
+                As the Founding Product Designer, I <strong>shaped Stressie from the ground up</strong>—
+                leading design strategy, defining the product vision, and translating research insights
+                into high-fidelity experiences ready for engineering handoff.
+              </p>
+              <div class="skill-divider"></div>
+
+              <div class="skill-groups">
+
+                <div class="skill-group">
+                  <span class="skill-group-label">Strategy &amp; Research</span>
+                  <div class="skill-tags">
+                    <span class="skill-tag">Founder Interviews</span>
+                    <span class="skill-tag">Data Analysis</span>
+                    <span class="skill-tag">Pilot Feedback</span>
+                    <span class="skill-tag">UX Strategy</span>
+                  </div>
+                </div>
+
+                <div class="skill-group">
+                  <span class="skill-group-label">Design &amp; Execution</span>
+                  <div class="skill-tags">
+                    <span class="skill-tag">High-Fidelity Prototyping</span>
+                    <span class="skill-tag">Brand Toolkit</span>
+                    <span class="skill-tag">Design System</span>
+                    <span class="skill-tag">Low-fi Prototype</span>
+                    <span class="skill-tag">Stakeholder Validation</span>
+                    <span class="skill-tag">Engineering Collaboration</span>
+                  </div>
+                </div>
+
+                <div class="skill-group">
+                  <span class="skill-group-label">Growth &amp; Visibility</span>
+                  <div class="skill-tags">
+                    <span class="skill-tag">Pitch &amp; Presentations</span>
+                    <span class="skill-tag">Marketing Design</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Right column -->
+            <div class="ov-right">
+
+              <!-- Timeline -->
+              <div class="ov-info-card">
+                <span class="ov-info-label">Timeline</span>
+                <div class="timeline-val">
+                  <strong>~3.5 months</strong>
+                </div>
+              </div>
+
+              <!-- People I worked with -->
+              <div class="ov-info-card">
+                <span class="ov-info-label">People I worked with</span>
+                <div class="team-list">
+
+                  <div class="team-member">
+                    <div class="team-avatar">
+                      <img src="Stressie%20Case%20Study%20Updated%20Materials/Overview%20of%20the%20project/People%20I%20worked%20with/Lupita.png" alt="Lupita" />
+                    </div>
+                    <div class="team-info">
+                      <span class="team-name">Lupita</span>
+                      <span class="team-role">CEO &amp; Co-Founder</span>
+                    </div>
+                    <a href="https://www.linkedin.com/in/lupitaalmuhana/" class="team-linkedin" target="_blank" rel="noopener" aria-label="LinkedIn">
+                      <img src="Stressie%20Case%20Study%20Updated%20Materials/Overview%20of%20the%20project/People%20I%20worked%20with/Linkedin%20Icon.svg" alt="LinkedIn" />
+                    </a>
+                  </div>
+
+                  <div class="team-divider"></div>
+
+                  <div class="team-member">
+                    <div class="team-avatar">
+                      <img src="Stressie%20Case%20Study%20Updated%20Materials/Overview%20of%20the%20project/People%20I%20worked%20with/NDA%20restricted%201.png" alt="" />
+                    </div>
+                    <div class="team-info">
+                      <span class="team-name nda-badge">Identity Protected</span>
+                      <span class="team-role">CTO &amp; Co-Founder</span>
+                    </div>
+                  </div>
+
+                  <div class="team-divider"></div>
+
+                  <div class="team-member">
+                    <div class="team-avatar">
+                      <img src="Stressie%20Case%20Study%20Updated%20Materials/Overview%20of%20the%20project/People%20I%20worked%20with/Mikoloj.png" alt="Mikolaj" />
+                    </div>
+                    <div class="team-info">
+                      <span class="team-name">Mikolaj</span>
+                      <span class="team-role">Software Engineer</span>
+                    </div>
+                    <a href="https://www.linkedin.com/in/mikolajzalog/" class="team-linkedin" target="_blank" rel="noopener" aria-label="LinkedIn">
+                      <img src="Stressie%20Case%20Study%20Updated%20Materials/Overview%20of%20the%20project/People%20I%20worked%20with/Linkedin%20Icon.svg" alt="LinkedIn" />
+                    </a>
+                  </div>
+
+                  <div class="team-divider"></div>
+
+                  <div class="team-member">
+                    <div class="team-avatar">
+                      <img src="Stressie%20Case%20Study%20Updated%20Materials/Overview%20of%20the%20project/People%20I%20worked%20with/Jenna.png" alt="Jenna" />
+                    </div>
+                    <div class="team-info">
+                      <span class="team-name">Jenna</span>
+                      <span class="team-role">Marketing Intern</span>
+                    </div>
+                    <a href="https://www.linkedin.com/in/jenna-c-51a774319/" class="team-linkedin" target="_blank" rel="noopener" aria-label="LinkedIn">
+                      <img src="Stressie%20Case%20Study%20Updated%20Materials/Overview%20of%20the%20project/People%20I%20worked%20with/Linkedin%20Icon.svg" alt="LinkedIn" />
+                    </a>
+                  </div>
+
+                </div>
+              </div>
+
+            </div><!-- /ov-right -->
+          </div><!-- /ov-grid -->
+        </div>
+
+      </section>
+
+      <!-- ══ 02 · PILOT FINDINGS ════════════════════════════ -->
+      <section id="pilot-findings" data-has-content="true">
+
+        <div class="section-header tr-anim">
+          <div class="section-badge">
+            <span class="section-num">02.</span>
+            <span class="section-title-text">Version 1 Pilot Findings</span>
+          </div>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="cs-section-wrap tr-anim">
+
+          <div class="cs-heading pf-heading"><span class="heading-orange">Piloted Version 01 with 50 Austin Police Department officers</span><span class="heading-dark"> in high-stress environments over three months, validating them as a key audience and gaining insights that shaped our approach. Key learnings included…</span></div>
+
+          <div class="pf-grid">
+
+            <!-- Left column -->
+            <div class="pf-col">
+
+              <div class="pf-card">
+                <span class="pf-card-title">Primary Stressors</span>
+                <p class="pf-card-body">We analyzed the <strong>key stressors affecting officers'</strong> well-being and identified the most significant ones:</p>
+                <div class="pf-stat-row">
+                  <div class="pf-stat-chip">
+                    <div class="pf-arc-wrap">
+                      <svg viewBox="0 0 80 80" width="80" height="80">
+                        <circle class="pf-arc-track" cx="40" cy="40" r="30" stroke-dasharray="141.37 47.12" transform="rotate(135 40 40)"/>
+                        <circle class="pf-arc-fill" cx="40" cy="40" r="30" data-pct="31" style="--arc-filled:43.83;--arc-gap:144.67" transform="rotate(135 40 40)"/>
+                      </svg>
+                      <span class="pf-arc-pct">31%</span>
+                    </div>
+                    <span class="pf-stat-name">Work</span>
+                  </div>
+                  <div class="pf-stat-chip">
+                    <div class="pf-arc-wrap">
+                      <svg viewBox="0 0 80 80" width="80" height="80">
+                        <circle class="pf-arc-track" cx="40" cy="40" r="30" stroke-dasharray="141.37 47.12" transform="rotate(135 40 40)"/>
+                        <circle class="pf-arc-fill" cx="40" cy="40" r="30" data-pct="24" style="--arc-filled:33.93;--arc-gap:154.57" transform="rotate(135 40 40)"/>
+                      </svg>
+                      <span class="pf-arc-pct">24%</span>
+                    </div>
+                    <span class="pf-stat-name">Family</span>
+                  </div>
+                  <div class="pf-stat-chip">
+                    <div class="pf-arc-wrap">
+                      <svg viewBox="0 0 80 80" width="80" height="80">
+                        <circle class="pf-arc-track" cx="40" cy="40" r="30" stroke-dasharray="141.37 47.12" transform="rotate(135 40 40)"/>
+                        <circle class="pf-arc-fill" cx="40" cy="40" r="30" data-pct="45" style="--arc-filled:63.62;--arc-gap:124.88" transform="rotate(135 40 40)"/>
+                      </svg>
+                      <span class="pf-arc-pct">45%</span>
+                    </div>
+                    <span class="pf-stat-name">Finances</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pf-card">
+                <span class="pf-card-title">Primary Uplifters</span>
+                <p class="pf-card-body">We analyzed the <strong>key uplifters that support officers'</strong> well-being and identified the most significant ones.</p>
+                <div class="pf-stat-row">
+                  <div class="pf-stat-chip">
+                    <div class="pf-arc-wrap">
+                      <svg viewBox="0 0 80 80" width="80" height="80">
+                        <circle class="pf-arc-track" cx="40" cy="40" r="30" stroke-dasharray="141.37 47.12" transform="rotate(135 40 40)"/>
+                        <circle class="pf-arc-fill" cx="40" cy="40" r="30" data-pct="54" style="--arc-filled:76.34;--arc-gap:112.16" transform="rotate(135 40 40)"/>
+                      </svg>
+                      <span class="pf-arc-pct">54%</span>
+                    </div>
+                    <span class="pf-stat-name">Nature</span>
+                  </div>
+                  <div class="pf-stat-chip">
+                    <div class="pf-arc-wrap">
+                      <svg viewBox="0 0 80 80" width="80" height="80">
+                        <circle class="pf-arc-track" cx="40" cy="40" r="30" stroke-dasharray="141.37 47.12" transform="rotate(135 40 40)"/>
+                        <circle class="pf-arc-fill" cx="40" cy="40" r="30" data-pct="26" style="--arc-filled:36.76;--arc-gap:151.74" transform="rotate(135 40 40)"/>
+                      </svg>
+                      <span class="pf-arc-pct">26%</span>
+                    </div>
+                    <span class="pf-stat-name">Travel</span>
+                  </div>
+                  <div class="pf-stat-chip">
+                    <div class="pf-arc-wrap">
+                      <svg viewBox="0 0 80 80" width="80" height="80">
+                        <circle class="pf-arc-track" cx="40" cy="40" r="30" stroke-dasharray="141.37 47.12" transform="rotate(135 40 40)"/>
+                        <circle class="pf-arc-fill" cx="40" cy="40" r="30" data-pct="20" style="--arc-filled:28.27;--arc-gap:160.23" transform="rotate(135 40 40)"/>
+                      </svg>
+                      <span class="pf-arc-pct">20%</span>
+                    </div>
+                    <span class="pf-stat-name">Music</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pf-card">
+                <span class="pf-card-title">Engagement Rate</span>
+                <p class="pf-card-body">The <strong>average engagement rate for this pilot was 17.4%</strong>, compared to an industry average of ~2.0%.</p>
+              </div>
+
+            </div><!-- /pf-col left -->
+
+            <!-- Right column -->
+            <div class="pf-col">
+
+              <div class="pf-card">
+                <span class="pf-card-title">Users found these delightful</span>
+                <ul class="pf-bullets">
+                  <li>After doing one exercise, most of the users <strong>felt calm and de-stressed</strong>.</li>
+                  <li>The <strong>AI feature</strong> where the model personalizes stress management strategy is loved.</li>
+                  <li>Most of the users loved <strong>less than a minute quick resets</strong>.</li>
+                </ul>
+                <p class="pf-footnote">*Data collected through a feedback form</p>
+              </div>
+
+              <div class="pf-card">
+                <span class="pf-card-title">Pain Points Identified</span>
+                <ul class="pf-bullets">
+                  <li>Users felt that the <strong>application was not intuitive</strong> and had a confusing home page.</li>
+                  <li>The <strong>application crashed repeatedly</strong> during use.</li>
+                  <li>The <strong>UI felt immature</strong> and didn't compel users to engage.</li>
+                  <li>The <strong>notifications were not working</strong> properly.</li>
+                  <li>Users <strong>didn't understand certain elements</strong> of the app, such as what the data graphs represented.</li>
+                </ul>
+                <p class="pf-footnote">*Data collected through a feedback form</p>
+              </div>
+
+            </div><!-- /pf-col right -->
+
+          </div><!-- /pf-grid -->
+        </div><!-- /cs-section-wrap -->
+
+      </section>
+
+      <!-- ══ 03 · STRATEGY ══════════════════════════════════ -->
+      <section id="strategy" data-has-content="true">
+
+        <div class="section-header tr-anim">
+          <div class="section-badge">
+            <span class="section-num">03.</span>
+            <span class="section-title-text">My Strategy for Addressing the Challenges</span>
+          </div>
+          <div class="section-line"></div>
+        </div>
+
+        <!-- Intro heading -->
+        <div class="cs-section-wrap tr-anim" style="padding-bottom:32px;animation-delay:0.06s">
+          <p class="st-intro-text">
+            After the pilot, users found the app's UI and certain features unintuitive.
+            <span class="st-orange-italic">I led the next design steps by brainstorming</span>
+            with the Product Owner and Tech team to address these challenges.
+          </p>
+        </div>
+
+        <!-- Two-column grid -->
+        <div class="cs-section-wrap tr-anim" style="padding-top:0;animation-delay:0.1s">
+          <div class="st-grid">
+
+            <!-- ── Left: Conversation ── -->
+            <div class="st-col">
+              <div class="st-card">
+                <span class="st-card-title">Our conversation went like this</span>
+
+                <div class="conv-list">
+
+                  <div class="conv-item">
+                    <img class="conv-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/Our%20conversation%20went%20this/Lupita.png" alt="Lupita" />
+                    <div class="conv-bubble">
+                      <span class="conv-name">Lupita Almuhana, Product Owner &amp; Founder</span>
+                      <p class="conv-text">Looks like users feel the UI is very immature and not very intuitive — any idea what we can do?</p>
+                    </div>
+                  </div>
+
+                  <div class="conv-divider"></div>
+
+                  <div class="conv-item">
+                    <img class="conv-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/Our%20conversation%20went%20this/NDA%20Ristricted.png" alt="NDA Restricted" />
+                    <div class="conv-bubble">
+                      <span class="conv-name">Identity Protected, Tech Lead / AI Engineer</span>
+                      <p class="conv-text">Why don't we just fix the bugs, change some colors — I'm not sure what's so confusing about the graphs?</p>
+                    </div>
+                  </div>
+
+                  <div class="conv-divider"></div>
+
+                  <div class="conv-item">
+                    <img class="conv-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/Our%20conversation%20went%20this/Me%20Founding%20Designer.png" alt="Me" />
+                    <div class="conv-bubble">
+                      <span class="conv-name">Me, Founding Product Designer</span>
+                      <p class="conv-text">There's a lot to improve. The reason users found it unintuitive is that <strong>the app was text-heavy, lacked clear visual hierarchy, and had poor information architecture.</strong></p>
+                    </div>
+                  </div>
+
+                  <div class="conv-divider"></div>
+
+                  <div class="conv-item">
+                    <img class="conv-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/Our%20conversation%20went%20this/Lupita%20Thinking.png" alt="Lupita" />
+                    <div class="conv-bubble">
+                      <span class="conv-name">Lupita Almuhana, Product Owner &amp; Founder</span>
+                      <p class="conv-text">Ok, then what can we do?</p>
+                    </div>
+                  </div>
+
+                  <div class="conv-divider"></div>
+
+                  <div class="conv-item">
+                    <img class="conv-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/Our%20conversation%20went%20this/Me%20Founding.png" alt="Me" />
+                    <div class="conv-bubble">
+                      <span class="conv-name">Me, Founding Product Designer</span>
+                      <p class="conv-text">Yes, I got a plan for it, hear me out....</p>
+                    </div>
+                  </div>
+
+                </div>
+              </div><!-- /st-card -->
+            </div><!-- /st-col left -->
+
+            <!-- ── Right: My Approach ── -->
+            <div class="st-col">
+              <div class="st-card">
+                <span class="st-card-title">My Approach</span>
+
+                <p class="approach-intro"><strong>I analyzed the information architecture, identified friction points,</strong> and proposed alternatives. Users found the UI immature due to inconsistencies in color, text hierarchy, and signifiers, leading us to a full redesign. This time, I focused on these core foundational principles:</p>
+
+                <div class="principle-list">
+
+                  <div class="principle-item">
+                    <img class="principle-icon" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/My%20Approach/User%20Centricity%20Icon.png" alt="User Centricity" />
+                    <div class="principle-body">
+                      <span class="principle-title">User Centricity</span>
+                      <p class="principle-text">With a clear understanding of user preferences, I improved existing features, fixed pain points, and <strong>ensured a user-centric redesign through focus group testing.</strong></p>
+                    </div>
+                  </div>
+
+                  <div class="principle-item">
+                    <img class="principle-icon" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/My%20Approach/Seamless%20and%20Stunning.png" alt="Seamless and Stunning" />
+                    <div class="principle-body">
+                      <span class="principle-title">Seamless and Stunning</span>
+                      <p class="principle-text"><strong>I aimed for more than usability</strong>—I wanted seamless interactions where every transition felt meaningful, creating a wow-worthy experience. To ensure this, I tested it with a small focus group.</p>
+                    </div>
+                  </div>
+
+                </div>
+              </div><!-- /st-card -->
+            </div><!-- /st-col right -->
+
+          </div><!-- /st-grid -->
+        </div><!-- /cs-section-wrap -->
+
+      </section>
+
+      <!-- ══ 04 · EXPERIENCES ═══════════════════════════════ -->
+      <section id="experiences" data-has-content="true">
+
+        <div class="section-header tr-anim">
+          <div class="section-badge">
+            <span class="section-num">04.</span>
+            <span class="section-title-text">Experiences I Designed With My Approach</span>
+          </div>
+          <div class="section-line"></div>
+        </div>
+
+        <!-- ── On-boarding Experience 01 (Mockup 1-5) ── -->
+        <div class="ob-wrap tr-anim" style="padding-top:0;animation-delay:0.08s">
+          <div class="ob-card">
+            <span class="ob-label">Onboarding Experience 01</span>
+            <p class="ob-desc">
+              We start by personalizing the experience—understanding what uplifts users to better identify their stressors.
+              <strong>Each step adapts in real time, tailoring the next screen</strong>
+              based on their input to keep them engaged and supported.
+            </p>
+            <div class="exp-phones-outer">
+              <div class="exp-phones-wrap">
+                <div class="exp-phones">
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%201.png" alt="Stressie experience screen 1" />
+                  </div>
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%202.png" alt="Stressie experience screen 2" />
+                  </div>
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%203.png" alt="Stressie experience screen 3" />
+                  </div>
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%204.png" alt="Stressie experience screen 4" />
+                  </div>
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%205.png" alt="Stressie experience screen 5" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /ob-card -->
+        </div><!-- /ob-wrap -->
+
+        <!-- ── On-boarding Experience 02 ── -->
+        <div class="ob-wrap tr-anim" style="animation-delay:0.1s">
+          <div class="ob-card">
+            <span class="ob-label">Onboarding Experience 02</span>
+            <p class="ob-desc">
+              Here, I designed a stress landscape assessment with 27 in-depth questions to build a deeper understanding of each user's stressors.
+              <strong>To keep the experience engaging, I structured the flow with a short break after every 10 questions</strong>,
+              featuring a simple exercise to help users reset before continuing.
+            </p>
+            <div class="exp-phones-outer">
+              <div class="exp-phones-wrap">
+                <div class="exp-phones">
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%201.png" alt="Onboarding screen 1" />
+                  </div>
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%202.png" alt="Onboarding screen 2" />
+                  </div>
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%203.png" alt="Onboarding screen 3" />
+                  </div>
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%204.png" alt="Onboarding screen 4" />
+                  </div>
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%205.png" alt="Onboarding screen 5" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /ob-card -->
+        </div><!-- /ob-wrap -->
+
+        <!-- ── Core Experience ── -->
+        <div class="ob-wrap tr-anim" style="animation-delay:0.12s">
+          <div class="ob-card">
+            <span class="ob-label">Core Experience</span>
+            <p class="ob-desc">
+              Once onboarding is complete, users step into their personalized daily wellness hub.
+              <strong>The core experience delivers intelligent, real-time stress interventions</strong>—from
+              AI-guided coping strategies and quick micro-resets to daily mood check-ins—all
+              tailored to each user's unique stress landscape and continuously updated as they grow.
+            </p>
+            <div class="exp-phones-outer">
+              <div class="exp-phones-wrap">
+                <div class="exp-phones">
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%201.png" alt="Core experience screen 1" />
+                  </div>
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%202.png" alt="Core experience screen 2" />
+                  </div>
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%203.png" alt="Core experience screen 3" />
+                  </div>
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%204.png" alt="Core experience screen 4" />
+                  </div>
+                  <div class="exp-phone">
+                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%205.png" alt="Core experience screen 5" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /ob-card -->
+        </div><!-- /ob-wrap -->
+
+      </section>
+
+      <!-- ══ 05 · WHAT USERS LOVED ═════════════════════════ -->
+      <section id="users-loved" data-has-content="true">
+
+        <div class="section-header tr-anim">
+          <div class="section-badge">
+            <span class="section-num">05.</span>
+            <span class="section-title-text">What Users Loved About the New Experience</span>
+          </div>
+          <div class="section-line"></div>
+        </div>
+
+        <!-- Intro -->
+        <div class="cs-section-wrap tr-anim" style="padding-bottom:32px;animation-delay:0.06s">
+          <p class="test-intro-text">
+            <span class="st-orange-italic">With Stressie's pilots at Amazon and InKind</span>,
+            we gathered early feedback and data on the revised experience. Here's what they loved most.
+          </p>
+        </div>
+
+        <!-- 5 Testimonial cards — 3+2 grid -->
+        <div class="cs-section-wrap tr-anim" style="padding-top:0;animation-delay:0.1s">
+          <div class="test-grid">
+
+            <!-- Card 1 -->
+            <div class="test-card">
+              <p class="test-quote">" I love the app's interface. Even before exploring its features, <strong>the overall vibe instantly makes me feel calmer</strong> and less stressed. "</p>
+              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Testrimonials%20Section/User%20face%201.png" alt="User" />
+            </div>
+
+            <!-- Card 2 -->
+            <div class="test-card">
+              <p class="test-quote">" The interventions are simple yet effective— <strong>I don't need anything extra</strong>, just my chair and a little space. "</p>
+              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Testrimonials%20Section/User%20face%202.png" alt="User" />
+            </div>
+
+            <!-- Card 3 -->
+            <div class="test-card">
+              <p class="test-quote">" <strong>The Quick Resets are a game-changer!</strong> They're perfect for moments of high stress, and I especially love the box breathing exercise. "</p>
+              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Testrimonials%20Section/User%20face%203.png" alt="User" />
+            </div>
+
+            <!-- Card 4 (wider) -->
+            <div class="test-card">
+              <p class="test-quote">" What surprised me most was how <strong>the app actually learns my patterns</strong> — it checks in at exactly the right moment and the advice never feels generic. "</p>
+              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Testrimonials%20Section/User%20face%204.png" alt="User" />
+            </div>
+
+            <!-- Card 5 (wider) -->
+            <div class="test-card">
+              <p class="test-quote">" <strong>I went from feeling constantly overwhelmed to managing my day in short, intentional moments.</strong> The daily check-ins are now part of my routine. "</p>
+              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Testrimonials%20Section/User%20face%205.png" alt="User" />
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══ 06 · FRUSTRATIONS ══════════════════════════════ -->
+      <section id="frustrations" data-has-content="true">
+
+        <div class="section-header tr-anim">
+          <div class="section-badge">
+            <span class="section-num">06.</span>
+            <span class="section-title-text">Frustrations Users Experienced</span>
+          </div>
+          <div class="section-line"></div>
+        </div>
+
+        <!-- Intro -->
+        <div class="cs-section-wrap tr-anim" style="padding-bottom:32px;animation-delay:0.06s">
+          <p class="test-intro-text">
+            <span class="st-orange-italic">As part of the same pilot</span>,
+            we also asked users about any frustrations they had with the app. Here's what they shared.
+          </p>
+        </div>
+
+        <!-- 3 frustration cards -->
+        <div class="cs-section-wrap tr-anim" style="padding-top:0;animation-delay:0.1s">
+          <div class="test-grid">
+
+            <!-- Card 1 -->
+            <div class="test-card">
+              <p class="test-quote">" <strong>There's no option to pause the stress assessment</strong>, and I'm unsure if my progress saves when I exit. This is frustrating. "</p>
+              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Frustration%20Points/User%201.png" alt="User" />
+            </div>
+
+            <!-- Card 2 -->
+            <div class="test-card">
+              <p class="test-quote">" <strong>I didn't find the coping points compelling as an incentive</strong> to complete the onboarding. I don't know their value. "</p>
+              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Frustration%20Points/User%202.png" alt="User" />
+            </div>
+
+            <!-- Card 3 -->
+            <div class="test-card">
+              <p class="test-quote">" Answering the questions feels mentally exhausting. I haven't built trust with the app yet, so <strong>sharing personal feelings this early is uncomfortable.</strong> "</p>
+              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Frustration%20Points/User%203.png" alt="User" />
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══ 07 · CURRENT WORK ══════════════════════════════ -->
+      <section id="current-work" data-has-content="true">
+
+        <div class="section-header tr-anim">
+          <div class="section-badge">
+            <span class="section-num">07.</span>
+            <span class="section-title-text">What I'm Currently Working On</span>
+          </div>
+          <div class="section-line"></div>
+        </div>
+
+        <!-- Intro -->
+        <div class="cs-section-wrap tr-anim" style="padding-bottom:36px;animation-delay:0.06s">
+          <p class="cw-intro">
+            <span class="cw-orange">We're wrapping up the pilot and gathering screen-level data using tools like Mixpanel and PostHog</span>. I'm analyzing potential friction points and incorporating early feedback to continuously refine the experience.
+          </p>
+        </div>
+
+        <!-- 4 event / context photos -->
+        <div class="cs-section-wrap tr-anim" style="padding-top:0;animation-delay:0.1s">
+          <div class="cw-images">
+            <div class="cw-img">
+              <img src="Stressie%20Case%20Study%20Updated%20Materials/What%20I%20am%20working%20on/What%20I%20am%20working%20on%201.png" alt="Stressie business card" />
+            </div>
+            <div class="cw-img">
+              <img src="Stressie%20Case%20Study%20Updated%20Materials/What%20I%20am%20working%20on/What%20I%20am%20working%20on%202.png" alt="Bhanu sharing vision" />
+            </div>
+            <div class="cw-img">
+              <img src="Stressie%20Case%20Study%20Updated%20Materials/What%20I%20am%20working%20on/What%20I%20am%20working%20on%203.png" alt="The team" />
+            </div>
+            <div class="cw-img">
+              <img src="Stressie%20Case%20Study%20Updated%20Materials/What%20I%20am%20working%20on/What%20I%20am%20working%20on%204.png" alt="Stressie booth" />
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── Thank You bar ──────────────────────────────────── -->
+      <div class="cs-thankyou">
+        <span class="cs-thankyou-text">✦ THANK_YOU</span>
+      </div>
+
+    </div><!-- /card -->
+  </div><!-- /page -->
+
+
+  <script>
+  /* ═══════════════════════════════════════════════════════════
+     CUSTOM CURSOR
+  ═══════════════════════════════════════════════════════════ */
+  const cursor   = document.getElementById('customCursor');
+  const mainCard = document.querySelector('.card');
+
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+    if (mainCard) {
+      const r = mainCard.getBoundingClientRect();
+      const over = e.clientX >= r.left && e.clientX <= r.right &&
+                   e.clientY >= r.top  && e.clientY <= r.bottom;
+      cursor.classList.toggle('on-card', over);
+    }
+  });
+
+  document.querySelectorAll('a[href], button, [role="button"]').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.style.opacity = '0'; });
+    el.addEventListener('mouseleave', () => { cursor.style.opacity = '1'; });
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     WORD-BY-WORD HEADING ANIMATION
+  ═══════════════════════════════════════════════════════════ */
+  function splitWords(el) {
+    const nodes = Array.from(el.childNodes);
+    el.innerHTML = '';
+    nodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        node.textContent.split(/(\s+)/).forEach(chunk => {
+          if (/^\s+$/.test(chunk)) { el.appendChild(document.createTextNode(chunk)); }
+          else if (chunk) {
+            const s = document.createElement('span');
+            s.className = 'word'; s.textContent = chunk;
+            el.appendChild(s);
+          }
+        });
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const wrapper = node.cloneNode(false);
+        node.childNodes.forEach(child => {
+          if (child.nodeType === Node.TEXT_NODE) {
+            child.textContent.split(/(\s+)/).forEach(chunk => {
+              if (/^\s+$/.test(chunk)) { wrapper.appendChild(document.createTextNode(chunk)); }
+              else if (chunk) {
+                const s = document.createElement('span');
+                s.className = 'word'; s.textContent = chunk;
+                wrapper.appendChild(s);
+              }
+            });
+          }
+        });
+        el.appendChild(wrapper);
+      }
+    });
+  }
+
+  const csHeading     = document.getElementById('csHeading');
+  const csSubtitle    = document.getElementById('csSubtitle');
+  const heroTopRow    = document.getElementById('heroTopRow');
+  const heroCitations = document.getElementById('heroCitations');
+  const heroDarkCard  = document.getElementById('heroDarkCard');
+
+  splitWords(csHeading);
+  const allWords = csHeading.querySelectorAll('.word');
+
+  setTimeout(() => heroTopRow.classList.add('visible'), 80);
+  allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 260 + i * 40));
+  const afterWords = 260 + allWords.length * 40 + 60;
+  setTimeout(() => csSubtitle.classList.add('visible'),    afterWords);
+  setTimeout(() => heroCitations.classList.add('visible'), afterWords + 130);
+  setTimeout(() => heroDarkCard.classList.add('visible'),  afterWords + 340);
+
+  /* ═══════════════════════════════════════════════════════════
+     HAMBURGER MENU
+  ═══════════════════════════════════════════════════════════ */
+  const hamburger  = document.getElementById('navHamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const backdrop   = document.getElementById('menuBackdrop');
+
+  function toggleMenu(force) {
+    const open = force !== undefined ? force : !hamburger.classList.contains('open');
+    hamburger.classList.toggle('open', open);
+    mobileMenu.classList.toggle('open', open);
+    backdrop.classList.toggle('open', open);
+  }
+  hamburger.addEventListener('click', () => toggleMenu());
+  backdrop.addEventListener('click',  () => toggleMenu(false));
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      toggleMenu(false);
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) setTimeout(() => smoothScrollTo(
+        target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight, 900
+      ), 400);
+    });
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     SMOOTH ANCHOR SCROLL
+  ═══════════════════════════════════════════════════════════ */
+  function easeOutExpo(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
+  function smoothScrollTo(targetY, duration) {
+    const startY = window.scrollY, dist = targetY - startY, start = performance.now();
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      window.scrollTo(0, startY + dist * easeOutExpo(t));
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  const nav = document.querySelector('.nav');
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      smoothScrollTo(target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight, 900);
+    });
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     NAV AUTO-HIDE
+  ═══════════════════════════════════════════════════════════ */
+  let lastY = window.scrollY;
+  window.addEventListener('scroll', () => {
+    const currentY = window.scrollY, delta = currentY - lastY;
+    if (Math.abs(delta) < 4) { lastY = currentY; return; }
+    if (delta > 0 && currentY > 80) {
+      nav.classList.add('nav-hidden');
+    } else if (delta < 0) {
+      nav.classList.remove('nav-hidden');
+    }
+    lastY = currentY;
+  }, { passive: true });
+
+  /* ═══════════════════════════════════════════════════════════
+     NAV SCROLL SPY
+  ═══════════════════════════════════════════════════════════ */
+  const navBtns = document.querySelectorAll('.nav-btn[data-section]');
+
+  const spyObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navBtns.forEach(b => b.classList.toggle('active', b.dataset.section === e.target.id));
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+
+  document.querySelectorAll('section[id]').forEach(s => {
+    if (s.children.length > 0) spyObs.observe(s);
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     SECTION ENTRANCE ANIMATIONS
+  ═══════════════════════════════════════════════════════════ */
+  const wrapObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('triggered');
+      wrapObs.unobserve(e.target);
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.cs-section-wrap').forEach(el => wrapObs.observe(el));
+
+  const childObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('visible');
+      childObs.unobserve(e.target);
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.tr-anim').forEach(el => childObs.observe(el));
+
+  /* ═══════════════════════════════════════════════════════════
+     ARC CHART ANIMATION — fires when stat chips scroll into view
+  ═══════════════════════════════════════════════════════════ */
+  const arcObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.querySelectorAll('.pf-arc-fill[data-pct]').forEach((arc, i) => {
+        setTimeout(() => arc.classList.add('arc-animated'), i * 120);
+      });
+      arcObs.unobserve(e.target);
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('.pf-stat-row').forEach(row => arcObs.observe(row));
+
+  /* ═══════════════════════════════════════════════════════════
+     INDIVIDUAL ELEMENT STAGGER ANIMATIONS
+     Each group of children fades up one-by-one when their
+     parent container scrolls into view.
+  ═══════════════════════════════════════════════════════════ */
+  const STAGGER_PAIRS = [
+    { parent: '.pf-grid',        child: '.pf-col'         },
+    { parent: '.st-grid',        child: '.st-col'         },
+    { parent: '.conv-list',      child: '.conv-item'      },
+    { parent: '.principle-list', child: '.principle-item' },
+    { parent: '.test-grid',      child: '.test-card'      },
+    { parent: '.cw-images',      child: '.cw-img'         },
+  ];
+
+  const animGroups = new Map();
+
+  STAGGER_PAIRS.forEach(({ parent, child }) => {
+    document.querySelectorAll(parent).forEach(parentEl => {
+      const kids = Array.from(parentEl.querySelectorAll(':scope > ' + child));
+      if (!kids.length) return;
+      kids.forEach(k => k.classList.add('el-anim'));
+      animGroups.set(parentEl, kids);
+    });
+  });
+
+  const elObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const kids = animGroups.get(e.target) || [];
+      kids.forEach((kid, i) => {
+        setTimeout(() => kid.classList.add('el-visible'), 120 + i * 100);
+      });
+      elObs.unobserve(e.target);
+    });
+  }, { threshold: 0.08 });
+
+  animGroups.forEach((_, parentEl) => elObs.observe(parentEl));
+  </script>
+
+</body>
+</html>
