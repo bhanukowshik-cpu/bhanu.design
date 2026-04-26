@@ -1115,9 +1115,9 @@
     }
     .product-area .stressie-phones-row {
       position: absolute;
-      top: 80px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%) translateY(30px);
+      transform: translateX(-50%) translateY(calc(-50% + 30px));
       width: 80%;
       display: flex;
       align-items: flex-start;
@@ -1133,7 +1133,6 @@
       height: auto;
       object-fit: initial;
       object-position: initial;
-      border-radius: 26px;
       display: block;
       pointer-events: none;
     }
@@ -1170,7 +1169,7 @@
       .product-area .product-img-live,
       .product-area .product-img-analytics { width: 68%; left: 16%; top: 32px; }
       .product-video { width: 68%; top: 32px; }
-      .product-area .stressie-phones-row { top: 34px; }
+      .product-area .stressie-phones-row { width: 84%; }
     }
 
     /* ── Tablet: 768px – 1023px ──────────────────────────────── */
@@ -1202,10 +1201,11 @@
       .page                 { padding: 60px 12px 56px; }
       .card                 { gap: 20px; padding-bottom: 28px; border-radius: 16px; }
       .hero                 { padding: 22px 20px 0; gap: 16px; }
+      .hero-content         { gap: 20px; }
       .greeting             { font-size: 16px; }
       .hero-heading         { font-size: 26px; line-height: 38px; }
       .hero-subtext         { font-size: 13px; line-height: 24px; }
-      .current-badge        { font-size: 13px; padding: 12px 16px; display: flex; align-self: stretch; width: 100%; box-sizing: border-box; }
+      .current-badge        { font-size: 13px; padding: 12px 16px; display: flex; align-self: stretch; width: 100%; box-sizing: border-box; white-space: normal; }
       .photo-wrapper        { width: 150px; height: 160px; border-radius: 14px; }
       .photo-wrapper img.photo { border-radius: 14px; }
       .overview-section     { margin: 0 12px; }
@@ -1221,7 +1221,7 @@
       .product-area .product-img-live,
       .product-area .product-img-analytics { width: 82%; left: 9%; top: 30px; height: 250px; object-fit: cover; object-position: top center; }
       .product-video        { width: 82%; top: 30px; height: 250px; object-fit: cover; object-position: top center; }
-      .product-area .stressie-phones-row { top: 50px; gap: 8px; width: 86%; }
+      .product-area .stressie-phones-row { gap: 8px; width: 86%; }
       .case-study-bottom    { padding: 16px 18px 22px; gap: 14px; }
       .case-study-caption   { font-size: 12px; line-height: 22px; }
       .case-study-hl-row    { flex-direction: column; align-items: flex-start; gap: 12px; }
@@ -1237,16 +1237,25 @@
       .site-footer          { padding: 20px 16px; }
     }
 
+    /* ── Phone: stack hero vertically ≤600px ─────────────────── */
+    @media (max-width: 600px) {
+      .hero-content         { flex-direction: column; gap: 0; }
+      .photo-wrapper        { order: -1; width: 100%; height: 220px; border-radius: 14px; margin-bottom: 18px; }
+      .photo-wrapper img.photo { border-radius: 14px; object-position: top center; }
+      .hero-heading         { font-size: 24px; line-height: 36px; }
+      .current-badge        { white-space: normal; width: 100%; box-sizing: border-box; }
+    }
+
     /* ── Small mobile: up to 480px ───────────────────────────── */
     @media (max-width: 480px) {
-      .photo-wrapper        { width: 110px; height: 120px; border-radius: 12px; }
+      .photo-wrapper        { height: 190px; border-radius: 12px; }
       .photo-wrapper img.photo { border-radius: 12px; }
       .hero-heading         { font-size: 22px; line-height: 33px; }
       .product-area         { height: 220px; }
       .product-area .product-img-live,
       .product-area .product-img-analytics { width: 90%; left: 5%; top: 30px; height: 210px; object-fit: cover; object-position: top center; }
       .product-video        { width: 90%; top: 30px; height: 210px; object-fit: cover; object-position: top center; }
-      .product-area .stressie-phones-row { top: 30px; gap: 5px; }
+      .product-area .stressie-phones-row { gap: 5px; }
       .case-study-headline  { font-size: 18px; line-height: 28px; }
       #ldFWPass             { width: calc(100vw - 32px); min-width: 0; }
       #ldFramePass          { padding: 28px 20px 22px; }
@@ -2811,7 +2820,7 @@
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             img.style.opacity   = '1';
-            img.style.transform = 'translateX(-50%) translateY(0)';
+            img.style.transform = 'translateX(-50%) translateY(-50%)';
           });
         });
       }
