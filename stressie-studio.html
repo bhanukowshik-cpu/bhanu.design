@@ -738,7 +738,7 @@
     }
     /* Stack to single column below 860px */
     @media (max-width: 860px) {
-      .pf-grid     { grid-template-columns: 1fr; }
+      .pf-grid     { grid-template-columns: 1fr; max-width: 580px; margin-left: auto; margin-right: auto; }
       .pf-stat-row { gap: 16px; }
     }
     @media (max-width: 767px) {
@@ -869,40 +869,35 @@
     }
 
     /* ─── 04 · EXPERIENCES — phone grid ─────────────────── */
-    .exp-phones-outer { /* no centering wrapper needed in grid */ }
-    .exp-phones-wrap  { /* no scrolling */ }
+    .exp-phones-outer { }
+    .exp-phones-wrap  { }
 
-    /* 3-up top row, 2-up centered bottom row (6-col ghost grid) */
+    /* Desktop: all 5 in a single row */
     .exp-phones {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      display: flex;
+      flex-wrap: nowrap;
       gap: 18px;
-      align-items: end;
     }
-    .exp-phone:nth-child(1),
-    .exp-phone:nth-child(2),
-    .exp-phone:nth-child(3) { grid-column: span 2; }
-    /* phones 4 & 5 sit in cols 2-3 and 4-5 → visually centered */
-    .exp-phone:nth-child(4) { grid-column: 2 / 4; }
-    .exp-phone:nth-child(5) { grid-column: 4 / 6; }
 
     .exp-phone {
+      flex: 1;
+      min-width: 0;
       border-radius: 30px;
       overflow: hidden;
     }
     .exp-phone img { width: 100%; display: block; }
 
+    /* Mobile: 3-up top row, 2-up centered bottom row */
     @media (max-width: 767px) {
       .exp-phones {
-        grid-template-columns: repeat(3, 1fr);
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 12px;
       }
-      .exp-phone:nth-child(1),
-      .exp-phone:nth-child(2),
-      .exp-phone:nth-child(3) { grid-column: span 1; }
-      .exp-phone:nth-child(4) { grid-column: 1 / 2; }
-      .exp-phone:nth-child(5) { grid-column: 3 / 4; }
-      .exp-phone { border-radius: 22px; }
+      .exp-phone {
+        flex: 0 0 calc(33.333% - 8px);
+        border-radius: 22px;
+      }
     }
     @media (max-width: 480px) {
       .exp-phones { gap: 10px; }
@@ -1068,7 +1063,7 @@
 
   <!-- ── NAV ───────────────────────────────────────────────── -->
   <nav class="nav">
-    <a href="index.html" class="nav-home">
+    <a href="index.html" class="nav-home" onclick="sessionStorage.setItem('skipLoader','1')">
       <img src="cs-nav-logo.svg" alt="" />
       <span>Stressie</span>
     </a>
