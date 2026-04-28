@@ -1977,9 +1977,9 @@
         }, 400);
       }));
 
-      /* Progress bar: starts 800 ms, runs 5 200 ms */
+      /* Progress bar: starts 800 ms, runs 2 200 ms (done by 3 s) */
       const BAR_START    = 800;
-      const BAR_DURATION = 5200;
+      const BAR_DURATION = 2200;
 
       setTimeout(() => {
         let t0 = null;
@@ -1995,7 +1995,7 @@
         barRafId = requestAnimationFrame(stepBar);
       }, BAR_START);
 
-      /* Exit at 6 200 ms */
+      /* Exit at 4 000 ms */
       setTimeout(() => {
         cancelAnimationFrame(barRafId);
         if (fill)    fill.style.width    = '100%';
@@ -2006,12 +2006,12 @@
           const card = document.querySelector('.card');
           if (card) card.classList.add('page-ready');
         });
-      }, 6200);
+      }, 4000);
 
       setTimeout(() => {
         loader.remove();
         document.documentElement.style.overflow = '';
-      }, 7100);
+      }, 5000);
     }
 
   })();
