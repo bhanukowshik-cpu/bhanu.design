@@ -118,11 +118,11 @@
     .hero-heading {
       font-family: var(--font-heading);
       font-weight: 700;
-      font-size: 44px;
-      line-height: 60px;
-      letter-spacing: -0.5px;
+      font-size: 30px;
+      line-height: 1.15;
+      letter-spacing: -0.8px;
       color: var(--secondary);
-      max-width: 860px;
+      white-space: nowrap;
     }
     .hero-heading em {
       font-family: var(--font-heading);
@@ -141,7 +141,8 @@
       font-weight: 400;
       font-size: 14px;
       line-height: 1.7;
-      color: #515151;
+      color: rgba(0,0,0,0.45);
+      max-width: 560px;
     }
     .hero-subtext strong {
       font-weight: 600;
@@ -3572,12 +3573,10 @@
       releaseMagnet();
       mode = 'snap'; snapEl = el; magnetEl = el;
       const r  = el.getBoundingClientRect();
-      const br = Math.min(parseFloat(getComputedStyle(el).borderRadius) || 10, 24);
       origCX = r.left + r.width  / 2;
       origCY = r.top  + r.height / 2;
       snapW  = r.width; snapH = r.height;
-      snapCX = origCX; snapCY = origCY;
-      setShape(r.width, r.height, br, SNAP_BG, '1.5px solid ' + SNAP_BDR);
+      setShape(12, 12, 9999, DOT_COLOR, '0px solid transparent');
       hideLabel();
     }
 
@@ -3680,8 +3679,8 @@
         if (mode !== 'snap' || snapEl !== d.el) enterSnap(d.el);
         // Magnetic move: shift element up to 10px toward cursor
         const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-        const moveX = clamp((mx - origCX) / (snapW / 2), -1, 1) * 10;
-        const moveY = clamp((my - origCY) / (snapH / 2), -1, 1) * 10;
+        const moveX = clamp((mx - origCX) / (snapW / 2), -1, 1) * 5;
+        const moveY = clamp((my - origCY) / (snapH / 2), -1, 1) * 5;
         magnetEl.style.transition = 'transform 0.12s ease-out';
         magnetEl.style.transform  = `translate(${moveX}px,${moveY}px)`;
         // Cursor overlay follows the element's moved center
@@ -3709,10 +3708,10 @@
       const dt = Math.min((now - lastNow) / 1000, 0.05);
       lastNow = now;
 
-      const K  = mode === 'snap' ? K_SNAP : K_DOT;
-      const B  = mode === 'snap' ? B_SNAP : B_DOT;
-      const tx = mode === 'snap' ? snapCX : mx;
-      const ty = mode === 'snap' ? snapCY : my;
+      const K  = K_DOT;
+      const B  = B_DOT;
+      const tx = mx;
+      const ty = my;
 
       vx += ((tx - rx) * K - vx * B) * dt;
       vy += ((ty - ry) * K - vy * B) * dt;
