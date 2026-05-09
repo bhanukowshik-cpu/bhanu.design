@@ -118,11 +118,11 @@
     .hero-heading {
       font-family: var(--font-heading);
       font-weight: 700;
-      font-size: 30px;
-      line-height: 1.15;
-      letter-spacing: -0.8px;
+      font-size: 44px;
+      line-height: 60px;
+      letter-spacing: -0.5px;
       color: var(--secondary);
-      white-space: nowrap;
+      max-width: 860px;
     }
     .hero-heading em {
       font-family: var(--font-heading);
@@ -3514,6 +3514,7 @@
     let snapEl  = null;
     let snapCX  = 0, snapCY = 0;
     let lblText = '';
+    let magnetEl = null, origCX = 0, origCY = 0, snapW = 0, snapH = 0;
 
     /* ── Spring constants ───────────────────────────────────────── */
     const K_DOT  = 320, B_DOT  = 38;
@@ -3546,30 +3547,43 @@
       lbl.classList.remove('cc-label-visible');
     }
 
+    function releaseMagnet() {
+      if (!magnetEl) return;
+      const el = magnetEl; magnetEl = null;
+      el.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      el.style.transform  = 'translate(0px, 0px)';
+      setTimeout(() => { el.style.transition = ''; el.style.transform = ''; }, 520);
+    }
+
     function enterDot() {
+      releaseMagnet();
       mode = 'dot'; snapEl = null;
       setShape(12, 12, 9999, DOT_COLOR, '0px solid transparent');
       hideLabel();
     }
 
     function enterText() {
+      releaseMagnet();
       mode = 'text'; snapEl = null;
       setShape(3, 33, 3, BLUE, '0px solid transparent');
       hideLabel();
     }
 
     function enterSnap(el) {
-      mode   = 'snap';
-      snapEl = el;
+      releaseMagnet();
+      mode = 'snap'; snapEl = el; magnetEl = el;
       const r  = el.getBoundingClientRect();
       const br = Math.min(parseFloat(getComputedStyle(el).borderRadius) || 10, 24);
-      snapCX = r.left + r.width  / 2;
-      snapCY = r.top  + r.height / 2;
+      origCX = r.left + r.width  / 2;
+      origCY = r.top  + r.height / 2;
+      snapW  = r.width; snapH = r.height;
+      snapCX = origCX; snapCY = origCY;
       setShape(r.width, r.height, br, SNAP_BG, '1.5px solid ' + SNAP_BDR);
       hideLabel();
     }
 
     function enterLabel(icon, text) {
+      releaseMagnet();
       const key = icon + text;
       if (mode === 'label' && lblText === key) return;
       mode = 'label'; snapEl = null; lblText = key;
@@ -3665,9 +3679,15 @@
 
       if (typeof d === 'object' && d.type === 'snap') {
         if (mode !== 'snap' || snapEl !== d.el) enterSnap(d.el);
-        const r = snapEl.getBoundingClientRect();
-        snapCX = r.left + r.width  / 2;
-        snapCY = r.top  + r.height / 2;
+        // Magnetic move: shift element up to 10px toward cursor
+        const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+        const moveX = clamp((mx - origCX) / (snapW / 2), -1, 1) * 10;
+        const moveY = clamp((my - origCY) / (snapH / 2), -1, 1) * 10;
+        magnetEl.style.transition = 'transform 0.12s ease-out';
+        magnetEl.style.transform  = `translate(${moveX}px,${moveY}px)`;
+        // Cursor overlay follows the element's moved center
+        snapCX = origCX + moveX;
+        snapCY = origCY + moveY;
       } else if (typeof d === 'object' && d.type === 'label') {
         enterLabel(d.icon, d.text);
       } else if (d === 'text') {
@@ -3681,6 +3701,7 @@
       visible = false;
       dot.style.opacity = '0';
       hideLabel();
+      releaseMagnet();
     });
 
     /* ── Spring loop ────────────────────────────────────────────── */
