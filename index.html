@@ -6,7 +6,7 @@
   <title>Bhanu — Product Designer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;1,600&family=JetBrains+Mono:wght@400;500;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Montserrat:ital,wght@0,400;0,600;0,700;1,600&family=JetBrains+Mono:wght@400;500;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 
   <style>
@@ -114,45 +114,133 @@
       50%       { opacity: 0; }
     }
 
-    /* ─── CONTENT ROW ────────────────────────────────────────── */
-    .hero-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-    }
-
-    /* ─── LEFT COLUMN ────────────────────────────────────────── */
-    .hero-left {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      max-width: 717px;
-      flex: 1;
-    }
-
+    /* ─── HERO HEADING (full-width above the card) ──────────── */
     .hero-heading {
       font-family: var(--font-heading);
       font-weight: 700;
-      font-size: 42px;
+      font-size: 44px;
       line-height: 60px;
       letter-spacing: -0.5px;
       color: var(--secondary);
-      width: 100%;
+      max-width: 860px;
     }
     .hero-heading em {
       font-family: var(--font-heading);
       font-weight: 600;
       font-style: italic;
     }
+    .hero-hi {
+      background: var(--primary);
+      border-radius: 6px;
+      padding: 0 6px;
+      font-style: normal;
+    }
 
     .hero-subtext {
       font-family: var(--font-mono);
-      font-weight: 500;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(0,0,0,0.45);
+      max-width: 560px;
+    }
+    .hero-subtext strong {
+      font-weight: 600;
+      color: rgba(0,0,0,0.65);
+    }
+
+    /* ─── HERO FRAME ────────────────────────────────────────── */
+    .hero-frame {
+      position: relative;
+      width: 100%;
+      border: 1px solid rgba(37,37,37,0.07);
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      min-height: 500px;
+      background-color: #FEFDFB;
+      background-image: radial-gradient(circle, rgba(190,186,174,0.55) 0.72px, transparent 0.72px);
+      background-size: 20px 20px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.7) inset,
+        0 2px 8px rgba(0,0,0,0.03),
+        0 8px 32px rgba(0,0,0,0.04),
+        0 24px 64px rgba(0,0,0,0.03);
+    }
+    .hf-pill { display: none; }
+    .hf-left {
+      flex: 0 0 52%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 36px 0;
+    }
+    .hf-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 36px 40px 36px 32px;
+      overflow: hidden;
+      justify-content: center;
+    }
+    .hf-section-label {
+      font-family: var(--font-heading);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(37,37,37,0.32);
+      margin-bottom: 20px;
+    }
+    .hf-impact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-bottom: 0;
+    }
+    .hf-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.38s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.38s cubic-bezier(0.4,0,0.2,1);
+    }
+    .hf-metric.is-exit  { opacity: 0; transform: translateY(-8px); }
+    .hf-metric.is-enter { opacity: 0; transform: translateY(10px); transition: none !important; }
+    .hf-metric-headline {
+      font-family: var(--font-mono);
+      font-weight: 700;
       font-size: 15px;
-      line-height: 30px;
-      color: var(--grey);
-      max-width: 717px;
+      color: #252525;
+      line-height: 1.35;
+    }
+    .hf-metric-sub {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 14px;
+      color: #515151;
+      line-height: 25px;
+    }
+    .hf-block-gap { height: 20px; }
+    .hf-role-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .hf-role-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(37,37,37,0.64);
+      background: rgba(255,255,255,0.85);
+      border: 1px solid rgba(37,37,37,0.11);
+      border-radius: 8px;
+      padding: 8px 14px;
+      white-space: nowrap;
     }
 
     /* ─── CURRENTLY WORKING BADGE ────────────────────────────── */
@@ -204,11 +292,8 @@
     /* ─── PHOTO WRAPPER ──────────────────────────────────────── */
     .photo-wrapper {
       position: relative;
-      width: 323px;
-      height: 310px;
-      border-radius: 25px;
-      overflow: hidden;
       flex-shrink: 0;
+      overflow: visible;
       /* cursor handled globally */
     }
 
@@ -1267,11 +1352,6 @@
       .ld-contact-sep       { display: none; }
     }
 
-    @media (min-width: 1280px) {
-      #cursorPillText { font-size: 20px; }
-      #cursorPill { height: auto; padding: 15px 20px; border-radius: 10px; }
-    }
-
     /* ─── FOOTER ────────────────────────────────────────────────── */
     .site-footer {
       background: #1A1917;
@@ -1389,137 +1469,86 @@
     @media (pointer: fine) and (hover: hover) {
       html.cc-active,
       html.cc-active * { cursor: none !important; }
-      /* CTAs restore native pointer so the hand cursor appears */
-      html.cc-active a[href],
-      html.cc-active button,
-      html.cc-active [role="button"] { cursor: pointer !important; }
-      /* Footer: pointer across every element, not just interactive ones */
-      html.cc-active .site-footer,
-      html.cc-active .site-footer * { cursor: pointer !important; }
-      /* Password gate: restore native cursor — ring cursor not yet visible on load */
+      /* Loader: restore native until custom cursor is ready */
       html.cc-active #loader,
-      html.cc-active #loader * { cursor: auto !important; }
-      html.cc-active #loader input  { cursor: text !important; }
+      html.cc-active #loader * { cursor: auto    !important; }
+      html.cc-active #loader input  { cursor: text    !important; }
       html.cc-active #loader button { cursor: pointer !important; }
+      /* Sticky notes: native grab overrides global none */
+      html.cc-active .sticky-stack .sticky-note,
+      html.cc-active .sticky-stack .sticky-note *             { cursor: grab     !important; }
+      html.cc-active .sticky-stack .sticky-note.is-dragging,
+      html.cc-active .sticky-stack .sticky-note.is-dragging * { cursor: grabbing !important; }
     }
+    /* Sticky note grab cursor — non cc-active contexts too */
+    .sticky-stack .sticky-note,
+    .sticky-stack .sticky-note *             { cursor: grab; }
+    .sticky-stack .sticky-note.is-dragging,
+    .sticky-stack .sticky-note.is-dragging * { cursor: grabbing; }
 
-    /* ── Cursor 1: Frosted glass ring cursor ────────────────────── *
-     * Single state — glass blur circle with clockwise-spinning ring.
-     * Size and position set by JS; blend mode always normal.
-     * ──────────────────────────────────────────────────────────────── */
-    #cursorBlend {
+    /* ── Blue dot cursor ──────────────────────────────────────── */
+    #ccDot {
       position: fixed;
       top: 0; left: 0;
-      width: 88px; height: 88px;
+      pointer-events: none;
+      z-index: 13000;
+      will-change: transform;
+      width: 36px;
+      height: 36px;
       border-radius: 9999px;
-      pointer-events: none;
-      z-index: 13000;
-      will-change: transform;
+      background: rgba(37,37,37,0.15);
+      border: 0px solid transparent;
       opacity: 0;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      background: rgba(255, 255, 255, 0.06);
+      /* shape morphs with spring overshoot; color/border ease normally */
+      transition:
+        width         0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+        height        0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.30s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background    0.26s ease,
+        border        0.26s ease,
+        opacity       0.18s ease;
     }
 
-    /* Ring SVG — centred inside the cursor */
-    #cursorRing {
-      position: absolute;
-      top: 50%; left: 50%;
-      /* JS writes: transform = translate(-50%,-50%) rotate(Ndeg) */
-    }
-    #cursorRing text {
-      font-family: 'Poppins', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      fill: rgb(10, 10, 10);
-    }
-
-    /* ── Cursor 2: contextual pill (View case study / Connect for details) */
-    #cursorPill {
+    /* ── Case study hover label ──────────────────────────────── */
+    #ccLabel {
       position: fixed;
       top: 0; left: 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 13px 20px;
-      background: #ffffff;
-      /* tail at top-left — points toward cursor which sits above-left */
-      border-radius: 5px 22px 22px 22px;
-      border: 1px solid rgba(0,0,0,0.12);
       pointer-events: none;
-      z-index: 13000;
-      white-space: nowrap;
-      will-change: transform;
-      opacity: 0;
-      transition: opacity 0.22s ease-out;
-    }
-    #cursorPill.pill-visible { opacity: 1; }
-
-    #cursorPillIcon {
-      font-size: 20px;
-      line-height: 1;
-      transform: translateY(5px);
-      opacity: 0;
-      transition: transform 0.25s ease-out 0.05s, opacity 0.25s ease-out 0.05s;
-    }
-    #cursorPillText {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 16px;
-      font-weight: 700;
-      color: #1A1917;
-      letter-spacing: -0.01em;
-      white-space: nowrap;
-      transform: translateY(5px);
-      opacity: 0;
-      transition: transform 0.25s ease-out 0.08s, opacity 0.25s ease-out 0.08s;
-    }
-    #cursorPill.pill-visible #cursorPillIcon,
-    #cursorPill.pill-visible #cursorPillText {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    /* ── Cursor 3: speech bubble — photo hover ───────────────────── */
-    #cursorBubble {
-      position: fixed;
-      top: 0; left: 0;
+      z-index: 13001;
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 13px 20px;
+      gap: 9px;
       background: #ffffff;
-      /* bottom-left corner tight = speech-bubble tail pointing down-left */
+      border: 1px solid rgba(0,0,0,0.10);
+      /* bottom-left tail → points toward cursor which sits below-left */
       border-radius: 22px 22px 22px 5px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
-      pointer-events: none;
-      z-index: 13000;
+      padding: 11px 18px;
       white-space: nowrap;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+      opacity: 0;
       will-change: transform;
-      opacity: 0;
-      transition: opacity 0.22s ease-out;
+      transition: opacity 0.2s ease;
     }
-    #cursorBubble.bubble-visible { opacity: 1; }
-
-    #cursorBubbleEmoji {
-      font-size: 20px;
+    #ccLabel.cc-label-visible { opacity: 1; }
+    .cc-lbl-icon {
+      font-size: 18px;
       line-height: 1;
-      /* slight slide-in from below */
-      transform: translateY(5px);
+      transform: translateY(1px);
       opacity: 0;
-      transition: transform 0.25s ease-out 0.05s, opacity 0.25s ease-out 0.05s;
+      transition: transform 0.22s ease 0.04s, opacity 0.22s ease 0.04s;
     }
-    #cursorBubbleText {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 16px;
+    .cc-lbl-text {
+      font-family: var(--font-mono);
+      font-size: 14px;
       font-weight: 700;
       color: #1A1917;
       letter-spacing: -0.01em;
       transform: translateY(5px);
       opacity: 0;
-      transition: transform 0.25s ease-out 0.08s, opacity 0.25s ease-out 0.08s;
+      transition: transform 0.22s ease 0.07s, opacity 0.22s ease 0.07s;
     }
-    #cursorBubble.bubble-visible #cursorBubbleEmoji,
-    #cursorBubble.bubble-visible #cursorBubbleText {
+    #ccLabel.cc-label-visible .cc-lbl-icon,
+    #ccLabel.cc-label-visible .cc-lbl-text {
       transform: translateY(0);
       opacity: 1;
     }
@@ -1802,32 +1831,24 @@
     }
 
     /* ─── ABOUT SECTION ─────────────────────────────────────── */
-    .about-section {
-      padding: 0 50px 50px;
-    }
+    .about-section { padding: 0 50px 50px; }
     .about-layout {
       display: flex;
       align-items: flex-start;
       gap: 64px;
       margin-top: 36px;
     }
-
-    /* ── Spec-frame wrapper — padding accommodates all annotations ── */
     .about-spec-wrap {
       flex-shrink: 0;
       position: relative;
       padding: 44px 72px 48px 0;
       cursor: default;
     }
-
-    /* ── The photo frame ─────────────────────────────────────── */
     .spec-frame {
       position: relative;
       width: 300px;
       height: 380px;
     }
-
-    /* ── Image mask ─────────────────────────────────────────── */
     .sf-image-wrap {
       width: 100%;
       height: 100%;
@@ -1854,16 +1875,12 @@
       display: block;
       filter: grayscale(1) contrast(1.04);
       transform: scale(1);
-      transition:
-        filter   0.65s ease,
-        transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transition: filter 0.65s ease, transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
     .about-spec-wrap:hover .sf-photo {
       filter: grayscale(0) contrast(1);
       transform: scale(1.025);
     }
-
-    /* ── Corner radius callout (top-left) ───────────────────── */
     .sf-corner-callout {
       position: absolute;
       top: -36px;
@@ -1898,11 +1915,9 @@
       white-space: nowrap;
       transition: color 0.4s ease;
     }
-    .about-spec-wrap:hover .sf-corner-icon  { border-color: rgba(37,37,37,0.52); }
-    .about-spec-wrap:hover .sf-callout-line { background: rgba(37,37,37,0.38); }
+    .about-spec-wrap:hover .sf-corner-icon   { border-color: rgba(37,37,37,0.52); }
+    .about-spec-wrap:hover .sf-callout-line  { background: rgba(37,37,37,0.38); }
     .about-spec-wrap:hover .sf-callout-label { color: rgba(37,37,37,0.72); }
-
-    /* ── Width measurement bar (below image) ────────────────── */
     .sf-width-measure {
       position: absolute;
       bottom: -42px;
@@ -1921,8 +1936,7 @@
       background: rgba(37,37,37,0.16);
       transition: background 0.4s ease;
     }
-    .sf-h-line::before,
-    .sf-h-line::after {
+    .sf-h-line::before, .sf-h-line::after {
       content: '';
       position: absolute;
       top: -4px;
@@ -1944,9 +1958,7 @@
     .about-spec-wrap:hover .sf-h-line,
     .about-spec-wrap:hover .sf-h-line::before,
     .about-spec-wrap:hover .sf-h-line::after { background: rgba(37,37,37,0.36); }
-    .about-spec-wrap:hover .sf-w-label { color: rgba(37,37,37,0.72); }
-
-    /* ── Height measurement bar (right of image) ────────────── */
+    .about-spec-wrap:hover .sf-w-label       { color: rgba(37,37,37,0.72); }
     .sf-height-measure {
       position: absolute;
       top: 0;
@@ -1966,8 +1978,7 @@
       flex-shrink: 0;
       transition: background 0.4s ease;
     }
-    .sf-v-line::before,
-    .sf-v-line::after {
+    .sf-v-line::before, .sf-v-line::after {
       content: '';
       position: absolute;
       left: -4px;
@@ -1990,9 +2001,7 @@
     .about-spec-wrap:hover .sf-v-line,
     .about-spec-wrap:hover .sf-v-line::before,
     .about-spec-wrap:hover .sf-v-line::after { background: rgba(37,37,37,0.36); }
-    .about-spec-wrap:hover .sf-h-label { color: rgba(37,37,37,0.72); }
-
-    /* ── About text ─────────────────────────────────────────── */
+    .about-spec-wrap:hover .sf-h-label       { color: rgba(37,37,37,0.72); }
     .about-text {
       flex: 1;
       display: flex;
@@ -2025,8 +2034,6 @@
       max-width: 460px;
       margin: 0;
     }
-
-    /* ── About responsive ───────────────────────────────────── */
     @media (max-width: 1023px) {
       .about-section     { padding: 0 32px 40px; }
       .about-layout      { gap: 44px; }
@@ -2035,25 +2042,147 @@
       .sf-height-measure { height: 304px; }
     }
     @media (max-width: 900px) {
-      .about-layout  { flex-direction: column; align-items: flex-start; gap: 36px; }
-      .about-text    { padding-top: 0; }
-      .about-body    { max-width: 100%; }
+      .about-layout { flex-direction: column; align-items: flex-start; gap: 36px; }
+      .about-text   { padding-top: 0; }
+      .about-body   { max-width: 100%; }
     }
     @media (max-width: 767px) {
       .about-section     { padding: 0 20px 32px; }
-      .about-layout      { gap: 28px; }
       .spec-frame        { width: 200px; height: 254px; }
       .sf-width-measure  { width: 200px; }
       .sf-height-measure { height: 254px; }
       .about-spec-wrap   { padding: 36px 60px 40px 0; }
-      .sf-callout-label,
-      .sf-w-label,
-      .sf-h-label        { font-size: 9px; }
-      .about-eyebrow     { font-size: 10px; }
-      .about-heading     { font-size: 22px; }
-      .about-body        { font-size: 12px; line-height: 1.8; }
+      .sf-callout-label, .sf-w-label, .sf-h-label { font-size: 9px; }
+      .about-eyebrow  { font-size: 10px; }
+      .about-heading  { font-size: 22px; }
+      .about-body     { font-size: 12px; line-height: 1.8; }
     }
 
+
+    /* ─── STICKY STACK ──────────────────────────────────────── */
+    .sticky-stack {
+      position: relative;
+      width: 370px; height: 370px;
+      flex-shrink: 0;
+      overflow: visible;
+      touch-action: none;
+    }
+    .sticky-stack::before {
+      content: '';
+      position: absolute;
+      bottom: 18px; left: 10%; right: 10%; height: 60px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(50,35,15,0.22) 0%, transparent 70%);
+      filter: blur(16px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .sticky-note {
+      position: absolute;
+      width: 302px; height: 302px;
+      top: 34px; left: 34px;
+      border-radius: 3px;
+      padding: 24px 24px 20px;
+      box-sizing: border-box;
+      will-change: transform, box-shadow;
+      transform-origin: center center;
+      user-select: none;
+      overflow: hidden;
+      cursor: grab;
+      box-shadow:
+        0 1px 2px rgba(0,0,0,0.12),
+        0 3px 7px rgba(0,0,0,0.10),
+        0 8px 20px rgba(0,0,0,0.10),
+        0 20px 44px rgba(0,0,0,0.09),
+        0 44px 80px rgba(0,0,0,0.07),
+        0 1px 0px rgba(255,255,255,0.65) inset;
+      transition: box-shadow 0.4s ease, transform 0.4s ease;
+    }
+    .sticky-note:hover:not(.is-dragging) {
+      transform: translateY(-6px) !important;
+      box-shadow:
+        0 2px 3px rgba(0,0,0,0.10),
+        0 6px 14px rgba(0,0,0,0.10),
+        0 16px 36px rgba(0,0,0,0.11),
+        0 36px 64px rgba(0,0,0,0.09),
+        0 64px 96px rgba(0,0,0,0.06),
+        0 1px 0px rgba(255,255,255,0.60) inset !important;
+    }
+    .sticky-note.is-dragging { cursor: grabbing !important; transition: none !important; }
+    .sticky-note.is-springing {
+      transition: transform 0.58s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.45s ease !important;
+    }
+    .sticky-note.is-going-back {
+      transition: transform 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    }
+    .sticky-note.is-springing-back:hover {
+      transform: none !important;
+      box-shadow:
+        0 1px 2px rgba(0,0,0,0.10),
+        0 3px 6px rgba(0,0,0,0.09),
+        0 8px 18px rgba(0,0,0,0.09),
+        0 20px 40px rgba(0,0,0,0.08),
+        0 40px 72px rgba(0,0,0,0.05),
+        0 1px 0px rgba(255,255,255,0.60) inset !important;
+    }
+    .sn-warm  { background: linear-gradient(148deg, #F4E88E 0%, #EDD870 45%, #E3CA5C 100%); }
+    .sn-blue  { background: linear-gradient(148deg, #D2C8EE 0%, #C4BBDE 45%, #B6ABCE 100%); }
+    .sn-stone { background: linear-gradient(148deg, #ECAA9D 0%, #E49B8C 45%, #D88878 100%); }
+    .sticky-note::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 28% 14%, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.08) 38%, transparent 62%),
+        radial-gradient(ellipse at 88% 88%, rgba(0,0,0,0.07) 0%, transparent 48%),
+        linear-gradient(to top, rgba(0,0,0,0.05) 0%, transparent 38%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .sticky-note::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 6px; border-radius: 3px 3px 0 0;
+      opacity: 0.22;
+      pointer-events: none; z-index: 2;
+    }
+    .sn-warm::after  { background: #7A5A00; }
+    .sn-blue::after  { background: #4A3880; }
+    .sn-stone::after { background: #8B2A18; }
+    .sn-content { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; }
+    .sn-title { font-family: 'Caveat', cursive; font-weight: 700; font-size: 22px; color: #1A1A1A; letter-spacing: 0.1px; margin-bottom: 2px; flex-shrink: 0; line-height: 1.15; }
+    .sn-desc  { font-family: 'Caveat', cursive; font-weight: 500; font-size: 15px; color: rgba(0,0,0,0.58); line-height: 1.4; margin-bottom: 10px; flex-shrink: 0; }
+    .sn-rule  { height: 1px; background: rgba(0,0,0,0.12); margin-bottom: 11px; flex-shrink: 0; border: none; }
+    .sn-body  { font-family: var(--font-mono); font-weight: 400; font-size: 12px; color: rgba(0,0,0,0.55); line-height: 1.65; flex-shrink: 0; }
+    .sn-body.sn-body--lg { font-size: 13px; line-height: 1.6; }
+    .sn-spacer { flex: 1; min-height: 4px; }
+    .sn-footer { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .sn-cta { font-family: 'Caveat', cursive; font-weight: 600; font-size: 15px; color: #1A1A1A; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; opacity: 0.48; transition: opacity 0.2s ease; pointer-events: auto; }
+    .sn-cta:hover { opacity: 1; }
+    .sn-cta-arrow { display: inline-block; transition: transform 0.2s ease; }
+    .sn-cta:hover .sn-cta-arrow { transform: translateX(3px); }
+
+    /* ─── old hero-frame rule removed — see .hero-frame above ── */
+
+    /* ─── HERO FRAME + STICKY STACK RESPONSIVE ──────────────── */
+    @media (max-width: 1023px) {
+      .hf-left         { flex: 0 0 48%; }
+      .sticky-stack    { width: 316px; height: 316px; }
+      .sticky-note     { width: 258px; height: 258px; top: 29px; left: 29px; }
+    }
+    @media (max-width: 767px) {
+      .hero-frame      { flex-direction: column; min-height: unset; }
+      .hf-left         { flex: none; width: 100%; padding: 36px 0 16px; }
+      .hf-right        { padding: 16px 28px 36px; }
+      .sticky-stack    { width: 250px; height: 250px; }
+      .sticky-note     { width: 204px; height: 204px; top: 23px; left: 23px; padding: 18px; }
+    }
+    @media (max-width: 600px) {
+      .sticky-stack    { width: 274px; height: 274px; align-self: center; }
+      .sticky-note     { width: 224px; height: 224px; top: 25px; left: 25px; padding: 20px; }
+    }
+    @media (max-width: 480px) {
+      .sticky-stack    { width: 238px; height: 238px; }
+      .sticky-note     { width: 194px; height: 194px; top: 22px; left: 22px; }
+    }
   </style>
 </head>
 
@@ -2086,8 +2215,8 @@
             <div class="ldh m-b"></div>
             <div class="ldh m-l"></div>
             <div class="ldh m-r"></div>
-            <div id="ldT1W"><div id="ldT1">Senior Systems</div></div>
-            <div id="ldT2W"><div id="ldT2">Product Designer</div></div>
+            <div id="ldT1W"><div id="ldT1">Product Designer</div></div>
+            <div id="ldT2W"><div id="ldT2">Feel Simple.</div></div>
           </div>
         </div>
 
@@ -2300,30 +2429,83 @@
 
         <div class="greeting reveal" id="greeting"><span id="greetingText"></span><span id="lottieWave"></span><span class="cursor"></span></div>
 
-        <div class="hero-content">
-          <div class="hero-left">
-            <h1 class="hero-heading reveal">
-              0 → 1 Product Designer <em>Building From First Principles,</em>
-              Systems People Use That Drive Real Business Impact.
-            </h1>
+        <h1 class="hero-heading reveal">
+          Product Designer Making Complex Products <span class="hero-hi">Feel Simple.</span>
+        </h1>
 
-            <div class="current-badge reveal">
-              <div class="pulse-wrap">
-                <div class="dot-ring"></div>
-                <div class="dot-core"></div>
+        <p class="hero-subtext reveal">
+          Currently building <strong>EverTutor</strong> — a multimodal, voice-first AI tutoring system reaching thousands of students daily.
+        </p>
+
+        <div class="hero-frame reveal" id="heroFrame">
+
+          <!-- Hidden pills for JS compatibility -->
+          <div class="hf-pill" id="hfPill0" aria-hidden="true"><span class="hf-pill-text"></span></div>
+          <div class="hf-pill" id="hfPill1" aria-hidden="true"><span class="hf-pill-text"></span></div>
+          <div class="hf-pill" id="hfPill2" aria-hidden="true"><span class="hf-pill-text"></span></div>
+          <div class="hf-pill" id="hfPill3" aria-hidden="true"><span class="hf-pill-text"></span></div>
+
+          <!-- LEFT: sticky note stack -->
+          <div class="hf-left">
+            <div class="sticky-stack" id="stickyStack">
+
+              <!-- Back · stone -->
+              <div class="sticky-note sn-stone" id="sn-back">
+                <div class="sn-content">
+                  <div class="sn-title">Dearly</div>
+                  <div class="sn-rule"></div>
+                  <div class="sn-body">A quieter, more personal way to send notes online.</div>
+                </div>
               </div>
-              Currently designing 1:1 adaptive AI tutoring systems at SigIQ.ai
-            </div>
-          </div>
 
-          <div class="photo-wrapper" id="photoWrapper">
-            <img
-              class="photo"
-              src="./photo.jpg"
-              alt="Bhanu"
-            />
-          </div>
-        </div>
+              <!-- Mid · blue -->
+              <div class="sticky-note sn-blue" id="sn-mid">
+                <div class="sn-content">
+                  <div class="sn-title">Stressie</div>
+                  <div class="sn-rule"></div>
+                  <div class="sn-body">Designing calmer workplace experiences through behavioral health systems.</div>
+                </div>
+              </div>
+
+              <!-- Front · yellow -->
+              <div class="sticky-note sn-warm" id="sn-top">
+                <div class="sn-content">
+                  <div class="sn-title">EverTutor</div>
+                  <div class="sn-rule"></div>
+                  <div class="sn-body sn-body--lg">An adaptive AI tutor that personalizes to each learner in real time.<br><br>Designed three interconnected tools that together power the full tutoring experience.</div>
+                </div>
+              </div>
+
+            </div><!-- /sticky-stack -->
+          </div><!-- /hf-left -->
+
+          <!-- RIGHT: dynamic panel -->
+          <div class="hf-right">
+            <div class="hf-section-label">Selected Impact</div>
+            <div class="hf-impact-list" id="hfImpactList">
+              <div class="hf-metric">
+                <div class="hf-metric-headline" id="hfMH0"></div>
+                <div class="hf-metric-sub"      id="hfMS0"></div>
+              </div>
+              <div class="hf-metric">
+                <div class="hf-metric-headline" id="hfMH1"></div>
+                <div class="hf-metric-sub"      id="hfMS1"></div>
+              </div>
+              <div class="hf-metric">
+                <div class="hf-metric-headline" id="hfMH2"></div>
+                <div class="hf-metric-sub"      id="hfMS2"></div>
+              </div>
+            </div>
+            <a id="hfCta" href="./evertutor-live.html" class="explore-btn" style="margin-top:20px; align-self:flex-start;">
+              View case study <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M4 12L12 4M12 4H6.5M12 4V9.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <div class="hf-block-gap"></div>
+            <div class="hf-section-label">My Role</div>
+            <div class="hf-role-pills" id="hfRolePills"></div>
+          </div><!-- /hf-right -->
+
+        </div><!-- /hero-frame -->
+
       </div><!-- /hero -->
 
 
@@ -2350,7 +2532,7 @@
       <!-- ── FEATURED WORK: EverTutor header ──────────────────── -->
       <div class="fw-header reveal">
         <h2 class="fw-title">1. EverTutor</h2>
-        <p class="fw-desc">As a Lead Product Designer, I led design and curriculum direction across three platforms — Live (serve), Studio (create), and Analytics (measure) — building a cohesive AI tutoring platform that connects real-time learning delivery, content creation, and mastery tracking to enable personalized learning at scale.</p>
+        <p class="fw-desc">Led product design across three interconnected platforms — Live, Studio, and Analytics — turning a fragmented tutoring experience into a cohesive AI system that personalizes learning at scale for thousands of students daily.</p>
       </div>
 
       <!-- ── CASE STUDY CARD 1 — EverTutor Live ──────────────────── -->
@@ -2374,7 +2556,7 @@
           <p class="case-study-caption reveal">1.1 EverTutor Live (AI Tutor Experience Platform)</p>
 
           <div class="case-study-hl-row reveal">
-            <p class="case-study-headline">Designed a 0→1 AI Tutor System Operationalizing Bloom's 2 Sigma, Scaling 1:1 Learning Across 8+ Schools and ~2,000 Students</p>
+            <p class="case-study-headline">Built the AI tutor experience from scratch — real-time 1:1 personalization, Bloom's 2 Sigma in production, scaling across 8+ schools and ~2,000 students</p>
             <a class="explore-btn" href="./evertutor-live.html">Explore the system <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M4 12L12 4M12 4H6.5M12 4V9.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
           </div>
 
@@ -2436,7 +2618,7 @@
           <p class="case-study-caption reveal">1.2 EverTutor Studio (AI Tutor Creation Platform)</p>
 
           <div class="case-study-hl-row reveal">
-            <p class="case-study-headline">Architected a 0→1 AI Tutor Creation System That Reduced Lesson Design from 100+ hrs to ~4 hrs</p>
+            <p class="case-study-headline">Designed the authoring tool that made it possible — reducing lesson creation from 100+ hours to ~4, without sacrificing quality</p>
             <a class="explore-btn" href="./evertutor-studio.html">Explore the system <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M4 12L12 4M12 4H6.5M12 4V9.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
           </div>
 
@@ -2494,7 +2676,7 @@
               <p class="case-study-caption">1.3 EverTutor Analytics (AI Tutor Analytics Platform)</p>
 
               <div class="case-study-hl-row">
-                <p class="case-study-headline">Designed a 0→1 Analytics Platform for AI Tutoring, Turning Student Behavior Into Actionable Insights for Educators</p>
+                <p class="case-study-headline">Designed the analytics layer that closed the loop — turning raw student behavior into actionable insights for educators in real time</p>
                 <div class="connect-frame">Connect for details</div>
               </div>
             </div>
@@ -2508,7 +2690,7 @@
       <!-- ── FEATURED WORK: Stressie header ─────────────────────── -->
       <div class="fw-header reveal">
         <h2 class="fw-title">2. Stressie</h2>
-        <p class="fw-desc">As the Founding Product Designer, I built Stressie's product experience from the ground up — leading design strategy, running pilot research, and shipping a full redesign informed by real user data. The app is incubated at Harvard Innovation Labs and is actively piloting at Amazon and InKind.</p>
+        <p class="fw-desc">Founding Product Designer. Took the product from raw pilot research to a full redesign — building the design system, rethinking the IA, and shipping a product now incubated at Harvard Innovation Labs and piloting at Amazon and InKind.</p>
       </div>
 
       <!-- ── CASE STUDY CARD — Stressie ─────────────────────────── -->
@@ -2529,7 +2711,7 @@
         <div class="case-study-bottom">
 
           <div class="case-study-hl-row reveal">
-            <p class="case-study-headline">Redesigned a Workplace Stress App From the Ground Up — From Pilot Insights to a Harvard-Incubated Product Piloting at Amazon &amp; InKind</p>
+            <p class="case-study-headline">Took workplace stress from a vague problem to a Harvard-incubated product — redesigned end to end from pilot research, now live at Amazon and InKind</p>
             <a class="explore-btn" href="./stressie-studio.html">Explore the case study <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M4 12L12 4M12 4H6.5M12 4V9.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
           </div>
 
@@ -2569,43 +2751,32 @@
 
         <div class="about-layout">
 
-          <!-- Spec-frame image component -->
           <div class="about-spec-wrap">
             <div class="spec-frame">
-
-              <!-- Corner radius callout -->
               <div class="sf-corner-callout">
                 <div class="sf-corner-icon"></div>
                 <div class="sf-callout-line"></div>
                 <span class="sf-callout-label">r — 24px</span>
               </div>
-
-              <!-- Width measurement bar -->
               <div class="sf-width-measure">
                 <div class="sf-h-line"></div>
                 <span class="sf-w-label">300px</span>
               </div>
-
-              <!-- Height measurement bar -->
               <div class="sf-height-measure">
                 <div class="sf-v-line"></div>
                 <span class="sf-h-label">380px</span>
               </div>
-
-              <!-- Photo -->
               <div class="sf-image-wrap">
                 <img src="./photo.jpg" alt="Bhanu Kowshik" class="sf-photo" />
               </div>
-
             </div>
           </div>
 
-          <!-- About text -->
           <div class="about-text">
             <span class="about-eyebrow">Designer &amp; Builder</span>
-            <h3 class="about-heading">I design from<br>first principles.</h3>
-            <p class="about-body">I'm a product designer who thinks in systems and builds in code. My work spans 0→1 products, AI experiences, and complex multi-platform tools — always starting from the user's reality, not a template.</p>
-            <p class="about-body">I've led design across edtech, healthtech, and AI — shipping products from concept to production, solo and on cross-functional teams. I care as much about how something works as how it looks.</p>
+            <h3 class="about-heading">I make complex<br>things feel simple.</h3>
+            <p class="about-body">I'm a product designer who thinks in systems and builds in code. My work spans AI experiences, multi-platform tools, and products built from scratch — always starting from the user's reality, not a template.</p>
+            <p class="about-body">I've shipped design across edtech, healthtech, and AI — from concept to production, solo and on cross-functional teams. I care as much about how something works as how it looks.</p>
             <p class="about-body">Based in Austin, TX. Always building something on the side.</p>
           </div>
 
@@ -2675,28 +2846,24 @@
 
     revealEls.forEach(el => revealObs.observe(el));
 
-    // ── Photo — same reveal but gated on image.decode() ──────────
-    const photoWrapper = document.getElementById('photoWrapper');
-    if (photoWrapper) {
-      const photoImg = photoWrapper.querySelector('img.photo');
+    // ── Hero frame — reveal on intersection ──────────────────────
+    const heroFrame = document.getElementById('heroFrame');
+    if (heroFrame) {
+      heroFrame.style.opacity    = '0';
+      heroFrame.style.transform  = 'translateY(32px)';
+      heroFrame.style.transition = 'none';
 
-      photoWrapper.style.opacity    = '0';
-      photoWrapper.style.transform  = 'translateY(32px)';
-      photoWrapper.style.transition = 'none';
-
-      const photoObs = new IntersectionObserver((entries) => {
+      const heroObs = new IntersectionObserver((entries) => {
         if (!entries[0].isIntersecting) return;
-        photoObs.disconnect();
-        photoImg.decode().catch(() => {}).then(() => {
-          photoWrapper.style.transition =
-            'opacity 0.65s cubic-bezier(0.22,0.61,0.36,1), ' +
-            'transform 0.65s cubic-bezier(0.22,0.61,0.36,1)';
-          photoWrapper.style.opacity   = '1';
-          photoWrapper.style.transform = 'translateY(0)';
-        });
-      }, { threshold: 0.2 });
+        heroObs.disconnect();
+        heroFrame.style.transition =
+          'opacity 0.65s cubic-bezier(0.22,0.61,0.36,1), ' +
+          'transform 0.65s cubic-bezier(0.22,0.61,0.36,1)';
+        heroFrame.style.opacity   = '1';
+        heroFrame.style.transform = 'translateY(0)';
+      }, { threshold: 0.1 });
 
-      photoObs.observe(photoWrapper);
+      heroObs.observe(heroFrame);
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -3318,6 +3485,252 @@
   (function initCursor() {
     if (!window.matchMedia('(pointer: fine) and (hover: hover)').matches) return;
 
+    const BLUE      = '#4361EE';
+    const DOT_COLOR = 'rgba(37,37,37,0.15)';
+    const SNAP_BG   = 'rgba(67,97,238,0.09)';
+    const SNAP_BDR  = 'rgba(67,97,238,0.28)';
+
+    /* ── Build DOM ──────────────────────────────────────────────── */
+    const dot = document.createElement('div');
+    dot.id = 'ccDot';
+    dot.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(dot);
+
+    // Floating label pill — appears on case study card hover
+    const lbl = document.createElement('div');
+    lbl.id = 'ccLabel';
+    lbl.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(lbl);
+
+    document.documentElement.classList.add('cc-active');
+
+    /* ── State ──────────────────────────────────────────────────── */
+    let mx = -300, my = -300;
+    let rx = -300, ry = -300;
+    let vx = 0, vy = 0;
+    let lastNow = 0;
+    let visible = false;
+    let mode    = 'dot';   // 'dot' | 'text' | 'snap' | 'label'
+    let snapEl  = null;
+    let snapCX  = 0, snapCY = 0;
+    let lblText = '';
+    let magnetEl = null, origCX = 0, origCY = 0, snapW = 0, snapH = 0;
+
+    /* ── Spring constants ───────────────────────────────────────── */
+    const K_DOT  = 320, B_DOT  = 38;
+    const K_SNAP = 260, B_SNAP = 30;
+
+    /* ── Selectors ──────────────────────────────────────────────── */
+    const TEXT_SEL = [
+      'p','h1','h2','h3','h4','h5','h6','li','blockquote',
+      '.hero-heading','.hero-subtext','.sn-body','.sn-title',
+      '.fw-desc','.fw-title','.about-body','.about-heading',
+      '.hf-metric-headline','.hf-metric-sub','.hf-section-label',
+      '.greeting','.cs-headline','.case-study-meta',
+      '.footer-label','.footer-value',
+    ].join(',');
+
+    const CTA_SEL     = 'a[href], button, [role="button"]';
+    const CARD_SEL    = '.case-study-card, .ov-card, .product-area, .fw-header, .case-study-bottom';
+    const CONNECT_SEL = '#csCardAnalytics, .analytics-card-wrapper, .connect-frame';
+
+    /* ── Shape helpers ──────────────────────────────────────────── */
+    function setShape(w, h, r, bg, bdr) {
+      dot.style.width        = w + 'px';
+      dot.style.height       = h + 'px';
+      dot.style.borderRadius = r + 'px';
+      dot.style.background   = bg;
+      dot.style.border       = bdr;
+    }
+
+    function hideLabel() {
+      lbl.classList.remove('cc-label-visible');
+    }
+
+    function releaseMagnet() {
+      if (!magnetEl) return;
+      const el = magnetEl; magnetEl = null;
+      el.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      el.style.transform  = 'translate(0px, 0px)';
+      setTimeout(() => { el.style.transition = ''; el.style.transform = ''; }, 520);
+    }
+
+    function enterDot() {
+      releaseMagnet();
+      mode = 'dot'; snapEl = null;
+      setShape(36, 36, 9999, DOT_COLOR, '0px solid transparent');
+      hideLabel();
+    }
+
+    function enterText() {
+      releaseMagnet();
+      mode = 'text'; snapEl = null;
+      setShape(3, 33, 3, BLUE, '0px solid transparent');
+      hideLabel();
+    }
+
+    function enterSnap(el) {
+      releaseMagnet();
+      mode = 'snap'; snapEl = el; magnetEl = el;
+      const r  = el.getBoundingClientRect();
+      origCX = r.left + r.width  / 2;
+      origCY = r.top  + r.height / 2;
+      snapW  = r.width; snapH = r.height;
+      setShape(36, 36, 9999, DOT_COLOR, '0px solid transparent');
+      hideLabel();
+    }
+
+    function enterLabel(icon, text) {
+      releaseMagnet();
+      const key = icon + text;
+      if (mode === 'label' && lblText === key) return;
+      mode = 'label'; snapEl = null; lblText = key;
+      setShape(3, 33, 3, BLUE, '0px solid transparent');
+      lbl.innerHTML = `<span class="cc-lbl-icon">${icon}</span><span class="cc-lbl-text">${text}</span>`;
+      // Force reflow so the enter animation re-triggers on content change
+      lbl.classList.remove('cc-label-visible');
+      requestAnimationFrame(() => lbl.classList.add('cc-label-visible'));
+    }
+
+    /* ── Mode detection ─────────────────────────────────────────── */
+    function detect(x, y) {
+      const el = document.elementFromPoint(x, y);
+      if (!el || el === document.documentElement || el === document.body) return 'dot';
+
+      // Sticky notes — hide dot, show native grab
+      if (el.closest('.sticky-stack')) return 'hide';
+
+      // CTA snap — highest priority after sticky
+      const cta = el.closest(CTA_SEL);
+      if (cta) return { type: 'snap', el: cta };
+
+      // Case study card labels
+      if (el.closest(CONNECT_SEL)) return { type: 'label', icon: '💬', text: 'Connect for details' };
+      if (el.closest(CARD_SEL))    return { type: 'label', icon: '🚀', text: 'View case study' };
+
+      // Text — only when cursor is actually near rendered characters
+      if (isNearRenderedText(x, y)) return 'text';
+
+      return 'dot';
+    }
+
+    /* ── isNearRenderedText ─────────────────────────────────────────
+       Uses caretRangeFromPoint to find the nearest text character and
+       checks whether it's actually within PAD px of the cursor.
+       This prevents false positives from block elements whose DOM box
+       extends into blank whitespace beyond their visible text.
+    ────────────────────────────────────────────────────────────────── */
+    function isNearRenderedText(x, y) {
+      const PAD = 6;
+      const pts = [[x,y],[x+PAD,y],[x-PAD,y],[x,y+PAD],[x,y-PAD]];
+
+      for (const [px, py] of pts) {
+        const h = document.elementFromPoint(px, py);
+        if (!h || h.closest(CTA_SEL) || h.closest('.sticky-stack')) continue;
+        if (!h.closest(TEXT_SEL)) continue;
+
+        // Verify an actual text character exists at this point
+        const cr = document.caretRangeFromPoint
+          ? document.caretRangeFromPoint(px, py) : null;
+        if (!cr || cr.startContainer.nodeType !== Node.TEXT_NODE) continue;
+
+        const txt = cr.startContainer;
+        const off = Math.min(cr.startOffset, txt.length - 1);
+        if (off < 0 || !txt.length) continue;
+
+        // Get the bounding rect of that character
+        const charRange = document.createRange();
+        charRange.setStart(txt, off);
+        charRange.setEnd(txt, Math.min(off + 1, txt.length));
+        const rects = charRange.getClientRects();
+        if (!rects.length) continue;
+
+        const r = rects[0];
+        // Accept if the cursor is within PAD px of the character's rect
+        if (px >= r.left - PAD && px <= r.right  + PAD &&
+            py >= r.top  - PAD && py <= r.bottom + PAD) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /* ── Mouse events ───────────────────────────────────────────── */
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX;
+      my = e.clientY;
+
+      if (!visible) {
+        visible = true;
+        rx = mx; ry = my;
+        dot.style.opacity = '1';
+      }
+
+      const d = detect(mx, my);
+
+      if (d === 'hide') {
+        dot.style.opacity = '0';
+        hideLabel();
+        return;
+      }
+      dot.style.opacity = '1';
+
+      if (typeof d === 'object' && d.type === 'snap') {
+        if (mode !== 'snap' || snapEl !== d.el) enterSnap(d.el);
+        // Magnetic move: shift element up to 10px toward cursor
+        const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+        const moveX = clamp((mx - origCX) / (snapW / 2), -1, 1) * 5;
+        const moveY = clamp((my - origCY) / (snapH / 2), -1, 1) * 5;
+        magnetEl.style.transition = 'transform 0.12s ease-out';
+        magnetEl.style.transform  = `translate(${moveX}px,${moveY}px)`;
+        // Cursor overlay follows the element's moved center
+        snapCX = origCX + moveX;
+        snapCY = origCY + moveY;
+      } else if (typeof d === 'object' && d.type === 'label') {
+        enterLabel(d.icon, d.text);
+      } else if (d === 'text') {
+        if (mode !== 'text') enterText();
+      } else {
+        if (mode !== 'dot') enterDot();
+      }
+    });
+
+    document.addEventListener('mouseleave', () => {
+      visible = false;
+      dot.style.opacity = '0';
+      hideLabel();
+      releaseMagnet();
+    });
+
+    /* ── Spring loop ────────────────────────────────────────────── */
+    function tick(now) {
+      if (!lastNow) lastNow = now;
+      const dt = Math.min((now - lastNow) / 1000, 0.05);
+      lastNow = now;
+
+      const K  = K_DOT;
+      const B  = B_DOT;
+      const tx = mx;
+      const ty = my;
+
+      vx += ((tx - rx) * K - vx * B) * dt;
+      vy += ((ty - ry) * K - vy * B) * dt;
+      rx += vx * dt;
+      ry += vy * dt;
+
+      dot.style.transform = `translate3d(${rx}px,${ry}px,0) translate(-50%,-50%)`;
+      // Label: bottom-left tail corner sits near cursor; label extends up and right
+      lbl.style.transform = `translate3d(${rx + 10}px,${ry - 10}px,0) translateY(-100%)`;
+
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+  </script>
+
+  <script>
+  (function initCursorOLD_REMOVED() {
+    return; // replaced by initCursor above
     const NS   = 'http://www.w3.org/2000/svg';
     const HALF = 44;
     const POS_K = 300, POS_B = 40;
@@ -3659,6 +4072,288 @@
         });
       });
     });
+  })();
+
+  /* ── STICKY STACK + HERO FRAME ─────────────────────────────── */
+  (function () {
+    'use strict';
+
+    /* ─── Slot layout ───────────────────────────────────────── */
+    const SLOTS = [
+      { tx:   0, ty:  0, rot:  0, sc: 1 },
+      { tx: -22, ty: 14, rot: -9, sc: 1 },
+      { tx:  26, ty: 24, rot:  8, sc: 1 },
+    ];
+
+    /* ─── Panel data ────────────────────────────────────────── */
+    const CARD_DATA = {
+      'sn-top': {
+        href: './evertutor-live.html',
+        role: ['Solo Product Designer','0→1 Product Design','Founder Collaboration','AI Interaction Design'],
+        impact: [
+          { headline: '2× expected academic growth',             sub: "Validated Bloom's 2 Sigma hypothesis in production." },
+          { headline: 'Reduced lesson creation 100 hrs → 4 hrs', sub: 'Through a unified authoring system.' },
+          { headline: 'Scaled to 2,000+ daily active students',  sub: 'Within the first year of launch.' },
+        ],
+      },
+      'sn-mid': {
+        href: './stressie-studio.html',
+        role: ['Lead Product Designer','Research-Led Design','Design Systems','Behavioral UX'],
+        impact: [
+          { headline: 'Behavioral health workplace design', sub: 'Calmer experiences through research-led interaction patterns.' },
+          { headline: 'Full design system ownership',       sub: 'Consistent product language across every surface.' },
+          { headline: 'Research to production',             sub: 'From qualitative interviews to shipped, validated product.' },
+        ],
+      },
+      'sn-back': {
+        href: '#',
+        role: ['Solo Designer & Developer','0→1 Product Build','Full-Stack Ownership','Rapid Prototyping'],
+        impact: [
+          { headline: 'Shipped in 48 hours',    sub: 'Concept to live product — solo design and development.' },
+          { headline: 'Personal digital notes', sub: 'A quieter, more intentional way to send notes online.' },
+          { headline: 'End-to-end ownership',   sub: 'Design, engineering, and launch — one person.' },
+        ],
+      },
+    };
+
+    /* ─── DOM refs ──────────────────────────────────────────── */
+    const stack  = document.getElementById('stickyStack');
+    if (!stack) return;
+
+    // DOM order: back(0), mid(1), top(2) — front is last child (highest z)
+    // Logical order array: index 0 = front, 1 = mid, 2 = back
+    const noteEls = [
+      document.getElementById('sn-top'),
+      document.getElementById('sn-mid'),
+      document.getElementById('sn-back'),
+    ];
+    if (!noteEls[0]) return;
+
+    /* ─── Build transform string ────────────────────────────── */
+    function buildT(tx, ty, rot, sc) {
+      return `translateX(${tx}px) translateY(${ty}px) rotate(${rot}deg) scale(${sc})`;
+    }
+
+    /* ─── Apply slot to note ────────────────────────────────── */
+    function applySlot(note, slotIdx, animate) {
+      const s = SLOTS[slotIdx];
+      if (animate) {
+        note.classList.remove('is-dragging', 'is-going-back');
+        note.classList.add('is-springing');
+        setTimeout(() => note.classList.remove('is-springing'), 620);
+      } else {
+        note.classList.remove('is-dragging', 'is-going-back', 'is-springing');
+        note.style.transition = 'none';
+      }
+      note.style.transform    = buildT(s.tx, s.ty, s.rot, s.sc);
+      note.style.zIndex       = String(3 - slotIdx);
+      note.style.pointerEvents = slotIdx === 0 ? 'auto' : 'none';
+    }
+
+    /* ─── Init ──────────────────────────────────────────────── */
+    noteEls.forEach((n, i) => applySlot(n, i, false));
+
+    /* ─── Notify panel ──────────────────────────────────────── */
+    function notifyFront() {
+      if (typeof window.__hfFrontChange === 'function') {
+        window.__hfFrontChange(noteEls[0].id);
+      }
+    }
+
+    /* ─── Drag state ────────────────────────────────────────── */
+    let dragging  = null;
+    let startX = 0, startY = 0;
+    let curX  = 0, curY  = 0;
+    let curRot = 0;
+    let lastT = 0, lastX = 0, lastY = 0;
+    let velX  = 0, velY  = 0;
+    let hasInteracted = false;
+
+    function onPointerDown(e) {
+      if (e.button !== 0 && e.pointerType === 'mouse') return;
+      hasInteracted = true;
+      dragging = noteEls[0];
+      startX = e.clientX; startY = e.clientY;
+      lastX  = e.clientX; lastY  = e.clientY;
+      lastT  = e.timeStamp;
+      velX = velY = 0;
+      dragging.classList.add('is-dragging');
+      dragging.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    }
+
+    function onPointerMove(e) {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      const dt = e.timeStamp - lastT;
+      if (dt > 0) {
+        velX = (e.clientX - lastX) / dt;
+        velY = (e.clientY - lastY) / dt;
+      }
+      lastX = e.clientX; lastY = e.clientY; lastT = e.timeStamp;
+
+      const s   = SLOTS[0];
+      curX      = s.tx + dx;
+      curY      = s.ty + dy;
+      curRot    = s.rot + dx * 0.04;
+      dragging.style.transform = buildT(curX, curY, curRot, 1);
+      e.preventDefault();
+    }
+
+    function onPointerUp(e) {
+      if (!dragging) return;
+      const note = dragging;
+      dragging = null;
+      note.classList.remove('is-dragging');
+
+      const dx   = e.clientX - startX;
+      const speed = Math.abs(velX);
+
+      if (Math.abs(dx) > 160 || speed > 0.5) {
+        swipeOut(note, dx, curY, curRot, velX);
+      } else {
+        springBack(note);
+      }
+    }
+
+    /* ─── Spring back (rAF loop) ────────────────────────────── */
+    function springBack(note) {
+      const s = SLOTS[0];
+      let x = curX, y = curY, rot = curRot;
+      let vx = velX * 16, vy = velY * 16, vrot = 0;
+      const K = 260, B = 34;
+      let rafId;
+      let prev = performance.now();
+
+      note.style.transition = 'none';
+
+      function step(now) {
+        const dt = Math.min((now - prev) / 1000, 0.05);
+        prev = now;
+
+        const fx = -K * (x - s.tx) - B * vx;
+        const fy = -K * (y - s.ty) - B * vy;
+        const fr = -K * (rot - s.rot) - B * vrot;
+
+        vx   += fx * dt;  vy   += fy * dt;  vrot += fr * dt;
+        x    += vx * dt;  y    += vy * dt;  rot  += vrot * dt;
+
+        note.style.transform = buildT(x, y, rot, 1);
+
+        const settled =
+          Math.abs(vx) < 0.4 && Math.abs(x - s.tx) < 0.4 &&
+          Math.abs(vy) < 0.4 && Math.abs(y - s.ty) < 0.4;
+
+        if (settled) {
+          cancelAnimationFrame(rafId);
+          applySlot(note, 0, false);
+        } else {
+          rafId = requestAnimationFrame(step);
+        }
+      }
+      rafId = requestAnimationFrame(step);
+    }
+
+    /* ─── Swipe out ─────────────────────────────────────────── */
+    function swipeOut(note, dx, dy, rot, vx) {
+      const signX  = dx >= 0 ? 1 : -1;
+      const finalX = signX * 620;
+      const finalY = dy + 80;
+      const finalR = rot + signX * 18;
+
+      note.style.transition = 'transform 0.38s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.32s ease';
+      note.style.opacity    = '0';
+      note.style.transform  = buildT(finalX, finalY, finalR, 1);
+
+      note.addEventListener('transitionend', function onDone() {
+        note.removeEventListener('transitionend', onDone);
+
+        // Cycle: swiped → back slot; mid → front; back → mid
+        noteEls.push(noteEls.shift());
+
+        // Reset swiped card (now at index 2 = back)
+        note.style.transition = 'none';
+        note.style.opacity    = '1';
+        applySlot(note, 2, false);
+
+        // Spring remaining cards
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            noteEls.forEach((n, i) => { if (i !== 2) applySlot(n, i, true); });
+            notifyFront();
+          });
+        });
+      }, { once: true });
+    }
+
+    /* ─── Event listeners ───────────────────────────────────── */
+    stack.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.sticky-note') === noteEls[0]) onPointerDown(e);
+    });
+    window.addEventListener('pointermove',   onPointerMove, { passive: false });
+    window.addEventListener('pointerup',     onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+
+    /* ─── Auto-swipe hint (fires once after 4 s) ────────────── */
+    setTimeout(() => {
+      if (hasInteracted) return;
+      const front = noteEls[0];
+      const s     = SLOTS[0];
+      front.style.transition = 'transform 0.55s cubic-bezier(0.34,1.2,0.64,1)';
+      front.style.transform  = buildT(s.tx + 20, s.ty - 4, s.rot + 2, 1);
+      setTimeout(() => {
+        front.style.transition = 'transform 0.65s cubic-bezier(0.25,0.46,0.45,0.94)';
+        front.style.transform  = buildT(s.tx, s.ty, s.rot, s.sc);
+      }, 580);
+    }, 4000);
+
+    /* ─── Panel update with staggered transition ────────────── */
+    window.__hfFrontChange = function(cardId) {
+      const data    = CARD_DATA[cardId];
+      if (!data) return;
+      const metrics = Array.from(document.querySelectorAll('.hf-metric'));
+
+      // 1. Exit — stagger out
+      metrics.forEach((m, i) => {
+        setTimeout(() => m.classList.add('is-exit'), i * 45);
+      });
+
+      // 2. Swap content + enter
+      setTimeout(() => {
+        data.impact.forEach((imp, i) => {
+          const h = document.getElementById('hfMH' + i);
+          const s = document.getElementById('hfMS' + i);
+          if (h) h.textContent = imp.headline;
+          if (s) s.textContent = imp.sub;
+        });
+        const ctaEl   = document.getElementById('hfCta');
+        if (ctaEl) ctaEl.href = data.href;
+
+        const pillsEl = document.getElementById('hfRolePills');
+        if (pillsEl) {
+          pillsEl.innerHTML = data.role
+            .map(r => `<span class="hf-role-pill">${r}</span>`)
+            .join('');
+        }
+
+        metrics.forEach(m => {
+          m.classList.remove('is-exit');
+          m.classList.add('is-enter');
+        });
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            metrics.forEach((m, i) => {
+              setTimeout(() => m.classList.remove('is-enter'), i * 60);
+            });
+          });
+        });
+      }, metrics.length * 45 + 80);
+    };
+
+    // Init panel with front card data
+    notifyFront();
+
   })();
 
   /* ── HAMBURGER MENU ──────────────────────────────────────────── */
