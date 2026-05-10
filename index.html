@@ -4266,16 +4266,27 @@
         // Cycle: swiped → back slot; mid → front; back → mid
         noteEls.push(noteEls.shift());
 
-        // Reset swiped card (now at index 2 = back)
-        note.style.transition = 'none';
-        note.style.opacity    = '1';
-        applySlot(note, 2, false);
+        // Place card at back z-index immediately (so it renders behind others)
+        // but start it offset in the direction it flew, invisible & slightly scaled down
+        const bs = SLOTS[2];
+        note.style.transition    = 'none';
+        note.style.opacity       = '0';
+        note.style.zIndex        = '1';
+        note.style.pointerEvents = 'none';
+        note.style.transform     = buildT(signX * 180, finalY * 0.25, finalR * 0.5, 0.82);
 
-        // Spring remaining cards
+        // Spring front + mid cards into their new positions first
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             noteEls.forEach((n, i) => { if (i !== 2) applySlot(n, i, true); });
             notifyFront();
+
+            // After a short pause, pull the card back into its back-slot position
+            setTimeout(() => {
+              note.style.transition = 'transform 0.52s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.38s ease';
+              note.style.opacity    = '1';
+              note.style.transform  = buildT(bs.tx, bs.ty, bs.rot, bs.sc);
+            }, 80);
           });
         });
       }, { once: true });
