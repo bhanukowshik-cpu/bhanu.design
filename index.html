@@ -4218,10 +4218,11 @@
       dragging = null;
       note.classList.remove('is-dragging');
 
-      const dx   = e.clientX - startX;
-      const speed = Math.abs(velX);
+      const dx    = e.clientX - startX;
+      const dy    = e.clientY - startY;
+      const speed = Math.max(Math.abs(velX), Math.abs(velY));
 
-      if (Math.abs(dx) > 160 || speed > 0.5) {
+      if (Math.max(Math.abs(dx), Math.abs(dy)) > 120 || speed > 0.5) {
         swipeOut(note, dx, curY, curRot, velX);
       } else {
         springBack(note);
