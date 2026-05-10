@@ -4279,11 +4279,11 @@
       note.style.pointerEvents = 'none';
       void note.offsetHeight;
 
-      // Spring the card back toward center (SLOTS[0] = tx:0, ty:0) using rAF physics.
-      // Because z-index is already 1, the card travels BEHIND the new front & mid cards —
-      // like sliding a card to the bottom of a deck rather than flinging it off-screen.
-      // Once settled at center (fully hidden behind the front card), snap to SLOTS[2].
-      const target = SLOTS[0]; // spring toward center — hidden behind deck at z:1
+      // Spring the card directly to SLOTS[2] (its final back-slot position) using rAF physics.
+      // Because z-index is already 1, the card travels BEHIND the new front & mid cards.
+      // Springing to the exact final position means the settled state matches applySlot(2)
+      // perfectly — no visible snap or position jump at the end.
+      const target = SLOTS[2]; // spring to final back-slot position directly
       let x   = curX,   y = curY,   r = curRot;
       let _vx = velX * 10, _vy = velY * 10, _vr = 0;
       const K = 380, B = 42; // snappy spring
