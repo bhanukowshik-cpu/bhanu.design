@@ -28,11 +28,11 @@
 
     html { scroll-behavior: smooth; }
 
-    /* ─── PAGE — denser, finer dot-grid ─────────────────────── */
+    /* ─── PAGE — whiteboard canvas dot-grid ─────────────────── */
     body {
-      background-color: var(--bg);
-      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
-      background-size: 19px 19px;
+      background-color: #F5F3EF;
+      background-image: radial-gradient(circle, #AEACA5 1.5px, transparent 1.5px);
+      background-size: 22px 22px;
       background-attachment: fixed;   /* grid stays put as page scrolls */
       min-height: 100vh;
       font-family: var(--font-heading);
@@ -53,7 +53,7 @@
       width: 1200px;
       max-width: 100%;
       border-radius: 30px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 12px 40px rgba(0,0,0,0.10);
       overflow: clip;
       display: flex;
       flex-direction: column;
@@ -1587,9 +1587,9 @@
       inset: 0;
       z-index: 99999;
       pointer-events: all;
-      background-color: #FFFCF8;
-      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
-      background-size: 19px 19px;
+      background-color: #F5F3EF;
+      background-image: radial-gradient(circle, #AEACA5 1.5px, transparent 1.5px);
+      background-size: 22px 22px;
       background-attachment: fixed;
       /* Slide the whole canvas up on exit */
       transition: transform 0.78s cubic-bezier(0.76, 0, 0.24, 1) 0.22s;
@@ -2131,7 +2131,7 @@
     }
     .sticky-note.is-dragging { cursor: grabbing !important; transition: none !important; }
     .sticky-note.is-springing {
-      transition: transform 0.58s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.45s ease !important;
+      transition: transform 0.58s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.45s ease, box-shadow 0.45s ease !important;
     }
     .sticky-note.is-going-back {
       transition: transform 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
@@ -4074,9 +4074,9 @@
 
     /* ─── Slot layout ───────────────────────────────────────── */
     const SLOTS = [
-      { tx:   0, ty:  0, rot:  0, sc: 1 },
-      { tx: -22, ty: 14, rot: -9, sc: 1 },
-      { tx:  26, ty: 24, rot:  8, sc: 1 },
+      { tx:   0, ty:  0, rot:  0, sc: 1, op: 1.00 }, // front
+      { tx: -22, ty: 14, rot: -9, sc: 1, op: 0.88 }, // mid
+      { tx:  26, ty: 24, rot:  8, sc: 1, op: 0.76 }, // back
     ];
 
     /* ─── Panel data ────────────────────────────────────────── */
@@ -4139,8 +4139,9 @@
         note.classList.remove('is-dragging', 'is-going-back', 'is-springing');
         note.style.transition = 'none';
       }
-      note.style.transform    = buildT(s.tx, s.ty, s.rot, s.sc);
-      note.style.zIndex       = String(3 - slotIdx);
+      note.style.transform     = buildT(s.tx, s.ty, s.rot, s.sc);
+      note.style.opacity       = String(s.op);
+      note.style.zIndex        = String(3 - slotIdx);
       note.style.pointerEvents = slotIdx === 0 ? 'auto' : 'none';
     }
 
@@ -4254,8 +4255,7 @@
       // Cycle the logical order — swiped card becomes the new back
       noteEls.push(noteEls.shift());
 
-      // Strip any leftover transition classes and lock in z-index BEFORE animating
-      // so the card immediately sits BEHIND the front and mid cards
+      // Immediately drop to back z-layer and disable interaction
       note.classList.remove('is-dragging', 'is-going-back', 'is-springing');
       void note.offsetHeight;
       note.style.transition    = 'none';
@@ -4263,14 +4263,18 @@
       note.style.pointerEvents = 'none';
       void note.offsetHeight;
 
-      // Slide the card smoothly into the back-slot position.
-      // Because z-index is already 1, it passes BEHIND the other two cards —
-      // like putting a card at the bottom of a deck.
-      const bs = SLOTS[2];
-      note.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-      note.style.transform  = buildT(bs.tx, bs.ty, bs.rot, bs.sc);
+      // Spring the card back toward center (SLOTS[0] = tx:0, ty:0) using rAF physics.
+      // Because z-index is already 1, the card travels BEHIND the new front & mid cards —
+      // like sliding a card to the bottom of a deck rather than flinging it off-screen.
+      // Once settled at center (fully hidden behind the front card), snap to SLOTS[2].
+      const target = SLOTS[0]; // spring toward center — hidden behind deck at z:1
+      let x   = curX,   y = curY,   r = curRot;
+      let _vx = velX * 10, _vy = velY * 10, _vr = 0;
+      const K = 380, B = 42; // snappy spring
+      let rafId;
+      let prev = performance.now();
 
-      // Simultaneously shuffle the remaining two cards into their new positions
+      // Animate the remaining two cards into their new slots simultaneously
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           noteEls.forEach((n, i) => { if (i !== 2) applySlot(n, i, true); });
@@ -4278,12 +4282,32 @@
         });
       });
 
-      // Lock in final state cleanly once the transition is done
-      setTimeout(() => {
-        note.style.transition = 'none';
-        void note.offsetHeight;
-        applySlot(note, 2, false);
-      }, 540);
+      function step(now) {
+        const dt = Math.min((now - prev) / 1000, 0.05);
+        prev = now;
+
+        const fx = -K * (x - target.tx) - B * _vx;
+        const fy = -K * (y - target.ty) - B * _vy;
+        const fr = -K * (r - target.rot) - B * _vr;
+
+        _vx += fx * dt;  _vy += fy * dt;  _vr += fr * dt;
+        x   += _vx * dt; y   += _vy * dt; r   += _vr * dt;
+
+        note.style.transform = buildT(x, y, r, 1);
+
+        const settled =
+          Math.abs(_vx) < 0.5 && Math.abs(x - target.tx) < 0.5 &&
+          Math.abs(_vy) < 0.5 && Math.abs(y - target.ty) < 0.5;
+
+        if (settled) {
+          cancelAnimationFrame(rafId);
+          // Card is now behind the front card — snap to back-slot cleanly (invisible move)
+          applySlot(note, 2, false);
+        } else {
+          rafId = requestAnimationFrame(step);
+        }
+      }
+      rafId = requestAnimationFrame(step);
     }
 
     /* ─── Event listeners ───────────────────────────────────── */
