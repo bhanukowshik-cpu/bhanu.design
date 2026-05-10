@@ -182,7 +182,7 @@
       display: flex;
       flex-direction: column;
       padding: 36px 40px 36px 32px;
-      overflow: visible; /* allow popover to escape */
+      overflow: hidden;
       justify-content: center;
     }
     .hf-section-label {
@@ -230,6 +230,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      margin-top: 20px;
+      align-self: flex-start;
       font-family: var(--font-mono);
       font-size: 13px;
       font-weight: 500;
@@ -240,86 +242,6 @@
       transition: border-color 0.2s ease, opacity 0.2s ease;
     }
     .hf-cta-link:hover { border-color: var(--secondary); opacity: 0.7; }
-
-    /* ── UI preview popover on "View case study" hover ───────── */
-    .hf-cta-wrap {
-      position: relative;
-      display: inline-block;
-      align-self: flex-start;
-      margin-top: 20px;
-    }
-    .hf-ui-popover {
-      position: absolute;
-      bottom: calc(100% + 12px);
-      left: -14px;
-      width: 300px;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #fff;
-      box-shadow:
-        0 0 0 1px rgba(0,0,0,0.07),
-        0 4px 12px rgba(0,0,0,0.08),
-        0 16px 48px rgba(0,0,0,0.14);
-      opacity: 0;
-      transform: translateY(8px) scale(0.97);
-      transform-origin: bottom left;
-      transition: opacity 0.17s ease, transform 0.17s ease;
-      pointer-events: none;
-      z-index: 20;
-    }
-    /* Show on CTA wrap hover */
-    .hf-cta-wrap:hover .hf-ui-popover {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    /* Downward-pointing tail */
-    .hf-ui-popover::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 24px;
-      width: 10px; height: 10px;
-      background: #fff;
-      box-shadow: 2px 2px 4px rgba(0,0,0,0.06);
-      transform: rotate(45deg);
-      border-radius: 1px;
-    }
-    .hf-popover-imgs {
-      position: relative;
-      height: 176px;
-    }
-    .hf-popover-img {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      object-position: top left;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-    .hf-popover-img.is-active      { opacity: 1; }
-    .hf-popover-img--stressie      { object-position: 50% 12%; background: #f4eade; }
-    .hf-popover-img--dearly        { object-position: center 22%; }
-    /* Footer label */
-    .hf-popover-label {
-      padding: 7px 12px;
-      font-family: var(--font-mono);
-      font-size: 9.5px;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      color: rgba(37,37,37,0.4);
-      background: #f8f7f5;
-      border-top: 1px solid rgba(0,0,0,0.06);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .hf-popover-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: #28CA41;
-      flex-shrink: 0;
-    }
     .hf-role-pills {
       display: flex;
       flex-wrap: wrap;
@@ -2600,32 +2522,9 @@
                 <div class="hf-metric-sub"      id="hfMS2"></div>
               </div>
             </div>
-            <div class="hf-cta-wrap">
-              <a id="hfCta" href="./evertutor-live.html" class="hf-cta-link">
-                View case study <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </a>
-              <!-- UI preview popover -->
-              <div class="hf-ui-popover">
-                <div class="hf-popover-imgs">
-                  <img id="hfPopoverEt"
-                       class="hf-popover-img is-active"
-                       src="./Dashboard%20Updated.png"
-                       alt="" draggable="false">
-                  <img id="hfPopoverStressie"
-                       class="hf-popover-img hf-popover-img--stressie"
-                       src="./Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%202.png"
-                       alt="" draggable="false">
-                  <img id="hfPopoverDearly"
-                       class="hf-popover-img hf-popover-img--dearly"
-                       src="./studio-ui.jpg"
-                       alt="" draggable="false">
-                </div>
-                <div class="hf-popover-label">
-                  <span class="hf-popover-dot"></span>
-                  <span id="hfPopoverLabel">EverTutor — Analytics Dashboard</span>
-                </div>
-              </div>
-            </div>
+            <a id="hfCta" href="./evertutor-live.html" class="hf-cta-link">
+              View case study <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
             <div class="hf-block-gap"></div>
             <div class="hf-section-label">My Role</div>
             <div class="hf-role-pills" id="hfRolePills"></div>
@@ -4432,19 +4331,6 @@
     window.__hfFrontChange = function(cardId) {
       const data    = CARD_DATA[cardId];
       if (!data) return;
-
-      // Swap popover preview image + label
-      const popoverMap = {
-        'sn-top':  { el: document.getElementById('hfPopoverEt'),       label: 'EverTutor — Analytics Dashboard' },
-        'sn-mid':  { el: document.getElementById('hfPopoverStressie'), label: 'Stressie — Onboarding Flow'      },
-        'sn-back': { el: document.getElementById('hfPopoverDearly'),   label: 'Dearly — Personal Notes'         },
-      };
-      Object.values(popoverMap).forEach(({ el }) => el && el.classList.remove('is-active'));
-      if (popoverMap[cardId]) {
-        popoverMap[cardId].el && popoverMap[cardId].el.classList.add('is-active');
-        const lbl = document.getElementById('hfPopoverLabel');
-        if (lbl) lbl.textContent = popoverMap[cardId].label;
-      }
 
       const metrics = Array.from(document.querySelectorAll('.hf-metric'));
 
