@@ -176,7 +176,32 @@
       align-items: center;
       justify-content: center;
       padding: 36px 0;
+      position: relative; /* needed to contain the UI preview */
     }
+
+    /* ── UI preview (sits behind card stack) ─────────────────── */
+    .hf-ui-preview {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .hf-ui-img {
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.55s ease;
+      border-radius: 10px 10px 0 0;
+      box-shadow: 0 -6px 48px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.05);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 22%, black 48%);
+      mask-image:         linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 22%, black 48%);
+    }
+    .hf-ui-img.is-active   { opacity: 1; }
+    .hf-ui-img--et         { width: min(390px, 95%); }
+    .hf-ui-img--stressie   { width: 118px; border-radius: 22px 22px 0 0; bottom: 0; }
+    .hf-ui-img--dearly     { width: min(340px, 88%); }
     .hf-right {
       flex: 1;
       display: flex;
@@ -2473,6 +2498,20 @@
 
           <!-- LEFT: sticky note stack -->
           <div class="hf-left">
+
+            <!-- UI preview — sits behind card stack, swaps on card change -->
+            <div class="hf-ui-preview" aria-hidden="true">
+              <img id="hfPreviewEt"
+                   class="hf-ui-img hf-ui-img--et is-active"
+                   src="./Dashboard%20Updated.png" alt="">
+              <img id="hfPreviewStressie"
+                   class="hf-ui-img hf-ui-img--stressie"
+                   src="./Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%202.png" alt="">
+              <img id="hfPreviewDearly"
+                   class="hf-ui-img hf-ui-img--dearly"
+                   src="./studio-ui.jpg" alt="">
+            </div>
+
             <div class="sticky-stack" id="stickyStack">
 
               <!-- Back · stone -->
@@ -4331,6 +4370,15 @@
     window.__hfFrontChange = function(cardId) {
       const data    = CARD_DATA[cardId];
       if (!data) return;
+
+      // Swap UI preview image
+      const previewMap = {
+        'sn-top':  document.getElementById('hfPreviewEt'),
+        'sn-mid':  document.getElementById('hfPreviewStressie'),
+        'sn-back': document.getElementById('hfPreviewDearly'),
+      };
+      Object.values(previewMap).forEach(el => el && el.classList.remove('is-active'));
+      if (previewMap[cardId]) previewMap[cardId].classList.add('is-active');
       const metrics = Array.from(document.querySelectorAll('.hf-metric'));
 
       // 1. Exit — stagger out
