@@ -767,15 +767,33 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 500;
-      background: rgba(255, 252, 248, 0.82);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: 0px 1px 0px 0px rgba(0,0,0,0.06);
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      box-shadow: none;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 8px 40px;
       height: 54px;
+      transition: top 0.45s cubic-bezier(0.22,0.61,0.36,1),
+                  left 0.45s cubic-bezier(0.22,0.61,0.36,1),
+                  right 0.45s cubic-bezier(0.22,0.61,0.36,1),
+                  background 0.45s ease,
+                  border-radius 0.45s ease,
+                  box-shadow 0.45s ease,
+                  padding 0.45s ease,
+                  height 0.45s ease;
+    }
+    .top-nav.scrolled {
+      top: 12px;
+      left: 24px;
+      right: 24px;
+      background: #EDEAE3;
+      border-radius: 20px;
+      box-shadow: 0 2px 18px rgba(0,0,0,0.08);
+      padding: 10px 24px;
+      height: auto;
     }
     .nav-links {
       display: flex;
@@ -838,6 +856,13 @@
       .nav-links      { display: none; }
       .nav-hamburger  { display: flex; }
       .top-nav        { padding: 8px 20px; }
+      .top-nav.scrolled { left: 12px; right: 12px; padding: 8px 18px; }
+    }
+    .nav-brand {
+      position: relative;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
     }
     .nav-logo {
       font-family: var(--font-heading);
@@ -846,6 +871,45 @@
       color: var(--secondary);
       white-space: nowrap;
       text-decoration: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .top-nav.scrolled .nav-logo {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(5px);
+    }
+    .nav-callme {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(calc(-50% - 5px));
+      display: flex;
+      flex-direction: column;
+      gap: 0px;
+      opacity: 0;
+      pointer-events: none;
+      white-space: nowrap;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .top-nav.scrolled .nav-callme {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(-50%);
+    }
+    .nav-callme-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(37,37,37,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      line-height: 1.3;
+    }
+    .nav-callme-name {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--secondary);
+      line-height: 1.2;
     }
     .nav-work {
       display: flex;
@@ -2434,7 +2498,13 @@
 
   <!-- TOP NAV -->
   <nav class="top-nav" id="topNav">
-    <span class="nav-logo">Bhanu Kowshik</span>
+    <div class="nav-brand">
+      <span class="nav-logo">Bhanu Kowshik</span>
+      <div class="nav-callme">
+        <span class="nav-callme-label">You can call me</span>
+        <span class="nav-callme-name">Bhanu :)</span>
+      </div>
+    </div>
     <div class="nav-links">
       <a class="nav-work" href="#s2Section">WORK</a>
       <a class="nav-work" href="./resume.pdf" target="_blank" rel="noopener">RESUME</a>
@@ -2467,14 +2537,14 @@
       <feColorMatrix type="saturate" values="0"/>
     </filter>
     <clipPath id="heroAvatarClip">
-      <rect x="60" y="-7" width="48" height="48" rx="6"/>
+      <rect x="86" y="-7" width="48" height="48" rx="6"/>
     </clipPath>
   </defs>
-  <!-- Ball loops symmetric around y=17 (±30px), so visual center matches text midline exactly -->
-  <path d="M5,17 C10,0 24,-12 38,-6 C52,0 54,20 44,32 C34,44 16,46 6,36 C-4,26 -2,4 10,-4 C22,-12 42,-6 46,12 C50,30 44,46 28,46 C12,46 2,32 4,18 C6,4 18,-2 30,6 C42,14 44,30 36,38 C28,46 18,44 14,34 C10,24 14,12 22,12 C30,12 38,20 40,30 C42,40 46,34 54,28 C60,24 64,20 84,17 L2000,17" stroke="#252525" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Avatar: B&W, face centered, rounded corners, 20% smaller (48×48) -->
-  <image href="photo.jpg" x="60" y="-7" width="48" height="48" clip-path="url(#heroAvatarClip)" preserveAspectRatio="xMidYMid slice" filter="url(#hgGray)"/>
-  <rect x="60" y="-7" width="48" height="48" rx="6" fill="none" stroke="rgba(0,0,0,0.10)" stroke-width="1"/>
+  <!-- Wide ball: loops span x:-6→74, symmetric ±~16px around y=17 -->
+  <path d="M4,17 C10,-2 28,-14 46,-6 C64,2 66,24 50,36 C34,48 10,46 2,32 C-6,18 -2,-4 14,-10 C30,-16 58,-6 62,12 C66,30 56,46 36,46 C16,46 4,30 6,16 C8,2 22,-4 36,4 C50,12 54,30 44,38 C34,46 20,44 16,32 C12,20 18,8 28,8 C38,8 46,18 48,30 C50,42 56,36 64,28 C70,22 74,19 110,17 L2000,17" stroke="#252525" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Avatar: B&W, face centered, rounded corners, 48×48, centered at x=110 -->
+  <image href="photo.jpg" x="86" y="-7" width="48" height="48" clip-path="url(#heroAvatarClip)" preserveAspectRatio="xMidYMid slice" filter="url(#hgGray)"/>
+  <rect x="86" y="-7" width="48" height="48" rx="6" fill="none" stroke="rgba(0,0,0,0.10)" stroke-width="1"/>
 </svg></span>
         </h1>
 
@@ -4428,6 +4498,19 @@
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') toggleMenu(false);
     });
+  })();
+
+  /* ── SCROLL-AWARE NAV ────────────────────────────────────────── */
+  (function () {
+    const nav = document.getElementById('topNav');
+    if (!nav) return;
+    let prev = false;
+    function onScroll() {
+      const now = window.scrollY > 60;
+      if (now !== prev) { nav.classList.toggle('scrolled', now); prev = now; }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
   })();
   </script>
 </body>
