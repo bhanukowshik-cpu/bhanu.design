@@ -4274,35 +4274,33 @@
 
         // Remove any classes that carry !important transitions before we snap
         note.classList.remove('is-dragging', 'is-going-back', 'is-springing');
-        // Force reflow — commits class removal + ensures transition:none actually applies
-        void note.offsetHeight;
+        void note.offsetHeight; // commit class removal before transition:none
 
-        // Snap card invisibly to the center of the stack (same as front slot),
-        // scaled down slightly so it sits "inside" the deck at z-index 1.
-        // Front card (z-index 3) fully hides it here.
+        // Snap card invisibly to JUST behind the back slot (scaled slightly small).
+        // We do NOT use SLOTS[0] as starting point — the new front card (B) is still
+        // animating there, so the returning card would be visible and uncovered.
         note.style.transition    = 'none';
         note.style.opacity       = '0';
         note.style.zIndex        = '1';
         note.style.pointerEvents = 'none';
-        note.style.transform     = buildT(SLOTS[0].tx, SLOTS[0].ty, SLOTS[0].rot, 0.82);
+        note.style.transform     = buildT(bs.tx, bs.ty + 14, bs.rot, bs.sc * 0.82);
 
-        // Force reflow so the snap takes effect before we re-enable transitions
-        void note.offsetHeight;
+        void note.offsetHeight; // commit snap before re-enabling transitions
 
-        // Shuffle front + mid into their new positions
+        // Shuffle front + mid into their new positions first
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             noteEls.forEach((n, i) => { if (i !== 2) applySlot(n, i, true); });
             notifyFront();
 
-            // Card slides out from behind the deck into the back slot, fading in as it goes.
-            // Because z-index is 1 it stays behind the other cards the whole time —
-            // you only see it peek out as it reaches the back-slot position.
+            // Wait for the stack shuffle to mostly settle, THEN pop the back
+            // card in at its final position — subtle scale-up + fade, all at z-index 1
+            // so it stays tucked behind the other two cards the whole time.
             setTimeout(() => {
-              note.style.transition = 'transform 0.52s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.28s ease';
+              note.style.transition = 'transform 0.38s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.28s ease';
               note.style.opacity    = '1';
               note.style.transform  = buildT(bs.tx, bs.ty, bs.rot, bs.sc);
-            }, 90);
+            }, 320);
           });
         });
       }, { once: true });
