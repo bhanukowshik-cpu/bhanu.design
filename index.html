@@ -4252,12 +4252,16 @@
     /* ─── Swipe out ─────────────────────────────────────────── */
     function swipeOut(note, dx, dy, rot, vx) {
       const signX  = dx >= 0 ? 1 : -1;
-      const finalX = signX * 620;
-      const finalY = dy + 80;
-      const finalR = rot + signX * 18;
+      // Boost exit speed for slow drags so the card always flies off convincingly
+      const speed  = Math.max(Math.abs(vx), 0.9);
+      const dur    = Math.max(0.18, Math.min(0.36, 0.55 / speed));
+      const finalX = signX * (window.innerWidth * 0.75);
+      const finalY = dy + signX * 60;
+      const finalR = rot + signX * 22;
 
-      note.style.transition = 'transform 0.38s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.32s ease';
-      note.style.opacity    = '0';
+      // Exit with no opacity change — card physically flies off at full opacity
+      note.style.transition = `transform ${dur}s cubic-bezier(0.25,0.46,0.45,0.94)`;
+      note.style.opacity    = '1';
       note.style.transform  = buildT(finalX, finalY, finalR, 1);
 
       note.addEventListener('transitionend', function onDone() {
@@ -4266,14 +4270,14 @@
         // Cycle: swiped → back slot; mid → front; back → mid
         noteEls.push(noteEls.shift());
 
-        // Place card at back z-index immediately (so it renders behind others)
-        // but start it offset in the direction it flew, invisible & slightly scaled down
+        // Card is now off-screen — snap it invisibly to the pull-back start position
         const bs = SLOTS[2];
         note.style.transition    = 'none';
         note.style.opacity       = '0';
         note.style.zIndex        = '1';
         note.style.pointerEvents = 'none';
-        note.style.transform     = buildT(signX * 180, finalY * 0.25, finalR * 0.5, 0.82);
+        // Start pull-back from the side it exited, slightly closer + scaled down
+        note.style.transform     = buildT(signX * 160, finalY * 0.2, finalR * 0.4, 0.84);
 
         // Spring front + mid cards into their new positions first
         requestAnimationFrame(() => {
