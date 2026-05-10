@@ -4251,59 +4251,39 @@
 
     /* ─── Swipe out ─────────────────────────────────────────── */
     function swipeOut(note, dx, dy, rot, vx) {
-      const signX  = dx >= 0 ? 1 : -1;
-      // Boost exit speed for slow drags so the card always flies off convincingly
-      const speed  = Math.max(Math.abs(vx), 0.9);
-      const dur    = Math.max(0.18, Math.min(0.36, 0.55 / speed));
-      const finalX = signX * (window.innerWidth * 0.75);
-      const finalY = dy + signX * 60;
-      const finalR = rot + signX * 22;
+      // Cycle the logical order — swiped card becomes the new back
+      noteEls.push(noteEls.shift());
 
-      // Exit with no opacity change — card physically flies off at full opacity
-      note.style.transition = `transform ${dur}s cubic-bezier(0.25,0.46,0.45,0.94)`;
-      note.style.opacity    = '1';
-      note.style.transform  = buildT(finalX, finalY, finalR, 1);
+      // Strip any leftover transition classes and lock in z-index BEFORE animating
+      // so the card immediately sits BEHIND the front and mid cards
+      note.classList.remove('is-dragging', 'is-going-back', 'is-springing');
+      void note.offsetHeight;
+      note.style.transition    = 'none';
+      note.style.zIndex        = '1';
+      note.style.pointerEvents = 'none';
+      void note.offsetHeight;
 
-      note.addEventListener('transitionend', function onDone() {
-        note.removeEventListener('transitionend', onDone);
+      // Slide the card smoothly into the back-slot position.
+      // Because z-index is already 1, it passes BEHIND the other two cards —
+      // like putting a card at the bottom of a deck.
+      const bs = SLOTS[2];
+      note.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+      note.style.transform  = buildT(bs.tx, bs.ty, bs.rot, bs.sc);
 
-        // Cycle: swiped → back slot; mid → front; back → mid
-        noteEls.push(noteEls.shift());
-
-        const bs = SLOTS[2];
-
-        // Remove any classes that carry !important transitions before we snap
-        note.classList.remove('is-dragging', 'is-going-back', 'is-springing');
-        void note.offsetHeight; // commit class removal before transition:none
-
-        // Snap card invisibly to JUST behind the back slot (scaled slightly small).
-        // We do NOT use SLOTS[0] as starting point — the new front card (B) is still
-        // animating there, so the returning card would be visible and uncovered.
-        note.style.transition    = 'none';
-        note.style.opacity       = '0';
-        note.style.zIndex        = '1';
-        note.style.pointerEvents = 'none';
-        note.style.transform     = buildT(bs.tx, bs.ty + 14, bs.rot, bs.sc * 0.82);
-
-        void note.offsetHeight; // commit snap before re-enabling transitions
-
-        // Shuffle front + mid into their new positions first
+      // Simultaneously shuffle the remaining two cards into their new positions
+      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            noteEls.forEach((n, i) => { if (i !== 2) applySlot(n, i, true); });
-            notifyFront();
-
-            // Wait for the stack shuffle to mostly settle, THEN pop the back
-            // card in at its final position — subtle scale-up + fade, all at z-index 1
-            // so it stays tucked behind the other two cards the whole time.
-            setTimeout(() => {
-              note.style.transition = 'transform 0.38s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.28s ease';
-              note.style.opacity    = '1';
-              note.style.transform  = buildT(bs.tx, bs.ty, bs.rot, bs.sc);
-            }, 320);
-          });
+          noteEls.forEach((n, i) => { if (i !== 2) applySlot(n, i, true); });
+          notifyFront();
         });
-      }, { once: true });
+      });
+
+      // Lock in final state cleanly once the transition is done
+      setTimeout(() => {
+        note.style.transition = 'none';
+        void note.offsetHeight;
+        applySlot(note, 2, false);
+      }, 540);
     }
 
     /* ─── Event listeners ───────────────────────────────────── */
