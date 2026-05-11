@@ -1505,56 +1505,114 @@
     }
 
     /* ─── FOOTER ────────────────────────────────────────────────── */
-    /* ── PAGE END WAVE ─────────────────────────────────────────── */
+    /* ── PAGE END AURORA ───────────────────────────────────────── */
     .page-end-wave {
       position: relative;
-      height: 200px;
-      background: #1A1917;
+      height: 480px;
+      background: #0C0B0A;
       overflow: hidden;
+    }
+    /* Fade from page cream into darkness */
+    .page-end-wave::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 120px;
+      background: linear-gradient(to bottom, #FFFCF8 0%, transparent 100%);
+      z-index: 10;
+      pointer-events: none;
+    }
+    /* Fade bottom edge into footer */
+    .page-end-wave::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60px;
+      background: linear-gradient(to bottom, transparent, #1A1917);
+      z-index: 10;
+      pointer-events: none;
     }
     .pew-blob {
       position: absolute;
       border-radius: 50%;
-      transition: opacity 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                  transform 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      opacity: 0;
     }
+
+    /* Blob A — wide deep-lime base, the "horizon" */
     .pew-blob--a {
-      width: 820px; height: 420px;
-      background: #B5D400;
-      filter: blur(82px);
-      bottom: -330px; left: 50%;
-      margin-left: -410px;
-      opacity: 0; transform: translateY(50px);
+      width: 140%; height: 600px;
+      background: #4A7800;
+      filter: blur(100px);
+      bottom: -200px; left: -20%;
     }
+    .pew-revealed .pew-blob--a {
+      animation:
+        pew-in  2.2s cubic-bezier(0.16, 1, 0.3, 1) both,
+        pew-breathe-a 11s ease-in-out 2.2s infinite;
+    }
+    @keyframes pew-breathe-a {
+      0%, 100% { opacity: 0.62; transform: translateY(0); }
+      50%       { opacity: 0.72; transform: translateY(-22px); }
+    }
+
+    /* Blob B — lime-green, left arc */
     .pew-blob--b {
-      width: 500px; height: 300px;
+      width: 72%; height: 440px;
+      background: #8CC200;
+      filter: blur(88px);
+      bottom: -140px; left: -4%;
+    }
+    .pew-revealed .pew-blob--b {
+      animation:
+        pew-in  2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both,
+        pew-breathe-b 13s ease-in-out 2.4s infinite;
+    }
+    @keyframes pew-breathe-b {
+      0%, 100% { opacity: 0.42; transform: translateY(0) translateX(0); }
+      40%       { opacity: 0.5;  transform: translateY(-28px) translateX(18px); }
+      80%       { opacity: 0.38; transform: translateY(-8px)  translateX(-8px); }
+    }
+
+    /* Blob C — bright lime, right arc */
+    .pew-blob--c {
+      width: 66%; height: 400px;
+      background: #AACF00;
+      filter: blur(82px);
+      bottom: -120px; right: -4%;
+    }
+    .pew-revealed .pew-blob--c {
+      animation:
+        pew-in  2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both,
+        pew-breathe-c 14s ease-in-out 2.4s infinite;
+    }
+    @keyframes pew-breathe-c {
+      0%, 100% { opacity: 0.34; transform: translateY(0) translateX(0); }
+      45%       { opacity: 0.42; transform: translateY(-24px) translateX(-14px); }
+    }
+
+    /* Blob D — brand lime highlight, bright core */
+    .pew-blob--d {
+      width: 46%; height: 320px;
       background: #E6F28D;
       filter: blur(68px);
-      bottom: -250px; left: 8%;
-      opacity: 0; transform: translateY(50px);
-      transition-delay: 0.18s;
+      bottom: 30px; left: 50%;
+      margin-left: -23%;
     }
-    .pew-blob--c {
-      width: 480px; height: 280px;
-      background: #C8D855;
-      filter: blur(68px);
-      bottom: -240px; right: 8%;
-      opacity: 0; transform: translateY(50px);
-      transition-delay: 0.18s;
+    .pew-revealed .pew-blob--d {
+      animation:
+        pew-in  2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both,
+        pew-breathe-d 9s ease-in-out 2.65s infinite;
     }
-    .pew-blob--d {
-      width: 260px; height: 180px;
-      background: #F0F8B0;
-      filter: blur(48px);
-      bottom: -120px; left: 50%;
-      margin-left: -130px;
-      opacity: 0; transform: translateY(50px);
-      transition-delay: 0.38s;
+    @keyframes pew-breathe-d {
+      0%, 100% { opacity: 0.2;  transform: translateY(0) scale(1); }
+      50%       { opacity: 0.28; transform: translateY(-32px) scale(1.08); }
     }
-    .page-end-wave.pew-revealed .pew-blob--a { opacity: 0.52; transform: translateY(0); }
-    .page-end-wave.pew-revealed .pew-blob--b { opacity: 0.28; transform: translateY(0); }
-    .page-end-wave.pew-revealed .pew-blob--c { opacity: 0.22; transform: translateY(0); }
-    .page-end-wave.pew-revealed .pew-blob--d { opacity: 0.16; transform: translateY(0); }
+
+    /* Shared entry keyframe */
+    @keyframes pew-in {
+      from { opacity: 0; transform: translateY(80px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
     .site-footer {
       background: #1A1917;
@@ -2029,10 +2087,10 @@
     /* ─── ABOUT V2 ──────────────────────────────────────────── */
     .av2-inner {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr auto;
       align-items: start;
       margin-top: 48px;
-      gap: 0;
+      gap: 0 40px;
     }
     .av2-left {
       min-width: 0;
