@@ -1505,6 +1505,57 @@
     }
 
     /* ─── FOOTER ────────────────────────────────────────────────── */
+    /* ── PAGE END WAVE ─────────────────────────────────────────── */
+    .page-end-wave {
+      position: relative;
+      height: 200px;
+      background: #1A1917;
+      overflow: hidden;
+    }
+    .pew-blob {
+      position: absolute;
+      border-radius: 50%;
+      transition: opacity 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  transform 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .pew-blob--a {
+      width: 820px; height: 420px;
+      background: #B5D400;
+      filter: blur(82px);
+      bottom: -330px; left: 50%;
+      margin-left: -410px;
+      opacity: 0; transform: translateY(50px);
+    }
+    .pew-blob--b {
+      width: 500px; height: 300px;
+      background: #E6F28D;
+      filter: blur(68px);
+      bottom: -250px; left: 8%;
+      opacity: 0; transform: translateY(50px);
+      transition-delay: 0.18s;
+    }
+    .pew-blob--c {
+      width: 480px; height: 280px;
+      background: #C8D855;
+      filter: blur(68px);
+      bottom: -240px; right: 8%;
+      opacity: 0; transform: translateY(50px);
+      transition-delay: 0.18s;
+    }
+    .pew-blob--d {
+      width: 260px; height: 180px;
+      background: #F0F8B0;
+      filter: blur(48px);
+      bottom: -120px; left: 50%;
+      margin-left: -130px;
+      opacity: 0; transform: translateY(50px);
+      transition-delay: 0.38s;
+    }
+    .page-end-wave.pew-revealed .pew-blob--a { opacity: 0.52; transform: translateY(0); }
+    .page-end-wave.pew-revealed .pew-blob--b { opacity: 0.28; transform: translateY(0); }
+    .page-end-wave.pew-revealed .pew-blob--c { opacity: 0.22; transform: translateY(0); }
+    .page-end-wave.pew-revealed .pew-blob--d { opacity: 0.16; transform: translateY(0); }
+
     .site-footer {
       background: #1A1917;
       padding: 26px 44px;
@@ -2000,11 +2051,11 @@
       padding-top: 8px;
     }
     .av2-right .spec-frame {
-      width: 100%;
-      height: 460px;
+      width: 300px;
+      height: 300px;
     }
-    .av2-right .sf-width-measure { width: 100%; }
-    .av2-right .sf-height-measure { height: 460px; }
+    .av2-right .sf-width-measure { width: 300px; }
+    .av2-right .sf-height-measure { height: 300px; }
     .av2-headline {
       font-family: var(--font-heading);
       font-size: 40px;
@@ -2110,8 +2161,7 @@
       font-family: var(--font-mono);
     }
     .av2-acc-item.is-open .av2-acc-icon {
-      transform: rotate(45deg);
-      background: var(--primary);
+      display: none;
     }
     .av2-acc-company {
       font-family: var(--font-heading);
@@ -2157,7 +2207,7 @@
       margin: 0;
     }
     /* Photo wrap + philosophy toast */
-    .av2-photo-wrap { position: relative; width: 100%; }
+    .av2-photo-wrap { position: relative; }
     .av2-phil-toast {
       position: absolute;
       bottom: 14px;
@@ -2825,11 +2875,11 @@
                 <div class="sfh m-r"></div>
                 <div class="sf-width-measure">
                   <div class="sf-h-line"></div>
-                  <span class="sf-w-label">50%</span>
+                  <span class="sf-w-label">300px</span>
                 </div>
                 <div class="sf-height-measure">
                   <div class="sf-v-line"></div>
-                  <span class="sf-h-label">460px</span>
+                  <span class="sf-h-label">300px</span>
                 </div>
                 <div class="sf-image-wrap">
                   <img src="./photo.jpg" alt="Bhanu Kowshik" class="sf-photo" />
@@ -2846,6 +2896,13 @@
 
     </div><!-- /card -->
   </div><!-- /page -->
+
+  <div class="page-end-wave" aria-hidden="true">
+    <div class="pew-blob pew-blob--a"></div>
+    <div class="pew-blob pew-blob--b"></div>
+    <div class="pew-blob pew-blob--c"></div>
+    <div class="pew-blob pew-blob--d"></div>
+  </div>
 
   <footer class="site-footer" id="contactSection">
     <span class="footer-tagline">
@@ -4563,6 +4620,16 @@
   })();
   </script>
   <script>
+  /* ── PAGE END WAVE reveal ────────────────────────────── */
+  (function () {
+    const wave = document.querySelector('.page-end-wave');
+    if (!wave) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { wave.classList.add('pew-revealed'); io.disconnect(); }
+    }, { threshold: 0.1 });
+    io.observe(wave);
+  })();
+
   /* ── About V2 accordion ───────────────────────────────── */
   (function () {
     const acc = document.getElementById('av2Acc');
