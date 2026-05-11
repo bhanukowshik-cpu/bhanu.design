@@ -4543,16 +4543,29 @@
       hideTimer = setTimeout(() => toast.classList.remove('toast-show'), 2800);
     }
 
+    function triggerCopy(btn) {
+      const text  = btn.dataset.copy;
+      const label = btn.dataset.toast === 'mail' ? 'Mail copied' : 'Phone copied';
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(label);
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 2200);
+      });
+    }
+
     document.querySelectorAll('.footer-copy-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
-        const text  = btn.dataset.copy;
-        const label = btn.dataset.toast === 'mail' ? 'Mail copied' : 'Phone copied';
-        navigator.clipboard.writeText(text).then(() => {
-          showToast(label);
-          btn.classList.add('copied');
-          setTimeout(() => btn.classList.remove('copied'), 2200);
-        });
+        e.stopPropagation();
+        triggerCopy(btn);
+      });
+    });
+
+    document.querySelectorAll('.footer-cred-row').forEach(row => {
+      row.style.cursor = 'pointer';
+      row.addEventListener('click', () => {
+        const btn = row.querySelector('.footer-copy-btn');
+        if (btn) triggerCopy(btn);
       });
     });
   })();
