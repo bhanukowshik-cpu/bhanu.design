@@ -1543,8 +1543,6 @@
       .fw-desc              { font-size: 13px; line-height: 23px; }
       .case-study-card      { margin: 0 20px; }
       .product-area         { height: 260px; }
-      .product-area .product-img-live,
-      .product-area .product-img-analytics { width: 120%; }
       .product-area .stressie-phones-row { gap: 8px; width: 96%; }
       .case-study-bottom    { padding: 16px 18px 22px; gap: 14px; }
       .case-study-caption   { font-size: 12px; line-height: 22px; }
@@ -1592,10 +1590,8 @@
       .photo-wrapper img.photo { border-radius: 12px; }
       .hero-heading { font-size: 22px; line-height: 32px; }
       .product-area         { height: 220px; }
-      .product-area .product-img-live,
-      .product-area .product-img-analytics { width: 130%; max-height: calc(110% - 46px); }
       .product-video        { width: 94%; }
-      .product-area .stressie-phones-row { gap: 5px; width: 100%; top: 50%; align-items: center; transform: translateX(-50%) translateY(calc(-50% + 28px)); }
+      .product-area .stressie-phones-row { gap: 5px; width: 100%; }
       .case-study-headline  { font-size: 18px; line-height: 28px; }
       #ldFWPass             { width: calc(100vw - 32px); min-width: 0; }
       #ldFramePass          { padding: 28px 20px 22px; }
@@ -3788,13 +3784,10 @@
         img.style.transition =
           'opacity 0.75s cubic-bezier(0.22, 0.61, 0.36, 1), ' +
           'transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1)';
-        const isMobile = window.matchMedia('(max-width: 480px)').matches;
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             img.style.opacity   = '1';
-            img.style.transform = isMobile
-              ? 'translateX(-50%) translateY(-50%)'
-              : 'translateX(-50%) translateY(0)';
+            img.style.transform = 'translateX(-50%) translateY(0)';
           });
         });
       }
