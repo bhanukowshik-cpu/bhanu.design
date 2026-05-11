@@ -1,5 +1,25 @@
 # Claude Instructions — Bhanu's Portfolio
 
+## ⚠️ CRITICAL — Read This First, Every Session
+
+**All edits MUST go to the worktree, not the main Portfolio folder.**
+
+The live server at `http://localhost:8080` serves files from this exact path:
+```
+/Users/bhanu/Desktop/Portfolio/.claude/worktrees/reverent-faraday-a80749/
+```
+
+**Always edit these worktree files:**
+- `/Users/bhanu/Desktop/Portfolio/.claude/worktrees/reverent-faraday-a80749/index.html`
+- `/Users/bhanu/Desktop/Portfolio/.claude/worktrees/reverent-faraday-a80749/evertutor-live.html`
+- `/Users/bhanu/Desktop/Portfolio/.claude/worktrees/reverent-faraday-a80749/stressie-studio.html`
+
+**Never edit** `/Users/bhanu/Desktop/Portfolio/index.html` (the main file) — changes there will NOT appear on localhost:8080.
+
+Before touching any file, confirm you are reading/writing the worktree path above.
+
+---
+
 ## The Golden Rule
 **Never rewrite a file from scratch.** Always make surgical edits. If you feel the urge to use the Write tool on an existing file, stop and ask first.
 
@@ -32,9 +52,9 @@ Always confirm the current state of the file before making changes. Read the rel
 
 ## What This Project Is
 
-A single-file static portfolio at `index.html` (no build system, no framework). All HTML + CSS + JS lives in one file. Changes are live at `http://localhost:8080`.
+A single-file static portfolio. All HTML + CSS + JS lives in one file. Changes are live at `http://localhost:8080` (served from the worktree above).
 
-Key files:
+Key files (all under the worktree path):
 - `index.html` — the homepage (primary file)
 - `evertutor-live.html` — EverTutor case study
 - `evertutor-studio.html` — EverTutor Studio case study
