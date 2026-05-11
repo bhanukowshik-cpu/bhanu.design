@@ -1505,123 +1505,49 @@
     }
 
     /* ─── FOOTER ────────────────────────────────────────────────── */
-    /* ── PAGE END AURORA ───────────────────────────────────────── */
-    .page-end-wave {
+    /* ── OVERSCROLL AURORA ──────────────────────────────────────── */
+    #pgWrap {
       position: relative;
-      height: 480px;
-      background: #0C0B0A;
-      overflow: hidden;
+      will-change: transform;
     }
-    /* Fade from page cream into darkness */
-    .page-end-wave::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 120px;
-      background: linear-gradient(to bottom, #FFFCF8 0%, transparent 100%);
-      z-index: 10;
-      pointer-events: none;
-    }
-    /* Fade bottom edge into footer */
-    .page-end-wave::after {
-      content: '';
-      position: absolute;
+    #osAurora {
+      position: fixed;
       bottom: 0; left: 0; right: 0;
-      height: 60px;
-      background: linear-gradient(to bottom, transparent, #1A1917);
-      z-index: 10;
+      height: 100vh;
       pointer-events: none;
+      overflow: hidden;
+      z-index: -1;
     }
-    .pew-blob {
+    .osa-blob {
       position: absolute;
       border-radius: 50%;
       opacity: 0;
+      will-change: transform, opacity;
     }
-
-    /* Blob A — wide deep-lime base "horizon", bottom-anchored */
-    .pew-blob--a {
-      width: 150%; height: 560px;
+    .osa-blob--a {
+      width: 150%; height: 600px;
       background: #3D6500;
       filter: blur(110px);
-      bottom: -260px; left: -25%;
+      bottom: -420px; left: -25%;
     }
-    .pew-revealed .pew-blob--a {
-      animation:
-        pew-in-a 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-        pew-breathe-a 12s ease-in-out 2.4s infinite;
-    }
-    @keyframes pew-in-a {
-      from { opacity: 0;    transform: translateY(60px); }
-      to   { opacity: 0.75; transform: translateY(0); }
-    }
-    @keyframes pew-breathe-a {
-      0%, 100% { opacity: 0.75; transform: translateY(0); }
-      50%       { opacity: 0.85; transform: translateY(-18px); }
-    }
-
-    /* Blob B — brighter lime mid-band, left lean */
-    .pew-blob--b {
-      width: 80%; height: 400px;
+    .osa-blob--b {
+      width: 82%; height: 480px;
       background: #7DB600;
-      filter: blur(90px);
-      bottom: -160px; left: -8%;
+      filter: blur(94px);
+      bottom: -380px; left: -8%;
     }
-    .pew-revealed .pew-blob--b {
-      animation:
-        pew-in-b 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards,
-        pew-breathe-b 14s ease-in-out 2.6s infinite;
-    }
-    @keyframes pew-in-b {
-      from { opacity: 0;    transform: translateY(60px) translateX(0); }
-      to   { opacity: 0.5;  transform: translateY(0)    translateX(0); }
-    }
-    @keyframes pew-breathe-b {
-      0%, 100% { opacity: 0.5;  transform: translateY(0)    translateX(0); }
-      40%       { opacity: 0.58; transform: translateY(-24px) translateX(20px); }
-      80%       { opacity: 0.44; transform: translateY(-6px)  translateX(-10px); }
-    }
-
-    /* Blob C — lime-yellow arc, right lean */
-    .pew-blob--c {
-      width: 75%; height: 380px;
+    .osa-blob--c {
+      width: 78%; height: 440px;
       background: #AACF00;
-      filter: blur(85px);
-      bottom: -140px; right: -8%;
+      filter: blur(90px);
+      bottom: -360px; right: -8%;
     }
-    .pew-revealed .pew-blob--c {
-      animation:
-        pew-in-c 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards,
-        pew-breathe-c 15s ease-in-out 2.6s infinite;
-    }
-    @keyframes pew-in-c {
-      from { opacity: 0;    transform: translateY(60px) translateX(0); }
-      to   { opacity: 0.38; transform: translateY(0)    translateX(0); }
-    }
-    @keyframes pew-breathe-c {
-      0%, 100% { opacity: 0.38; transform: translateY(0)    translateX(0); }
-      45%       { opacity: 0.46; transform: translateY(-20px) translateX(-16px); }
-    }
-
-    /* Blob D — brand lime crown, rises highest */
-    .pew-blob--d {
-      width: 55%; height: 300px;
+    .osa-blob--d {
+      width: 56%; height: 340px;
       background: #D4E850;
-      filter: blur(72px);
-      bottom: -60px; left: 50%;
-      margin-left: -27.5%;
-    }
-    .pew-revealed .pew-blob--d {
-      animation:
-        pew-in-d 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.45s forwards,
-        pew-breathe-d 10s ease-in-out 2.85s infinite;
-    }
-    @keyframes pew-in-d {
-      from { opacity: 0;    transform: translateY(60px) scale(0.88); }
-      to   { opacity: 0.28; transform: translateY(0)    scale(1); }
-    }
-    @keyframes pew-breathe-d {
-      0%, 100% { opacity: 0.28; transform: translateY(0)    scale(1); }
-      50%       { opacity: 0.36; transform: translateY(-34px) scale(1.1); }
+      filter: blur(74px);
+      bottom: -280px; left: 50%;
+      margin-left: -28%;
     }
 
     .site-footer {
@@ -2112,11 +2038,11 @@
     }
     .av2-right {
       position: sticky;
-      top: 80px;
+      top: 100px;
       display: flex;
       align-items: stretch;
       justify-content: center;
-      padding-top: 8px;
+      padding-top: 48px;
     }
     .av2-right .spec-frame {
       width: 300px;
@@ -2476,6 +2402,7 @@
 </head>
 
 <body>
+<div id="pgWrap">
 
   <!-- TOP NAV -->
   <nav class="top-nav" id="topNav">
@@ -2964,13 +2891,6 @@
 
     </div><!-- /card -->
   </div><!-- /page -->
-
-  <div class="page-end-wave" aria-hidden="true">
-    <div class="pew-blob pew-blob--a"></div>
-    <div class="pew-blob pew-blob--b"></div>
-    <div class="pew-blob pew-blob--c"></div>
-    <div class="pew-blob pew-blob--d"></div>
-  </div>
 
   <footer class="site-footer" id="contactSection">
     <span class="footer-tagline">
@@ -4688,14 +4608,132 @@
   })();
   </script>
   <script>
-  /* ── PAGE END WAVE reveal ────────────────────────────── */
+  /* ── ELASTIC OVERSCROLL AURORA ──────────────────────────────────
+     Physics:
+       - Rubber-band damping on input    (damp formula)
+       - Spring snap-back on release     (K=300, B=28)
+       - inputVel drives blob scale+rise (harder pull → bigger blobs)
+     ────────────────────────────────────────────────────────────── */
   (function () {
-    const wave = document.querySelector('.page-end-wave');
-    if (!wave) return;
-    const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { wave.classList.add('pew-revealed'); io.disconnect(); }
-    }, { threshold: 0.1 });
-    io.observe(wave);
+    var wrap  = document.getElementById('pgWrap');
+    var blobs = document.querySelectorAll('.osa-blob');
+    if (!wrap || !blobs.length) return;
+
+    var pull      = 0;   // current rubber-band offset px (≥ 0)
+    var springV   = 0;   // spring velocity for snap-back
+    var inputVel  = 0;   // magnitude of user's gesture speed  (px/s)
+    var rafId     = null;
+    var releasing = false;
+
+    /* Diminishing-returns clamp: pulls harder but gives less */
+    function damp(raw) {
+      var lim = 200;
+      return raw <= 0 ? 0 : lim * (1 - Math.exp(-raw / lim));
+    }
+
+    function isAtBottom() {
+      return window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+    }
+
+    function render(offset) {
+      var t    = Math.min(offset / 170, 1);              // 0→1 normalised pull
+      var speed = Math.min(Math.abs(inputVel) / 900, 1); // 0→1 gesture speed
+
+      /* Page rubber-bands upward */
+      wrap.style.transform = offset > 0.5
+        ? 'translateY(' + (-offset).toFixed(2) + 'px)'
+        : '';
+
+      /* Blobs rise + swell — scale responds to BOTH depth and speed */
+      var rise  = t * (110 + speed * 90);
+      var swell = 1 + t * (0.38 + speed * 0.28);
+      blobs[0].style.opacity   = (t * 0.80).toFixed(3);
+      blobs[0].style.transform = 'translateY(' + (-rise).toFixed(1) + 'px) scale(' + swell.toFixed(3) + ')';
+
+      rise  = t * (86 + speed * 70);
+      swell = 1 + t * (0.26 + speed * 0.18);
+      blobs[1].style.opacity   = (t * 0.54).toFixed(3);
+      blobs[1].style.transform = 'translateY(' + (-rise).toFixed(1) + 'px) translateX(' + (-t * 28).toFixed(1) + 'px) scale(' + swell.toFixed(3) + ')';
+
+      rise  = t * (80 + speed * 65);
+      swell = 1 + t * (0.22 + speed * 0.15);
+      blobs[2].style.opacity   = (t * 0.44).toFixed(3);
+      blobs[2].style.transform = 'translateY(' + (-rise).toFixed(1) + 'px) translateX(' + (t * 28).toFixed(1) + 'px) scale(' + swell.toFixed(3) + ')';
+
+      rise  = t * (60 + speed * 50);
+      swell = 1 + t * (0.32 + speed * 0.22);
+      blobs[3].style.opacity   = (t * 0.32).toFixed(3);
+      blobs[3].style.transform = 'translateY(' + (-rise).toFixed(1) + 'px) scale(' + swell.toFixed(3) + ')';
+    }
+
+    function springBack() {
+      releasing = true;
+      cancelAnimationFrame(rafId);
+      var K = 300, B = 28, prev = performance.now();
+      (function step(now) {
+        var dt = Math.min((now - prev) / 1000, 0.05);
+        prev = now;
+        springV += (-K * pull - B * springV) * dt;
+        pull    += springV * dt;
+        if (pull < 0) { pull = 0; springV = 0; }
+        inputVel *= 0.85;
+        render(pull);
+        if (pull > 0.3 || Math.abs(springV) > 1) {
+          rafId = requestAnimationFrame(step);
+        } else {
+          pull = 0; springV = 0; inputVel = 0; releasing = false;
+          render(0);
+        }
+      })(prev);
+    }
+
+    /* ── Wheel (trackpad / mouse) ─────────────────────────────── */
+    var wheelTimer = null;
+    window.addEventListener('wheel', function (e) {
+      if (!isAtBottom() || e.deltaY <= 0) {
+        if (pull > 0 && !releasing) springBack();
+        return;
+      }
+      e.preventDefault();
+      cancelAnimationFrame(rafId);
+      clearTimeout(wheelTimer);
+      releasing = false;
+      var raw  = e.deltaY * (e.deltaMode === 1 ? 20 : e.deltaMode === 2 ? 400 : 1);
+      inputVel = raw * 55;
+      pull     = damp(pull + raw * 0.52);
+      render(pull);
+      wheelTimer = setTimeout(springBack, 80);
+    }, { passive: false });
+
+    /* ── Touch ────────────────────────────────────────────────── */
+    var lastY = 0, prevT = 0;
+    window.addEventListener('touchstart', function (e) {
+      lastY = e.touches[0].clientY;
+      prevT = performance.now();
+      cancelAnimationFrame(rafId);
+      releasing = false;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', function (e) {
+      var y  = e.touches[0].clientY;
+      var dy = lastY - y;           // positive = dragging up (overscroll)
+      var dt = Math.max(performance.now() - prevT, 1);
+      prevT  = performance.now();
+      lastY  = y;
+      if (dy > 0 && isAtBottom()) {
+        e.preventDefault();
+        releasing = false;
+        inputVel  = (dy / dt) * 1000;
+        pull      = damp(pull + dy * 0.72);
+        render(pull);
+      } else if (dy < 0 && pull > 0) {
+        springBack();
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', function () {
+      if (pull > 0.5) springBack();
+    }, { passive: true });
   })();
 
   /* ── About V2 accordion ───────────────────────────────── */
@@ -4714,5 +4752,12 @@
     });
   })();
   </script>
+</div><!-- /#pgWrap -->
+<div id="osAurora" aria-hidden="true">
+  <div class="osa-blob osa-blob--a"></div>
+  <div class="osa-blob osa-blob--b"></div>
+  <div class="osa-blob osa-blob--c"></div>
+  <div class="osa-blob osa-blob--d"></div>
+</div>
 </body>
 </html>
