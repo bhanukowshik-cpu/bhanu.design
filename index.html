@@ -1138,18 +1138,15 @@
        pointer-events:none removes all click/hover affordance   */
     .product-video {
       position: absolute;
-      top: auto;
-      bottom: -10%;
+      top: 60px;
       left: 50%;
-      width: 88%;
+      width: 82%;
       height: auto;
-      max-height: calc(110% - 46px);
       display: block;
-      border-radius: 8px 8px 0 0;
-      overflow: hidden;
+      border-radius: 10px;
       pointer-events: none;
       opacity: 0;
-      transform: translateX(-50%) translateY(28px) scale(1.5);
+      transform: translateX(-50%) translateY(28px);
     }
     /* Nuke any browser-injected pseudo-element overlays */
     .product-video::-webkit-media-controls { display: none !important; }
@@ -1186,16 +1183,16 @@
     }
     .product-area .product-img-live {
       position: absolute;
-      top: auto;
-      bottom: -10%;
-      left: 50%;
-      transform: translateX(-50%) translateY(28px);
-      width: 88%;
+      top: 60px;
+      left: 9%;
+      width: 82%;
       height: auto;
-      max-height: calc(110% - 46px);
+      object-fit: initial;
+      object-position: initial;
       display: block;
-      border-radius: 5px 5px 0 0;
+      border-radius: 5px;
       pointer-events: none;
+      transform: translateY(28px);
       opacity: 0;
     }
 
@@ -1446,7 +1443,7 @@
       position: absolute;
       top: 60px;
       left: 50%;
-      transform: translateX(-50%) translateY(28px);
+      transform: translateX(-50%);
       width: 92%;
       display: flex;
       align-items: flex-start;
@@ -1474,16 +1471,16 @@
     }
     .product-area .product-img-analytics {
       position: absolute;
-      top: auto;
-      bottom: -10%;
-      left: 50%;
-      transform: translateX(-50%) translateY(28px);
-      width: 88%;
+      top: 60px;
+      left: 9%;
+      width: 82%;
       height: auto;
-      max-height: calc(110% - 46px);
+      object-fit: initial;
+      object-position: initial;
       display: block;
-      border-radius: 5px 5px 0 0;
+      border-radius: 5px;
       pointer-events: none;
+      transform: translateY(28px);
       opacity: 0;
     }
 
@@ -1492,7 +1489,10 @@
     /* ── Medium desktop / large tablet: shrink product-area so media clips bottom ── */
     @media (max-width: 1260px) {
       .product-area { height: 280px; }
-      .product-area .stressie-phones-row { width: 92%; }
+      .product-area .product-img-live,
+      .product-area .product-img-analytics { width: 82%; left: 9%; top: 52px; }
+      .product-video { width: 82%; top: 52px; }
+      .product-area .stressie-phones-row { width: 92%; top: 52px; }
     }
 
     /* ── Tablet: 768px – 1023px ──────────────────────────────── */
@@ -1543,6 +1543,9 @@
       .fw-desc              { font-size: 13px; line-height: 23px; }
       .case-study-card      { margin: 0 20px; }
       .product-area         { height: 260px; }
+      .product-area .product-img-live,
+      .product-area .product-img-analytics { width: 90%; left: 5%; top: 30px; height: auto; }
+      .product-video        { width: 90%; top: 30px; height: auto; }
       .product-area .stressie-phones-row { gap: 8px; width: 96%; }
       .case-study-bottom    { padding: 16px 18px 22px; gap: 14px; }
       .case-study-caption   { font-size: 12px; line-height: 22px; }
@@ -1590,7 +1593,9 @@
       .photo-wrapper img.photo { border-radius: 12px; }
       .hero-heading { font-size: 22px; line-height: 32px; }
       .product-area         { height: 220px; }
-      .product-video        { width: 94%; }
+      .product-area .product-img-live,
+      .product-area .product-img-analytics { width: 95%; left: 2.5%; top: 28px; height: auto; }
+      .product-video        { width: 95%; top: 28px; height: auto; }
       .product-area .stressie-phones-row { gap: 5px; width: 100%; }
       .case-study-headline  { font-size: 18px; line-height: 28px; }
       #ldFWPass             { width: calc(100vw - 32px); min-width: 0; }
@@ -3616,7 +3621,7 @@
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             vid.style.opacity   = '1';
-            vid.style.transform = 'translateX(-50%) translateY(0) scale(1.5)';
+            vid.style.transform = 'translateX(-50%) translateY(0)';
           });
         });
       }
@@ -3686,7 +3691,7 @@
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             img.style.opacity   = '1';
-            img.style.transform = 'translateX(-50%) translateY(0)';
+            img.style.transform = 'translateY(0)';
           });
         });
       }
@@ -3831,7 +3836,7 @@
             'transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1)';
           setTimeout(() => {
             img.style.opacity   = '1';
-            img.style.transform = 'translateX(-50%) translateY(0)';
+            img.style.transform = 'translateY(0)';
           }, 20);
         }, 450);
       }, { once: true });
