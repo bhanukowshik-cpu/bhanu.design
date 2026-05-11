@@ -2885,8 +2885,8 @@
                 <div class="hf-metric-sub"      id="hfMS2"></div>
               </div>
             </div>
-            <a id="hfCta" href="./evertutor-live.html" class="hf-cta-link">
-              View case study <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <a id="hfCta" href="#csCardLive" class="hf-cta-link">
+              <span id="hfCtaLabel">Explore System</span> <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
             <div class="hf-block-gap"></div>
             <div class="hf-section-label">My Role</div>
@@ -4590,7 +4590,9 @@
     /* ─── Panel data ────────────────────────────────────────── */
     const CARD_DATA = {
       'sn-top': {
-        href: './evertutor-live.html',
+        href: '#csCardLive',
+        ctaLabel: 'Explore System',
+        ctaTarget: '_self',
         role: ['Sole Product Designer','0→1 Product Designer','Founder Collaboration'],
         impact: [
           { headline: '2× expected academic growth',             sub: "Validated Bloom's 2 Sigma hypothesis in production" },
@@ -4599,7 +4601,9 @@
         ],
       },
       'sn-mid': {
-        href: './stressie-studio.html',
+        href: '#csCardStressie',
+        ctaLabel: 'Case Study',
+        ctaTarget: '_self',
         role: ['Founding Product Designer','Design Systems','Behavioral UX'],
         impact: [
           { headline: 'Behavioral health workplace design', sub: 'Calmer experiences through research-led interaction patterns' },
@@ -4608,7 +4612,9 @@
         ],
       },
       'sn-back': {
-        href: '#',
+        href: 'https://dearly-rho.vercel.app',
+        ctaLabel: 'Try it out',
+        ctaTarget: '_blank',
         role: ['Solo Designer & Developer','0→1 Product Build','Full-Stack Ownership'],
         impact: [
           { headline: 'Shipped in 48 hours',    sub: 'Concept to live product. Solo design and development' },
@@ -4869,6 +4875,9 @@
         });
         if (ctaEl) {
           ctaEl.href = data.href;
+          ctaEl.target = data.ctaTarget || '_self';
+          const labelEl = document.getElementById('hfCtaLabel');
+          if (labelEl) labelEl.textContent = data.ctaLabel || 'View case study';
           ctaEl.classList.remove('is-exit');
           ctaEl.classList.add('is-enter');
         }
