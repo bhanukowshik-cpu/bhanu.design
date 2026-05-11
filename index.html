@@ -2647,6 +2647,7 @@
       user-select: none;
       overflow: hidden;
       cursor: grab;
+      touch-action: none;
       box-shadow:
         0 1px 2px rgba(0,0,0,0.12),
         0 3px 7px rgba(0,0,0,0.10),
@@ -4713,7 +4714,8 @@
       const dy    = e.clientY - startY;
       const speed = Math.max(Math.abs(velX), Math.abs(velY));
 
-      if (Math.max(Math.abs(dx), Math.abs(dy)) > 120 || speed > 0.5) {
+      const swipeThreshold = window.matchMedia('(pointer: coarse)').matches ? 70 : 120;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) > swipeThreshold || speed > 0.4) {
         swipeOut(note, dx, curY, curRot, velX);
       } else {
         springBack(note);
@@ -4821,7 +4823,7 @@
     /* ─── Event listeners ───────────────────────────────────── */
     stack.addEventListener('pointerdown', (e) => {
       if (e.target.closest('.sticky-note') === noteEls[0]) onPointerDown(e);
-    });
+    }, { passive: false });
     window.addEventListener('pointermove',   onPointerMove, { passive: false });
     window.addEventListener('pointerup',     onPointerUp);
     window.addEventListener('pointercancel', onPointerUp);
