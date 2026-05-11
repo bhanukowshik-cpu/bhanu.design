@@ -1538,21 +1538,26 @@
       opacity: 0;
     }
 
-    /* Blob A — wide deep-lime base, the "horizon" */
+    /* Blob A — wide deep-lime base, centered vertically */
     .pew-blob--a {
       width: 140%; height: 600px;
       background: #4A7800;
       filter: blur(100px);
-      bottom: -200px; left: -20%;
+      top: 50%; left: -20%;
+      margin-top: -300px;
     }
     .pew-revealed .pew-blob--a {
       animation:
-        pew-in  2.2s cubic-bezier(0.16, 1, 0.3, 1) both,
+        pew-in-a 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards,
         pew-breathe-a 11s ease-in-out 2.2s infinite;
+    }
+    @keyframes pew-in-a {
+      from { opacity: 0;    transform: translateY(70px); }
+      to   { opacity: 0.62; transform: translateY(0); }
     }
     @keyframes pew-breathe-a {
       0%, 100% { opacity: 0.62; transform: translateY(0); }
-      50%       { opacity: 0.72; transform: translateY(-22px); }
+      50%       { opacity: 0.72; transform: translateY(-20px); }
     }
 
     /* Blob B — lime-green, left arc */
@@ -1560,34 +1565,44 @@
       width: 72%; height: 440px;
       background: #8CC200;
       filter: blur(88px);
-      bottom: -140px; left: -4%;
+      top: 50%; left: -4%;
+      margin-top: -220px;
     }
     .pew-revealed .pew-blob--b {
       animation:
-        pew-in  2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both,
-        pew-breathe-b 13s ease-in-out 2.4s infinite;
+        pew-in-b 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.18s forwards,
+        pew-breathe-b 13s ease-in-out 2.38s infinite;
+    }
+    @keyframes pew-in-b {
+      from { opacity: 0;    transform: translateY(70px) translateX(0); }
+      to   { opacity: 0.42; transform: translateY(0) translateX(0); }
     }
     @keyframes pew-breathe-b {
       0%, 100% { opacity: 0.42; transform: translateY(0) translateX(0); }
-      40%       { opacity: 0.5;  transform: translateY(-28px) translateX(18px); }
+      40%       { opacity: 0.5;  transform: translateY(-26px) translateX(18px); }
       80%       { opacity: 0.38; transform: translateY(-8px)  translateX(-8px); }
     }
 
-    /* Blob C — bright lime, right arc */
+    /* Blob C — brighter lime, right arc */
     .pew-blob--c {
       width: 66%; height: 400px;
       background: #AACF00;
       filter: blur(82px);
-      bottom: -120px; right: -4%;
+      top: 50%; right: -4%;
+      margin-top: -200px;
     }
     .pew-revealed .pew-blob--c {
       animation:
-        pew-in  2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both,
-        pew-breathe-c 14s ease-in-out 2.4s infinite;
+        pew-in-c 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.18s forwards,
+        pew-breathe-c 14s ease-in-out 2.38s infinite;
+    }
+    @keyframes pew-in-c {
+      from { opacity: 0;    transform: translateY(70px) translateX(0); }
+      to   { opacity: 0.34; transform: translateY(0) translateX(0); }
     }
     @keyframes pew-breathe-c {
       0%, 100% { opacity: 0.34; transform: translateY(0) translateX(0); }
-      45%       { opacity: 0.42; transform: translateY(-24px) translateX(-14px); }
+      45%       { opacity: 0.42; transform: translateY(-22px) translateX(-14px); }
     }
 
     /* Blob D — brand lime highlight, bright core */
@@ -1595,23 +1610,22 @@
       width: 46%; height: 320px;
       background: #E6F28D;
       filter: blur(68px);
-      bottom: 30px; left: 50%;
+      top: 50%; left: 50%;
+      margin-top: -160px;
       margin-left: -23%;
     }
     .pew-revealed .pew-blob--d {
       animation:
-        pew-in  2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both,
-        pew-breathe-d 9s ease-in-out 2.65s infinite;
+        pew-in-d 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.42s forwards,
+        pew-breathe-d 9s ease-in-out 2.62s infinite;
+    }
+    @keyframes pew-in-d {
+      from { opacity: 0;    transform: translateY(70px) scale(0.9); }
+      to   { opacity: 0.22; transform: translateY(0) scale(1); }
     }
     @keyframes pew-breathe-d {
-      0%, 100% { opacity: 0.2;  transform: translateY(0) scale(1); }
-      50%       { opacity: 0.28; transform: translateY(-32px) scale(1.08); }
-    }
-
-    /* Shared entry keyframe */
-    @keyframes pew-in {
-      from { opacity: 0; transform: translateY(80px); }
-      to   { opacity: 1; transform: translateY(0); }
+      0%, 100% { opacity: 0.22; transform: translateY(0) scale(1); }
+      50%       { opacity: 0.3;  transform: translateY(-30px) scale(1.08); }
     }
 
     .site-footer {
@@ -2175,7 +2189,7 @@
       text-transform: uppercase;
     }
     /* Accordion */
-    .av2-acc { display: flex; flex-direction: row; gap: 12px; }
+    .av2-acc { display: flex; flex-direction: row; gap: 12px; align-items: flex-start; }
     .av2-acc-item {
       border-radius: 14px;
       background: rgba(37,37,37,0.04);
