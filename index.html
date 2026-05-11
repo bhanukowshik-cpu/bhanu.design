@@ -1443,12 +1443,12 @@
     }
     .product-area .stressie-phones-row {
       position: absolute;
-      top: 50%;
+      top: 60px;
       left: 50%;
-      transform: translateX(-50%) translateY(calc(-50% + 28px));
+      transform: translateX(-50%) translateY(28px);
       width: 92%;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 14px;
       opacity: 0;
     }
@@ -1594,7 +1594,7 @@
       .product-area .product-img-live,
       .product-area .product-img-analytics { width: 130%; max-height: none; }
       .product-video        { width: 94%; }
-      .product-area .stressie-phones-row { gap: 5px; width: 100%; }
+      .product-area .stressie-phones-row { gap: 5px; width: 100%; top: 50%; align-items: center; transform: translateX(-50%) translateY(calc(-50% + 28px)); }
       .case-study-headline  { font-size: 18px; line-height: 28px; }
       #ldFWPass             { width: calc(100vw - 32px); min-width: 0; }
       #ldFramePass          { padding: 28px 20px 22px; }
@@ -3787,10 +3787,13 @@
         img.style.transition =
           'opacity 0.75s cubic-bezier(0.22, 0.61, 0.36, 1), ' +
           'transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1)';
+        const isMobile = window.matchMedia('(max-width: 480px)').matches;
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             img.style.opacity   = '1';
-            img.style.transform = 'translateX(-50%) translateY(-50%)';
+            img.style.transform = isMobile
+              ? 'translateX(-50%) translateY(-50%)'
+              : 'translateX(-50%) translateY(0)';
           });
         });
       }
