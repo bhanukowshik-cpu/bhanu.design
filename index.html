@@ -144,10 +144,9 @@
     .hero-subtext {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 14px;
+      font-size: 15px;
       line-height: 1.7;
       color: #515151;
-      
     }
     .hero-subtext strong {
       font-weight: 600;
@@ -217,18 +216,19 @@
     .hf-metric.is-exit  { opacity: 0; transform: translateY(-8px); }
     .hf-metric.is-enter { opacity: 0; transform: translateY(10px); transition: none !important; }
     .hf-metric-headline {
-      font-family: var(--font-mono);
+      font-family: var(--font-heading);
       font-weight: 700;
-      font-size: 15px;
+      font-size: 17px;
       color: #252525;
-      line-height: 1.35;
+      line-height: 1.3;
+      letter-spacing: -0.3px;
     }
     .hf-metric-sub {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 14px;
-      color: #515151;
-      line-height: 25px;
+      font-size: 13px;
+      color: #717171;
+      line-height: 1.6;
     }
     .hf-block-gap { height: 20px; }
     .hf-cta-link {
@@ -414,6 +414,56 @@
     }
     .reveal-fade.visible {
       animation: reveal-fade 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    }
+
+    /* ─── HERO ENTRANCE — word-clip + line-clip reveal ──────────────────── */
+    @keyframes hero-nav-slide {
+      from { opacity: 0; transform: translateY(-18px); }
+      to   { opacity: 1; transform: translateY(0);     }
+    }
+    @keyframes hero-frame-up {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    /* Nav opacity set to 0 via JS at init — not CSS — so .scrolled toggle never flickers it */
+    .top-nav.hero-revealed {
+      animation: hero-nav-slide 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0ms both;
+    }
+
+    /* Word-clip: each word rises up from its own hidden slot */
+    .word-clip {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: bottom;
+      padding-bottom: 0.06em;
+    }
+    .word-inner {
+      display: inline-block;
+      transform: translateY(108%);
+      /* transition always present so browser can animate the value change */
+      transition: transform 0.68s cubic-bezier(0.16, 1, 0.3, 1) var(--wd, 0ms);
+      will-change: transform;
+    }
+    .hero.hero-revealed .word-inner { transform: translateY(0); }
+    .hero.hero-revealed .hero-heading { opacity: 1 !important; animation: none !important; }
+
+    /* Line-clip: full line rises from a hidden trough */
+    .hero-lw { overflow: hidden; display: block; }
+    .hero-li {
+      display: block;
+      transform: translateY(110%);
+      /* transition always present */
+      transition: transform 0.72s cubic-bezier(0.16, 1, 0.3, 1) var(--ld, 0ms);
+      will-change: transform;
+    }
+    .hero.hero-revealed .hero-li { transform: translateY(0); }
+    .hero.hero-revealed #greeting,
+    .hero.hero-revealed .hero-subtext { opacity: 1 !important; animation: none !important; }
+
+    /* Hero frame: float up after words land */
+    .hero.hero-revealed .hero-frame {
+      animation: hero-frame-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) var(--hf-delay, 560ms) both;
     }
 
     /* ─── PHOTO — greyscale default, colour on hover ─────────── */
@@ -864,7 +914,7 @@
       .nav-links      { display: none; }
       .nav-hamburger  { display: flex; }
       .top-nav        { padding: 8px 20px; }
-      .top-nav.scrolled { left: 0; right: 0; padding: 8px 20px; }
+      .top-nav.scrolled { left: 20px; right: 20px; padding: 8px 20px; border-radius: 16px; }
     }
     .nav-brand {
       position: relative;
@@ -981,13 +1031,6 @@
          Ellipse 115% wide × 95% tall centred at the bottom edge gives the
          wide, high green spread seen in the Figma reference.              */
       background:
-        radial-gradient(ellipse 120% 155% at 50% 116%,
-          #20f567 0%,
-          #00d050 10%,
-          #00a838 22%,
-          #005c1e 38%,
-          #002410 55%,
-          transparent 73%),
         linear-gradient(to top, #001a08 0%, #000603 40%, #000000 65%),
         #000000;
       overflow: hidden;
@@ -1029,16 +1072,26 @@
       user-select: none;
     }
 
-    /* EverTutor Live card — same green gradient as Studio */
+    /* Green glow rises from the bottom on hover — scaleY avoids the
+       overflow:hidden clipping gap that translateY caused */
+    .product-area::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 140% 120% at 50% bottom,
+        #20f567 0%, #00d050 10%, #00a838 22%,
+        #005c1e 38%, #002410 55%, transparent 73%);
+      pointer-events: none;
+      z-index: 0;
+      transform-origin: center bottom;
+      transform: scaleY(0.35);
+      transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .case-study-card:hover .product-area::before {
+      transform: scaleY(1);
+    }
     .product-area-live {
       background:
-        radial-gradient(ellipse 120% 155% at 50% 116%,
-          #20f567 0%,
-          #00d050 10%,
-          #00a838 22%,
-          #005c1e 38%,
-          #002410 55%,
-          transparent 73%),
         linear-gradient(to top, #001a08 0%, #000603 40%, #000000 65%),
         #000000;
     }
@@ -1292,11 +1345,13 @@
     /* Stressie product area — warm orange glow */
     .product-area-stressie {
       background:
-        radial-gradient(ellipse 120% 155% at 50% 116%,
-          #FF8C2A 0%, #E06010 10%, #BF5010 22%,
-          #7A2E00 38%, #3A1000 55%, transparent 73%),
         linear-gradient(to top, #2A0E00 0%, #0F0400 40%, #000000 65%),
         #000000;
+    }
+    .product-area-stressie::before {
+      background: radial-gradient(ellipse 140% 120% at 50% bottom,
+        #FF8C2A 0%, #E06010 10%, #BF5010 22%,
+        #7A2E00 38%, #3A1000 55%, transparent 73%);
     }
     .product-area .stressie-phones-row {
       position: absolute;
@@ -1325,9 +1380,6 @@
     /* Analytics product area — same green as Studio/Live */
     .product-area-analytics {
       background:
-        radial-gradient(ellipse 120% 155% at 50% 116%,
-          #20f567 0%, #00d050 10%, #00a838 22%,
-          #005c1e 38%, #002410 55%, transparent 73%),
         linear-gradient(to top, #001a08 0%, #000603 40%, #000000 65%),
         #000000;
     }
@@ -1382,6 +1434,7 @@
 
     /* ── Mobile: up to 767px ─────────────────────────────────── */
     @media (max-width: 767px) {
+      .hero-transform-graphic { display: none; }
       .top-nav              { padding: 8px 16px; height: 50px; }
       .page                 { padding: 60px 12px 56px; }
       .card                 { gap: 20px; padding-bottom: 28px; border-radius: 16px; }
@@ -1568,11 +1621,6 @@
     @media (pointer: fine) and (hover: hover) {
       html.cc-active,
       html.cc-active * { cursor: none !important; }
-      /* Loader: restore native until custom cursor is ready */
-      html.cc-active #loader,
-      html.cc-active #loader * { cursor: auto    !important; }
-      html.cc-active #loader input  { cursor: text    !important; }
-      html.cc-active #loader button { cursor: pointer !important; }
       /* Sticky notes: native grab overrides global none */
       html.cc-active .sticky-stack .sticky-note,
       html.cc-active .sticky-stack .sticky-note *             { cursor: grab     !important; }
@@ -1621,7 +1669,7 @@
       border: 1px solid rgba(0,0,0,0.10);
       /* bottom-left tail → points toward cursor which sits below-left */
       border-radius: 22px 22px 22px 5px;
-      padding: 11px 18px;
+      padding: 16px 22px;
       white-space: nowrap;
       box-shadow: 0 6px 24px rgba(0,0,0,0.10);
       opacity: 0;
@@ -1652,281 +1700,15 @@
       opacity: 1;
     }
 
-    /* ══════════════════════════════════════════  INTRO LOADER
-       Design-tool / canvas aesthetic — white, light, precise.
-       Duration: 10 s
-       Exit: whole canvas slides upward off-screen
-    ══════════════════════════════════════════════════════════════════ */
-
-    /* Loader root — same dot-grid as portfolio so exit is seamless */
-    #loader {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      pointer-events: all;
-      background-color: #FFFCF8;
-      background-image: radial-gradient(circle, rgba(0,0,0,0.16) 1px, transparent 1px);
-      background-size: 16px 16px;
-      background-attachment: fixed;
-      /* Slide the whole canvas up on exit */
-      transition: transform 0.78s cubic-bezier(0.76, 0, 0.24, 1) 0.22s;
-    }
-    #loader.ld-exit { transform: translateY(-100%); }
-
-    /* Content wrapper — fades first, then loader slides */
-    #ldContent {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      transition: opacity 0.22s ease;
-    }
-    #loader.ld-exit #ldContent { opacity: 0; }
-
-    /* ── Center guide lines (dashed, Figma-style) ──────────────────── */
-    #ldGH { display: none; }   /* horizontal guide removed */
-    #ldGV { display: none; }   /* vertical guide removed   */
-
-    /* ── Frame wrap — absolutely centred on canvas ─────────────────── */
-    #ldFW {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: max-content;
-      max-width: calc(100vw - 60px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;              /* label centred above frame */
-    }
-
-    /* ── Layer-name label (Figma chip above top-left of frame) ────── */
-    #ldLabel {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 9px;
-      padding: 3px 10px 3px 8px;
-      background: rgba(255,255,255,0.9);
-      border: 1px solid rgba(160,158,150,0.35);
-      border-radius: 5px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12.65px;               /* +15% from 11px */
-      font-weight: 500;
-      color: rgba(28, 26, 20, 0.68);
-      letter-spacing: 0.04em;
-      white-space: nowrap;
-      opacity: 0;
-      transform: translateY(5px);
-      transition: opacity 0.4s ease 1.2s, transform 0.4s ease 1.2s;
-    }
-    #ldLabelDot {
-      width: 7px; height: 7px;
-      border-radius: 2px;
-      background: #AEBC48;
-      flex-shrink: 0;
-    }
-    #loader.ld-go #ldLabel { opacity: 1; transform: translateY(0); }
-
-    /* ── Selection frame ────────────────────────────────────────────── */
-    #ldFrame {
-      position: relative;
-      width: max-content;
-      max-width: 100%;
-      padding: 28px 60px 32px;
-      border: 1.5px solid transparent;
-      background: #ffffff;
-      transition: border-color 0.35s ease 1.0s;
-    }
-    #loader.ld-go #ldFrame { border-color: #AEBC48; }
-
-    /* Handles — 4 corners + 4 midpoints, Figma-style */
-    .ldh {
-      position: absolute;
-      background: #FAFAF7;
-      border: 1.5px solid #AEBC48;
-      border-radius: 1.5px;
-      opacity: 0;
-      transition: opacity 0.2s ease 1.15s;
-    }
-    #loader.ld-go .ldh { opacity: 1; }
-    /* Corner handles — square */
-    .ldh.c-tl, .ldh.c-tr, .ldh.c-bl, .ldh.c-br { width: 7px; height: 7px; }
-    .ldh.c-tl { top:    -4px; left:  -4px; }
-    .ldh.c-tr { top:    -4px; right: -4px; }
-    .ldh.c-bl { bottom: -4px; left:  -4px; }
-    .ldh.c-br { bottom: -4px; right: -4px; }
-    /* Midpoint handles — rectangular */
-    .ldh.m-t, .ldh.m-b { width: 13px; height: 5px; }
-    .ldh.m-l, .ldh.m-r { width: 5px;  height: 13px; }
-    .ldh.m-t { top:    -3px;   left: 50%; transform: translateX(-50%); }
-    .ldh.m-b { bottom: -3px;   left: 50%; transform: translateX(-50%); }
-    .ldh.m-l { left:   -3px;   top:  50%; transform: translateY(-50%); }
-    .ldh.m-r { right:  -3px;   top:  50%; transform: translateY(-50%); }
-
-    /* ── Text clip reveals ──────────────────────────────────────────── */
-    #ldT1W, #ldT2W { overflow: hidden; line-height: 1.05; }
-
-    #ldT1, #ldT2 {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 700;
-      font-size: clamp(26px, 4vw, 48px);   /* ~20% smaller */
-      color: #1A1917;
-      letter-spacing: -0.025em;
-      text-align: center;
-      width: 100%;
-      transform: translateY(108%);
-    }
-    #ldT1 { transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.35s; }
-    #ldT2 { transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.48s; }
-    #loader.ld-go #ldT1,
-    #loader.ld-go #ldT2 { transform: translateY(0); }
-
-    /* ── Measurement lines (Figma pink) ─────────────────────────────── */
-    #ldML, #ldMR {
-      position: absolute;
-      height: 1px;
-      background: #1A73E8;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s ease 1.85s;
-    }
-    #loader.ld-go #ldML,
-    #loader.ld-go #ldMR { opacity: 1; }
-
-    /* Arrowheads — both ends of both lines */
-    #ldML::before, #ldMR::after {     /* outer tips (→ viewport edges) */
-      content: '';
-      position: absolute;
-      top: 50%; transform: translateY(-50%);
-      width: 0; height: 0;
-      border-top: 3.5px solid transparent;
-      border-bottom: 3.5px solid transparent;
-    }
-    #ldML::before { left:  0; border-right: 5px solid #1A73E8; }
-    #ldMR::after  { right: 0; border-left:  5px solid #1A73E8; }
-    #ldML::after, #ldMR::before {     /* inner tips (→ frame edges) */
-      content: '';
-      position: absolute;
-      top: 50%; transform: translateY(-50%);
-      width: 0; height: 0;
-      border-top: 3.5px solid transparent;
-      border-bottom: 3.5px solid transparent;
-    }
-    #ldML::after  { right: 0; border-left:  5px solid #1A73E8; }
-    #ldMR::before { left:  0; border-right: 5px solid #1A73E8; }
-
-    /* Pixel-distance labels */
-    #ldMLPx, #ldMRPx {
-      position: absolute;
-      top: -19px;
-      left: 50%; transform: translateX(-50%);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      font-weight: 500;
-      color: #1A73E8;
-      white-space: nowrap;
-      background: #FAFAF7;
-      padding: 1px 4px;
-      border-radius: 3px;
-    }
-
-    /* ── Page fade-in after loader ─────────────────────────────────────
-       .card starts hidden. After the loader exits JS adds .page-ready
-       which triggers this transition, fading all content into view.
+    /* ── Page reveal —————————————————————————————————————————————————
+       .card starts hidden; JS adds .page-ready immediately on load
+       so hero entrance animations play against a clean blank canvas.
     ──────────────────────────────────────────────────────────────────── */
     .card {
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.75s ease, transform 0.75s ease;
     }
     .card.page-ready {
       opacity: 1;
-      transform: translateY(0);
-    }
-    /* When loader is skipped (return visit) show card instantly via CSS —
-       no JS timing needed, class is on <html> before body is parsed */
-    html.loader-skip .card {
-      opacity: 1 !important;
-      transform: translateY(0) !important;
-      transition: none !important;
-    }
-
-    /* ── Corner label — year ────────────────────────────────────────── */
-    #ldYear {
-      position: absolute;
-      top: 38px;
-      right: 44px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10.5px;
-      font-weight: 500;
-      color: rgba(40, 38, 30, 0.30);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      opacity: 0;
-      transition: opacity 0.9s ease 0.1s;
-    }
-    #loader.ld-go #ldYear { opacity: 1; }
-
-    /* ── Progress bar ────────────────────────────────────────────────── */
-    #ldProgress {
-      position: absolute;
-      bottom: 52px;
-      left: 44px;
-      right: 44px;             /* full width between margins */
-      height: 3px;
-      background: rgba(0, 0, 0, 0.08);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-    #ldFill {
-      height: 100%;
-      width: 0%;
-      background: #AEBC48;
-      border-radius: 3px;
-    }
-
-    /* ── Counter — large, centred below the bar ─────────────────────── */
-    #ldCount {
-      position: absolute;
-      bottom: 14px;
-      left: 0; right: 0;
-      text-align: center;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 26px;
-      font-weight: 700;
-      color: rgba(28, 26, 18, 0.55);
-      letter-spacing: 0.05em;
-    }
-
-    /* ── Animation section wrapper ───────────────────────────────────── */
-    #ldAnimSection {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-
-    /* ── Toast ───────────────────────────────────────────────────────── */
-    #ldToast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%) translateY(12px);
-      background: #E6F28D;
-      color: #252525;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      font-weight: 500;
-      padding: 9px 20px;
-      border-radius: 8px;
-      opacity: 0;
-      transition: opacity 0.22s ease, transform 0.22s ease;
-      pointer-events: none;
-      z-index: 100000;
-      letter-spacing: 0.03em;
-      white-space: nowrap;
-    }
-    #ldToast.ld-toast-show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
     }
 
     /* ─── ABOUT SECTION ─────────────────────────────────────── */
@@ -1951,22 +1733,22 @@
     }
     .sfh {
       position: absolute;
-      background: #FAFAF7;
-      border: 1.5px solid #AEBC48;
-      border-radius: 1.5px;
+      background: #ffffff;
+      border: 2px solid #AEBC48;
+      border-radius: 0;
       z-index: 2;
     }
-    .sfh.c-tl, .sfh.c-tr, .sfh.c-bl, .sfh.c-br { width: 7px; height: 7px; }
-    .sfh.c-tl { top:    -4px; left:  -4px; }
-    .sfh.c-tr { top:    -4px; right: -4px; }
-    .sfh.c-bl { bottom: -4px; left:  -4px; }
-    .sfh.c-br { bottom: -4px; right: -4px; }
-    .sfh.m-t, .sfh.m-b { width: 13px; height: 5px; }
-    .sfh.m-l, .sfh.m-r { width: 5px;  height: 13px; }
-    .sfh.m-t { top:    -3px; left: 50%; transform: translateX(-50%); }
-    .sfh.m-b { bottom: -3px; left: 50%; transform: translateX(-50%); }
-    .sfh.m-l { left:   -3px; top:  50%; transform: translateY(-50%); }
-    .sfh.m-r { right:  -3px; top:  50%; transform: translateY(-50%); }
+    .sfh.c-tl, .sfh.c-tr, .sfh.c-bl, .sfh.c-br { width: 10px; height: 10px; }
+    .sfh.c-tl { top:    -5px; left:  -5px; }
+    .sfh.c-tr { top:    -5px; right: -5px; }
+    .sfh.c-bl { bottom: -5px; left:  -5px; }
+    .sfh.c-br { bottom: -5px; right: -5px; }
+    .sfh.m-t, .sfh.m-b { width: 10px; height: 4px; }
+    .sfh.m-l, .sfh.m-r { width: 7px;  height: 20px; }
+    .sfh.m-t { top:    -2px; left: 50%; transform: translateX(-50%); }
+    .sfh.m-b { bottom: -2px; left: 50%; transform: translateX(-50%); }
+    .sfh.m-l { left:   -4px; top:  50%; transform: translateY(-50%); }
+    .sfh.m-r { right:  -4px; top:  50%; transform: translateY(-50%); }
     .sf-image-wrap {
       width: 100%;
       height: 100%;
@@ -2081,10 +1863,11 @@
     }
     .about-heading {
       font-family: var(--font-heading);
-      font-size: 30px;
+      font-size: 34px;
       font-weight: 700;
       color: var(--secondary);
-      line-height: 1.25;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
       margin: 0;
     }
     .about-body {
@@ -2095,6 +1878,73 @@
       line-height: 1.85;
       max-width: 460px;
       margin: 0;
+    }
+    .about-stats {
+      display: flex;
+      align-items: center;
+      padding: 20px 0;
+      border-top: 1px solid rgba(37,37,37,0.08);
+      border-bottom: 1px solid rgba(37,37,37,0.08);
+      gap: 0;
+    }
+    .about-stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+    }
+    .about-stat-div {
+      width: 1px;
+      height: 36px;
+      background: rgba(37,37,37,0.1);
+      flex-shrink: 0;
+      margin: 0 24px;
+    }
+    .about-stat-num {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--secondary);
+      letter-spacing: -0.025em;
+      line-height: 1;
+    }
+    .about-stat-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: rgba(37,37,37,0.42);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.3;
+    }
+    .about-currently {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 4px;
+    }
+    .about-currently-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(37,37,37,0.38);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .about-currently-rule {
+      width: 20px;
+      height: 1px;
+      background: rgba(37,37,37,0.18);
+      flex-shrink: 0;
+    }
+    .about-currently-val {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--secondary);
+      letter-spacing: 0.01em;
     }
     @media (max-width: 1023px) {
       .about-section     { padding: 0 32px 40px; }
@@ -2116,10 +1966,255 @@
       .about-spec-wrap   { padding: 36px 60px 40px 0; }
       .sf-w-label, .sf-h-label { font-size: 9px; }
       .about-eyebrow  { font-size: 10px; }
-      .about-heading  { font-size: 22px; }
+      .about-heading  { font-size: 24px; }
       .about-body     { font-size: 12px; line-height: 1.8; }
+      .about-stat-num { font-size: 18px; }
+      .about-stat-label { font-size: 9px; }
+      .about-stat-div { margin: 0 14px; height: 28px; }
+      .about-currently-val { font-size: 10.5px; }
     }
 
+
+    /* ─── ABOUT V2 ──────────────────────────────────────────── */
+    .av2-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+      margin-top: 48px;
+      gap: 0;
+    }
+    .av2-left {
+      min-width: 0;
+      padding-right: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+      padding-bottom: 60px;
+    }
+    .av2-right {
+      position: sticky;
+      top: 80px;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding-top: 8px;
+    }
+    .av2-right .spec-frame {
+      width: 100%;
+      height: 460px;
+    }
+    .av2-right .sf-width-measure { width: 100%; }
+    .av2-right .sf-height-measure { height: 460px; }
+    .av2-headline {
+      font-family: var(--font-heading);
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--secondary);
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      margin: 0;
+    }
+    /* Scrolling strip */
+    .av2-strip-wrap { width: 75%; }
+    .av2-strip {
+      height: auto;
+      border-radius: 12px;
+      background: var(--primary);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+    .av2-strip-track {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      animation: av2scroll 22s linear infinite;
+      white-space: nowrap;
+      padding: 15px 7px;
+    }
+    .av2-strip-item {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: #252525;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .av2-strip-sep {
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .av2-strip-star { width: 10px; height: 10px; display: block; object-fit: contain; }
+    @keyframes av2scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    /* Section groups */
+    .av2-section {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .av2-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(37,37,37,0.38);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    /* Accordion */
+    .av2-acc { display: flex; flex-direction: row; gap: 12px; }
+    .av2-acc-item {
+      border-radius: 14px;
+      background: rgba(37,37,37,0.04);
+      overflow: hidden;
+      transition: background 0.35s ease;
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    .av2-acc-item.is-open { background: rgba(37,37,37,0.06); }
+    .av2-acc-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+    }
+    .av2-acc-text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+    .av2-acc-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(37,37,37,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--secondary);
+      flex-shrink: 0;
+      transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1), background 0.3s ease;
+      line-height: 1;
+      font-family: var(--font-mono);
+    }
+    .av2-acc-item.is-open .av2-acc-icon {
+      transform: rotate(45deg);
+      background: var(--primary);
+    }
+    .av2-acc-company {
+      font-family: var(--font-heading);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--secondary);
+      letter-spacing: -0.015em;
+    }
+    .av2-acc-role {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(37,37,37,0.45);
+      letter-spacing: 0.03em;
+    }
+    .av2-acc-body {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.55s cubic-bezier(0.16,1,0.3,1), opacity 0.35s ease;
+    }
+    .av2-acc-item.is-open .av2-acc-body {
+      max-height: 300px;
+      opacity: 1;
+    }
+    .av2-acc-period {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(37,37,37,0.4);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0 16px 8px 16px;
+    }
+    .av2-acc-desc {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(37,37,37,0.65);
+      line-height: 1.75;
+      padding: 0 16px 18px 16px;
+      margin: 0;
+    }
+    /* Photo wrap + philosophy toast */
+    .av2-photo-wrap { position: relative; width: 100%; }
+    .av2-phil-toast {
+      position: absolute;
+      bottom: 14px;
+      left: 10px;
+      right: 10px;
+      background: rgba(255,252,248,0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 12px;
+      padding: 14px 16px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none;
+      z-index: 5;
+    }
+    .av2-photo-wrap:hover .av2-phil-toast { opacity: 1; transform: translateY(0); }
+    .av2-phil-toast-text {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--secondary);
+      line-height: 1.65;
+      margin: 0;
+    }
+    .av2-photo-wrap:hover .sf-photo { filter: grayscale(0) contrast(1); transform: scale(1); }
+    /* Personal Photos */
+    .av2-photos {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 160px 160px;
+      gap: 10px;
+    }
+    .av2-photo {
+      border-radius: 14px;
+      background: rgba(37,37,37,0.05);
+      overflow: hidden;
+      position: relative;
+    }
+    .av2-photo-tall { grid-row: span 2; }
+    .av2-photo-wide { grid-column: span 2; }
+    .av2-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    @media (max-width: 900px) {
+      .av2-inner { grid-template-columns: 1fr; }
+      .av2-left  { padding-right: 0; }
+      .av2-right { position: static; justify-content: flex-start; padding-top: 0; }
+      .av2-right .spec-frame { width: 100%; height: 280px; }
+      .av2-right .sf-width-measure { width: 100%; }
+      .av2-right .sf-height-measure { height: 280px; }
+      .av2-headline { font-size: 28px; }
+      .av2-strip-wrap { width: 100%; }
+      .av2-acc { flex-direction: column; }
+    }
+    @media (max-width: 600px) {
+      .av2-photos { grid-template-columns: 1fr 1fr; grid-template-rows: 140px 140px 140px; }
+      .av2-photo-tall { grid-row: span 1; }
+    }
 
     /* ─── STICKY STACK ──────────────────────────────────────── */
     .sticky-stack {
@@ -2236,236 +2331,33 @@
     }
     @media (max-width: 767px) {
       .hero-frame      { flex-direction: column; min-height: unset; }
-      .hf-left         { flex: none; width: 100%; padding: 36px 0 16px; }
-      .hf-right        { padding: 16px 28px 36px; }
-      .sticky-stack    { width: 250px; height: 250px; }
-      .sticky-note     { width: 204px; height: 204px; top: 23px; left: 23px; padding: 18px; }
-    }
-    @media (max-width: 600px) {
-      .sticky-stack    { width: 274px; height: 274px; align-self: center; }
-      .sticky-note     { width: 224px; height: 224px; top: 25px; left: 25px; padding: 20px; }
+      .hf-left         { flex: none; width: 100%; padding: 24px 0 10px; }
+      .hf-right        { padding: 12px 20px 24px; }
+      .hf-impact-list  { gap: 14px; }
+      .hf-metric-headline { font-size: 15px; }
+      .hf-metric-sub   { font-size: 12px; }
+      .hf-block-gap    { height: 12px; }
+      .hf-cta-link     { margin-top: 12px; font-size: 12px; }
+      .hf-role-pill    { padding: 6px 10px; font-size: 10px; }
+      .hf-role-pills   { gap: 6px; }
+      .sticky-stack    { width: 260px; height: 260px; }
+      .sticky-note     { width: 212px; height: 212px; top: 24px; left: 24px; padding: 16px; }
+      .sn-title                        { font-size: 17px; }
+      .sn-desc                         { font-size: 12px; }
+      .sn-body, .sn-body.sn-body--lg   { font-size: 10px; line-height: 1.5; }
+      .sn-cta                          { font-size: 12px; }
+      .sn-rule                         { margin-bottom: 8px; }
     }
     @media (max-width: 480px) {
-      .sticky-stack    { width: 238px; height: 238px; }
-      .sticky-note     { width: 194px; height: 194px; top: 22px; left: 22px; }
+      .sticky-stack                    { width: 240px; height: 240px; }
+      .sticky-note                     { width: 196px; height: 196px; top: 22px; left: 22px; padding: 14px; }
+      .sn-title                        { font-size: 16px; }
+      .sn-body, .sn-body.sn-body--lg   { font-size: 10px; line-height: 1.5; }
     }
   </style>
 </head>
 
 <body>
-
-  <!-- ══════════════════════════  INTRO LOADER ══════════════════════ -->
-  <div id="loader" aria-hidden="true">
-    <div id="ldContent">
-
-      <!-- ── LOADER ANIMATION ──────────────────────────────────────────── -->
-      <div id="ldAnimSection">
-
-        <div id="ldGH"></div>
-        <div id="ldGV"></div>
-
-        <div id="ldML"><span id="ldMLPx"></span></div>
-        <div id="ldMR"><span id="ldMRPx"></span></div>
-
-        <div id="ldFW">
-          <div id="ldLabel">
-            <div id="ldLabelDot"></div>
-            Bhanu Kowshik
-          </div>
-          <div id="ldFrame">
-            <div class="ldh c-tl"></div>
-            <div class="ldh c-tr"></div>
-            <div class="ldh c-bl"></div>
-            <div class="ldh c-br"></div>
-            <div class="ldh m-t"></div>
-            <div class="ldh m-b"></div>
-            <div class="ldh m-l"></div>
-            <div class="ldh m-r"></div>
-            <div id="ldT1W"><div id="ldT1">Product Designer</div></div>
-            <div id="ldT2W"><div id="ldT2">Feel Simple.</div></div>
-          </div>
-        </div>
-
-        <span id="ldYear">2026</span>
-        <div id="ldProgress"><div id="ldFill"></div></div>
-        <div id="ldCount">0%</div>
-
-      </div><!-- /ldAnimSection -->
-
-      <!-- Toast notification -->
-      <div id="ldToast" aria-live="polite"></div>
-
-    </div><!-- /ldContent -->
-  </div>
-
-  <script>
-  (function () {
-    const loader = document.getElementById('loader');
-    if (!loader) return;
-
-    /* ── Skip loader on back/forward navigation OR returning from a case study ── */
-    const navType = performance.getEntriesByType('navigation')[0]?.type;
-    const fromCaseStudy = sessionStorage.getItem('skipLoader') === '1';
-    if (fromCaseStudy) sessionStorage.removeItem('skipLoader');
-    if (navType === 'back_forward' || fromCaseStudy) {
-      loader.remove();
-      document.documentElement.classList.add('loader-skip');
-      const card = document.querySelector('.card');
-      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
-      return;
-    }
-
-    /* Lock scroll */
-    document.documentElement.style.overflow = 'hidden';
-
-    /* ── Rotating title — cycles via localStorage ────────────────── */
-    const TITLES = [
-      ['Senior Systems', 'Product Designer'],
-      ['0→1 Product',    'Builder'],
-      ['AI Product',     'Designer'],
-    ];
-    const stored = parseInt(localStorage.getItem('bkTitleIdx') || '0', 10);
-    const idx    = isNaN(stored) ? 0 : ((stored % TITLES.length) + TITLES.length) % TITLES.length;
-    localStorage.setItem('bkTitleIdx', String((idx + 1) % TITLES.length));
-    const t1El = document.getElementById('ldT1');
-    const t2El = document.getElementById('ldT2');
-    if (t1El) t1El.textContent = TITLES[idx][0];
-    if (t2El) t2El.textContent = TITLES[idx][1];
-
-    /* ── Elements ────────────────────────────────────────────────── */
-    const toast       = document.getElementById('ldToast');
-    const fill        = document.getElementById('ldFill');
-    const counter     = document.getElementById('ldCount');
-
-    /* Start loader immediately */
-    startLoader();
-
-    /* ── Connect for details → scroll to footer ─────────────────── */
-    document.querySelectorAll('.connect-frame').forEach(el => {
-      el.addEventListener('click', () => {
-        document.getElementById('contactSection').scrollIntoView({ behavior: 'smooth' });
-      });
-    });
-
-    /* ── Copy buttons (email + phone, each independent) ─────────── */
-    document.querySelectorAll('.ld-copy-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const value    = btn.dataset.value;
-        const toastMsg = btn.dataset.toast;
-        const onCopied = () => { showToast(toastMsg); showTick(btn); };
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(value).then(onCopied, onCopied);
-        } else {
-          const ta = document.createElement('textarea');
-          ta.value = value;
-          ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
-          document.body.appendChild(ta);
-          ta.select();
-          try { document.execCommand('copy'); } catch (_) {}
-          document.body.removeChild(ta);
-          onCopied();
-        }
-      });
-    });
-
-    function showToast(msg) {
-      if (!toast) return;
-      toast.textContent = msg;
-      toast.classList.add('ld-toast-show');
-      setTimeout(() => toast.classList.remove('ld-toast-show'), 2600);
-    }
-
-    function showTick(btn) {
-      const copyIcon = btn.querySelector('.ld-ci');
-      const tickIcon = btn.querySelector('.ld-ti');
-      if (!copyIcon || !tickIcon) return;
-      copyIcon.style.display = 'none';
-      tickIcon.style.display = 'block';
-      tickIcon.classList.remove('tick-animate');
-      void tickIcon.offsetWidth;
-      tickIcon.classList.add('tick-animate');
-      setTimeout(() => {
-        tickIcon.style.display = 'none';
-        copyIcon.style.display = 'block';
-      }, 2600);
-    }
-
-    /* ── Loader animation sequence ───────────────────────────────── */
-    function startLoader() {
-      let barRafId;
-
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        loader.classList.add('ld-go');
-
-        /* Position measurement lines after frame paints */
-        setTimeout(() => {
-          const frame = document.getElementById('ldFrame');
-          if (!frame) return;
-          const r    = frame.getBoundingClientRect();
-          const vw   = window.innerWidth;
-          const midY = r.top + r.height * 0.5 - 0.5;
-
-          const ml   = document.getElementById('ldML');
-          const mr   = document.getElementById('ldMR');
-          const mlPx = document.getElementById('ldMLPx');
-          const mrPx = document.getElementById('ldMRPx');
-          if (!ml || !mr) return;
-
-          const leftGap  = Math.round(r.left);
-          const rightGap = Math.round(vw - r.right);
-
-          ml.style.top   = midY + 'px';
-          ml.style.left  = '0px';
-          ml.style.width = Math.max(0, r.left - 6) + 'px';
-          mlPx.textContent = leftGap + ' px';
-
-          mr.style.top   = midY + 'px';
-          mr.style.left  = (r.right + 6) + 'px';
-          mr.style.width = Math.max(0, vw - r.right - 6) + 'px';
-          mrPx.textContent = rightGap + ' px';
-        }, 400);
-      }));
-
-      /* Progress bar: starts 800 ms, runs 2 200 ms (done by 3 s) */
-      const BAR_START    = 800;
-      const BAR_DURATION = 2200;
-
-      setTimeout(() => {
-        let t0 = null;
-        function stepBar(ts) {
-          if (!t0) t0 = ts;
-          const progress = Math.min((ts - t0) / BAR_DURATION, 1);
-          const eased    = 1 - Math.pow(1 - progress, 1.6);
-          const pct      = Math.floor(eased * 100);
-          if (fill)    fill.style.width    = pct + '%';
-          if (counter) counter.textContent = pct + '%';
-          if (progress < 1) barRafId = requestAnimationFrame(stepBar);
-        }
-        barRafId = requestAnimationFrame(stepBar);
-      }, BAR_START);
-
-      /* Exit at 4 000 ms */
-      setTimeout(() => {
-        cancelAnimationFrame(barRafId);
-        if (fill)    fill.style.width    = '100%';
-        if (counter) counter.textContent = '100%';
-        loader.classList.add('ld-exit');
-
-        requestAnimationFrame(() => {
-          const card = document.querySelector('.card');
-          if (card) card.classList.add('page-ready');
-        });
-      }, 4000);
-
-      setTimeout(() => {
-        loader.remove();
-        document.documentElement.style.overflow = '';
-      }, 5000);
-    }
-
-  })();
-  </script>
-  <!-- ══════════════════════════  END LOADER ════════════════════════ -->
 
   <!-- TOP NAV -->
   <nav class="top-nav" id="topNav">
@@ -2830,46 +2722,126 @@
       <!-- ── ABOUT ──────────────────────────────────────────────── -->
       <div class="about-section reveal" id="aboutSection">
 
-        <div class="fw-header">
-          <h2 class="fw-title">About</h2>
-          <p class="fw-desc">The person behind the work.</p>
-        </div>
+        <div class="av2-inner">
 
-        <div class="about-layout">
+          <!-- LEFT 3/4 — scrollable -->
+          <div class="av2-left">
 
-          <div class="about-text">
-            <span class="about-eyebrow">Designer &amp; Builder</span>
-            <h3 class="about-heading">I make complex<br>things feel simple.</h3>
-            <p class="about-body">I'm a product designer who thinks in systems and builds in code. My work spans AI experiences, multi-platform tools, and products built from scratch — always starting from the user's reality, not a template.</p>
-            <p class="about-body">I've shipped design across edtech, healthtech, and AI — from concept to production, solo and on cross-functional teams. I care as much about how something works as how it looks.</p>
-            <p class="about-body">Based in Austin, TX. Always building something on the side.</p>
-          </div>
+            <h2 class="av2-headline">I design intelligent products that think, adapt, and scale — by rethinking interaction models from first principles.</h2>
 
-          <div class="about-spec-wrap">
-            <div class="spec-frame">
-              <div class="sfh c-tl"></div>
-              <div class="sfh c-tr"></div>
-              <div class="sfh c-bl"></div>
-              <div class="sfh c-br"></div>
-              <div class="sfh m-t"></div>
-              <div class="sfh m-b"></div>
-              <div class="sfh m-l"></div>
-              <div class="sfh m-r"></div>
-              <div class="sf-width-measure">
-                <div class="sf-h-line"></div>
-                <span class="sf-w-label">300px</span>
+            <!-- Scrolling strip -->
+            <div class="av2-strip-wrap">
+              <div class="av2-strip">
+                <div class="av2-strip-track">
+                  <span class="av2-strip-item">5+ years of experience</span>
+                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
+                  <span class="av2-strip-item">0→1 product builder</span>
+                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
+                  <span class="av2-strip-item">AI systems designer</span>
+                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
+                  <span class="av2-strip-item">Voice UI specialist</span>
+                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
+                  <span class="av2-strip-item">Design systems thinker</span>
+                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
+                  <span class="av2-strip-item">Edtech &amp; Healthtech</span>
+                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
+                  <span class="av2-strip-item">5+ years of experience</span>
+                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
+                  <span class="av2-strip-item">0→1 product builder</span>
+                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
+                  <span class="av2-strip-item">AI systems designer</span>
+                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
+                  <span class="av2-strip-item">Voice UI specialist</span>
+                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
+                  <span class="av2-strip-item">Design systems thinker</span>
+                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
+                  <span class="av2-strip-item">Edtech &amp; Healthtech</span>
+                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
+                </div>
               </div>
-              <div class="sf-height-measure">
-                <div class="sf-v-line"></div>
-                <span class="sf-h-label">300px</span>
+            </div>
+
+            <!-- Experience accordion -->
+            <div class="av2-section">
+              <span class="av2-label">Experience</span>
+              <div class="av2-acc" id="av2Acc">
+
+                <div class="av2-acc-item" data-id="evertutor">
+                  <button class="av2-acc-trigger">
+                    <span class="av2-acc-icon">+</span>
+                    <span class="av2-acc-text">
+                      <span class="av2-acc-company">EverTutor</span>
+                      <span class="av2-acc-role">Sole Designer</span>
+                    </span>
+                  </button>
+                  <div class="av2-acc-body">
+                    <span class="av2-acc-period">2022 – Present</span>
+                    <p class="av2-acc-desc">Led design across three interconnected platforms — Live, Studio, and Analytics. Built the AI tutoring experience from scratch, reducing lesson creation from 100+ hours to 4, reaching 2,000+ students daily across 8+ schools.</p>
+                  </div>
+                </div>
+
+                <div class="av2-acc-item" data-id="stressie">
+                  <button class="av2-acc-trigger">
+                    <span class="av2-acc-icon">+</span>
+                    <span class="av2-acc-text">
+                      <span class="av2-acc-company">Stressie</span>
+                      <span class="av2-acc-role">Founding Product Designer</span>
+                    </span>
+                  </button>
+                  <div class="av2-acc-body">
+                    <span class="av2-acc-period">2023</span>
+                    <p class="av2-acc-desc">Took Stressie from raw pilot research with 50 officers to a full redesign. Built the design system, rethought the IA, shipped a product now incubated at Harvard Innovation Labs and piloting at Amazon and InKind. 8.7× industry-average engagement.</p>
+                  </div>
+                </div>
+
               </div>
-              <div class="sf-image-wrap">
-                <img src="./photo.jpg" alt="Bhanu Kowshik" class="sf-photo" />
+            </div>
+
+            <!-- Personal photos -->
+            <div class="av2-section">
+              <span class="av2-label">When I'm not moving people and numbers with design</span>
+              <div class="av2-photos">
+                <div class="av2-photo av2-photo-tall"></div>
+                <div class="av2-photo av2-photo-wide"></div>
+                <div class="av2-photo"></div>
+                <div class="av2-photo"></div>
+                <div class="av2-photo"></div>
+              </div>
+            </div>
+
+          </div><!-- /av2-left -->
+
+          <!-- RIGHT 1/2 — sticky photo -->
+          <div class="av2-right">
+            <div class="av2-photo-wrap">
+              <div class="spec-frame">
+                <div class="sfh c-tl"></div>
+                <div class="sfh c-tr"></div>
+                <div class="sfh c-bl"></div>
+                <div class="sfh c-br"></div>
+                <div class="sfh m-t"></div>
+                <div class="sfh m-b"></div>
+                <div class="sfh m-l"></div>
+                <div class="sfh m-r"></div>
+                <div class="sf-width-measure">
+                  <div class="sf-h-line"></div>
+                  <span class="sf-w-label">50%</span>
+                </div>
+                <div class="sf-height-measure">
+                  <div class="sf-v-line"></div>
+                  <span class="sf-h-label">460px</span>
+                </div>
+                <div class="sf-image-wrap">
+                  <img src="./photo.jpg" alt="Bhanu Kowshik" class="sf-photo" />
+                </div>
+              </div>
+              <div class="av2-phil-toast">
+                <p class="av2-phil-toast-text">I believe great design feels invisible, yet quietly solves user needs while leaving people delighted.</p>
               </div>
             </div>
           </div>
 
-        </div>
+        </div><!-- /av2-inner -->
       </div><!-- /about -->
 
     </div><!-- /card -->
@@ -2915,8 +2887,109 @@
 
     const STAGGER = 110; // ms between items entering in the same batch
 
+    /* ── Hero word-split & line-clip setup ───────────────────────────────
+       Runs immediately so the DOM is ready before hero-revealed fires.
+       - Heading: each word wrapped in overflow:hidden clip + translateY inner
+       - Greeting / subtext: whole line wrapped in a single clip trough     */
+    (function setupHeroClipReveal() {
+      const WORD_GAP = 44; // ms stagger between words
+      const delayRef = { d: 0 }; // shared mutable counter
+
+      function makeWordClip(content, d) {
+        const clip = document.createElement('span');
+        clip.className = 'word-clip';
+        const inner = document.createElement('span');
+        inner.className = 'word-inner';
+        inner.style.setProperty('--wd', d + 'ms');
+        if (typeof content === 'string') inner.textContent = content;
+        else inner.appendChild(content);
+        clip.appendChild(inner);
+        return clip;
+      }
+
+      function wrapNode(node) {
+        if (node.nodeType === 3) { // text node — split into words
+          const frag = document.createDocumentFragment();
+          node.textContent.split(/(\s+)/).forEach(chunk => {
+            if (/^\s+$/.test(chunk)) {
+              frag.appendChild(document.createTextNode(chunk));
+            } else if (chunk) {
+              frag.appendChild(makeWordClip(chunk, delayRef.d));
+              delayRef.d += WORD_GAP;
+            }
+          });
+          return frag;
+        }
+        if (node.classList?.contains('hero-transform-graphic')) {
+          return node.cloneNode(true); // SVG graphic — keep as-is
+        }
+        // Element node (e.g. hero-hi span) — treat as one word-clip unit
+        const el = makeWordClip(node.cloneNode(true), delayRef.d);
+        delayRef.d += WORD_GAP;
+        return el;
+      }
+
+      // Split heading into per-word clips
+      const heading = document.querySelector('.hero-heading');
+      if (heading) {
+        const frag = document.createDocumentFragment();
+        [...heading.childNodes].forEach(n => frag.appendChild(wrapNode(n)));
+        heading.innerHTML = '';
+        heading.appendChild(frag);
+      }
+
+      // Set hero-frame delay to fire after all words have landed
+      const heroFrame = document.querySelector('.hero-frame');
+      if (heroFrame) heroFrame.style.setProperty('--hf-delay', (delayRef.d + 80) + 'ms');
+
+      // Line-clip the greeting
+      const greeting = document.getElementById('greeting');
+      if (greeting) {
+        const lw = document.createElement('div');
+        lw.className = 'hero-lw';
+        const li = document.createElement('div');
+        li.className = 'hero-li';
+        li.style.setProperty('--ld', '0ms');
+        while (greeting.firstChild) li.appendChild(greeting.firstChild);
+        lw.appendChild(li);
+        greeting.appendChild(lw);
+      }
+
+      // Line-clip the subtext — fires after last heading word
+      const subtext = document.querySelector('.hero-subtext');
+      if (subtext) {
+        const lw = document.createElement('span');
+        lw.className = 'hero-lw';
+        const li = document.createElement('span');
+        li.className = 'hero-li';
+        li.style.setProperty('--ld', (delayRef.d + 60) + 'ms');
+        while (subtext.firstChild) li.appendChild(subtext.firstChild);
+        lw.appendChild(li);
+        subtext.appendChild(lw);
+      }
+    })();
+
+    // ── Hero entrance — fires immediately, no loader to wait for ────────
+    (function triggerHeroReveal() {
+      const nav  = document.getElementById('topNav');
+      const hero = document.querySelector('.hero');
+      const card = document.querySelector('.card');
+      if (card) card.classList.add('page-ready');
+      // Double rAF ensures transitions are registered before values change
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (nav)  nav.classList.add('hero-revealed');
+        if (hero) hero.classList.add('hero-revealed');
+        // Lock nav opacity after its slide-in animation finishes so
+        // .scrolled class toggling never causes a flicker
+        setTimeout(() => { if (nav) nav.style.opacity = '1'; }, 700);
+      }));
+    })();
+
     // ── General reveal observer ──────────────────────────────────
-    const revealEls = [...document.querySelectorAll('.reveal, .reveal-fade')];
+    // Hero elements are excluded — they're triggered explicitly above
+    const heroSection = document.querySelector('.hero');
+    const revealEls = [...document.querySelectorAll('.reveal, .reveal-fade')]
+      .filter(el => !heroSection || !heroSection.contains(el));
 
     const revealObs = new IntersectionObserver((entries) => {
       // Grab all newly-intersecting items; sort top→bottom for natural stagger
@@ -3641,7 +3714,7 @@
       const key = icon + text;
       if (mode === 'label' && lblText === key) return;
       mode = 'label'; snapEl = null; lblText = key;
-      setShape(3, 33, 3, BLUE, '0px solid transparent');
+      dot.style.opacity = '0';
       lbl.innerHTML = `<span class="cc-lbl-icon">${icon}</span><span class="cc-lbl-text">${text}</span>`;
       // Force reflow so the enter animation re-triggers on content change
       lbl.classList.remove('cc-label-visible');
@@ -3729,25 +3802,25 @@
         hideLabel();
         return;
       }
-      dot.style.opacity = '1';
 
       if (typeof d === 'object' && d.type === 'snap') {
         if (mode !== 'snap' || snapEl !== d.el) enterSnap(d.el);
-        dot.style.opacity = '0'; // hide dot while snapping
-        // Magnetic move: shift element up to 10px toward cursor
+        dot.style.opacity = '0';
         const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
         const moveX = clamp((mx - origCX) / (snapW / 2), -1, 1) * 5;
         const moveY = clamp((my - origCY) / (snapH / 2), -1, 1) * 5;
         magnetEl.style.transition = 'transform 0.12s ease-out';
         magnetEl.style.transform  = `translate(${moveX}px,${moveY}px)`;
-        // Cursor overlay follows the element's moved center
         snapCX = origCX + moveX;
         snapCY = origCY + moveY;
       } else if (typeof d === 'object' && d.type === 'label') {
+        dot.style.opacity = '0';
         enterLabel(d.icon, d.text);
       } else if (d === 'text') {
+        dot.style.opacity = '1';
         if (mode !== 'text') enterText();
       } else {
+        dot.style.opacity = '1';
         if (mode !== 'dot') enterDot();
       }
     });
@@ -4478,6 +4551,8 @@
   (function () {
     const nav = document.getElementById('topNav');
     if (!nav) return;
+    /* Hide via inline style (not CSS) so .scrolled class toggles never cause a flicker */
+    nav.style.opacity = '0';
     let prev = false;
     function onScroll() {
       const now = window.scrollY > 60;
@@ -4485,6 +4560,23 @@
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
+  })();
+  </script>
+  <script>
+  /* ── About V2 accordion ───────────────────────────────── */
+  (function () {
+    const acc = document.getElementById('av2Acc');
+    if (!acc) return;
+    acc.querySelectorAll('.av2-acc-trigger').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const item = btn.closest('.av2-acc-item');
+        const isOpen = item.classList.contains('is-open');
+        acc.querySelectorAll('.av2-acc-item').forEach(function (i) {
+          i.classList.remove('is-open');
+        });
+        if (!isOpen) item.classList.add('is-open');
+      });
+    });
   })();
   </script>
 </body>
