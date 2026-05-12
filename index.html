@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bhanu — Product Designer</title>
+  <meta name="format-detection" content="telephone=no" />
+  <title>Bhanu · Product Designer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Montserrat:ital,wght@0,400;0,600;0,700;1,600&family=JetBrains+Mono:wght@400;500;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
@@ -146,7 +147,7 @@
       font-weight: 400;
       font-size: 15px;
       line-height: 1.7;
-      color: #515151;
+      color: var(--grey);
     }
     .hero-subtext strong {
       font-weight: 600;
@@ -196,12 +197,12 @@
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: rgba(37,37,37,0.32);
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
     .hf-impact-list {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 28px;
       margin-bottom: 0;
     }
     .hf-metric {
@@ -215,11 +216,15 @@
     }
     .hf-metric.is-exit  { opacity: 0; transform: translateY(-8px); }
     .hf-metric.is-enter { opacity: 0; transform: translateY(10px); transition: none !important; }
+    .hf-role-pill.is-exit  { opacity: 0; transform: translateY(-6px); }
+    .hf-role-pill.is-enter { opacity: 0; transform: translateY(8px);  transition: none !important; }
+    .hf-cta-link.is-exit   { opacity: 0; transform: translateY(-6px); }
+    .hf-cta-link.is-enter  { opacity: 0; transform: translateY(8px);  transition: none !important; }
     .hf-metric-headline {
       font-family: var(--font-heading);
       font-weight: 700;
       font-size: 17px;
-      color: #252525;
+      color: var(--secondary);
       line-height: 1.3;
       letter-spacing: -0.3px;
     }
@@ -227,10 +232,10 @@
       font-family: var(--font-mono);
       font-weight: 400;
       font-size: 13px;
-      color: #717171;
+      color: var(--grey);
       line-height: 1.6;
     }
-    .hf-block-gap { height: 20px; }
+    .hf-block-gap { height: 28px; }
     .hf-cta-link {
       display: inline-flex;
       align-items: center;
@@ -246,7 +251,11 @@
       padding: 4px 10px 4px 10px;
       margin-left: -10px;
       border-radius: 5px;
-      transition: background 0.15s ease, border-color 0.15s ease;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.32s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.32s cubic-bezier(0.4,0,0.2,1),
+                  background 0.15s ease, border-color 0.15s ease;
     }
     .hf-cta-link:hover {
       background: #F2F2F2;
@@ -264,6 +273,10 @@
       color: rgba(37,37,37,0.64);
       background: rgba(255,255,255,0.85);
       border: 1px solid rgba(37,37,37,0.11);
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.32s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.32s cubic-bezier(0.4,0,0.2,1);
       border-radius: 8px;
       padding: 8px 14px;
       white-space: nowrap;
@@ -481,7 +494,7 @@
     ──────────────────────────────────────────────────────────── */
     .section-divider {
       position: relative;
-      margin: 0 40px;
+      margin: 27px 40px 0;
       height: 160px;
       background: #ffffff;
       border: 1px solid #EBEBEB;
@@ -492,7 +505,7 @@
       overflow: hidden;
     }
 
-    /* Full-width horizontal dashed guide */
+    /* Horizontal dashed guide */
     .sd-guide-h {
       position: absolute;
       top: 50%;
@@ -865,7 +878,10 @@
       width: 36px; height: 36px; padding: 6px;
       background: none; border: none;
       cursor: pointer !important; flex-shrink: 0;
+      border-radius: 8px;
+      transition: background 0.15s ease;
     }
+    .nav-hamburger:hover { background: rgba(37,37,37,0.07); }
     .nav-hamburger span {
       display: block; height: 2px;
       background: var(--secondary); border-radius: 2px;
@@ -883,7 +899,7 @@
       background: var(--bg);
       box-shadow: -8px 0 32px rgba(0,0,0,0.10);
       display: flex; flex-direction: column; justify-content: flex-start;
-      align-items: flex-start; padding: 80px 32px 48px; gap: 4px;
+      align-items: flex-start; padding: 100px 32px 48px; gap: 4px;
       transform: translateX(100%);
       transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1);
     }
@@ -908,7 +924,19 @@
     .mobile-menu a:nth-child(1) { transition-delay: 0.08s; }
     .mobile-menu a:nth-child(2) { transition-delay: 0.13s; }
     .mobile-menu a:nth-child(3) { transition-delay: 0.18s; }
+    .mobile-menu a:nth-child(4) { transition-delay: 0.23s; }
+    .mobile-menu a:nth-child(5) { transition-delay: 0.28s; border-bottom: none; }
     .mobile-menu a:last-child { border-bottom: none; }
+
+    /* Side project chip inside the panel — no pill, just inline with dot */
+    .mobile-side-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      width: auto !important; white-space: nowrap;
+    }
+    .mobile-chip-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #4CAF50; flex-shrink: 0;
+    }
 
     @media (max-width: 900px) {
       .nav-links      { display: none; }
@@ -988,6 +1016,64 @@
       background: #F2F2F2;
     }
 
+    /* ── scrolled nav chip ── */
+    .nav-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      max-width: 0;
+      padding: 6px 0;
+      margin-left: 0;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 100px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--secondary);
+      text-decoration: none;
+      white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: max-width 0.4s cubic-bezier(0.22,0.61,0.36,1),
+                  padding   0.4s cubic-bezier(0.22,0.61,0.36,1),
+                  margin    0.4s cubic-bezier(0.22,0.61,0.36,1),
+                  opacity   0.35s ease,
+                  border-color 0.3s ease;
+    }
+    .top-nav.scrolled .nav-chip {
+      max-width: 240px;
+      padding: 6px 13px 6px 10px;
+      margin-left: 6px;
+      border-color: rgba(37,37,37,0.18);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .nav-chip:hover { border-color: rgba(37,37,37,0.35); }
+    .nav-chip-dot {
+      width: 6px; height: 6px;
+      background: #4ade80;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 5px rgba(74,222,128,0.7);
+    }
+    .nav-chip::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -80%;
+      width: 55%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(74,222,128,0.22), transparent);
+      animation: chip-shimmer 3.2s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes chip-shimmer {
+      0%       { left: -80%; }
+      55%, 100% { left: 120%; }
+    }
+
     /* ─── FEATURED WORK HEADER ──────────────────────────────────── */
     .fw-header {
       padding: 0 40px;
@@ -998,14 +1084,14 @@
     .fw-title {
       font-family: var(--font-heading);
       font-weight: 700;
-      font-size: 22px;
+      font-size: 26px;
       color: var(--secondary);
     }
     .fw-desc {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 14px;
-      line-height: 26px;
+      font-size: 15px;
+      line-height: 1.7;
       color: var(--grey);
       max-width: 100%;
     }
@@ -1057,7 +1143,7 @@
       width: 82%;
       height: auto;
       display: block;
-      border-radius: 10px;
+      border-radius: 5px;
       pointer-events: none;
       opacity: 0;
       transform: translateX(-50%) translateY(28px);
@@ -1185,7 +1271,7 @@
       font-family: var(--font-mono);
       font-size: 15px;
       font-weight: 500;
-      color: #515151;
+      color: var(--grey);
       line-height: 30px;
     }
     .case-study-hl-row {
@@ -1252,7 +1338,7 @@
     .metric-card {
       flex: 1;
       background: #fff;
-      border: 1px solid #ececec;
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 10px 15px;
       display: flex;
@@ -1293,8 +1379,8 @@
     .metric-desc {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 14px;
-      color: #515151;
+      font-size: 15px;
+      color: var(--grey);
       line-height: 25px;
     }
 
@@ -1421,6 +1507,7 @@
       .overview-section    { margin: 0 32px; }
       .fw-header           { padding: 0 32px; }
       .case-study-card     { margin: 0 32px; }
+      .section-divider     { margin: 20px 32px 0; }
       .case-study-bottom   { padding: 18px 32px 26px; }
       .case-study-headline { font-size: 22px; line-height: 34px; }
     }
@@ -1446,7 +1533,7 @@
       .current-badge        { font-size: 13px; padding: 12px 16px; display: flex; align-self: stretch; width: 100%; box-sizing: border-box; white-space: normal; }
       .photo-wrapper        { width: 150px; height: 160px; border-radius: 14px; }
       .photo-wrapper img.photo { border-radius: 14px; }
-      .overview-section     { margin: 0 12px; }
+      .overview-section     { margin: 0 20px; }
       .overview-card        { padding: 16px 16px 14px; gap: 14px; }
       .overview-panels      { gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; }
       .overview-panel       { min-width: 72%; scroll-snap-align: center; }
@@ -1454,7 +1541,7 @@
       .fw-header            { padding: 0 20px; gap: 8px; }
       .fw-title             { font-size: 18px; }
       .fw-desc              { font-size: 13px; line-height: 23px; }
-      .case-study-card      { margin: 0 12px; }
+      .case-study-card      { margin: 0 20px; }
       .product-area         { height: 260px; }
       .product-area .product-img-live,
       .product-area .product-img-analytics { width: 90%; left: 5%; top: 30px; height: auto; }
@@ -1472,8 +1559,21 @@
       .metric-desc          { font-size: 12px; line-height: 21px; }
       .more-work-btn        { font-size: 12px; padding: 10px 20px; }
       .analytics-card-wrapper.open { padding-top: 20px; }
-      .site-footer          { padding: 20px 16px; }
-      .section-divider      { margin: 0; height: 140px; }
+      .site-footer          { padding: 48px 20px 32px; gap: 32px; }
+      .footer-top           { flex-direction: column; gap: 28px; }
+      .footer-heading       { font-size: 24px; }
+      .footer-right         { width: 100%; gap: 10px; }
+      .footer-cred-row      { padding: 14px 14px 14px 18px; gap: 8px; width: 100%; box-sizing: border-box; overflow: hidden; }
+      .footer-cred-value    { font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+      .footer-copy-btn      { width: 22px; height: 22px; flex-shrink: 0; }
+      .footer-links-pair    { grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; box-sizing: border-box; }
+      .footer-links-pair .footer-link-row { padding: 14px 10px 14px 14px; gap: 6px; box-sizing: border-box; overflow: hidden; }
+      .footer-link-value    { font-size: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+      .footer-link-icon     { width: 14px; height: 14px; flex-shrink: 0; }
+      .footer-line-graphic  { height: 52px; }
+      .footer-line-graphic svg { height: 52px; }
+      .footer-bottom        { flex-direction: column; gap: 4px; align-items: flex-start; padding-top: 20px; }
+      .section-divider      { margin: 20px 20px 0; height: 140px; }
       .sd-selected          { white-space: normal; text-align: center; padding: 12px 20px; font-size: 13px; max-width: 60%; }
     }
 
@@ -1505,74 +1605,215 @@
     }
 
     /* ─── FOOTER ────────────────────────────────────────────────── */
-    /* ── OVERSCROLL AURORA ──────────────────────────────────────── */
-    #pgWrap {
+    .site-footer {
+      background: #252525;
+      padding: 72px 72px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
       position: relative;
-      z-index: 1;
-      background: var(--bg, #FFFCF8);
-      will-change: transform;
-    }
-    #osAurora {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: 100vh;
-      pointer-events: none;
       overflow: hidden;
-      z-index: -1;
-    }
-    .osa-blob {
-      position: absolute;
-      border-radius: 50%;
-      opacity: 0;
-      will-change: transform, opacity;
-    }
-    .osa-blob--a {
-      width: 150%; height: 600px;
-      background: #3D6500;
-      filter: blur(110px);
-      bottom: -420px; left: -25%;
-    }
-    .osa-blob--b {
-      width: 82%; height: 480px;
-      background: #7DB600;
-      filter: blur(94px);
-      bottom: -380px; left: -8%;
-    }
-    .osa-blob--c {
-      width: 78%; height: 440px;
-      background: #AACF00;
-      filter: blur(90px);
-      bottom: -360px; right: -8%;
-    }
-    .osa-blob--d {
-      width: 56%; height: 340px;
-      background: #D4E850;
-      filter: blur(74px);
-      bottom: -280px; left: 50%;
-      margin-left: -28%;
     }
 
-    .site-footer {
-      background: #1A1917;
-      padding: 26px 44px;
+    /* ── background wordmark ── */
+    .footer-wordmark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-50%);
+      font-family: var(--font-heading);
+      font-size: 18vw;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      color: rgba(255,255,255,0.055);
+      white-space: nowrap;
+      line-height: 1;
+      z-index: 0;
+      pointer-events: none;
+      user-select: none;
+      -webkit-mask-image:
+        linear-gradient(to bottom, black 10%, transparent 82%),
+        linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%);
+      -webkit-mask-composite: destination-in;
+      mask-image:
+        linear-gradient(to bottom, black 10%, transparent 82%),
+        linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%);
+      mask-composite: intersect;
+    }
+
+    /* ── two-col layout ── */
+    .footer-top {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
+      gap: 48px;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      flex: 1;
+    }
+    .footer-eyebrow {
+      font-family: var(--font-heading);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.28);
+      text-transform: uppercase;
+    }
+    .footer-heading {
+      font-family: var(--font-heading);
+      font-size: clamp(26px, 3.2vw, 42px);
+      font-weight: 700;
+      line-height: 1.5;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      max-width: 520px;
+    }
+    .footer-heading .fh-highlight {
+      background: var(--primary);
+      color: #1A1917;
+      border-radius: 6px;
+      padding: 0 8px;
+      white-space: nowrap;
+    }
+
+    /* ── right: credential pills ── */
+    .footer-right {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex-shrink: 0;
+      align-items: stretch;
+    }
+    .footer-cred-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 100px;
+      padding: 18px 18px 18px 28px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .footer-cred-value {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 500;
+      color: #ffffff;
+      cursor: default;
+      user-select: text;
+      white-space: nowrap;
+      flex: 1;
+    }
+    /* ── external link pills ── */
+    .footer-link-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 100px;
+      padding: 18px 18px 18px 28px;
+      width: 100%;
+      text-decoration: none;
+      transition: background 0.2s ease, border-color 0.2s ease;
+      cursor: pointer !important;
+      box-sizing: border-box;
+    }
+    .footer-link-row:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.18);
+    }
+    .footer-link-value {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      flex: 1;
+      white-space: nowrap;
+      transition: color 0.2s ease;
+    }
+    .footer-link-row:hover .footer-link-value { color: rgba(255,255,255,0.90); }
+    .footer-link-icon {
+      flex-shrink: 0;
+      opacity: 0.55;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .footer-link-row:hover .footer-link-icon {
+      opacity: 1;
+      transform: translate(2px,-2px);
+    }
+    .footer-links-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+    .footer-links-pair .footer-link-row {
+      width: 100%;
+      padding: 22px 14px 22px 20px;
+      gap: 8px;
+    }
+    .ph-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4ade80;
+      flex-shrink: 0;
+      animation: ph-pulse 2.2s ease-in-out infinite;
+    }
+    @keyframes ph-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(74,222,128,0.60); }
+      60%  { box-shadow: 0 0 0 7px rgba(74,222,128,0); }
+      100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+    }
+
+    /* ── bottom bar ── */
+    /* ── footer tangled-line graphic ── */
+    .footer-line-graphic {
+      width: 100%;
+      height: 70px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .footer-line-graphic svg {
+      display: block;
+      height: 70px;
+    }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 28px;
+      border-top: none;
+      position: relative;
+      z-index: 1;
     }
     .site-footer .footer-tagline {
       display: flex;
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
-      justify-content: center;
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 400;
       letter-spacing: 0.10em;
-      color: rgba(255,255,255,0.4);
+      color: rgba(255,255,255,0.25);
       text-transform: uppercase;
     }
-    .footer-label { color: rgba(255,255,255,0.4); }
+    .footer-label {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      color: rgba(255,255,255,0.28);
+    }
     .footer-divider {
       width: 1px; height: 12px;
       background: rgba(255,255,255,0.15);
@@ -1583,7 +1824,7 @@
       font-size: 11px;
       font-weight: 500;
       letter-spacing: 0.04em;
-      color: #ffffff;
+      color: rgba(255,255,255,0.5);
       text-decoration: none;
       text-transform: none;
       transition: opacity 0.2s ease;
@@ -1594,19 +1835,20 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 20px;
-      height: 20px;
+      width: 28px;
+      height: 28px;
       background: transparent;
       border: none;
       padding: 0;
-      margin-left: 5px;
+      margin-left: 0;
       cursor: pointer !important;
       opacity: 0.75;
-      transition: opacity 0.15s;
+      border-radius: 8px;
+      transition: opacity 0.18s, box-shadow 0.18s;
       vertical-align: middle;
       flex-shrink: 0;
     }
-    .footer-copy-btn:hover { opacity: 1; }
+    .footer-copy-btn:hover { opacity: 1; box-shadow: 0 0 0 10px rgba(255,255,255,0.10); background: rgba(255,255,255,0.10); }
     .footer-copy-btn .icon-clipboard,
     .footer-copy-btn .icon-check {
       position: absolute;
@@ -1624,6 +1866,24 @@
     .footer-copy-btn.copied .check-draw {
       stroke-dashoffset: 0;
       transition: stroke-dashoffset 0.32s cubic-bezier(0.22,0.61,0.36,1) 0.08s;
+    }
+
+    /* ── Footer responsive overrides (must come AFTER base footer CSS) ── */
+    @media (max-width: 767px) {
+      .site-footer          { padding: 48px 20px 24px; gap: 20px; }
+      .footer-top           { flex-direction: column; gap: 28px; }
+      .footer-heading       { font-size: 24px; line-height: 1.4; }
+      .footer-right         { width: 100%; gap: 10px; }
+      .footer-cred-row      { padding: 14px 14px 14px 18px; gap: 8px; width: 100%; box-sizing: border-box; overflow: hidden; }
+      .footer-cred-value    { font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+      .footer-copy-btn      { width: 22px; height: 22px; flex-shrink: 0; }
+      .footer-links-pair    { grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; box-sizing: border-box; }
+      .footer-links-pair .footer-link-row { padding: 14px 14px 14px 18px; gap: 8px; box-sizing: border-box; overflow: hidden; }
+      .footer-link-value    { font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+      .footer-link-icon     { width: 22px; height: 22px; flex-shrink: 0; }
+      .footer-line-graphic  { height: 44px; }
+      .footer-line-graphic svg { height: 44px; }
+      .footer-bottom        { flex-direction: column; gap: 4px; align-items: center; justify-content: center; padding-top: 8px; }
     }
 
     /* modern pill toast */
@@ -1718,7 +1978,6 @@
       border-radius: 22px 22px 22px 5px;
       padding: 16px 22px;
       white-space: nowrap;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.10);
       opacity: 0;
       will-change: transform;
       transition: opacity 0.2s ease;
@@ -1759,7 +2018,7 @@
     }
 
     /* ─── ABOUT SECTION ─────────────────────────────────────── */
-    .about-section { padding: 0 50px 50px; }
+    .about-section { padding: 0 40px 40px; margin-top: 27px; }
     .about-layout {
       display: flex;
       align-items: flex-start;
@@ -1790,7 +2049,7 @@
     .sfh.c-tr { top:    -5px; right: -5px; }
     .sfh.c-bl { bottom: -5px; left:  -5px; }
     .sfh.c-br { bottom: -5px; right: -5px; }
-    .sfh.m-t, .sfh.m-b { width: 10px; height: 4px; }
+    .sfh.m-t, .sfh.m-b { width: 20px; height: 7px; }
     .sfh.m-l, .sfh.m-r { width: 7px;  height: 20px; }
     .sfh.m-t { top:    -2px; left: 50%; transform: translateX(-50%); }
     .sfh.m-b { bottom: -2px; left: 50%; transform: translateX(-50%); }
@@ -2032,11 +2291,41 @@
     }
     .av2-left {
       min-width: 0;
-      padding-right: 40px;
+      padding-right: 60px;
       display: flex;
       flex-direction: column;
-      gap: 48px;
-      padding-bottom: 60px;
+      gap: 28px;
+    }
+    .av2-philosophy {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 400;
+      color: #515151;
+      line-height: 1.85;
+      margin: 0;
+    }
+    .av2-portrait-wrap {
+      width: 300px;
+      height: 320px;
+      border-radius: 16px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .av2-portrait-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 8%;
+      filter: grayscale(1);
+      transition: filter 0.65s cubic-bezier(0.16,1,0.3,1);
+      display: block;
+    }
+    .av2-portrait-wrap:hover .av2-portrait-img { filter: grayscale(0); }
+    .av2-life-strip {
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
     .av2-right {
       position: sticky;
@@ -2050,8 +2339,8 @@
       width: 300px;
       height: 300px;
     }
-    .av2-right .sf-width-measure { width: 300px; }
-    .av2-right .sf-height-measure { height: 300px; }
+    .av2-right .sf-width-measure { display: none; }
+    .av2-right .sf-height-measure { display: none; }
     .av2-headline {
       font-family: var(--font-heading);
       font-size: 28px;
@@ -2061,39 +2350,82 @@
       letter-spacing: -0.02em;
       margin: 0;
     }
-    /* Scrolling strip */
-    .av2-strip-wrap { width: 100%; }
-    .av2-strip {
-      height: auto;
-      border-radius: 12px;
-      background: var(--primary);
-      overflow: hidden;
+    .av2-text-block {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 20px;
     }
-    .av2-strip-track {
+    /* Skill pills */
+    .av2-pills {
       display: flex;
-      align-items: center;
-      gap: 14px;
-      animation: av2scroll 22s linear infinite;
-      white-space: nowrap;
-      padding: 15px 7px;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 28px;
     }
-    .av2-strip-item {
+    .av2-pill {
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 600;
-      color: #252525;
-      letter-spacing: 0.07em;
+      color: rgba(37,37,37,0.65);
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      white-space: nowrap;
+      padding: 8px 16px;
+      border: 1.5px solid rgba(37,37,37,0.18);
+      border-radius: 100px;
+      background: transparent;
+      transition: border-color 0.3s ease, color 0.3s ease;
     }
-    .av2-strip-sep {
-      display: inline-flex;
-      align-items: center;
+    .av2-pill:hover {
+      border-color: rgba(37,37,37,0.45);
+      color: rgba(37,37,37,0.9);
+    }
+    /* About label */
+    .av2-about-label {
+      font-family: var(--font-heading);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(37,37,37,0.32);
+      margin-bottom: 20px;
+    }
+    /* Photo marquee */
+    .av2-photo-marquee-wrap {
+      width: 100%;
+      overflow: hidden;
+    }
+    .av2-photo-marquee {
+      display: flex;
+      overflow: hidden;
+    }
+    .av2-photo-marquee-track {
+      display: flex;
+      animation: av2scroll 56s linear infinite;
+      will-change: transform;
+    }
+    .av2-photo-marquee-track:hover {
+      animation-play-state: paused;
+    }
+    .av2-marquee-photo {
       flex-shrink: 0;
+      width: 260px;
+      height: 272px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-right: 12px;
     }
-    .av2-strip-star { width: 10px; height: 10px; display: block; object-fit: contain; }
+    .av2-marquee-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(1);
+      transition: filter 0.55s cubic-bezier(0.16,1,0.3,1);
+    }
+    .av2-marquee-photo:hover img {
+      filter: grayscale(0);
+    }
     @keyframes av2scroll {
       0%   { transform: translateX(0); }
       100% { transform: translateX(-50%); }
@@ -2118,7 +2450,7 @@
       border-radius: 14px;
       background: rgba(37,37,37,0.04);
       overflow: hidden;
-      transition: background 0.35s ease;
+      transition: background 0.5s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease;
       flex: 1 1 0;
       min-width: 0;
     }
@@ -2133,7 +2465,10 @@
       border: none;
       cursor: pointer;
       text-align: left;
+      transition: background 0.2s ease;
     }
+    .av2-acc-trigger:hover { background: rgba(37,37,37,0.04); }
+    .av2-acc-trigger:active { background: rgba(37,37,37,0.08); }
     .av2-acc-text {
       display: flex;
       flex-direction: column;
@@ -2152,12 +2487,13 @@
       font-weight: 300;
       color: var(--secondary);
       flex-shrink: 0;
-      transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1), background 0.3s ease;
+      transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), background 0.3s ease;
       line-height: 1;
       font-family: var(--font-mono);
     }
     .av2-acc-item.is-open .av2-acc-icon {
-      display: none;
+      transform: rotate(45deg);
+      background: rgba(37,37,37,0.12);
     }
     .av2-acc-company {
       font-family: var(--font-heading);
@@ -2174,13 +2510,16 @@
       letter-spacing: 0.03em;
     }
     .av2-acc-body {
-      max-height: 0;
-      overflow: hidden;
+      display: grid;
+      grid-template-rows: 0fr;
       opacity: 0;
-      transition: max-height 0.55s cubic-bezier(0.16,1,0.3,1), opacity 0.35s ease;
+      transition:
+        grid-template-rows 0.5s cubic-bezier(0.16,1,0.3,1),
+        opacity 0.35s cubic-bezier(0.16,1,0.3,1);
     }
+    .av2-acc-body-inner { overflow: hidden; }
     .av2-acc-item.is-open .av2-acc-body {
-      max-height: 300px;
+      grid-template-rows: 1fr;
       opacity: 1;
     }
     .av2-acc-period {
@@ -2205,22 +2544,40 @@
     /* Photo wrap + philosophy toast */
     .av2-photo-wrap { position: relative; margin-top: 10px; }
     .av2-phil-toast {
-      position: absolute;
-      bottom: 14px;
-      left: 10px;
-      right: 10px;
+      width: 300px;
+      box-sizing: border-box;
+      display: block;
+      position: relative;
+      margin-top: 14px;
       background: rgba(255,252,248,0.92);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border-radius: 12px;
       padding: 14px 16px;
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
-      pointer-events: none;
-      z-index: 5;
+      border: 1px solid rgba(37,37,37,0.08);
     }
-    .av2-photo-wrap:hover .av2-phil-toast { opacity: 1; transform: translateY(0); }
+    .av2-phil-toast::before {
+      content: '';
+      position: absolute;
+      top: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+      border-bottom: 9px solid rgba(37,37,37,0.08);
+    }
+    .av2-phil-toast::after {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid rgba(255,252,248,0.92);
+    }
     .av2-phil-toast-text {
       font-family: var(--font-mono);
       font-size: 11px;
@@ -2233,8 +2590,8 @@
     /* Personal Photos */
     .av2-photos {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-template-rows: 160px 160px;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: 300px;
       gap: 10px;
     }
     .av2-photo {
@@ -2243,9 +2600,8 @@
       overflow: hidden;
       position: relative;
     }
-    .av2-photo-tall { grid-row: span 2; }
-    .av2-photo-wide { grid-column: span 2; }
-    .av2-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .av2-photo img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1); transition: filter 0.55s cubic-bezier(0.16,1,0.3,1); }
+    .av2-photo:hover img { filter: grayscale(0); }
     @media (max-width: 900px) {
       .av2-inner { grid-template-columns: 1fr; }
       .av2-left  { padding-right: 0; }
@@ -2291,6 +2647,7 @@
       user-select: none;
       overflow: hidden;
       cursor: grab;
+      touch-action: none;
       box-shadow:
         0 1px 2px rgba(0,0,0,0.12),
         0 3px 7px rgba(0,0,0,0.10),
@@ -2383,7 +2740,7 @@
       .hf-metric-headline { font-size: 15px; }
       .hf-metric-sub   { font-size: 12px; }
       .hf-block-gap    { height: 12px; }
-      .hf-cta-link     { margin-top: 12px; font-size: 12px; }
+      .hf-cta-link     { margin-top: 12px; font-size: 12px; margin-left: 0; padding-left: 6px; }
       .hf-role-pill    { padding: 6px 10px; font-size: 10px; }
       .hf-role-pills   { gap: 6px; }
       .sticky-stack    { width: 260px; height: 260px; }
@@ -2400,11 +2757,78 @@
       .sn-title                        { font-size: 16px; }
       .sn-body, .sn-body.sn-body--lg   { font-size: 10px; line-height: 1.5; }
     }
+
+    /* ── Other Projects section ──────────────────────────────── */
+    .other-projects {
+      padding: 64px 52px 80px;
+      border-top: 1px solid rgba(37,37,37,0.08);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .other-projects-label {
+      font-family: var(--font-mono); font-size: 15px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #aaa; margin-bottom: 28px;
+    }
+    .other-projects-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+    .op-card {
+      background: #fff; border-radius: 14px; overflow: hidden;
+      border: 1px solid rgba(37,37,37,0.1);
+      display: flex; flex-direction: column;
+      text-decoration: none; color: inherit;
+      cursor: default;
+    }
+    .op-card-img {
+      width: 100%; height: 190px; overflow: hidden;
+      background: #DDD9D0; position: relative;
+    }
+    .op-card-img img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    .op-card-img-studio {
+      background:
+        radial-gradient(ellipse 140% 120% at 50% bottom, #20f567 0%, #00d050 10%, #00a838 22%, #005c1e 38%, #002410 55%, transparent 73%),
+        linear-gradient(to top, #001a08 0%, #000603 40%, #000000 65%), #000000;
+    }
+    .op-card-img-studio video {
+      position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+      width: 88%; height: auto; border-radius: 10px; pointer-events: none; display: block;
+    }
+    .op-card-img-stressie {
+      background:
+        radial-gradient(ellipse 140% 120% at 50% bottom, #FF8C2A 0%, #E06010 10%, #BF5010 22%, #7A2E00 38%, #3A1000 55%, transparent 73%),
+        linear-gradient(to top, #2A0E00 0%, #0F0400 40%, #000000 65%), #000000;
+      display: flex; align-items: flex-start; justify-content: center; gap: 10px; padding-top: 18px;
+    }
+    .op-card-img-stressie img {
+      width: auto !important; height: 170% !important; object-fit: initial !important;
+      position: static !important; flex-shrink: 0;
+    }
+    .op-card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .op-card-tag {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #666;
+      background: #F0EDE8; border-radius: 100px; padding: 4px 10px;
+    }
+    .op-card-body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .op-card-title { font-family: var(--font-heading); font-size: 20px; font-weight: 700; color: #252525; line-height: 1.3; }
+    .op-card-desc { font-family: var(--font-mono); font-size: 15px; color: #515151; line-height: 1.6; flex: 1; }
+    .op-card-cta {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      background: #252525; color: #fff;
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.04em; padding: 11px 14px; border-radius: 8px; margin-top: 4px;
+      cursor: pointer; transition: transform 0.18s ease;
+    }
+    .op-card-cta:hover { transform: translateY(-3px); }
+    @media (max-width: 900px) {
+      .other-projects { padding: 48px 24px 64px; }
+      .other-projects-grid { grid-template-columns: 1fr; }
+      .op-card-img { height: 200px; }
+    }
   </style>
 </head>
 
 <body>
-<div id="pgWrap">
 
   <!-- TOP NAV -->
   <nav class="top-nav" id="topNav">
@@ -2417,8 +2841,12 @@
     </div>
     <div class="nav-links">
       <a class="nav-work" href="#s2Section">WORK</a>
+      <a class="nav-work" href="#aboutSection">ABOUT</a>
       <a class="nav-work" href="./resume.pdf" target="_blank" rel="noopener">RESUME</a>
       <a class="nav-work" href="#contactSection">CONTACT</a>
+      <a class="nav-chip" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">
+        <span class="nav-chip-dot"></span>Side project · 48hr build ↗
+      </a>
     </div>
     <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
       <span></span><span></span><span></span>
@@ -2428,8 +2856,12 @@
   <div class="mobile-menu-backdrop" id="menuBackdrop"></div>
   <div class="mobile-menu" id="mobileMenu">
     <a href="#s2Section">Work</a>
+    <a href="#aboutSection">About</a>
     <a href="./resume.pdf" target="_blank" rel="noopener">Resume</a>
     <a href="#contactSection">Contact</a>
+    <a href="https://dearly-rho.vercel.app" target="_blank" rel="noopener" class="mobile-side-chip">
+      <span class="mobile-chip-dot"></span>Side project · 48hr build ↗
+    </a>
   </div>
 
   <div class="page">
@@ -2441,7 +2873,7 @@
         <div class="greeting reveal" id="greeting"><span id="greetingText"></span><span id="lottieWave"></span><span class="cursor"></span></div>
 
         <h1 class="hero-heading reveal">
-          Product Designer Making Complex Products <span class="hero-hi">Feel Simple.</span><span class="hero-transform-graphic" aria-hidden="true"><svg width="200" height="34" viewBox="0 0 200 34" fill="none" overflow="visible" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;position:relative;top:-5px">
+          Product Designer <span class="hero-hi">moving</span> numbers and people<span class="hero-transform-graphic" aria-hidden="true"><svg width="200" height="34" viewBox="0 0 200 34" fill="none" overflow="visible" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;position:relative;top:-5px">
   <defs>
     <filter id="hgGray" color-interpolation-filters="sRGB">
       <feColorMatrix type="saturate" values="0"/>
@@ -2459,7 +2891,7 @@
         </h1>
 
         <p class="hero-subtext reveal">
-          Currently building <strong>EverTutor</strong> — a multimodal, voice-first AI tutoring system reaching thousands of students daily.
+          I design systems that make learning feel personal. Built <strong>EverTutor</strong> from zero. 2,000+ students, 2× academic growth, shipped in under a year.
         </p>
 
         <div class="hero-frame reveal" id="heroFrame">
@@ -2479,7 +2911,7 @@
                 <div class="sn-content">
                   <div class="sn-title">Dearly</div>
                   <div class="sn-rule"></div>
-                  <div class="sn-body">A quieter, more personal way to send notes online.</div>
+                  <div class="sn-body">A quieter, more personal way to send notes online.<br><br>Built and launched solo in 48 hours. Designed, coded, and shipped.</div>
                 </div>
               </div>
 
@@ -2488,7 +2920,7 @@
                 <div class="sn-content">
                   <div class="sn-title">Stressie</div>
                   <div class="sn-rule"></div>
-                  <div class="sn-body">Designing calmer workplace experiences through behavioral health systems.</div>
+                  <div class="sn-body">Designing calmer workplace experiences through behavioral health systems.<br><br>Piloted with Amazon &amp; InKind. Unlocked $600K in funding.</div>
                 </div>
               </div>
 
@@ -2521,8 +2953,8 @@
                 <div class="hf-metric-sub"      id="hfMS2"></div>
               </div>
             </div>
-            <a id="hfCta" href="./evertutor-live.html" class="hf-cta-link">
-              View case study <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <a id="hfCta" href="#csCardLive" class="hf-cta-link">
+              <span id="hfCtaLabel">Explore System</span> <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
             <div class="hf-block-gap"></div>
             <div class="hf-section-label">My Role</div>
@@ -2540,6 +2972,7 @@
       </div>
 
       <!-- ── SECTION DIVIDER ────────────────────────────────────── -->
+      <div id="s2Section" style="position:relative;top:-70px;pointer-events:none;"></div>
       <div class="section-divider" id="sdFrame">
         <div class="sd-guide-h"></div>
         <div class="sd-guide-v"></div>
@@ -2557,7 +2990,7 @@
       <!-- ── FEATURED WORK: EverTutor header ──────────────────── -->
       <div class="fw-header reveal">
         <h2 class="fw-title">1. EverTutor</h2>
-        <p class="fw-desc">Led product design across three interconnected platforms — Live, Studio, and Analytics — turning a fragmented tutoring experience into a cohesive AI system that personalizes learning at scale for thousands of students daily.</p>
+        <p class="fw-desc">Led product design across three interconnected platforms: Live, Studio, and Analytics, turning a fragmented tutoring experience into a cohesive AI system that personalizes learning at scale for thousands of students daily.</p>
       </div>
 
       <!-- ── CASE STUDY CARD 1 — EverTutor Live ──────────────────── -->
@@ -2581,7 +3014,7 @@
           <p class="case-study-caption reveal">1.1 EverTutor Live (AI Tutor Experience Platform)</p>
 
           <div class="case-study-hl-row reveal">
-            <p class="case-study-headline">Built the AI tutor experience from scratch — real-time 1:1 personalization, Bloom's 2 Sigma in production, scaling across 8+ schools and ~2,000 students</p>
+            <p class="case-study-headline">Built the AI tutor experience from scratch: real-time 1:1 personalization, Bloom's 2 Sigma in production, scaling across 8+ schools and ~2,000 students</p>
             <a class="explore-btn" href="./evertutor-live.html">Explore the system <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M4 12L12 4M12 4H6.5M12 4V9.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
           </div>
 
@@ -2643,7 +3076,7 @@
           <p class="case-study-caption reveal">1.2 EverTutor Studio (AI Tutor Creation Platform)</p>
 
           <div class="case-study-hl-row reveal">
-            <p class="case-study-headline">Designed the authoring tool that made it possible — reducing lesson creation from 100+ hours to ~4, without sacrificing quality</p>
+            <p class="case-study-headline">Designed the authoring tool that made it possible, reducing lesson creation from 100+ hours to ~4 hours, without sacrificing quality</p>
             <a class="explore-btn" href="./evertutor-studio.html">Explore the system <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M4 12L12 4M12 4H6.5M12 4V9.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
           </div>
 
@@ -2701,7 +3134,7 @@
               <p class="case-study-caption">1.3 EverTutor Analytics (AI Tutor Analytics Platform)</p>
 
               <div class="case-study-hl-row">
-                <p class="case-study-headline">Designed the analytics layer that closed the loop — turning raw student behavior into actionable insights for educators in real time</p>
+                <p class="case-study-headline">Designed the analytics layer that closed the loop, turning raw student behavior into actionable insights for educators in real time</p>
                 <div class="connect-frame">Connect for details</div>
               </div>
             </div>
@@ -2715,7 +3148,7 @@
       <!-- ── FEATURED WORK: Stressie header ─────────────────────── -->
       <div class="fw-header reveal">
         <h2 class="fw-title">2. Stressie</h2>
-        <p class="fw-desc">Founding Product Designer. Took the product from raw pilot research to a full redesign — building the design system, rethinking the IA, and shipping a product now incubated at Harvard Innovation Labs and piloting at Amazon and InKind.</p>
+        <p class="fw-desc">Founding Product Designer. Took the product from raw pilot research to a full redesign, building the design system, rethinking the IA, and shipping a product now incubated at Harvard Innovation Labs and piloted at Amazon and InKind.</p>
       </div>
 
       <!-- ── CASE STUDY CARD — Stressie ─────────────────────────── -->
@@ -2736,7 +3169,7 @@
         <div class="case-study-bottom">
 
           <div class="case-study-hl-row reveal">
-            <p class="case-study-headline">Took workplace stress from a vague problem to a Harvard-incubated product — redesigned end to end from pilot research, now live at Amazon and InKind</p>
+            <p class="case-study-headline">Took workplace stress from a vague problem to a Harvard-incubated product, redesigned end-to-end from pilot research, now live at Amazon and InKind</p>
             <a class="explore-btn" href="./stressie-studio.html">Explore the case study <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M4 12L12 4M12 4H6.5M12 4V9.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
           </div>
 
@@ -2747,7 +3180,7 @@
                 <p class="metric-desc">Measured across the Version 1 pilot with 50 Austin Police Department officers</p>
               </div>
               <div class="metric-card reveal">
-                <p class="metric-value">Incubating at <mark>Harvard Innovation Labs</mark></p>
+                <p class="metric-value">Incubated at <mark>Harvard Innovation Labs</mark></p>
                 <p class="metric-desc">Selected and supported by one of the world's leading startup incubators</p>
               </div>
             </div>
@@ -2769,147 +3202,146 @@
       <!-- ── ABOUT ──────────────────────────────────────────────── -->
       <div class="about-section reveal" id="aboutSection">
 
-        <div class="av2-inner">
+        <div class="av2-about-label">About Me</div>
 
-          <!-- LEFT 3/4 — scrollable -->
-          <div class="av2-left">
+        <div class="av2-text-block">
+          <h2 class="av2-headline">The best design decisions I've made weren't made alone</h2>
+          <p class="av2-philosophy">Engineers, users, even the person who says "this feels weird": everyone has a design idea. My job is knowing which ones to build</p>
+        </div>
 
-            <h2 class="av2-headline">I design intelligent products that think, adapt, and scale — by rethinking interaction models from first principles.</h2>
+        <div class="av2-pills">
+          <span class="av2-pill">5+ Years Experience</span>
+          <span class="av2-pill">0→1 Product Design</span>
+          <span class="av2-pill">Metric Driven</span>
+          <span class="av2-pill">AI Systems</span>
+        </div>
 
-            <!-- Scrolling strip -->
-            <div class="av2-strip-wrap">
-              <div class="av2-strip">
-                <div class="av2-strip-track">
-                  <span class="av2-strip-item">5+ years of experience</span>
-                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
-                  <span class="av2-strip-item">0→1 product builder</span>
-                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
-                  <span class="av2-strip-item">AI systems designer</span>
-                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
-                  <span class="av2-strip-item">Voice UI specialist</span>
-                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
-                  <span class="av2-strip-item">Design systems thinker</span>
-                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
-                  <span class="av2-strip-item">Edtech &amp; Healthtech</span>
-                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
-                  <span class="av2-strip-item">5+ years of experience</span>
-                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
-                  <span class="av2-strip-item">0→1 product builder</span>
-                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
-                  <span class="av2-strip-item">AI systems designer</span>
-                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
-                  <span class="av2-strip-item">Voice UI specialist</span>
-                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
-                  <span class="av2-strip-item">Design systems thinker</span>
-                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
-                  <span class="av2-strip-item">Edtech &amp; Healthtech</span>
-                  <span class="av2-strip-sep"><img src="Skill star divider.svg" alt="" aria-hidden="true" class="av2-strip-star"></span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Experience accordion -->
-            <div class="av2-section">
-              <span class="av2-label">Experience</span>
-              <div class="av2-acc" id="av2Acc">
-
-                <div class="av2-acc-item" data-id="evertutor">
-                  <button class="av2-acc-trigger">
-                    <span class="av2-acc-icon">+</span>
-                    <span class="av2-acc-text">
-                      <span class="av2-acc-company">EverTutor</span>
-                      <span class="av2-acc-role">Sole Designer</span>
-                    </span>
-                  </button>
-                  <div class="av2-acc-body">
-                    <span class="av2-acc-period">2022 – Present</span>
-                    <p class="av2-acc-desc">Led design across three interconnected platforms — Live, Studio, and Analytics. Built the AI tutoring experience from scratch, reducing lesson creation from 100+ hours to 4, reaching 2,000+ students daily across 8+ schools.</p>
-                  </div>
-                </div>
-
-                <div class="av2-acc-item" data-id="stressie">
-                  <button class="av2-acc-trigger">
-                    <span class="av2-acc-icon">+</span>
-                    <span class="av2-acc-text">
-                      <span class="av2-acc-company">Stressie</span>
-                      <span class="av2-acc-role">Founding Product Designer</span>
-                    </span>
-                  </button>
-                  <div class="av2-acc-body">
-                    <span class="av2-acc-period">2023</span>
-                    <p class="av2-acc-desc">Took Stressie from raw pilot research with 50 officers to a full redesign. Built the design system, rethought the IA, shipped a product now incubated at Harvard Innovation Labs and piloting at Amazon and InKind. 8.7× industry-average engagement.</p>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            <!-- Personal photos -->
-            <div class="av2-section">
-              <span class="av2-label">When I'm not moving people and numbers with design</span>
-              <div class="av2-photos">
-                <div class="av2-photo av2-photo-tall"></div>
-                <div class="av2-photo av2-photo-wide"></div>
-                <div class="av2-photo"></div>
-                <div class="av2-photo"></div>
-                <div class="av2-photo"></div>
-              </div>
-            </div>
-
-          </div><!-- /av2-left -->
-
-          <!-- RIGHT 1/2 — sticky photo -->
-          <div class="av2-right">
-            <div class="av2-photo-wrap">
-              <div class="spec-frame">
-                <div class="sfh c-tl"></div>
-                <div class="sfh c-tr"></div>
-                <div class="sfh c-bl"></div>
-                <div class="sfh c-br"></div>
-                <div class="sfh m-t"></div>
-                <div class="sfh m-b"></div>
-                <div class="sfh m-l"></div>
-                <div class="sfh m-r"></div>
-                <div class="sf-width-measure">
-                  <div class="sf-h-line"></div>
-                  <span class="sf-w-label">300px</span>
-                </div>
-                <div class="sf-height-measure">
-                  <div class="sf-v-line"></div>
-                  <span class="sf-h-label">300px</span>
-                </div>
-                <div class="sf-image-wrap">
-                  <img src="./photo.jpg" alt="Bhanu Kowshik" class="sf-photo" />
-                </div>
-              </div>
-              <div class="av2-phil-toast">
-                <p class="av2-phil-toast-text">I believe great design feels invisible, yet quietly solves user needs while leaving people delighted.</p>
-              </div>
+        <div class="av2-photo-marquee-wrap">
+          <div class="av2-photo-marquee">
+            <div class="av2-photo-marquee-track">
+              <div class="av2-marquee-photo"><img src="personal-rowing.jpg" alt="Rowing"></div>
+              <div class="av2-marquee-photo"><img src="personal-evertutor.jpg" alt="EverTutor"></div>
+              <div class="av2-marquee-photo"><img src="personal-stressie.jpg" alt="Stressie"></div>
+              <div class="av2-marquee-photo"><img src="personal-chess.jpg" alt="Chess"></div>
+              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-rowing.jpg" alt=""></div>
+              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-evertutor.jpg" alt=""></div>
+              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-stressie.jpg" alt=""></div>
+              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-chess.jpg" alt=""></div>
             </div>
           </div>
+        </div>
 
-        </div><!-- /av2-inner -->
       </div><!-- /about -->
 
     </div><!-- /card -->
   </div><!-- /page -->
 
+  <section class="other-projects">
+    <p class="other-projects-label">Other Projects</p>
+    <div class="other-projects-grid">
+
+      <a class="op-card" href="./evertutor-studio.html">
+        <div class="op-card-img op-card-img-studio">
+          <video autoplay muted loop playsinline>
+            <source src="./et-studio-recording.mov" type="video/mp4" />
+          </video>
+        </div>
+        <div class="op-card-body">
+          <div class="op-card-tags"><span class="op-card-tag">EverTutor</span><span class="op-card-tag">Authoring</span></div>
+          <p class="op-card-title">EverTutor Studio</p>
+          <p class="op-card-desc">The teacher-facing authoring tool that reduced lesson creation from 100+ hours to ~4 hours without sacrificing quality.</p>
+          <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </a>
+
+      <a class="op-card" href="./stressie-studio.html">
+        <div class="op-card-img op-card-img-stressie">
+          <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%202.png" alt="Stressie screen 1" />
+          <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%203.png" alt="Stressie screen 2" />
+        </div>
+        <div class="op-card-body">
+          <div class="op-card-tags"><span class="op-card-tag">Wellness</span><span class="op-card-tag">Enterprise</span></div>
+          <p class="op-card-title">Stressie</p>
+          <p class="op-card-desc">Took workplace stress from a vague problem to a Harvard-incubated product, now live at Amazon and InKind.</p>
+          <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </a>
+
+      <a class="op-card" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">
+        <div class="op-card-img">
+          <img src="dearly-full-visual.png" alt="Dearly — personal notes app" />
+        </div>
+        <div class="op-card-body">
+          <div class="op-card-tags"><span class="op-card-tag">Side Project</span><span class="op-card-tag">Consumer</span></div>
+          <p class="op-card-title">Dearly</p>
+          <p class="op-card-desc">A notes app designed to feel personal — shipped as an independent side project and live on Product Hunt.</p>
+          <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
   <footer class="site-footer" id="contactSection">
-    <span class="footer-tagline">
-      <span class="footer-label">Connect with me</span>
-      <span class="footer-divider"></span>
-      <a href="mailto:kowshikbhanu1000@gmail.com" class="footer-email">kowshikbhanu1000@gmail.com</a>
-      <button class="footer-copy-btn" data-copy="kowshikbhanu1000@gmail.com" data-toast="mail" aria-label="Copy email">
-        <svg class="icon-clipboard" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <svg class="icon-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="4 12 9 17 20 7"/></svg>
-      </button>
-      <span class="footer-divider"></span>
-      <a href="tel:+15128448316" class="footer-email">+1 (512) 844-8316</a>
-      <button class="footer-copy-btn" data-copy="+15128448316" data-toast="phone" aria-label="Copy phone">
-        <svg class="icon-clipboard" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <svg class="icon-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="4 12 9 17 20 7"/></svg>
-      </button>
-    </span>
+
+    <!-- background wordmark -->
+    <span class="footer-wordmark" aria-hidden="true">BHANU</span>
+
+    <!-- two-col: left = tagline, right = creds -->
+    <div class="footer-top">
+
+      <div class="footer-left">
+        <span class="footer-eyebrow">Get in touch</span>
+        <h2 class="footer-heading">
+          Numbers tell you what's working. People tell you why. Let's chase <span class="fh-highlight">both together</span>
+        </h2>
+      </div>
+
+      <div class="footer-right">
+        <div class="footer-cred-row">
+          <span class="footer-cred-value">kowshikbhanu1000@gmail.com</span>
+          <button class="footer-copy-btn" data-copy="kowshikbhanu1000@gmail.com" data-toast="mail" aria-label="Copy email">
+            <svg class="icon-clipboard" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="4 12 9 17 20 7"/></svg>
+          </button>
+        </div>
+        <div class="footer-cred-row">
+          <span class="footer-cred-value">+1 (512) 844-8316</span>
+          <button class="footer-copy-btn" data-copy="+15128448316" data-toast="phone" aria-label="Copy phone">
+            <svg class="icon-clipboard" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="4 12 9 17 20 7"/></svg>
+          </button>
+        </div>
+        <div class="footer-links-pair">
+          <a href="https://www.linkedin.com/in/bhanukowshik/" target="_blank" rel="noopener" class="footer-link-row">
+            <span class="footer-link-value">LinkedIn</span>
+            <svg class="footer-link-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </a>
+          <a href="https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal" target="_blank" rel="noopener" class="footer-link-row">
+            <span class="ph-dot"></span>
+            <span class="footer-link-value">Product Hunt</span>
+            <svg class="footer-link-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- tangled-to-straight line graphic -->
+    <div class="footer-line-graphic" aria-hidden="true">
+      <svg width="4000" height="70" viewBox="0 0 4000 70" fill="none" preserveAspectRatio="xMinYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(20 0)">
+          <path d="M4,35 C10,16 28,4 46,12 C64,20 66,42 50,54 C34,66 10,64 2,50 C-6,36 -2,14 14,8 C30,2 58,12 62,30 C66,48 56,64 36,64 C16,64 4,48 6,34 C8,20 22,14 36,22 C50,30 54,48 44,56 C34,64 20,62 16,50 C12,38 18,26 28,26 C38,26 46,36 48,48 C50,60 56,54 64,46 C70,40 74,37 110,35 L4000,35" stroke="rgba(255,255,255,0.22)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- bottom bar -->
+    <div class="footer-bottom">
+      <span class="footer-label">Made with a lot of Chai</span>
+      <span class="footer-label">© 2026 Bhanu Kowshik</span>
+    </div>
+
   </footer>
 
   <div id="copyToast">
@@ -3636,7 +4068,10 @@
         });
       });
 
-      // Make main case study cards fully clickable too
+    })();
+
+    // Make main case study cards fully clickable
+    (function() {
       const csLinks = {
         '': './evertutor-studio.html',
         'csCardLive': './evertutor-live.html',
@@ -3661,10 +4096,14 @@
   (function initCursor() {
     if (!window.matchMedia('(pointer: fine) and (hover: hover)').matches) return;
 
-    const BLUE      = '#4361EE';
-    const DOT_COLOR = 'rgba(37,37,37,0.7)';
-    const SNAP_BG   = 'rgba(67,97,238,0.09)';
-    const SNAP_BDR  = 'rgba(67,97,238,0.28)';
+    const BLUE           = '#4361EE';
+    const DOT_COLOR      = 'rgba(37,37,37,0.7)';
+    const DOT_COLOR_DARK = 'rgba(210,210,210,0.88)';
+    const SNAP_BG        = 'rgba(67,97,238,0.09)';
+    const SNAP_BDR       = 'rgba(67,97,238,0.28)';
+
+    /* dark-surface selectors — add more as needed */
+    const DARK_SEL = '.site-footer';
 
     /* ── Build DOM ──────────────────────────────────────────────── */
     const dot = document.createElement('div');
@@ -3707,7 +4146,7 @@
     ].join(',');
 
     const CTA_SEL     = 'a[href], button, [role="button"]';
-    const CARD_SEL    = '.case-study-card, .ov-card, .product-area, .fw-header, .case-study-bottom';
+    const CARD_SEL    = '.case-study-card, .ov-card, .product-area, .case-study-bottom';
     const CONNECT_SEL = '#csCardAnalytics, .analytics-card-wrapper, .connect-frame';
 
     /* ── Shape helpers ──────────────────────────────────────────── */
@@ -3842,7 +4281,8 @@
         dot.style.opacity = '1';
       }
 
-      const d = detect(mx, my);
+      const d      = detect(mx, my);
+      const onDark = !!e.target.closest(DARK_SEL);
 
       if (d === 'hide') {
         dot.style.opacity = '0';
@@ -3866,9 +4306,11 @@
       } else if (d === 'text') {
         dot.style.opacity = '1';
         if (mode !== 'text') enterText();
+        dot.style.background = BLUE;
       } else {
         dot.style.opacity = '1';
         if (mode !== 'dot') enterDot();
+        dot.style.background = onDark ? DOT_COLOR_DARK : DOT_COLOR;
       }
     });
 
@@ -3879,26 +4321,10 @@
       releaseMagnet();
     });
 
-    /* ── Spring loop ────────────────────────────────────────────── */
-    function tick(now) {
-      if (!lastNow) lastNow = now;
-      const dt = Math.min((now - lastNow) / 1000, 0.05);
-      lastNow = now;
-
-      const K  = K_DOT;
-      const B  = B_DOT;
-      const tx = mx;
-      const ty = my;
-
-      vx += ((tx - rx) * K - vx * B) * dt;
-      vy += ((ty - ry) * K - vy * B) * dt;
-      rx += vx * dt;
-      ry += vy * dt;
-
-      dot.style.transform = `translate3d(${rx}px,${ry}px,0) translate(-50%,-50%)`;
-      // Label: bottom-left tail corner sits near cursor; label extends up and right
-      lbl.style.transform = `translate3d(${rx + 10}px,${ry - 10}px,0) translateY(-100%)`;
-
+    /* ── Direct position (instant, no spring lag) ──────────────── */
+    function tick() {
+      dot.style.transform = `translate3d(${mx}px,${my}px,0) translate(-50%,-50%)`;
+      lbl.style.transform = `translate3d(${mx + 10}px,${my - 10}px,0) translateY(-100%)`;
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
@@ -4237,16 +4663,29 @@
       hideTimer = setTimeout(() => toast.classList.remove('toast-show'), 2800);
     }
 
+    function triggerCopy(btn) {
+      const text  = btn.dataset.copy;
+      const label = btn.dataset.toast === 'mail' ? 'Mail copied' : 'Phone copied';
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(label);
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 2200);
+      });
+    }
+
     document.querySelectorAll('.footer-copy-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
-        const text  = btn.dataset.copy;
-        const label = btn.dataset.toast === 'mail' ? 'Mail copied' : 'Phone copied';
-        navigator.clipboard.writeText(text).then(() => {
-          showToast(label);
-          btn.classList.add('copied');
-          setTimeout(() => btn.classList.remove('copied'), 2200);
-        });
+        e.stopPropagation();
+        triggerCopy(btn);
+      });
+    });
+
+    document.querySelectorAll('.footer-cred-row').forEach(row => {
+      row.style.cursor = 'pointer';
+      row.addEventListener('click', () => {
+        const btn = row.querySelector('.footer-copy-btn');
+        if (btn) triggerCopy(btn);
       });
     });
   })();
@@ -4265,30 +4704,36 @@
     /* ─── Panel data ────────────────────────────────────────── */
     const CARD_DATA = {
       'sn-top': {
-        href: './evertutor-live.html',
-        role: ['Solo Product Designer','0→1 Product Designer','Lead Curriculum Designer','Founder Collaboration','QA Lead'],
+        href: '#csCardLive',
+        ctaLabel: 'Explore System',
+        ctaTarget: '_self',
+        role: ['Sole Product Designer','0→1 Product Designer','Founder Collaboration'],
         impact: [
-          { headline: '2× expected academic growth',             sub: "Validated Bloom's 2 Sigma hypothesis in production." },
-          { headline: 'Reduced lesson creation 100 hrs → 4 hrs', sub: 'Through a unified authoring system.' },
-          { headline: 'Scaled to 2,000+ daily active students',  sub: 'Within the first year of launch.' },
+          { headline: '2× expected academic growth',             sub: "Validated Bloom's 2 Sigma hypothesis in production" },
+          { headline: 'Reduced lesson creation 100 hrs → 4 hrs', sub: 'Through a unified authoring system' },
+          { headline: 'Scaled to 2,000+ daily active students',  sub: 'Within the first year of launch' },
         ],
       },
       'sn-mid': {
-        href: './stressie-studio.html',
-        role: ['Lead Product Designer','Research-Led Design','Design Systems','Behavioral UX'],
+        href: '#csCardStressie',
+        ctaLabel: 'Case Study',
+        ctaTarget: '_self',
+        role: ['Founding Product Designer','Design Systems','Behavioral UX'],
         impact: [
-          { headline: 'Behavioral health workplace design', sub: 'Calmer experiences through research-led interaction patterns.' },
-          { headline: 'Full design system ownership',       sub: 'Consistent product language across every surface.' },
-          { headline: 'Research to production',             sub: 'From qualitative interviews to shipped, validated product.' },
+          { headline: 'Behavioral health workplace design', sub: 'Calmer experiences through research-led interaction patterns' },
+          { headline: 'Full design system ownership',       sub: 'Consistent product language across every surface' },
+          { headline: '$600K funding unlocked',              sub: 'Measurable calm in 5 min/day unlocked the company\'s first raise' },
         ],
       },
       'sn-back': {
-        href: '#',
-        role: ['Solo Designer & Developer','0→1 Product Build','Full-Stack Ownership','Rapid Prototyping'],
+        href: 'https://dearly-rho.vercel.app',
+        ctaLabel: 'Try it out',
+        ctaTarget: '_blank',
+        role: ['Solo Designer & Developer','0→1 Product Build','Full-Stack Ownership'],
         impact: [
-          { headline: 'Shipped in 48 hours',    sub: 'Concept to live product — solo design and development.' },
-          { headline: 'Personal digital notes', sub: 'A quieter, more intentional way to send notes online.' },
-          { headline: 'End-to-end ownership',   sub: 'Design, engineering, and launch — one person.' },
+          { headline: 'Shipped in 48 hours',    sub: 'Concept to live product. Solo design and development' },
+          { headline: 'Personal digital notes', sub: 'A quieter, more intentional way to send notes online' },
+          { headline: 'End-to-end ownership',   sub: 'Design, engineering, and launch. One person' },
         ],
       },
     };
@@ -4389,7 +4834,8 @@
       const dy    = e.clientY - startY;
       const speed = Math.max(Math.abs(velX), Math.abs(velY));
 
-      if (Math.max(Math.abs(dx), Math.abs(dy)) > 120 || speed > 0.5) {
+      const swipeThreshold = window.matchMedia('(pointer: coarse)').matches ? 70 : 120;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) > swipeThreshold || speed > 0.4) {
         swipeOut(note, dx, curY, curRot, velX);
       } else {
         springBack(note);
@@ -4497,7 +4943,7 @@
     /* ─── Event listeners ───────────────────────────────────── */
     stack.addEventListener('pointerdown', (e) => {
       if (e.target.closest('.sticky-note') === noteEls[0]) onPointerDown(e);
-    });
+    }, { passive: false });
     window.addEventListener('pointermove',   onPointerMove, { passive: false });
     window.addEventListener('pointerup',     onPointerUp);
     window.addEventListener('pointercancel', onPointerUp);
@@ -4522,10 +4968,16 @@
 
       const metrics = Array.from(document.querySelectorAll('.hf-metric'));
 
-      // 1. Exit — stagger out
+      // 1. Exit — stagger out metrics + pills + CTA
       metrics.forEach((m, i) => {
         setTimeout(() => m.classList.add('is-exit'), i * 45);
       });
+      const oldPills = Array.from(document.querySelectorAll('.hf-role-pill'));
+      oldPills.forEach((p, i) => {
+        setTimeout(() => p.classList.add('is-exit'), i * 35);
+      });
+      const ctaEl = document.getElementById('hfCta');
+      if (ctaEl) ctaEl.classList.add('is-exit');
 
       // 2. Swap content + enter
       setTimeout(() => {
@@ -4535,13 +4987,19 @@
           if (h) h.textContent = imp.headline;
           if (s) s.textContent = imp.sub;
         });
-        const ctaEl   = document.getElementById('hfCta');
-        if (ctaEl) ctaEl.href = data.href;
+        if (ctaEl) {
+          ctaEl.href = data.href;
+          ctaEl.target = data.ctaTarget || '_self';
+          const labelEl = document.getElementById('hfCtaLabel');
+          if (labelEl) labelEl.textContent = data.ctaLabel || 'View case study';
+          ctaEl.classList.remove('is-exit');
+          ctaEl.classList.add('is-enter');
+        }
 
         const pillsEl = document.getElementById('hfRolePills');
         if (pillsEl) {
           pillsEl.innerHTML = data.role
-            .map(r => `<span class="hf-role-pill">${r}</span>`)
+            .map(r => `<span class="hf-role-pill is-enter">${r}</span>`)
             .join('');
         }
 
@@ -4554,6 +5012,12 @@
             metrics.forEach((m, i) => {
               setTimeout(() => m.classList.remove('is-enter'), i * 60);
             });
+            if (pillsEl) {
+              Array.from(pillsEl.querySelectorAll('.hf-role-pill')).forEach((p, i) => {
+                setTimeout(() => p.classList.remove('is-enter'), i * 50);
+              });
+            }
+            if (ctaEl) setTimeout(() => ctaEl.classList.remove('is-enter'), 0);
           });
         });
       }, metrics.length * 45 + 80);
@@ -4608,135 +5072,6 @@
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
   })();
-  </script>
-  <script>
-  /* ── ELASTIC OVERSCROLL AURORA ──────────────────────────────────
-     Physics:
-       - Rubber-band damping on input    (damp formula)
-       - Spring snap-back on release     (K=300, B=28)
-       - inputVel drives blob scale+rise (harder pull → bigger blobs)
-     ────────────────────────────────────────────────────────────── */
-  (function () {
-    var wrap  = document.getElementById('pgWrap');
-    var blobs = document.querySelectorAll('.osa-blob');
-    if (!wrap || !blobs.length) return;
-
-    var pull      = 0;   // current rubber-band offset px (≥ 0)
-    var springV   = 0;   // spring velocity for snap-back
-    var inputVel  = 0;   // magnitude of user's gesture speed  (px/s)
-    var rafId     = null;
-    var releasing = false;
-
-    /* Diminishing-returns clamp: pulls harder but gives less */
-    function damp(raw) {
-      var lim = 200;
-      return raw <= 0 ? 0 : lim * (1 - Math.exp(-raw / lim));
-    }
-
-    function isAtBottom() {
-      return window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
-    }
-
-    function render(offset) {
-      var t    = Math.min(offset / 170, 1);              // 0→1 normalised pull
-      var speed = Math.min(Math.abs(inputVel) / 900, 1); // 0→1 gesture speed
-
-      /* Page rubber-bands upward */
-      wrap.style.transform = offset > 0.5
-        ? 'translateY(' + (-offset).toFixed(2) + 'px)'
-        : '';
-
-      /* Blobs rise + swell — scale responds to BOTH depth and speed */
-      var rise  = t * (110 + speed * 90);
-      var swell = 1 + t * (0.38 + speed * 0.28);
-      blobs[0].style.opacity   = (t * 0.80).toFixed(3);
-      blobs[0].style.transform = 'translateY(' + (-rise).toFixed(1) + 'px) scale(' + swell.toFixed(3) + ')';
-
-      rise  = t * (86 + speed * 70);
-      swell = 1 + t * (0.26 + speed * 0.18);
-      blobs[1].style.opacity   = (t * 0.54).toFixed(3);
-      blobs[1].style.transform = 'translateY(' + (-rise).toFixed(1) + 'px) translateX(' + (-t * 28).toFixed(1) + 'px) scale(' + swell.toFixed(3) + ')';
-
-      rise  = t * (80 + speed * 65);
-      swell = 1 + t * (0.22 + speed * 0.15);
-      blobs[2].style.opacity   = (t * 0.44).toFixed(3);
-      blobs[2].style.transform = 'translateY(' + (-rise).toFixed(1) + 'px) translateX(' + (t * 28).toFixed(1) + 'px) scale(' + swell.toFixed(3) + ')';
-
-      rise  = t * (60 + speed * 50);
-      swell = 1 + t * (0.32 + speed * 0.22);
-      blobs[3].style.opacity   = (t * 0.32).toFixed(3);
-      blobs[3].style.transform = 'translateY(' + (-rise).toFixed(1) + 'px) scale(' + swell.toFixed(3) + ')';
-    }
-
-    function springBack() {
-      releasing = true;
-      cancelAnimationFrame(rafId);
-      var K = 300, B = 28, prev = performance.now();
-      (function step(now) {
-        var dt = Math.min((now - prev) / 1000, 0.05);
-        prev = now;
-        springV += (-K * pull - B * springV) * dt;
-        pull    += springV * dt;
-        if (pull < 0) { pull = 0; springV = 0; }
-        inputVel *= 0.85;
-        render(pull);
-        if (pull > 0.3 || Math.abs(springV) > 1) {
-          rafId = requestAnimationFrame(step);
-        } else {
-          pull = 0; springV = 0; inputVel = 0; releasing = false;
-          render(0);
-        }
-      })(prev);
-    }
-
-    /* ── Wheel (trackpad / mouse) ─────────────────────────────── */
-    var wheelTimer = null;
-    window.addEventListener('wheel', function (e) {
-      if (!isAtBottom() || e.deltaY <= 0) {
-        if (pull > 0 && !releasing) springBack();
-        return;
-      }
-      e.preventDefault();
-      cancelAnimationFrame(rafId);
-      clearTimeout(wheelTimer);
-      releasing = false;
-      var raw  = e.deltaY * (e.deltaMode === 1 ? 20 : e.deltaMode === 2 ? 400 : 1);
-      inputVel = raw * 55;
-      pull     = damp(pull + raw * 0.52);
-      render(pull);
-      wheelTimer = setTimeout(springBack, 80);
-    }, { passive: false });
-
-    /* ── Touch ────────────────────────────────────────────────── */
-    var lastY = 0, prevT = 0;
-    window.addEventListener('touchstart', function (e) {
-      lastY = e.touches[0].clientY;
-      prevT = performance.now();
-      cancelAnimationFrame(rafId);
-      releasing = false;
-    }, { passive: true });
-
-    window.addEventListener('touchmove', function (e) {
-      var y  = e.touches[0].clientY;
-      var dy = lastY - y;           // positive = dragging up (overscroll)
-      var dt = Math.max(performance.now() - prevT, 1);
-      prevT  = performance.now();
-      lastY  = y;
-      if (dy > 0 && isAtBottom()) {
-        e.preventDefault();
-        releasing = false;
-        inputVel  = (dy / dt) * 1000;
-        pull      = damp(pull + dy * 0.72);
-        render(pull);
-      } else if (dy < 0 && pull > 0) {
-        springBack();
-      }
-    }, { passive: false });
-
-    window.addEventListener('touchend', function () {
-      if (pull > 0.5) springBack();
-    }, { passive: true });
-  })();
 
   /* ── About V2 accordion ───────────────────────────────── */
   (function () {
@@ -4753,13 +5088,33 @@
       });
     });
   })();
+
+  /* ── Fix nav position: move nav out of will-change:transform ancestor (browser extension compat) ── */
+  (function fixNavContainingBlock() {
+    function fix() {
+      var nav = document.getElementById('topNav');
+      if (!nav) return;
+      var el = nav.parentElement;
+      var needsFix = false;
+      while (el && el !== document.documentElement) {
+        var wc = getComputedStyle(el).willChange;
+        var tr = getComputedStyle(el).transform;
+        if ((wc && wc.indexOf('transform') !== -1) || (tr && tr !== 'none' && tr !== '')) {
+          needsFix = true;
+          break;
+        }
+        el = el.parentElement;
+      }
+      if (needsFix && nav.parentElement !== document.body) {
+        document.body.insertBefore(nav, document.body.firstChild);
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fix);
+    } else {
+      setTimeout(fix, 100);
+    }
+  })();
   </script>
-</div><!-- /#pgWrap -->
-<div id="osAurora" aria-hidden="true">
-  <div class="osa-blob osa-blob--a"></div>
-  <div class="osa-blob osa-blob--b"></div>
-  <div class="osa-blob osa-blob--c"></div>
-  <div class="osa-blob osa-blob--d"></div>
-</div>
 </body>
 </html>
