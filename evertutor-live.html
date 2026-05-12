@@ -727,6 +727,7 @@
     .op-card-img {
       width: 100%; height: 190px; overflow: hidden;
       background: #DDD9D0;
+      position: relative;
     }
     .op-card-img img {
       width: 100%; height: 100%; object-fit: cover; object-position: center top;
@@ -734,6 +735,46 @@
       display: block;
     }
     .op-card:hover .op-card-img img { transform: scale(1.04); }
+
+    /* Studio card — dark green gradient with video */
+    .op-card-img-studio {
+      background:
+        radial-gradient(ellipse 140% 120% at 50% bottom,
+          #20f567 0%, #00d050 10%, #00a838 22%,
+          #005c1e 38%, #002410 55%, transparent 73%),
+        linear-gradient(to top, #001a08 0%, #000603 40%, #000000 65%),
+        #000000;
+    }
+    .op-card-img-studio video {
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 88%;
+      height: auto;
+      border-radius: 4px;
+      pointer-events: none;
+      display: block;
+    }
+
+    /* Stressie card — orange gradient with phone image */
+    .op-card-img-stressie {
+      background:
+        radial-gradient(ellipse 140% 120% at 50% bottom,
+          #FF8C2A 0%, #E06010 10%, #BF5010 22%,
+          #7A2E00 38%, #3A1000 55%, transparent 73%),
+        linear-gradient(to top, #2A0E00 0%, #0F0400 40%, #000000 65%),
+        #000000;
+    }
+    .op-card-img-stressie img {
+      width: 52% !important;
+      height: auto !important;
+      object-fit: initial !important;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
     .op-card-body {
       padding: 20px 22px 22px;
       display: flex; flex-direction: column; gap: 10px; flex: 1;
@@ -1297,8 +1338,10 @@
       <div class="other-projects-grid">
 
         <a class="op-card" href="./evertutor-studio.html">
-          <div class="op-card-img">
-            <img src="studio-ui.jpg" alt="EverTutor Studio UI" />
+          <div class="op-card-img op-card-img-studio">
+            <video autoplay muted loop playsinline>
+              <source src="./et-studio-recording.mov" type="video/mp4" />
+            </video>
           </div>
           <div class="op-card-body">
             <span class="op-card-tag">EverTutor · Authoring</span>
@@ -1309,7 +1352,7 @@
         </a>
 
         <a class="op-card" href="./stressie-studio.html">
-          <div class="op-card-img">
+          <div class="op-card-img op-card-img-stressie">
             <img src="Stressie%20Case%20Study%20Updated%20Materials/Summary%20of%20the%20project/Home%20Screen%20Image.png" alt="Stressie app" />
           </div>
           <div class="op-card-body">
@@ -1322,7 +1365,7 @@
 
         <a class="op-card" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">
           <div class="op-card-img">
-            <img src="dearly-preview.png" alt="Dearly — personal notes app" />
+            <img src="dearly-full-visual.png" alt="Dearly — personal notes app" />
           </div>
           <div class="op-card-body">
             <span class="op-card-tag">Side Project · Consumer</span>
