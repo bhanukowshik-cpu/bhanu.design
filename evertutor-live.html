@@ -718,18 +718,32 @@
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
     }
     .op-card {
-      background: #F5F3EE; border-radius: 12px; padding: 24px;
-      display: flex; flex-direction: column; gap: 12px;
+      background: #F5F3EE; border-radius: 14px; overflow: hidden;
+      display: flex; flex-direction: column;
       text-decoration: none; color: inherit;
-      transition: background 0.2s, transform 0.2s;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
     }
-    .op-card:hover { background: #EDEAE3; transform: translateY(-2px); }
+    .op-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.09); }
+    .op-card-img {
+      width: 100%; height: 190px; overflow: hidden;
+      background: #DDD9D0;
+    }
+    .op-card-img img {
+      width: 100%; height: 100%; object-fit: cover; object-position: center top;
+      transition: transform 0.4s ease;
+      display: block;
+    }
+    .op-card:hover .op-card-img img { transform: scale(1.04); }
+    .op-card-body {
+      padding: 20px 22px 22px;
+      display: flex; flex-direction: column; gap: 10px; flex: 1;
+    }
     .op-card-tag {
       font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
       text-transform: uppercase; color: #aaa;
     }
     .op-card-title {
-      font-family: var(--font-heading); font-size: 16px; font-weight: 700;
+      font-family: var(--font-heading); font-size: 17px; font-weight: 700;
       color: #252525; line-height: 1.3;
     }
     .op-card-desc {
@@ -737,14 +751,18 @@
       line-height: 1.6; flex: 1;
     }
     .op-card-cta {
-      font-family: var(--font-mono); font-size: 11px; color: #555;
-      display: inline-flex; align-items: center; gap: 5px;
-      transition: gap 0.2s, color 0.2s;
+      display: inline-flex; align-items: center; gap: 7px;
+      background: #252525; color: #fff;
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.04em; padding: 9px 14px; border-radius: 8px;
+      align-self: flex-start; margin-top: 4px;
+      transition: opacity 0.15s;
     }
-    .op-card:hover .op-card-cta { gap: 8px; color: #252525; }
-    @media (max-width: 768px) {
+    .op-card:hover .op-card-cta { opacity: 0.8; }
+    @media (max-width: 900px) {
       .other-projects { padding: 48px 24px 64px; }
       .other-projects-grid { grid-template-columns: 1fr; }
+      .op-card-img { height: 200px; }
     }
 
   </style>
@@ -1279,24 +1297,39 @@
       <div class="other-projects-grid">
 
         <a class="op-card" href="./evertutor-studio.html">
-          <span class="op-card-tag">EverTutor · Authoring</span>
-          <p class="op-card-title">EverTutor Studio</p>
-          <p class="op-card-desc">The teacher-facing authoring tool that reduced lesson creation from 100+ hours to ~4 hours without sacrificing quality.</p>
-          <span class="op-card-cta">Explore case study <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div class="op-card-img">
+            <img src="studio-ui.jpg" alt="EverTutor Studio UI" />
+          </div>
+          <div class="op-card-body">
+            <span class="op-card-tag">EverTutor · Authoring</span>
+            <p class="op-card-title">EverTutor Studio</p>
+            <p class="op-card-desc">The teacher-facing authoring tool that reduced lesson creation from 100+ hours to ~4 hours without sacrificing quality.</p>
+            <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
         </a>
 
         <a class="op-card" href="./stressie-studio.html">
-          <span class="op-card-tag">Wellness · Enterprise</span>
-          <p class="op-card-title">Stressie</p>
-          <p class="op-card-desc">Took workplace stress from a vague problem to a Harvard-incubated product, now live at Amazon and InKind.</p>
-          <span class="op-card-cta">Explore case study <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div class="op-card-img">
+            <img src="Stressie%20Case%20Study%20Updated%20Materials/Summary%20of%20the%20project/Home%20Screen%20Image.png" alt="Stressie app" />
+          </div>
+          <div class="op-card-body">
+            <span class="op-card-tag">Wellness · Enterprise</span>
+            <p class="op-card-title">Stressie</p>
+            <p class="op-card-desc">Took workplace stress from a vague problem to a Harvard-incubated product, now live at Amazon and InKind.</p>
+            <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
         </a>
 
         <a class="op-card" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">
-          <span class="op-card-tag">Side Project · Consumer</span>
-          <p class="op-card-title">Dearly</p>
-          <p class="op-card-desc">A notes app designed to feel personal — shipped as an independent side project and live on Product Hunt.</p>
-          <span class="op-card-cta">View live product <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div class="op-card-img">
+            <img src="dearly-preview.png" alt="Dearly — personal notes app" />
+          </div>
+          <div class="op-card-body">
+            <span class="op-card-tag">Side Project · Consumer</span>
+            <p class="op-card-title">Dearly</p>
+            <p class="op-card-desc">A notes app designed to feel personal — shipped as an independent side project and live on Product Hunt.</p>
+            <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
         </a>
 
       </div>
