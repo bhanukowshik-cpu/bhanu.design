@@ -1714,12 +1714,17 @@
       entries.forEach(e => {
         if (!e.isIntersecting) return;
         e.target.classList.add('triggered');
-        e.target.querySelectorAll('.hl').forEach((hl, i) =>
-          setTimeout(() => hl.classList.add('revealed'), 600 + i * 150)
-        );
         wrapObs.unobserve(e.target);
       });
     }, { threshold: 0.06 });
+
+    const hlObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        setTimeout(() => e.target.classList.add('revealed'), 120);
+        hlObs.unobserve(e.target);
+      });
+    }, { threshold: 0.8 });
     document.querySelectorAll('.cs-section-wrap').forEach(el => wrapObs.observe(el));
 
     const childObs = new IntersectionObserver(entries => {
@@ -1734,6 +1739,8 @@
         childObs.unobserve(el);
       });
     }, { threshold: 0.18 });
+    document.querySelectorAll('.hl').forEach(el => hlObs.observe(el));
+
     document.querySelectorAll('.tr-anim').forEach(el => {
       childObs.observe(el);
       el.addEventListener('animationend', () => {
