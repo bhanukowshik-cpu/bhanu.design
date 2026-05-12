@@ -104,6 +104,8 @@
     /* Designation pills */
     .designation-row { display: flex; align-items: center; gap: 10px; opacity: 0; }
     .designation-row.visible { animation: fade-in 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
+    #heroSubtext { opacity: 0; transform: translateY(20px); }
+    #heroSubtext.visible { animation: section-rise 0.9s cubic-bezier(0.16,1,0.3,1) both; }
     .desig-pill {
       background: rgba(247,247,247,0.95); padding: 5px 20px; border-radius: 100px;
       font-family: var(--font-mono); font-weight: 400; font-size: 12px;
@@ -871,7 +873,7 @@
         </div>
 
         <h1 class="cs-heading" id="csHeading">Designed a 0→1 AI Tutor experience, from prototypes to live classrooms across 8+ schools, serving ~2,000+ students in real time.</h1>
-        <p class="chal-body">I owned interaction design, voice UX, and the curriculum tooling system, end to end, from the first prototype to live classroom deployment.</p>
+        <p class="chal-body" id="heroSubtext">I owned interaction design, voice UX, and the curriculum tooling system, end to end, from the first prototype to live classroom deployment.</p>
 
         <!-- Hero frame: real background + real screen UI image -->
         <div class="et-live-frame" id="liveFrame">
@@ -1617,6 +1619,8 @@
         }, { once: true });
       }, 260 + i * 44);
     });
+    setTimeout(() => document.getElementById('heroSubtext').classList.add('visible'),
+               260 + 5 * 44);
     setTimeout(() => document.getElementById('liveFrame').classList.add('visible'),
                260 + words.length * 44 + 160);
 
