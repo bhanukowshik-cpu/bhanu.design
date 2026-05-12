@@ -40,37 +40,29 @@
     }
 
     /* ─── CUSTOM CURSOR ──────────────────────────────────────── */
-    #customCursor {
+    html.cc-active * { cursor: none !important; }
+    #ccDot {
       position: fixed;
-      width: 17px;
-      height: 17px;
-      background: #252525;          /* solid on dot-grid background */
-      mix-blend-mode: normal;
-      border-radius: 50%;
+      top: 0; left: 0;
       pointer-events: none;
-      z-index: 100000;
-      transform: translate(-50%, -50%);
-      will-change: left, top;
-      transition: width 0.18s ease, height 0.18s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #customCursor.hovered   { width: 26px; height: 26px; }
-    /* Over the white card: invert so it reads against dark text */
-    #customCursor.on-card {
-      background: #FFFFFF;
-      mix-blend-mode: difference;
-    }
-    #customCursor.drag-mode {
-      width: 64px;
-      height: 64px;
-      background: #252525;
-      mix-blend-mode: normal;
+      z-index: 13000;
+      will-change: transform;
+      width: 12px; height: 12px;
+      border-radius: 9999px;
+      background: rgba(37,37,37,0.7);
+      opacity: 0;
+      transition:
+        width         0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+        height        0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.30s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background    0.26s ease,
+        opacity       0.18s ease;
     }
 
-    /* "Hold & Drag" label — flex child, centered by parent */
+    /* "Hold & Drag" label — positioned independently */
     #dragLabel {
+      position: fixed;
+      top: 0; left: 0;
       pointer-events: none;
       font-family: var(--font-mono);
       font-size: 12px;
@@ -82,7 +74,13 @@
       padding: 8px;
       opacity: 0;
       transition: opacity 0.18s ease;
-      flex-shrink: 0;
+      background: #252525;
+      border-radius: 50%;
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #dragLabel.visible { opacity: 1; }
 
@@ -563,7 +561,7 @@
 
     /* Hide custom cursor on touch devices */
     @media (hover: none) {
-      #customCursor, #dragLabel { display: none; }
+      #ccDot, #dragLabel { display: none; }
       body { cursor: auto; }
       a, button { cursor: pointer; }
       .carousel-viewport { cursor: grab; }
@@ -1633,6 +1631,19 @@
     .op-card-img img {
       width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block;
     }
+    .op-card-img-live {
+      background:
+        radial-gradient(ellipse 140% 120% at 50% bottom,
+          #3DD6F5 0%, #1BA8CC 10%, #0D7A99 22%,
+          #044D66 38%, #011E33 55%, transparent 73%),
+        linear-gradient(to top, #011220 0%, #000608 40%, #000000 65%),
+        #000000;
+    }
+    .op-card-img-live img {
+      position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+      width: 88%; height: auto; border-radius: 10px;
+      pointer-events: none; display: block;
+    }
     .op-card-img-stressie {
       background:
         radial-gradient(ellipse 140% 120% at 50% bottom,
@@ -1711,9 +1722,8 @@
   </div>
 
   <!-- ── CURSOR ────────────────────────────────────────────── -->
-  <div id="customCursor">
-    <div id="dragLabel">Hold &amp;<br>Drag</div>
-  </div>
+  <div id="ccDot" aria-hidden="true"></div>
+  <div id="dragLabel">Hold &amp;<br>Drag</div>
 
   <!-- ── NAV — 191:14841 ───────────────────────────────────── -->
   <nav class="nav">
@@ -2174,7 +2184,7 @@
         <div class="other-projects-grid">
 
           <a class="op-card" href="./evertutor-live.html">
-            <div class="op-card-img">
+            <div class="op-card-img op-card-img-live">
               <img src="Student home page Updated.png" alt="EverTutor Live UI" />
             </div>
             <div class="op-card-body">
@@ -2223,48 +2233,120 @@
 
 
   <script>
-  /* ═══════════════════════════════════════════════════════════
-     CUSTOM CURSOR
-  ═══════════════════════════════════════════════════════════ */
-  const cursor    = document.getElementById('customCursor');
-  const dragLabel = document.getElementById('dragLabel');
+  /* ── CUSTOM CURSOR (dot ↔ line) ─────────────────────────── */
+  (function initCursor() {
+    const dot = document.getElementById('ccDot');
+    document.documentElement.classList.add('cc-active');
 
-  const mainCard = document.querySelector('.card');
-  document.addEventListener('mousemove', e => {
-    // Snap directly — no lerp lag
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top  = e.clientY + 'px';
-    // Switch between solid (#252525) on dot-bg and difference on white card
-    if (!cursor.classList.contains('drag-mode')) {
-      const r = mainCard.getBoundingClientRect();
-      const over = e.clientX >= r.left && e.clientX <= r.right &&
-                   e.clientY >= r.top  && e.clientY <= r.bottom;
-      cursor.classList.toggle('on-card', over);
+    const BLUE      = '#4361EE';
+    const DOT_COLOR = 'rgba(37,37,37,0.7)';
+    const CTA_SEL   = 'a[href]:not(.op-card), button, [role="button"], .op-card-cta';
+    const TEXT_SEL  = [
+      'p','h1','h2','h3','h4','h5','h6','li',
+      '.phase-heading','.phase-desc','.sys-card-title','.sys-card-desc',
+      '.phase-expand-title','.phase-expand-desc',
+      '.out-section-title','.problem-statement','.chal-title','.chal-statement',
+      '.chal-body','.section-label','.phase-goal-label','.prob-body','.prob-title',
+      '.impact-stat-desc','.impact-stat-hl','.team-role-body','.what-if-body',
+    ].join(',');
+
+    let mx = -300, my = -300, visible = false, mode = 'dot';
+    let magnetEl = null, origCX = 0, origCY = 0, snapW = 0, snapH = 0;
+
+    function setShape(w, h, r, bg) {
+      dot.style.width        = w + 'px';
+      dot.style.height       = h + 'px';
+      dot.style.borderRadius = r + 'px';
+      dot.style.background   = bg;
     }
-  });
 
-  // All CTAs: hide the dot cursor so native pointer hand shows through
-  document.querySelectorAll('a[href], button, [role="button"]').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.classList.remove('hovered', 'drag-mode');
-      cursor.style.transition = 'none';
-      cursor.style.opacity = '0';
-    });
-    el.addEventListener('mouseleave', () => {
-      cursor.style.transition = '';
-      cursor.style.opacity = '1';
-    });
-  });
+    function releaseMagnet() {
+      if (!magnetEl) return;
+      const el = magnetEl; magnetEl = null;
+      el.style.transition = 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+      el.style.transform  = 'translate(0px,0px)';
+      setTimeout(() => { el.style.transition = ''; el.style.transform = ''; }, 520);
+    }
 
+    function enterDot()  { releaseMagnet(); mode = 'dot';  setShape(12, 12, 9999, DOT_COLOR); }
+    function enterText() { releaseMagnet(); mode = 'text'; setShape(3,  33, 3,    BLUE); }
+
+    function isNearText(x, y) {
+      const PAD = 6;
+      for (const [px, py] of [[x,y],[x+PAD,y],[x-PAD,y],[x,y+PAD],[x,y-PAD]]) {
+        const h = document.elementFromPoint(px, py);
+        if (!h || h.closest(CTA_SEL)) continue;
+        if (!h.closest(TEXT_SEL)) continue;
+        const cr = document.caretRangeFromPoint ? document.caretRangeFromPoint(px, py) : null;
+        if (!cr || cr.startContainer.nodeType !== Node.TEXT_NODE) continue;
+        const txt = cr.startContainer, off = Math.min(cr.startOffset, txt.length - 1);
+        if (off < 0 || !txt.length) continue;
+        const r2 = document.createRange();
+        r2.setStart(txt, off); r2.setEnd(txt, Math.min(off + 1, txt.length));
+        const rects = r2.getClientRects();
+        if (!rects.length) continue;
+        const rc = rects[0];
+        if (px >= rc.left - PAD && px <= rc.right + PAD && py >= rc.top - PAD && py <= rc.bottom + PAD) return true;
+      }
+      return false;
+    }
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      if (!visible) { visible = true; dot.style.opacity = '1'; }
+
+      const el = document.elementFromPoint(mx, my);
+      const cta = el && el.closest(CTA_SEL);
+
+      if (cta) {
+        dot.style.opacity = '0';
+        if (magnetEl !== cta) {
+          releaseMagnet();
+          magnetEl = cta;
+          const rc = cta.getBoundingClientRect();
+          origCX = rc.left + rc.width / 2; origCY = rc.top + rc.height / 2;
+          snapW = rc.width; snapH = rc.height;
+        }
+        const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+        const moveX = clamp((mx - origCX) / (snapW / 2), -1, 1) * 5;
+        const moveY = clamp((my - origCY) / (snapH / 2), -1, 1) * 5;
+        magnetEl.style.transition = 'transform 0.12s ease-out';
+        magnetEl.style.transform  = `translate(${moveX}px,${moveY}px)`;
+      } else {
+        if (magnetEl) releaseMagnet();
+        dot.style.opacity = '1';
+        if (isNearText(mx, my)) { if (mode !== 'text') enterText(); dot.style.background = BLUE; }
+        else                    { if (mode !== 'dot')  enterDot();  dot.style.background = DOT_COLOR; }
+      }
+
+      dot.style.transform = `translate3d(${mx}px,${my}px,0) translate(-50%,-50%)`;
+    });
+
+    document.addEventListener('mouseleave', () => {
+      visible = false; dot.style.opacity = '0'; releaseMagnet();
+    });
+
+    (function tick() { dot.style.transform = `translate3d(${mx}px,${my}px,0) translate(-50%,-50%)`; requestAnimationFrame(tick); })();
+  })();
+
+  /* ── DRAG LABEL FOLLOW ── */
+  (function() {
+    const label = document.getElementById('dragLabel');
+    if (!label) return;
+    document.addEventListener('mousemove', e => {
+      if (label.classList.contains('visible')) {
+        label.style.transform = `translate3d(${e.clientX}px,${e.clientY}px,0) translate(-50%,-50%)`;
+      }
+    });
+  })();
+
+  const dragLabel = document.getElementById('dragLabel');
   const carouselViewport = document.getElementById('carouselViewport');
   carouselViewport.addEventListener('mouseenter', () => {
-    cursor.classList.remove('hovered');
-    cursor.classList.add('drag-mode');
     dragLabel.classList.add('visible');
   });
   carouselViewport.addEventListener('mouseleave', () => {
     if (!isDragging) {
-      cursor.classList.remove('drag-mode');
       dragLabel.classList.remove('visible');
     }
   });
@@ -2464,7 +2546,6 @@
     }
 
     if (!viewport.matches(':hover')) {
-      cursor.classList.remove('drag-mode');
       dragLabel.classList.remove('visible');
     }
   }
