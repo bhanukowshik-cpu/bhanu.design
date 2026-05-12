@@ -459,7 +459,12 @@
     .out-item-arrow { flex-shrink: 0; }
     .out-item p { flex: 1; }
     .out-item strong { font-weight: 600; }
-    .hl { background: #E6F28D; border-radius: 3px; padding: 0 3px; }
+    .hl {
+      background: linear-gradient(#E6F28D, #E6F28D) no-repeat left center / 0% 100%;
+      transition: background-size 0.55s cubic-bezier(0.22,0.61,0.36,1);
+      border-radius: 3px; padding: 0 3px;
+    }
+    .hl.revealed { background-size: 100% 100%; }
     .out-item .dim { font-weight: 400; color: #515151; }
     .out-divider { height: 1px; background: rgba(37,37,37,0.08); }
     .cs-link { color: var(--secondary); text-decoration: underline; text-decoration-color: rgba(37,37,37,0.35); text-underline-offset: 2px; white-space: nowrap; }
@@ -1710,6 +1715,9 @@
       entries.forEach(e => {
         if (!e.isIntersecting) return;
         e.target.classList.add('triggered');
+        e.target.querySelectorAll('.hl').forEach((hl, i) =>
+          setTimeout(() => hl.classList.add('revealed'), 600 + i * 150)
+        );
         wrapObs.unobserve(e.target);
       });
     }, { threshold: 0.06 });
