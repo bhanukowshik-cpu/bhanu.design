@@ -761,6 +761,9 @@
       pointer-events: none;
       display: block;
     }
+    .op-card-img-studio video::-webkit-media-controls,
+    .op-card-img-studio video::-webkit-media-controls-overlay-play-button,
+    .op-card-img-studio video::-webkit-media-controls-panel { display: none !important; }
 
     /* Stressie card — orange gradient with phone image */
     .op-card-img-stressie {
@@ -1959,8 +1962,16 @@
     });
   </script>
 
-
-
+  <script>
+  /* Force-play all autoplay videos (handles browsers that defer autoplay) */
+  function tryPlayVideos() {
+    document.querySelectorAll('video[autoplay]').forEach(v => {
+      if (v.paused) v.play().catch(() => {});
+    });
+  }
+  document.addEventListener('DOMContentLoaded', tryPlayVideos);
+  window.addEventListener('load', tryPlayVideos);
+  </script>
 
 </body>
 </html>
