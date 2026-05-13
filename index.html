@@ -188,6 +188,31 @@
       align-items: center;
       justify-content: center;
       padding: 36px 0;
+      position: relative;
+    }
+    .hf-projects-label {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-4deg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+    }
+    .hf-projects-text {
+      font-family: 'Caveat', cursive;
+      font-size: 22px;
+      font-weight: 600;
+      color: #252525;
+      line-height: 1;
+      letter-spacing: 0.2px;
+    }
+    .hf-projects-arrow {
+      margin-top: 3px;
+      margin-left: 10px;
     }
     .hf-right {
       flex: 1;
@@ -2677,6 +2702,7 @@
       flex-shrink: 0;
       overflow: visible;
       touch-action: none;
+      z-index: 1;
     }
     .sticky-stack::before {
       content: '';
@@ -2786,7 +2812,8 @@
     }
     @media (max-width: 767px) {
       .hero-frame      { flex-direction: column; min-height: unset; }
-      .hf-left         { flex: none; width: 100%; padding: 24px 0 10px; }
+      .hf-left         { flex: none; width: 100%; padding: 16px 0 10px; flex-direction: column; gap: 8px; }
+      .hf-projects-label { position: relative; top: auto; left: auto; transform: rotate(-4deg); }
       .hf-right        { padding: 12px 20px 24px; }
       .hf-impact-list  { gap: 14px; }
       .hf-metric-headline { font-size: 15px; }
@@ -2888,6 +2915,17 @@
 
           <!-- LEFT: sticky note stack -->
           <div class="hf-left">
+
+            <!-- Hand-drawn label -->
+            <div class="hf-projects-label">
+              <span class="hf-projects-text">Selected Projects</span>
+              <svg class="hf-projects-arrow" width="28" height="44" viewBox="0 0 28 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2 C12 12 10 24 14 38" stroke="rgba(37,37,37,0.32)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                <path d="M14 38 L8 30" stroke="rgba(37,37,37,0.32)" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M14 38 L20 30" stroke="rgba(37,37,37,0.32)" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </div>
+
             <div class="sticky-stack" id="stickyStack">
 
               <!-- Back · stone -->
@@ -4780,10 +4818,15 @@
 
       const dx    = e.clientX - startX;
       const dy    = e.clientY - startY;
-      const speed = Math.max(Math.abs(velX), Math.abs(velY));
+
+      // Zero stale velocity if pointer was stationary before release
+      if (e.timeStamp - lastT > 80) { velX = 0; velY = 0; }
+
+      const speed        = Math.max(Math.abs(velX), Math.abs(velY));
+      const displacement = Math.max(Math.abs(dx), Math.abs(dy));
 
       const swipeThreshold = window.matchMedia('(pointer: coarse)').matches ? 70 : 120;
-      if (Math.max(Math.abs(dx), Math.abs(dy)) > swipeThreshold || speed > 0.4) {
+      if (displacement > swipeThreshold || (speed > 0.5 && displacement > 30)) {
         swipeOut(note, dx, curY, curRot, velX);
       } else {
         springBack(note);
