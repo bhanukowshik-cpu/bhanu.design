@@ -32,8 +32,8 @@
     /* ─── PAGE — whiteboard canvas dot-grid ─────────────────── */
     body {
       background-color: #FFFCF8;
-      background-image: radial-gradient(circle, rgba(0,0,0,0.16) 1px, transparent 1px);
-      background-size: 16px 16px;
+      background-image: radial-gradient(circle, rgba(0,0,0,0.13) 0.8px, transparent 0.8px);
+      background-size: 18px 18px;
       background-attachment: fixed;   /* grid stays put as page scrolls */
       min-height: 100vh;
       font-family: var(--font-heading);
@@ -141,10 +141,13 @@
       margin-left: 10px;
       white-space: nowrap;
       opacity: 0;
-      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(20px);
+      transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .hero.hero-revealed .hero-transform-graphic {
       opacity: 1;
+      transform: translateY(0);
       transition-delay: 900ms;
     }
 
@@ -172,8 +175,6 @@
       align-items: stretch;
       min-height: 500px;
       background-color: #FEFDFB;
-      background-image: radial-gradient(circle, rgba(190,186,174,0.55) 0.72px, transparent 0.72px);
-      background-size: 20px 20px;
       box-shadow:
         0 0 0 1px rgba(255,255,255,0.7) inset,
         0 2px 8px rgba(0,0,0,0.03),
@@ -509,6 +510,14 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .section-divider.sd-revealed {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     /* Horizontal dashed guide */
@@ -1510,6 +1519,17 @@
 
     /* ─── RESPONSIVE ─────────────────────────────────────────── */
 
+    /* ── Large desktop: wider card, scaled sections ─────────────── */
+    @media (min-width: 1600px) {
+      .card                { width: 1560px; }
+      .product-area        { height: 600px; }
+      .hero-frame          { min-height: 540px; }
+      .sticky-stack        { width: 444px; height: 444px; }
+      .sticky-note         { width: 362px; height: 362px; top: 41px; left: 41px; padding: 29px 29px 24px; }
+      .top-nav             { padding: 8px calc(50% - 780px); }
+      .top-nav.scrolled    { left: max(4px, calc(50% - 780px)); right: max(4px, calc(50% - 780px)); }
+    }
+
     /* ── Medium desktop / large tablet: shrink product-area so media clips bottom ── */
     @media (max-width: 1260px) {
       .product-area { height: 280px; }
@@ -2452,7 +2472,7 @@
     }
     @keyframes av2scroll {
       0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
+      100% { transform: translateX(-33.333%); }
     }
     /* Section groups */
     .av2-section {
@@ -3184,6 +3204,10 @@
               <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-evertutor.jpg" alt=""></div>
               <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-stressie.jpg" alt=""></div>
               <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-chess.jpg" alt=""></div>
+              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-rowing.jpg" alt=""></div>
+              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-evertutor.jpg" alt=""></div>
+              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-stressie.jpg" alt=""></div>
+              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-chess.jpg" alt=""></div>
             </div>
           </div>
         </div>
@@ -3328,9 +3352,9 @@
         heading.appendChild(frag);
       }
 
-      // Set hero-frame delay to fire after subtext finishes (words→SVG→subtext→frame)
+      // Set hero-frame delay to fire with subtext and divider (words→SVG→everything else at once)
       const heroFrame = document.querySelector('.hero-frame');
-      if (heroFrame) heroFrame.style.setProperty('--hf-delay', '1640ms');
+      if (heroFrame) heroFrame.style.setProperty('--hf-delay', '1480ms');
 
       // Line-clip the greeting
       const greeting = document.getElementById('greeting');
@@ -3352,7 +3376,7 @@
         lw.className = 'hero-lw';
         const li = document.createElement('span');
         li.className = 'hero-li';
-        li.style.setProperty('--ld', '1240ms');
+        li.style.setProperty('--ld', '1480ms');
         while (subtext.firstChild) li.appendChild(subtext.firstChild);
         lw.appendChild(li);
         subtext.appendChild(lw);
@@ -3372,6 +3396,11 @@
         // Lock nav opacity after its slide-in animation finishes so
         // .scrolled class toggling never causes a flicker
         setTimeout(() => { if (nav) nav.style.opacity = '1'; }, 700);
+        // Section divider fires with subtext + hero-frame (all at once after words→SVG)
+        setTimeout(() => {
+          const sd = document.getElementById('sdFrame');
+          if (sd) sd.classList.add('sd-revealed');
+        }, 1480);
       }));
     })();
 
