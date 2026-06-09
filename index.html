@@ -2990,6 +2990,32 @@
     [data-theme="dark"] .top-nav.scrolled .nav-chip { border-color: rgba(240,237,232,0.18); }
     [data-theme="dark"] .nav-chip:hover   { background: rgba(240,237,232,0.05); }
 
+    /* Case study cards — fix mark text + explore button in dark mode */
+    [data-theme="dark"] .metric-value mark { color: #1A1917; }
+    [data-theme="dark"] .explore-btn {
+      background: #FFFCF8;
+      color: #252525;
+    }
+    [data-theme="dark"] .explore-btn:hover { opacity: 0.85; }
+    [data-theme="dark"] .explore-btn.explore-btn--outline {
+      background: transparent;
+      color: var(--secondary);
+      border-color: var(--secondary);
+    }
+    [data-theme="dark"] .explore-btn.explore-btn--outline:hover {
+      background: rgba(240,237,232,0.08);
+      color: var(--secondary);
+    }
+    [data-theme="dark"] .case-study-caption { color: var(--grey); }
+    [data-theme="dark"] .more-work-btn {
+      border-color: var(--secondary);
+      color: var(--secondary);
+    }
+    [data-theme="dark"] .more-work-btn:hover {
+      background: var(--secondary);
+      color: #252525;
+    }
+
     /* ══════════════════════════════════════════════════════════
        PORTFOLIO CHAT — floating bar + side panel
     ══════════════════════════════════════════════════════════ */
@@ -5621,9 +5647,9 @@
     const ctx = canvas.getContext('2d');
 
     const SPACING   = 18;
-    const DOT_R     = 1.8;
+    const DOT_R     = 1.1;
     const ATTRACT_R = 100;
-    const MAX_PUSH  = 18;
+    const MAX_PUSH  = 9;
     const STIFFNESS = 0.07;
     const DAMPING   = 0.72;
     const R2        = ATTRACT_R * ATTRACT_R;
@@ -5633,8 +5659,8 @@
 
     function dotColor() {
       return document.documentElement.getAttribute('data-theme') === 'dark'
-        ? 'rgba(255,255,255,0.22)'
-        : 'rgba(0,0,0,0.28)';
+        ? 'rgba(255,255,255,0.18)'
+        : 'rgba(0,0,0,0.22)';
     }
 
     function build() {
