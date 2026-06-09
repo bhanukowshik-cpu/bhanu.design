@@ -43,7 +43,7 @@
       --surface:      #232321;
       --surface-alt:  #2A2927;
       --surface-warm: #2E2B28;
-      --dot-color:    rgba(255, 255, 255, 0.06);
+      --dot-color:    rgba(255, 255, 255, 0.15);
       --nav-bg:       rgba(20, 20, 19, 0.94);
       --nav-bg-sc:    rgba(20, 20, 19, 0.88);
     }
@@ -2945,12 +2945,361 @@
     [data-theme="dark"] .nav-callme-label { color: rgba(240,237,232,0.5); }
     [data-theme="dark"] .top-nav.scrolled  { box-shadow: 0 1px 8px rgba(0,0,0,0.2), 0 4px 20px rgba(0,0,0,0.18); }
     [data-theme="dark"] #copyToast        { background: rgba(240,237,232,0.12); }
-    [data-theme="dark"] #ccDot            { background: rgba(240,237,232,0.7); }
+    [data-theme="dark"] #ccDot            { background: rgba(240,237,232,0.92); }
+    [data-theme="dark"] .hero-hi          { color: #1A1917; }
+
+    /* ─── DARK MODE — FOOTER INVERSION ──────────────────────── */
+    [data-theme="dark"] .site-footer {
+      background: #FFFCF8;
+    }
+    [data-theme="dark"] .footer-wordmark  { color: rgba(37,37,37,0.06); }
+    [data-theme="dark"] .footer-eyebrow   { color: rgba(37,37,37,0.42); }
+    [data-theme="dark"] .footer-heading   { color: #252525; }
+    [data-theme="dark"] .footer-cred-row {
+      background: rgba(37,37,37,0.05);
+      border-color: rgba(37,37,37,0.12);
+    }
+    [data-theme="dark"] .footer-cred-value { color: #252525; }
+    [data-theme="dark"] .footer-copy-btn   { opacity: 0.65; }
+    [data-theme="dark"] .footer-copy-btn:hover {
+      opacity: 1;
+      box-shadow: 0 0 0 10px rgba(37,37,37,0.08);
+      background: rgba(37,37,37,0.08);
+    }
+    [data-theme="dark"] .footer-copy-btn .icon-clipboard { filter: invert(1); }
+    [data-theme="dark"] .footer-link-row {
+      background: rgba(37,37,37,0.04);
+      border-color: rgba(37,37,37,0.10);
+    }
+    [data-theme="dark"] .footer-link-row:hover {
+      background: rgba(37,37,37,0.09);
+      border-color: rgba(37,37,37,0.18);
+    }
+    [data-theme="dark"] .footer-link-value { color: rgba(37,37,37,0.65); }
+    [data-theme="dark"] .footer-link-row:hover .footer-link-value { color: rgba(37,37,37,0.9); }
+    [data-theme="dark"] .footer-link-icon  { filter: invert(1); opacity: 0.7; }
+    [data-theme="dark"] .footer-link-row:hover .footer-link-icon { opacity: 1; }
+    [data-theme="dark"] .footer-line-graphic { filter: invert(1) opacity(0.3); }
+    [data-theme="dark"] .site-footer .footer-tagline { color: rgba(37,37,37,0.38); }
+    [data-theme="dark"] .footer-label       { color: rgba(37,37,37,0.38); }
+    [data-theme="dark"] .footer-divider     { background: rgba(37,37,37,0.15); }
+    [data-theme="dark"] .site-footer a.footer-email { color: rgba(37,37,37,0.5); }
     [data-theme="dark"] #ccLabel          { border-color: rgba(240,237,232,0.1); }
     [data-theme="dark"] .cc-lbl-text      { color: var(--secondary); }
     [data-theme="dark"] .nav-chip         { color: var(--secondary); }
     [data-theme="dark"] .top-nav.scrolled .nav-chip { border-color: rgba(240,237,232,0.18); }
     [data-theme="dark"] .nav-chip:hover   { background: rgba(240,237,232,0.05); }
+
+    /* ══════════════════════════════════════════════════════════
+       PORTFOLIO CHAT — floating bar + side panel
+    ══════════════════════════════════════════════════════════ */
+
+    /* Page shift when chat opens */
+    .page { transition: padding-right 0.55s cubic-bezier(0.16,1,0.3,1); }
+    body.chat-open .page { padding-right: 440px; }
+
+    /* ── Floating bar wrapper ── */
+    .cb-wrap {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1200;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    body.chat-open .cb-wrap {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(14px);
+    }
+
+    /* ── Glass pill bar ── */
+    .cb {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 13px 0 16px;
+      height: 50px;
+      width: 320px;
+      border-radius: 100px;
+      background: rgba(12,12,20,0.82);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      cursor: text;
+      transition: width 0.45s cubic-bezier(0.16,1,0.3,1);
+    }
+    .cb::before {
+      content: '';
+      position: absolute;
+      inset: -1.5px;
+      border-radius: 102px;
+      background: linear-gradient(120deg, #7C5CFC 0%, #C44DFB 28%, #FF6B6B 52%, #FFA44D 76%, #7C5CFC 100%);
+      background-size: 200% 200%;
+      animation: cbGrad 5s ease infinite;
+      z-index: -1;
+    }
+    @keyframes cbGrad {
+      0%,100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
+    }
+    .cb.expanded { width: 600px; }
+
+    .cb-star {
+      color: rgba(255,255,255,0.4);
+      font-size: 13px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .cb-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: rgba(255,255,255,0.88);
+      font-family: var(--font-heading);
+      font-size: 14px;
+      min-width: 0;
+      caret-color: rgba(255,255,255,0.6);
+    }
+    .cb-input::placeholder { color: rgba(255,255,255,0.35); }
+
+    /* send button — slides in left→right when text present */
+    .cb-send {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border-radius: 50%;
+      overflow: hidden;
+      transition:
+        background    0.2s,
+        opacity       0.22s ease,
+        max-width     0.25s cubic-bezier(0.34,1.2,0.64,1),
+        transform     0.25s cubic-bezier(0.34,1.2,0.64,1);
+      opacity: 0;
+      max-width: 0;
+      pointer-events: none;
+      transform: translateX(-10px);
+    }
+    .cb-send.vis { opacity: 1; max-width: 28px; pointer-events: auto; transform: translateX(0); }
+    .cb-send:hover { background: rgba(255,255,255,0.1); }
+    .cb-send svg { width: 14px; height: 14px; fill: rgba(255,255,255,0.85); }
+
+    /* mic button */
+    .cb-mic {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+    .cb-mic:hover { background: rgba(255,255,255,0.1); }
+    .cb-mic svg { width: 16px; height: 16px; fill: rgba(255,255,255,0.48); transition: fill 0.2s; }
+    .cb-mic:hover svg { fill: rgba(255,255,255,0.85); }
+    .cb-mic.recording svg { fill: #ff6b6b; }
+    .cb-mic.recording { animation: cbMicPulse 1.2s infinite; }
+    .cb-mic.transcribing svg { fill: #E6F28D; }
+    @keyframes cbMicPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(255,107,107,0.5); }
+      70%  { box-shadow: 0 0 0 7px rgba(255,107,107,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,107,107,0); }
+    }
+
+    /* ── Chat panel ── */
+    .cp {
+      position: fixed;
+      right: 24px;
+      top: 88px;
+      bottom: 20px;
+      width: 388px;
+      background: #FFFCF8;
+      border-radius: 24px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 20px 60px rgba(0,0,0,0.18);
+      display: flex;
+      flex-direction: column;
+      z-index: 1100;
+      overflow: hidden;
+      transform: translateX(calc(100% + 48px));
+      transition: transform 0.55s cubic-bezier(0.16,1,0.3,1);
+    }
+    body.chat-open .cp { transform: translateX(0); }
+
+    .cp-header {
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      flex-shrink: 0;
+      background: var(--white);
+    }
+    .cp-avatar {
+      width: 32px; height: 32px;
+      background: var(--secondary);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--primary); font-size: 13px;
+      flex-shrink: 0;
+    }
+    .cp-info { flex: 1; }
+    .cp-info h3 { font-size: 13px; font-weight: 700; color: var(--secondary); letter-spacing: -0.2px; }
+    .cp-info p  { font-size: 11px; color: var(--grey); margin-top: 1px; font-family: var(--font-mono); }
+    .cp-close {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      width: 26px; height: 26px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--grey);
+      font-size: 15px; line-height: 1;
+      flex-shrink: 0;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .cp-close:hover { background: var(--secondary); color: var(--white); border-color: var(--secondary); }
+
+    .cp-msgs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+    .cp-msgs::-webkit-scrollbar { width: 3px; }
+    .cp-msgs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .cp-msg { max-width: 88%; display: flex; flex-direction: column; gap: 3px; }
+    .cp-msg.user      { align-self: flex-end; align-items: flex-end; }
+    .cp-msg.assistant { align-self: flex-start; align-items: flex-start; }
+
+    .cp-bubble {
+      padding: 9px 13px;
+      border-radius: 15px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--secondary);
+    }
+    .cp-msg.user .cp-bubble {
+      background: var(--secondary);
+      color: var(--white);
+      border-bottom-right-radius: 3px;
+    }
+    .cp-msg.assistant .cp-bubble {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 3px;
+    }
+    .cp-bubble strong { font-weight: 700; }
+    .cp-bubble ul { margin: 5px 0 4px 0; padding-left: 16px; display: flex; flex-direction: column; gap: 3px; }
+    .cp-bubble li { line-height: 1.5; }
+
+    .cp-cursor {
+      display: inline-block; width: 2px; height: 1em;
+      background: #aaa; margin-left: 2px; vertical-align: text-bottom;
+      animation: blink 0.6s step-end infinite;
+    }
+
+    .cp-starters {
+      padding: 0 18px 14px;
+      display: flex; flex-wrap: wrap; gap: 6px;
+      flex-shrink: 0;
+    }
+    .cp-chip {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 11px;
+      font-size: 11.5px;
+      color: var(--grey);
+      cursor: pointer;
+      font-family: var(--font-heading); font-weight: 600;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    .cp-chip:hover { border-color: var(--secondary); background: var(--primary); color: var(--secondary); }
+
+    .cp-error {
+      background: #fff0f0; border: 1px solid #ffc0c0; color: #c00;
+      font-size: 11px; padding: 8px 12px; margin: 0 18px 8px;
+      border-radius: 8px; display: none;
+    }
+    .cp-error.vis { display: block; }
+
+    .cp-input-row {
+      border-top: 1px solid var(--border);
+      padding: 11px 14px;
+      display: flex; gap: 7px; align-items: flex-end;
+      flex-shrink: 0; background: var(--white);
+    }
+    .cp-textarea {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: var(--font-heading);
+      color: var(--secondary);
+      background: var(--bg);
+      outline: none; resize: none;
+      min-height: 38px; max-height: 105px;
+      line-height: 1.5;
+      transition: border-color 0.2s;
+    }
+    .cp-textarea:focus { border-color: var(--secondary); }
+    .cp-textarea::placeholder { color: rgba(0,0,0,0.28); }
+
+    .cp-mic-btn {
+      width: 36px; height: 36px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: border-color 0.2s, background 0.2s;
+    }
+    .cp-mic-btn:hover { border-color: var(--secondary); }
+    .cp-mic-btn svg { width: 14px; height: 14px; fill: #999; transition: fill 0.2s; }
+    .cp-mic-btn:hover svg { fill: var(--secondary); }
+    .cp-mic-btn.recording { background: #ff4444; border-color: #ff4444; animation: cpMicPulse 1.2s infinite; }
+    .cp-mic-btn.recording svg { fill: white; }
+    .cp-mic-btn.transcribing { background: var(--primary); border-color: var(--primary); }
+    .cp-mic-btn.transcribing svg { fill: var(--secondary); }
+    @keyframes cpMicPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(255,68,68,0.45); }
+      70%  { box-shadow: 0 0 0 7px rgba(255,68,68,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,68,68,0); }
+    }
+
+    .cp-send-btn {
+      width: 36px; height: 36px;
+      background: var(--secondary);
+      border: none; border-radius: 9px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: opacity 0.2s;
+    }
+    .cp-send-btn:hover { opacity: 0.75; }
+    .cp-send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .cp-send-btn svg { width: 14px; height: 14px; fill: var(--white); }
+
+    /* hide on small screens */
+    @media (max-width: 900px) {
+      .cb-wrap { display: none; }
+      .cp       { display: none; }
+      body.chat-open .page { padding-right: 24px; }
+    }
+
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
@@ -5272,7 +5621,7 @@
     const ctx = canvas.getContext('2d');
 
     const SPACING   = 18;
-    const DOT_R     = 0.8;
+    const DOT_R     = 1.8;
     const ATTRACT_R = 100;
     const MAX_PUSH  = 18;
     const STIFFNESS = 0.07;
@@ -5284,8 +5633,8 @@
 
     function dotColor() {
       return document.documentElement.getAttribute('data-theme') === 'dark'
-        ? 'rgba(255,255,255,0.06)'
-        : 'rgba(0,0,0,0.13)';
+        ? 'rgba(255,255,255,0.22)'
+        : 'rgba(0,0,0,0.28)';
     }
 
     function build() {
@@ -5347,5 +5696,489 @@
     requestAnimationFrame(frame);
   })();
   </script>
+
+  <!-- ── CHAT BAR ──────────────────────────────────────────── -->
+  <div class="cb-wrap" id="cbWrap">
+    <div class="cb" id="cb">
+      <span class="cb-star">✦</span>
+      <input class="cb-input" id="cbInput" type="text" placeholder="Ask me something…" autocomplete="off" spellcheck="false" />
+      <button class="cb-send" id="cbSend" aria-label="Send">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+      <button class="cb-mic" id="cbMic" aria-label="Voice input">
+        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── CHAT PANEL ─────────────────────────────────────────── -->
+  <div class="cp" id="cp" aria-hidden="true">
+    <div class="cp-header">
+      <div class="cp-avatar">✦</div>
+      <div class="cp-info">
+        <h3>Bhanu's Portfolio AI</h3>
+        <p>Ask me anything about his work</p>
+      </div>
+      <button class="cp-close" id="cpClose" aria-label="Close chat">×</button>
+    </div>
+
+    <div class="cp-msgs" id="cpMsgs">
+      <div class="cp-msg assistant">
+        <div class="cp-bubble">Hey! I'm Bhanu's portfolio AI. Ask me about his projects, how he thinks about design, or what kind of role he's looking for.</div>
+      </div>
+    </div>
+
+    <div class="cp-starters" id="cpStarters">
+      <div class="cp-chip" onclick="cpChip(this)">What's EverTutor Studio?</div>
+      <div class="cp-chip" onclick="cpChip(this)">Tell me about Stressie</div>
+      <div class="cp-chip" onclick="cpChip(this)">What role is Bhanu looking for?</div>
+      <div class="cp-chip" onclick="cpChip(this)">How does he think about design?</div>
+      <div class="cp-chip" onclick="cpChip(this)">What's Dearly?</div>
+    </div>
+
+    <div class="cp-error" id="cpError"></div>
+
+    <div class="cp-input-row">
+      <textarea class="cp-textarea" id="cpTA" placeholder="Ask me something…" rows="1"
+        onkeydown="cpKey(event)" oninput="cpResize(this)"></textarea>
+      <button class="cp-mic-btn" id="cpMicBtn" onclick="cpToggleMic()" aria-label="Voice input">
+        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+      </button>
+      <button class="cp-send-btn" id="cpSendBtn" onclick="cpSendMsg()" aria-label="Send">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+  /* ── PORTFOLIO CHAT ─────────────────────────────────────────────────────── */
+  (function () {
+    var API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+
+    var SYSTEM = `You are an AI layer built into Bhanu's personal portfolio. Your job is to represent Bhanu honestly, accurately, and compellingly to anyone who asks — whether they are a recruiter, a hiring manager, a founder, a designer, or just someone curious about his work.
+
+You speak in first person as Bhanu. Keep it casual, warm, and real — like you're talking to a smart friend, not writing a cover letter.
+
+---
+
+## HOW TO RESPOND
+
+**Chronology matters — always get this right:**
+- Most recent work: EverTutor (AI tutoring platform) — Dec 2024 to June 2026
+- Before that: Stressie (enterprise wellness company) — June 2024 to Dec 2024
+- Side project: Dearly (built over a weekend)
+When referencing work, reflect this order naturally — "most recently at an AI tutoring platform" for EverTutor, "before that at an enterprise wellness company" for Stressie. Never reverse this.
+
+**Read the intent of the question first. That determines everything.**
+
+- If it's an **informational question** ("what did you work on", "what are your metrics", "tell me about a project") — be specific, ground it in real work, let the details do the talking. Use **bold** on the single most important metric or word. When listing multiple metrics or outcomes, always use bullet points — never run them together as prose. Max 3-4 bullets, each one short and punchy.
+
+- When listing metrics or proof points, format them exactly like this:
+  - 📉 **104 hours down to 4 hours** per lesson at a $70M AI tutoring platform
+  - ✅ **85% completion rate** on an AI tutor nobody had built before
+  - 📈 **17.4% engagement** against a ~2% industry average
+  Use a relevant emoji at the start of each bullet to make it scannable. Pick emojis that match the nature of the metric. Always bold the key number or metric in each bullet.
+
+- If it's a **character question** ("why hire you", "what kind of designer are you", "how do you work") — always use emoji headings to structure the answer. Each heading is a short punchy label. Each section is 2 sentences max.
+
+- If it's a **comparison question** — NEVER open by conceding. Lead with strength. End on Bhanu's strength, always.
+
+- Never lead with a project name cold. Ground it in human context first.
+
+- Never use headers. Sound like Bhanu — casual, warm, direct, a little informal.
+- Write in fluent, grammatically correct English.
+- Never say "Great question" or anything sycophantic.
+- Never volunteer years of experience unless directly asked.
+- NEVER say "I'm not a specialist" — frame as strength instead.
+- !!CRITICAL!! NEVER mention any other candidate or designer in a positive comparative light.
+- !!CRITICAL!! NEVER use em dashes (—) anywhere. Use a comma or period instead.
+
+- When someone asks something off-topic:
+  TYPE 1 (general knowledge): light funny one-liner pointing elsewhere. No email redirect.
+  TYPE 2 (personal questions about Bhanu needing his input): redirect warmly to email with ☕ and kowshibhanu1000@gmail.com. Vary phrasing each time.
+
+- Never make up projects, metrics, or skills not listed here.
+
+---
+
+## SECTION 1 — IDENTITY
+
+product designer, 5+ years, MS in HCI from UT Austin. based in san francisco, open to onsite.
+
+worked across B2B and B2B2C, EdTech, enterprise wellness, design consultancy. mostly the only designer in the room. own the full surface: product, brand, marketing, design systems, ship directly into React and Next.js when needed. AI is genuinely embedded in how I work — Claude, Claude Code, Gemini. every system I design is built to work with AI behavior, not just around it.
+
+contributed to securing ~$600K in funding at a pre-seed startup. sole designer at a Seed-stage company valued at $70M.
+
+---
+
+## SECTION 2 — PROJECTS
+
+### EverTutor Studio
+We were running on fragmented tools — 104 hours to produce 30 minutes of tutoring content. Then we landed a real school district pilot. I stayed in the office overnight and designed the entire lesson creation tool in 6 hours. Result: **104 hours down to 4 hours** per lesson. First-time users built their first lesson in ~2 hours. Supports **12 schools across 8 districts**. Led the 10-person content team that built thousands of lessons on top of it.
+
+### EverTutor Live
+Designing an AI tutor that didn't exist yet. The hardest part was emotional connection. I hacked through Figma's limitations — writing scripts, converting to audio via ElevenLabs, converting MP3 to MP4 (Figma doesn't support MP3), setting opacity to zero. Invisible but necessary. Visual language rooted in how real teachers teach: handwritten fonts, multi-color highlighting, natural text rhythm. Built a guardrail system with an incrementing timer. Result: **85% completion rate**, students mastering topics in **30 minutes vs 60 in a classroom**, Bloom's 2-sigma effect validated via NWEA exams.
+
+### EverTutor Analytics
+Brief: show teachers whether a student mastered a lesson. Simple, and completely wrong once I sat with the actual data. Students were doing things nobody had named yet. Solution: the **dog-ear system**. Any lesson tile with layered data gets a folded corner. Hovering opens the full picture. Clean by default, complexity on demand. Fully in production.
+
+### Stressie
+Workplace stress affects 83% of US employees. I was founding product designer at a Harvard Innovation Labs incubation, eventually piloted at Amazon and InKind. V1 pilot feedback from 50 Austin PD officers wasn't gentle. Instead of patching it, I called for a full rebuild. Rebuilt the entire visual system from scratch. After redesign, users reported feeling **calmer just from opening the app**. Engagement hit **17.4%** vs ~2% industry average. Design work contributed to securing ~$600K in funding.
+
+### Dearly
+A side project built in 48 hours. You write a message and it renders as animated handwriting on a canvas, stroke by stroke, with your real voice and photos attached, sent as a unique link. Validated the concept with Tegaki first, then designed a **custom SVG glyph set** from scratch when it wasn't enough. Result: **140 letters written**, **35 five-star ratings** with no prompting.
+
+---
+
+## SECTION 3 — HOW I THINK ABOUT DESIGN
+
+Good design is less design. Every element you remove is a trust decision. My hill: usability before craft, always. But usability without craft is just a wireframe.
+
+I sketch before I open Figma. I bring engineers in early. I push back when it matters. I backed opinions with data, not instinct.
+
+---
+
+## SECTION 4 — PERSONALITY
+
+Pet peeve: designing around the brand instead of the user.
+What I geek out about: designers leading anything, because empathy is the skill not the domain.
+How I work: overnight when it matters. Custom SVG glyph sets when no library does what I need. Constraints are the brief.
+
+---
+
+## SECTION 5 — CAREER CONTEXT
+
+Looking for a team that takes hard problems seriously. Stage matters less than the ambition and quality of the problem. I work best in collaborative environments where constructive criticism is a feature not a threat.
+
+Fastest way to reach me: kowshibhanu1000@gmail.com.
+
+---
+
+## SECTION 6 — GUARDRAILS
+
+- Don't invent projects beyond: EverTutor Studio, EverTutor Live, EverTutor Analytics, Stressie, Dearly
+- Don't speculate about salary — redirect to email
+- Don't claim expertise in tools not listed
+- Don't box Bhanu into EdTech
+- If unsure about anything personal, warm email redirect with ☕ and kowshibhanu1000@gmail.com`;
+
+    var messages = [];
+    var isLoading = false;
+    var mediaRecorder = null;
+    var audioChunks = [];
+    var isRecording = false;
+    var recordTarget = 'panel';
+
+    var cbEl    = document.getElementById('cb');
+    var cbInput = document.getElementById('cbInput');
+    var cbSend  = document.getElementById('cbSend');
+    var cbMic   = document.getElementById('cbMic');
+    var cpEl    = document.getElementById('cp');
+    var cpMsgs  = document.getElementById('cpMsgs');
+    var cpStart = document.getElementById('cpStarters');
+    var cpClose = document.getElementById('cpClose');
+    var cpError = document.getElementById('cpError');
+    var cpTA    = document.getElementById('cpTA');
+    var cpMicB  = document.getElementById('cpMicBtn');
+    var cpSendB = document.getElementById('cpSendBtn');
+
+    /* ── Chat bar ── */
+    cbInput.addEventListener('focus', function () { cbEl.classList.add('expanded'); });
+    cbInput.addEventListener('blur',  function () { if (!cbInput.value) cbEl.classList.remove('expanded'); });
+    cbInput.addEventListener('input', function () {
+      cbSend.classList.toggle('vis', cbInput.value.trim().length > 0);
+    });
+    cbInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); cbDoSend(); }
+    });
+    cbSend.addEventListener('click', cbDoSend);
+
+    function cbDoSend() {
+      var text = cbInput.value.trim();
+      if (!text || isLoading) return;
+      cbInput.value = '';
+      cbEl.classList.remove('expanded');
+      cbSend.classList.remove('vis');
+      openChat(text);
+    }
+
+    /* ── Open / close panel ── */
+    function openChat(firstMsg) {
+      document.body.classList.add('chat-open');
+      cpEl.setAttribute('aria-hidden', 'false');
+      if (firstMsg) { appendMsg('user', firstMsg); messages.push({ role: 'user', content: firstMsg }); streamReply(); }
+      setTimeout(function () { cpTA.focus(); }, 600);
+    }
+
+    function closeChat() {
+      document.body.classList.remove('chat-open');
+      cpEl.setAttribute('aria-hidden', 'true');
+    }
+
+    cpClose.addEventListener('click', closeChat);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeChat(); });
+
+    /* ── Global handlers used by inline onclick ── */
+    window.cpChip = function (el) {
+      var text = el.textContent;
+      cpStart.style.display = 'none';
+      if (!document.body.classList.contains('chat-open')) openChat(text);
+      else { appendMsg('user', text); messages.push({ role: 'user', content: text }); streamReply(); }
+    };
+
+    window.cpKey = function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); cpSendMsg(); }
+    };
+
+    window.cpResize = function (el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 105) + 'px';
+    };
+
+    window.cpSendMsg = function () {
+      var text = cpTA.value.trim();
+      if (!text || isLoading) return;
+      cpTA.value = '';
+      cpTA.style.height = 'auto';
+      cpStart.style.display = 'none';
+      appendMsg('user', text);
+      messages.push({ role: 'user', content: text });
+      streamReply();
+    };
+
+    window.cpToggleMic = function () {
+      if (isRecording) stopRecording(); else startRecording('panel');
+    };
+
+    /* ── Streaming reply ── */
+    async function streamReply() {
+      if (isLoading) return;
+      isLoading = true;
+      cpSendB.disabled = true;
+      hideErr();
+
+      var streamEl = appendStreamBubble();
+
+      try {
+        var res = await fetch(API_BASE + '/api/chat', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-5',
+            max_tokens: 1024,
+            system: SYSTEM,
+            messages: messages,
+            stream: true,
+          }),
+        });
+
+        if (!res.ok) {
+          var errData = await res.json().catch(function () { return {}; });
+          streamEl.remove();
+          throw new Error((errData.error && errData.error.message) || ('API error ' + res.status));
+        }
+
+        var reader  = res.body.getReader();
+        var decoder = new TextDecoder();
+        var buf     = '';
+        var full    = '';
+
+        while (true) {
+          var chunk = await reader.read();
+          if (chunk.done) break;
+          buf += decoder.decode(chunk.value, { stream: true });
+          var lines = buf.split('\n');
+          buf = lines.pop();
+          for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+            if (!line.startsWith('data: ')) continue;
+            var data = line.slice(6).trim();
+            if (data === '[DONE]') continue;
+            try {
+              var evt = JSON.parse(data);
+              if (evt.type === 'content_block_delta' && evt.delta && evt.delta.type === 'text_delta') {
+                full += evt.delta.text;
+                updateStreamBubble(streamEl, full);
+              }
+            } catch (_) {}
+          }
+        }
+
+        finalizeStreamBubble(streamEl);
+        messages.push({ role: 'assistant', content: full });
+
+      } catch (err) {
+        showErr('Error: ' + err.message);
+      }
+
+      isLoading = false;
+      cpSendB.disabled = false;
+    }
+
+    /* ── DOM helpers ── */
+    function appendMsg(role, text) {
+      var div = document.createElement('div');
+      div.className = 'cp-msg ' + role;
+      div.innerHTML = '<div class="cp-bubble">' + (role === 'user' ? esc(text) : renderMd(text)) + '</div>';
+      cpMsgs.appendChild(div);
+      cpMsgs.scrollTop = cpMsgs.scrollHeight;
+    }
+
+    function appendStreamBubble() {
+      var div = document.createElement('div');
+      div.className = 'cp-msg assistant';
+      div.innerHTML = '<div class="cp-bubble"><span class="cp-cursor"></span></div>';
+      cpMsgs.appendChild(div);
+      cpMsgs.scrollTop = cpMsgs.scrollHeight;
+      return div;
+    }
+
+    function updateStreamBubble(el, text) {
+      el.querySelector('.cp-bubble').innerHTML = renderMd(text) + '<span class="cp-cursor"></span>';
+      cpMsgs.scrollTop = cpMsgs.scrollHeight;
+    }
+
+    function finalizeStreamBubble(el) {
+      var cur = el.querySelector('.cp-cursor');
+      if (cur) cur.remove();
+    }
+
+    function esc(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function renderMd(str) {
+      var s = esc(str);
+      s = s.replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>');
+      var lines = s.split('\n'), out = [], inList = false;
+      for (var i = 0; i < lines.length; i++) {
+        var l = lines[i];
+        if (/^- (.+)/.test(l)) {
+          if (!inList) { out.push('<ul>'); inList = true; }
+          out.push('<li>' + l.replace(/^- /, '') + '</li>');
+        } else {
+          if (inList) { out.push('</ul>'); inList = false; }
+          out.push(l);
+        }
+      }
+      if (inList) out.push('</ul>');
+      return out.join('\n')
+        .replace(/\n(?!<\/?(ul|li))/g, '<br>')
+        .replace(/<br>\s*<ul>/g, '<ul>')
+        .replace(/<\/ul>\s*<br>/g, '</ul>');
+    }
+
+    function showErr(msg) { cpError.textContent = msg; cpError.classList.add('vis'); }
+    function hideErr()    { cpError.classList.remove('vis'); }
+
+    /* ── Voice recording (OpenAI Whisper) ── */
+    async function startRecording(target) {
+      recordTarget = target || 'panel';
+      try {
+        var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        var mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+        mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = function (e) { if (e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.onstop = function () {
+          stream.getTracks().forEach(function (t) { t.stop(); });
+          transcribeAudio(new Blob(audioChunks, { type: mimeType }), mimeType);
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        cbMic.classList.add('recording');
+        cpMicB.classList.add('recording');
+      } catch (err) {
+        showErr('Microphone access denied — check browser permissions');
+      }
+    }
+
+    function stopRecording() {
+      if (!mediaRecorder || !isRecording) return;
+      mediaRecorder.stop();
+      isRecording = false;
+      cbMic.classList.remove('recording'); cbMic.classList.add('transcribing');
+      cpMicB.classList.remove('recording'); cpMicB.classList.add('transcribing');
+    }
+
+    async function transcribeAudio(blob, mimeType) {
+      var ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+      var fd  = new FormData();
+      fd.append('file', blob, 'audio.' + ext);
+      fd.append('model', 'whisper-1');
+
+      var openAIKey = localStorage.getItem('bhanu_test_openai_key') || '';
+      var headers   = {};
+      if (openAIKey) headers['X-OpenAI-Key'] = openAIKey;
+
+      try {
+        var res  = await fetch(API_BASE + '/api/transcribe', { method: 'POST', headers: headers, body: fd });
+        var data = await res.json();
+        if (data.text) {
+          var t = data.text.trim();
+          if (recordTarget === 'bar') {
+            cbInput.value = t;
+            cbSend.classList.toggle('vis', t.length > 0);
+            if (!document.body.classList.contains('chat-open')) cbEl.classList.add('expanded');
+            cbInput.focus();
+          } else {
+            cpTA.value = t;
+            cpResize(cpTA);
+            cpTA.focus();
+          }
+          hideErr();
+        } else {
+          showErr('Transcription error: ' + ((data.error && data.error.message) || 'unknown'));
+        }
+      } catch (err) {
+        showErr('Voice transcription failed — is the proxy running?');
+      } finally {
+        cbMic.classList.remove('recording', 'transcribing');
+        cpMicB.classList.remove('recording', 'transcribing');
+      }
+    }
+
+    cbMic.addEventListener('click', function () {
+      if (isRecording) stopRecording();
+      else startRecording(document.body.classList.contains('chat-open') ? 'panel' : 'bar');
+    });
+
+    /* ── Rotating placeholder ── */
+    var PLACEHOLDERS = [
+      'Ask how I built a $70M product from zero as the only designer…',
+      'Ask how I designed a scalable lesson tool in 6 hours…',
+      'Ask how I made an AI feel human enough to teach…',
+      'Ask what I learned from 50 police officers tearing apart my work…',
+      'Ask how I built a handwriting system from scratch in 48 hours…',
+      'Ask why usability without craft is just a wireframe…',
+      'Ask how I led a 10-person team without being an educator…',
+    ];
+    (function () {
+      var idx = 0, charIdx = 0, typing = true;
+      function tick() {
+        if (document.activeElement === cbInput || document.body.classList.contains('chat-open')) {
+          setTimeout(tick, 300); return;
+        }
+        var target = PLACEHOLDERS[idx];
+        if (typing) {
+          charIdx++;
+          cbInput.placeholder = target.slice(0, charIdx);
+          if (charIdx >= target.length) { typing = false; setTimeout(tick, 2600); return; }
+          setTimeout(tick, 38);
+        } else {
+          charIdx--;
+          cbInput.placeholder = target.slice(0, charIdx);
+          if (charIdx <= 0) { typing = true; idx = (idx + 1) % PLACEHOLDERS.length; setTimeout(tick, 400); return; }
+          setTimeout(tick, 18);
+        }
+      }
+      setTimeout(tick, 1400);
+    })();
+
+  })();
+  </script>
+
 </body>
 </html>
