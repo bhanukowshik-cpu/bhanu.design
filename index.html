@@ -35,17 +35,17 @@
     }
 
     [data-theme="dark"] {
-      --bg:           #141413;
-      --white:        #1D1C1A;
+      --bg:           #16140F;
+      --white:        #1E1C17;
       --secondary:    #F0EDE8;
       --grey:         #999999;
-      --border:       #2E2E2B;
-      --surface:      #232321;
-      --surface-alt:  #2A2927;
-      --surface-warm: #2E2B28;
-      --dot-color:    rgba(255, 255, 255, 0.15);
-      --nav-bg:       rgba(20, 20, 19, 0.94);
-      --nav-bg-sc:    rgba(20, 20, 19, 0.88);
+      --border:       #302C24;
+      --surface:      #252018;
+      --surface-alt:  #2C2820;
+      --surface-warm: #332E26;
+      --dot-color:    rgba(255, 255, 255, 0.13);
+      --nav-bg:       rgba(22, 20, 15, 0.94);
+      --nav-bg-sc:    rgba(22, 20, 15, 0.72);
     }
 
     html { scroll-behavior: smooth; }
@@ -2872,26 +2872,60 @@
     }
 
     /* ─── THEME TOGGLE BUTTON ────────────────────────────────── */
+    /* ─── THEME TOGGLE — iOS-style pill ─────────────────────── */
     .theme-toggle {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
       background: none;
       border: none;
+      padding: 3px;
       cursor: pointer !important;
       flex-shrink: 0;
-      color: var(--secondary);
-      transition: background 0.15s ease;
-      padding: 0;
+      border-radius: 100px;
     }
-    .theme-toggle:hover { background: var(--surface-alt); }
-    .theme-icon-sun  { display: none; }
-    .theme-icon-moon { display: block; }
-    [data-theme="dark"] .theme-icon-sun  { display: block; }
-    [data-theme="dark"] .theme-icon-moon { display: none; }
+    .tt-track {
+      display: flex;
+      align-items: center;
+      width: 48px;
+      height: 26px;
+      border-radius: 100px;
+      background: rgba(37,37,37,0.10);
+      border: 1px solid rgba(37,37,37,0.14);
+      padding: 3px;
+      flex-shrink: 0;
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    .tt-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.10);
+      transform: translateX(0);
+      transition: transform 0.38s cubic-bezier(0.34,1.56,0.64,1),
+                  background 0.3s ease,
+                  box-shadow 0.3s ease;
+      flex-shrink: 0;
+      color: #252525;
+    }
+    .tt-sun  { display: none; }
+    .tt-moon { display: block; }
+    [data-theme="dark"] .tt-track {
+      background: rgba(240,237,232,0.12);
+      border-color: rgba(240,237,232,0.18);
+    }
+    [data-theme="dark"] .tt-thumb {
+      transform: translateX(22px);
+      background: #2A2720;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.28);
+      color: #F0EDE8;
+    }
+    [data-theme="dark"] .tt-sun  { display: block; }
+    [data-theme="dark"] .tt-moon { display: none; }
 
     /* ─── DARK MODE TARGETED OVERRIDES ──────────────────────── */
     [data-theme="dark"] .greeting {
@@ -2990,6 +3024,30 @@
     [data-theme="dark"] .top-nav.scrolled .nav-chip { border-color: rgba(240,237,232,0.18); }
     [data-theme="dark"] .nav-chip:hover   { background: rgba(240,237,232,0.05); }
 
+    /* ── Dark card — warm glow lift ─────────────────────────── */
+    [data-theme="dark"] .card {
+      box-shadow: 0 4px 6px rgba(0,0,0,0.22),
+                  0 12px 40px rgba(0,0,0,0.50),
+                  0 0 0 0.5px rgba(230,242,141,0.06);
+    }
+
+    /* ── Glassy scrolled nav in dark mode (#5) ──────────────── */
+    [data-theme="dark"] .top-nav.scrolled {
+      background: rgba(22, 20, 15, 0.68);
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.32),
+                  0 4px 24px rgba(0,0,0,0.24),
+                  0 0 0 0.5px rgba(240,237,232,0.08);
+    }
+
+    /* ── Smooth theme transition (#1) ───────────────────────── */
+    html.color-transitioning * {
+      transition-property: background-color, color, border-color, box-shadow, opacity !important;
+      transition-duration: 0.28s !important;
+      transition-timing-function: ease !important;
+    }
+
     /* Case study cards — fix mark text + explore button in dark mode */
     [data-theme="dark"] .metric-value mark { color: #1A1917; }
     [data-theme="dark"] .explore-btn {
@@ -3024,7 +3082,7 @@
     .page { transition: padding-right 0.55s cubic-bezier(0.16,1,0.3,1); }
     body.chat-open .page { padding-right: 440px; }
 
-    /* ── Floating bar wrapper ── */
+    /* ── Floating bar wrapper — is the gradient border ring ── */
     .cb-wrap {
       position: fixed;
       bottom: 20px;
@@ -3032,14 +3090,23 @@
       transform: translateX(-50%);
       z-index: 1200;
       transition: opacity 0.3s ease, transform 0.3s ease;
+      background: linear-gradient(120deg, #7C5CFC 0%, #C44DFB 28%, #FF6B6B 52%, #FFA44D 76%, #7C5CFC 100%);
+      background-size: 200% 200%;
+      animation: cbGrad 5s ease infinite;
+      border-radius: 102px;
+      padding: 1.5px;
     }
     body.chat-open .cb-wrap {
       opacity: 0;
       pointer-events: none;
       transform: translateX(-50%) translateY(14px);
     }
+    @keyframes cbGrad {
+      0%,100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
+    }
 
-    /* ── Glass pill bar ── */
+    /* ── Glass pill bar — dark interior inside the gradient wrapper ── */
     .cb {
       position: relative;
       display: flex;
@@ -3049,25 +3116,11 @@
       height: 50px;
       width: 320px;
       border-radius: 100px;
-      background: rgba(12,12,20,0.82);
+      background: rgba(14, 14, 22, 0.88);
       backdrop-filter: blur(28px);
       -webkit-backdrop-filter: blur(28px);
       cursor: text;
       transition: width 0.45s cubic-bezier(0.16,1,0.3,1);
-    }
-    .cb::before {
-      content: '';
-      position: absolute;
-      inset: -1.5px;
-      border-radius: 102px;
-      background: linear-gradient(120deg, #7C5CFC 0%, #C44DFB 28%, #FF6B6B 52%, #FFA44D 76%, #7C5CFC 100%);
-      background-size: 200% 200%;
-      animation: cbGrad 5s ease infinite;
-      z-index: -1;
-    }
-    @keyframes cbGrad {
-      0%,100% { background-position: 0% 50%; }
-      50%      { background-position: 100% 50%; }
     }
     .cb.expanded { width: 600px; }
 
@@ -3360,8 +3413,12 @@
     </div>
     <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-        <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M15.5 11A7 7 0 0 1 7 2.5a7 7 0 1 0 8.5 8.5z"/></svg>
-        <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="9" r="3.2"/><line x1="9" y1="1.2" x2="9" y2="2.8"/><line x1="9" y1="15.2" x2="9" y2="16.8"/><line x1="1.2" y1="9" x2="2.8" y2="9"/><line x1="15.2" y1="9" x2="16.8" y2="9"/><line x1="3.4" y1="3.4" x2="4.5" y2="4.5"/><line x1="13.5" y1="13.5" x2="14.6" y2="14.6"/><line x1="14.6" y1="3.4" x2="13.5" y2="4.5"/><line x1="4.5" y1="13.5" x2="3.4" y2="14.6"/></svg>
+        <span class="tt-track">
+          <span class="tt-thumb">
+            <svg class="tt-moon" width="11" height="11" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15.5 11A7 7 0 0 1 7 2.5a7 7 0 1 0 8.5 8.5z"/></svg>
+            <svg class="tt-sun" width="11" height="11" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="9" r="3.2"/><line x1="9" y1="1.2" x2="9" y2="2.8"/><line x1="9" y1="15.2" x2="9" y2="16.8"/><line x1="1.2" y1="9" x2="2.8" y2="9"/><line x1="15.2" y1="9" x2="16.8" y2="9"/><line x1="3.4" y1="3.4" x2="4.5" y2="4.5"/><line x1="13.5" y1="13.5" x2="14.6" y2="14.6"/><line x1="14.6" y1="3.4" x2="13.5" y2="4.5"/><line x1="4.5" y1="13.5" x2="3.4" y2="14.6"/></svg>
+          </span>
+        </span>
       </button>
       <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -5591,7 +5648,11 @@
     var btn  = document.getElementById('themeToggle');
     var KEY  = 'portfolio-theme';
 
-    function apply(theme) {
+    function apply(theme, animate) {
+      if (animate) {
+        root.classList.add('color-transitioning');
+        setTimeout(function() { root.classList.remove('color-transitioning'); }, 380);
+      }
       root.setAttribute('data-theme', theme);
       try { localStorage.setItem(KEY, theme); } catch(e) {}
     }
@@ -5599,14 +5660,14 @@
     var saved = null;
     try { saved = localStorage.getItem(KEY); } catch(e) {}
     if (saved === 'dark' || saved === 'light') {
-      apply(saved);
+      apply(saved, false);
     } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      apply('dark');
+      apply('dark', false);
     }
 
     if (btn) {
       btn.addEventListener('click', function() {
-        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
       });
     }
   })();
