@@ -392,7 +392,7 @@
     <div class="error-bar" id="errorBar"></div>
 
     <div class="chat-input-area">
-      <textarea id="msgInput" placeholder="Ask about Bhanu's work…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <textarea id="msgInput" placeholder="" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
       <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled title="Add your API key above to start">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
@@ -891,6 +891,59 @@ if any of this sounds like what you're looking for, the fastest way to reach me 
         .replace(/<br>\s*<ul>/g, '<ul>')
         .replace(/<\/ul>\s*<br>/g, '</ul>');
     }
+
+    // ── Rotating placeholder ──
+    const PLACEHOLDERS = [
+      'Ask how I built a $70M product from zero as the only designer…',
+      'Ask how I designed a scalable lesson tool in 6 hours…',
+      'Ask how I made an AI feel human enough to teach…',
+      'Ask what I learned from 50 police officers tearing apart my work…',
+      'Ask how I built a handwriting system from scratch in 48 hours…',
+      'Ask why usability without craft is just a wireframe…',
+      'Ask how I led a 10-person team without being an educator…',
+      'Ask what I'd do differently if I had more time…',
+    ];
+
+    (function rotatePlaceholder() {
+      const input = document.getElementById('msgInput');
+      let idx = 0;
+      let charIdx = 0;
+      let typing = true;
+      let pauseTimer = null;
+
+      function tick() {
+        if (document.activeElement === input || isLoading) {
+          pauseTimer = setTimeout(tick, 300);
+          return;
+        }
+
+        const target = PLACEHOLDERS[idx];
+
+        if (typing) {
+          charIdx++;
+          input.placeholder = target.slice(0, charIdx);
+          if (charIdx >= target.length) {
+            typing = false;
+            pauseTimer = setTimeout(tick, 2600); // pause when full
+            return;
+          }
+          pauseTimer = setTimeout(tick, 38);
+        } else {
+          charIdx--;
+          input.placeholder = target.slice(0, charIdx);
+          if (charIdx <= 0) {
+            typing = true;
+            idx = (idx + 1) % PLACEHOLDERS.length;
+            pauseTimer = setTimeout(tick, 400); // pause before next
+            return;
+          }
+          pauseTimer = setTimeout(tick, 18);
+        }
+      }
+
+      // Start after a short delay so page feels settled
+      setTimeout(tick, 1200);
+    })();
   </script>
 </body>
 </html>
