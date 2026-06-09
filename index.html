@@ -25,19 +25,46 @@
       --green:      #4CAF50;
       --font-heading: 'Montserrat', sans-serif;
       --font-mono:    'JetBrains Mono', monospace;
+      /* Theme surfaces */
+      --surface:      #FFFFFF;
+      --surface-alt:  #F2F2F2;
+      --surface-warm: #F0EDE8;
+      --dot-color:    rgba(0, 0, 0, 0.13);
+      --nav-bg:       rgba(255, 252, 248, 0.92);
+      --nav-bg-sc:    rgba(255, 252, 248, 0.78);
+    }
+
+    [data-theme="dark"] {
+      --bg:           #141413;
+      --white:        #1D1C1A;
+      --secondary:    #F0EDE8;
+      --grey:         #999999;
+      --border:       #2E2E2B;
+      --surface:      #232321;
+      --surface-alt:  #2A2927;
+      --surface-warm: #2E2B28;
+      --dot-color:    rgba(255, 255, 255, 0.06);
+      --nav-bg:       rgba(20, 20, 19, 0.94);
+      --nav-bg-sc:    rgba(20, 20, 19, 0.88);
     }
 
     html { scroll-behavior: smooth; }
 
-    /* ─── PAGE — whiteboard canvas dot-grid ─────────────────── */
+    /* ─── PAGE — whiteboard canvas dot-grid (now magnetic canvas) ── */
     body {
-      background-color: #FFFCF8;
-      background-image: radial-gradient(circle, rgba(0,0,0,0.13) 0.8px, transparent 0.8px);
-      background-size: 18px 18px;
-      background-attachment: fixed;   /* grid stays put as page scrolls */
+      background-color: var(--bg);
       min-height: 100vh;
       font-family: var(--font-heading);
       overflow-x: hidden;
+    }
+
+    /* ─── MAGNETIC DOT CANVAS ───────────────────────────────── */
+    #dotCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
     }
 
     /* ─── OUTER WRAPPER ──────────────────────────────────────── */
@@ -45,6 +72,8 @@
       display: flex;
       justify-content: center;
       padding: 94px 24px 90px;
+      position: relative;
+      z-index: 1;
     }
 
     /* ─── MAIN CARD ──────────────────────────────────────────── */
@@ -174,7 +203,7 @@
       flex-direction: row;
       align-items: stretch;
       min-height: 500px;
-      background-color: #FEFDFB;
+      background-color: var(--surface);
       box-shadow:
         0 0 0 1px rgba(255,255,255,0.7) inset,
         0 2px 8px rgba(0,0,0,0.03),
@@ -291,7 +320,7 @@
                   background 0.15s ease, border-color 0.15s ease;
     }
     .hf-cta-link:hover {
-      background: #F2F2F2;
+      background: var(--surface-alt);
       border-color: transparent;
     }
     .hf-role-pills {
@@ -304,7 +333,7 @@
       font-size: 11px;
       font-weight: 500;
       color: rgba(37,37,37,0.64);
-      background: rgba(255,255,255,0.85);
+      background: var(--surface);
       border: 1px solid rgba(37,37,37,0.11);
       opacity: 1;
       transform: translateY(0);
@@ -529,8 +558,8 @@
       position: relative;
       margin: 27px 40px 0;
       height: 160px;
-      background: #ffffff;
-      border: 1px solid #EBEBEB;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 10px;
       display: flex;
       align-items: center;
@@ -577,7 +606,7 @@
       padding: 14px 36px;
       border: 2px solid #AEBC48;
       border-radius: 5px;
-      background: #ffffff;
+      background: var(--surface);
       font-family: var(--font-mono);
       font-weight: 500;
       font-size: 14px;
@@ -593,7 +622,7 @@
       position: absolute;
       width: 14px;
       height: 14px;
-      background: #ffffff;
+      background: var(--surface);
       border: 2px solid #AEBC48;
       border-radius: 0;
     }
@@ -606,8 +635,8 @@
     .sd-measure {
       position: absolute;
       top: 50%;
-      background: #F2F2F2;
-      color: #515151;
+      background: var(--surface-alt);
+      color: var(--grey);
       font-family: var(--font-mono);
       font-size: 10px;
       font-weight: 500;
@@ -876,7 +905,7 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 500;
-      background: rgba(255, 252, 248, 0.92);
+      background: var(--nav-bg);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       box-shadow: 0 1px 0 rgba(0,0,0,0.05);
@@ -899,7 +928,7 @@
       top: 12px;
       left: max(4px, calc(50% - 620px));
       right: max(4px, calc(50% - 620px));
-      background: rgba(255, 252, 248, 0.78);
+      background: var(--nav-bg-sc);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
       border-radius: 20px;
@@ -1054,7 +1083,7 @@
       transition: background 0.15s ease;
     }
     .nav-work:hover {
-      background: #F2F2F2;
+      background: var(--surface-alt);
     }
 
     /* ── scrolled nav chip ── */
@@ -1329,15 +1358,15 @@
     .caption-row .shipped-pill { margin-left: auto; }
     .shipped-pill {
       font-family: var(--font-mono); font-size: 11px; font-weight: 500;
-      letter-spacing: 0.05em; color: #555;
-      background: #F0EDE8; border-radius: 100px;
+      letter-spacing: 0.05em; color: var(--grey);
+      background: var(--surface-warm); border-radius: 100px;
       padding: 3px 10px; white-space: nowrap; flex-shrink: 0;
     }
     .shipped-pill-overlay {
       position: absolute; bottom: 14px; right: 14px; z-index: 5;
       font-family: var(--font-mono); font-size: 11px; font-weight: 500;
-      letter-spacing: 0.05em; color: #555;
-      background: #F0EDE8; border-radius: 100px;
+      letter-spacing: 0.05em; color: var(--grey);
+      background: var(--surface-warm); border-radius: 100px;
       padding: 3px 10px; white-space: nowrap;
       pointer-events: none;
     }
@@ -1381,7 +1410,7 @@
     .explore-btn.explore-btn--outline:hover { opacity: 1; background: var(--secondary); color: #fff; }
 
     .connect-frame {
-      background: #F7F7F7;
+      background: var(--surface-alt);
       border-radius: 10px;
       padding: 10px 20px;
       font-family: var(--font-heading);
@@ -1404,7 +1433,7 @@
     }
     .metric-card {
       flex: 1;
-      background: #fff;
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 10px 15px;
@@ -1555,15 +1584,15 @@
 
     /* ── Large desktop: wider card, scaled sections ─────────────── */
     @media (min-width: 1600px) {
-      .card                { max-width: 1600px; }
+      .card                { max-width: 1280px; }
     }
     @media (min-width: 1440px) {
-      .card                { max-width: 1440px; }
-      .product-area        { height: 600px; }
-      .hero-frame          { min-height: 540px; }
+      .card                { max-width: 1300px; }
+      .product-area        { height: 500px; }
+      .hero-frame          { min-height: 460px; }
       .sticky-stack        { width: 444px; height: 444px; }
       .sticky-note         { width: 362px; height: 362px; top: 41px; left: 41px; padding: 29px 29px 24px; }
-      .top-nav.scrolled    { left: max(4px, calc(50% - 720px)); right: max(4px, calc(50% - 720px)); }
+      .top-nav.scrolled    { left: max(4px, calc(50% - 650px)); right: max(4px, calc(50% - 650px)); }
     }
 
 
@@ -2062,6 +2091,7 @@
       opacity: 0;
       will-change: transform;
       transition: opacity 0.2s ease;
+      background: var(--surface);
     }
     #ccLabel.cc-label-visible { opacity: 1; }
     .cc-lbl-icon {
@@ -2120,7 +2150,7 @@
     }
     .sfh {
       position: absolute;
-      background: #ffffff;
+      background: var(--surface);
       border: 2px solid #AEBC48;
       border-radius: 0;
       z-index: 2;
@@ -2190,7 +2220,7 @@
       font-weight: 500;
       color: #1A73E8;
       letter-spacing: 0.04em;
-      background: #FAFAF7;
+      background: var(--bg);
       padding: 1px 4px;
       border-radius: 3px;
     }
@@ -2229,7 +2259,7 @@
       color: #1A73E8;
       letter-spacing: 0.04em;
       white-space: nowrap;
-      background: #FAFAF7;
+      background: var(--bg);
       padding: 1px 4px;
       border-radius: 3px;
     }
@@ -2840,6 +2870,87 @@
       .sn-title                        { font-size: 16px; }
       .sn-body, .sn-body.sn-body--lg   { font-size: 10px; line-height: 1.5; }
     }
+
+    /* ─── THEME TOGGLE BUTTON ────────────────────────────────── */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: none;
+      border: none;
+      cursor: pointer !important;
+      flex-shrink: 0;
+      color: var(--secondary);
+      transition: background 0.15s ease;
+      padding: 0;
+    }
+    .theme-toggle:hover { background: var(--surface-alt); }
+    .theme-icon-sun  { display: none; }
+    .theme-icon-moon { display: block; }
+    [data-theme="dark"] .theme-icon-sun  { display: block; }
+    [data-theme="dark"] .theme-icon-moon { display: none; }
+
+    /* ─── DARK MODE TARGETED OVERRIDES ──────────────────────── */
+    [data-theme="dark"] .greeting {
+      color: rgba(240, 237, 232, 0.38);
+    }
+    [data-theme="dark"] .cursor {
+      background: var(--secondary);
+    }
+    [data-theme="dark"] .hero-frame {
+      border-color: rgba(240, 237, 232, 0.07);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.4) inset,
+                  0 2px 8px rgba(0,0,0,0.3),
+                  0 8px 32px rgba(0,0,0,0.25);
+    }
+    [data-theme="dark"] .hf-section-label {
+      color: rgba(240, 237, 232, 0.32);
+    }
+    [data-theme="dark"] .hf-role-pill {
+      color: rgba(240, 237, 232, 0.60);
+      background: rgba(35, 35, 33, 0.9);
+      border-color: rgba(240, 237, 232, 0.11);
+    }
+    [data-theme="dark"] .hero-subtext strong {
+      color: rgba(240, 237, 232, 0.85);
+    }
+    [data-theme="dark"] .current-badge {
+      border-color: var(--border);
+    }
+    [data-theme="dark"] .case-study-card {
+      background: var(--surface);
+      border-color: rgba(240, 237, 232, 0.15);
+    }
+    [data-theme="dark"] .sd-selected {
+      color: var(--secondary);
+    }
+    [data-theme="dark"] .nav-hamburger:hover { background: rgba(240,237,232,0.07); }
+    [data-theme="dark"] .nav-hamburger span  { background: var(--secondary); }
+    [data-theme="dark"] .mobile-menu {
+      background: #1D1C1A;
+      box-shadow: -8px 0 32px rgba(0,0,0,0.5);
+    }
+    [data-theme="dark"] .mobile-menu a {
+      color: var(--secondary);
+      border-bottom-color: var(--border);
+    }
+    [data-theme="dark"] .mobile-menu-backdrop { background: rgba(0,0,0,0.6); }
+    [data-theme="dark"] .hf-cta-link {
+      color: var(--secondary);
+      border-bottom-color: rgba(240,237,232,0.3);
+    }
+    [data-theme="dark"] .nav-callme-label { color: rgba(240,237,232,0.5); }
+    [data-theme="dark"] .top-nav.scrolled  { box-shadow: 0 1px 8px rgba(0,0,0,0.2), 0 4px 20px rgba(0,0,0,0.18); }
+    [data-theme="dark"] #copyToast        { background: rgba(240,237,232,0.12); }
+    [data-theme="dark"] #ccDot            { background: rgba(240,237,232,0.7); }
+    [data-theme="dark"] #ccLabel          { border-color: rgba(240,237,232,0.1); }
+    [data-theme="dark"] .cc-lbl-text      { color: var(--secondary); }
+    [data-theme="dark"] .nav-chip         { color: var(--secondary); }
+    [data-theme="dark"] .top-nav.scrolled .nav-chip { border-color: rgba(240,237,232,0.18); }
+    [data-theme="dark"] .nav-chip:hover   { background: rgba(240,237,232,0.05); }
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
@@ -2852,6 +2963,7 @@
 </head>
 
 <body>
+<canvas id="dotCanvas" aria-hidden="true"></canvas>
 
   <!-- TOP NAV -->
   <nav class="top-nav" id="topNav">
@@ -2871,9 +2983,15 @@
         <span class="nav-chip-dot"></span>Side project · 48hr build ↗
       </a>
     </div>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+    <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M15.5 11A7 7 0 0 1 7 2.5a7 7 0 1 0 8.5 8.5z"/></svg>
+        <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="9" r="3.2"/><line x1="9" y1="1.2" x2="9" y2="2.8"/><line x1="9" y1="15.2" x2="9" y2="16.8"/><line x1="1.2" y1="9" x2="2.8" y2="9"/><line x1="15.2" y1="9" x2="16.8" y2="9"/><line x1="3.4" y1="3.4" x2="4.5" y2="4.5"/><line x1="13.5" y1="13.5" x2="14.6" y2="14.6"/><line x1="14.6" y1="3.4" x2="13.5" y2="4.5"/><line x1="4.5" y1="13.5" x2="3.4" y2="14.6"/></svg>
+      </button>
+      <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </nav>
 
   <div class="mobile-menu-backdrop" id="menuBackdrop"></div>
@@ -5092,6 +5210,32 @@
     });
   })();
 
+  /* ── Dark / Light mode toggle ─────────────────────────────────────────── */
+  (function() {
+    var root = document.documentElement;
+    var btn  = document.getElementById('themeToggle');
+    var KEY  = 'portfolio-theme';
+
+    function apply(theme) {
+      root.setAttribute('data-theme', theme);
+      try { localStorage.setItem(KEY, theme); } catch(e) {}
+    }
+
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch(e) {}
+    if (saved === 'dark' || saved === 'light') {
+      apply(saved);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      apply('dark');
+    }
+
+    if (btn) {
+      btn.addEventListener('click', function() {
+        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+    }
+  })();
+
   /* ── Fix nav position: move nav out of will-change:transform ancestor (browser extension compat) ── */
   (function fixNavContainingBlock() {
     function fix() {
@@ -5117,6 +5261,90 @@
     } else {
       setTimeout(fix, 100);
     }
+  })();
+
+  /* ═══════════════════════════════════════════════════════════
+     MAGNETIC DOT GRID — spring physics, replaces CSS bg dots
+     ═══════════════════════════════════════════════════════════ */
+  (function () {
+    const canvas = document.getElementById('dotCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const SPACING   = 18;
+    const DOT_R     = 0.8;
+    const ATTRACT_R = 100;
+    const MAX_PUSH  = 18;
+    const STIFFNESS = 0.07;
+    const DAMPING   = 0.72;
+    const R2        = ATTRACT_R * ATTRACT_R;
+
+    let W = 0, H = 0, dots = [];
+    let mx = -9999, my = -9999;
+
+    function dotColor() {
+      return document.documentElement.getAttribute('data-theme') === 'dark'
+        ? 'rgba(255,255,255,0.06)'
+        : 'rgba(0,0,0,0.13)';
+    }
+
+    function build() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width  = W;
+      canvas.height = H;
+      dots = [];
+      for (let ry = 0; ry <= H + SPACING; ry += SPACING) {
+        for (let rx = 0; rx <= W + SPACING; rx += SPACING) {
+          dots.push({ rx, ry, x: rx, y: ry, vx: 0, vy: 0 });
+        }
+      }
+    }
+
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = dotColor();
+      ctx.beginPath();
+
+      for (let i = 0; i < dots.length; i++) {
+        const d  = dots[i];
+        const dx = mx - d.rx;
+        const dy = my - d.ry;
+        const d2 = dx * dx + dy * dy;
+
+        if (d2 < R2 && d2 > 0) {
+          const dist  = Math.sqrt(d2);
+          const force = (1 - dist / ATTRACT_R) * MAX_PUSH;
+          d.vx += ((d.rx + dx / dist * force) - d.x) * STIFFNESS;
+          d.vy += ((d.ry + dy / dist * force) - d.y) * STIFFNESS;
+        } else {
+          d.vx += (d.rx - d.x) * STIFFNESS;
+          d.vy += (d.ry - d.y) * STIFFNESS;
+        }
+        d.vx *= DAMPING;
+        d.vy *= DAMPING;
+        d.x  += d.vx;
+        d.y  += d.vy;
+
+        ctx.moveTo(d.x + DOT_R, d.y);
+        ctx.arc(d.x, d.y, DOT_R, 0, Math.PI * 2);
+      }
+
+      ctx.fill();
+      requestAnimationFrame(frame);
+    }
+
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    document.addEventListener('mouseleave', () => { mx = -9999; my = -9999; });
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(build, 150);
+    });
+
+    build();
+    requestAnimationFrame(frame);
   })();
   </script>
 </body>
