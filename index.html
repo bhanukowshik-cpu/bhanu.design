@@ -3091,14 +3091,7 @@
       z-index: 1200;
       transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
       overflow: hidden;
-      border-radius: 999px;
-      animation: cb-glow-breathe 9s ease-in-out infinite;
-    }
-    /* ambient tinted glow that slowly cycles hue — sits outside the clip */
-    @keyframes cb-glow-breathe {
-      0%, 100% { box-shadow: 0 12px 40px -12px rgba(255,110,170,0.30); }
-      33%      { box-shadow: 0 12px 40px -12px rgba(110,140,255,0.32); }
-      66%      { box-shadow: 0 12px 40px -12px rgba(80,215,180,0.28); }
+      border-radius: 100px;
     }
     .cb-wrap:hover,
     .cb-wrap:focus-within { transform: translateX(-50%) translateY(-2px); }
@@ -3112,41 +3105,51 @@
     /* Interior: backdrop blur + corner specular only (Layer 4 from useLiquidGlass.js).
      * Rim: ::before with mask-composite punches out the interior so the rim
      * gradient (Layer 3) is confined to the 1.4px border ring — no bleed. */
+    /* Artlist recipe: flat dark smoke layer + radial light bloom rising from
+     * the bottom edge, soft blur, full-pill radius, hairline rim. */
     .glass-pill {
-      background: rgba(255,255,255,0.18);
-      backdrop-filter: blur(32px) saturate(160%) brightness(108%);
-      -webkit-backdrop-filter: blur(32px) saturate(160%) brightness(108%);
-      border-radius: 999px;
+      background-image:
+        linear-gradient(0deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+        radial-gradient(34.57% 51.92% at 49.87% 95.19%, rgba(247,247,252,0.08) 33.17%, rgba(247,247,252,0) 100%);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 100px;
       border: none;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.22),
+        0 12px 40px rgba(0,0,0,0.28);
       transition: background 0.2s ease, box-shadow 0.2s ease;
     }
-    /* shine sweep — clipped by .cb-wrap's overflow:hidden */
-    .glass-pill::before {
-      content: '';
-      position: absolute;
-      top: 0; bottom: 0;
-      left: -30%;
-      width: 40%;
-      background: linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent);
-      transform: skewX(-15deg) translateX(-150%);
-      pointer-events: none;
+    [data-theme="light"] .glass-pill {
+      background-image:
+        linear-gradient(0deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+        radial-gradient(34.57% 51.92% at 49.87% 95.19%, rgba(247,247,252,0.08) 33.17%, rgba(247,247,252,0) 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.22),
+        0 12px 40px rgba(0,0,0,0.28);
     }
-    .glass-pill:hover::before { animation: cb-shine 0.9s ease; }
-    @keyframes cb-shine { to { transform: skewX(-15deg) translateX(450%); } }
+    .glass-pill::before { display: none; }
     .glass-pill::after {
       content: '';
       position: absolute;
       inset: 0;
-      border-radius: 999px;
+      border-radius: 100px;
       background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-      opacity: 0.035;
+      opacity: 0; /* noise off — Artlist glass is clean */
       mix-blend-mode: overlay;
       pointer-events: none;
     }
-    .glass-pill:hover {
-      background: rgba(255,255,255,0.24);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.70);
+    .glass-pill:hover,
+    [data-theme="light"] .glass-pill:hover {
+      background-image:
+        linear-gradient(0deg, rgba(8,8,10,0.52), rgba(8,8,10,0.52)),
+        radial-gradient(34.57% 51.92% at 49.87% 95.19%, rgba(247,247,252,0.12) 33.17%, rgba(247,247,252,0) 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.16),
+        inset 0 1px 0 rgba(255,255,255,0.30),
+        0 12px 40px rgba(0,0,0,0.32);
     }
 
     /* ── Rainbow arc behind pill ── */
@@ -3164,9 +3167,10 @@
       );
       animation: pill-arc-spin 6s linear infinite;
       pointer-events: none;
-      opacity: 0.55;
+      opacity: 0.375;
       transition: top 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    [data-theme="light"] #pill-arc { opacity: 0.275; }
     @keyframes pill-arc-spin {
       from { transform: translateX(-50%) rotate(0deg); }
       to   { transform: translateX(-50%) rotate(360deg); }
@@ -3174,35 +3178,23 @@
     .cb-wrap:focus-within #pill-arc {
       top: 57px;
     }
-    /* rotating light-catch ring, confined to a 1.5px rim via mask-composite */
-    @property --cb-ring {
-      syntax: '<angle>';
-      inherits: false;
-      initial-value: 0deg;
+    /* pill text colors — dark bar (default) uses the white var() fallbacks;
+       light theme flips to dark text */
+    [data-theme="light"] {
+      --cb-text-color:  rgba(0,0,0,0.72);
+      --cb-caret-color: rgba(0,0,0,0.4);
+      --cb-placeholder: rgba(0,0,0,0.35);
+      --cb-icon-fill:   rgba(0,0,0,0.65);
+      --cb-icon-dim:    rgba(0,0,0,0.35);
     }
-    .cb-wrap::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 999px;
-      padding: 1.5px;
-      background: conic-gradient(from var(--cb-ring),
-        rgba(255,255,255,0.95), rgba(165,130,255,0.65),
-        rgba(255,255,255,0.10), rgba(90,200,255,0.70),
-        rgba(255,255,255,0.95));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-              mask-composite: exclude;
-      opacity: 0;
-      transition: opacity 0.5s ease;
-      pointer-events: none;
+    /* Artlist glass is always dark — bar text stays white in light theme */
+    [data-theme="light"] .cb {
+      --cb-text-color:  rgba(255,255,255,0.88);
+      --cb-caret-color: rgba(255,255,255,0.6);
+      --cb-placeholder: rgba(255,255,255,0.4);
+      --cb-icon-fill:   rgba(255,255,255,0.65);
+      --cb-icon-dim:    rgba(255,255,255,0.35);
     }
-    .cb-wrap:focus-within::after {
-      opacity: 1;
-      animation: cb-ring-spin 3.5s linear infinite;
-    }
-    @keyframes cb-ring-spin { to { --cb-ring: 360deg; } }
 
     /* ── Chat bar pill ── */
     .cb {
@@ -3249,19 +3241,28 @@
     .cb-input::placeholder { color: var(--cb-placeholder, rgba(255,255,255,0.4)); }
 
     /* send button — slides in left→right when text present */
+    /* glossy circular CTA — puffy glass bead, dark arrow (Artlist-style) */
     .cb-send {
-      background: transparent;
+      background:
+        radial-gradient(circle at 50% 55%, #d9e466 0%, #e6f28d 55%, #f1f8bb 82%, #fbfde8 100%);
       border: none;
       cursor: pointer;
-      padding: 4px;
+      width: 34px;
+      height: 34px;
+      padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
       border-radius: 50%;
       overflow: hidden;
+      box-shadow:
+        inset 0 0 4px 1.5px rgba(255,255,255,0.70),
+        inset 2px 3px 5px rgba(255,255,255,0.65),
+        0 3px 12px rgba(0,0,0,0.30);
       transition:
         background    0.2s,
+        box-shadow    0.2s ease,
         opacity       0.22s ease,
         max-width     0.25s cubic-bezier(0.34,1.2,0.64,1),
         transform     0.25s cubic-bezier(0.34,1.2,0.64,1);
@@ -3270,11 +3271,20 @@
       pointer-events: none;
       transform: translateX(-10px);
     }
-    .cb-send.vis { opacity: 1; max-width: 28px; pointer-events: auto; transform: translateX(0); }
-    .cb-send:hover { background: rgba(255,255,255,0.1); }
-    .cb-send.vis:hover  { transform: scale(1.12); }
-    .cb-send.vis:active { transform: scale(0.90); }
-    .cb-send svg { width: 14px; height: 14px; fill: var(--cb-icon-fill, rgba(255,255,255,0.85)); transition: fill 0.25s ease; }
+    .cb-send.vis { opacity: 1; max-width: 34px; pointer-events: auto; transform: translateX(0); }
+    .cb-send.vis:hover {
+      transform: scale(1.10);
+      background:
+        radial-gradient(circle at 50% 55%, #e3ef67 0%, #ecf781 60%, #f4fbab 85%, #fbfddd 100%);
+      box-shadow:
+        inset 0 0 5px 2px rgba(255,255,255,0.85),
+        inset 2px 3px 5px rgba(255,255,255,0.75),
+        0 0 16px 4px rgba(230,242,141,0.55),
+        0 0 36px 10px rgba(230,242,141,0.28),
+        0 4px 16px rgba(0,0,0,0.30);
+    }
+    .cb-send.vis:active { transform: scale(0.92); }
+    .cb-send svg { width: 16px; height: 16px; fill: #16181c; }
 
     /* mic button */
     .cb-mic {
@@ -5895,43 +5905,6 @@
   })();
   </script>
 
-  <!-- ── PILL TEXT — content-aware color via elementsFromPoint ── -->
-  <script>
-  (function () {
-    var pill = document.getElementById('cb');
-    var root = document.documentElement;
-
-    function setVars(dark) {
-      root.style.setProperty('--cb-text-color',  dark ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.72)');
-      root.style.setProperty('--cb-caret-color', dark ? 'rgba(255,255,255,0.6)'  : 'rgba(0,0,0,0.4)');
-      root.style.setProperty('--cb-placeholder', dark ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)');
-      root.style.setProperty('--cb-icon-fill',   dark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.65)');
-      root.style.setProperty('--cb-icon-dim',    dark ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.35)');
-    }
-
-    function update() {
-      var r = pill.getBoundingClientRect();
-      var els = document.elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-      var bg = null;
-      for (var i = 0; i < els.length; i++) {
-        if (els[i] === pill || pill.contains(els[i])) continue;
-        var c = getComputedStyle(els[i]).backgroundColor;
-        if (c && c !== 'rgba(0, 0, 0, 0)' && c !== 'transparent') { bg = c; break; }
-      }
-      var m = bg && bg.match(/[\d.]+/g);
-      var lum = m ? 0.299 * m[0] + 0.587 * m[1] + 0.114 * m[2] : 0;
-      setVars(lum < 140);
-    }
-
-    update();
-    setTimeout(update, 400);
-    window.addEventListener('scroll', update, { passive: true });
-    pill.addEventListener('transitionend', update);
-    var btn = document.getElementById('themeToggle');
-    if (btn) btn.addEventListener('click', function () { setTimeout(update, 50); });
-  })();
-  </script>
-
   <!-- ── CHAT BAR ──────────────────────────────────────────── -->
   <div class="cb-wrap" id="cbWrap">
     <div id="pill-arc"></div>
@@ -5939,7 +5912,7 @@
       <img class="cb-photo" src="photo.jpg" alt="Bhanu" />
       <input class="cb-input" id="cbInput" type="text" placeholder="Ask me something…" autocomplete="off" spellcheck="false" />
       <button class="cb-send" id="cbSend" aria-label="Send">
-        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.59 5.58L20 12l-8-8-8 8z"/></svg>
       </button>
       <button class="cb-mic" id="cbMic" aria-label="Voice input">
         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
@@ -6449,44 +6422,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
   })();
 
-  // ── Glass luminance adaptation — scroll-driven, instant (CSS transition handles fade) ──
-  (function () {
-    var pill = document.getElementById('cb');
-
-    function getLum() {
-      var rect = pill.getBoundingClientRect();
-      var cx   = (rect.left + rect.right)  / 2;
-      var cy   = (rect.top  + rect.bottom) / 2;
-      var els  = document.elementsFromPoint(cx, cy);
-      for (var i = 0; i < els.length; i++) {
-        var el = els[i];
-        if (el === pill || pill.contains(el)) continue;
-        var bg = getComputedStyle(el).backgroundColor;
-        var m  = bg.match(/[\d.]+/g);
-        if (m && m.length >= 3) {
-          var a = m.length >= 4 ? +m[3] : 1;
-          if (a < 0.05) continue;
-          return 0.299 * +m[0] + 0.587 * +m[1] + 0.114 * +m[2];
-        }
-      }
-      return 200;
-    }
-
-    function update() {
-      var darkBg = getLum() < 128;
-      var root   = document.documentElement;
-      root.style.setProperty('--cb-text-color',  darkBg ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.72)');
-      root.style.setProperty('--cb-caret-color', darkBg ? 'rgba(255,255,255,0.6)'  : 'rgba(0,0,0,0.4)');
-      root.style.setProperty('--cb-placeholder', darkBg ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)');
-      root.style.setProperty('--cb-icon-fill',   darkBg ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.65)');
-      root.style.setProperty('--cb-icon-dim',    darkBg ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.35)');
-    }
-
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update, { passive: true });
-    setTimeout(update, 500);   // after pill reveal animation
-    setTimeout(update, 1500);  // insurance
-  })();
+  // ── Pill text colors are theme-driven via CSS vars ([data-theme="light"] block) ──
   </script>
 
   <script>
