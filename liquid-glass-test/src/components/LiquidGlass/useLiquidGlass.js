@@ -151,7 +151,7 @@ export default function useLiquidGlass({ width, height, refraction, blur, aberra
     // ── Luminance smoothing ──────────────────────────────────────────────────
     const avgLum = totalLum / (gw * gh)
     smoothedLumRef.current += (avgLum - smoothedLumRef.current) / 12
-    const dark = smoothedLumRef.current < 128
+    const darkBg = smoothedLumRef.current < 128
 
     // ── Paint glass canvas ───────────────────────────────────────────────────
     glassCtx.clearRect(0, 0, gw, gh)
@@ -186,16 +186,16 @@ export default function useLiquidGlass({ width, height, refraction, blur, aberra
     glassCtx.roundRect(0.7, 0.7, gw - 1.4, gh - 1.4, gh / 2)
     glassCtx.stroke()
 
-    // Layer 4 — tight corner specular (top-left only, doesn't reach center)
+    // Layer 4 — tight corner specular (top-left only)
     const spec = glassCtx.createRadialGradient(0, 0, 0, 0, 0, gw * 0.28)
     spec.addColorStop(0,    'rgba(255,255,255,0.18)')
     spec.addColorStop(0.25, 'rgba(255,255,255,0.04)')
-    spec.addColorStop(1,    'rgba(255,255,255,0)')
+    spec.addColorStop(1,    'rgba(255,255,255,0.0)')
     glassCtx.fillStyle = spec
     glassCtx.fillRect(0, 0, gw, gh)
 
-    // Layer 8 — content-aware label
-    glassCtx.fillStyle    = dark ? 'rgba(255,255,255,0.92)' : 'rgba(0,0,0,0.72)'
+    // Layer 8 — label color follows background luminance
+    glassCtx.fillStyle    = darkBg ? 'rgba(255,255,255,0.92)' : 'rgba(0,0,0,0.72)'
     glassCtx.font         = '500 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
     glassCtx.textAlign    = 'center'
     glassCtx.textBaseline = 'middle'
