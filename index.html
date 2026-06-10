@@ -3148,12 +3148,6 @@
       background: rgba(255,255,255,0.24);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.70);
     }
-    /* Liquid-glass refraction — Chromium only (html.svg-glass set by JS).
-     * Safari/Firefox can't do backdrop-filter: url(), they keep the blur above. */
-    html.svg-glass .glass-pill {
-      backdrop-filter: url(#cb-frosted);
-      -webkit-backdrop-filter: url(#cb-frosted);
-    }
 
     /* ── Rainbow arc behind pill ── */
     #pill-arc {
@@ -5952,62 +5946,6 @@
       </button>
     </div>
   </div>
-
-  <!-- Liquid-glass refraction filter for the chat bar (Chromium only).
-       The displacement map (feImage) is drawn at runtime to match the pill shape. -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <filter id="cb-frosted" primitiveUnits="objectBoundingBox" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
-      <feImage id="cbDispMap" x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="map"/>
-      <feGaussianBlur in="SourceGraphic" stdDeviation="0.021 0.17" result="blur"/>
-      <feDisplacementMap in="blur" in2="map" scale="0.2" xChannelSelector="R" yChannelSelector="G">
-        <animate attributeName="scale" to="0.3" dur="0.3s" begin="cb.mouseover" fill="freeze"/>
-        <animate attributeName="scale" to="0.2" dur="0.3s" begin="cb.mouseout" fill="freeze"/>
-      </feDisplacementMap>
-      <feColorMatrix type="saturate" values="1.6"/>
-      <feComponentTransfer>
-        <feFuncR type="linear" slope="1.08"/>
-        <feFuncG type="linear" slope="1.08"/>
-        <feFuncB type="linear" slope="1.08"/>
-      </feComponentTransfer>
-    </filter>
-  </svg>
-  <script>
-  /* Liquid-glass displacement map: R = x-shift, G = y-shift, 128 = neutral.
-     Pixels near the pill rim sample the backdrop outward, bending it like a
-     lens (same trick as the frosted-glass CodePen, but pill-shaped).
-     Chromium only — others keep the plain blur fallback in .glass-pill. */
-  (function () {
-    if (!/Chrom(e|ium)/.test(navigator.userAgent)) return;
-    var W = 480, H = 58;                       // matches .cb.bar-revealed
-    var R = H / 2, A = W / 2 - R;              // capsule: radius R around segment ±A
-    var BAND = 16;                             // px of rim affected by refraction
-    var MAX = 24;                              // max sample offset in px
-    var S0 = 0.2;                              // base feDisplacementMap scale
-    var D = Math.sqrt((W * W + H * H) / 2);    // SVG objectBoundingBox diagonal norm
-    var c = document.createElement('canvas');
-    c.width = W; c.height = H;
-    var ctx = c.getContext('2d');
-    var img = ctx.createImageData(W, H);
-    var d = img.data, i = 0;
-    for (var y = 0; y < H; y++) {
-      for (var x = 0; x < W; x++) {
-        var px = x + 0.5 - W / 2, py = y + 0.5 - H / 2;
-        var qx = Math.max(Math.abs(px) - A, 0);
-        var len = Math.sqrt(qx * qx + py * py) || 1;
-        var t = Math.min(Math.max(1 + (len - R) / BAND, 0), 1);
-        var m = MAX * t * t;                   // ease-in toward the rim
-        var nx = (px < 0 ? -qx : qx) / len, ny = py / len;
-        d[i++] = Math.max(0, Math.min(255, Math.round(128 + nx * m * 255 / (D * S0))));
-        d[i++] = Math.max(0, Math.min(255, Math.round(128 + ny * m * 255 / (D * S0))));
-        d[i++] = 128;
-        d[i++] = 255;
-      }
-    }
-    ctx.putImageData(img, 0, 0);
-    document.getElementById('cbDispMap').setAttribute('href', c.toDataURL());
-    document.documentElement.classList.add('svg-glass');
-  })();
-  </script>
 
   <!-- ── CHAT PANEL ─────────────────────────────────────────── -->
   <div class="cp" id="cp" aria-hidden="true">
