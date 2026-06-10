@@ -3107,17 +3107,17 @@
      */
     .glass-pill {
       background:
-        radial-gradient(circle 55px at 0% 0%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 25%, transparent 100%) padding-box,
+        radial-gradient(circle 60px at 0% 0%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 25%, transparent 100%) padding-box,
         linear-gradient(
           135deg,
           rgba(255,255,255,0.48) 0%,
           rgba(255,255,255,0.12) 38%,
-          rgba(255,255,255,0)    46%,
-          rgba(255,255,255,0)    54%,
+          rgba(255,255,255,0.00) 46%,
+          rgba(255,255,255,0.00) 54%,
           rgba(255,255,255,0.28) 100%
         ) border-box;
-      backdrop-filter: blur(6px) brightness(1.1);
-      -webkit-backdrop-filter: blur(6px) brightness(1.1);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       border-radius: 999px;
       border: 1.4px solid transparent;
       box-shadow: none;
@@ -3125,14 +3125,14 @@
     }
     .glass-pill:hover {
       background:
-        radial-gradient(circle 55px at 0% 0%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 25%, transparent 100%) padding-box,
+        radial-gradient(circle 60px at 0% 0%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 25%, transparent 100%) padding-box,
         linear-gradient(
           135deg,
-          rgba(255,255,255,0.56) 0%,
-          rgba(255,255,255,0.15) 38%,
-          rgba(255,255,255,0)    46%,
-          rgba(255,255,255,0)    54%,
-          rgba(255,255,255,0.32) 100%
+          rgba(255,255,255,0.55) 0%,
+          rgba(255,255,255,0.16) 38%,
+          rgba(255,255,255,0.00) 46%,
+          rgba(255,255,255,0.00) 54%,
+          rgba(255,255,255,0.34) 100%
         ) border-box;
     }
 
@@ -3169,13 +3169,13 @@
       background: transparent;
       border: none;
       outline: none;
-      color: rgba(255,255,255,0.88);
+      color: var(--cb-text-color, rgba(255,255,255,0.88));
       font-family: var(--font-heading);
       font-size: 14px;
       min-width: 0;
-      caret-color: rgba(255,255,255,0.6);
+      caret-color: var(--cb-caret-color, rgba(255,255,255,0.6));
     }
-    .cb-input::placeholder { color: rgba(255,255,255,0.4); }
+    .cb-input::placeholder { color: var(--cb-placeholder, rgba(255,255,255,0.4)); }
 
     /* send button — slides in left→right when text present */
     .cb-send {
@@ -6332,6 +6332,47 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       setTimeout(tick, 1400);
     })();
 
+  })();
+
+  // ── Glass luminance adaptation (mirrors useLiquidGlass.js smoothedLumRef logic) ──
+  (function () {
+    var pill        = document.getElementById('cb');
+    var smoothedLum = 128;
+
+    function getRawLum() {
+      var rect = pill.getBoundingClientRect();
+      var cx   = (rect.left + rect.right)  / 2;
+      var cy   = (rect.top  + rect.bottom) / 2;
+      var els  = document.elementsFromPoint(cx, cy);
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        if (el === pill || pill.contains(el)) continue;
+        var bg = getComputedStyle(el).backgroundColor;
+        var m  = bg.match(/[\d.]+/g);
+        if (m && m.length >= 3) {
+          var a = m.length >= 4 ? +m[3] : 1;
+          if (a < 0.05) continue;
+          return 0.299 * +m[0] + 0.587 * +m[1] + 0.114 * +m[2];
+        }
+      }
+      return 200;
+    }
+
+    function update() {
+      smoothedLum += (getRawLum() - smoothedLum) / 12;
+      var darkBg = smoothedLum < 128;
+      var root   = document.documentElement;
+      root.style.setProperty('--cb-text-color',  darkBg ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.72)');
+      root.style.setProperty('--cb-caret-color', darkBg ? 'rgba(255,255,255,0.6)'  : 'rgba(0,0,0,0.4)');
+      root.style.setProperty('--cb-placeholder', darkBg ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)');
+    }
+
+    var lastTs = 0;
+    function raf(ts) {
+      if (ts - lastTs > 100) { lastTs = ts; update(); }
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
   })();
   </script>
 
