@@ -3089,8 +3089,19 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 1200;
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      overflow: hidden;
+      border-radius: 999px;
+      animation: cb-glow-breathe 9s ease-in-out infinite;
     }
+    /* ambient tinted glow that slowly cycles hue — sits outside the clip */
+    @keyframes cb-glow-breathe {
+      0%, 100% { box-shadow: 0 12px 40px -12px rgba(255,110,170,0.30); }
+      33%      { box-shadow: 0 12px 40px -12px rgba(110,140,255,0.32); }
+      66%      { box-shadow: 0 12px 40px -12px rgba(80,215,180,0.28); }
+    }
+    .cb-wrap:hover,
+    .cb-wrap:focus-within { transform: translateX(-50%) translateY(-2px); }
     body.chat-open .cb-wrap {
       opacity: 0;
       pointer-events: none;
@@ -3102,56 +3113,102 @@
      * Rim: ::before with mask-composite punches out the interior so the rim
      * gradient (Layer 3) is confined to the 1.4px border ring — no bleed. */
     .glass-pill {
-      background:
-        radial-gradient(circle 60px at 0% 0%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 25%, transparent 100%),
-        rgba(255,255,255,0.10);
-      backdrop-filter: blur(20px) saturate(180%) brightness(115%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(115%);
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(32px) saturate(160%) brightness(108%);
+      -webkit-backdrop-filter: blur(32px) saturate(160%) brightness(108%);
       border-radius: 999px;
       border: none;
-      box-shadow: none;
-      transition: background 0.2s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+      transition: background 0.2s ease, box-shadow 0.2s ease;
     }
-    /* Rim gradient — mask cuts out content-box so only the 1.4px ring shows */
+    /* shine sweep — clipped by .cb-wrap's overflow:hidden */
     .glass-pill::before {
       content: '';
       position: absolute;
+      top: 0; bottom: 0;
+      left: -30%;
+      width: 40%;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent);
+      transform: skewX(-15deg) translateX(-150%);
+      pointer-events: none;
+    }
+    .glass-pill:hover::before { animation: cb-shine 0.9s ease; }
+    @keyframes cb-shine { to { transform: skewX(-15deg) translateX(450%); } }
+    .glass-pill::after {
+      content: '';
+      position: absolute;
       inset: 0;
-      border-radius: inherit;
-      padding: 1.4px;
-      background: linear-gradient(
-        135deg,
-        rgba(255,255,255,0.48) 0%,
-        rgba(255,255,255,0.12) 38%,
-        rgba(255,255,255,0.00) 46%,
-        rgba(255,255,255,0.00) 54%,
-        rgba(255,255,255,0.28) 100%
-      );
-      -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      -webkit-mask-composite: destination-out;
-      mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      mask-composite: exclude;
+      border-radius: 999px;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+      opacity: 0.035;
+      mix-blend-mode: overlay;
       pointer-events: none;
     }
     .glass-pill:hover {
-      background:
-        radial-gradient(circle 60px at 0% 0%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 25%, transparent 100%),
-        rgba(255,255,255,0.13);
+      background: rgba(255,255,255,0.24);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.70);
     }
-    .glass-pill:hover::before {
-      background: linear-gradient(
-        135deg,
-        rgba(255,255,255,0.55) 0%,
-        rgba(255,255,255,0.16) 38%,
-        rgba(255,255,255,0.00) 46%,
-        rgba(255,255,255,0.00) 54%,
-        rgba(255,255,255,0.34) 100%
+    /* Liquid-glass refraction — Chromium only (html.svg-glass set by JS).
+     * Safari/Firefox can't do backdrop-filter: url(), they keep the blur above. */
+    html.svg-glass .glass-pill {
+      backdrop-filter: url(#cb-frosted);
+      -webkit-backdrop-filter: url(#cb-frosted);
+    }
+
+    /* ── Rainbow arc behind pill ── */
+    #pill-arc {
+      position: absolute;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      left: 50%;
+      top: 35px;
+      transform: translateX(-50%);
+      background: conic-gradient(
+        from 0deg,
+        #ff4757, #ff6b35, #ffd32a, #2ed573, #1e90ff, #a29bfe, #fd79a8, #ff4757
       );
+      animation: pill-arc-spin 6s linear infinite;
+      pointer-events: none;
+      opacity: 0.55;
+      transition: top 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    @keyframes pill-arc-spin {
+      from { transform: translateX(-50%) rotate(0deg); }
+      to   { transform: translateX(-50%) rotate(360deg); }
+    }
+    .cb-wrap:focus-within #pill-arc {
+      top: 57px;
+    }
+    /* rotating light-catch ring, confined to a 1.5px rim via mask-composite */
+    @property --cb-ring {
+      syntax: '<angle>';
+      inherits: false;
+      initial-value: 0deg;
+    }
+    .cb-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      padding: 1.5px;
+      background: conic-gradient(from var(--cb-ring),
+        rgba(255,255,255,0.95), rgba(165,130,255,0.65),
+        rgba(255,255,255,0.10), rgba(90,200,255,0.70),
+        rgba(255,255,255,0.95));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+              mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+    .cb-wrap:focus-within::after {
+      opacity: 1;
+      animation: cb-ring-spin 3.5s linear infinite;
+    }
+    @keyframes cb-ring-spin { to { --cb-ring: 360deg; } }
 
     /* ── Chat bar pill ── */
     .cb {
@@ -3166,9 +3223,11 @@
       /* spring: slight overshoot for tactile feel */
       transition: width 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .cb.bar-revealed { width: 416px; }
+    .cb.bar-revealed { width: 480px; }
     .cb.expanded     { width: 600px; }
-    .cb:focus-within::before { background: linear-gradient(135deg, rgba(255,255,255,0.60) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0) 46%, rgba(255,255,255,0) 54%, rgba(255,255,255,0.36) 100%); }
+    @media (prefers-reduced-motion: reduce) {
+      #pill-arc, .cb-wrap, .cb-wrap::after, .glass-pill::before { animation: none !important; }
+    }
 
     /* photo avatar in bar */
     .cb-photo {
@@ -3219,6 +3278,8 @@
     }
     .cb-send.vis { opacity: 1; max-width: 28px; pointer-events: auto; transform: translateX(0); }
     .cb-send:hover { background: rgba(255,255,255,0.1); }
+    .cb-send.vis:hover  { transform: scale(1.12); }
+    .cb-send.vis:active { transform: scale(0.90); }
     .cb-send svg { width: 14px; height: 14px; fill: var(--cb-icon-fill, rgba(255,255,255,0.85)); transition: fill 0.25s ease; }
 
     /* mic button */
@@ -3230,9 +3291,10 @@
       display: flex;
       align-items: center;
       border-radius: 50%;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.25s cubic-bezier(0.34,1.2,0.64,1);
     }
-    .cb-mic:hover { background: rgba(255,255,255,0.1); }
+    .cb-mic:hover  { background: rgba(255,255,255,0.1); transform: scale(1.12); }
+    .cb-mic:active { transform: scale(0.90); }
     .cb-mic svg { width: 16px; height: 16px; fill: var(--cb-icon-dim, rgba(255,255,255,0.48)); transition: fill 0.2s; }
     .cb-mic:hover svg { fill: var(--cb-icon-fill, rgba(255,255,255,0.85)); }
     .cb-mic.recording svg { fill: #ff6b6b; }
@@ -3425,9 +3487,12 @@
 
     /* hide on small screens */
     @media (max-width: 900px) {
-      .cb-wrap { display: none; }
-      .cp       { display: none; }
+      .cp { display: none; }
       body.chat-open .page { padding-right: 24px; }
+    }
+    @media (max-width: 540px) {
+      .cb.bar-revealed { width: calc(100vw - 32px); }
+      .cb.expanded     { width: calc(100vw - 32px); }
     }
 
   </style>
@@ -3489,7 +3554,7 @@
   </div>
 
   <div class="page">
-    <div class="card">
+    <div class="card" data-bg-canvas="color">
 
       <!-- HERO -->
       <div class="hero">
@@ -5836,8 +5901,46 @@
   })();
   </script>
 
+  <!-- ── PILL TEXT — content-aware color via elementsFromPoint ── -->
+  <script>
+  (function () {
+    var pill = document.getElementById('cb');
+    var root = document.documentElement;
+
+    function setVars(dark) {
+      root.style.setProperty('--cb-text-color',  dark ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.72)');
+      root.style.setProperty('--cb-caret-color', dark ? 'rgba(255,255,255,0.6)'  : 'rgba(0,0,0,0.4)');
+      root.style.setProperty('--cb-placeholder', dark ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)');
+      root.style.setProperty('--cb-icon-fill',   dark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.65)');
+      root.style.setProperty('--cb-icon-dim',    dark ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.35)');
+    }
+
+    function update() {
+      var r = pill.getBoundingClientRect();
+      var els = document.elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      var bg = null;
+      for (var i = 0; i < els.length; i++) {
+        if (els[i] === pill || pill.contains(els[i])) continue;
+        var c = getComputedStyle(els[i]).backgroundColor;
+        if (c && c !== 'rgba(0, 0, 0, 0)' && c !== 'transparent') { bg = c; break; }
+      }
+      var m = bg && bg.match(/[\d.]+/g);
+      var lum = m ? 0.299 * m[0] + 0.587 * m[1] + 0.114 * m[2] : 0;
+      setVars(lum < 140);
+    }
+
+    update();
+    setTimeout(update, 400);
+    window.addEventListener('scroll', update, { passive: true });
+    pill.addEventListener('transitionend', update);
+    var btn = document.getElementById('themeToggle');
+    if (btn) btn.addEventListener('click', function () { setTimeout(update, 50); });
+  })();
+  </script>
+
   <!-- ── CHAT BAR ──────────────────────────────────────────── -->
   <div class="cb-wrap" id="cbWrap">
+    <div id="pill-arc"></div>
     <div class="cb glass-pill" id="cb">
       <img class="cb-photo" src="photo.jpg" alt="Bhanu" />
       <input class="cb-input" id="cbInput" type="text" placeholder="Ask me something…" autocomplete="off" spellcheck="false" />
@@ -5849,6 +5952,62 @@
       </button>
     </div>
   </div>
+
+  <!-- Liquid-glass refraction filter for the chat bar (Chromium only).
+       The displacement map (feImage) is drawn at runtime to match the pill shape. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="cb-frosted" primitiveUnits="objectBoundingBox" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+      <feImage id="cbDispMap" x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="map"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0.021 0.17" result="blur"/>
+      <feDisplacementMap in="blur" in2="map" scale="0.2" xChannelSelector="R" yChannelSelector="G">
+        <animate attributeName="scale" to="0.3" dur="0.3s" begin="cb.mouseover" fill="freeze"/>
+        <animate attributeName="scale" to="0.2" dur="0.3s" begin="cb.mouseout" fill="freeze"/>
+      </feDisplacementMap>
+      <feColorMatrix type="saturate" values="1.6"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="1.08"/>
+        <feFuncG type="linear" slope="1.08"/>
+        <feFuncB type="linear" slope="1.08"/>
+      </feComponentTransfer>
+    </filter>
+  </svg>
+  <script>
+  /* Liquid-glass displacement map: R = x-shift, G = y-shift, 128 = neutral.
+     Pixels near the pill rim sample the backdrop outward, bending it like a
+     lens (same trick as the frosted-glass CodePen, but pill-shaped).
+     Chromium only — others keep the plain blur fallback in .glass-pill. */
+  (function () {
+    if (!/Chrom(e|ium)/.test(navigator.userAgent)) return;
+    var W = 480, H = 58;                       // matches .cb.bar-revealed
+    var R = H / 2, A = W / 2 - R;              // capsule: radius R around segment ±A
+    var BAND = 16;                             // px of rim affected by refraction
+    var MAX = 24;                              // max sample offset in px
+    var S0 = 0.2;                              // base feDisplacementMap scale
+    var D = Math.sqrt((W * W + H * H) / 2);    // SVG objectBoundingBox diagonal norm
+    var c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    var ctx = c.getContext('2d');
+    var img = ctx.createImageData(W, H);
+    var d = img.data, i = 0;
+    for (var y = 0; y < H; y++) {
+      for (var x = 0; x < W; x++) {
+        var px = x + 0.5 - W / 2, py = y + 0.5 - H / 2;
+        var qx = Math.max(Math.abs(px) - A, 0);
+        var len = Math.sqrt(qx * qx + py * py) || 1;
+        var t = Math.min(Math.max(1 + (len - R) / BAND, 0), 1);
+        var m = MAX * t * t;                   // ease-in toward the rim
+        var nx = (px < 0 ? -qx : qx) / len, ny = py / len;
+        d[i++] = Math.max(0, Math.min(255, Math.round(128 + nx * m * 255 / (D * S0))));
+        d[i++] = Math.max(0, Math.min(255, Math.round(128 + ny * m * 255 / (D * S0))));
+        d[i++] = 128;
+        d[i++] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    document.getElementById('cbDispMap').setAttribute('href', c.toDataURL());
+    document.documentElement.classList.add('svg-glass');
+  })();
+  </script>
 
   <!-- ── CHAT PANEL ─────────────────────────────────────────── -->
   <div class="cp" id="cp" aria-hidden="true">
@@ -6392,18 +6551,238 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   })();
   </script>
 
-  <!-- Chromatic edge dispersion filter for .glass-pill refractive rim effect -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <defs>
-      <filter id="glass-dispersion">
-        <feColorMatrix type="matrix"
-          values="1 0 0 0  0.015
-                  0 1 0 0  0
-                  0 0 1 0 -0.015
-                  0 0 0 1  0"/>
-      </filter>
-    </defs>
-  </svg>
+  <script>
+  /* ── glass canvas removed — CSS glassmorphism handles the pill ─────────── */
+  (function () { return; /* noop */
+
+    // ── Math helpers ────────────────────────────────────────────────────────
+    function ss(a, b, t) {
+      t = Math.max(0, Math.min(1, (t - a) / (b - a)));
+      return t * t * (3 - 2 * t);
+    }
+    function squircleSDF(x, y, hw, hh, r) {
+      var qx = Math.max(Math.abs(x) - hw + r, 0) / r;
+      var qy = Math.max(Math.abs(y) - hh + r, 0) / r;
+      return (Math.pow(Math.pow(qx, 4) + Math.pow(qy, 4), 0.25) * r - r) +
+             Math.min(Math.max(Math.abs(x) - hw + r, Math.abs(y) - hh + r), 0);
+    }
+
+    // ── Displacement map (cached per pill size) ──────────────────────────────
+    var dispCache = null, dispW = 0, dispH = 0;
+    function getDispMap(w, h) {
+      if (w === dispW && h === dispH) return dispCache;
+      var raw = [], max = 0, asp = w / h;
+      for (var i = 0; i < w * h; i++) {
+        var px = i % w, py = Math.floor(i / w);
+        var ix = px / w - 0.5, iy = py / h - 0.5;
+        var sdf = squircleSDF(ix * asp, iy, 0.29 * asp, 0.21, 0.56);
+        var d = ss(0.9, 0, sdf - 0.07), s = ss(0, 1, d);
+        var ddx = ix * s * w * 0.95, ddy = iy * s * h * 0.95;
+        max = Math.max(max, Math.abs(ddx), Math.abs(ddy));
+        raw.push(ddx, ddy);
+      }
+      dispCache = { raw: raw, max: Math.max(max * 0.5, 1) };
+      dispW = w; dispH = h;
+      return dispCache;
+    }
+
+    // ── Box blur ─────────────────────────────────────────────────────────────
+    function boxBlur(src, w, h, r) {
+      if (r < 1) return src;
+      var out = new Uint8ClampedArray(src.length);
+      for (var y = 0; y < h; y++) {
+        for (var x = 0; x < w; x++) {
+          var rr = 0, gg = 0, bb = 0, n = 0;
+          for (var dy = -r; dy <= r; dy++) {
+            for (var dx = -r; dx <= r; dx++) {
+              var nx = Math.max(0, Math.min(w - 1, x + dx));
+              var ny = Math.max(0, Math.min(h - 1, y + dy));
+              var si = (ny * w + nx) * 4;
+              rr += src[si]; gg += src[si + 1]; bb += src[si + 2]; n++;
+            }
+          }
+          var oi = (y * w + x) * 4;
+          out[oi] = rr / n; out[oi + 1] = gg / n; out[oi + 2] = bb / n; out[oi + 3] = 255;
+        }
+      }
+      return out;
+    }
+
+    // ── Background canvas — draws page background colors for sampling ─────────
+    var bgCv  = document.getElementById('bg-canvas');
+    var bgCtx = bgCv.getContext('2d', { willReadFrequently: true });
+
+    function drawBackground() {
+      bgCv.width  = window.innerWidth;
+      bgCv.height = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        window.innerHeight + 200
+      );
+      bgCtx.clearRect(0, 0, bgCv.width, bgCv.height);
+
+      // Base: body background color covers the full page
+      bgCtx.fillStyle = getComputedStyle(document.body).backgroundColor;
+      bgCtx.fillRect(0, 0, bgCv.width, bgCv.height);
+
+      // Sections tagged with data-bg-canvas are drawn on top
+      document.querySelectorAll('[data-bg-canvas]').forEach(function (el) {
+        var rect = el.getBoundingClientRect();
+        var top  = rect.top  + window.scrollY;
+        var left = rect.left;
+        var w    = rect.width;
+        var h    = rect.height;
+        var type = el.dataset.bgCanvas;
+
+        if (type === 'color') {
+          bgCtx.fillStyle = getComputedStyle(el).backgroundColor;
+          bgCtx.fillRect(left, top, w, h);
+        } else if (type === 'gradient') {
+          var parts = (el.dataset.bgGradient || '').split(',');
+          if (parts.length >= 3) {
+            var angle = parseFloat(parts[3] || 180);
+            var rad   = angle * Math.PI / 180;
+            var grad  = bgCtx.createLinearGradient(
+              left, top,
+              left + Math.sin(rad) * w,
+              top  + Math.cos(rad) * h
+            );
+            grad.addColorStop(0, parts[1]);
+            grad.addColorStop(1, parts[2]);
+            bgCtx.fillStyle = grad;
+            bgCtx.fillRect(left, top, w, h);
+          }
+        }
+      });
+
+      // Draw <img> elements at their page positions so photo content is sampable
+      document.querySelectorAll('img').forEach(function (img) {
+        if (!img.complete || img.naturalWidth === 0) return;
+        if (img.classList.contains('cb-photo')) return;
+        var rect = img.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return;
+        try {
+          bgCtx.drawImage(img, rect.left, rect.top + window.scrollY, rect.width, rect.height);
+        } catch (e) { /* cross-origin — skip */ }
+      });
+    }
+
+    // ── Glass canvas — displaced pixel output inside the pill ─────────────────
+    var glassCv  = document.getElementById('glass-cv');
+    var glassCtx = glassCv.getContext('2d');
+    var pill     = document.getElementById('cb');
+    var REFR = 10, BLUR = 4, ABERR = 8;
+
+    function renderGlass() {
+      var GW = Math.round(pill.offsetWidth);
+      var GH = Math.round(pill.offsetHeight);
+      if (GW < 10 || GH < 10) return;
+
+      glassCv.width  = GW;
+      glassCv.height = GH;
+
+      var gr = pill.getBoundingClientRect();
+      var sx = Math.round(gr.left);
+      var sy = Math.round(gr.top + window.scrollY);
+
+      var srcData;
+      try { srcData = bgCtx.getImageData(sx, sy, GW, GH); }
+      catch (e) { return; }
+
+      var bl  = boxBlur(srcData.data, GW, GH, BLUR);
+      var dm  = getDispMap(GW, GH);
+      var raw = dm.raw, sc = REFR / dm.max;
+      var out = new Uint8ClampedArray(GW * GH * 4);
+      var lum = 0;
+
+      for (var i = 0; i < GW * GH; i++) {
+        var px = i % GW, py = Math.floor(i / GW);
+        var sdx = raw[i * 2] * sc;
+        var sdy = raw[i * 2 + 1] * sc;
+        var rsx = Math.max(0, Math.min(GW - 1, Math.round(px + sdx + ABERR * 0.55)));
+        var rsy = Math.max(0, Math.min(GH - 1, Math.round(py + sdy)));
+        var gsx = Math.max(0, Math.min(GW - 1, Math.round(px + sdx)));
+        var gsy = Math.max(0, Math.min(GH - 1, Math.round(py + sdy)));
+        var bsx = Math.max(0, Math.min(GW - 1, Math.round(px + sdx - ABERR * 0.55)));
+        var bsy = Math.max(0, Math.min(GH - 1, Math.round(py + sdy)));
+        out[i * 4]     = bl[(rsy * GW + rsx) * 4];
+        out[i * 4 + 1] = bl[(gsy * GW + gsx) * 4 + 1];
+        out[i * 4 + 2] = bl[(bsy * GW + bsx) * 4 + 2];
+        out[i * 4 + 3] = 255;
+        lum += 0.299 * out[i * 4] + 0.587 * out[i * 4 + 1] + 0.114 * out[i * 4 + 2];
+      }
+
+      // Paint displaced pixels
+      glassCtx.clearRect(0, 0, GW, GH);
+      glassCtx.putImageData(new ImageData(out, GW, GH), 0, 0);
+
+      // Clip to pill shape
+      glassCtx.globalCompositeOperation = 'destination-in';
+      glassCtx.beginPath();
+      glassCtx.roundRect(0, 0, GW, GH, GH / 2);
+      glassCtx.fillStyle = '#fff';
+      glassCtx.fill();
+      glassCtx.globalCompositeOperation = 'source-over';
+
+      glassCtx.save();
+      glassCtx.beginPath();
+      glassCtx.roundRect(0, 0, GW, GH, GH / 2);
+      glassCtx.clip();
+
+      // Rim — gradient stroke only, border-ring confined (no interior fill, no bleed)
+      // Mirrors the CSS ::before mask-composite approach: bright TL → shadow BR
+      var rimGrad = glassCtx.createLinearGradient(0, 0, GW, GH);
+      rimGrad.addColorStop(0.00, 'rgba(255,255,255,0.70)');
+      rimGrad.addColorStop(0.35, 'rgba(255,255,255,0.20)');
+      rimGrad.addColorStop(0.50, 'rgba(255,255,255,0.0)');
+      rimGrad.addColorStop(0.65, 'rgba(0,0,0,0.0)');
+      rimGrad.addColorStop(1.00, 'rgba(0,0,0,0.15)');
+      glassCtx.strokeStyle = rimGrad;
+      glassCtx.lineWidth   = 1.5;
+      glassCtx.beginPath();
+      glassCtx.roundRect(0.75, 0.75, GW - 1.5, GH - 1.5, GH / 2);
+      glassCtx.stroke();
+
+      glassCtx.restore();
+
+      // Content-aware text color (replaces scroll-based getLum())
+      var avgLum = lum / (GW * GH);
+      var dark   = avgLum < 128;
+      var root   = document.documentElement;
+      root.style.setProperty('--cb-text-color',  dark ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.72)');
+      root.style.setProperty('--cb-caret-color', dark ? 'rgba(255,255,255,0.6)'  : 'rgba(0,0,0,0.4)');
+      root.style.setProperty('--cb-placeholder', dark ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)');
+      root.style.setProperty('--cb-icon-fill',   dark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.65)');
+      root.style.setProperty('--cb-icon-dim',    dark ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.35)');
+    }
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+    pill.classList.add('glass-active');
+    drawBackground();
+    renderGlass();
+    // Redraw after fonts/images have settled (initial scrollHeight may be partial)
+    setTimeout(function () { drawBackground(); renderGlass(); }, 400);
+
+    window.addEventListener('scroll', renderGlass, { passive: true });
+
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () { drawBackground(); renderGlass(); }, 150);
+    });
+
+    // Redraw when dark/light theme toggles
+    var themeBtn = document.getElementById('themeToggle');
+    if (themeBtn) themeBtn.addEventListener('click', function () {
+      setTimeout(function () { drawBackground(); renderGlass(); }, 50);
+    });
+
+    // Re-render when pill width transition ends (bar reveal / expand animations)
+    pill.addEventListener('transitionend', renderGlass);
+
+  })();
+  </script>
+
 
 </body>
 </html>
