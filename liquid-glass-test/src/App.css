@@ -1,0 +1,315 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.app-root {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #fff;
+}
+
+/* ── Background ── */
+.bg-photo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url('/src/assets/dejan-zakic-68AnV6eU2aw-unsplash.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ── GlassPanel core ── */
+
+/* Outer shell: shadow + tilt — lives OUTSIDE the SVG filter so shadows aren't clipped away */
+.gp-shell {
+  position: relative;
+  will-change: transform;
+  display: inline-block;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.24),
+    0 8px 32px rgba(0,0,0,0.22),
+    0 2px 8px rgba(0,0,0,0.12);
+}
+
+.gp-shell--clickable { cursor: pointer; }
+
+/* Inner glass: SVG displacement filter + overflow clip (content is safe inside padding) */
+.gp {
+  position: relative;
+  overflow: hidden;
+  filter: url(#glass-edge-disp);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    inset 0 -1px 0 rgba(255,255,255,0.08);
+}
+
+/* Frosted backdrop — moderate blur so background features stay visible for displacement */
+.gp__bg {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(var(--blur, 14px)) saturate(var(--sat, 180%));
+  -webkit-backdrop-filter: blur(var(--blur, 14px)) saturate(var(--sat, 180%));
+  background: var(--tint, rgba(255,255,255,0.12));
+}
+
+/* Mouse-tracking radial glow */
+.gp__edge {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 60% at var(--hx, 50%) var(--hy, -10%),
+    rgba(255,255,255,0.28) 0%,
+    transparent 65%
+  );
+  pointer-events: none;
+}
+
+/* Static top-edge specular */
+.gp__glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.18) 0%,
+    rgba(255,255,255,0.04) 25%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.gp__content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Layout ── */
+.page-header {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 60px 24px 32px;
+}
+
+.page-header h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.55));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: rgba(255,255,255,0.55);
+}
+
+.demo-section {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto 56px;
+  padding: 0 24px;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 20px;
+}
+
+/* ── Preset row ── */
+.preset-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.preset-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.preset-sub {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.55);
+  margin-top: 3px;
+}
+
+/* ── Controls ── */
+.controls-wrap {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.controls-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.8);
+}
+
+.controls-grid label span {
+  display: flex;
+  justify-content: space-between;
+}
+
+.controls-grid code {
+  font-family: 'SF Mono', 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.controls-grid input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+.controls-grid input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+/* ── Preview ── */
+.preview-row {
+  display: flex;
+  justify-content: center;
+}
+
+.preview-content {
+  text-align: center;
+  min-width: 220px;
+}
+
+.preview-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.preview-content h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.preview-content p {
+  font-size: 0.875rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+  max-width: 240px;
+}
+
+.preview-sub {
+  margin-top: 10px;
+  font-size: 0.8rem !important;
+  color: rgba(255,255,255,0.45) !important;
+}
+
+/* ── Buttons ── */
+.button-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.click-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.3);
+  font-size: 0.75rem;
+}
+
+/* ── Cards ── */
+.cards-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.card-content {
+  text-align: center;
+  min-width: 160px;
+  max-width: 200px;
+}
+
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.card-content h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.card-content p {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.5;
+}
+
+/* ── Footer ── */
+.page-footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 32px 24px 56px;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.8rem;
+  line-height: 1.8;
+}
+
+.page-footer code {
+  font-family: 'SF Mono', monospace;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.6);
+}
+
+.footer-note {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+}
