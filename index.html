@@ -3098,42 +3098,59 @@
     }
 
     /* ── Apple Liquid Glass ─────────────────────────────────── */
-    /*
-     * Refraction is faked with three techniques:
-     *   1. Layered background: specular gradient (bright top → dim bottom)
-     *      sitting over the base tint — simulates light bending through glass
-     *   2. Inset top shadow: bright 2px glow = the refraction highlight line
-     *   3. Inset bottom shadow: slight darkening = glass curving away from light
-     */
+    /* Interior: backdrop blur + corner specular only (Layer 4 from useLiquidGlass.js).
+     * Rim: ::before with mask-composite punches out the interior so the rim
+     * gradient (Layer 3) is confined to the 1.4px border ring — no bleed. */
     .glass-pill {
       background:
-        radial-gradient(circle 60px at 0% 0%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 25%, transparent 100%) padding-box,
-        linear-gradient(
-          135deg,
-          rgba(255,255,255,0.48) 0%,
-          rgba(255,255,255,0.12) 38%,
-          rgba(255,255,255,0.00) 46%,
-          rgba(255,255,255,0.00) 54%,
-          rgba(255,255,255,0.28) 100%
-        ) border-box;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+        radial-gradient(circle 60px at 0% 0%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 25%, transparent 100%),
+        rgba(255,255,255,0.10);
+      backdrop-filter: blur(20px) saturate(180%) brightness(115%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(115%);
       border-radius: 999px;
-      border: 1.4px solid transparent;
+      border: none;
       box-shadow: none;
       transition: background 0.2s ease;
     }
+    /* Rim gradient — mask cuts out content-box so only the 1.4px ring shows */
+    .glass-pill::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1.4px;
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.48) 0%,
+        rgba(255,255,255,0.12) 38%,
+        rgba(255,255,255,0.00) 46%,
+        rgba(255,255,255,0.00) 54%,
+        rgba(255,255,255,0.28) 100%
+      );
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out;
+      mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      pointer-events: none;
+    }
     .glass-pill:hover {
       background:
-        radial-gradient(circle 60px at 0% 0%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 25%, transparent 100%) padding-box,
-        linear-gradient(
-          135deg,
-          rgba(255,255,255,0.55) 0%,
-          rgba(255,255,255,0.16) 38%,
-          rgba(255,255,255,0.00) 46%,
-          rgba(255,255,255,0.00) 54%,
-          rgba(255,255,255,0.34) 100%
-        ) border-box;
+        radial-gradient(circle 60px at 0% 0%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 25%, transparent 100%),
+        rgba(255,255,255,0.13);
+    }
+    .glass-pill:hover::before {
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.55) 0%,
+        rgba(255,255,255,0.16) 38%,
+        rgba(255,255,255,0.00) 46%,
+        rgba(255,255,255,0.00) 54%,
+        rgba(255,255,255,0.34) 100%
+      );
     }
 
     /* ── Chat bar pill ── */
@@ -3151,7 +3168,7 @@
     }
     .cb.bar-revealed { width: 416px; }
     .cb.expanded     { width: 600px; }
-    .cb:focus-within { border-color: rgba(255, 255, 255, 0.3); }
+    .cb:focus-within::before { background: linear-gradient(135deg, rgba(255,255,255,0.60) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0) 46%, rgba(255,255,255,0) 54%, rgba(255,255,255,0.36) 100%); }
 
     /* photo avatar in bar */
     .cb-photo {
@@ -3174,6 +3191,7 @@
       font-size: 14px;
       min-width: 0;
       caret-color: var(--cb-caret-color, rgba(255,255,255,0.6));
+      transition: color 0.25s ease;
     }
     .cb-input::placeholder { color: var(--cb-placeholder, rgba(255,255,255,0.4)); }
 
@@ -3201,7 +3219,7 @@
     }
     .cb-send.vis { opacity: 1; max-width: 28px; pointer-events: auto; transform: translateX(0); }
     .cb-send:hover { background: rgba(255,255,255,0.1); }
-    .cb-send svg { width: 14px; height: 14px; fill: rgba(255,255,255,0.85); }
+    .cb-send svg { width: 14px; height: 14px; fill: var(--cb-icon-fill, rgba(255,255,255,0.85)); transition: fill 0.25s ease; }
 
     /* mic button */
     .cb-mic {
@@ -3215,8 +3233,8 @@
       transition: background 0.2s;
     }
     .cb-mic:hover { background: rgba(255,255,255,0.1); }
-    .cb-mic svg { width: 16px; height: 16px; fill: rgba(255,255,255,0.48); transition: fill 0.2s; }
-    .cb-mic:hover svg { fill: rgba(255,255,255,0.85); }
+    .cb-mic svg { width: 16px; height: 16px; fill: var(--cb-icon-dim, rgba(255,255,255,0.48)); transition: fill 0.2s; }
+    .cb-mic:hover svg { fill: var(--cb-icon-fill, rgba(255,255,255,0.85)); }
     .cb-mic.recording svg { fill: #ff6b6b; }
     .cb-mic.recording { animation: cbMicPulse 1.2s infinite; }
     .cb-mic.transcribing svg { fill: #E6F28D; }
@@ -6334,12 +6352,11 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
   })();
 
-  // ── Glass luminance adaptation (mirrors useLiquidGlass.js smoothedLumRef logic) ──
+  // ── Glass luminance adaptation — scroll-driven, instant (CSS transition handles fade) ──
   (function () {
-    var pill        = document.getElementById('cb');
-    var smoothedLum = 128;
+    var pill = document.getElementById('cb');
 
-    function getRawLum() {
+    function getLum() {
       var rect = pill.getBoundingClientRect();
       var cx   = (rect.left + rect.right)  / 2;
       var cy   = (rect.top  + rect.bottom) / 2;
@@ -6359,20 +6376,19 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     }
 
     function update() {
-      smoothedLum += (getRawLum() - smoothedLum) / 12;
-      var darkBg = smoothedLum < 128;
+      var darkBg = getLum() < 128;
       var root   = document.documentElement;
       root.style.setProperty('--cb-text-color',  darkBg ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.72)');
       root.style.setProperty('--cb-caret-color', darkBg ? 'rgba(255,255,255,0.6)'  : 'rgba(0,0,0,0.4)');
       root.style.setProperty('--cb-placeholder', darkBg ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)');
+      root.style.setProperty('--cb-icon-fill',   darkBg ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.65)');
+      root.style.setProperty('--cb-icon-dim',    darkBg ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.35)');
     }
 
-    var lastTs = 0;
-    function raf(ts) {
-      if (ts - lastTs > 100) { lastTs = ts; update(); }
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+    setTimeout(update, 500);   // after pill reveal animation
+    setTimeout(update, 1500);  // insurance
   })();
   </script>
 
