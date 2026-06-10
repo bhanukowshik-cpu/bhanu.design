@@ -3082,7 +3082,7 @@
     .page { transition: padding-right 0.55s cubic-bezier(0.16,1,0.3,1); }
     body.chat-open .page { padding-right: 440px; }
 
-    /* ── Floating bar wrapper — is the gradient border ring ── */
+    /* ── Floating bar wrapper ── */
     .cb-wrap {
       position: fixed;
       bottom: 20px;
@@ -3090,45 +3090,80 @@
       transform: translateX(-50%);
       z-index: 1200;
       transition: opacity 0.3s ease, transform 0.3s ease;
-      background: linear-gradient(120deg, #7C5CFC 0%, #C44DFB 28%, #FF6B6B 52%, #FFA44D 76%, #7C5CFC 100%);
-      background-size: 200% 200%;
-      animation: cbGrad 5s ease infinite;
-      border-radius: 102px;
-      padding: 1.5px;
     }
     body.chat-open .cb-wrap {
       opacity: 0;
       pointer-events: none;
       transform: translateX(-50%) translateY(14px);
     }
-    @keyframes cbGrad {
-      0%,100% { background-position: 0% 50%; }
-      50%      { background-position: 100% 50%; }
+
+    /* ── Apple Liquid Glass ─────────────────────────────────── */
+    /*
+     * Refraction is faked with three techniques:
+     *   1. Layered background: specular gradient (bright top → dim bottom)
+     *      sitting over the base tint — simulates light bending through glass
+     *   2. Inset top shadow: bright 2px glow = the refraction highlight line
+     *   3. Inset bottom shadow: slight darkening = glass curving away from light
+     */
+    .glass-pill {
+      background:
+        radial-gradient(circle 55px at 0% 0%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 25%, transparent 100%) padding-box,
+        linear-gradient(rgba(0,0,0,0.32) 0 0) padding-box,
+        linear-gradient(
+          135deg,
+          rgba(255,255,255,0.48) 0%,
+          rgba(255,255,255,0.12) 38%,
+          rgba(0,0,0,0.32)       46%,
+          rgba(0,0,0,0.32)       54%,
+          rgba(255,255,255,0.28) 100%
+        ) border-box;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 999px;
+      border: 1.4px solid transparent;
+      box-shadow: none;
+      transition: background 0.2s ease;
+    }
+    .glass-pill:hover {
+      background:
+        radial-gradient(circle 55px at 0% 0%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 25%, transparent 100%) padding-box,
+        linear-gradient(rgba(0,0,0,0.40) 0 0) padding-box,
+        linear-gradient(
+          135deg,
+          rgba(255,255,255,0.56) 0%,
+          rgba(255,255,255,0.15) 38%,
+          rgba(0,0,0,0.40)       46%,
+          rgba(0,0,0,0.40)       54%,
+          rgba(255,255,255,0.32) 100%
+        ) border-box;
     }
 
-    /* ── Glass pill bar — dark interior inside the gradient wrapper ── */
+    /* ── Chat bar pill ── */
     .cb {
       position: relative;
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 0 13px 0 16px;
-      height: 50px;
-      width: 320px;
-      border-radius: 100px;
-      background: rgba(14, 14, 22, 0.88);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
+      gap: 10px;
+      padding: 0 16px 0 10px;
+      height: 58px;
+      width: 52px; /* intro: photo-only; JS adds .bar-revealed */
       cursor: text;
-      transition: width 0.45s cubic-bezier(0.16,1,0.3,1);
+      /* spring: slight overshoot for tactile feel */
+      transition: width 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .cb.expanded { width: 600px; }
+    .cb.bar-revealed { width: 416px; }
+    .cb.expanded     { width: 600px; }
+    .cb:focus-within { border-color: rgba(255, 255, 255, 0.3); }
 
-    .cb-star {
-      color: rgba(255,255,255,0.4);
-      font-size: 13px;
+    /* photo avatar in bar */
+    .cb-photo {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      object-fit: cover;
       flex-shrink: 0;
-      user-select: none;
+      opacity: 0.88;
+      border: 1px solid rgba(255,255,255,0.2);
     }
 
     .cb-input {
@@ -3142,7 +3177,7 @@
       min-width: 0;
       caret-color: rgba(255,255,255,0.6);
     }
-    .cb-input::placeholder { color: rgba(255,255,255,0.35); }
+    .cb-input::placeholder { color: rgba(255,255,255,0.4); }
 
     /* send button — slides in left→right when text present */
     .cb-send {
@@ -4858,7 +4893,8 @@
       } else {
         dot.style.opacity = '1';
         if (mode !== 'dot') enterDot();
-        dot.style.background = onDark ? DOT_COLOR_DARK : DOT_COLOR;
+        const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+        dot.style.background = onDark ? (isDarkTheme ? DOT_COLOR : DOT_COLOR_DARK) : (isDarkTheme ? DOT_COLOR_DARK : DOT_COLOR);
       }
     });
 
@@ -5786,8 +5822,8 @@
 
   <!-- ── CHAT BAR ──────────────────────────────────────────── -->
   <div class="cb-wrap" id="cbWrap">
-    <div class="cb" id="cb">
-      <span class="cb-star">✦</span>
+    <div class="cb glass-pill" id="cb">
+      <img class="cb-photo" src="photo.jpg" alt="Bhanu" />
       <input class="cb-input" id="cbInput" type="text" placeholder="Ask me something…" autocomplete="off" spellcheck="false" />
       <button class="cb-send" id="cbSend" aria-label="Send">
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
@@ -5956,6 +5992,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var isRecording = false;
     var recordTarget = 'panel';
 
+    var cbWrap  = document.getElementById('cbWrap');
     var cbEl    = document.getElementById('cb');
     var cbInput = document.getElementById('cbInput');
     var cbSend  = document.getElementById('cbSend');
@@ -6232,6 +6269,39 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       else startRecording(document.body.classList.contains('chat-open') ? 'panel' : 'bar');
     });
 
+    /* ── Intro: photo rises, then bar springs open ─────────────────
+     *
+     *  Phase 1 (400 ms delay): the cb-wrap fades + rises up from below
+     *         so the user sees just the circular photo floating up
+     *  Phase 2 (620 ms after phase 1): bar springs out to full width
+     *
+     *  Inline styles are used so the normal body.chat-open CSS rule
+     *  (which hides the bar when chat opens) takes over cleanly after.
+     * ─────────────────────────────────────────────────────────────── */
+    cbWrap.style.opacity = '0';
+    cbWrap.style.pointerEvents = 'none';
+
+    setTimeout(function () {
+      /* Phase 1 — photo rises */
+      cbWrap.style.transition =
+        'opacity 0.5s cubic-bezier(0.34,1.1,0.64,1), ' +
+        'transform 0.6s cubic-bezier(0.34,1.3,0.64,1)';
+      cbWrap.style.opacity       = '1';
+      cbWrap.style.pointerEvents = 'auto';
+
+      setTimeout(function () {
+        /* Phase 2 — clear inline styles, hand off to CSS, spring-expand */
+        cbWrap.style.transition    = '';
+        cbWrap.style.opacity       = '';
+        cbWrap.style.pointerEvents = '';
+        cbEl.style.overflow        = '';
+
+        requestAnimationFrame(function () {
+          cbEl.classList.add('bar-revealed');
+        });
+      }, 620);
+    }, 400);
+
     /* ── Rotating placeholder ── */
     var PLACEHOLDERS = [
       'Ask how I built a $70M product from zero as the only designer…',
@@ -6266,6 +6336,19 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
   })();
   </script>
+
+  <!-- Chromatic edge dispersion filter for .glass-pill refractive rim effect -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <filter id="glass-dispersion">
+        <feColorMatrix type="matrix"
+          values="1 0 0 0  0.015
+                  0 1 0 0  0
+                  0 0 1 0 -0.015
+                  0 0 0 1  0"/>
+      </filter>
+    </defs>
+  </svg>
 
 </body>
 </html>
