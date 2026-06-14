@@ -4282,7 +4282,7 @@
       font-family: var(--font-mono); font-weight: 700; color: #ffffff;
       background: rgba(255, 255, 255, 0.14);
       -webkit-backdrop-filter: blur(10px) saturate(150%); backdrop-filter: blur(10px) saturate(150%);
-      border-radius: 999px;
+      border-radius: 16px;
       padding: 0.04em 0.5em; margin-right: 0.16em;
       overflow: hidden;
       box-shadow: inset 1.5px 2px 3px rgba(255, 255, 255, 0.95),
@@ -7310,20 +7310,15 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       ctx.wordsEl.insertBefore(s, ctx.caretEl);            // words flow before the trailing caret
     }
 
-    var CP_WORD_INTERVAL = REDUCE ? 0 : 22;
-    function wordsThisFrame(ctx) {
-      var q = ctx.queue.length;
-      if (q > 80) return 8; if (q > 40) return 5; return 3;   // drain faster on a big backlog
-    }
+    var CP_WORD_INTERVAL = REDUCE ? 0 : 28;   // ms between words → steady ~36 wps, Claude-Code-like
     function startPump(ctx) {
       if (ctx.rafId || ctx.finalized) return;
       ctx.rafId = requestAnimationFrame(function step(ts) {
         ctx.rafId = 0;
         if (ctx.aborted || ctx.finalized) return;
         if (REDUCE) { while (ctx.queue.length) appendWord(ctx, ctx.queue.shift()); }
-        else if ((ts - ctx.lastTs) >= CP_WORD_INTERVAL) {     // once per tick, reveal a whole budget
-          var budget = wordsThisFrame(ctx);
-          while (ctx.queue.length && budget > 0) { appendWord(ctx, ctx.queue.shift()); budget--; }
+        else if (ctx.queue.length && (ts - ctx.lastTs) >= CP_WORD_INTERVAL) {
+          appendWord(ctx, ctx.queue.shift());                 // ONE word per tick — smooth, never bursty
           ctx.lastTs = ts;
         }
         if (ctx.queue.length) ctx.rafId = requestAnimationFrame(step);   // more buffered → keep going
@@ -8218,7 +8213,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         pg.addColorStop(0.66, '#A855F7'); pg.addColorStop(1, '#EC4899');
         function pillPath() {
           ctx.beginPath();
-          if (ctx.roundRect) ctx.roundRect(tStart, pillY, pillW, pillH, pillH / 2);
+          if (ctx.roundRect) ctx.roundRect(tStart, pillY, pillW, pillH, 16 * dpr);
           else ctx.rect(tStart, pillY, pillW, pillH);
         }
         ctx.fillStyle = '#33333a'; pillPath(); ctx.fill();               // frosted surface
