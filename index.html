@@ -2080,10 +2080,10 @@
     @keyframes vt-spin { to { transform: rotate(360deg); } }
 
     /* live waveform — 3 white bars; middle one stays static */
-    /* rounded-pill speaking waveform — staggered idle bounce; JS scales it by mic level */
+    /* rounded-pill speaking waveform — each bar tracks a live mic frequency band;
+       the cp-vwave idle bounce only runs as a fallback when audio analysis is unavailable */
     .vt-wave {
-      display: none; align-items: center; gap: 3px; height: 24px; flex-shrink: 0;
-      transform-origin: center; transition: transform 0.12s ease;
+      display: none; align-items: center; gap: 3px; height: 28px; flex-shrink: 0;
     }
     .vt-wave span {
       width: 4px; height: 6px;
@@ -2098,6 +2098,7 @@
     .vt-wave span:nth-child(5) { animation-delay: -0.35s; }
     .vt-wave span:nth-child(6) { animation-delay: -0.85s; }
     @keyframes cp-vwave { 0%, 100% { height: 5px; } 50% { height: 22px; } }
+    .vt-wave.is-live span { animation: none; transition: height 0.06s ease-out; }
     @media (prefers-reduced-motion: reduce) {
       .vt-wave span { animation: none; }
       .vt-wave span:nth-child(odd)  { height: 9px; }
@@ -7548,18 +7549,29 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var waveCtx = null, waveRAF = null;
     function startWave(stream) {
       var wave = voiceToast ? voiceToast.querySelector('.vt-wave') : null;
+      var bars = wave ? wave.querySelectorAll('span') : [];
       var AC = window.AudioContext || window.webkitAudioContext;
-      if (!wave || !AC) return;
+      if (!bars.length || !AC) return;                   // no analyser → CSS idle bounce fallback
       waveCtx = new AC();
       var analyser = waveCtx.createAnalyser();
-      analyser.fftSize = 256;
+      analyser.fftSize = 128;                             // 64 bins
+      analyser.smoothingTimeConstant = 0.8;              // smooth the spectrum
       waveCtx.createMediaStreamSource(stream).connect(analyser);
       var data = new Uint8Array(analyser.frequencyBinCount);
-      (function tick() {
+      // map each bar to a live frequency band (low → high), weighted to the voice range
+      var BANDS = [[1,3],[3,6],[6,10],[10,16],[16,26],[26,42]];
+      var lvl = [0,0,0,0,0,0];
+      wave.classList.add('is-live');
+      (function tick(now) {
         analyser.getByteFrequencyData(data);
-        var sum = 0; for (var j = 2; j < 60; j++) sum += data[j];
-        var lvl = sum / (58 * 255);                      // 0..1 overall mic level
-        wave.style.transform = 'scaleY(' + (1 + lvl * 0.9) + ')';   // swell the bounce with the voice
+        for (var i = 0; i < bars.length && i < BANDS.length; i++) {
+          var b = BANDS[i], sum = 0;
+          for (var j = b[0]; j < b[1]; j++) sum += data[j];
+          var target = sum / (b[1] - b[0]) / 255;        // 0..1 energy in this band
+          lvl[i] += (target - lvl[i]) * 0.45;            // ease toward target
+          var idle = 0.10 * (0.5 + 0.5 * Math.sin((now || 0) / 240 + i * 1.1));  // gentle life in silence
+          bars[i].style.height = Math.round(5 + (lvl[i] + idle) * 24) + 'px';     // 5..~31px
+        }
         waveRAF = requestAnimationFrame(tick);
       })();
     }
@@ -7567,7 +7579,10 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (waveRAF) cancelAnimationFrame(waveRAF);
       waveRAF = null;
       if (waveCtx) { waveCtx.close(); waveCtx = null; }
-      if (voiceToast) { var w = voiceToast.querySelector('.vt-wave'); if (w) w.style.transform = ''; }
+      if (voiceToast) {
+        var w = voiceToast.querySelector('.vt-wave');
+        if (w) { w.classList.remove('is-live'); w.querySelectorAll('span').forEach(function (s) { s.style.height = ''; }); }
+      }
     }
 
     /* insert transcribed text at the caret; replace only if the field is empty */
