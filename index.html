@@ -2080,14 +2080,29 @@
     @keyframes vt-spin { to { transform: rotate(360deg); } }
 
     /* live waveform — 3 white bars; middle one stays static */
-    .vt-wave { display: none; align-items: center; gap: 4px; height: 18px; flex-shrink: 0; }
-    .vt-wave span {
-      width: 3px; height: 6px;
-      border-radius: 2px;
-      background: rgba(255,255,255,0.92);
-      transition: height 0.07s linear;
+    /* rounded-pill speaking waveform — staggered idle bounce; JS scales it by mic level */
+    .vt-wave {
+      display: none; align-items: center; gap: 3px; height: 24px; flex-shrink: 0;
+      transform-origin: center; transition: transform 0.12s ease;
     }
-    .vt-wave span:nth-child(2) { height: 11px; opacity: 0.6; } /* static middle */
+    .vt-wave span {
+      width: 4px; height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.92);
+      animation: cp-vwave 0.95s ease-in-out infinite;
+    }
+    .vt-wave span:nth-child(1) { animation-delay: -0.20s; }
+    .vt-wave span:nth-child(2) { animation-delay: -0.55s; }
+    .vt-wave span:nth-child(3) { animation-delay: -0.05s; }
+    .vt-wave span:nth-child(4) { animation-delay: -0.70s; }
+    .vt-wave span:nth-child(5) { animation-delay: -0.35s; }
+    .vt-wave span:nth-child(6) { animation-delay: -0.85s; }
+    @keyframes cp-vwave { 0%, 100% { height: 5px; } 50% { height: 22px; } }
+    @media (prefers-reduced-motion: reduce) {
+      .vt-wave span { animation: none; }
+      .vt-wave span:nth-child(odd)  { height: 9px; }
+      .vt-wave span:nth-child(even) { height: 16px; }
+    }
 
     /* state visibility */
     #voiceToast.vt-listening .vt-spinner { display: none; }
@@ -4963,7 +4978,7 @@
   <!-- voice status toast: spinner (waiting/processing) ↔ live waveform (listening) -->
   <div id="voiceToast" aria-hidden="true">
     <div class="vt-spinner"></div>
-    <div class="vt-wave" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="vt-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
     <span class="vt-msg">Waiting for mic permission…</span>
   </div>
 
@@ -7532,23 +7547,19 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
        Local-only level metering via Web Audio; transcription stays on the proxy. ── */
     var waveCtx = null, waveRAF = null;
     function startWave(stream) {
-      var bars = voiceToast ? voiceToast.querySelectorAll('.vt-wave span') : [];
+      var wave = voiceToast ? voiceToast.querySelector('.vt-wave') : null;
       var AC = window.AudioContext || window.webkitAudioContext;
-      if (!bars.length || !AC) return;
+      if (!wave || !AC) return;
       waveCtx = new AC();
       var analyser = waveCtx.createAnalyser();
       analyser.fftSize = 256;
       waveCtx.createMediaStreamSource(stream).connect(analyser);
-      var data  = new Uint8Array(analyser.frequencyBinCount);
-      var BANDS = { 0: [1, 12], 2: [22, 90] }; // left = lows, right = highs
+      var data = new Uint8Array(analyser.frequencyBinCount);
       (function tick() {
         analyser.getByteFrequencyData(data);
-        [0, 2].forEach(function (i) {
-          var b = BANDS[i], sum = 0;
-          for (var j = b[0]; j < b[1]; j++) sum += data[j];
-          var lvl = sum / (b[1] - b[0]) / 255;
-          bars[i].style.height = Math.round(5 + lvl * 15) + 'px';
-        });
+        var sum = 0; for (var j = 2; j < 60; j++) sum += data[j];
+        var lvl = sum / (58 * 255);                      // 0..1 overall mic level
+        wave.style.transform = 'scaleY(' + (1 + lvl * 0.9) + ')';   // swell the bounce with the voice
         waveRAF = requestAnimationFrame(tick);
       })();
     }
@@ -7556,9 +7567,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (waveRAF) cancelAnimationFrame(waveRAF);
       waveRAF = null;
       if (waveCtx) { waveCtx.close(); waveCtx = null; }
-      if (voiceToast) voiceToast.querySelectorAll('.vt-wave span').forEach(function (b, i) {
-        if (i !== 1) b.style.height = '';
-      });
+      if (voiceToast) { var w = voiceToast.querySelector('.vt-wave'); if (w) w.style.transform = ''; }
     }
 
     /* insert transcribed text at the caret; replace only if the field is empty */
