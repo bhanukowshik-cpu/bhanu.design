@@ -3914,21 +3914,25 @@
       overflow: clip;
       isolation: isolate;
     }
-    /* SIGNATURE — clipped, blurred, upward-fading rainbow aurora at the header's
-       bottom seam. Reuses the Ask-button conic wheel + ask-wheel-spin, slowed right
-       down. The spin keyframe carries translateX(-50%) in both steps, so this static
-       transform survives the animation and also centers it under reduced-motion. */
+    /* SIGNATURE — rainbow aurora rising from the floor of the chat space (section 2),
+       clipped to its bottom seam and masked to fade upward. Reuses the Ask-button conic
+       wheel + ask-wheel-spin (slowed right down). .cp-glow is the clipped reveal band; the
+       spin keyframe carries translateX(-50%) so the static transform survives the spin. */
+    .cp-glow {
+      position: absolute; left: 0; right: 0; bottom: 100%;   /* the seam above the dock = section-2 floor */
+      height: 150px; overflow: hidden;
+      pointer-events: none; z-index: 0;
+      -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.5) 45%, transparent 100%);
+              mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.5) 45%, transparent 100%);
+    }
     .cp-wheel-glow {
-      position: absolute; z-index: 0; pointer-events: none;
-      left: 50%; bottom: -150%;
-      width: 200%; aspect-ratio: 1 / 1; transform: translateX(-50%);
+      position: absolute; left: 50%; bottom: -180%;          /* ~30% of the wheel reveals in the band */
+      width: 150%; aspect-ratio: 1 / 1; transform: translateX(-50%);
       border-radius: 50%;
       background: conic-gradient(from 0deg,
         #ff4757, #ff6b35, #ffd32a, #2ed573, #1e90ff, #a29bfe, #fd79a8, #ff4757);
-      filter: blur(34px) saturate(125%);
-      opacity: 0.28;
-      -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.6) 14%, transparent 38%);
-              mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.6) 14%, transparent 38%);
+      filter: blur(30px) saturate(130%);
+      opacity: 0.5;
       animation: ask-wheel-spin 26s linear infinite;
       will-change: transform; backface-visibility: hidden;
     }
@@ -3965,6 +3969,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      position: relative; z-index: 2;   /* above the section-2 floor glow */
     }
     .cp-msgs::-webkit-scrollbar { width: 3px; }
     .cp-msgs::-webkit-scrollbar-thumb { background: var(--cp-hairline); border-radius: 3px; }
@@ -4147,6 +4152,7 @@
     .cp-error.vis { display: block; }
 
     .cp-input-row {
+      position: relative; z-index: 1;   /* anchors + sits behind the section-2 floor glow */
       border-top: 1px solid var(--cp-hairline);
       padding: 12px 14px 14px;
       display: flex;
@@ -6967,7 +6973,6 @@
   <!-- ── CHAT PANEL ─────────────────────────────────────────── -->
   <div class="cp" id="cp" aria-hidden="true">
     <div class="cp-header">
-      <span class="cp-wheel-glow" aria-hidden="true"></span>
       <div class="cp-info">
         <h3>Chat with Bhanu</h3>
         <p>Powered by Claude &amp; OpenAI Whisper</p>
@@ -6987,6 +6992,7 @@
     <div class="cp-error" id="cpError"></div>
 
     <div class="cp-input-row">
+      <div class="cp-glow" aria-hidden="true"><span class="cp-wheel-glow"></span></div>
       <div class="cp-pill">
         <textarea class="cp-textarea" id="cpTA" placeholder="Ask me something…" rows="1"
           onkeydown="cpKey(event)" oninput="cpResize(this)"></textarea>
@@ -7504,8 +7510,18 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       voiceToast.classList.remove('vt-waiting', 'vt-listening', 'vt-processing', 'vt-error');
       if (state) voiceToast.classList.add('vt-' + state);
       if (msg && voiceToastMsg) voiceToastMsg.textContent = msg;
-      // pin just above the floating bar
-      voiceToast.style.bottom = (window.innerHeight - cbWrap.getBoundingClientRect().top + 12) + 'px';
+      if (recordTarget === 'panel' && cpMsgs) {
+        // inside the chat panel, pinned just above the chat space
+        var pr = cpMsgs.getBoundingClientRect();
+        voiceToast.style.bottom = 'auto';
+        voiceToast.style.top  = (pr.top + 10) + 'px';
+        voiceToast.style.left = (pr.left + pr.width / 2) + 'px';
+      } else {
+        // pin just above the floating ask bar
+        voiceToast.style.top  = 'auto';
+        voiceToast.style.left = '50%';
+        voiceToast.style.bottom = (window.innerHeight - cbWrap.getBoundingClientRect().top + 12) + 'px';
+      }
       voiceToast.classList.add('toast-show');
     }
     function hideVoiceToast() {
