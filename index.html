@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="format-detection" content="telephone=no" />
+  <!-- dev: never cache this file so edits always show (Safari was holding stale copies) -->
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Bhanu · Product Designer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -2034,6 +2038,62 @@
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
+
+    /* ── Voice status toast — reuses the #copyToast pill look ── */
+    #voiceToast {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px) scale(0.96);
+      z-index: 9999;
+      background: rgba(12, 12, 12, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 100px;
+      padding: 10px 18px 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: rgba(255,255,255,0.88);
+      white-space: nowrap;
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.22s ease;
+      pointer-events: none;
+    }
+    #voiceToast.toast-show { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
+
+    /* spinner — shown in waiting + processing */
+    .vt-spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.22);
+      border-top-color: rgba(255,255,255,0.92);
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: vt-spin 0.7s linear infinite;
+    }
+    #voiceToast.vt-processing .vt-spinner { border-top-color: #E6F28D; }
+    @keyframes vt-spin { to { transform: rotate(360deg); } }
+
+    /* live waveform — 3 white bars; middle one stays static */
+    .vt-wave { display: none; align-items: center; gap: 4px; height: 18px; flex-shrink: 0; }
+    .vt-wave span {
+      width: 3px; height: 6px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.92);
+      transition: height 0.07s linear;
+    }
+    .vt-wave span:nth-child(2) { height: 11px; opacity: 0.6; } /* static middle */
+
+    /* state visibility */
+    #voiceToast.vt-listening .vt-spinner { display: none; }
+    #voiceToast.vt-listening .vt-wave    { display: flex; }
+    #voiceToast.vt-error .vt-spinner,
+    #voiceToast.vt-error .vt-wave        { display: none; }
     /* ─── CUSTOM CURSOR — desktop fine-pointer only ────────────── */
     @media (pointer: fine) and (hover: hover) {
       html.cc-active,
@@ -2879,53 +2939,254 @@
       justify-content: center;
       background: none;
       border: none;
-      padding: 3px;
+      padding: 0;
       cursor: pointer !important;
       flex-shrink: 0;
       border-radius: 100px;
+      transition: transform 0.15s ease;
     }
+    .theme-toggle:active { transform: scale(0.93); }
     .tt-track {
-      display: flex;
-      align-items: center;
-      width: 48px;
-      height: 26px;
+      position: relative;
+      width: 58px;
+      height: 30px;
       border-radius: 100px;
-      background: rgba(37,37,37,0.10);
-      border: 1px solid rgba(37,37,37,0.14);
-      padding: 3px;
+      background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%);
+      border: 1.5px solid rgba(255,255,255,0.40);
       flex-shrink: 0;
-      transition: background 0.3s ease, border-color 0.3s ease;
+      overflow: hidden;
+      transition: background 0.5s ease, border-color 0.4s ease;
     }
-    .tt-thumb {
-      width: 20px;
-      height: 20px;
+    .tt-track::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; top: 0;
+      height: 50%;
+      border-radius: 100px 100px 50% 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 100%);
+      pointer-events: none;
+      z-index: 10;
+    }
+    /* Hills */
+    .tt-hill-back {
+      position: absolute;
+      bottom: 0; left: -5%;
+      width: 75%; height: 13px;
+      background: #72B87A;
+      border-radius: 50% 60% 0 0;
+      z-index: 1;
+      transition: background 0.5s ease;
+    }
+    .tt-hill-front {
+      position: absolute;
+      bottom: 0; right: -8%;
+      width: 62%; height: 11px;
+      background: #5DA066;
+      border-radius: 60% 50% 0 0;
+      z-index: 2;
+      transition: background 0.5s ease;
+    }
+    /* Stars — hidden in day/light mode */
+    .tt-star {
+      position: absolute;
+      background: rgba(255,255,255,0.90);
       border-radius: 50%;
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.10);
-      transform: translateX(0);
-      transition: transform 0.38s cubic-bezier(0.34,1.56,0.64,1),
-                  background 0.3s ease,
-                  box-shadow 0.3s ease;
-      flex-shrink: 0;
-      color: #252525;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 1;
     }
-    .tt-sun  { display: none; }
-    .tt-moon { display: block; }
+    .tt-star-1 { width: 2.5px; height: 2.5px; top: 5px;  left: 8px;  }
+    .tt-star-2 { width: 2px;   height: 2px;   top: 11px; left: 18px; }
+    .tt-star-3 { width: 2px;   height: 2px;   top: 6px;  left: 27px; }
+    .tt-star-4 { width: 1.5px; height: 1.5px; top: 13px; left: 11px; }
+    [data-theme="dark"] .tt-star { opacity: 1; }
+    /* Twinkling — each star on its own rhythm */
+    @keyframes tt-twinkle {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.12; }
+    }
+    [data-theme="dark"] .tt-star-1 { animation: tt-twinkle 2.1s ease-in-out infinite; }
+    [data-theme="dark"] .tt-star-2 { animation: tt-twinkle 1.7s ease-in-out 0.8s  infinite; }
+    [data-theme="dark"] .tt-star-3 { animation: tt-twinkle 2.5s ease-in-out 1.5s  infinite; }
+    [data-theme="dark"] .tt-star-4 { animation: tt-twinkle 1.9s ease-in-out 0.4s  infinite; }
+    /* Shooting star */
+    .tt-shoot {
+      position: absolute;
+      top: 3px; left: 4px;
+      width: 9px; height: 1px;
+      background: linear-gradient(to right, transparent, #FFE87A);
+      border-radius: 1px;
+      opacity: 0;
+      transform: rotate(35deg);
+      z-index: 2;
+      pointer-events: none;
+    }
+    @keyframes tt-shooting-star {
+      0%   { opacity: 0; transform: translate(0,    0   ) rotate(35deg); }
+      3%   { opacity: 0.85; }
+      15%  { opacity: 0; transform: translate(20px, 8px) rotate(35deg); }
+      100% { opacity: 0; transform: translate(20px, 8px) rotate(35deg); }
+    }
+    [data-theme="dark"] .tt-shoot {
+      animation: tt-shooting-star 5s ease-in 2s infinite;
+    }
+    /* Cloud — visible in day/light mode */
+    .tt-cloud {
+      position: absolute;
+      right: 9px; top: 6px;
+      width: 15px; height: 7px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 10px;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+    }
+    .tt-cloud::before {
+      content: '';
+      position: absolute;
+      width: 9px; height: 9px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      top: -5px; left: 2px;
+    }
+    .tt-cloud::after {
+      content: '';
+      position: absolute;
+      width: 7px; height: 7px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      top: -4px; left: 7px;
+    }
+    [data-theme="dark"] .tt-cloud { opacity: 0; }
+    /* Cloud drift — light mode only. Starts off-screen right, exits off-screen left → seamless loop */
+    @keyframes tt-cloud-drift {
+      from { transform: translateX(30px);  }
+      to   { transform: translateX(-85px); }
+    }
+    [data-theme="light"] .tt-cloud {
+      animation: tt-cloud-drift 26s linear 0s infinite backwards;
+    }
+    /* Secondary clouds */
+    .tt-cloud-b {
+      position: absolute;
+      right: 3px; top: 11px;
+      width: 9px; height: 4px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .tt-cloud-b::before {
+      content: '';
+      position: absolute;
+      width: 6px; height: 6px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      top: -3px; left: 1px;
+    }
+    .tt-cloud-b::after {
+      content: '';
+      position: absolute;
+      width: 5px; height: 5px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      top: -3px; left: 4px;
+    }
+    [data-theme="dark"]  .tt-cloud-b { opacity: 0; }
+    [data-theme="light"] .tt-cloud-b {
+      opacity: 0.65;
+      animation: tt-cloud-drift 18s linear 4s infinite backwards;
+    }
+    .tt-cloud-c {
+      position: absolute;
+      right: 18px; top: 4px;
+      width: 11px; height: 5px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .tt-cloud-c::before {
+      content: '';
+      position: absolute;
+      width: 7px; height: 7px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      top: -4px; left: 1px;
+    }
+    .tt-cloud-c::after {
+      content: '';
+      position: absolute;
+      width: 6px; height: 6px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      top: -3px; left: 5px;
+    }
+    [data-theme="dark"]  .tt-cloud-c { opacity: 0; }
+    [data-theme="light"] .tt-cloud-c {
+      opacity: 0.45;
+      animation: tt-cloud-drift 34s linear 7.5s infinite backwards;
+    }
+    /* Thumb — SUN on LEFT in light mode, MOON on RIGHT in dark mode */
+    .tt-thumb {
+      position: absolute;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      top: 50%; left: 1.5px;
+      overflow: hidden;
+      background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800);
+      transform: translateX(0) translateY(-50%);
+      transition: transform 0.44s cubic-bezier(0.34,1.56,0.64,1),
+                  background 0.5s ease;
+      z-index: 3;
+    }
+    /* Craters — hidden on sun, visible on moon */
+    .tt-thumb::before,
+    .tt-thumb::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(148,158,185,0.50);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .tt-thumb::before { width: 7px; height: 7px; top: 4px;  left: 5px;  }
+    .tt-thumb::after  { width: 5px; height: 5px; top: 13px; left: 14px; }
+    [data-theme="dark"] .tt-thumb::before,
+    [data-theme="dark"] .tt-thumb::after { opacity: 1; }
+    /* Light mode — explicit so transitions fire as rule-swaps, not rule-removals */
+    [data-theme="light"] .tt-track {
+      background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%);
+      border-color: rgba(255,255,255,0.40);
+    }
+    [data-theme="light"] .tt-hill-back  { background: #72B87A; }
+    [data-theme="light"] .tt-hill-front { background: #5DA066; }
+    [data-theme="light"] .tt-thumb {
+      transform: translateX(0) translateY(-50%);
+      background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800);
+    }
+    [data-theme="light"] .tt-star  { opacity: 0; }
+    [data-theme="light"] .tt-cloud { opacity: 1; }
+    [data-theme="light"] .tt-thumb::before,
+    [data-theme="light"] .tt-thumb::after { opacity: 0; }
+    /* Dark mode */
     [data-theme="dark"] .tt-track {
-      background: rgba(240,237,232,0.12);
-      border-color: rgba(240,237,232,0.18);
+      background: linear-gradient(180deg, #0B1829 0%, #152238 100%);
+      border-color: rgba(255,255,255,0.10);
     }
+    [data-theme="dark"] .tt-track::after {
+      background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%);
+    }
+    [data-theme="dark"] .tt-hill-back  { background: #1D3D25; }
+    [data-theme="dark"] .tt-hill-front { background: #152C1A; }
     [data-theme="dark"] .tt-thumb {
-      transform: translateX(22px);
-      background: #2A2720;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.28);
-      color: #F0EDE8;
+      transform: translateX(28px) translateY(-50%);
+      background: #EEF0F5;
     }
-    [data-theme="dark"] .tt-sun  { display: block; }
-    [data-theme="dark"] .tt-moon { display: none; }
 
     /* ─── DARK MODE TARGETED OVERRIDES ──────────────────────── */
     [data-theme="dark"] .greeting {
@@ -3043,9 +3304,25 @@
 
     /* ── Smooth theme transition (#1) ───────────────────────── */
     html.color-transitioning * {
-      transition-property: background-color, color, border-color, box-shadow, opacity !important;
-      transition-duration: 0.28s !important;
+      transition-property: background, background-color, color, border-color, opacity !important;
+      transition-duration: 0.5s !important;
       transition-timing-function: ease !important;
+    }
+    /* Restore each toggle element's own transition (overrides the * rule) */
+    html.color-transitioning .tt-track {
+      transition: background 0.5s ease, border-color 0.4s ease !important;
+    }
+    html.color-transitioning .tt-hill-back,
+    html.color-transitioning .tt-hill-front {
+      transition: background 0.5s ease !important;
+    }
+    html.color-transitioning .tt-star,
+    html.color-transitioning .tt-cloud {
+      transition: opacity 0.4s ease !important;
+    }
+    html.color-transitioning .tt-thumb {
+      transition: transform 0.44s cubic-bezier(0.34,1.56,0.64,1),
+                  background 0.5s ease !important;
     }
 
     /* Case study cards — fix mark text + explore button in dark mode */
@@ -3082,23 +3359,49 @@
     .page { transition: padding-right 0.55s cubic-bezier(0.16,1,0.3,1); }
     body.chat-open .page { padding-right: 440px; }
 
-    /* ── Floating bar wrapper ── */
+    /* ── Floating bar wrapper — shrink-to-fits the bar (width:max-content) and
+       centers with margin-inline:auto. NOT transform: translateX(-50%): Safari
+       fails to recompute that −50% while the bar's width animates, so the
+       collapse slid left then snapped to center. Auto margins re-center via
+       layout every frame, which Safari handles correctly. ── */
     .cb-wrap {
       position: fixed;
       bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 0;
+      right: 0;
+      width: max-content;
+      max-width: calc(100vw - 24px);
+      margin-inline: auto;
       z-index: 1200;
-      transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
       overflow: hidden;
-      border-radius: 100px;
+      border-radius: 29px;
     }
     .cb-wrap:hover,
-    .cb-wrap:focus-within { transform: translateX(-50%) translateY(-2px); }
+    .cb-wrap:focus-within { transform: translateY(-2px); }
+    .cb-wrap:has(.cb.expanded) { border-radius: 28px; }
     body.chat-open .cb-wrap {
       opacity: 0;
       pointer-events: none;
-      transform: translateX(-50%) translateY(14px);
+      transform: translateY(14px);
+    }
+
+    /* ── Entrance: the bar rises from below AFTER the hero lands.
+       The hidden state is an EXPLICIT class (.cb-prerise) rather than the
+       animation's backwards-fill, because Safari doesn't reliably apply
+       backwards-fill during animation-delay — it was showing the bar
+       immediately and skipping the rise. JS waits ~2.4s, swaps prerise→rising
+       (a plain CSS animation, no delay), then unfolds on animationend. ── */
+    .cb-wrap.cb-prerise {
+      opacity: 0;
+      transform: translateY(110px);
+    }
+    @keyframes cb-rise {
+      from { opacity: 0; transform: translateY(110px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .cb-wrap.cb-rising {
+      animation: cb-rise 0.7s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
     }
 
     /* ── Apple Liquid Glass ─────────────────────────────────── */
@@ -3113,7 +3416,7 @@
         radial-gradient(34.57% 51.92% at 49.87% 95.19%, rgba(247,247,252,0.08) 33.17%, rgba(247,247,252,0) 100%);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border-radius: 100px;
+      border-radius: 29px; /* explicit so the expand transition animates (see .cb-wrap) */
       border: none;
       box-shadow:
         inset 0 0 0 1px rgba(255,255,255,0.10),
@@ -3135,7 +3438,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      border-radius: 100px;
+      border-radius: 29px;
       background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
       opacity: 0; /* noise off — Artlist glass is clean */
       mix-blend-mode: overlay;
@@ -3154,6 +3457,7 @@
 
     /* ── Rainbow arc behind pill ── */
     #pill-arc {
+      display: none; /* wheel moved inside the Ask CTA (.cb-send::before) */
       position: absolute;
       width: 800px;
       height: 800px;
@@ -3168,9 +3472,23 @@
       animation: pill-arc-spin 6s linear infinite;
       pointer-events: none;
       opacity: 0.375;
-      transition: top 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition:
+        top     0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+        width   0.9s ease,
+        height  0.9s ease,
+        opacity 0.9s ease;
     }
     [data-theme="light"] #pill-arc { opacity: 0.275; }
+    /* intro flourish — brighter, bigger, higher for the first 5s after reveal */
+    #pill-arc.arc-intro {
+      width: 1100px;
+      height: 1100px;
+      top: 16px;
+      opacity: 0.56;
+    }
+    [data-theme="light"] #pill-arc.arc-intro { opacity: 0.41; }
+    /* hidden until the bar fully opens — JS removes this on intro phase 3 */
+    #pill-arc.arc-hidden { opacity: 0; }
     @keyframes pill-arc-spin {
       from { transform: translateX(-50%) rotate(0deg); }
       to   { transform: translateX(-50%) rotate(360deg); }
@@ -3200,30 +3518,155 @@
     .cb {
       position: relative;
       display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0 16px 0 10px;
+      flex-direction: column;
+      justify-content: flex-end;
       height: 58px;
       width: 52px; /* intro: photo-only; JS adds .bar-revealed */
       cursor: text;
-      /* spring: slight overshoot for tactile feel */
-      transition: width 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+      /* collapse (this is the destination state when .expanded is removed):
+         pure deceleration, no overshoot — springs feel wrong in reverse */
+      transition:
+        width  0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        border-radius 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .cb.bar-revealed { width: 480px; }
-    .cb.expanded     { width: 600px; }
+    /* expand: springy overshoot for tactile feel */
+    .cb.expanded {
+      width: 620px;
+      height: 212px;
+      border-radius: 28px;
+      transition:
+        width  0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+        height 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* bottom control row — fixed height, pinned by the column flex-end so
+       vertical expansion grows above it without moving the controls.
+       11px inset matches the (58 − 36) / 2 vertical inset of the controls. */
+    .cb-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 11px;
+      height: 58px;
+      width: 100%;
+      flex-shrink: 0;
+      transition: padding 0.4s ease;
+    }
+
+    /* prompt hints — revealed by the vertical expansion; chips flow + wrap */
+    .cb-hints {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 8px;
+      padding: 18px 20px 0;
+      opacity: 0;
+      transform: translateY(6px);
+      pointer-events: none;
+      transition:
+        opacity   0.3s  ease            0.12s,
+        transform 0.35s cubic-bezier(0.34,1.2,0.64,1) 0.12s;
+    }
+    .cb.expanded .cb-hints { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .cb-hints-title {
+      flex-basis: 100%;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.32);
+      margin-bottom: 4px;
+    }
+    .cb-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      padding: 7px 13px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1;
+      color: rgba(255,255,255,0.62);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s cubic-bezier(0.34,1.2,0.64,1);
+    }
+    /* leading dot — turns lime on hover as a focus cue */
+    .cb-hint::before {
+      content: '';
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.28);
+      flex-shrink: 0;
+      transition: background 0.18s ease, box-shadow 0.18s ease;
+    }
+    .cb-hint:hover {
+      background: rgba(230,242,141,0.08);
+      border-color: rgba(230,242,141,0.40);
+      color: rgba(255,255,255,0.95);
+      transform: translateY(-1px);
+    }
+    .cb-hint:hover::before {
+      background: #E6F28D;
+      box-shadow: 0 0 6px rgba(230,242,141,0.7);
+    }
+    .cb-hint:active { transform: translateY(0); }
+
+    /* intro: photo + "Ask me anything" CTA float up together; glass, input
+       and mic are hidden. On reveal the glass fades in, the photo grows, the
+       input/mic appear, and the CTA shrinks "Ask me anything" → "Ask". */
+    .cb.cb-intro {
+      width: 246px;
+      background-image: none;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .cb.cb-intro .cb-row { justify-content: center; gap: 12px; }
+    .cb.cb-intro .cb-input,
+    .cb.cb-intro .cb-mic {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .cb.cb-intro .cb-photo { width: 26px; height: 26px; }
+    .cb.cb-intro .cb-send  { width: 168px; }
+
+    /* CTA label crossfade — "Ask me anything" (intro) ↔ "Ask" (revealed) */
+    .cb-send-intro {
+      position: absolute;
+      left: 0; right: 0;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+    .cb-send-label { transition: opacity 0.28s ease; }
+    .cb.cb-intro .cb-send-intro { opacity: 1; }
+    .cb.cb-intro .cb-send-label,
+    .cb.cb-intro .cb-send-enter { opacity: 0; }
     @media (prefers-reduced-motion: reduce) {
-      #pill-arc, .cb-wrap, .cb-wrap::after, .glass-pill::before { animation: none !important; }
+      #pill-arc, .cb-wrap, .cb-wrap::after, .glass-pill::before, .cb-send::before { animation: none !important; }
     }
 
     /* photo avatar in bar */
     .cb-photo {
-      width: 26px;
-      height: 26px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
       opacity: 0.88;
       border: 1px solid rgba(255,255,255,0.2);
+      transition:
+        width  0.5s cubic-bezier(0.34, 1.4, 0.64, 1),
+        height 0.5s cubic-bezier(0.34, 1.4, 0.64, 1);
     }
 
     .cb-input {
@@ -3236,90 +3679,220 @@
       font-size: 14px;
       min-width: 0;
       caret-color: var(--cb-caret-color, rgba(255,255,255,0.6));
-      transition: color 0.25s ease;
+      transition: color 0.25s ease, opacity 0.3s ease;
     }
     .cb-input::placeholder { color: var(--cb-placeholder, rgba(255,255,255,0.4)); }
 
     /* send button — slides in left→right when text present */
-    /* glossy circular CTA — puffy glass bead, dark arrow (Artlist-style) */
+    /* frosted-glass "Ask" CTA — blurred brand circle clipped at the bottom,
+       specular catch on the top-left edge (Artlist construction) */
     .cb-send {
-      background:
-        radial-gradient(circle at 50% 55%, #d9e466 0%, #e6f28d 55%, #f1f8bb 82%, #fbfde8 100%);
+      position: relative;
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(10px) saturate(150%);
+      -webkit-backdrop-filter: blur(10px) saturate(150%);
       border: none;
       cursor: pointer;
-      width: 34px;
-      height: 34px;
+      height: 36px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border-radius: 999px;
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: #ffffff;
+      white-space: nowrap;
+      box-shadow:
+        inset 1.5px 2px 3px rgba(255,255,255,0.95),
+        inset 0 0 0 1px rgba(255,255,255,0.30);
+      padding: 0 16px;
+      transition:
+        box-shadow    0.25s ease,
+        opacity       0.3s ease,
+        transform     0.25s cubic-bezier(0.34,1.2,0.64,1);
+    }
+    /* behind the frosted surface: ::before = rotating rainbow wheel (idle),
+       ::after = lime disc that fades in over it once there is text (.vis) */
+    .cb-send::before,
+    .cb-send::after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      left: 50%;
+      top: 35%;
+      width: 150%;
+      aspect-ratio: 1 / 1;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      filter: blur(8px);
+      /* force a stable GPU layer so Safari reliably paints the blurred disc
+         behind the backdrop-filtered button (fixes the intermittent no-rainbow) */
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transition: filter 0.25s ease, opacity 0.3s ease, top 0.35s cubic-bezier(0.34,1.2,0.64,1);
+    }
+    .cb-send::before {
+      background: conic-gradient(
+        from 0deg,
+        #ff4757, #ff6b35, #ffd32a, #2ed573, #1e90ff, #a29bfe, #fd79a8, #ff4757
+      );
+      opacity: 0.5;
+      animation: ask-wheel-spin 6s linear infinite;
+    }
+    @keyframes ask-wheel-spin {
+      from { transform: translateX(-50%) rotate(0deg); }
+      to   { transform: translateX(-50%) rotate(360deg); }
+    }
+    .cb-send::after {
+      background: #E6F28D; /* brand olive-lime (highlight color) */
+      opacity: 0;
+      transition: background 0.25s ease, filter 0.25s ease, opacity 0.3s ease, top 0.35s cubic-bezier(0.34,1.2,0.64,1);
+    }
+    .cb-send.vis::after { opacity: 1; }
+    .cb-send.vis { color: #252525; } /* dark label + ↵ icon on the lime fill */
+    /* hover: the discs rise to flood ~80% of the pill and sharpen */
+    .cb-send:hover::before,
+    .cb-send:hover::after { top: 20%; filter: blur(6px); }
+    .cb-send:hover {
+      transform: scale(1.06);
+      box-shadow:
+        inset 1.5px 2px 3px rgba(255,255,255,1),
+        inset 0 0 0 1px rgba(255,255,255,0.40),
+        0 0 16px 4px rgba(255,255,255,0.35),
+        0 0 36px 10px rgba(255,255,255,0.18);
+    }
+    .cb-send.vis:hover {
+      box-shadow:
+        inset 1.5px 2px 3px rgba(255,255,255,1),
+        inset 0 0 0 1px rgba(255,255,255,0.40),
+        0 0 16px 4px rgba(230,242,141,0.50),
+        0 0 36px 10px rgba(230,242,141,0.26);
+    }
+    .cb-send.vis:hover::after { background: #edf7a3; }
+    .cb-send:active { transform: scale(0.94); }
+    /* typed: the ↵ return hint unfolds beside "Ask" */
+    .cb-send-enter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 0;
+      opacity: 0;
+      margin-left: 0;
+      overflow: hidden;
+      pointer-events: none;
+      transition:
+        width       0.25s cubic-bezier(0.34,1.2,0.64,1),
+        margin-left 0.25s cubic-bezier(0.34,1.2,0.64,1),
+        opacity     0.2s ease;
+    }
+    .cb-send-enter svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .cb-send.vis .cb-send-enter { width: 13px; opacity: 0.65; margin-left: 6px; }
+
+    /* mic button — flat dark disc, subtle center glow on hover */
+    .cb-mic {
+      background: rgba(255,255,255,0.10);
+      border: none;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
       padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
       border-radius: 50%;
-      overflow: hidden;
-      box-shadow:
-        inset 0 0 4px 1.5px rgba(255,255,255,0.70),
-        inset 2px 3px 5px rgba(255,255,255,0.65),
-        0 3px 12px rgba(0,0,0,0.30);
-      transition:
-        background    0.2s,
-        box-shadow    0.2s ease,
-        opacity       0.22s ease,
-        max-width     0.25s cubic-bezier(0.34,1.2,0.64,1),
-        transform     0.25s cubic-bezier(0.34,1.2,0.64,1);
-      opacity: 0;
-      max-width: 0;
-      pointer-events: none;
-      transform: translateX(-10px);
+      transition: opacity 0.3s ease, background 0.2s ease, box-shadow 0.25s ease, transform 0.25s cubic-bezier(0.34,1.2,0.64,1);
     }
-    .cb-send.vis { opacity: 1; max-width: 34px; pointer-events: auto; transform: translateX(0); }
-    .cb-send.vis:hover {
-      transform: scale(1.10);
-      background:
-        radial-gradient(circle at 50% 55%, #e3ef67 0%, #ecf781 60%, #f4fbab 85%, #fbfddd 100%);
-      box-shadow:
-        inset 0 0 5px 2px rgba(255,255,255,0.85),
-        inset 2px 3px 5px rgba(255,255,255,0.75),
-        0 0 16px 4px rgba(230,242,141,0.55),
-        0 0 36px 10px rgba(230,242,141,0.28),
-        0 4px 16px rgba(0,0,0,0.30);
+    .cb-mic:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,0.16);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.18), 0 0 16px rgba(255,255,255,0.18);
     }
-    .cb-send.vis:active { transform: scale(0.92); }
-    .cb-send svg { width: 16px; height: 16px; fill: #16181c; }
-
-    /* mic button */
-    .cb-mic {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      padding: 5px;
+    .cb-mic:active { transform: translateY(0); }
+    .cb-mic svg { width: 16px; height: 16px; fill: var(--cb-icon-fill, rgba(255,255,255,0.85)); transition: fill 0.2s; }
+    /* recording: the disc splits — waveform pill slides out, mic becomes stop.
+       Bar heights are driven live from the mic via Web Audio (see startWave) */
+    .cb-stop-ic { display: none; }
+    .cb-mic.recording .cb-mic-ic,
+    .cb-mic.transcribing .cb-mic-ic { display: none; }
+    .cb-mic.recording .cb-stop-ic,
+    .cb-mic.transcribing .cb-stop-ic { display: block; fill: #E6F28D; }
+    .cb-mic.recording     { background: rgba(230,242,141,0.16); }
+    .cb-mic.transcribing  { background: rgba(230,242,141,0.16); }
+    .cb-wave {
       display: flex;
       align-items: center;
-      border-radius: 50%;
-      transition: background 0.2s, transform 0.25s cubic-bezier(0.34,1.2,0.64,1);
+      justify-content: center;
+      gap: 4px;
+      height: 36px;
+      width: 0;
+      opacity: 0;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.10);
+      border-radius: 999px;
+      pointer-events: none;
+      transition: width 0.3s cubic-bezier(0.34,1.2,0.64,1), opacity 0.25s ease;
     }
-    .cb-mic:hover  { background: rgba(255,255,255,0.1); transform: scale(1.12); }
-    .cb-mic:active { transform: scale(0.90); }
-    .cb-mic svg { width: 16px; height: 16px; fill: var(--cb-icon-dim, rgba(255,255,255,0.48)); transition: fill 0.2s; }
-    .cb-mic:hover svg { fill: var(--cb-icon-fill, rgba(255,255,255,0.85)); }
-    .cb-mic.recording svg { fill: #ff6b6b; }
-    .cb-mic.recording { animation: cbMicPulse 1.2s infinite; }
+    .cb-row:has(.cb-mic.recording) .cb-wave,
+    .cb-row:has(.cb-mic.transcribing) .cb-wave { width: 48px; opacity: 1; }
+    .cb-wave span {
+      width: 3px;
+      height: 8px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.92);
+      transition: background 0.25s ease, height 0.08s linear;
+    }
+    /* processing: bars turn lime and run a sequential loading shimmer so the
+       transcription wait is clearly visible */
+    .cb-row:has(.cb-mic.transcribing) .cb-wave span {
+      background: #E6F28D;
+      animation: cb-wave-loading 0.9s ease-in-out infinite;
+    }
+    .cb-row:has(.cb-mic.transcribing) .cb-wave span:nth-child(2) { animation-delay: 0.15s; }
+    .cb-row:has(.cb-mic.transcribing) .cb-wave span:nth-child(3) { animation-delay: 0.30s; }
+    @keyframes cb-wave-loading {
+      0%, 100% { height: 6px;  opacity: 0.45; }
+      50%      { height: 18px; opacity: 1; }
+    }
     .cb-mic.transcribing svg { fill: #E6F28D; }
+    .cb-mic.transcribing { animation: cbMicPulse 1.2s infinite; }
     @keyframes cbMicPulse {
-      0%   { box-shadow: 0 0 0 0 rgba(255,107,107,0.5); }
-      70%  { box-shadow: 0 0 0 7px rgba(255,107,107,0); }
-      100% { box-shadow: 0 0 0 0 rgba(255,107,107,0); }
+      0%   { box-shadow: 0 0 0 0 rgba(230,242,141,0.45); }
+      70%  { box-shadow: 0 0 0 6px rgba(230,242,141,0); }
+      100% { box-shadow: 0 0 0 0 rgba(230,242,141,0); }
     }
 
     /* ── Chat panel ── */
     .cp {
+      /* local palette — the panel is dark unconditionally, independent of page theme */
+      --cp-surface:    #16140F;
+      --cp-raise:      #1E1C17;
+      --cp-ink:        #F0EDE8;
+      --cp-ink-dim:    rgba(240,237,232,0.58);
+      --cp-hairline:   rgba(240,237,232,0.10);
+      --cp-glass:      rgba(240,237,232,0.05);
+      --cp-glass-edge: rgba(240,237,232,0.14);
       position: fixed;
       right: 24px;
       top: 88px;
       bottom: 20px;
       width: 388px;
-      background: #FFFCF8;
+      background:
+        radial-gradient(120% 80% at 50% -8%, rgba(240,237,232,0.05) 0%, transparent 46%),
+        var(--cp-surface);
+      border: 1px solid rgba(240,237,232,0.08);
       border-radius: 24px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 20px 60px rgba(0,0,0,0.18);
+      box-shadow:
+        inset 0 1px 0 rgba(240,237,232,0.06),
+        0 4px 8px rgba(0,0,0,0.30),
+        0 28px 80px rgba(0,0,0,0.55);
       display: flex;
       flex-direction: column;
       z-index: 1100;
@@ -3330,14 +3903,36 @@
     body.chat-open .cp { transform: translateX(0); }
 
     .cp-header {
-      padding: 16px 18px 14px;
-      border-bottom: 1px solid var(--border);
+      position: relative;
+      padding: 18px 18px 17px;
+      border-bottom: 1px solid var(--cp-hairline);
       display: flex;
       align-items: center;
       gap: 11px;
       flex-shrink: 0;
-      background: var(--white);
+      background: var(--cp-raise);
+      overflow: clip;
+      isolation: isolate;
     }
+    /* SIGNATURE — clipped, blurred, upward-fading rainbow aurora at the header's
+       bottom seam. Reuses the Ask-button conic wheel + ask-wheel-spin, slowed right
+       down. The spin keyframe carries translateX(-50%) in both steps, so this static
+       transform survives the animation and also centers it under reduced-motion. */
+    .cp-wheel-glow {
+      position: absolute; z-index: 0; pointer-events: none;
+      left: 50%; bottom: -150%;
+      width: 200%; aspect-ratio: 1 / 1; transform: translateX(-50%);
+      border-radius: 50%;
+      background: conic-gradient(from 0deg,
+        #ff4757, #ff6b35, #ffd32a, #2ed573, #1e90ff, #a29bfe, #fd79a8, #ff4757);
+      filter: blur(34px) saturate(125%);
+      opacity: 0.28;
+      -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.6) 14%, transparent 38%);
+              mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.6) 14%, transparent 38%);
+      animation: ask-wheel-spin 26s linear infinite;
+      will-change: transform; backface-visibility: hidden;
+    }
+    .cp-info, .cp-close { position: relative; z-index: 1; }
     .cp-avatar {
       width: 32px; height: 32px;
       background: var(--secondary);
@@ -3347,21 +3942,21 @@
       flex-shrink: 0;
     }
     .cp-info { flex: 1; }
-    .cp-info h3 { font-size: 13px; font-weight: 700; color: var(--secondary); letter-spacing: -0.2px; }
-    .cp-info p  { font-size: 11px; color: var(--grey); margin-top: 1px; font-family: var(--font-mono); }
+    .cp-info h3 { font-family: var(--font-heading); font-size: 15px; font-weight: 700; color: var(--cp-ink); letter-spacing: -0.2px; }
+    .cp-info p  { font-family: var(--font-mono); font-size: 11px; color: var(--cp-ink-dim); margin-top: 2px; letter-spacing: 0.01em; }
     .cp-close {
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      width: 26px; height: 26px;
+      background: rgba(240,237,232,0.04);
+      border: 1px solid var(--cp-hairline);
+      border-radius: 8px;
+      width: 28px; height: 28px;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      color: var(--grey);
+      color: var(--cp-ink-dim);
       font-size: 15px; line-height: 1;
       flex-shrink: 0;
       transition: background 0.2s, color 0.2s, border-color 0.2s;
     }
-    .cp-close:hover { background: var(--secondary); color: var(--white); border-color: var(--secondary); }
+    .cp-close:hover { background: rgba(240,237,232,0.10); color: var(--cp-ink); border-color: rgba(240,237,232,0.22); }
 
     .cp-msgs {
       flex: 1;
@@ -3370,31 +3965,43 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      scroll-behavior: smooth;
     }
     .cp-msgs::-webkit-scrollbar { width: 3px; }
-    .cp-msgs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .cp-msgs::-webkit-scrollbar-thumb { background: var(--cp-hairline); border-radius: 3px; }
 
     .cp-msg { max-width: 88%; display: flex; flex-direction: column; gap: 3px; }
     .cp-msg.user      { align-self: flex-end; align-items: flex-end; }
-    .cp-msg.assistant { align-self: flex-start; align-items: flex-start; }
+    .cp-msg.assistant { align-self: flex-start; align-items: flex-start;
+      flex-direction: row; gap: 10px; max-width: 92%; }   /* row: [avatar][frame] */
+
+    /* Bhanu's photo avatar beside each assistant message */
+    .cp-ava { position: relative; width: 30px; height: 30px; flex-shrink: 0; margin-top: 1px; }
+    .cp-ava-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+      border: 1px solid rgba(240,237,232,0.18); display: block; }
 
     .cp-bubble {
-      padding: 9px 13px;
-      border-radius: 15px;
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--secondary);
+      position: relative;                                  /* caret/ring context (folded from old gutter rule) */
+      padding: 11px 15px;
+      border-radius: 16px;
+      font-size: 15.5px;                                   /* +20% type */
+      line-height: 1.55;
+      color: var(--cp-ink);
     }
     .cp-msg.user .cp-bubble {
-      background: var(--secondary);
-      color: var(--white);
-      border-bottom-right-radius: 3px;
+      background: var(--primary);
+      color: #16181c;
+      font-weight: 500;
+      border-bottom-right-radius: 5px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.30), 0 6px 16px rgba(230,242,141,0.10);
     }
     .cp-msg.assistant .cp-bubble {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-bottom-left-radius: 3px;
+      background: var(--cp-glass);
+      -webkit-backdrop-filter: blur(16px) saturate(120%);
+              backdrop-filter: blur(16px) saturate(120%);
+      border: 1px solid var(--cp-hairline);
+      border-top-left-radius: 6px;
+      box-shadow: inset 0 1px 0 var(--cp-glass-edge), 0 8px 24px rgba(0,0,0,0.28);
+      contain: layout paint;                               /* scope per-word reflow */
     }
     .cp-bubble strong { font-weight: 700; }
     .cp-bubble ul { margin: 5px 0 4px 0; padding-left: 16px; display: flex; flex-direction: column; gap: 3px; }
@@ -3404,6 +4011,113 @@
       display: inline-block; width: 2px; height: 1em;
       background: #aaa; margin-left: 2px; vertical-align: text-bottom;
       animation: blink 0.6s step-end infinite;
+    }
+
+    /* ── "Develops into focus" — visible thinking + chat micro-interactions ── */
+
+    /* message entrance — a quiet rise, no bounce */
+    @keyframes cp-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .cp-msg.cp-enter { animation: cp-rise 0.32s cubic-bezier(0.22,1,0.36,1) both; }
+
+    /* thinking shell — mono status beside the spinning photo, on the bare panel */
+    .cp-msg.assistant .cp-bubble.cp-thinking {
+      display: inline-flex; align-items: center; min-height: 18px;
+      background: transparent; border: none; box-shadow: none;
+      -webkit-backdrop-filter: none; backdrop-filter: none; padding: 2px 0;
+    }
+
+    /* status line — mono dim ink, with a soft lime shimmer swept across the glyphs */
+    .cp-status {
+      font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.01em;
+      white-space: nowrap;
+      background: linear-gradient(90deg,
+        var(--cp-ink-dim) 0%, var(--cp-ink-dim) 38%,
+        var(--primary) 50%,
+        var(--cp-ink-dim) 62%, var(--cp-ink-dim) 100%);
+      background-size: 220% 100%;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: cp-shine 2.4s linear infinite;
+    }
+    @keyframes cp-shine { from { background-position: 120% 0; } to { background-position: -20% 0; } }
+    .cp-status.cp-swap { animation: cp-shine 2.4s linear infinite, cp-fade-swap 0.26s cubic-bezier(0.22,1,0.36,1); }
+    @keyframes cp-fade-swap { from { opacity: 0.35; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* live streaming caret — lime, slow breathe; retracts on completion */
+    .cp-cursor.cp-live {
+      width: 2px; height: 1.05em; background: var(--primary); border-radius: 1px;
+      box-shadow: 0 0 6px rgba(230,242,141,0.5); animation: blink 0.85s step-end infinite;
+    }
+    .cp-cursor.cp-retract { animation: cp-caret-out 0.3s cubic-bezier(0.22,1,0.36,1) forwards; }
+    @keyframes cp-caret-out { from { opacity: 1; transform: scaleY(1); } to { opacity: 0; transform: scaleY(0.4); } }
+
+    /* spinning lime loader ring around the photo avatar while thinking */
+    .cp-ava-loading::before {
+      content: ''; position: absolute; inset: -3px; border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0deg, transparent 200deg,
+        var(--primary) 320deg, #fff 360deg);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 0);
+              mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 0);
+      animation: cp-ring-spin 0.9s linear infinite;
+      will-change: transform;
+    }
+    @keyframes cp-ring-spin { to { transform: rotate(360deg); } }
+    .cp-ava-loading .cp-ava-img { opacity: 0.72; }
+
+    /* word-by-word reveal — transform + opacity only (cheap, no blur) */
+    .cp-word { display: inline; animation: cp-word-in 0.22s cubic-bezier(0.22,1,0.36,1) both; }
+    @keyframes cp-word-in {
+      from { opacity: 0; transform: translateY(1px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* "more below" cue — there is no autoscroll, so flag overflow at finalize */
+    .cp-msgs.cp-has-more::after {
+      content: '↓'; position: sticky; bottom: 6px; align-self: center;
+      width: 24px; height: 24px; margin-top: -24px; pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-size: 13px; color: var(--cp-ink-dim);
+      background: var(--cp-raise); border: 1px solid var(--cp-hairline); border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    }
+
+    /* the answer frame resolves once as streaming begins */
+    .cp-bubble.cp-streaming { animation: cp-fade-swap 0.22s ease; }
+
+    /* completion settle */
+    @keyframes cp-settle { 0% { transform: translateY(-1.5px); } 60% { transform: translateY(0.5px); } 100% { transform: translateY(0); } }
+    .cp-msg.cp-done .cp-bubble { animation: cp-settle 0.4s cubic-bezier(0.22,1,0.36,1); }
+
+    /* send-button press feedback */
+    .cb-send.cp-fire { animation: cp-press 0.28s cubic-bezier(0.22,1,0.36,1); }
+    @keyframes cp-press { 0% { transform: scale(1); } 40% { transform: scale(0.93); } 100% { transform: scale(1); } }
+
+    /* softer send re-arm + dock focus lift */
+    .cp-pill .cb-send { transition: opacity 0.22s cubic-bezier(0.22,1,0.36,1); }
+    .cp-pill { transition: box-shadow 0.28s cubic-bezier(0.22,1,0.36,1), transform 0.28s cubic-bezier(0.22,1,0.36,1); }
+    .cp-pill:focus-within {
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 0 0 1px rgba(230,242,141,0.26),
+        inset 0 1px 0 rgba(255,255,255,0.22),
+        0 8px 26px rgba(0,0,0,0.2);
+    }
+
+    /* reduced motion — states stay legible, tweens drop (kept last to win the cascade) */
+    @media (prefers-reduced-motion: reduce) {
+      .cp-msg.cp-enter,
+      .cp-status, .cp-status.cp-swap,
+      .cp-bubble.cp-streaming,
+      .cp-cursor.cp-live, .cp-cursor.cp-retract,
+      .cp-msg.cp-done .cp-bubble,
+      .cb-send.cp-fire { animation: none !important; }
+      .cp-status { -webkit-text-fill-color: var(--cp-ink-dim); color: var(--cp-ink-dim); background: none; }
+      .cp-cursor.cp-live { opacity: 1; box-shadow: none; }
+      .cp-pill:focus-within { transform: none; }
+      .cp-wheel-glow { animation: none; opacity: 0.20; }
+      .cp-ava-loading::before { animation: none;
+        background: conic-gradient(var(--primary), rgba(230,242,141,0.25)); }
+      .cp-word { animation: none; }
     }
 
     .cp-starters {
@@ -3433,61 +4147,44 @@
     .cp-error.vis { display: block; }
 
     .cp-input-row {
-      border-top: 1px solid var(--border);
-      padding: 11px 14px;
-      display: flex; gap: 7px; align-items: flex-end;
-      flex-shrink: 0; background: var(--white);
+      border-top: 1px solid var(--cp-hairline);
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-shrink: 0; background: transparent;
+    }
+    /* dark glass dock — mirrors the landing ask bar so the mic + "Ask" CTA
+       read identically here. The mic/send below reuse the .cb-mic / .cb-send
+       components verbatim; this pill is the dark surface they're built for. */
+    .cp-pill {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      background: #17191d;
+      border-radius: 18px;
+      padding: 7px 7px 7px 4px;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        0 6px 20px rgba(0,0,0,0.16);
     }
     .cp-textarea {
       flex: 1;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      padding: 8px 12px;
-      font-size: 13px;
-      font-family: var(--font-heading);
-      color: var(--secondary);
-      background: var(--bg);
+      min-width: 0;
+      border: none;
+      background: transparent;
       outline: none; resize: none;
-      min-height: 38px; max-height: 105px;
+      padding: 9px 4px 9px 12px;
+      font-size: 14px;
+      font-family: var(--font-heading);
       line-height: 1.5;
-      transition: border-color 0.2s;
+      color: rgba(255,255,255,0.92);
+      caret-color: rgba(255,255,255,0.6);
+      min-height: 36px; max-height: 105px;
     }
-    .cp-textarea:focus { border-color: var(--secondary); }
-    .cp-textarea::placeholder { color: rgba(0,0,0,0.28); }
-
-    .cp-mic-btn {
-      width: 36px; height: 36px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; transition: border-color 0.2s, background 0.2s;
-    }
-    .cp-mic-btn:hover { border-color: var(--secondary); }
-    .cp-mic-btn svg { width: 14px; height: 14px; fill: #999; transition: fill 0.2s; }
-    .cp-mic-btn:hover svg { fill: var(--secondary); }
-    .cp-mic-btn.recording { background: #ff4444; border-color: #ff4444; animation: cpMicPulse 1.2s infinite; }
-    .cp-mic-btn.recording svg { fill: white; }
-    .cp-mic-btn.transcribing { background: var(--primary); border-color: var(--primary); }
-    .cp-mic-btn.transcribing svg { fill: var(--secondary); }
-    @keyframes cpMicPulse {
-      0%   { box-shadow: 0 0 0 0 rgba(255,68,68,0.45); }
-      70%  { box-shadow: 0 0 0 7px rgba(255,68,68,0); }
-      100% { box-shadow: 0 0 0 0 rgba(255,68,68,0); }
-    }
-
-    .cp-send-btn {
-      width: 36px; height: 36px;
-      background: var(--secondary);
-      border: none; border-radius: 9px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; transition: opacity 0.2s;
-    }
-    .cp-send-btn:hover { opacity: 0.75; }
-    .cp-send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-    .cp-send-btn svg { width: 14px; height: 14px; fill: var(--white); }
+    .cp-textarea::placeholder { color: rgba(255,255,255,0.4); }
+    .cp-pill .cb-send:disabled { opacity: 0.45; pointer-events: none; }
 
     /* hide on small screens */
     @media (max-width: 900px) {
@@ -3497,6 +4194,174 @@
     @media (max-width: 540px) {
       .cb.bar-revealed { width: calc(100vw - 32px); }
       .cb.expanded     { width: calc(100vw - 32px); }
+    }
+
+    /* ─── GLASS LOADING SCREEN (Figma artboard + liquid glass cursor) ─── */
+    html.glass-loading, html.glass-loading body { overflow: hidden; }
+    #glassLoader {
+      position: fixed; inset: 0; z-index: 99999;
+      background: #0b0b0d;
+      opacity: 1; transition: opacity .85s ease;
+      cursor: none;   /* the glass blob replaces the pointer */
+    }
+    #glassLoader.is-hidden { opacity: 0; pointer-events: none; }
+
+    /* static dot mesh (same look as the page, but not cursor-reactive) */
+    #glassDots {
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: radial-gradient(rgba(255,255,255,0.15) 1.3px, transparent 1.4px);
+      background-size: 26px 26px; background-position: center;
+      -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 55%, transparent 100%);
+              mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 55%, transparent 100%);
+    }
+
+    /* the glass blob canvas floats on top as the cursor */
+    #glassCanvas {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      display: block; z-index: 5; pointer-events: none;
+    }
+    body.no-webgl #glassCanvas { display: none; }
+
+    /* ── Figma artboard ── */
+    #figArtboard {
+      position: absolute; inset: 0; z-index: 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #figFrame {
+      position: relative;
+      padding: 40px 60px;
+      background: #2E2E2E;               /* filled artboard card (a touch lighter than #252525) */
+      border: 1px solid #1A73E8;        /* Figma selection blue */
+      border-radius: 2px;
+      text-align: center;
+    }
+    /* layer-name tab */
+    .fig-tab {
+      position: absolute; top: -21px; left: -1px;
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em;
+      color: #fff; background: #1A73E8; padding: 2px 8px;
+      border-radius: 3px 3px 0 0; white-space: nowrap;
+    }
+    /* corner handles — white squares with blue stroke (classic Figma) */
+    .fig-handle {
+      position: absolute; background: #fff; border: 1.5px solid #1A73E8; z-index: 4;
+    }
+    /* corners — circles */
+    .fig-handle.tl, .fig-handle.tr, .fig-handle.bl, .fig-handle.br {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .fig-handle.tl { top: -5px; left: -5px; }
+    .fig-handle.tr { top: -5px; right: -5px; }
+    .fig-handle.bl { bottom: -5px; left: -5px; }
+    .fig-handle.br { bottom: -5px; right: -5px; }
+    /* mid-edge expander handles — rounded bars (UI only) */
+    .fig-handle.tc, .fig-handle.bc { width: 22px; height: 8px; border-radius: 5px; left: 50%; transform: translateX(-50%); }
+    .fig-handle.lc, .fig-handle.rc { width: 8px; height: 22px; border-radius: 5px; top: 50%; transform: translateY(-50%); }
+    .fig-handle.tc { top: -4px; }
+    .fig-handle.bc { bottom: -4px; }
+    .fig-handle.lc { left: -4px; }
+    .fig-handle.rc { right: -4px; }
+
+    .fig-name {
+      font-family: var(--font-mono); font-weight: 500;
+      font-size: clamp(11px, 1.4vw, 14px); letter-spacing: .3em;
+      color: #9aa0a6; margin-bottom: 16px;
+    }
+    .fig-title {
+      font-family: var(--font-mono); font-weight: 700; color: #fff;
+      font-size: clamp(20px, 4.2vw, 52px); line-height: 1.15;
+      letter-spacing: -0.01em; white-space: nowrap;
+    }
+    /* "AI Native" — frosted-glass pill with a static blurred AI gradient glow
+       (the Ask-CTA look, AI colours, not animated) */
+    /* literal copy of the home-page Ask CTA: frosted translucent surface with a
+       soft blurred colour wheel behind it (blur scaled up for the bigger pill) */
+    .ai-native {
+      position: relative; display: inline-flex; align-items: center; justify-content: center;
+      vertical-align: middle;
+      font-family: var(--font-mono); font-weight: 700; color: #ffffff;
+      background: rgba(255, 255, 255, 0.14);
+      -webkit-backdrop-filter: blur(10px) saturate(150%); backdrop-filter: blur(10px) saturate(150%);
+      border-radius: 999px;
+      padding: 0.04em 0.5em; margin-right: 0.16em;
+      overflow: hidden;
+      box-shadow: inset 1.5px 2px 3px rgba(255, 255, 255, 0.95),
+                  inset 0 0 0 1px rgba(255, 255, 255, 0.30);
+    }
+    .ai-native::before {
+      content: ''; position: absolute; z-index: -1;
+      left: 50%; top: 35%; width: 150%; aspect-ratio: 1 / 1;
+      transform: translateX(-50%); border-radius: 50%;
+      filter: blur(38px); opacity: 0.55;        /* large blur → a soft wash, not bands */
+      background: conic-gradient(from 0deg,
+        #22D3EE, #4F8BFF, #6366F1, #A855F7, #EC4899, #22D3EE);
+    }
+
+    /* ── Dimension lines ── */
+    /* frame width (bottom) + height (right) in Figma blue */
+    .fig-wmeasure {
+      position: absolute; left: 0; right: 0; bottom: -28px;
+      display: flex; flex-direction: column; align-items: center; gap: 5px; pointer-events: none;
+    }
+    .fig-hline { position: relative; width: 100%; height: 1px; background: #1A73E8; }
+    .fig-hline::before, .fig-hline::after {
+      content: ''; position: absolute; top: -4px; width: 1px; height: 9px; background: #1A73E8;
+    }
+    .fig-hline::before { left: 0; } .fig-hline::after { right: 0; }
+    .fig-hmeasure {
+      position: absolute; top: 0; bottom: 0; right: -34px;
+      display: flex; flex-direction: row; align-items: center; gap: 6px; pointer-events: none;
+    }
+    .fig-vline { position: relative; width: 1px; height: 100%; background: #1A73E8; }
+    .fig-vline::before, .fig-vline::after {
+      content: ''; position: absolute; left: -4px; width: 9px; height: 1px; background: #1A73E8;
+    }
+    .fig-vline::before { top: 0; } .fig-vline::after { bottom: 0; }
+    .fig-mlabel {
+      font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+      color: #1A73E8; background: #0b0b0d; padding: 1px 5px; border-radius: 3px; white-space: nowrap;
+    }
+    /* live spacing-to-edge on both sides (Figma red) */
+    .fig-gap {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      display: flex; align-items: center; gap: 6px; pointer-events: none;
+    }
+    .fig-gap-left  { left: 0; }
+    .fig-gap-right { right: 0; }
+    .fig-gline { position: relative; height: 1px; background: #F24822; }
+    .fig-gline::before, .fig-gline::after {
+      content: ''; position: absolute; top: -4px; width: 1px; height: 9px; background: #F24822;
+    }
+    .fig-gline::before { left: 0; } .fig-gline::after { right: 0; }
+    .fig-glabel {
+      font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+      color: #F24822; background: #0b0b0d; padding: 1px 5px; border-radius: 3px; white-space: nowrap;
+    }
+
+    /* Loading bar — full-width across the bottom, count centered */
+    #glassProgress {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      width: 100%; z-index: 6; pointer-events: none;
+    }
+    #glassProgressLabel {
+      position: absolute; left: 50%; transform: translateX(-50%); bottom: 18px;
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: .3em;
+      color: #c9c9c9;
+    }
+    #glassProgressTrack {
+      height: 4px; width: 100%;
+      background: rgba(255, 255, 255, 0.12); overflow: hidden;
+    }
+    #glassProgressBar {
+      height: 100%; width: 0%;
+      background: var(--primary); box-shadow: 0 0 16px rgba(230, 242, 141, 0.7);
+    }
+    @media (max-width: 640px) {
+      .fig-title { white-space: normal; }
+      .fig-hmeasure, .fig-gap { display: none; }   /* avoid clutter on narrow screens */
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #glassLoader { transition: opacity .3s ease; }
     }
 
   </style>
@@ -3511,6 +4376,74 @@
 </head>
 
 <body>
+
+  <!-- ─── GLASS LOADING SCREEN ─── -->
+  <div id="glassLoader" role="status" aria-label="Loading">
+    <!-- static dot mesh (matches the main page, but not cursor-reactive) -->
+    <div id="glassDots" aria-hidden="true"></div>
+
+    <!-- Figma artboard — frame, handles & text all BELOW the glass so the blob
+         refracts them; matching copies are drawn into the refraction buffer too -->
+    <div id="figArtboard" aria-hidden="true">
+      <div id="figFrame">
+        <span class="fig-tab">Hero</span>
+        <span class="fig-handle tl"></span><span class="fig-handle tr"></span>
+        <span class="fig-handle bl"></span><span class="fig-handle br"></span>
+        <span class="fig-handle tc"></span><span class="fig-handle bc"></span>
+        <span class="fig-handle lc"></span><span class="fig-handle rc"></span>
+        <div class="fig-name">BHANU KOWSHIK</div>
+        <h1 class="fig-title"><span class="ai-native">AI&nbsp;Native</span> Product Designer</h1>
+      </div>
+    </div>
+
+    <!-- glossy chromatic glass blob (floats on top as the cursor) -->
+    <canvas id="glassCanvas"></canvas>
+
+    <div id="glassProgress" aria-hidden="true">
+      <div id="glassProgressLabel"><span id="glassPct">0</span>%</div>
+      <div id="glassProgressTrack"><div id="glassProgressBar"></div></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var loader = document.getElementById('glassLoader');
+      if (!loader) return;
+      document.documentElement.classList.add('glass-loading');
+
+      function hideGlassLoader() {
+        if (loader.classList.contains('is-hidden')) return;
+        loader.classList.add('is-hidden');
+        document.documentElement.classList.remove('glass-loading');
+        setTimeout(function () { loader.style.display = 'none'; }, 950);
+      }
+      window.__hideGlassLoader = hideGlassLoader;
+
+      // WebGL + reduced-motion capability check → fall back to plain text
+      var glOK = false;
+      try {
+        var c = document.createElement('canvas');
+        glOK = !!(c.getContext('webgl2') || c.getContext('webgl'));
+      } catch (e) { glOK = false; }
+      var reduce = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!glOK || reduce) document.body.classList.add('no-webgl');
+
+      // Loading bar — fills 0→100% over the 5s hold (runs in every path)
+      var bar = document.getElementById('glassProgressBar');
+      var pctEl = document.getElementById('glassPct');
+      var t0 = performance.now();
+      (function step(now) {
+        var p = Math.min((now - t0) / 5000, 1);
+        if (bar) bar.style.width = (p * 100).toFixed(1) + '%';
+        if (pctEl) pctEl.textContent = Math.round(p * 100);
+        if (p < 1) requestAnimationFrame(step);
+      })(t0);
+
+      // Safety net: never leave the loader stuck even if the module fails
+      setTimeout(hideGlassLoader, 5700);
+    })();
+  </script>
+
 <canvas id="dotCanvas" aria-hidden="true"></canvas>
 
   <!-- TOP NAV -->
@@ -3534,10 +4467,17 @@
     <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
         <span class="tt-track">
-          <span class="tt-thumb">
-            <svg class="tt-moon" width="11" height="11" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15.5 11A7 7 0 0 1 7 2.5a7 7 0 1 0 8.5 8.5z"/></svg>
-            <svg class="tt-sun" width="11" height="11" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="9" r="3.2"/><line x1="9" y1="1.2" x2="9" y2="2.8"/><line x1="9" y1="15.2" x2="9" y2="16.8"/><line x1="1.2" y1="9" x2="2.8" y2="9"/><line x1="15.2" y1="9" x2="16.8" y2="9"/><line x1="3.4" y1="3.4" x2="4.5" y2="4.5"/><line x1="13.5" y1="13.5" x2="14.6" y2="14.6"/><line x1="14.6" y1="3.4" x2="13.5" y2="4.5"/><line x1="4.5" y1="13.5" x2="3.4" y2="14.6"/></svg>
-          </span>
+          <span class="tt-star tt-star-1"></span>
+          <span class="tt-star tt-star-2"></span>
+          <span class="tt-star tt-star-3"></span>
+          <span class="tt-star tt-star-4"></span>
+          <span class="tt-shoot"></span>
+          <span class="tt-cloud"></span>
+          <span class="tt-cloud-b"></span>
+          <span class="tt-cloud-c"></span>
+          <span class="tt-hill-back"></span>
+          <span class="tt-hill-front"></span>
+          <span class="tt-thumb"></span>
         </span>
       </button>
       <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
@@ -4012,6 +4952,13 @@
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
     <span id="copyToastMsg">Mail copied</span>
+  </div>
+
+  <!-- voice status toast: spinner (waiting/processing) ↔ live waveform (listening) -->
+  <div id="voiceToast" aria-hidden="true">
+    <div class="vt-spinner"></div>
+    <div class="vt-wave" aria-hidden="true"><span></span><span></span><span></span></div>
+    <span class="vt-msg">Waiting for mic permission…</span>
   </div>
 
   <script>
@@ -5769,13 +6716,95 @@
     var btn  = document.getElementById('themeToggle');
     var KEY  = 'portfolio-theme';
 
+    /* WAAPI toggle animation — explicit from/to, no CSS transition quirks */
+    function animateToggleScene(toDark) {
+      var track     = document.querySelector('.tt-track');
+      var thumb     = document.querySelector('.tt-thumb');
+      var hillBack  = document.querySelector('.tt-hill-back');
+      var hillFront = document.querySelector('.tt-hill-front');
+      var stars     = document.querySelectorAll('.tt-star');
+      var cloud     = document.querySelector('.tt-cloud');
+      var cloudB    = document.querySelector('.tt-cloud-b');
+      var cloudC    = document.querySelector('.tt-cloud-c');
+      if (!track) return;
+
+      /* Cancel any in-progress WAAPI animations on these elements */
+      [track, thumb, hillBack, hillFront, cloud, cloudB, cloudC].forEach(function(el) {
+        if (el) el.getAnimations().forEach(function(a) { a.cancel(); });
+      });
+      stars.forEach(function(el) {
+        el.getAnimations().forEach(function(a) { a.cancel(); });
+      });
+
+      var ease   = { easing: 'ease',                              fill: 'none' };
+      var spring = { easing: 'cubic-bezier(0.34,1.56,0.64,1)',   fill: 'none' };
+
+      track.animate([
+        { background: toDark ? 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' : 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' },
+        { background: toDark ? 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' : 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' }
+      ], { duration: 500, easing: ease.easing, fill: ease.fill });
+
+      track.animate([
+        { borderColor: toDark ? 'rgba(255,255,255,0.40)' : 'rgba(255,255,255,0.10)' },
+        { borderColor: toDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.40)' }
+      ], { duration: 400, easing: ease.easing, fill: ease.fill });
+
+      thumb.animate([
+        { transform: toDark ? 'translateX(0) translateY(-50%)' : 'translateX(28px) translateY(-50%)' },
+        { transform: toDark ? 'translateX(28px) translateY(-50%)' : 'translateX(0) translateY(-50%)' }
+      ], { duration: 440, easing: spring.easing, fill: spring.fill });
+
+      thumb.animate([
+        { background: toDark ? 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' : '#EEF0F5' },
+        { background: toDark ? '#EEF0F5' : 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' }
+      ], { duration: 500, easing: ease.easing, fill: ease.fill });
+
+      hillBack.animate([
+        { background: toDark ? '#72B87A' : '#1D3D25' },
+        { background: toDark ? '#1D3D25' : '#72B87A' }
+      ], { duration: 500, easing: ease.easing, fill: ease.fill });
+
+      hillFront.animate([
+        { background: toDark ? '#5DA066' : '#152C1A' },
+        { background: toDark ? '#152C1A' : '#5DA066' }
+      ], { duration: 500, easing: ease.easing, fill: ease.fill });
+
+      stars.forEach(function(s) {
+        s.animate([
+          { opacity: toDark ? 0 : 1 },
+          { opacity: toDark ? 1 : 0 }
+        ], { duration: 400, easing: ease.easing, fill: ease.fill });
+      });
+
+      cloud.animate([
+        { opacity: toDark ? 1 : 0 },
+        { opacity: toDark ? 0 : 1 }
+      ], { duration: 400, easing: ease.easing, fill: ease.fill });
+
+      if (cloudB) cloudB.animate([
+        { opacity: toDark ? 0.65 : 0 },
+        { opacity: toDark ? 0    : 0.65 }
+      ], { duration: 400, easing: ease.easing, fill: ease.fill });
+
+      if (cloudC) cloudC.animate([
+        { opacity: toDark ? 0.45 : 0 },
+        { opacity: toDark ? 0    : 0.45 }
+      ], { duration: 400, easing: ease.easing, fill: ease.fill });
+    }
+
     function apply(theme, animate) {
       if (animate) {
+        var toDark = theme === 'dark';
+        animateToggleScene(toDark);           /* WAAPI: reliable in all browsers */
         root.classList.add('color-transitioning');
-        setTimeout(function() { root.classList.remove('color-transitioning'); }, 380);
+        void root.offsetHeight;
+        root.setAttribute('data-theme', theme);
+        try { localStorage.setItem(KEY, theme); } catch(e) {}
+        setTimeout(function() { root.classList.remove('color-transitioning'); }, 600);
+      } else {
+        root.setAttribute('data-theme', theme);
+        try { localStorage.setItem(KEY, theme); } catch(e) {}
       }
-      root.setAttribute('data-theme', theme);
-      try { localStorage.setItem(KEY, theme); } catch(e) {}
     }
 
     var saved = null;
@@ -5784,6 +6813,8 @@
       apply(saved, false);
     } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       apply('dark', false);
+    } else {
+      apply('light', false);
     }
 
     if (btn) {
@@ -5906,56 +6937,68 @@
   </script>
 
   <!-- ── CHAT BAR ──────────────────────────────────────────── -->
-  <div class="cb-wrap" id="cbWrap">
-    <div id="pill-arc"></div>
+  <div class="cb-wrap cb-prerise" id="cbWrap">
+    <div id="pill-arc" class="arc-hidden"></div>
     <div class="cb glass-pill" id="cb">
-      <img class="cb-photo" src="photo.jpg" alt="Bhanu" />
-      <input class="cb-input" id="cbInput" type="text" placeholder="Ask me something…" autocomplete="off" spellcheck="false" />
-      <button class="cb-send" id="cbSend" aria-label="Send">
-        <svg viewBox="0 0 24 24"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.59 5.58L20 12l-8-8-8 8z"/></svg>
-      </button>
-      <button class="cb-mic" id="cbMic" aria-label="Voice input">
-        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
-      </button>
+      <div class="cb-hints" id="cbHints">
+        <span class="cb-hints-title">Try asking</span>
+        <button class="cb-hint" type="button">Why you over someone with 8+ years at Google?</button>
+        <button class="cb-hint" type="button">What metrics did you move?</button>
+        <button class="cb-hint" type="button">Why should we hire you?</button>
+        <button class="cb-hint" type="button">What did you choose not to build?</button>
+        <button class="cb-hint" type="button">What are you actually bad at?</button>
+      </div>
+      <div class="cb-row">
+        <img class="cb-photo" src="photo.jpg" alt="Bhanu" />
+        <input class="cb-input" id="cbInput" type="text" placeholder="Ask me something…" autocomplete="off" spellcheck="false" />
+        <button class="cb-mic" id="cbMic" aria-label="Voice input">
+          <svg class="cb-mic-ic" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+          <svg class="cb-stop-ic" viewBox="0 0 24 24"><rect x="7.5" y="7.5" width="9" height="9" rx="2.5"/></svg>
+        </button>
+        <button class="cb-send" id="cbSend" aria-label="Send">
+          <span class="cb-send-intro" aria-hidden="true">Ask me anything</span>
+          <span class="cb-send-label">Ask</span>
+          <span class="cb-send-enter" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg></span>
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- ── CHAT PANEL ─────────────────────────────────────────── -->
   <div class="cp" id="cp" aria-hidden="true">
     <div class="cp-header">
-      <div class="cp-avatar">✦</div>
+      <span class="cp-wheel-glow" aria-hidden="true"></span>
       <div class="cp-info">
-        <h3>Bhanu's Portfolio AI</h3>
-        <p>Ask me anything about his work</p>
+        <h3>Chat with Bhanu</h3>
+        <p>Powered by Claude &amp; OpenAI Whisper</p>
       </div>
       <button class="cp-close" id="cpClose" aria-label="Close chat">×</button>
     </div>
 
     <div class="cp-msgs" id="cpMsgs">
-      <div class="cp-msg assistant">
+      <div class="cp-msg assistant cp-done">
+        <span class="cp-ava" aria-hidden="true"><img class="cp-ava-img" src="photo.jpg" alt=""></span>
         <div class="cp-bubble">Hey! I'm Bhanu's portfolio AI. Ask me about his projects, how he thinks about design, or what kind of role he's looking for.</div>
       </div>
     </div>
-
-    <div class="cp-starters" id="cpStarters">
-      <div class="cp-chip" onclick="cpChip(this)">What's EverTutor Studio?</div>
-      <div class="cp-chip" onclick="cpChip(this)">Tell me about Stressie</div>
-      <div class="cp-chip" onclick="cpChip(this)">What role is Bhanu looking for?</div>
-      <div class="cp-chip" onclick="cpChip(this)">How does he think about design?</div>
-      <div class="cp-chip" onclick="cpChip(this)">What's Dearly?</div>
-    </div>
+    <div id="cpSR" aria-live="polite" aria-atomic="true"
+      style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;"></div>
 
     <div class="cp-error" id="cpError"></div>
 
     <div class="cp-input-row">
-      <textarea class="cp-textarea" id="cpTA" placeholder="Ask me something…" rows="1"
-        onkeydown="cpKey(event)" oninput="cpResize(this)"></textarea>
-      <button class="cp-mic-btn" id="cpMicBtn" onclick="cpToggleMic()" aria-label="Voice input">
-        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
-      </button>
-      <button class="cp-send-btn" id="cpSendBtn" onclick="cpSendMsg()" aria-label="Send">
-        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-      </button>
+      <div class="cp-pill">
+        <textarea class="cp-textarea" id="cpTA" placeholder="Ask me something…" rows="1"
+          onkeydown="cpKey(event)" oninput="cpResize(this)"></textarea>
+        <button class="cb-mic" id="cpMicBtn" onclick="cpToggleMic()" aria-label="Voice input">
+          <svg class="cb-mic-ic" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+          <svg class="cb-stop-ic" viewBox="0 0 24 24"><rect x="7.5" y="7.5" width="9" height="9" rx="2.5"/></svg>
+        </button>
+        <button class="cb-send" id="cpSendBtn" onclick="cpSendMsg()" aria-label="Send">
+          <span class="cb-send-label">Ask</span>
+          <span class="cb-send-enter" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg></span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -6085,12 +7128,64 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var cbMic   = document.getElementById('cbMic');
     var cpEl    = document.getElementById('cp');
     var cpMsgs  = document.getElementById('cpMsgs');
-    var cpStart = document.getElementById('cpStarters');
     var cpClose = document.getElementById('cpClose');
     var cpError = document.getElementById('cpError');
     var cpTA    = document.getElementById('cpTA');
     var cpMicB  = document.getElementById('cpMicBtn');
     var cpSendB = document.getElementById('cpSendBtn');
+    var cpSR    = document.getElementById('cpSR');
+
+    /* ── Visible-thinking controller — paced by timers, ended by the real stream ── */
+    var REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var THINK_PHASES = [
+      'Reading the question',
+      'Looking through Bhanu’s work',
+      'Checking the system prompt',
+      'Analyzing',
+      'Drafting'
+    ];
+    var THINK_DWELL = [700, 850, 650, 800, 900];   // dwell before advancing past phase i
+    var thinkTimer = null, thinkIdx = 0;
+
+    function startThinking(statusEl) {
+      thinkIdx = 0;
+      statusEl.textContent = THINK_PHASES[0];
+      function advance() {
+        if (thinkIdx >= THINK_PHASES.length - 1) return;   // hold on the last phrase
+        thinkIdx++;
+        statusEl.textContent = THINK_PHASES[thinkIdx];
+        if (!REDUCE) {
+          statusEl.classList.remove('cp-swap');
+          void statusEl.offsetWidth;                       // restart the crossfade (1 node)
+          statusEl.classList.add('cp-swap');
+        }
+        if (thinkIdx < THINK_PHASES.length - 1)
+          thinkTimer = setTimeout(advance, THINK_DWELL[thinkIdx]);
+      }
+      thinkTimer = setTimeout(advance, THINK_DWELL[0]);
+    }
+    function stopThinking() {
+      if (thinkTimer) { clearTimeout(thinkTimer); thinkTimer = null; }
+    }
+
+    /* ── No autoscroll — position the assistant shell once on send, then hold still ── */
+    var activeCtx = null;   // the in-flight stream context (for closeChat teardown)
+
+    function scrollAssistantIntoView(shellEl) {
+      var target = shellEl.offsetTop - cpMsgs.clientHeight * 0.32;   // shell sits ~1/3 down, room to grow
+      if (target <= 0) return;                                       // already high enough
+      var max = cpMsgs.scrollHeight - cpMsgs.clientHeight;
+      cpMsgs.scrollTo({ top: Math.min(Math.max(target, 0), Math.max(max, 0)),
+                        behavior: REDUCE ? 'auto' : 'smooth' });
+    }
+
+    /* with no autoscroll, surface a "↓ more" cue when an answer overflows below the fold */
+    function updateMoreCue() {
+      var overflow = cpMsgs.scrollHeight - cpMsgs.clientHeight;
+      var atBottom = overflow - cpMsgs.scrollTop < 24;
+      cpMsgs.classList.toggle('cp-has-more', overflow > 24 && !atBottom);
+    }
+    cpMsgs.addEventListener('scroll', updateMoreCue, { passive: true });
 
     /* ── Chat bar ── */
     cbInput.addEventListener('focus', function () { cbEl.classList.add('expanded'); });
@@ -6103,9 +7198,34 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     });
     cbSend.addEventListener('click', cbDoSend);
 
+    /* prompt hints — mousedown (not click) so the input never blurs and
+       the expanded state holds while the hint fills the field */
+    document.querySelectorAll('.cb-hint').forEach(function (hint) {
+      hint.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        cbInput.value = hint.textContent;
+        cbInput.dispatchEvent(new Event('input', { bubbles: true }));
+        cbInput.focus();
+      });
+    });
+
+    /* empty-input toast — reuses the footer #copyToast component */
+    var cbToastTimer;
+    function cbToast(msg) {
+      var toast    = document.getElementById('copyToast');
+      var toastMsg = document.getElementById('copyToastMsg');
+      if (!toast || !toastMsg) return;
+      clearTimeout(cbToastTimer);
+      toastMsg.textContent = msg;
+      toast.style.bottom = (window.innerHeight - cbWrap.getBoundingClientRect().top + 12) + 'px';
+      toast.classList.add('toast-show');
+      cbToastTimer = setTimeout(function () { toast.classList.remove('toast-show'); }, 2800);
+    }
+
     function cbDoSend() {
       var text = cbInput.value.trim();
-      if (!text || isLoading) return;
+      if (!text) { cbToast('Enter a question to ask first'); return; }
+      if (isLoading) return;
       cbInput.value = '';
       cbEl.classList.remove('expanded');
       cbSend.classList.remove('vis');
@@ -6123,19 +7243,18 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     function closeChat() {
       document.body.classList.remove('chat-open');
       cpEl.setAttribute('aria-hidden', 'true');
+      if (activeCtx) {                                      // tear down any in-flight stream
+        activeCtx.aborted = true; activeCtx.finalized = true;
+        if (activeCtx.ctrl) activeCtx.ctrl.abort();
+        if (activeCtx.rafId) cancelAnimationFrame(activeCtx.rafId);
+        stopThinking(); activeCtx = null;
+      }
     }
 
     cpClose.addEventListener('click', closeChat);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeChat(); });
 
     /* ── Global handlers used by inline onclick ── */
-    window.cpChip = function (el) {
-      var text = el.textContent;
-      cpStart.style.display = 'none';
-      if (!document.body.classList.contains('chat-open')) openChat(text);
-      else { appendMsg('user', text); messages.push({ role: 'user', content: text }); streamReply(); }
-    };
-
     window.cpKey = function (e) {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); cpSendMsg(); }
     };
@@ -6143,6 +7262,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     window.cpResize = function (el) {
       el.style.height = 'auto';
       el.style.height = Math.min(el.scrollHeight, 105) + 'px';
+      /* lime "Ask" CTA + ↵ hint light up once there's text, just like the bar */
+      cpSendB.classList.toggle('vis', el.value.trim().length > 0);
     };
 
     window.cpSendMsg = function () {
@@ -6150,7 +7271,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (!text || isLoading) return;
       cpTA.value = '';
       cpTA.style.height = 'auto';
-      cpStart.style.display = 'none';
+      cpSendB.classList.remove('vis');
+      cpSendB.classList.remove('cp-fire'); void cpSendB.offsetWidth; cpSendB.classList.add('cp-fire');
       appendMsg('user', text);
       messages.push({ role: 'user', content: text });
       streamReply();
@@ -6160,6 +7282,93 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (isRecording) stopRecording(); else startRecording('panel');
     };
 
+    /* ── Streaming engine: buffer SSE text, reveal it word-by-word, render once ── */
+    function makeStreamCtx(shellEl) {
+      return { el: shellEl, ctrl: null, raw: '', full: '', queue: [], started: false,
+               done: false, finalized: false, aborted: false,
+               wordsEl: null, caretEl: null, rafId: 0, lastTs: 0 };
+    }
+
+    var CP_WORD_RE = /\S+\s+/g;
+    function drainWords(ctx) {
+      CP_WORD_RE.lastIndex = 0; var m, end = 0;
+      while ((m = CP_WORD_RE.exec(ctx.raw)) !== null) { ctx.queue.push(m[0]); end = CP_WORD_RE.lastIndex; }
+      ctx.raw = ctx.raw.slice(end);
+      if (ctx.done && ctx.raw) { ctx.queue.push(ctx.raw); ctx.raw = ''; }   // flush final partial word
+    }
+
+    /* strip inline markdown from the VISIBLE stream only; renderMd restores it at finalize */
+    function cleanToken(tok) {
+      return tok.replace(/\*\*/g, '')
+                .replace(/(^|\s)[*_]{1,2}(?=\S)/g, '$1')
+                .replace(/(\S)[*_]{1,2}(?=\s|$)/g, '$1')
+                .replace(/^\s*[-*]\s+/, '');
+    }
+    function appendWord(ctx, token) {
+      var s = document.createElement('span');
+      s.className = 'cp-word'; s.textContent = cleanToken(token);
+      ctx.wordsEl.insertBefore(s, ctx.caretEl);            // words flow before the trailing caret
+    }
+
+    var CP_WORD_INTERVAL = REDUCE ? 0 : 22;
+    function wordsThisFrame(ctx) {
+      var q = ctx.queue.length;
+      if (q > 80) return 8; if (q > 40) return 5; return 3;   // drain faster on a big backlog
+    }
+    function startPump(ctx) {
+      if (ctx.rafId || ctx.finalized) return;
+      ctx.rafId = requestAnimationFrame(function step(ts) {
+        ctx.rafId = 0;
+        if (ctx.aborted || ctx.finalized) return;
+        if (REDUCE) { while (ctx.queue.length) appendWord(ctx, ctx.queue.shift()); }
+        else if ((ts - ctx.lastTs) >= CP_WORD_INTERVAL) {     // once per tick, reveal a whole budget
+          var budget = wordsThisFrame(ctx);
+          while (ctx.queue.length && budget > 0) { appendWord(ctx, ctx.queue.shift()); budget--; }
+          ctx.lastTs = ts;
+        }
+        if (ctx.queue.length) ctx.rafId = requestAnimationFrame(step);   // more buffered → keep going
+        else if (ctx.done) reallyFinalize(ctx);                          // drained AND stream done
+        // else: empty but not done → STOP; feedStream restarts on the next delta (no busy-loop)
+      });
+    }
+
+    function feedStream(ctx, deltaText) {
+      ctx.full += deltaText; ctx.raw += deltaText;
+      if (!ctx.started) {                                  // ── first token: honest handoff ──
+        ctx.started = true;
+        stopThinking();
+        ctx.el.querySelector('.cp-ava').classList.remove('cp-ava-loading');   // ring → static photo
+        var b = ctx.el.querySelector('.cp-bubble');
+        b.classList.remove('cp-thinking'); b.classList.add('cp-streaming');
+        b.setAttribute('aria-hidden', 'true');             // stays hidden while words churn
+        b.innerHTML = '';
+        ctx.wordsEl = document.createElement('span'); ctx.wordsEl.className = 'cp-words';
+        ctx.caretEl = document.createElement('span'); ctx.caretEl.className = 'cp-cursor cp-live';
+        ctx.wordsEl.appendChild(ctx.caretEl); b.appendChild(ctx.wordsEl);
+      }
+      drainWords(ctx); startPump(ctx);
+    }
+
+    function reallyFinalize(ctx) {
+      if (ctx.finalized || ctx.aborted) return;
+      ctx.finalized = true; ctx.rafId = 0; stopThinking();
+      var b = ctx.el.querySelector('.cp-bubble');
+      if (!ctx.started) {                                  // no token ever arrived
+        b.className = 'cp-bubble'; b.removeAttribute('aria-hidden');
+        b.textContent = 'No response — try again.';
+        ctx.el.querySelector('.cp-ava').classList.remove('cp-ava-loading');
+        ctx.el.classList.add('cp-done');
+        if (activeCtx === ctx) activeCtx = null;
+        return;
+      }
+      b.innerHTML = renderMd(ctx.full);                    // one authoritative render (bold/lists snap in)
+      b.classList.remove('cp-streaming'); b.removeAttribute('aria-hidden');
+      ctx.el.classList.add('cp-done');
+      if (cpSR) cpSR.textContent = ctx.full;               // announce the complete answer ONCE
+      updateMoreCue();
+      if (activeCtx === ctx) activeCtx = null;
+    }
+
     /* ── Streaming reply ── */
     async function streamReply() {
       if (isLoading) return;
@@ -6167,7 +7376,10 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       cpSendB.disabled = true;
       hideErr();
 
-      var streamEl = appendStreamBubble();
+      var ctrl = new AbortController();
+      var ctx  = makeStreamCtx(appendStreamBubble());
+      ctx.ctrl = ctrl; activeCtx = ctx;
+      requestAnimationFrame(function () { scrollAssistantIntoView(ctx.el); });   // position once, then hold
 
       try {
         var res = await fetch(API_BASE + '/api/chat', {
@@ -6180,18 +7392,18 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
             messages: messages,
             stream: true,
           }),
+          signal: ctrl.signal,
         });
 
         if (!res.ok) {
           var errData = await res.json().catch(function () { return {}; });
-          streamEl.remove();
+          ctx.el.remove();
           throw new Error((errData.error && errData.error.message) || ('API error ' + res.status));
         }
 
         var reader  = res.body.getReader();
         var decoder = new TextDecoder();
         var buf     = '';
-        var full    = '';
 
         while (true) {
           var chunk = await reader.read();
@@ -6207,18 +7419,26 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
             try {
               var evt = JSON.parse(data);
               if (evt.type === 'content_block_delta' && evt.delta && evt.delta.type === 'text_delta') {
-                full += evt.delta.text;
-                updateStreamBubble(streamEl, full);
+                feedStream(ctx, evt.delta.text);
               }
             } catch (_) {}
           }
         }
 
-        finalizeStreamBubble(streamEl);
-        messages.push({ role: 'assistant', content: full });
+        ctx.done = true; drainWords(ctx); startPump(ctx);   // pump drains the tail → reallyFinalize()
+        messages.push({ role: 'assistant', content: ctx.full });
 
       } catch (err) {
-        showErr('Error: ' + err.message);
+        ctx.aborted = true; ctx.done = true;
+        if (ctx.rafId) cancelAnimationFrame(ctx.rafId);
+        stopThinking();
+        if (activeCtx === ctx) activeCtx = null;
+        if (err.name === 'AbortError') {
+          ctx.el.remove();                                   // panel closed mid-stream — silent
+        } else {
+          if (ctx.full) messages.push({ role: 'assistant', content: ctx.full });  // keep partial turn
+          ctx.el.remove(); showErr('Error: ' + err.message);
+        }
       }
 
       isLoading = false;
@@ -6228,29 +7448,27 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     /* ── DOM helpers ── */
     function appendMsg(role, text) {
       var div = document.createElement('div');
-      div.className = 'cp-msg ' + role;
+      div.className = 'cp-msg cp-enter ' + role;
       div.innerHTML = '<div class="cp-bubble">' + (role === 'user' ? esc(text) : renderMd(text)) + '</div>';
       cpMsgs.appendChild(div);
-      cpMsgs.scrollTop = cpMsgs.scrollHeight;
+      div.addEventListener('animationend', function () { div.classList.remove('cp-enter'); }, { once: true });
+      return div;
     }
 
     function appendStreamBubble() {
       var div = document.createElement('div');
-      div.className = 'cp-msg assistant';
-      div.innerHTML = '<div class="cp-bubble"><span class="cp-cursor"></span></div>';
+      div.className = 'cp-msg assistant cp-enter';
+      div.innerHTML =
+        '<span class="cp-ava cp-ava-loading" aria-hidden="true">' +
+          '<img class="cp-ava-img" src="photo.jpg" alt="">' +
+        '</span>' +
+        '<div class="cp-bubble cp-thinking" aria-hidden="true">' +
+          '<span class="cp-status"></span>' +
+        '</div>';
       cpMsgs.appendChild(div);
-      cpMsgs.scrollTop = cpMsgs.scrollHeight;
+      div.addEventListener('animationend', function (e) { if (e.target === div) div.classList.remove('cp-enter'); }, { once: true });
+      startThinking(div.querySelector('.cp-status'));
       return div;
-    }
-
-    function updateStreamBubble(el, text) {
-      el.querySelector('.cp-bubble').innerHTML = renderMd(text) + '<span class="cp-cursor"></span>';
-      cpMsgs.scrollTop = cpMsgs.scrollHeight;
-    }
-
-    function finalizeStreamBubble(el) {
-      var cur = el.querySelector('.cp-cursor');
-      if (cur) cur.remove();
     }
 
     function esc(s) {
@@ -6281,9 +7499,74 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     function showErr(msg) { cpError.textContent = msg; cpError.classList.add('vis'); }
     function hideErr()    { cpError.classList.remove('vis'); }
 
-    /* ── Voice recording (OpenAI Whisper) ── */
+    /* ── Voice status toast ── */
+    var voiceToast    = document.getElementById('voiceToast');
+    var voiceToastMsg = voiceToast ? voiceToast.querySelector('.vt-msg') : null;
+    var voiceHideTimer;
+    function setVoiceToast(state, msg) {
+      if (!voiceToast) return;
+      clearTimeout(voiceHideTimer);
+      voiceToast.classList.remove('vt-waiting', 'vt-listening', 'vt-processing', 'vt-error');
+      if (state) voiceToast.classList.add('vt-' + state);
+      if (msg && voiceToastMsg) voiceToastMsg.textContent = msg;
+      // pin just above the floating bar
+      voiceToast.style.bottom = (window.innerHeight - cbWrap.getBoundingClientRect().top + 12) + 'px';
+      voiceToast.classList.add('toast-show');
+    }
+    function hideVoiceToast() {
+      if (voiceToast) voiceToast.classList.remove('toast-show');
+    }
+
+    /* ── Live waveform — left + right bars track mic level; middle stays static.
+       Local-only level metering via Web Audio; transcription stays on the proxy. ── */
+    var waveCtx = null, waveRAF = null;
+    function startWave(stream) {
+      var bars = voiceToast ? voiceToast.querySelectorAll('.vt-wave span') : [];
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!bars.length || !AC) return;
+      waveCtx = new AC();
+      var analyser = waveCtx.createAnalyser();
+      analyser.fftSize = 256;
+      waveCtx.createMediaStreamSource(stream).connect(analyser);
+      var data  = new Uint8Array(analyser.frequencyBinCount);
+      var BANDS = { 0: [1, 12], 2: [22, 90] }; // left = lows, right = highs
+      (function tick() {
+        analyser.getByteFrequencyData(data);
+        [0, 2].forEach(function (i) {
+          var b = BANDS[i], sum = 0;
+          for (var j = b[0]; j < b[1]; j++) sum += data[j];
+          var lvl = sum / (b[1] - b[0]) / 255;
+          bars[i].style.height = Math.round(5 + lvl * 15) + 'px';
+        });
+        waveRAF = requestAnimationFrame(tick);
+      })();
+    }
+    function stopWave() {
+      if (waveRAF) cancelAnimationFrame(waveRAF);
+      waveRAF = null;
+      if (waveCtx) { waveCtx.close(); waveCtx = null; }
+      if (voiceToast) voiceToast.querySelectorAll('.vt-wave span').forEach(function (b, i) {
+        if (i !== 1) b.style.height = '';
+      });
+    }
+
+    /* insert transcribed text at the caret; replace only if the field is empty */
+    function insertAtCursor(el, text) {
+      if (!el.value || !el.value.trim()) { el.value = text; return; }
+      var start = el.selectionStart != null ? el.selectionStart : el.value.length;
+      var end   = el.selectionEnd   != null ? el.selectionEnd   : el.value.length;
+      var before = el.value.slice(0, start);
+      var after  = el.value.slice(end);
+      var sep    = before && !/\s$/.test(before) ? ' ' : '';
+      el.value = before + sep + text + after;
+      var pos = (before + sep + text).length;
+      try { el.setSelectionRange(pos, pos); } catch (e) {}
+    }
+
+    /* ── Voice recording ── */
     async function startRecording(target) {
       recordTarget = target || 'panel';
+      setVoiceToast('waiting', 'Waiting for mic permission…');
       try {
         var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         var mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
@@ -6300,8 +7583,11 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         isRecording = true;
         cbMic.classList.add('recording');
         cpMicB.classList.add('recording');
+        setVoiceToast('listening', 'Listening…');
+        startWave(stream);
       } catch (err) {
-        showErr('Microphone access denied — check browser permissions');
+        setVoiceToast('error', 'Microphone access denied');
+        voiceHideTimer = setTimeout(hideVoiceToast, 2600);
       }
     }
 
@@ -6309,8 +7595,10 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (!mediaRecorder || !isRecording) return;
       mediaRecorder.stop();
       isRecording = false;
+      stopWave();
       cbMic.classList.remove('recording'); cbMic.classList.add('transcribing');
       cpMicB.classList.remove('recording'); cpMicB.classList.add('transcribing');
+      setVoiceToast('processing', 'Processing…');
     }
 
     async function transcribeAudio(blob, mimeType) {
@@ -6329,26 +7617,36 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         if (data.text) {
           var t = data.text.trim();
           if (recordTarget === 'bar') {
-            cbInput.value = t;
-            cbSend.classList.toggle('vis', t.length > 0);
+            insertAtCursor(cbInput, t);
+            cbSend.classList.toggle('vis', cbInput.value.trim().length > 0);
             if (!document.body.classList.contains('chat-open')) cbEl.classList.add('expanded');
             cbInput.focus();
           } else {
-            cpTA.value = t;
+            insertAtCursor(cpTA, t);
             cpResize(cpTA);
             cpTA.focus();
           }
           hideErr();
+          hideVoiceToast();
         } else {
+          setVoiceToast('error', 'Transcription failed');
+          voiceHideTimer = setTimeout(hideVoiceToast, 2600);
           showErr('Transcription error: ' + ((data.error && data.error.message) || 'unknown'));
         }
       } catch (err) {
+        setVoiceToast('error', 'Transcription failed — is the proxy running?');
+        voiceHideTimer = setTimeout(hideVoiceToast, 2600);
         showErr('Voice transcription failed — is the proxy running?');
       } finally {
         cbMic.classList.remove('recording', 'transcribing');
         cpMicB.classList.remove('recording', 'transcribing');
       }
     }
+
+    /* prevent the input blur on press — otherwise the bar collapses and the
+       button shifts out from under the cursor before mouseup, killing the click */
+    cbMic.addEventListener('mousedown', function (e) { e.preventDefault(); });
+    cbSend.addEventListener('mousedown', function (e) { e.preventDefault(); });
 
     cbMic.addEventListener('click', function () {
       if (isRecording) stopRecording();
@@ -6364,29 +7662,73 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
      *  Inline styles are used so the normal body.chat-open CSS rule
      *  (which hides the bar when chat opens) takes over cleanly after.
      * ─────────────────────────────────────────────────────────────── */
-    cbWrap.style.opacity = '0';
-    cbWrap.style.pointerEvents = 'none';
+    cbEl.classList.add('cb-intro'); /* photo + "Ask me anything", glass hidden */
 
-    setTimeout(function () {
-      /* Phase 1 — photo rises */
-      cbWrap.style.transition =
-        'opacity 0.5s cubic-bezier(0.34,1.1,0.64,1), ' +
-        'transform 0.6s cubic-bezier(0.34,1.3,0.64,1)';
-      cbWrap.style.opacity       = '1';
-      cbWrap.style.pointerEvents = 'auto';
+    /* Unfold: glass + input/mic fade in, photo grows, CTA morphs
+       "Ask me anything" → "Ask" sliding right. Runs once. */
+    function cbUnfold() {
+      if (!cbEl.classList.contains('cb-intro')) return;
+      cbSend.style.width = '168px';            // hold the wide intro width
+      cbEl.classList.remove('cb-intro');
+      cbEl.classList.add('bar-revealed');
 
+      cbSend.style.width = 'auto';
+      var restW = cbSend.offsetWidth;          // resting "Ask" width
+      cbSend.style.width = '168px';
+      requestAnimationFrame(function () {
+        cbSend.style.transition = 'width 0.55s cubic-bezier(0.34, 1.4, 0.64, 1)';
+        cbSend.style.width = restW + 'px';
+      });
+      setTimeout(function () {                  // hand width back to content sizing
+        cbSend.style.width = '';
+        cbSend.style.transition = '';
+      }, 640);
+
+      var arc = document.getElementById('pill-arc');
+      if (arc) {
+        setTimeout(function () {
+          arc.classList.remove('arc-hidden');
+          arc.classList.add('arc-intro');
+          setTimeout(function () { arc.classList.remove('arc-intro'); }, 5000);
+        }, 600);
+      }
+    }
+
+    /* The bar starts hidden via .cb-prerise. Wait out the hero (~2.4s), then
+       play the rise with the Web Animations API (robust onfinish), then unfold.
+       Console logs let us diagnose from the real browser. */
+    var reduceMotion = window.matchMedia &&
+                       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    console.log('[bar-intro] init · prerise=' + cbWrap.classList.contains('cb-prerise') +
+                ' · reduceMotion=' + reduceMotion + ' · visibility=' + document.visibilityState);
+    if (reduceMotion) {
+      cbWrap.classList.remove('cb-prerise');
+      cbUnfold();
+    } else {
       setTimeout(function () {
-        /* Phase 2 — clear inline styles, hand off to CSS, spring-expand */
-        cbWrap.style.transition    = '';
-        cbWrap.style.opacity       = '';
-        cbWrap.style.pointerEvents = '';
-        cbEl.style.overflow        = '';
-
-        requestAnimationFrame(function () {
-          cbEl.classList.add('bar-revealed');
-        });
-      }, 620);
-    }, 400);
+        console.log('[bar-intro] 2.4s elapsed → rising · visibility=' + document.visibilityState +
+                    ' · opacity=' + getComputedStyle(cbWrap).opacity);
+        cbWrap.classList.remove('cb-prerise');
+        var rose = false;
+        function finishRise() { if (rose) return; rose = true; console.log('[bar-intro] rise done → unfold'); cbUnfold(); }
+        if (cbWrap.animate) {
+          var a = cbWrap.animate(
+            [ { opacity: 0, transform: 'translateY(140px) scale(0.96)' },
+              { opacity: 1, transform: 'translateY(0) scale(1)' } ],
+            { duration: 1000, easing: 'cubic-bezier(0.34, 1.45, 0.64, 1)' });
+          /* diagnostic: does the animation clock actually advance in this browser? */
+          setTimeout(function () {
+            console.log('[bar-intro] 400ms-in · animTime=' + Math.round(a.currentTime || 0) +
+                        ' · playState=' + a.playState +
+                        ' · barTop=' + Math.round(cbWrap.getBoundingClientRect().top));
+          }, 400);
+          a.onfinish = finishRise;
+          setTimeout(finishRise, 1300);   // safety net
+        } else {
+          finishRise();
+        }
+      }, 2400);
+    }
 
     /* ── Rotating placeholder ── */
     var PLACEHOLDERS = [
@@ -6657,6 +7999,335 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   })();
   </script>
 
+  <!-- ─── GLASS LOADING SCREEN · Three.js liquid glass blob ─── -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+    import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
+    import { MeshTransmissionMaterial } from 'https://unpkg.com/@pmndrs/vanilla@1.25.0/materials/MeshTransmissionMaterial.js';
+
+    const loaderEl = document.getElementById('glassLoader');
+    const canvas   = document.getElementById('glassCanvas');
+
+    if (loaderEl && canvas && !document.body.classList.contains('no-webgl')) {
+      try { initGlass(); }
+      catch (e) {
+        console.warn('Glass loader failed, showing fallback:', e);
+        document.body.classList.add('no-webgl');
+      }
+    }
+
+    function initGlass() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(dpr);
+      renderer.setClearColor(0x000000, 0);   // transparent → the DOM artboard shows through
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.35;
+
+      const scene = new THREE.Scene();        // main: blob + lights (rendered transparent)
+      const bufferScene = new THREE.Scene();  // hidden dot field the blob refracts
+
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+      let w = loaderEl.clientWidth  || window.innerWidth;
+      let h = loaderEl.clientHeight || window.innerHeight;
+      let aspect = w / h;
+
+      const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
+      camera.position.set(0, 0, 5);
+
+      // Multiple lights + studio env → the bright glossy streaks that reveal the glass form
+      const key = new THREE.DirectionalLight(0xffffff, 3.0);
+      key.position.set(1, 2, 3);
+      scene.add(key);
+      const fill = new THREE.DirectionalLight(0xeaf0ff, 2.0);
+      fill.position.set(-3, -1, 2);
+      scene.add(fill);
+      const rim = new THREE.DirectionalLight(0xfff4e0, 2.2);
+      rim.position.set(-2, 3, -2);
+      scene.add(rim);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.15));
+
+      // ── Hidden dot-field backdrop that ONLY the blob refracts (lives in
+      //    bufferScene, never drawn to screen, so the crisp DOM artboard shows through) ──
+      const texCanvas = document.createElement('canvas');
+      const texCtx    = texCanvas.getContext('2d');
+      const texture   = new THREE.CanvasTexture(texCanvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+      const backdrop = new THREE.Mesh(
+        new THREE.PlaneGeometry(1, 1),
+        new THREE.MeshBasicMaterial({ map: texture })
+      );
+      backdrop.position.z = -1.2;
+      bufferScene.add(backdrop);
+
+      // ── Refractive glass material (drei MeshTransmissionMaterial, vanilla build) ──
+      const glass = new MeshTransmissionMaterial({
+        samples: 10,
+        transmissionSampler: false,
+        thickness: 0.6,              // deeper refraction → stronger glassy distortion
+        roughness: 0.0,
+        chromaticAberration: 0.12,   // the blue/orange edge fringing (boosted)
+        anisotropicBlur: 0.1,
+        distortion: 0.4,             // warps the refracted text
+        distortionScale: 0.6,
+        temporalDistortion: 0.15     // animated shimmer (uses glass.time)
+      });
+      glass.ior = 1.33;
+      glass.attenuationColor = new THREE.Color('white');
+      glass.envMapIntensity = 2.4;   // brighter reflections → the glass form reads
+      glass.clearcoat = 1.0;          // glossy lacquer highlights across the surface
+      glass.clearcoatRoughness = 0.0;
+      glass.specularIntensity = 1.0;
+
+      // Liquid morphing glass blob — an icosphere displaced by layered noise each frame
+      let blobGeo = new THREE.IcosahedronGeometry(0.92, 20);
+      blobGeo = mergeVertices(blobGeo);        // weld duplicate verts → smooth (not faceted)
+      blobGeo.computeVertexNormals();
+      const blob = new THREE.Mesh(blobGeo, glass);
+      const basePos  = blobGeo.attributes.position.array.slice();  // rest positions
+      const blobAttr = blobGeo.attributes.position;
+      const _v = new THREE.Vector3();
+      function morphBlob(t) {
+        const a = blobAttr.array;
+        for (let i = 0; i < a.length; i += 3) {
+          _v.set(basePos[i], basePos[i + 1], basePos[i + 2]);
+          const r0 = _v.length();
+          _v.normalize();
+          const x = _v.x, y = _v.y, z = _v.z;
+          // layered sines → organic gooey wobble (time terms halved → 50% slower morph)
+          const n =
+            0.16 * Math.sin(x * 3.0 + t * 0.65) +
+            0.13 * Math.sin(y * 3.6 + t * 0.85 + 1.7) +
+            0.11 * Math.sin(z * 3.2 + t * 0.55 + 3.1) +
+            0.08 * Math.sin((x + y) * 2.4 + t * 1.05) +
+            0.06 * Math.sin((y + z) * 4.1 + t * 0.45 + 2.2);
+          const r = r0 + n;
+          a[i] = x * r; a[i + 1] = y * r; a[i + 2] = z * r;
+        }
+        blobAttr.needsUpdate = true;
+        blobGeo.computeVertexNormals();
+      }
+      // pivot follows the cursor; the blob slowly turns while it morphs
+      const pivot = new THREE.Group();
+      pivot.add(blob);
+      scene.add(pivot);
+
+      // ── The blob IS the cursor: it follows the pointer's position ──
+      const ndc  = { x: 0.55, y: -0.5 };   // start off the title (lower-right)
+      const ease = { x: 0, y: 0 };
+      function onPointer(e) {
+        const p = (e.touches && e.touches[0]) || e;
+        ndc.x =  (p.clientX / window.innerWidth)  * 2 - 1;
+        ndc.y = -((p.clientY / window.innerHeight) * 2 - 1);
+      }
+      window.addEventListener('pointermove', onPointer, { passive: true });
+      window.addEventListener('touchmove',  onPointer, { passive: true });
+
+      // Offscreen buffer the glass refracts (the scene WITHOUT the blob)
+      let fbo = new THREE.WebGLRenderTarget(2, 2, {
+        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter
+      });
+
+      function drawBackdrop() {
+        const cw = Math.max(2, Math.round(w * dpr));
+        const ch = Math.max(2, Math.round(h * dpr));
+        texCanvas.width = cw; texCanvas.height = ch;
+        const ctx = texCtx;
+        // dark base
+        ctx.fillStyle = '#0b0b0d';
+        ctx.fillRect(0, 0, cw, ch);
+        // faint colour tints so the chromatic aberration has colour to split
+        let g = ctx.createRadialGradient(cw * 0.30, ch * 0.34, 0, cw * 0.30, ch * 0.34, cw * 0.55);
+        g.addColorStop(0, 'rgba(230,242,141,0.12)'); g.addColorStop(1, 'rgba(230,242,141,0)');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
+        g = ctx.createRadialGradient(cw * 0.72, ch * 0.66, 0, cw * 0.72, ch * 0.66, cw * 0.55);
+        g.addColorStop(0, 'rgba(80,140,255,0.12)'); g.addColorStop(1, 'rgba(80,140,255,0)');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
+        // dot grid (matches the DOM mesh) → the blob refracts/distorts these
+        const spacing = 26 * dpr, r = 1.4 * dpr;
+        ctx.fillStyle = 'rgba(255,255,255,0.22)';
+        for (let y = spacing / 2; y < ch; y += spacing) {
+          for (let x = spacing / 2; x < cw; x += spacing) {
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+
+        // Filled card + title — drawn to line up with the DOM frame so the blob
+        // refracts the #2E2E2E card and text wherever it passes over.
+        const clamp = (lo, v, hi) => Math.max(lo, Math.min(v, hi));
+        const nameCss  = clamp(11, w * 0.014, 14);
+        const titleCss = clamp(20, w * 0.042, 52);
+        const nameLine = nameCss * 1.2, titleLine = titleCss * 1.15, gapLine = 16;
+        const blockH = nameLine + gapLine + titleLine;
+        const nameY  = ((h / 2) - blockH / 2 + nameLine / 2) * dpr;
+        const titleY = ((h / 2) + blockH / 2 - titleLine / 2) * dpr;
+        const cx = cw / 2;
+        ctx.textBaseline = 'middle';
+
+        // measure title parts ("AI Native" sits in a pill)
+        const ts = titleCss * dpr;
+        const p1 = 'AI Native', p2 = 'Product Designer';
+        ctx.font = '700 ' + ts + "px 'JetBrains Mono', monospace";
+        const tw1 = ctx.measureText(p1).width;
+        const tw2 = ctx.measureText(p2).width;
+        const pillPadX = 0.42 * ts, gap = 0.72 * ts;
+        const pillW = tw1 + pillPadX * 2;
+        const titleW = pillW + gap + tw2;
+
+        // filled artboard card (matches the #2E2E2E DOM frame)
+        const padX = 60 * dpr, padY = 40 * dpr;
+        const cardW = titleW + padX * 2, cardH = blockH * dpr + padY * 2;
+        const cardX = cx - cardW / 2, cardY = ch / 2 - cardH / 2;
+        ctx.fillStyle = '#2E2E2E';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(cardX, cardY, cardW, cardH, 2 * dpr);
+        else ctx.rect(cardX, cardY, cardW, cardH);
+        ctx.fill();
+
+        // name — mono, letter-spaced, centered
+        const ns = nameCss * dpr;
+        ctx.fillStyle = '#cfd3d6';
+        ctx.font = '500 ' + ns + "px 'JetBrains Mono', monospace";
+        const nm = 'BHANU KOWSHIK', nsp = ns * 0.3;
+        let nt = -nsp;
+        for (const c of nm) nt += ctx.measureText(c).width + nsp;
+        let nx = cx - nt / 2;
+        ctx.textAlign = 'left';
+        for (const c of nm) { ctx.fillText(c, nx, nameY); nx += ctx.measureText(c).width + nsp; }
+
+        // title — "AI Native" pill (static AI gradient glow) + white "Product Designer"
+        ctx.font = '700 ' + ts + "px 'JetBrains Mono', monospace";
+        const tStart = cx - titleW / 2;
+        const pillH = ts * 1.18, pillY = titleY - pillH / 2;
+        const pg = ctx.createLinearGradient(tStart, 0, tStart + pillW, 0);
+        pg.addColorStop(0, '#22D3EE'); pg.addColorStop(0.38, '#6366F1');
+        pg.addColorStop(0.66, '#A855F7'); pg.addColorStop(1, '#EC4899');
+        function pillPath() {
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(tStart, pillY, pillW, pillH, pillH / 2);
+          else ctx.rect(tStart, pillY, pillW, pillH);
+        }
+        ctx.fillStyle = '#33333a'; pillPath(); ctx.fill();               // frosted surface
+        ctx.save(); ctx.globalAlpha = 0.45; ctx.fillStyle = pg; pillPath(); ctx.fill(); ctx.restore();  // soft AI wash
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(p1, tStart + pillPadX, titleY);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(p2, tStart + pillW + gap, titleY);
+
+        // ── Frame chrome drawn into the buffer so the blob refracts it too ──
+        const BLUE = '#1A73E8';
+        const lw = Math.max(1, Math.round(dpr));
+        // frame border
+        ctx.strokeStyle = BLUE; ctx.lineWidth = lw;
+        ctx.strokeRect(cardX + lw / 2, cardY + lw / 2, cardW - lw, cardH - lw);
+        // "Hero" layer tab
+        const tabFs = 11 * dpr, tabPad = 8 * dpr, tabH = tabFs + 6 * dpr;
+        ctx.font = '500 ' + tabFs + "px 'JetBrains Mono', monospace";
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        const tabW = ctx.measureText('Hero').width + tabPad * 2;
+        ctx.fillStyle = BLUE; ctx.fillRect(cardX, cardY - tabH, tabW, tabH);
+        ctx.fillStyle = '#fff'; ctx.fillText('Hero', cardX + tabPad, cardY - tabH / 2);
+        // handles: corners = circles, mid-edges = rounded bars
+        const midX = cardX + cardW / 2, midYc = cardY + cardH / 2;
+        ctx.lineWidth = 1.5 * dpr;
+        const corners = [[cardX, cardY], [cardX + cardW, cardY], [cardX, cardY + cardH], [cardX + cardW, cardY + cardH]];
+        for (const c of corners) {
+          ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(c[0], c[1], 5 * dpr, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = BLUE; ctx.stroke();
+        }
+        const bars = [
+          { x: midX, y: cardY, w: 22, h: 8 }, { x: midX, y: cardY + cardH, w: 22, h: 8 },
+          { x: cardX, y: midYc, w: 8, h: 22 }, { x: cardX + cardW, y: midYc, w: 8, h: 22 }
+        ];
+        for (const b of bars) {
+          const bw = b.w * dpr, bh = b.h * dpr;
+          ctx.fillStyle = '#fff'; ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(b.x - bw / 2, b.y - bh / 2, bw, bh, 4 * dpr);
+          else ctx.rect(b.x - bw / 2, b.y - bh / 2, bw, bh);
+          ctx.fill(); ctx.strokeStyle = BLUE; ctx.stroke();
+        }
+
+        texture.needsUpdate = true;
+      }
+
+      function fitPlane() {
+        const dist = camera.position.z - backdrop.position.z;
+        const ph = 2 * Math.tan((camera.fov * Math.PI / 180) / 2) * dist;
+        backdrop.scale.set(ph * aspect, ph, 1);
+      }
+
+      function resize() {
+        w = loaderEl.clientWidth  || window.innerWidth;
+        h = loaderEl.clientHeight || window.innerHeight;
+        aspect = w / h;
+        renderer.setSize(w, h, false);
+        camera.aspect = aspect; camera.updateProjectionMatrix();
+        fbo.setSize(Math.max(2, Math.round(w * dpr)), Math.max(2, Math.round(h * dpr)));
+        fitPlane();
+        drawBackdrop();
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      // Redraw the refracted text once webfonts load so it lines up with the DOM
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawBackdrop);
+
+      let rafId;
+      function tick() {
+        const t = performance.now() / 1000;
+        morphBlob(t);                 // liquid wobble (50% slower than before)
+        blob.rotation.y += 0.004;     // slow idle turn
+        blob.rotation.x += 0.002;
+
+        // follow the cursor's world position — low factor = a subtle premium lag/trail
+        const halfH = Math.tan((camera.fov * Math.PI / 180) / 2) * camera.position.z;
+        const halfW = halfH * camera.aspect;
+        ease.x += (ndc.x * halfW - ease.x) * 0.085;
+        ease.y += (ndc.y * halfH - ease.y) * 0.085;
+        pivot.position.x = ease.x;
+        pivot.position.y = ease.y;
+
+        // 1) render the hidden dot field into the buffer the glass refracts
+        renderer.setRenderTarget(fbo);
+        renderer.render(bufferScene, camera);
+
+        // 2) feed that buffer to the glass; render the blob (transparent elsewhere)
+        glass.buffer = fbo.texture;
+        glass.time = t;
+        renderer.setRenderTarget(null);
+        renderer.render(scene, camera);
+
+        rafId = requestAnimationFrame(tick);
+      }
+      rafId = requestAnimationFrame(tick);
+
+      // Hand off to the portfolio after 5s, then release the GPU
+      setTimeout(() => { if (window.__hideGlassLoader) window.__hideGlassLoader(); }, 5000);
+      setTimeout(() => {
+        cancelAnimationFrame(rafId);
+        window.removeEventListener('resize', resize);
+        window.removeEventListener('pointermove', onPointer);
+        window.removeEventListener('touchmove', onPointer);
+        fbo.dispose();
+        renderer.dispose();
+        pmrem.dispose();
+      }, 6000);
+    }
+  </script>
 
 </body>
 </html>
