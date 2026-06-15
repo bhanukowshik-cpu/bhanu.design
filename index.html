@@ -1484,6 +1484,51 @@
       line-height: 25px;
     }
 
+    /* ─── PROJECT STACK — sticky "deal onto a pile" parallax ─────────
+       The case-study cards pile up: each scrolls up and lands on TOP of
+       the previous one, which stays pinned behind it with a thin peeking
+       edge. Each card is a 50/50 split — metrics on the left, product
+       media on the right. --i (0,1,2,3) staggers the pinned top offset
+       so each older card's top edge peeks out from under the new one. */
+    .cs-stack {
+      margin: 0 40px;
+      display: flex;
+      flex-direction: column;
+    }
+    .cs-stack .case-study-card { margin: 0; }  /* stack provides the outer margin */
+    @media (max-width: 1023px) { .cs-stack { margin: 0 32px; } }
+    @media (max-width: 900px)  { .cs-stack { margin: 0 20px; } }
+
+    /* Desktop only — the sticky pile + 50/50 split. Below 1024px the cards
+       fall back to their original vertical layout (media on top, content
+       below) with their normal product-area heights, untouched. */
+    @media (min-width: 1024px) {
+      .cs-stack .case-study-card {
+        position: -webkit-sticky;
+        position: sticky;
+        top: calc(88px + var(--i, 0) * 18px);
+        flex-direction: row;
+        align-items: stretch;
+        min-height: 480px;
+        /* upward shadow → the covering card casts onto the one behind */
+        box-shadow: 0 -12px 34px rgba(0,0,0,0.08);
+      }
+      .cs-stack .case-study-card .case-study-bottom {
+        order: 1;
+        width: 50%;
+        box-sizing: border-box;
+        flex-shrink: 0;
+        justify-content: center;   /* vertically centre the metrics block */
+      }
+      .cs-stack .case-study-card .product-area {
+        order: 2;
+        width: 50%;
+        height: auto;          /* stretch to the taller (left) column */
+        align-self: stretch;
+        flex-shrink: 0;
+      }
+    }
+
     /* ─── MORE WORK CTA + ANALYTICS CARD ───────────────────────── */
     .more-work-wrap {
       display: flex;
@@ -4653,14 +4698,11 @@
         <div class="sd-measure" id="sdMeasureR"></div>
       </div>
 
-      <!-- ── FEATURED WORK: EverTutor header ──────────────────── -->
-      <div class="fw-header reveal">
-        <h2 class="fw-title">1. EverTutor</h2>
-        <p class="fw-desc">Led product design across three interconnected platforms: Live, Studio, and Analytics, turning a fragmented tutoring experience into a cohesive AI system that personalizes learning at scale for thousands of students daily.</p>
-      </div>
+      <!-- ── PROJECT STACK — sticky pile of case-study cards ─────── -->
+      <div class="cs-stack" id="csStack">
 
       <!-- ── CASE STUDY CARD 1 — EverTutor Live ──────────────────── -->
-      <div class="case-study-card reveal" id="csCardLive">
+      <div class="case-study-card reveal" id="csCardLive" style="--i:0">
 
         <!-- Product area with scrolling tags bar -->
         <div class="product-area product-area-live">
@@ -4711,7 +4753,7 @@
       </div><!-- /case-study-card-live -->
 
       <!-- ── CASE STUDY CARD 2 — EverTutor Studio ──────────────────── -->
-      <div class="case-study-card reveal">
+      <div class="case-study-card reveal" id="csCardStudio" style="--i:1">
 
         <!-- Product recording with scrolling tags bar -->
         <div class="product-area">
@@ -4772,17 +4814,8 @@
 
       </div><!-- /case-study-card-studio -->
 
-      <!-- ── MORE WORK CTA + ANALYTICS CARD ──────────────────────── -->
-      <div class="more-work-wrap">
-
-        <div class="more-work-section">
-          <button class="more-work-btn" id="moreWorkBtn">
-            More work from EverTutor <svg class="mw-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><polyline points="2.5 4 8 9 13.5 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="2.5 8.5 8 13.5 13.5 8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-        </div>
-
-        <div class="analytics-card-wrapper" id="analyticsWrapper">
-          <div class="case-study-card" id="csCardAnalytics">
+      <!-- ── CASE STUDY CARD 3 — EverTutor Analytics ─────────────── -->
+      <div class="case-study-card reveal" id="csCardAnalytics" style="--i:2">
 
             <div class="product-area product-area-analytics">
               <div class="tags-bar-overlay">
@@ -4805,20 +4838,10 @@
               </div>
             </div>
 
-          </div><!-- /csCardAnalytics -->
-        </div><!-- /analyticsWrapper -->
+      </div><!-- /csCardAnalytics -->
 
-      </div><!-- /more-work-wrap -->
-
-
-      <!-- ── FEATURED WORK: Stressie header ─────────────────────── -->
-      <div class="fw-header reveal">
-        <h2 class="fw-title">2. Stressie</h2>
-        <p class="fw-desc">Founding Product Designer. Took the product from raw pilot research to a full redesign, building the design system, rethinking the IA, and shipping a product now incubated at Harvard Innovation Labs and piloted at Amazon and InKind.</p>
-      </div>
-
-      <!-- ── CASE STUDY CARD — Stressie ─────────────────────────── -->
-      <div class="case-study-card reveal" id="csCardStressie">
+      <!-- ── CASE STUDY CARD 4 — Stressie ───────────────────────── -->
+      <div class="case-study-card reveal" id="csCardStressie" style="--i:3">
 
         <div class="product-area product-area-stressie">
           <div class="tags-bar-overlay">
@@ -4865,6 +4888,8 @@
         </div>
 
       </div><!-- /csCardStressie -->
+
+      </div><!-- /cs-stack -->
 
       <!-- ── ABOUT ──────────────────────────────────────────────── -->
       <div class="about-section reveal" id="aboutSection">
@@ -5564,33 +5589,42 @@
       }
     })();
 
-    /* ── More work CTA toggle ──────────────────────────────────── */
+    /* ── EverTutor Analytics card image fade-in ───────────────────
+       Analytics is now a permanent card in the stack (no longer behind
+       a "More work" toggle), so fade its screenshot in on scroll-in,
+       mirroring the Live card image observer above. */
     (function () {
-      const btn     = document.getElementById('moreWorkBtn');
-      const wrapper = document.getElementById('analyticsWrapper');
-      if (!btn || !wrapper) return;
+      const img  = document.getElementById('productImgAnalytics');
+      const area = img && img.closest('.product-area');
+      const card = img && img.closest('.case-study-card');
+      if (!img) return;
 
-      btn.addEventListener('click', () => {
-        wrapper.classList.add('open');
-        btn.style.transition = 'opacity 0.25s ease';
-        btn.style.opacity = '0';
-        setTimeout(() => { btn.style.display = 'none'; }, 260);
-        setTimeout(() => {
-          wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
-        // Fade in the analytics image once wrapper finishes expanding
-        setTimeout(() => {
-          const img = document.getElementById('productImgAnalytics');
-          if (!img) return;
-          img.style.transition =
-            'opacity 0.75s cubic-bezier(0.22, 0.61, 0.36, 1), ' +
-            'transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1)';
-          setTimeout(() => {
+      function fadeImgIn() {
+        img.style.transition =
+          'opacity 0.75s cubic-bezier(0.22, 0.61, 0.36, 1), ' +
+          'transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1)';
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
             img.style.opacity   = '1';
             img.style.transform = 'translateY(0)';
-          }, 20);
-        }, 450);
-      }, { once: true });
+          });
+        });
+      }
+
+      if ('IntersectionObserver' in window && area) {
+        const obs = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) {
+            let fired = false;
+            const onReady = () => { if (fired) return; fired = true; fadeImgIn(); };
+            if (card) card.addEventListener('animationend', onReady, { once: true });
+            setTimeout(onReady, 750);
+            obs.unobserve(area);
+          }
+        }, { threshold: 0.4 });
+        obs.observe(area);
+      } else {
+        fadeImgIn();
+      }
     })();
 
     /* ── SECTION DIVIDER — live measurement labels ─────────────── */
