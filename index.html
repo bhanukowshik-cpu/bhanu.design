@@ -1514,10 +1514,9 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      justify-content: space-between;   /* copy hard-left, orbit hard-right */
-      gap: 40px;
-      padding: 52px 60px;
-      min-height: 460px;
+      gap: 30px;
+      padding: 48px 56px;
+      min-height: 540px;
     }
     @media (min-width: 1024px) {
       .proj-card {
@@ -1527,99 +1526,97 @@
       }
     }
 
-    /* LEFT — copy (premium type, aligned to the design-system scale) */
-    .proj-copy { flex: 0 1 auto; max-width: 460px; min-width: 0; }
-    .proj-kicker {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-weight: 500;
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--grey);
-      margin: 0 0 14px;
-    }
+    /* LEFT — copy */
+    .proj-copy { flex: 0 1 auto; max-width: 660px; min-width: 0; }
     .proj-title {
       font-family: var(--font-heading);
-      font-weight: 700;                 /* matches hero H1 weight */
-      font-size: 30px;                  /* matches hero H1 (.hero-heading) */
-      line-height: 1.12;
-      letter-spacing: -0.8px;
+      font-weight: 700;                 /* bold */
+      font-size: 35px;
+      line-height: 1.1;
+      letter-spacing: -0.9px;
       color: var(--secondary);
-      margin: 0 0 16px;
+      margin: 0 0 22px;
     }
     .proj-desc {
       font-family: var(--font-heading);
-      font-weight: 450;
-      font-size: 16px;
-      line-height: 1.72;
-      letter-spacing: -0.1px;
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 35px;
+      letter-spacing: -0.2px;
       color: var(--secondary);
       margin: 0;
-      max-width: 40ch;
+      max-width: 32ch;
     }
     .proj-mark {
       font-family: var(--font-mono);
       font-weight: 600;
-      font-size: 0.86em;
-      background: var(--primary);
-      color: #252525;
-      padding: 0.12em 0.3em;
+      font-size: 0.9em;
+      background: #789F04;              /* brand highlight */
+      color: #fff;
+      padding: 0.1em 0.28em;
       border-radius: 4px;
       -webkit-box-decoration-break: clone;
       box-decoration-break: clone;
     }
     .proj-meta {
-      margin-top: 34px;
-      padding-top: 26px;
-      border-top: 1px solid rgba(127,127,127,0.16);
+      margin-top: 44px;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 18px;
     }
     .proj-meta-row {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 14px 36px;
+      gap: 16px 40px;
     }
     .proj-meta-item {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-family: var(--font-mono);
       font-weight: 500;
-      font-size: 13.5px;
-      letter-spacing: -0.2px;
+      font-size: 20px;
+      letter-spacing: -0.4px;
       color: var(--secondary);
     }
-    .proj-ic { flex-shrink: 0; height: 17px; width: auto; display: block; }
-    .proj-ic--bolt { height: 19px; }
+    .proj-ic { flex-shrink: 0; height: 24px; width: auto; display: block; }
+    .proj-ic--bolt { height: 26px; }
 
-    /* RIGHT — orbit visual */
+    /* RIGHT — orbit visual: fills the remaining space and centres a
+       fixed-size stage so the bubbles can revolve in full circles
+       without colliding with the copy or the card edge. */
     .proj-orbit {
-      flex: 0 0 400px;
-      position: relative;
-      width: 400px;
-      height: 400px;
+      flex: 1 1 auto;
+      min-width: 0;
       align-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    /* glass sphere — animated green liquid blob, theme-aware & optimized.
-       Light: transparent WebP background-image. Dark: WebM/MP4 video.
-       Only the active theme's asset is fetched. */
+    .proj-stage {
+      position: relative;
+      width: 480px;
+      height: 480px;
+      flex: 0 0 auto;
+    }
+    .proj-ring {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+    /* glass sphere — theme-aware video (only the active theme's plays/paints) */
     .proj-sphere-img {
       position: absolute;
       top: 50%; left: 50%;
-      width: 110%;              /* light blob has more canvas padding */
+      width: 48%;
       aspect-ratio: 1 / 1;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
-      background-image: url('blob-light.webp');   /* light (default) */
       pointer-events: none;
       user-select: none;
-      /* centring stays in `transform`; the breathing uses the independent
-         `scale` property so it can't disturb the clipped video's compositing */
+      /* centring stays in `transform`; breathing uses the independent
+         `scale` property so it can't disturb the clipped video compositing */
       transform: translate(-50%, -50%);
       transform-origin: center center;
       animation: proj-breathe 6.5s ease-in-out infinite alternate;
@@ -1633,15 +1630,16 @@
       .proj-sphere-img { animation: none; scale: 1; }
     }
     .proj-sphere-vid {
-      display: none;            /* shown only in dark mode */
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: contain;
-      /* circle clip so the H.264 fallback (no alpha) never shows a box */
-      border-radius: 50%;
+      border-radius: 50%;      /* hides the H.264 fallback's box in Safari */
     }
-    [data-theme="dark"] .proj-sphere-img { background-image: none; width: 48%; }
-    [data-theme="dark"] .proj-sphere-vid { display: block; }
+    .proj-vid-dark { display: none; }           /* light is default */
+    [data-theme="dark"] .proj-vid-light { display: none; }
+    [data-theme="dark"] .proj-vid-dark  { display: block; }
 
     /* ── orbiting "voice" nodes: green dot + speech bubble w/ tail ──
        JS positions each element (top/left:0 + transform) and rotates
@@ -1650,29 +1648,31 @@
     .proj-dot {
       position: absolute;
       top: 0; left: 0;
-      width: 9px; height: 9px;
+      width: 10px; height: 10px;
       border-radius: 50%;
-      background: #2E9E5B;
-      box-shadow: 0 0 0 4px rgba(46,158,91,0.13);
+      background: #789F04;
+      box-shadow: 0 0 0 4px rgba(120,159,4,0.16);
       will-change: transform;
     }
     .proj-bubble {
       position: absolute;
       top: 0; left: 0;
       --bub: var(--secondary);
+      --bub-text: #fff;
       background: var(--bub);
-      color: #fff;
+      color: var(--bub-text);
       font-family: var(--font-mono);
       font-weight: 500;
-      font-size: 12px;
+      font-size: 13px;
       letter-spacing: -0.2px;
-      padding: 7px 14px;
+      padding: 8px 15px;
       border-radius: 999px;
       white-space: nowrap;
       box-shadow: 0 6px 20px rgba(0,0,0,0.18);
       will-change: transform;
     }
-    [data-theme="dark"] .proj-bubble { --bub: #0E0C09; color: #F0EDE8; }
+    /* dark mode: white pills with dark text (per the design) */
+    [data-theme="dark"] .proj-bubble { --bub: #F4F2EE; --bub-text: #1A1813; }
     .proj-tail {
       position: absolute;
       top: 0; left: 0;
@@ -1693,15 +1693,18 @@
         min-height: 0;
       }
       .proj-copy { flex: 1 1 auto; max-width: 100%; }
-      .proj-orbit { align-self: center; }
+      .proj-orbit { flex: 0 0 auto; align-self: center; }
+      .proj-stage { width: 440px; height: 440px; }
     }
     @media (max-width: 560px) {
       .proj-card-inner { padding: 32px 24px; }
-      .proj-title { font-size: 26px; }
-      .proj-desc { font-size: 15px; max-width: none; }
-      .proj-meta { margin-top: 28px; padding-top: 22px; }
-      .proj-meta-item { font-size: 12.5px; }
-      .proj-orbit { flex-basis: 300px; width: 300px; height: 300px; }
+      .proj-title { font-size: 28px; }
+      .proj-desc { font-size: 17px; line-height: 28px; max-width: none; }
+      .proj-meta { margin-top: 32px; gap: 14px; }
+      .proj-meta-item { font-size: 15px; gap: 10px; }
+      .proj-ic { height: 20px; }
+      .proj-ic--bolt { height: 22px; }
+      .proj-stage { width: 300px; height: 300px; }
       .proj-bubble { font-size: 11px; padding: 6px 12px; }
     }
 
@@ -4933,7 +4936,6 @@
 
               <!-- LEFT: copy -->
               <div class="proj-copy">
-                <span class="proj-kicker">AI Tutoring System</span>
                 <h3 class="proj-title">EverTutor</h3>
                 <p class="proj-desc">World&rsquo;s first <mark class="proj-mark">multi modal 1:1 voice first AI tutor</mark> powered by 3 tools working as one system to create, serve, and measure adaptive tutoring.</p>
 
@@ -4942,8 +4944,8 @@
                     <span class="proj-meta-item">
                       <svg class="proj-ic" viewBox="0 0 26 23" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12.9423 14C13.0432 14.0001 13.0432 14.0001 13.1461 14.0002C15.4143 14.007 17.4942 14.488 19.5329 15.4799C19.5852 15.505 19.6375 15.5301 19.6914 15.556C22.2146 16.7807 24.8695 19.0562 25.9922 21.6812C26.0249 22.0421 25.9553 22.3327 25.7702 22.6426C25.4656 22.9211 25.2821 22.9713 24.8669 22.9648C24.5198 22.9356 24.2876 22.7289 24.0544 22.4866C23.9149 22.2951 23.7985 22.093 23.681 21.8876C23.279 21.218 22.8098 20.6413 22.2781 20.0705C22.2224 20.0102 22.2224 20.0102 22.1655 19.9488C19.8482 17.47 16.5103 16.1609 13.1543 16.0437C10.0853 16.0113 7.07819 17.1019 4.75715 19.104C4.69127 19.16 4.62539 19.216 4.55751 19.2736C3.43769 20.249 2.55677 21.4101 1.8003 22.6826C1.58525 22.9263 1.32044 22.966 1.00771 23C0.657636 22.9632 0.501049 22.8763 0.235619 22.6477C-0.0158556 22.2997 -0.0273058 22.0444 0.0253475 21.6366C0.112879 21.2832 0.31307 21.0125 0.523261 20.7198C0.589447 20.6246 0.589447 20.6246 0.65697 20.5276C2.14346 18.4091 3.98492 16.748 6.29125 15.5604C6.3658 15.522 6.3658 15.522 6.44185 15.4828C8.46686 14.4557 10.6801 13.9945 12.9423 14Z" fill="currentColor"/>
-                        <circle cx="13" cy="7" r="7" fill="#E6F28D"/>
-                        <circle cx="13" cy="7" r="6" stroke="currentColor" stroke-opacity="0.7" stroke-width="2"/>
+                        <circle cx="13" cy="7" r="7" fill="#789F04"/>
+                        <circle cx="13" cy="7" r="6" stroke="#465D00" stroke-width="2"/>
                       </svg>
                       Sole Product Designer
                     </span>
@@ -4956,8 +4958,8 @@
                     <span class="proj-meta-item">
                       <svg class="proj-ic" viewBox="0 0 29 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3 12H11C11.5523 12 12 12.4477 12 13V23H2V13C2 12.4823 2.39333 12.0562 2.89746 12.0049L3 12Z" stroke="currentColor" stroke-width="2"/>
-                        <path d="M18 1H26C26.5523 1 27 1.44772 27 2V23H17V2C17 1.48232 17.3933 1.05621 17.8975 1.00488L18 1Z" fill="#E6F28D"/>
-                        <path d="M18 1H26C26.5523 1 27 1.44772 27 2V23H17V2C17 1.48232 17.3933 1.05621 17.8975 1.00488L18 1Z" stroke="#5F6344" stroke-width="2"/>
+                        <path d="M18 1H26C26.5523 1 27 1.44772 27 2V23H17V2C17 1.48232 17.3933 1.05621 17.8975 1.00488L18 1Z" fill="#789F04"/>
+                        <path d="M18 1H26C26.5523 1 27 1.44772 27 2V23H17V2C17 1.48232 17.3933 1.05621 17.8975 1.00488L18 1Z" stroke="#465D00" stroke-width="2"/>
                         <line x1="1" y1="23" x2="28" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                       </svg>
                       2000+ Daily Active Users, 96% creation-time cut
@@ -4967,30 +4969,40 @@
               </div>
 
               <!-- RIGHT: orbit visual -->
-              <div class="proj-orbit" id="projOrbit" aria-hidden="true">
+              <div class="proj-orbit" aria-hidden="true">
+                <div class="proj-stage" id="projStage">
 
-                <!-- glass sphere with animated green liquid blob — theme-aware.
-                     Light: transparent WebP background. Dark: WebM (VP9 alpha) with
-                     an H.264 MP4 fallback (circle-clipped so Safari shows no box). -->
-                <div class="proj-sphere-img" role="img" aria-label="EverTutor glass blob" aria-hidden="true">
-                  <video class="proj-sphere-vid" autoplay muted loop playsinline preload="auto">
-                    <source src="blob-dark.webm" type="video/webm" />
-                    <source src="blob-dark.mp4" type="video/mp4" />
-                  </video>
-                </div>
+                  <!-- dashed orbit ring -->
+                  <svg class="proj-ring" viewBox="0 0 480 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="240" cy="240" r="160" stroke="rgba(130,130,130,0.34)" stroke-width="1.4" stroke-dasharray="3 7"/>
+                  </svg>
 
-                <!-- orbiting "voice" nodes: a connection dot + a speech bubble
-                     whose tail always points back at the blob. Positioned and
-                     animated by JS (see PROJECT ORBIT script). -->
-                <div class="proj-nodes" id="projNodes">
-                  <span class="proj-dot"></span>
-                  <span class="proj-dot"></span>
-                  <span class="proj-dot"></span>
-                  <span class="proj-bubble">ET Analytics<i class="proj-tail"></i></span>
-                  <span class="proj-bubble">ET Studio<i class="proj-tail"></i></span>
-                  <span class="proj-bubble">ET Live<i class="proj-tail"></i></span>
-                </div>
+                  <!-- glass sphere — theme-aware video (WebM VP9-alpha + H.264 MP4
+                       fallback, circle-clipped so Safari shows no box) -->
+                  <div class="proj-sphere-img" aria-hidden="true">
+                    <video class="proj-sphere-vid proj-vid-light" autoplay muted loop playsinline preload="auto">
+                      <source src="blob-light.webm" type="video/webm" />
+                      <source src="blob-light.mp4" type="video/mp4" />
+                    </video>
+                    <video class="proj-sphere-vid proj-vid-dark" autoplay muted loop playsinline preload="auto">
+                      <source src="blob-dark.webm" type="video/webm" />
+                      <source src="blob-dark.mp4" type="video/mp4" />
+                    </video>
+                  </div>
 
+                  <!-- orbiting "voice" nodes: a connection dot + a speech bubble
+                       whose tail always points back at the blob. Revolve in full
+                       circles (JS — see PROJECT ORBIT script). -->
+                  <div class="proj-nodes" id="projNodes">
+                    <span class="proj-dot"></span>
+                    <span class="proj-dot"></span>
+                    <span class="proj-dot"></span>
+                    <span class="proj-bubble">ET Analytics<i class="proj-tail"></i></span>
+                    <span class="proj-bubble">ET Studio<i class="proj-tail"></i></span>
+                    <span class="proj-bubble">ET Live<i class="proj-tail"></i></span>
+                  </div>
+
+                </div><!-- /proj-stage -->
               </div><!-- /proj-orbit -->
 
             </div><!-- /proj-card-inner -->
@@ -7029,37 +7041,35 @@
 
   })();
 
-  /* ── PROJECT ORBIT — voice bubbles drifting around the blob ───── */
+  /* ── PROJECT ORBIT — voice bubbles revolving in full circles ───── */
   (function () {
-    var orbit = document.getElementById('projOrbit');
+    var stage = document.getElementById('projStage');
     var wrap  = document.getElementById('projNodes');
-    if (!orbit || !wrap) return;
+    if (!stage || !wrap) return;
 
     var dots    = [].slice.call(wrap.querySelectorAll('.proj-dot'));
     var bubbles = [].slice.call(wrap.querySelectorAll('.proj-bubble'));
     var tails   = bubbles.map(function (b) { return b.querySelector('.proj-tail'); });
     if (bubbles.length < 3) return;
 
-    var D2R = Math.PI / 180;
-    // anchors (0 = right, y down): upper-left, upper-right, bottom
-    var ANCHORS = [225 * D2R, 315 * D2R, 90 * D2R];
-    var AMP   = 10 * D2R;   // gentle drift amplitude (arc, not full revolution)
-    var SPEED = 0.6;        // rad/s of the sine driver — slow & premium
-    var PHASE = [0, 2.1, 4.2];
+    var D2R     = Math.PI / 180;
+    var START   = [225 * D2R, 345 * D2R, 105 * D2R]; // 120° apart, starting offsets
+    var PERIOD  = 46;                                // seconds for one full revolution
+    var OMEGA   = (2 * Math.PI) / PERIOD;            // rad/s
 
     var reduce = window.matchMedia &&
                  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function place(now) {
-      var W = orbit.clientWidth, H = orbit.clientHeight;
+      var W = stage.clientWidth, H = stage.clientHeight;
       if (!W) return;
       var cx = W / 2, cy = H / 2;
-      var Rd = W * 0.36;   // dot radius (just outside the blob)
-      var Rb = W * 0.52;   // bubble-centre radius (clears the blob halo)
-      var t  = now / 1000;
+      var Rd = W * 0.333;   // dot radius — sits on the ring
+      var Rb = W * 0.385;   // bubble-centre radius — just outside the ring
+      var spin = reduce ? 0 : (now / 1000) * OMEGA;
 
       for (var i = 0; i < 3; i++) {
-        var a  = ANCHORS[i] + (reduce ? 0 : AMP * Math.sin(t * SPEED + PHASE[i]));
+        var a  = START[i] + spin;
         var ca = Math.cos(a), sa = Math.sin(a);
 
         dots[i].style.transform =
@@ -7096,7 +7106,7 @@
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (es) {
         es[0].isIntersecting ? start() : stop();
-      }, { threshold: 0 }).observe(orbit);
+      }, { threshold: 0 }).observe(stage);
     } else {
       start();
     }
@@ -7259,11 +7269,12 @@
         root.setAttribute('data-theme', theme);
         try { localStorage.setItem(KEY, theme); } catch(e) {}
       }
-      /* the dark-mode blob video is display:none until dark — kick playback
-         when it becomes visible (autoplay can be skipped while hidden) */
-      if (theme === 'dark') {
-        var blobVid = document.querySelector('.proj-sphere-vid');
-        if (blobVid) { var pr = blobVid.play(); if (pr && pr.catch) pr.catch(function(){}); }
+      /* each blob video is display:none until its theme is active — kick
+         playback when it becomes visible (autoplay can be skipped while hidden) */
+      var vids = document.querySelectorAll('.proj-sphere-vid');
+      for (var vi = 0; vi < vids.length; vi++) {
+        var pr = vids[vi].play();
+        if (pr && pr.catch) pr.catch(function(){});
       }
     }
 
