@@ -1598,15 +1598,26 @@
       height: 100%;
       overflow: visible;
     }
-    /* glass sphere — animated GIF (glass shell + green liquid baked in) */
+    /* glass sphere — animated GIF (glass shell + green liquid baked in).
+       Theme-aware via background-image so only the active theme's GIF
+       loads. Sized ~2× the earlier sphere. */
     .proj-sphere-img {
       position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 62%;
-      height: auto;
+      aspect-ratio: 1 / 1;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
       pointer-events: none;
       user-select: none;
+      /* light theme (default) */
+      background-image: url('tutor-blob-light.gif');
+      width: 164%;
+    }
+    [data-theme="dark"] .proj-sphere-img {
+      background-image: url('tutor-blob-dark.gif');
+      width: 124%;
     }
     .proj-pill {
       position: absolute;
@@ -4835,8 +4846,9 @@
                   <circle cx="190" cy="340" r="6.5" fill="#2E9E5B"/>
                 </svg>
 
-                <!-- glass sphere with animated green liquid blob (clean-edged) -->
-                <img class="proj-sphere-img" src="tutor-blob-dark.gif" alt="" aria-hidden="true" />
+                <!-- glass sphere with animated green liquid blob —
+                     theme-aware: light GIF in light mode, dark GIF in dark mode -->
+                <div class="proj-sphere-img" role="img" aria-label="EverTutor glass blob" aria-hidden="true"></div>
 
                 <!-- tool pills -->
                 <span class="proj-pill proj-pill--analytics">ET Analytics</span>
