@@ -1514,9 +1514,10 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 24px;
-      padding: 52px 56px;
-      min-height: 440px;
+      justify-content: space-between;   /* copy hard-left, orbit hard-right */
+      gap: 40px;
+      padding: 52px 60px;
+      min-height: 460px;
     }
     @media (min-width: 1024px) {
       .proj-card {
@@ -1526,77 +1527,82 @@
       }
     }
 
-    /* LEFT — copy */
-    .proj-copy { flex: 1 1 56%; max-width: 56%; }
+    /* LEFT — copy (premium type, aligned to the design-system scale) */
+    .proj-copy { flex: 0 1 auto; max-width: 460px; min-width: 0; }
+    .proj-kicker {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--grey);
+      margin: 0 0 14px;
+    }
     .proj-title {
       font-family: var(--font-heading);
-      font-weight: 800;
-      font-size: 42px;
-      line-height: 1.04;
-      letter-spacing: -1.2px;
+      font-weight: 700;                 /* matches hero H1 weight */
+      font-size: 30px;                  /* matches hero H1 (.hero-heading) */
+      line-height: 1.12;
+      letter-spacing: -0.8px;
       color: var(--secondary);
-      margin: 0 0 22px;
+      margin: 0 0 16px;
     }
     .proj-desc {
       font-family: var(--font-heading);
-      font-weight: 500;
-      font-size: 21px;
-      line-height: 1.5;
-      letter-spacing: -0.2px;
+      font-weight: 450;
+      font-size: 16px;
+      line-height: 1.72;
+      letter-spacing: -0.1px;
       color: var(--secondary);
       margin: 0;
-      max-width: 30ch;
+      max-width: 40ch;
     }
     .proj-mark {
       font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 0.9em;
+      font-weight: 600;
+      font-size: 0.86em;
       background: var(--primary);
       color: #252525;
-      padding: 0.06em 0.18em;
+      padding: 0.12em 0.3em;
       border-radius: 4px;
       -webkit-box-decoration-break: clone;
       box-decoration-break: clone;
     }
     .proj-meta {
-      margin-top: 54px;
+      margin-top: 34px;
+      padding-top: 26px;
+      border-top: 1px solid rgba(127,127,127,0.16);
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 15px;
     }
     .proj-meta-row {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 18px 40px;
+      gap: 14px 36px;
     }
     .proj-meta-item {
       display: inline-flex;
       align-items: center;
-      gap: 11px;
+      gap: 10px;
       font-family: var(--font-mono);
       font-weight: 500;
-      font-size: 17px;
-      letter-spacing: -0.3px;
+      font-size: 13.5px;
+      letter-spacing: -0.2px;
       color: var(--secondary);
     }
-    .proj-ic { flex-shrink: 0; height: 20px; width: auto; display: block; }
-    .proj-ic--bolt { height: 22px; }
+    .proj-ic { flex-shrink: 0; height: 17px; width: auto; display: block; }
+    .proj-ic--bolt { height: 19px; }
 
     /* RIGHT — orbit visual */
     .proj-orbit {
-      flex: 0 0 380px;
+      flex: 0 0 400px;
       position: relative;
-      width: 380px;
-      height: 380px;
+      width: 400px;
+      height: 400px;
       align-self: center;
-    }
-    .proj-orbit-ring {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      overflow: visible;
     }
     /* glass sphere — animated green liquid blob, theme-aware & optimized.
        Light: transparent WebP background-image. Dark: WebM/MP4 video.
@@ -1604,8 +1610,7 @@
     .proj-sphere-img {
       position: absolute;
       top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 150%;              /* light blob has more canvas padding */
+      width: 110%;              /* light blob has more canvas padding */
       aspect-ratio: 1 / 1;
       background-repeat: no-repeat;
       background-position: center;
@@ -1613,6 +1618,19 @@
       background-image: url('blob-light.webp');   /* light (default) */
       pointer-events: none;
       user-select: none;
+      /* centring stays in `transform`; the breathing uses the independent
+         `scale` property so it can't disturb the clipped video's compositing */
+      transform: translate(-50%, -50%);
+      transform-origin: center center;
+      animation: proj-breathe 6.5s ease-in-out infinite alternate;
+      will-change: scale;
+    }
+    @keyframes proj-breathe {
+      from { scale: 0.9; }
+      to   { scale: 1.1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .proj-sphere-img { animation: none; scale: 1; }
     }
     .proj-sphere-vid {
       display: none;            /* shown only in dark mode */
@@ -1620,27 +1638,50 @@
       height: 100%;
       object-fit: contain;
       /* circle clip so the H.264 fallback (no alpha) never shows a box */
-      clip-path: circle(49.5%);
+      border-radius: 50%;
     }
-    [data-theme="dark"] .proj-sphere-img { background-image: none; width: 64%; }
+    [data-theme="dark"] .proj-sphere-img { background-image: none; width: 48%; }
     [data-theme="dark"] .proj-sphere-vid { display: block; }
-    .proj-pill {
+
+    /* ── orbiting "voice" nodes: green dot + speech bubble w/ tail ──
+       JS positions each element (top/left:0 + transform) and rotates
+       each tail to point back at the blob. */
+    .proj-nodes { position: absolute; inset: 0; }
+    .proj-dot {
       position: absolute;
-      background: var(--secondary);
+      top: 0; left: 0;
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: #2E9E5B;
+      box-shadow: 0 0 0 4px rgba(46,158,91,0.13);
+      will-change: transform;
+    }
+    .proj-bubble {
+      position: absolute;
+      top: 0; left: 0;
+      --bub: var(--secondary);
+      background: var(--bub);
       color: #fff;
       font-family: var(--font-mono);
       font-weight: 500;
-      font-size: 13px;
+      font-size: 12px;
       letter-spacing: -0.2px;
       padding: 7px 14px;
       border-radius: 999px;
       white-space: nowrap;
-      box-shadow: 0 5px 16px rgba(0,0,0,0.14);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+      will-change: transform;
     }
-    [data-theme="dark"] .proj-pill { background: #0E0C09; color: #F0EDE8; }
-    .proj-pill--analytics { top: 17%; left: -6%; }
-    .proj-pill--studio    { top: 17%; right: -6%; }
-    .proj-pill--live      { bottom: -2%; left: 50%; transform: translateX(-50%); }
+    [data-theme="dark"] .proj-bubble { --bub: #0E0C09; color: #F0EDE8; }
+    .proj-tail {
+      position: absolute;
+      top: 0; left: 0;
+      width: 0; height: 0;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left: 9px solid var(--bub);   /* tip points +x; JS rotates toward blob */
+      will-change: transform;
+    }
 
     /* Responsive — stack copy over orbit, drop the sticky pile */
     @media (max-width: 1023px) {
@@ -1656,12 +1697,12 @@
     }
     @media (max-width: 560px) {
       .proj-card-inner { padding: 32px 24px; }
-      .proj-title { font-size: 32px; }
-      .proj-desc { font-size: 18px; max-width: none; }
-      .proj-meta { margin-top: 40px; }
-      .proj-meta-item { font-size: 15px; }
+      .proj-title { font-size: 26px; }
+      .proj-desc { font-size: 15px; max-width: none; }
+      .proj-meta { margin-top: 28px; padding-top: 22px; }
+      .proj-meta-item { font-size: 12.5px; }
       .proj-orbit { flex-basis: 300px; width: 300px; height: 300px; }
-      .proj-pill { font-size: 12px; padding: 6px 12px; }
+      .proj-bubble { font-size: 11px; padding: 6px 12px; }
     }
 
     /* ─── PROJECT STACK — sticky "deal onto a pile" parallax ─────────
@@ -4613,9 +4654,16 @@
     }
     #glassProgressLabel {
       position: absolute; left: 50%; transform: translateX(-50%); bottom: 18px;
-      font-family: var(--font-mono); font-size: 12px; letter-spacing: .3em;
+      display: flex; align-items: baseline; gap: 9px; white-space: nowrap;
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: .18em;
       color: #c9c9c9;
     }
+    #glassStage {
+      text-transform: uppercase; opacity: .82;
+      transition: opacity .35s ease;
+    }
+    #glassDivider { opacity: .4; }
+    #glassCount { color: #fff; letter-spacing: .12em; font-variant-numeric: tabular-nums; }
     #glassProgressTrack {
       height: 4px; width: 100%;
       background: rgba(255, 255, 255, 0.12); overflow: hidden;
@@ -4668,7 +4716,11 @@
     <canvas id="glassCanvas"></canvas>
 
     <div id="glassProgress" aria-hidden="true">
-      <div id="glassProgressLabel"><span id="glassPct">0</span>%</div>
+      <div id="glassProgressLabel">
+        <span id="glassStage">Setting things up</span>
+        <span id="glassDivider">·</span>
+        <span id="glassCount"><span id="glassPct">0</span>%</span>
+      </div>
       <div id="glassProgressTrack"><div id="glassProgressBar"></div></div>
     </div>
   </div>
@@ -4682,6 +4734,7 @@
         if (loader.classList.contains('is-hidden')) return;
         loader.classList.add('is-hidden');
         document.documentElement.classList.remove('glass-loading');
+        try { window.dispatchEvent(new Event('glassloaderhidden')); } catch (e) {}
         setTimeout(function () { loader.style.display = 'none'; }, 950);
       }
       window.__hideGlassLoader = hideGlassLoader;
@@ -4696,19 +4749,91 @@
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!glOK || reduce) document.body.classList.add('no-webgl');
 
-      // Loading bar — fills 0→100% over the 5s hold (runs in every path)
-      var bar = document.getElementById('glassProgressBar');
-      var pctEl = document.getElementById('glassPct');
-      var t0 = performance.now();
-      (function step(now) {
-        var p = Math.min((now - t0) / 5000, 1);
-        if (bar) bar.style.width = (p * 100).toFixed(1) + '%';
-        if (pctEl) pctEl.textContent = Math.round(p * 100);
-        if (p < 1) requestAnimationFrame(step);
-      })(t0);
+      // ── Loading bar — driven by REAL asset preloading ─────────────────
+      var bar     = document.getElementById('glassProgressBar');
+      var pctEl   = document.getElementById('glassPct');
+      var stageEl = document.getElementById('glassStage');
 
-      // Safety net: never leave the loader stuck even if the module fails
-      setTimeout(hideGlassLoader, 5700);
+      var MIN_HOLD = 2800;   // floor so the reveal reads as intentional, not a flash
+      var MAX_HOLD = 6500;   // ceiling — never trap the visitor if a file stalls
+      var t0 = performance.now();
+
+      // stage copy keyed to how far along the load is
+      var STAGES = [
+        [0.00, 'Setting things up'],
+        [0.18, 'Loading assets'],
+        [0.42, 'Preparing visuals'],
+        [0.68, 'Polishing pixels'],
+        [0.88, 'Almost ready'],
+        [1.00, 'Welcome']
+      ];
+      function stageFor(p) {
+        var s = STAGES[0][1];
+        for (var i = 0; i < STAGES.length; i++) if (p >= STAGES[i][0]) s = STAGES[i][1];
+        return s;
+      }
+
+      // preload every image + video poster on the page, counting each one in
+      var assetTarget = 0, assetDone = 0, collected = false;
+      function collect() {
+        if (collected) return; collected = true;
+        var urls = {};
+        var imgs = document.querySelectorAll('img');
+        for (var i = 0; i < imgs.length; i++) {
+          var s = imgs[i].currentSrc || imgs[i].getAttribute('src');
+          if (s) urls[s] = 1;
+        }
+        var vids = document.querySelectorAll('video');
+        for (var j = 0; j < vids.length; j++) {
+          if (vids[j].poster) urls[vids[j].poster] = 1;
+        }
+        var list = Object.keys(urls);
+        assetTarget = list.length;
+        list.forEach(function (u) {
+          var im = new Image(), counted = false;
+          function done() { if (counted) return; counted = true; assetDone++; }
+          im.onload = done; im.onerror = done;
+          im.src = u;
+          if (im.complete) done();   // already cached
+        });
+      }
+
+      var winLoaded = false, fontsReady = false;
+      if (document.readyState !== 'loading') collect();
+      else document.addEventListener('DOMContentLoaded', collect);
+      window.addEventListener('load', function () { winLoaded = true; });
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fontsReady = true; });
+      else fontsReady = true;
+
+      function assetFraction() { return assetTarget ? assetDone / assetTarget : (collected ? 1 : 0); }
+
+      var shown = 0;
+      (function step() {
+        var elapsed  = performance.now() - t0;
+        var assetsIn = collected && assetDone >= assetTarget;
+        var loaded   = fontsReady && (assetsIn || winLoaded);
+        var done     = (loaded && elapsed >= MIN_HOLD) || elapsed >= MAX_HOLD;
+
+        // Time paces a smooth walk through every stage over ~MIN_HOLD, but the
+        // finish is gated: while assets are still in flight we hold below 100%
+        // (rising with how many have landed) so it never says "Welcome" early.
+        var timeProg = Math.min(elapsed / MIN_HOLD, 1);
+        var ceil     = loaded ? 1 : (0.72 + assetFraction() * 0.22);
+        var target   = done ? 1 : Math.min(timeProg, ceil);
+
+        shown += (target - shown) * 0.12;          // ease toward target
+        if (done && shown > 0.99) shown = 1;
+
+        if (bar)     bar.style.width = (shown * 100).toFixed(1) + '%';
+        if (pctEl)   pctEl.textContent = Math.round(shown * 100);
+        if (stageEl) stageEl.textContent = stageFor(shown);
+
+        if (shown >= 1) { hideGlassLoader(); return; }
+        requestAnimationFrame(step);
+      })();
+
+      // hard safety net: never leave the loader stuck even if everything else fails
+      setTimeout(hideGlassLoader, MAX_HOLD + 900);
     })();
   </script>
 
@@ -4808,6 +4933,7 @@
 
               <!-- LEFT: copy -->
               <div class="proj-copy">
+                <span class="proj-kicker">AI Tutoring System</span>
                 <h3 class="proj-title">EverTutor</h3>
                 <p class="proj-desc">World&rsquo;s first <mark class="proj-mark">multi modal 1:1 voice first AI tutor</mark> powered by 3 tools working as one system to create, serve, and measure adaptive tutoring.</p>
 
@@ -4841,15 +4967,7 @@
               </div>
 
               <!-- RIGHT: orbit visual -->
-              <div class="proj-orbit" aria-hidden="true">
-
-                <!-- dashed orbit ring + connection dots -->
-                <svg class="proj-orbit-ring" viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="190" cy="190" r="150" stroke="rgba(130,130,130,0.34)" stroke-width="1.4" stroke-dasharray="3 7"/>
-                  <circle cx="75"  cy="94"  r="6.5" fill="#2E9E5B"/>
-                  <circle cx="305" cy="94"  r="6.5" fill="#2E9E5B"/>
-                  <circle cx="190" cy="340" r="6.5" fill="#2E9E5B"/>
-                </svg>
+              <div class="proj-orbit" id="projOrbit" aria-hidden="true">
 
                 <!-- glass sphere with animated green liquid blob — theme-aware.
                      Light: transparent WebP background. Dark: WebM (VP9 alpha) with
@@ -4861,10 +4979,17 @@
                   </video>
                 </div>
 
-                <!-- tool pills -->
-                <span class="proj-pill proj-pill--analytics">ET Analytics</span>
-                <span class="proj-pill proj-pill--studio">ET Studio</span>
-                <span class="proj-pill proj-pill--live">ET Live</span>
+                <!-- orbiting "voice" nodes: a connection dot + a speech bubble
+                     whose tail always points back at the blob. Positioned and
+                     animated by JS (see PROJECT ORBIT script). -->
+                <div class="proj-nodes" id="projNodes">
+                  <span class="proj-dot"></span>
+                  <span class="proj-dot"></span>
+                  <span class="proj-dot"></span>
+                  <span class="proj-bubble">ET Analytics<i class="proj-tail"></i></span>
+                  <span class="proj-bubble">ET Studio<i class="proj-tail"></i></span>
+                  <span class="proj-bubble">ET Live<i class="proj-tail"></i></span>
+                </div>
 
               </div><!-- /proj-orbit -->
 
@@ -6904,6 +7029,80 @@
 
   })();
 
+  /* ── PROJECT ORBIT — voice bubbles drifting around the blob ───── */
+  (function () {
+    var orbit = document.getElementById('projOrbit');
+    var wrap  = document.getElementById('projNodes');
+    if (!orbit || !wrap) return;
+
+    var dots    = [].slice.call(wrap.querySelectorAll('.proj-dot'));
+    var bubbles = [].slice.call(wrap.querySelectorAll('.proj-bubble'));
+    var tails   = bubbles.map(function (b) { return b.querySelector('.proj-tail'); });
+    if (bubbles.length < 3) return;
+
+    var D2R = Math.PI / 180;
+    // anchors (0 = right, y down): upper-left, upper-right, bottom
+    var ANCHORS = [225 * D2R, 315 * D2R, 90 * D2R];
+    var AMP   = 10 * D2R;   // gentle drift amplitude (arc, not full revolution)
+    var SPEED = 0.6;        // rad/s of the sine driver — slow & premium
+    var PHASE = [0, 2.1, 4.2];
+
+    var reduce = window.matchMedia &&
+                 window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function place(now) {
+      var W = orbit.clientWidth, H = orbit.clientHeight;
+      if (!W) return;
+      var cx = W / 2, cy = H / 2;
+      var Rd = W * 0.36;   // dot radius (just outside the blob)
+      var Rb = W * 0.52;   // bubble-centre radius (clears the blob halo)
+      var t  = now / 1000;
+
+      for (var i = 0; i < 3; i++) {
+        var a  = ANCHORS[i] + (reduce ? 0 : AMP * Math.sin(t * SPEED + PHASE[i]));
+        var ca = Math.cos(a), sa = Math.sin(a);
+
+        dots[i].style.transform =
+          'translate(' + (cx + Rd * ca) + 'px,' + (cy + Rd * sa) + 'px) translate(-50%,-50%)';
+
+        var bx = cx + Rb * ca, by = cy + Rb * sa;
+        var b  = bubbles[i];
+        b.style.transform =
+          'translate(' + bx + 'px,' + by + 'px) translate(-50%,-50%)';
+
+        // tail: sit on the bubble edge nearest the blob, tip pointing inward
+        var bw = b.offsetWidth, bh = b.offsetHeight;
+        var dx = cx - bx, dy = cy - by;
+        var dl = Math.hypot(dx, dy) || 1;
+        var ux = dx / dl, uy = dy / dl;
+        var tX = Math.abs(ux) > 1e-3 ? (bw / 2) / Math.abs(ux) : 1e9;
+        var tY = Math.abs(uy) > 1e-3 ? (bh / 2) / Math.abs(uy) : 1e9;
+        var edge = Math.min(tX, tY);
+        var ex = bw / 2 + ux * edge, ey = bh / 2 + uy * edge;
+        var ang = Math.atan2(uy, ux) / D2R;
+        tails[i].style.transform =
+          'translate(' + ex + 'px,' + ey + 'px) translate(-50%,-50%) rotate(' + ang + 'deg)';
+      }
+    }
+
+    var raf = null, running = false;
+    function loop(now) { place(now); raf = requestAnimationFrame(loop); }
+    function start() { if (!running) { running = true; raf = requestAnimationFrame(loop); } }
+    function stop()  { running = false; if (raf) cancelAnimationFrame(raf); raf = null; }
+
+    place(performance.now());           // first paint + reduced-motion layout
+    if (reduce) return;
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        es[0].isIntersecting ? start() : stop();
+      }, { threshold: 0 }).observe(orbit);
+    } else {
+      start();
+    }
+    window.addEventListener('resize', function () { place(performance.now()); }, { passive: true });
+  })();
+
   /* ── HAMBURGER MENU ──────────────────────────────────────────── */
   (function () {
     const hamburger  = document.getElementById('navHamburger');
@@ -8589,9 +8788,11 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       }
       rafId = requestAnimationFrame(tick);
 
-      // Hand off to the portfolio after 5s, then release the GPU
-      setTimeout(() => { if (window.__hideGlassLoader) window.__hideGlassLoader(); }, 5000);
-      setTimeout(() => {
+      // The preloader owns when we hand off (it hides once assets are in).
+      // Keep the blob rendering until then, release the GPU ~1s after the reveal.
+      let disposed = false;
+      function releaseGPU() {
+        if (disposed) return; disposed = true;
         cancelAnimationFrame(rafId);
         window.removeEventListener('resize', resize);
         window.removeEventListener('pointermove', onPointer);
@@ -8599,7 +8800,9 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         fbo.dispose();
         renderer.dispose();
         pmrem.dispose();
-      }, 6000);
+      }
+      window.addEventListener('glassloaderhidden', () => setTimeout(releaseGPU, 1100));
+      setTimeout(releaseGPU, 8000);   // hard fallback, well past the loader's own cap
     }
   </script>
 
