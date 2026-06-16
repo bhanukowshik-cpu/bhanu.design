@@ -123,12 +123,84 @@
        134px = page padding-top (94) + hero padding-top (40). */
     .hero-screen {
       display: flex;
-      flex-direction: column;
-      gap: 20px;
+      flex-direction: row;
+      gap: 48px;
+      align-items: stretch;
       min-height: calc(100svh - 134px);
       padding-bottom: 86px;
     }
-    .hero-screen .hero-meta { margin-top: auto; }
+    .hero-screen-left {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+    .hero-screen-left .hero-facts { margin-top: auto; }   /* pin facts to the bottom */
+
+    /* ─── HERO FACTS — static label/value block ──────────────── */
+    .hero-facts {
+      display: block;
+      border-top: 1px solid rgba(37,37,37,0.10);
+      padding-top: 18px;
+    }
+    .hfact {
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 52px;
+    }
+    .hfact:last-child { margin-right: 0; }
+    .hfact-k {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(37,37,37,0.42);
+      margin-bottom: 6px;
+    }
+    .hfact-v {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--secondary);
+    }
+
+    /* ─── HERO PHOTOS — vertical auto-scroll carousel (top → bottom) ─ */
+    .hero-photos {
+      flex: 0 0 300px;
+      align-self: stretch;
+      overflow: hidden;
+      border-radius: 18px;
+      position: relative;
+      opacity: 0;
+      transition: opacity 0.8s cubic-bezier(0.22,0.61,0.36,1);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 91%, transparent 100%);
+              mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 91%, transparent 100%);
+    }
+    .hero.hero-revealed .hero-photos { opacity: 1; transition-delay: 0.5s; }
+    .hero-photos-track {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: photo-scroll 30s linear infinite;
+      will-change: transform;
+    }
+    .hero-photos:hover .hero-photos-track { animation-play-state: paused; }
+    .hero-photo {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 14px;
+      display: block;
+    }
+    @keyframes photo-scroll {
+      from { transform: translateY(-50%); }   /* second copy showing */
+      to   { transform: translateY(0);     }  /* drifts downward, seamless */
+    }
 
     /* ─── GREETING / TYPING LINE ─────────────────────────────── */
     .greeting {
@@ -176,9 +248,9 @@
     .hero-heading {
       font-family: var(--font-heading);
       font-weight: 700;
-      font-size: 50px;
-      line-height: 80px;
-      letter-spacing: -1.2px;
+      font-size: 25px;
+      line-height: 36px;
+      letter-spacing: -0.3px;
       color: var(--secondary);
     }
     .hero-heading em {
@@ -225,20 +297,35 @@
     .hv-convert  { color: #1FA34A; }   /* convert — green  */
     .hv-connect  { color: #F2674B; }   /* connect — coral  */
 
-    /* "Scale" wrapped in a Figma-style selection box — gently pulses
-       up & down so the box itself "scales", echoing the word. */
+    /* "Scale" in a Figma-style selection box. A custom cursor grabs the
+       top-right handle and drags it out — the box resizes +10% from its
+       bottom-left anchor, then back. */
     .hv-scale {
       position: relative;
       display: inline-block;
-      transform-origin: center center;
+      transform-origin: left bottom;   /* bottom-left fixed; top-right drags */
       color: #0D99FF;                  /* Figma selection blue */
       margin: 0 12px;
-      animation: hv-scale-pulse 2.4s ease-in-out infinite;
+      animation: scale-resize 2.8s cubic-bezier(0.45,0,0.55,1) infinite;
     }
-    @keyframes hv-scale-pulse {
-      0%, 100% { transform: scale(1);    }
-      50%      { transform: scale(1.12); }
+    @keyframes scale-resize {
+      0%, 16%   { transform: scale(1);   }
+      50%       { transform: scale(1.1); }
+      84%, 100% { transform: scale(1);   }
     }
+    /* the cursor that "holds" the top-right handle */
+    .hv-cursor {
+      position: absolute;
+      top: -2px;
+      right: -8px;
+      width: 15px;
+      height: 15px;
+      transform: translate(70%, -70%);
+      pointer-events: none;
+      z-index: 3;
+      filter: drop-shadow(0 1px 1.5px rgba(0,0,0,0.4));
+    }
+    .hv-cursor svg { width: 100%; height: 100%; display: block; }
     .hv-scale::before {
       content: "";
       position: absolute;
@@ -378,6 +465,7 @@
       .hv-scale { animation: none; }
       .hm-track { animation: none; }
       .hv-ic-convert, .hv-ic-connect { animation: none; }
+      .hero-photos-track { animation: none; }
     }
 
     /* ─── HERO FRAME ────────────────────────────────────────── */
@@ -2083,7 +2171,8 @@
       .hero                { padding: 30px 32px 0; }
       .hero-screen         { min-height: calc(100svh - 104px); }  /* page 74 + hero 30 */
       .hero-content        { gap: 30px; }
-      .hero-heading { font-size: 38px; line-height: 56px; }
+      .hero-heading { font-size: 24px; line-height: 34px; }
+      .hero-photos  { flex-basis: 220px; }
       .photo-wrapper       { width: 260px; height: 250px; }
       .overview-section    { margin: 0 32px; }
       .fw-header           { padding: 0 32px; }
@@ -2110,7 +2199,9 @@
       .hero-screen          { min-height: calc(100svh - 82px); }  /* page 60 + hero 22 */
       .hero-content         { gap: 20px; }
       .greeting             { font-size: 16px; }
-      .hero-heading { font-size: 30px; line-height: 46px; }
+      .hero-heading { font-size: 23px; line-height: 33px; }
+      .hero-screen  { flex-direction: column; gap: 26px; }
+      .hero-photos  { display: none; }
       .hero-subtext         { font-size: 13px; line-height: 24px; }
       .current-badge        { font-size: 13px; padding: 12px 16px; display: flex; align-self: stretch; width: 100%; box-sizing: border-box; white-space: normal; }
       .photo-wrapper        { width: 150px; height: 160px; border-radius: 14px; }
@@ -2164,7 +2255,7 @@
       .hero-content         { flex-direction: column; gap: 0; }
       .photo-wrapper        { order: -1; width: 100%; height: 220px; border-radius: 14px; margin-bottom: 18px; }
       .photo-wrapper img.photo { border-radius: 14px; object-position: top center; }
-      .hero-heading { font-size: 24px; line-height: 34px; }
+      .hero-heading { font-size: 22px; line-height: 32px; }
       .current-badge        { white-space: normal; width: 100%; box-sizing: border-box; }
       .sd-selected          { max-width: calc(16ch + 40px); }
     }
@@ -2173,7 +2264,7 @@
     @media (max-width: 480px) {
       .photo-wrapper        { height: 190px; border-radius: 12px; }
       .photo-wrapper img.photo { border-radius: 12px; }
-      .hero-heading { font-size: 22px; line-height: 32px; }
+      .hero-heading { font-size: 21px; line-height: 30px; }
       .product-area         { height: 220px; }
       .product-area .product-img-live,
       .product-area .product-img-analytics { width: 95%; left: 2.5%; top: 28px; height: auto; }
@@ -3711,6 +3802,8 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.10);
     }
     [data-theme="dark"] .hero-meta .hm-sep { color: #525A15; }
+    [data-theme="dark"] .hero-facts { border-top-color: rgba(255,255,255,0.12); }
+    [data-theme="dark"] .hfact-k     { color: rgba(255,255,255,0.45); }
     [data-theme="dark"] .se-num   { color: #E6F28D; }
     [data-theme="dark"] .se-line  { background: rgba(255, 255, 255, 0.22); }
     [data-theme="dark"] .se-label { color: rgba(255, 255, 255, 0.50); }
@@ -3787,11 +3880,9 @@
     [data-theme="dark"] .top-nav.scrolled .nav-chip { border-color: rgba(240,237,232,0.18); }
     [data-theme="dark"] .nav-chip:hover   { background: rgba(240,237,232,0.05); }
 
-    /* ── Dark card — warm glow lift ─────────────────────────── */
+    /* ── Dark card — flat, no drop shadow ───────────────────── */
     [data-theme="dark"] .card {
-      box-shadow: 0 4px 6px rgba(0,0,0,0.22),
-                  0 12px 40px rgba(0,0,0,0.50),
-                  0 0 0 0.5px rgba(230,242,141,0.06);
+      box-shadow: none;
     }
 
     /* ── Glassy scrolled nav in dark mode (#5) ──────────────── */
@@ -5098,13 +5189,35 @@
         <!-- ── SECTION 1 · home screen: heading + carousel (pinned bottom) ── -->
         <div class="hero-screen">
 
+        <div class="hero-screen-left">
+
         <div class="greeting reveal" id="greeting"><span id="greetingText"></span><span id="lottieWave"></span><span class="cursor"></span></div>
 
         <h1 class="hero-heading reveal">
-          I design for ambiguous and undefined problems &mdash; experiences that Convert, <span class="hv hv-scale">Scale<i class="hv-h tl"></i><i class="hv-h tr"></i><i class="hv-h bl"></i><i class="hv-h br"></i></span>, and Connect through first principles &amp; obsessive detail to craft <span class="tool-cluster" aria-hidden="true"><span class="tool-ic tool-figma"></span><span class="tool-ic tool-claude"></span><span class="tool-ic tool-github"></span></span>
+          I design for ambiguous and undefined problems, experiences that Convert, <span class="hv hv-scale">Scale<i class="hv-h tl"></i><i class="hv-h tr"></i><i class="hv-h bl"></i><i class="hv-h br"></i><span class="hv-cursor" aria-hidden="true"><svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 20 L3 5 L7 8.8 L9.5 3.5 L11.6 4.4 L9.1 9.5 L14.5 9.5 Z" fill="#ffffff" stroke="#222222" stroke-width="1.3" stroke-linejoin="round"/></svg></span></span>, and Connect through first principles &amp; obsessive detail to craft <span class="tool-cluster" aria-hidden="true"><span class="tool-ic tool-figma"></span><span class="tool-ic tool-claude"></span><span class="tool-ic tool-github"></span></span>
         </h1>
 
-        <p class="hero-subtext hero-meta reveal"><span class="hm-track" id="metaTrack"></span></p>
+        <div class="hero-subtext hero-facts reveal">
+          <div class="hfact"><span class="hfact-k">Designing since</span><span class="hfact-v">5+ Years</span></div>
+          <div class="hfact"><span class="hfact-k">Worked in</span><span class="hfact-v">0 to 1, B2B, B2C and SaaS</span></div>
+          <div class="hfact"><span class="hfact-k">Based in</span><span class="hfact-v">San Francisco</span></div>
+        </div>
+
+        </div><!-- /hero-screen-left -->
+
+        <!-- vertical photo carousel (top → bottom), right of section 1 -->
+        <div class="hero-photos" aria-hidden="true">
+          <div class="hero-photos-track">
+            <img class="hero-photo" src="photos/pic-evertutor.jpg" alt="" loading="lazy">
+            <img class="hero-photo" src="photos/pic-rowing.jpg" alt="" loading="lazy">
+            <img class="hero-photo" src="photos/pic-stressie.jpg" alt="" loading="lazy">
+            <img class="hero-photo" src="photos/pic-check.jpg" alt="" loading="lazy">
+            <img class="hero-photo" src="photos/pic-evertutor.jpg" alt="" loading="lazy">
+            <img class="hero-photo" src="photos/pic-rowing.jpg" alt="" loading="lazy">
+            <img class="hero-photo" src="photos/pic-stressie.jpg" alt="" loading="lazy">
+            <img class="hero-photo" src="photos/pic-check.jpg" alt="" loading="lazy">
+          </div>
+        </div>
 
         </div><!-- /hero-screen -->
 
@@ -5134,26 +5247,29 @@
                 <div class="proj-meta">
                   <div class="proj-meta-row">
                     <span class="proj-meta-item">
-                      <svg class="proj-ic" viewBox="0 0 26 23" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                      <svg class="proj-ic proj-ic--light" viewBox="0 0 26 23" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12.9423 14C13.0432 14.0001 13.0432 14.0001 13.1461 14.0002C15.4143 14.007 17.4942 14.488 19.5329 15.4799C19.5852 15.505 19.6375 15.5301 19.6914 15.556C22.2146 16.7807 24.8695 19.0562 25.9922 21.6812C26.0249 22.0421 25.9553 22.3327 25.7702 22.6426C25.4656 22.9211 25.2821 22.9713 24.8669 22.9648C24.5198 22.9356 24.2876 22.7289 24.0544 22.4866C23.9149 22.2951 23.7985 22.093 23.681 21.8876C23.279 21.218 22.8098 20.6413 22.2781 20.0705C22.2224 20.0102 22.2224 20.0102 22.1655 19.9488C19.8482 17.47 16.5103 16.1609 13.1543 16.0437C10.0853 16.0113 7.07819 17.1019 4.75715 19.104C4.69127 19.16 4.62539 19.216 4.55751 19.2736C3.43769 20.249 2.55677 21.4101 1.8003 22.6826C1.58525 22.9263 1.32044 22.966 1.00771 23C0.657636 22.9632 0.501049 22.8763 0.235619 22.6477C-0.0158556 22.2997 -0.0273058 22.0444 0.0253475 21.6366C0.112879 21.2832 0.31307 21.0125 0.523261 20.7198C0.589447 20.6246 0.589447 20.6246 0.65697 20.5276C2.14346 18.4091 3.98492 16.748 6.29125 15.5604C6.3658 15.522 6.3658 15.522 6.44185 15.4828C8.46686 14.4557 10.6801 13.9945 12.9423 14Z" fill="currentColor"/>
                         <circle cx="13" cy="7" r="7" fill="#789F04"/>
                         <circle cx="13" cy="7" r="6" stroke="#465D00" stroke-width="2"/>
                       </svg>
+                      <img class="proj-ic proj-ic--dark" src="ic-profile-dark.svg" alt="" aria-hidden="true" />
                       Sole Product Designer
                     </span>
                     <span class="proj-meta-item">
-                      <img class="proj-ic proj-ic--bolt" src="icon-thunder.svg" alt="" aria-hidden="true" />
+                      <img class="proj-ic proj-ic--bolt proj-ic--light" src="icon-thunder.svg" alt="" aria-hidden="true" />
+                      <img class="proj-ic proj-ic--bolt proj-ic--dark" src="ic-bolt-dark.svg" alt="" aria-hidden="true" />
                       0 to 1 (all 3 tools)
                     </span>
                   </div>
                   <div class="proj-meta-row">
                     <span class="proj-meta-item">
-                      <svg class="proj-ic" viewBox="0 0 29 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                      <svg class="proj-ic proj-ic--light" viewBox="0 0 29 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3 12H11C11.5523 12 12 12.4477 12 13V23H2V13C2 12.4823 2.39333 12.0562 2.89746 12.0049L3 12Z" stroke="currentColor" stroke-width="2"/>
                         <path d="M18 1H26C26.5523 1 27 1.44772 27 2V23H17V2C17 1.48232 17.3933 1.05621 17.8975 1.00488L18 1Z" fill="#789F04"/>
                         <path d="M18 1H26C26.5523 1 27 1.44772 27 2V23H17V2C17 1.48232 17.3933 1.05621 17.8975 1.00488L18 1Z" stroke="#465D00" stroke-width="2"/>
                         <line x1="1" y1="23" x2="28" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                       </svg>
+                      <img class="proj-ic proj-ic--dark" src="ic-bar-dark.svg" alt="" aria-hidden="true" />
                       2000+ Daily Active Users, 96% creation-time cut
                     </span>
                   </div>
