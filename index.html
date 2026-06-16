@@ -1484,6 +1484,193 @@
       line-height: 25px;
     }
 
+    /* ─── PROJECT CARD STACK (new) — parallax pile of project cards ──
+       Replaces the old hero-frame. Each .proj-card sticks beneath the
+       previous one on desktop so they pile up while scrolling. Add more
+       cards with --i:1,2… to extend the stack. */
+    .proj-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      width: 100%;
+    }
+    .proj-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid rgba(37,37,37,0.07);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.6) inset,
+        0 2px 8px rgba(0,0,0,0.03),
+        0 18px 56px rgba(0,0,0,0.05);
+    }
+    [data-theme="dark"] .proj-card {
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.05) inset,
+        0 18px 56px rgba(0,0,0,0.35);
+    }
+    .proj-card-inner {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 24px;
+      padding: 52px 56px;
+      min-height: 440px;
+    }
+    @media (min-width: 1024px) {
+      .proj-card {
+        position: -webkit-sticky;
+        position: sticky;
+        top: calc(96px + var(--i, 0) * 18px);
+      }
+    }
+
+    /* LEFT — copy */
+    .proj-copy { flex: 1 1 56%; max-width: 56%; }
+    .proj-title {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 42px;
+      line-height: 1.04;
+      letter-spacing: -1.2px;
+      color: var(--secondary);
+      margin: 0 0 22px;
+    }
+    .proj-desc {
+      font-family: var(--font-heading);
+      font-weight: 500;
+      font-size: 21px;
+      line-height: 1.5;
+      letter-spacing: -0.2px;
+      color: var(--secondary);
+      margin: 0;
+      max-width: 30ch;
+    }
+    .proj-mark {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.9em;
+      background: var(--primary);
+      color: #252525;
+      padding: 0.06em 0.18em;
+      border-radius: 4px;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+    .proj-meta {
+      margin-top: 54px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .proj-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 18px 40px;
+    }
+    .proj-meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 17px;
+      letter-spacing: -0.3px;
+      color: var(--secondary);
+    }
+    .proj-ic { flex-shrink: 0; color: var(--secondary); }
+    .proj-ic--bolt { color: #6FB23A; }
+
+    /* RIGHT — orbit visual */
+    .proj-orbit {
+      flex: 0 0 380px;
+      position: relative;
+      width: 380px;
+      height: 380px;
+      align-self: center;
+    }
+    .proj-orbit-ring {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+    .proj-sphere {
+      position: absolute;
+      top: 23%; left: 23%;
+      width: 53%; height: 53%;
+      border-radius: 50%;
+      overflow: hidden;
+      background: radial-gradient(130% 130% at 32% 24%,
+        rgba(255,255,255,0.72), rgba(255,255,255,0.08) 42%,
+        rgba(120,150,135,0.12) 100%);
+      box-shadow:
+        inset 0 3px 10px rgba(255,255,255,0.85),
+        inset 0 -14px 30px rgba(70,115,90,0.22),
+        inset 0 0 0 1px rgba(255,255,255,0.5),
+        0 20px 44px rgba(40,80,60,0.18);
+      backdrop-filter: blur(1px);
+      -webkit-backdrop-filter: blur(1px);
+    }
+    .proj-blob {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      filter: blur(3px);
+    }
+    .proj-sphere-gloss {
+      position: absolute;
+      top: 7%; left: 11%;
+      width: 56%; height: 40%;
+      border-radius: 50%;
+      background: radial-gradient(100% 100% at 30% 20%,
+        rgba(255,255,255,0.9), rgba(255,255,255,0) 70%);
+      pointer-events: none;
+    }
+    .proj-pill {
+      position: absolute;
+      background: var(--secondary);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: -0.2px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+      box-shadow: 0 5px 16px rgba(0,0,0,0.14);
+    }
+    [data-theme="dark"] .proj-pill { background: #0E0C09; color: #F0EDE8; }
+    .proj-pill--analytics { top: 17%; left: -6%; }
+    .proj-pill--studio    { top: 17%; right: -6%; }
+    .proj-pill--live      { bottom: -2%; left: 50%; transform: translateX(-50%); }
+
+    /* Responsive — stack copy over orbit, drop the sticky pile */
+    @media (max-width: 1023px) {
+      .proj-card-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 40px;
+        padding: 40px 36px;
+        min-height: 0;
+      }
+      .proj-copy { flex: 1 1 auto; max-width: 100%; }
+      .proj-orbit { align-self: center; }
+    }
+    @media (max-width: 560px) {
+      .proj-card-inner { padding: 32px 24px; }
+      .proj-title { font-size: 32px; }
+      .proj-desc { font-size: 18px; max-width: none; }
+      .proj-meta { margin-top: 40px; }
+      .proj-meta-item { font-size: 15px; }
+      .proj-orbit { flex-basis: 300px; width: 300px; height: 300px; }
+      .proj-pill { font-size: 12px; padding: 6px 12px; }
+    }
+
     /* ─── PROJECT STACK — sticky "deal onto a pile" parallax ─────────
        The case-study cards pile up: each scrolls up and lands on TOP of
        the previous one, which stays pinned behind it with a thin peeking
@@ -1526,6 +1713,27 @@
         height: auto;          /* stretch to the taller (left) column */
         align-self: stretch;
         flex-shrink: 0;
+        /* vertically + horizontally centre the media in the tall panel */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* media was absolutely anchored at top:60px — make it a flex item so
+         the flex centring above takes over (tags-bar/glow stay absolute) */
+      .cs-stack .product-area .product-img-live,
+      .cs-stack .product-area .product-img-analytics,
+      .cs-stack .product-area .product-video,
+      .cs-stack .product-area .stressie-phones-row {
+        position: relative;
+        top: auto;
+        left: auto;
+        margin: 0;
+      }
+      /* the video + phone-row are now centred by flex, so cancel the JS
+         translateX(-50%) (it would otherwise double-shift them left) */
+      .cs-stack .product-area .product-video,
+      .cs-stack .product-area .stressie-phones-row {
+        transform: none !important;
       }
     }
 
@@ -4594,85 +4802,79 @@
           I design systems that make learning feel personal. Built <strong>EverTutor</strong> from zero. 2,000+ students, 2× academic growth, shipped in under a year.
         </p>
 
-        <div class="hero-frame reveal" id="heroFrame">
+        <!-- ── PROJECT CARD STACK — parallax pile of project cards ──────
+             Cards stack on top of each other on scroll (sticky pile).
+             Currently one card (EverTutor); add siblings with --i:1,2…
+             to grow the stack. Old hero-frame / sticky-note JS is kept
+             but self-guards (returns early when #stickyStack is absent). -->
+        <div class="proj-stack" id="projStack">
 
-          <!-- Hidden pills for JS compatibility -->
-          <div class="hf-pill" id="hfPill0" aria-hidden="true"><span class="hf-pill-text"></span></div>
-          <div class="hf-pill" id="hfPill1" aria-hidden="true"><span class="hf-pill-text"></span></div>
-          <div class="hf-pill" id="hfPill2" aria-hidden="true"><span class="hf-pill-text"></span></div>
-          <div class="hf-pill" id="hfPill3" aria-hidden="true"><span class="hf-pill-text"></span></div>
+          <!-- ── EverTutor ────────────────────────────────────────── -->
+          <article class="proj-card" id="projEverTutor" style="--i:0">
+            <div class="proj-card-inner">
 
-          <!-- LEFT: sticky note stack -->
-          <div class="hf-left">
+              <!-- LEFT: copy -->
+              <div class="proj-copy">
+                <h3 class="proj-title">EverTutor</h3>
+                <p class="proj-desc">World&rsquo;s first <mark class="proj-mark">multi modal 1:1 voice first AI tutor</mark> powered by 3 tools working as one system to create, serve, and measure adaptive tutoring.</p>
 
-            <!-- Hand-drawn label -->
-            <div class="hf-projects-label">
-              <span class="hf-projects-text">Selected Projects</span>
-              <svg class="hf-projects-arrow" width="28" height="54" viewBox="0 0 28 54" fill="none" overflow="visible" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14 2 C12 14 10 28 14 46" stroke="rgba(37,37,37,0.32)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-                <path d="M14 46 L8 37" stroke="rgba(37,37,37,0.32)" stroke-width="1.6" stroke-linecap="round"/>
-                <path d="M14 46 L20 37" stroke="rgba(37,37,37,0.32)" stroke-width="1.6" stroke-linecap="round"/>
-              </svg>
-            </div>
-
-            <div class="sticky-stack" id="stickyStack">
-
-              <!-- Back · stone -->
-              <div class="sticky-note sn-stone" id="sn-back">
-                <div class="sn-content">
-                  <div class="sn-title">Dearly</div>
-                  <div class="sn-rule"></div>
-                  <div class="sn-body">A quieter, more personal way to send notes online.<br><br>Built and launched solo in 48 hours. Designed, coded, and shipped.</div>
+                <div class="proj-meta">
+                  <div class="proj-meta-row">
+                    <span class="proj-meta-item">
+                      <svg class="proj-ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7.5" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>
+                      Sole Product Designer
+                    </span>
+                    <span class="proj-meta-item">
+                      <svg class="proj-ic proj-ic--bolt" width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 13.5h6L9 22l9-12h-6z"/></svg>
+                      0 to 1 (all 3 tools)
+                    </span>
+                  </div>
+                  <div class="proj-meta-row">
+                    <span class="proj-meta-item">
+                      <svg class="proj-ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V10M10 21V4M16 21v-7"/><path d="M2 21h18"/></svg>
+                      2000+ Daily Active Users, 96% creation-time cut
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <!-- Mid · blue -->
-              <div class="sticky-note sn-blue" id="sn-mid">
-                <div class="sn-content">
-                  <div class="sn-title">Stressie</div>
-                  <div class="sn-rule"></div>
-                  <div class="sn-body">Designing calmer workplace experiences through behavioral health systems.<br><br>Piloted with Amazon &amp; InKind. Unlocked $600K in funding.</div>
+              <!-- RIGHT: orbit visual -->
+              <div class="proj-orbit" aria-hidden="true">
+
+                <!-- dashed orbit ring + connection dots -->
+                <svg class="proj-orbit-ring" viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="190" cy="190" r="150" stroke="rgba(130,130,130,0.34)" stroke-width="1.4" stroke-dasharray="3 7"/>
+                  <circle cx="75"  cy="94"  r="6.5" fill="#2E9E5B"/>
+                  <circle cx="305" cy="94"  r="6.5" fill="#2E9E5B"/>
+                  <circle cx="190" cy="340" r="6.5" fill="#2E9E5B"/>
+                </svg>
+
+                <!-- glass sphere with green liquid blob -->
+                <div class="proj-sphere">
+                  <svg class="proj-blob" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="projBlobGrad" x1="60" y1="30" x2="130" y2="180" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#3FB873"/>
+                        <stop offset="0.55" stop-color="#1F8A4C"/>
+                        <stop offset="1" stop-color="#136336"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M104 28 C140 36 150 74 132 104 C122 122 138 150 116 168 C96 184 72 172 70 146 C68 122 50 110 58 82 C64 56 78 22 104 28 Z" fill="url(#projBlobGrad)"/>
+                  </svg>
+                  <span class="proj-sphere-gloss"></span>
                 </div>
-              </div>
 
-              <!-- Front · yellow -->
-              <div class="sticky-note sn-warm" id="sn-top">
-                <div class="sn-content">
-                  <div class="sn-title">EverTutor</div>
-                  <div class="sn-rule"></div>
-                  <div class="sn-body sn-body--lg">An adaptive AI tutor that personalizes to each learner in real time.<br><br>Led the design of 3 interconnected tools <span class="sn-bracket">(ET Studio, ET Live &amp; ET Analytics)</span> that work together to power the full tutoring experience.</div>
-                </div>
-              </div>
+                <!-- tool pills -->
+                <span class="proj-pill proj-pill--analytics">ET Analytics</span>
+                <span class="proj-pill proj-pill--studio">ET Studio</span>
+                <span class="proj-pill proj-pill--live">ET Live</span>
 
-            </div><!-- /sticky-stack -->
-          </div><!-- /hf-left -->
+              </div><!-- /proj-orbit -->
 
-          <!-- RIGHT: dynamic panel -->
-          <div class="hf-right">
-            <div class="hf-section-label">Selected Impact</div>
-            <div class="hf-impact-list" id="hfImpactList">
-              <div class="hf-metric">
-                <div class="hf-metric-headline" id="hfMH0"></div>
-                <div class="hf-metric-sub"      id="hfMS0"></div>
-              </div>
-              <div class="hf-metric">
-                <div class="hf-metric-headline" id="hfMH1"></div>
-                <div class="hf-metric-sub"      id="hfMS1"></div>
-              </div>
-              <div class="hf-metric">
-                <div class="hf-metric-headline" id="hfMH2"></div>
-                <div class="hf-metric-sub"      id="hfMS2"></div>
-              </div>
-            </div>
-            <a id="hfCta" href="#csCardLive" class="hf-cta-link">
-              <span id="hfCtaLabel">Explore System</span> <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-            <div class="hf-block-gap"></div>
-            <div class="hf-section-label">My Role</div>
-            <div class="hf-role-pills" id="hfRolePills"></div>
-          </div><!-- /hf-right -->
+            </div><!-- /proj-card-inner -->
+          </article><!-- /proj-card EverTutor -->
 
-        </div><!-- /hero-frame -->
+        </div><!-- /proj-stack -->
 
       </div><!-- /hero -->
 
@@ -5149,8 +5351,8 @@
 
     revealEls.forEach(el => revealObs.observe(el));
 
-    // ── Hero frame — reveal on intersection ──────────────────────
-    const heroFrame = document.getElementById('heroFrame');
+    // ── Hero frame / project stack — reveal on intersection ──────
+    const heroFrame = document.getElementById('projStack');
     if (heroFrame) {
       heroFrame.style.opacity    = '0';
       heroFrame.style.transform  = 'translateY(32px)';
