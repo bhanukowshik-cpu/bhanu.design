@@ -1598,27 +1598,32 @@
       height: 100%;
       overflow: visible;
     }
-    /* glass sphere — animated GIF (glass shell + green liquid baked in).
-       Theme-aware via background-image so only the active theme's GIF
-       loads. Sized ~2× the earlier sphere. */
+    /* glass sphere — animated green liquid blob, theme-aware & optimized.
+       Light: transparent WebP background-image. Dark: WebM/MP4 video.
+       Only the active theme's asset is fetched. */
     .proj-sphere-img {
       position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
+      width: 150%;              /* light blob has more canvas padding */
       aspect-ratio: 1 / 1;
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
+      background-image: url('blob-light.webp');   /* light (default) */
       pointer-events: none;
       user-select: none;
-      /* light theme (default) */
-      background-image: url('tutor-blob-light.gif');
-      width: 164%;
     }
-    [data-theme="dark"] .proj-sphere-img {
-      background-image: url('tutor-blob-dark.gif');
-      width: 64%;  /* this GIF's orb nearly fills its canvas (little padding) */
+    .proj-sphere-vid {
+      display: none;            /* shown only in dark mode */
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      /* circle clip so the H.264 fallback (no alpha) never shows a box */
+      clip-path: circle(49.5%);
     }
+    [data-theme="dark"] .proj-sphere-img { background-image: none; width: 64%; }
+    [data-theme="dark"] .proj-sphere-vid { display: block; }
     .proj-pill {
       position: absolute;
       background: var(--secondary);
@@ -4846,9 +4851,15 @@
                   <circle cx="190" cy="340" r="6.5" fill="#2E9E5B"/>
                 </svg>
 
-                <!-- glass sphere with animated green liquid blob —
-                     theme-aware: light GIF in light mode, dark GIF in dark mode -->
-                <div class="proj-sphere-img" role="img" aria-label="EverTutor glass blob" aria-hidden="true"></div>
+                <!-- glass sphere with animated green liquid blob — theme-aware.
+                     Light: transparent WebP background. Dark: WebM (VP9 alpha) with
+                     an H.264 MP4 fallback (circle-clipped so Safari shows no box). -->
+                <div class="proj-sphere-img" role="img" aria-label="EverTutor glass blob" aria-hidden="true">
+                  <video class="proj-sphere-vid" autoplay muted loop playsinline preload="auto">
+                    <source src="blob-dark.webm" type="video/webm" />
+                    <source src="blob-dark.mp4" type="video/mp4" />
+                  </video>
+                </div>
 
                 <!-- tool pills -->
                 <span class="proj-pill proj-pill--analytics">ET Analytics</span>
@@ -7048,6 +7059,12 @@
       } else {
         root.setAttribute('data-theme', theme);
         try { localStorage.setItem(KEY, theme); } catch(e) {}
+      }
+      /* the dark-mode blob video is display:none until dark — kick playback
+         when it becomes visible (autoplay can be skipped while hidden) */
+      if (theme === 'dark') {
+        var blobVid = document.querySelector('.proj-sphere-vid');
+        if (blobVid) { var pr = blobVid.play(); if (pr && pr.catch) pr.catch(function(){}); }
       }
     }
 
