@@ -11,7 +11,7 @@
   <title>Bhanu · Product Designer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Montserrat:ital,wght@0,400;0,600;0,700;1,600&family=JetBrains+Mono:wght@400;500;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=JetBrains+Mono:wght@400;500;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 
   <style>
@@ -39,17 +39,17 @@
     }
 
     [data-theme="dark"] {
-      --bg:           #16140F;
-      --white:        #1E1C17;
+      --bg:           #252525;
+      --white:        #1E1E1E;
       --secondary:    #F0EDE8;
       --grey:         #999999;
-      --border:       #302C24;
-      --surface:      #252018;
-      --surface-alt:  #2C2820;
-      --surface-warm: #332E26;
-      --dot-color:    rgba(255, 255, 255, 0.13);
-      --nav-bg:       rgba(22, 20, 15, 0.94);
-      --nav-bg-sc:    rgba(22, 20, 15, 0.72);
+      --border:       #3A3A3A;
+      --surface:      #2C2C2C;
+      --surface-alt:  #303030;
+      --surface-warm: #353535;
+      --dot-color:    rgba(255, 255, 255, 0.10);
+      --nav-bg:       rgba(37, 37, 37, 0.94);
+      --nav-bg-sc:    rgba(37, 37, 37, 0.72);
     }
 
     html { scroll-behavior: smooth; }
@@ -106,6 +106,30 @@
       justify-content: flex-start;
     }
 
+    /* ─── SCROLL-SNAP SECTIONS — one screen at a time ────────── */
+    html {
+      scroll-snap-type: y proximity;
+      scroll-padding-top: 80px;          /* land sections below the fixed nav */
+    }
+    /* Hero is NOT a snap target — it's naturally correct at scroll 0, and
+       snapping it would pull the page down on load (exposing section 2). */
+    .section-eyebrow,
+    .section-divider,
+    .about-section,
+    .site-footer { scroll-snap-align: start; }
+
+    /* Section 1 fills the viewport: heading at the top, carousel pinned to
+       the bottom (clearance left for the chat bar).
+       134px = page padding-top (94) + hero padding-top (40). */
+    .hero-screen {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: calc(100svh - 134px);
+      padding-bottom: 86px;
+    }
+    .hero-screen .hero-meta { margin-top: auto; }
+
     /* ─── GREETING / TYPING LINE ─────────────────────────────── */
     .greeting {
       font-family: var(--font-mono);
@@ -152,9 +176,9 @@
     .hero-heading {
       font-family: var(--font-heading);
       font-weight: 700;
-      font-size: 30px;
-      line-height: 1.15;
-      letter-spacing: -0.8px;
+      font-size: 50px;
+      line-height: 80px;
+      letter-spacing: -1.2px;
       color: var(--secondary);
     }
     .hero-heading em {
@@ -194,6 +218,166 @@
     .hero-subtext strong {
       font-weight: 600;
       color: rgba(0,0,0,0.65);
+    }
+
+    /* ─── HERO VERBS — Convert / Scale / Connect ─────────────── */
+    .hv          { font-weight: 700; white-space: nowrap; }
+    .hv-convert  { color: #1FA34A; }   /* convert — green  */
+    .hv-connect  { color: #F2674B; }   /* connect — coral  */
+
+    /* "Scale" wrapped in a Figma-style selection box — gently pulses
+       up & down so the box itself "scales", echoing the word. */
+    .hv-scale {
+      position: relative;
+      display: inline-block;
+      transform-origin: center center;
+      color: #0D99FF;                  /* Figma selection blue */
+      margin: 0 12px;
+      animation: hv-scale-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes hv-scale-pulse {
+      0%, 100% { transform: scale(1);    }
+      50%      { transform: scale(1.12); }
+    }
+    .hv-scale::before {
+      content: "";
+      position: absolute;
+      inset: -2px -8px;
+      border: 1.6px solid #0D99FF;
+      border-radius: 2px;
+      pointer-events: none;
+    }
+    .hv-h {                            /* corner handle — mirrors .sd-handle */
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--surface);
+      border: 1.6px solid #0D99FF;
+      border-radius: 1px;
+      z-index: 1;
+    }
+    .hv-h.tl { top: -2px;    left: -8px;  transform: translate(-50%, -50%); }
+    .hv-h.tr { top: -2px;    right: -8px; transform: translate(50%, -50%);  }
+    .hv-h.bl { bottom: -2px; left: -8px;  transform: translate(-50%, 50%);  }
+    .hv-h.br { bottom: -2px; right: -8px; transform: translate(50%, 50%);   }
+
+    /* Accent groups sit inside a word-clip (overflow:hidden) — let their
+       boxes / icons / pop-scale show and skip the word-rise so nothing clips. */
+    .word-clip:has(.hv-scale),
+    .word-clip:has(.hv-grp),
+    .word-clip:has(.tool-cluster)             { overflow: visible; }
+    .word-clip:has(.hv-scale) .word-inner,
+    .word-clip:has(.hv-grp) .word-inner,
+    .word-clip:has(.tool-cluster) .word-inner { transform: none !important; }
+
+    /* ─── HERO VERB ICONS — Convert ✓ / Connect 🔗 ───────────── */
+    .hv-grp { white-space: nowrap; }
+    .hv-ic {
+      height: 0.72em;
+      width: auto;
+      vertical-align: middle;
+      margin-left: 0.16em;
+      transform-origin: center center;
+    }
+    /* "payment confirmation" spring-pop, looped on a gentle cadence */
+    .hv-ic-convert { animation: confirm-pop 4s ease-in-out infinite;      }
+    .hv-ic-connect { animation: confirm-pop 4s ease-in-out infinite 2s;   }
+    @keyframes confirm-pop {
+      0%, 64%, 100% { transform: scale(1);    }
+      72%           { transform: scale(1.22); }
+      82%           { transform: scale(0.90); }
+      91%           { transform: scale(1.06); }
+    }
+
+    /* ─── TRAILING TOOL TILES — Figma / Claude / GitHub ──────── */
+    .tool-cluster { white-space: nowrap; margin-left: 0.22em; }
+    .tool-ic {
+      display: inline-block;
+      width: 0.74em;
+      height: 0.74em;
+      vertical-align: middle;
+      margin-left: 0.1em;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    .tool-figma  { background-image: url('hero-icons/figma.svg');  }
+    .tool-claude { background-image: url('hero-icons/claude.svg'); }
+    .tool-github { background-image: url('hero-icons/github.svg'); }
+    [data-theme="dark"] .tool-figma  { background-image: url('hero-icons/figma-dark.svg');  }
+    [data-theme="dark"] .tool-claude { background-image: url('hero-icons/claude-dark.svg'); }
+    [data-theme="dark"] .tool-github { background-image: url('hero-icons/github-dark.svg'); }
+
+    /* ─── SECTION EYEBROW — 01 ──── SELECTED WORK ────────────── */
+    .section-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 16px 0 2px;
+      font-family: var(--font-mono);
+    }
+    .se-num {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #6F7E15;
+    }
+    .se-line {
+      width: 48px;
+      height: 1px;
+      background: rgba(37,37,37,0.22);
+    }
+    .se-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(37,37,37,0.45);
+    }
+
+    /* ─── HERO META STRIP — right→left marquee ───────────────── */
+    .hero-meta {
+      color: rgba(37,37,37,0.60);
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: 0.01em;
+      padding: 20px 0;                 /* band: 20px top/bottom, text centered */
+      overflow: hidden;                /* clip the scrolling track */
+      -webkit-mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
+              mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
+    }
+    .hm-track {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      width: max-content;
+      white-space: nowrap;
+      animation: hm-marquee 40s linear infinite;
+      will-change: transform;
+    }
+    .hm-track:hover { animation-play-state: paused; }
+    @keyframes hm-marquee {
+      from { transform: translateX(0);     }
+      to   { transform: translateX(-50%);  }
+    }
+    .hero-meta .hm-item { white-space: nowrap; }
+    .hero-meta .hm-sep {
+      display: inline-flex;
+      align-items: center;
+      color: #AEBC48;
+      margin: 0 11px;
+      vertical-align: middle;
+      position: relative;
+      top: -1px;
+      flex-shrink: 0;
+    }
+    .hero-meta .hm-sep svg { width: 15px; height: 15px; }
+
+    /* Respect reduced-motion: stop the pulse + marquee */
+    @media (prefers-reduced-motion: reduce) {
+      .hv-scale { animation: none; }
+      .hm-track { animation: none; }
+      .hv-ic-convert, .hv-ic-connect { animation: none; }
     }
 
     /* ─── HERO FRAME ────────────────────────────────────────── */
@@ -1543,20 +1727,19 @@
       font-size: 20px;
       line-height: 35px;
       letter-spacing: -0.2px;
-      color: var(--secondary);
+      color: #747474;
       margin: 0;
       max-width: 32ch;
     }
     .proj-mark {
-      font-family: var(--font-mono);
-      font-weight: 600;
-      font-size: 0.9em;
-      background: #789F04;              /* brand highlight */
-      color: #fff;
-      padding: 0.1em 0.28em;
-      border-radius: 4px;
-      -webkit-box-decoration-break: clone;
-      box-decoration-break: clone;
+      font-family: var(--font-heading);
+      font-weight: 500;                 /* medium */
+      font-style: italic;
+      background: none;
+      color: #252525;                   /* dark phrase on light card */
+    }
+    [data-theme="dark"] .proj-mark {
+      color: #fff;                      /* white phrase on dark card */
     }
     .proj-meta {
       margin-top: 44px;
@@ -1582,6 +1765,10 @@
     }
     .proj-ic { flex-shrink: 0; height: 24px; width: auto; display: block; }
     .proj-ic--bolt { height: 26px; }
+    /* theme-aware meta icons: light cuts by default, dark-theme cuts in dark */
+    .proj-ic--dark { display: none; }
+    [data-theme="dark"] .proj-ic--light { display: none; }
+    [data-theme="dark"] .proj-ic--dark  { display: block; }
 
     /* RIGHT — orbit visual: fills the remaining space and centres a
        fixed-size stage so the bubbles can revolve in full circles
@@ -1615,19 +1802,8 @@
       aspect-ratio: 1 / 1;
       pointer-events: none;
       user-select: none;
-      /* centring stays in `transform`; breathing uses the independent
-         `scale` property so it can't disturb the clipped video compositing */
+      /* fixed size — no breathing/scaling (kept static for a calmer, premium feel) */
       transform: translate(-50%, -50%);
-      transform-origin: center center;
-      animation: proj-breathe 6.5s ease-in-out infinite alternate;
-      will-change: scale;
-    }
-    @keyframes proj-breathe {
-      from { scale: 0.9; }
-      to   { scale: 1.1; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .proj-sphere-img { animation: none; scale: 1; }
     }
     .proj-sphere-vid {
       position: absolute;
@@ -1905,8 +2081,9 @@
       .page                { padding: 74px 20px 70px; }
       .card                { gap: 24px; padding-bottom: 36px; border-radius: 20px; }
       .hero                { padding: 30px 32px 0; }
+      .hero-screen         { min-height: calc(100svh - 104px); }  /* page 74 + hero 30 */
       .hero-content        { gap: 30px; }
-      .hero-heading { font-size: 30px; line-height: 44px; }
+      .hero-heading { font-size: 38px; line-height: 56px; }
       .photo-wrapper       { width: 260px; height: 250px; }
       .overview-section    { margin: 0 32px; }
       .fw-header           { padding: 0 32px; }
@@ -1930,9 +2107,10 @@
       .page                 { padding: 60px 12px 56px; }
       .card                 { gap: 20px; padding-bottom: 28px; border-radius: 16px; }
       .hero                 { padding: 22px 20px 0; gap: 16px; }
+      .hero-screen          { min-height: calc(100svh - 82px); }  /* page 60 + hero 22 */
       .hero-content         { gap: 20px; }
       .greeting             { font-size: 16px; }
-      .hero-heading { font-size: 26px; line-height: 38px; }
+      .hero-heading { font-size: 30px; line-height: 46px; }
       .hero-subtext         { font-size: 13px; line-height: 24px; }
       .current-badge        { font-size: 13px; padding: 12px 16px; display: flex; align-self: stretch; width: 100%; box-sizing: border-box; white-space: normal; }
       .photo-wrapper        { width: 150px; height: 160px; border-radius: 14px; }
@@ -3518,6 +3696,24 @@
     [data-theme="dark"] .hero-subtext strong {
       color: rgba(240, 237, 232, 0.85);
     }
+    [data-theme="dark"] .hv-convert       { color: #84BF86; }
+    [data-theme="dark"] .hv-connect       { color: #FB9393; }
+    [data-theme="dark"] .hv-scale         { color: #0F8EDD; }
+    [data-theme="dark"] .hv-scale::before { border-color: #0F8EDD; }
+    [data-theme="dark"] .hv-h             { border-color: #0F8EDD; }
+
+    /* Carousel as a framed band in dark mode (252525 = page bg, so the
+       hairlines define the frame); white-80% text, olive stars. */
+    [data-theme="dark"] .hero-meta {
+      background: #252525;
+      color: rgba(255, 255, 255, 0.80);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+    }
+    [data-theme="dark"] .hero-meta .hm-sep { color: #525A15; }
+    [data-theme="dark"] .se-num   { color: #E6F28D; }
+    [data-theme="dark"] .se-line  { background: rgba(255, 255, 255, 0.22); }
+    [data-theme="dark"] .se-label { color: rgba(255, 255, 255, 0.50); }
     [data-theme="dark"] .current-badge {
       border-color: var(--border);
     }
@@ -4899,29 +5095,25 @@
       <!-- HERO -->
       <div class="hero">
 
+        <!-- ── SECTION 1 · home screen: heading + carousel (pinned bottom) ── -->
+        <div class="hero-screen">
+
         <div class="greeting reveal" id="greeting"><span id="greetingText"></span><span id="lottieWave"></span><span class="cursor"></span></div>
 
         <h1 class="hero-heading reveal">
-          Product Designer <span class="hero-hi">moving</span> numbers and people<span class="hero-transform-graphic" aria-hidden="true"><svg width="200" height="34" viewBox="0 0 200 34" fill="none" overflow="visible" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;position:relative;top:-5px">
-  <defs>
-    <filter id="hgGray" color-interpolation-filters="sRGB">
-      <feColorMatrix type="saturate" values="0"/>
-    </filter>
-    <clipPath id="heroAvatarClip">
-      <rect x="86" y="-7" width="48" height="48" rx="6"/>
-    </clipPath>
-  </defs>
-  <!-- Wide ball: loops span x:-6→74, symmetric ±~16px around y=17 -->
-  <path d="M4,17 C10,-2 28,-14 46,-6 C64,2 66,24 50,36 C34,48 10,46 2,32 C-6,18 -2,-4 14,-10 C30,-16 58,-6 62,12 C66,30 56,46 36,46 C16,46 4,30 6,16 C8,2 22,-4 36,4 C50,12 54,30 44,38 C34,46 20,44 16,32 C12,20 18,8 28,8 C38,8 46,18 48,30 C50,42 56,36 64,28 C70,22 74,19 110,17 L2000,17" stroke="#252525" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Avatar: B&W, face centered, rounded corners, 48×48, centered at x=110 -->
-  <image href="photo.jpg" x="86" y="-7" width="48" height="48" clip-path="url(#heroAvatarClip)" preserveAspectRatio="xMidYMid slice" filter="url(#hgGray)"/>
-  <rect x="86" y="-7" width="48" height="48" rx="6" fill="none" stroke="rgba(0,0,0,0.10)" stroke-width="1"/>
-</svg></span>
+          I design for ambiguous and undefined problems &mdash; experiences that Convert, <span class="hv hv-scale">Scale<i class="hv-h tl"></i><i class="hv-h tr"></i><i class="hv-h bl"></i><i class="hv-h br"></i></span>, and Connect through first principles &amp; obsessive detail to craft <span class="tool-cluster" aria-hidden="true"><span class="tool-ic tool-figma"></span><span class="tool-ic tool-claude"></span><span class="tool-ic tool-github"></span></span>
         </h1>
 
-        <p class="hero-subtext reveal">
-          I design systems that make learning feel personal. Built <strong>EverTutor</strong> from zero. 2,000+ students, 2× academic growth, shipped in under a year.
-        </p>
+        <p class="hero-subtext hero-meta reveal"><span class="hm-track" id="metaTrack"></span></p>
+
+        </div><!-- /hero-screen -->
+
+        <!-- ── SECTION HEADING — 01 / Selected Work ─────────────────── -->
+        <div class="section-eyebrow">
+          <span class="se-num">01</span>
+          <span class="se-line"></span>
+          <span class="se-label">Selected Work</span>
+        </div>
 
         <!-- ── PROJECT CARD STACK — parallax pile of project cards ──────
              Cards stack on top of each other on scroll (sticky pile).
@@ -5439,6 +5631,17 @@
         lw.appendChild(li);
         subtext.appendChild(lw);
       }
+    })();
+
+    /* ── Hero meta marquee — duplicate items so translateX(-50%) loops
+          seamlessly (each half is an identical run of the same set). ── */
+    (function setupHeroMetaMarquee() {
+      const track = document.getElementById('metaTrack');
+      if (!track) return;
+      const STAR = '<span class="hm-sep" aria-hidden="true"><svg viewBox="0 0 21 21" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M10.5 1.5 Q12.99 4.51 16.86 4.14 Q16.51 8.01 19.5 10.5 Q16.51 12.99 16.86 16.86 Q12.99 16.49 10.5 19.5 Q8.01 16.49 4.14 16.86 Q4.49 12.99 1.5 10.5 Q4.49 8.01 4.14 4.14 Q8.01 4.51 10.5 1.5 Z"/></svg></span>';
+      const items = ['5+ years of experience', '0 to 1 &nbsp;|&nbsp; B2B &nbsp;|&nbsp; B2C &nbsp;|&nbsp; SaaS', 'Design Systems', 'Based in San Francisco'];
+      const set = items.map(t => `<span class="hm-item">${t}</span>${STAR}`).join('');
+      track.innerHTML = set.repeat(6); // 6 = two identical halves of 3 sets each
     })();
 
     // ── Hero entrance — fires immediately, no loader to wait for ────────
@@ -7100,17 +7303,9 @@
     function start() { if (!running) { running = true; raf = requestAnimationFrame(loop); } }
     function stop()  { running = false; if (raf) cancelAnimationFrame(raf); raf = null; }
 
-    place(performance.now());           // first paint + reduced-motion layout
-    if (reduce) return;
-
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (es) {
-        es[0].isIntersecting ? start() : stop();
-      }, { threshold: 0 }).observe(stage);
-    } else {
-      start();
-    }
-    window.addEventListener('resize', function () { place(performance.now()); }, { passive: true });
+    // Static placement only — bubbles no longer revolve (animation removed).
+    place(0);
+    window.addEventListener('resize', function () { place(0); }, { passive: true });
   })();
 
   /* ── HAMBURGER MENU ──────────────────────────────────────────── */
@@ -7343,7 +7538,7 @@
 
     function dotColor() {
       return document.documentElement.getAttribute('data-theme') === 'dark'
-        ? 'rgba(255,255,255,0.18)'
+        ? 'rgba(255,255,255,0.10)'
         : 'rgba(0,0,0,0.22)';
     }
 
