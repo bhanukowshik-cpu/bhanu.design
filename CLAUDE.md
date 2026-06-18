@@ -2,6 +2,8 @@
 
 ## ⚠️ CRITICAL — Read This First, Every Session
 
+### On the Mac (iMac / MacBook at /Users/bhanu/Desktop/Portfolio)
+
 **All edits MUST go to the worktree, not the main Portfolio folder.**
 
 The live server at `http://localhost:8080` serves files from this exact path:
@@ -17,6 +19,27 @@ The live server at `http://localhost:8080` serves files from this exact path:
 **Never edit** `/Users/bhanu/Desktop/Portfolio/index.html` (the main file) — changes there will NOT appear on localhost:8080.
 
 Before touching any file, confirm you are reading/writing the worktree path above.
+
+---
+
+### On Windows (or any new machine)
+
+The worktree above is Mac-only. On Windows, clone the repo and **edit the main files directly**:
+
+```
+git clone https://github.com/bhanukowshik-cpu/bhanu.design.git
+cd bhanu.design
+python -m http.server 8080
+```
+
+**Edit these files directly** (no worktree):
+- `index.html`
+- `evertutor-live.html`
+- `stressie-studio.html`
+
+The live server at `http://localhost:8080` will serve from the cloned folder root.
+
+**Before starting on Windows:** confirm the path to `index.html` exists and edit only that path — do NOT use any Mac worktree path.
 
 ---
 
