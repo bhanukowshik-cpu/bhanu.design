@@ -2,29 +2,20 @@
 
 ## ⚠️ CRITICAL — Read This First, Every Session
 
-### On the Mac (iMac / MacBook at /Users/bhanu/Desktop/Portfolio)
+The live server at `http://localhost:8080` serves files from the **main repo folder**.
 
-**All edits MUST go to the worktree, not the main Portfolio folder.**
+### On Mac (`/Users/bhanu/Desktop/Portfolio`)
 
-The live server at `http://localhost:8080` serves files from this exact path:
-```
-/Users/bhanu/Desktop/Portfolio/.claude/worktrees/reverent-faraday-a80749/
-```
+**Edit these files directly:**
+- `/Users/bhanu/Desktop/Portfolio/index.html`
+- `/Users/bhanu/Desktop/Portfolio/evertutor-live.html`
+- `/Users/bhanu/Desktop/Portfolio/stressie-studio.html`
 
-**Always edit these worktree files:**
-- `/Users/bhanu/Desktop/Portfolio/.claude/worktrees/reverent-faraday-a80749/index.html`
-- `/Users/bhanu/Desktop/Portfolio/.claude/worktrees/reverent-faraday-a80749/evertutor-live.html`
-- `/Users/bhanu/Desktop/Portfolio/.claude/worktrees/reverent-faraday-a80749/stressie-studio.html`
-
-**Never edit** `/Users/bhanu/Desktop/Portfolio/index.html` (the main file) — changes there will NOT appear on localhost:8080.
-
-Before touching any file, confirm you are reading/writing the worktree path above.
-
----
+The worktree at `.claude/worktrees/reverent-faraday-a80749/` is no longer the active server root — **do not edit worktree files**.
 
 ### On Windows (or any new machine)
 
-The worktree above is Mac-only. On Windows, clone the repo and **edit the main files directly**:
+Clone the repo and edit the main files directly:
 
 ```
 git clone https://github.com/bhanukowshik-cpu/bhanu.design.git
@@ -32,14 +23,12 @@ cd bhanu.design
 python -m http.server 8080
 ```
 
-**Edit these files directly** (no worktree):
+**Edit these files directly:**
 - `index.html`
 - `evertutor-live.html`
 - `stressie-studio.html`
 
-The live server at `http://localhost:8080` will serve from the cloned folder root.
-
-**Before starting on Windows:** confirm the path to `index.html` exists and edit only that path — do NOT use any Mac worktree path.
+**Before starting on any machine:** confirm which folder the server is running from (`lsof -p <PID> | grep cwd` on Mac, or check your terminal's working directory). Edit only files in that folder.
 
 ---
 
@@ -75,9 +64,9 @@ Always confirm the current state of the file before making changes. Read the rel
 
 ## What This Project Is
 
-A single-file static portfolio. All HTML + CSS + JS lives in one file. Changes are live at `http://localhost:8080` (served from the worktree above).
+A single-file static portfolio. All HTML + CSS + JS lives in one file. Changes are live at `http://localhost:8080` (served from the repo root).
 
-Key files (all under the worktree path):
+Key files (all in the repo root):
 - `index.html` — the homepage (primary file)
 - `evertutor-live.html` — EverTutor case study
 - `evertutor-studio.html` — EverTutor Studio case study
