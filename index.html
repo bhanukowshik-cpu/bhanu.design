@@ -36,6 +36,9 @@
       --dot-color:    rgba(0, 0, 0, 0.13);
       --nav-bg:       rgba(255, 252, 248, 0.92);
       --nav-bg-sc:    rgba(255, 252, 248, 0.78);
+      /* Grain texture */
+      --noise-opacity: 0.10;
+      --noise-blend:   multiply;
     }
 
     [data-theme="dark"] {
@@ -50,6 +53,9 @@
       --dot-color:    rgba(255, 255, 255, 0.10);
       --nav-bg:       rgba(37, 37, 37, 0.94);
       --nav-bg-sc:    rgba(37, 37, 37, 0.72);
+      /* Grain texture — off in dark mode so bg stays true #1E1E1E */
+      --noise-opacity: 0;
+      --noise-blend:   screen;
     }
 
     html { scroll-behavior: smooth; }
@@ -75,7 +81,7 @@
     .page {
       display: flex;
       justify-content: center;
-      padding: 94px 24px 90px;
+      padding: 94px 10% 90px;
       position: relative;
       z-index: 1;
     }
@@ -83,9 +89,10 @@
     /* ─── MAIN CARD ──────────────────────────────────────────── */
     .card {
       position: relative;
+      isolation: isolate;
       background: var(--white);
       width: 100%;
-      max-width: 1200px;
+      max-width: 1920px;
       border-radius: 30px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 12px 40px rgba(0,0,0,0.10);
       overflow: clip;
@@ -94,6 +101,20 @@
       gap: 27px;
       padding-top: 0;       /* hero gets its own top padding via .hero padding-top */
       padding-bottom: 50px;
+    }
+
+    /* Grain layer pinned behind all card content */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 200px 200px;
+      opacity: var(--noise-opacity);
+      mix-blend-mode: var(--noise-blend);
     }
 
     /* ─── HERO SECTION ───────────────────────────────────────── */
@@ -122,84 +143,272 @@
        the bottom (clearance left for the chat bar).
        134px = page padding-top (94) + hero padding-top (40). */
     .hero-screen {
-      display: flex;
-      flex-direction: row;
-      gap: 48px;
-      align-items: stretch;
+      position: relative;
+      display: grid;
+      grid-template-columns: 4fr 1fr;   /* 80% text column / 20% photo column */
       min-height: calc(100svh - 134px);
-      padding-bottom: 86px;
+      padding-bottom: 96px;
     }
+    /* Bottom-centre bloom gradient clipped to section 1 */
+    .hero-screen::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 240px;
+      background:
+        radial-gradient(ellipse 65% 100% at 50% 100%, rgba(230,242,141,0.30) 0%, transparent 70%),
+        linear-gradient(to top, rgba(230,242,141,0.12) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* ─── SCROLL PROGRESS BAR — top of page ───────────────── */
+    .scroll-progress {
+      position: fixed;
+      top: 0; left: 0;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(to right, #E6F28D, rgba(230,242,141,0.6));
+      z-index: 9999;
+      transform-origin: left;
+      transition: width 0.1s linear;
+      pointer-events: none;
+    }
+    .scroll-progress::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0;
+      width: 40px; height: 100%;
+      background: inherit;
+      filter: blur(4px);
+      opacity: 0.8;
+    }
+    [data-theme="dark"] .scroll-progress {
+      background: linear-gradient(to right, #E6F28D, rgba(230,242,141,0.5));
+    }
+
     .hero-screen-left {
-      flex: 1 1 auto;
       min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 22px;
+      align-self: center;               /* vertically center text in grid row */
     }
-    .hero-screen-left .hero-facts { margin-top: auto; }   /* pin facts to the bottom */
+    .hero-screen-left .hero-facts { margin-top: 14px; }   /* reduced to pull pill up, clearing hero-foot */
 
-    /* ─── HERO FACTS — static label/value block ──────────────── */
+    /* ─── HERO FACTS — bordered glass panel (matches Figma) ──── */
     .hero-facts {
-      display: block;
-      border-top: 1px solid rgba(37,37,37,0.10);
-      padding-top: 18px;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      align-self: flex-start;
+      gap: 88px;
+      border-radius: 20px;
+      padding: 22px 30px;
+      background: rgba(255,252,248,0.80);
+      border: 1px solid rgba(37,37,37,0.12);
+      position: relative;
     }
+    [data-theme="dark"] .hero-facts {
+      background: linear-gradient(180deg, #262626 0%, #1E1E1E 100%);
+      border: none;
+    }
+    [data-theme="dark"] .hero-facts::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      padding: 1px;
+      background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.10) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* ─── HERO CTA BUTTONS — frosted glass + colour bloom at bottom ── */
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .hero-cta {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 14px 30px;
+      border-radius: 999px;
+      overflow: hidden;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      /* glass: subtle dark tint */
+      background: rgba(0,0,0,0.06);
+      color: #252525;
+      box-shadow:
+        inset 1.5px 2px 3px rgba(255,255,255,0.80),
+        inset 0 0 0 1px rgba(0,0,0,0.10);
+      backdrop-filter: blur(10px) saturate(150%);
+      -webkit-backdrop-filter: blur(10px) saturate(150%);
+      transition: transform 0.18s cubic-bezier(0.16,1,0.3,1),
+                  box-shadow 0.18s cubic-bezier(0.16,1,0.3,1);
+    }
+    .hero-cta:hover::before { top: -10%; filter: blur(6px); }
+    .hero-cta:hover {
+      transform: scale(1.06);
+      box-shadow:
+        inset 1.5px 2px 3px rgba(255,255,255,1),
+        inset 0 0 0 1px rgba(255,255,255,0.40),
+        0 0 16px 4px rgba(230,242,141,0.50),
+        0 0 36px 10px rgba(230,242,141,0.26);
+    }
+    .hero-cta:active { transform: scale(0.94); }
+
+    /* coloured disc — clipped at the bottom by overflow:hidden */
+    .hero-cta::before {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      left: 50%;
+      top: 5%;
+      width: 230%;
+      aspect-ratio: 1 / 1;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      filter: blur(8px);
+      will-change: top, filter;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transition: top 0.35s cubic-bezier(0.34,1.2,0.64,1), filter 0.25s ease;
+    }
+    .hero-cta-primary::before  { background: #E6F28D; opacity: 0.85; }
+    .hero-cta-secondary::before { background: #A8D8FF; opacity: 0.80; }
+
+    /* dark mode: flip to white-tinted glass */
+    [data-theme="dark"] .hero-cta {
+      background: rgba(255,255,255,0.14);
+      color: #252525;
+      box-shadow:
+        inset 1.5px 2px 3px rgba(255,255,255,0.95),
+        inset 0 0 0 1px rgba(255,255,255,0.30);
+    }
+    [data-theme="dark"] .hero-cta-primary::before  { opacity: 0.90; }
+    [data-theme="dark"] .hero-cta-secondary::before { opacity: 0.85; }
+    /* dark-mode hover: higher specificity so it beats the dark base rule */
+    [data-theme="dark"] .hero-cta:hover {
+      transform: scale(1.06);
+      box-shadow:
+        inset 1.5px 2px 3px rgba(255,255,255,1),
+        inset 0 0 0 1px rgba(255,255,255,0.40),
+        0 0 16px 4px rgba(230,242,141,0.50),
+        0 0 36px 10px rgba(230,242,141,0.26);
+    }
+    [data-theme="dark"] .hero-cta:hover::before { top: -10%; filter: blur(6px); }
+    [data-theme="dark"] .hero-cta:active { transform: scale(0.94); }
     .hfact {
-      display: inline-block;
-      vertical-align: top;
-      margin-right: 52px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
     }
-    .hfact:last-child { margin-right: 0; }
     .hfact-k {
       display: block;
       font-family: var(--font-mono);
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 500;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: rgba(37,37,37,0.42);
-      margin-bottom: 6px;
+      white-space: nowrap;
+      color: #525252;
     }
     .hfact-v {
       display: block;
       font-family: var(--font-mono);
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 500;
       color: var(--secondary);
     }
 
-    /* ─── HERO PHOTOS — vertical auto-scroll carousel (top → bottom) ─ */
+    /* ─── HERO PHOTOS — 20% grid column, photos positioned inside it ─── */
     .hero-photos {
-      flex: 0 0 300px;
-      align-self: stretch;
-      overflow: hidden;
-      border-radius: 18px;
-      position: relative;
+      position: relative;               /* polaroids are absolute within this column */
+      pointer-events: none;
+      z-index: 2;
       opacity: 0;
-      transition: opacity 0.8s cubic-bezier(0.22,0.61,0.36,1);
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 91%, transparent 100%);
-              mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 91%, transparent 100%);
+      overflow: visible;                /* allow rotate to bleed slightly */
+      transition: opacity 0.9s cubic-bezier(0.22,0.61,0.36,1);
     }
-    .hero.hero-revealed .hero-photos { opacity: 1; transition-delay: 0.5s; }
-    .hero-photos-track {
+    .hero.hero-revealed .hero-photos { opacity: 1; transition-delay: 0.45s; }
+    .polaroid {
+      position: absolute;
+      width: clamp(145px, 11vw, 188px);
+      opacity: 1;
+    }
+    /* 3-photo zigzag */
+    .polaroid.p1 { left: 5%;  top: 3%;  z-index: 1; transform: rotate(-5deg); }
+    .polaroid.p2 { left: 30%; top: 38%; z-index: 2; transform: rotate(4deg);  }
+    .polaroid.p3 { left: 5%;  top: 73%; z-index: 3; transform: rotate(-3deg); }
+    .polaroid.p4 { display: none; }
+    /* 4-photo cascade on bigger screens — tighter spread to fit 4 */
+    @media (min-width: 1600px) {
+      .polaroid.p1 { top: 2%;  }
+      .polaroid.p2 { top: 38%; }
+      .polaroid.p3 { top: 70%; }
+      .polaroid.p4 { display: block; left: -70%; top: 78%; z-index: 4; transform: rotate(3deg); }
+    }
+    .pc {
+      display: block;
+      background: #f2f2f2;
+      padding: 5px 5px 5px;
+      border-radius: 4px;
+      box-shadow: none;
+    }
+    .pc img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      object-position: top center;
+      border-radius: 2px;
+    }
+    .pc-cap {
+      display: block;
+      margin-top: 7px;
+      font-family: 'Caveat', cursive;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 1;
+      text-align: center;
+      color: #252525;
+      white-space: nowrap;
+    }
+    /* ── MOBILE POLAROID CAROUSEL ─────────────────────────────── */
+    .hero-carousel {
+      display: none; /* desktop: hidden */
+    }
+    .hero-carousel-track {
       display: flex;
-      flex-direction: column;
-      gap: 16px;
-      animation: photo-scroll 30s linear infinite;
+      gap: 22px;
+      width: max-content;
+      animation: hero-carousel-scroll 38s linear infinite;
       will-change: transform;
     }
-    .hero-photos:hover .hero-photos-track { animation-play-state: paused; }
-    .hero-photo {
-      width: 100%;
-      aspect-ratio: 4 / 5;
-      object-fit: cover;
-      object-position: center;
-      border-radius: 14px;
-      display: block;
+    .hero-carousel-wrap {
+      flex-shrink: 0;
+      transform: rotate(var(--r, 0deg));
     }
-    @keyframes photo-scroll {
-      from { transform: translateY(-50%); }   /* second copy showing */
-      to   { transform: translateY(0);     }  /* drifts downward, seamless */
+    .hero-carousel-wrap .pc {
+      width: 120px;
+    }
+    @keyframes hero-carousel-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @keyframes pfloat {
+      0%, 100% { transform: translateY(0);    }
+      50%      { transform: translateY(-9px); }
     }
 
     /* ─── GREETING / TYPING LINE ─────────────────────────────── */
@@ -248,10 +457,13 @@
     .hero-heading {
       font-family: var(--font-heading);
       font-weight: 700;
-      font-size: 25px;
-      line-height: 36px;
-      letter-spacing: -0.3px;
+      font-size: 30px;
+      line-height: 48px;
+      letter-spacing: -0.5px;
       color: var(--secondary);
+    }
+    @media (min-width: 1600px) {
+      .hero-heading { font-size: 40px; line-height: 60px; }
     }
     .hero-heading em {
       font-family: var(--font-heading);
@@ -293,53 +505,35 @@
     }
 
     /* ─── HERO VERBS — Convert / Scale / Connect ─────────────── */
-    .hv          { font-weight: 700; white-space: nowrap; }
+    .hv          { font-family: var(--font-mono); font-weight: 700; white-space: nowrap; }
     .hv-convert  { color: #1FA34A; }   /* convert — green  */
     .hv-connect  { color: #F2674B; }   /* connect — coral  */
 
-    /* "Scale" in a Figma-style selection box. A custom cursor grabs the
-       top-right handle and drags it out — the box resizes +10% from its
-       bottom-left anchor, then back. */
+    /* "Scale" in a static Figma-style selection box: blue border, corner
+       handles, and a custom cursor resting on the top-right handle. */
     .hv-scale {
       position: relative;
       display: inline-block;
       transform-origin: left bottom;   /* bottom-left fixed; top-right drags */
       color: #0D99FF;                  /* Figma selection blue */
       margin: 0 12px;
-      animation: scale-resize 2.8s cubic-bezier(0.45,0,0.55,1) infinite;
-    }
-    @keyframes scale-resize {
-      0%, 16%   { transform: scale(1);   }
-      50%       { transform: scale(1.1); }
-      84%, 100% { transform: scale(1);   }
     }
     /* the cursor that "holds" the top-right handle */
-    .hv-cursor {
-      position: absolute;
-      top: -2px;
-      right: -8px;
-      width: 15px;
-      height: 15px;
-      transform: translate(70%, -70%);
-      pointer-events: none;
-      z-index: 3;
-      filter: drop-shadow(0 1px 1.5px rgba(0,0,0,0.4));
-    }
-    .hv-cursor svg { width: 100%; height: 100%; display: block; }
+    .hv-cursor { display: none; }
     .hv-scale::before {
       content: "";
       position: absolute;
       inset: -2px -8px;
-      border: 1.6px solid #0D99FF;
+      border: 2px solid #0D99FF;
       border-radius: 2px;
       pointer-events: none;
     }
-    .hv-h {                            /* corner handle — mirrors .sd-handle */
+    .hv-h {                            /* corner handle — white fill, blue border */
       position: absolute;
-      width: 6px;
-      height: 6px;
-      background: var(--surface);
-      border: 1.6px solid #0D99FF;
+      width: 9px;
+      height: 9px;
+      background: #ffffff;
+      border: 2px solid #0D99FF;
       border-radius: 1px;
       z-index: 1;
     }
@@ -366,9 +560,8 @@
       margin-left: 0.16em;
       transform-origin: center center;
     }
-    /* "payment confirmation" spring-pop, looped on a gentle cadence */
-    .hv-ic-convert { animation: confirm-pop 4s ease-in-out infinite;      }
-    .hv-ic-connect { animation: confirm-pop 4s ease-in-out infinite 2s;   }
+    .hv-ic-convert { animation: none; }
+    .hv-ic-connect { animation: none; }
     @keyframes confirm-pop {
       0%, 64%, 100% { transform: scale(1);    }
       72%           { transform: scale(1.22); }
@@ -380,10 +573,10 @@
     .tool-cluster { white-space: nowrap; margin-left: 0.22em; }
     .tool-ic {
       display: inline-block;
-      width: 0.74em;
-      height: 0.74em;
+      width: 55.78px;
+      height: 55.78px;
       vertical-align: middle;
-      margin-left: 0.1em;
+      margin-left: 6px;
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
@@ -465,7 +658,7 @@
       .hv-scale { animation: none; }
       .hm-track { animation: none; }
       .hv-ic-convert, .hv-ic-connect { animation: none; }
-      .hero-photos-track { animation: none; }
+      .pc { animation: none; }
     }
 
     /* ─── HERO FRAME ────────────────────────────────────────── */
@@ -810,7 +1003,11 @@
     }
     .hero.hero-revealed .hero-li { transform: translateY(0); }
     .hero.hero-revealed #greeting,
-    .hero.hero-revealed .hero-subtext { opacity: 1 !important; animation: none !important; }
+    .hero.hero-revealed .hero-subtext,
+    .hero.hero-revealed .hero-ctas { opacity: 1 !important; animation: none !important; }
+    /* hero-facts pill: JS wraps .hfact items in a block .hero-li — override to flex so row layout works */
+    .hero-facts .hero-lw { display: flex; }
+    .hero-facts .hero-li { display: flex; flex-direction: row; gap: 48px; align-items: flex-start; }
 
     /* Hero frame: float up after words land */
     .hero.hero-revealed .hero-frame {
@@ -1215,7 +1412,11 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 0;
+      background: #141414;
+      border-radius: 100px;
+      padding: 4px;
+      position: relative;
     }
 
     /* ─── HAMBURGER ──────────────────────────────────────────── */
@@ -1304,6 +1505,15 @@
       white-space: nowrap;
       text-decoration: none;
       transition: opacity 0.3s ease, transform 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav-wave {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
     }
     .top-nav.scrolled .nav-logo {
       opacity: 0;
@@ -1348,19 +1558,75 @@
       align-items: center;
       justify-content: center;
       padding: 5px 15px;
-      border-radius: 5px;
+      border-radius: 100px;
       font-family: var(--font-mono);
       font-weight: 500;
       font-size: 12px;
-      color: var(--secondary);
+      color: rgba(255, 255, 255, 0.55);
       text-decoration: none;
       text-transform: uppercase;
       white-space: nowrap;
-      transition: background 0.15s ease;
+      transition: color 0.2s ease;
+      position: relative;
+      z-index: 1;
     }
     .nav-work:hover {
-      background: var(--surface-alt);
+      color: rgba(255, 255, 255, 0.9);
     }
+    .nav-work.nav-active {
+      color: #ffffff;
+    }
+    .nav-work::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 18px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.55) 0%, transparent 70%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.22s ease;
+    }
+    .nav-work:not(.nav-active):hover::after {
+      opacity: 1;
+    }
+    .nav-indicator {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 4px;
+      width: 60px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px) saturate(150%);
+      -webkit-backdrop-filter: blur(10px) saturate(150%);
+      border: none;
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow:
+        inset 1.5px 2px 3px rgba(255, 255, 255, 0.38),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+      transition: left 0.32s cubic-bezier(0.22, 0.61, 0.36, 1),
+                  width 0.32s cubic-bezier(0.22, 0.61, 0.36, 1),
+                  opacity 0.25s ease;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .nav-indicator::before {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      left: 50%;
+      top: 35%;
+      width: 150%;
+      aspect-ratio: 1 / 1;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.22);
+      filter: blur(8px);
+    }
+    .nav-indicator.visible { opacity: 1; }
 
     /* ── scrolled nav chip ── */
     .nav-chip {
@@ -2142,10 +2408,10 @@
 
     /* ── Large desktop: wider card, scaled sections ─────────────── */
     @media (min-width: 1600px) {
-      .card                { max-width: 1280px; }
+      /* card uses base max-width: 1920px — no cap here */
     }
     @media (min-width: 1440px) {
-      .card                { max-width: 1300px; }
+      /* card uses base max-width: 1920px — fills the viewport */
       .product-area        { height: 500px; }
       .hero-frame          { min-height: 460px; }
       .sticky-stack        { width: 444px; height: 444px; }
@@ -2166,13 +2432,23 @@
     /* ── Tablet: 768px – 1023px ──────────────────────────────── */
     @media (max-width: 1023px) {
       .top-nav             { padding: 8px 24px; }
-      .page                { padding: 74px 20px 70px; }
+      .page                { padding: 74px 10% 70px; }
       .card                { gap: 24px; padding-bottom: 36px; border-radius: 20px; }
       .hero                { padding: 30px 32px 0; }
       .hero-screen         { min-height: calc(100svh - 104px); }  /* page 74 + hero 30 */
       .hero-content        { gap: 30px; }
-      .hero-heading { font-size: 24px; line-height: 34px; }
-      .hero-photos  { flex-basis: 220px; }
+      .hero-heading { font-size: 26px; line-height: 36px; }
+      .hero-screen  { grid-template-columns: 1fr; } /* text fills full width — no photo column */
+      .hero-screen-left { max-width: 100%; }
+      .hero-facts   { max-width: 100%; }
+      .hero-photos  { display: none; }
+      .hero-carousel {
+        display: block;
+        overflow: hidden;
+        padding: 28px 0 10px;
+        -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+        mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+      }
       .photo-wrapper       { width: 260px; height: 250px; }
       .overview-section    { margin: 0 32px; }
       .fw-header           { padding: 0 32px; }
@@ -2193,13 +2469,13 @@
     @media (max-width: 767px) {
       .hero-transform-graphic { display: none; }
       .top-nav              { padding: 8px 16px; height: 50px; }
-      .page                 { padding: 60px 12px 56px; }
+      .page                 { padding: 60px 5% 56px; }
       .card                 { gap: 20px; padding-bottom: 28px; border-radius: 16px; }
       .hero                 { padding: 22px 20px 0; gap: 16px; }
       .hero-screen          { min-height: calc(100svh - 82px); }  /* page 60 + hero 22 */
       .hero-content         { gap: 20px; }
       .greeting             { font-size: 16px; }
-      .hero-heading { font-size: 23px; line-height: 33px; }
+      .hero-heading { font-size: 24px; line-height: 34px; }
       .hero-screen  { flex-direction: column; gap: 26px; }
       .hero-photos  { display: none; }
       .hero-subtext         { font-size: 13px; line-height: 24px; }
@@ -2264,7 +2540,7 @@
     @media (max-width: 480px) {
       .photo-wrapper        { height: 190px; border-radius: 12px; }
       .photo-wrapper img.photo { border-radius: 12px; }
-      .hero-heading { font-size: 21px; line-height: 30px; }
+      .hero-heading { font-size: 20px; line-height: 30px; }
       .product-area         { height: 220px; }
       .product-area .product-img-live,
       .product-area .product-img-analytics { width: 95%; left: 2.5%; top: 28px; height: auto; }
@@ -3792,6 +4068,10 @@
     [data-theme="dark"] .hv-scale         { color: #0F8EDD; }
     [data-theme="dark"] .hv-scale::before { border-color: #0F8EDD; }
     [data-theme="dark"] .hv-h             { border-color: #0F8EDD; }
+    /* hero text on dark background — crisp near-white per Figma */
+    [data-theme="dark"] .hero-heading { color: #F5F5F7; }
+    [data-theme="dark"] .greeting     { color: #F5F5F7; }
+    [data-theme="dark"] .hfact-v      { color: #F5F5F7; }
 
     /* Carousel as a framed band in dark mode (252525 = page bg, so the
        hairlines define the frame); white-80% text, olive stars. */
@@ -3879,6 +4159,11 @@
     [data-theme="dark"] .nav-chip         { color: var(--secondary); }
     [data-theme="dark"] .top-nav.scrolled .nav-chip { border-color: rgba(240,237,232,0.18); }
     [data-theme="dark"] .nav-chip:hover   { background: rgba(240,237,232,0.05); }
+    [data-theme="dark"] .nav-links        { background: rgba(255,255,255,0.08); box-shadow: 0 0 0 1px rgba(255,255,255,0.07); }
+    [data-theme="dark"] .nav-work         { color: rgba(255,255,255,0.45); }
+    [data-theme="dark"] .nav-work:hover   { color: rgba(255,255,255,0.8); }
+    [data-theme="dark"] .nav-work.nav-active { color: #ffffff; }
+    [data-theme="dark"] .nav-indicator    { background: rgba(255,255,255,0.06); box-shadow: inset 1.5px 2px 3px rgba(255,255,255,0.30), inset 0 0 0 1px rgba(255,255,255,0.10); }
 
     /* ── Dark card — flat, no drop shadow ───────────────────── */
     [data-theme="dark"] .card {
@@ -3949,8 +4234,8 @@
     ══════════════════════════════════════════════════════════ */
 
     /* Page shift when chat opens */
-    .page { transition: padding-right 0.55s cubic-bezier(0.16,1,0.3,1); }
-    body.chat-open .page { padding-right: 440px; }
+    .page { transition: padding-right 0.55s cubic-bezier(0.16,1,0.3,1), padding-left 0.55s cubic-bezier(0.16,1,0.3,1); }
+    body.chat-open .page { padding-right: 420px; padding-left: 20px; }
 
     /* ── Floating bar wrapper — shrink-to-fits the bar (width:max-content) and
        centers with margin-inline:auto. NOT transform: translateX(-50%): Safari
@@ -4113,7 +4398,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      height: 58px;
+      height: 63px;
       width: 52px; /* intro: photo-only; JS adds .bar-revealed */
       cursor: text;
       /* collapse (this is the destination state when .expanded is removed):
@@ -4123,11 +4408,11 @@
         height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
         border-radius 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .cb.bar-revealed { width: 480px; }
+    .cb.bar-revealed { width: 614px; }
     /* expand: springy overshoot for tactile feel */
     .cb.expanded {
-      width: 620px;
-      height: 212px;
+      width: 792px;
+      height: 252px;
       border-radius: 28px;
       transition:
         width  0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -4143,7 +4428,7 @@
       align-items: center;
       gap: 10px;
       padding: 0 11px;
-      height: 58px;
+      height: 63px;
       width: 100%;
       flex-shrink: 0;
       transition: padding 0.4s ease;
@@ -4154,8 +4439,8 @@
       display: flex;
       flex-wrap: wrap;
       align-content: flex-start;
-      gap: 8px;
-      padding: 18px 20px 0;
+      gap: 12px 6px;
+      padding: 10px 18px 10px;
       opacity: 0;
       transform: translateY(6px);
       pointer-events: none;
@@ -4165,27 +4450,27 @@
     }
     .cb.expanded .cb-hints { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .cb-hints-title {
-      flex-basis: 100%;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 9.5px;
-      font-weight: 600;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.32);
-      margin-bottom: 4px;
+      display: block;
+      width: 100%;
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 10px;
+      letter-spacing: 0.01em;
     }
     .cb-hint {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 10px;
-      padding: 7px 13px;
+      gap: 6px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      padding: 6px 11px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11.5px;
+      font-size: 15px;
       line-height: 1;
-      color: rgba(255,255,255,0.62);
+      color: rgba(255,255,255,0.52);
       cursor: pointer;
       white-space: nowrap;
       transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s cubic-bezier(0.34,1.2,0.64,1);
@@ -4193,7 +4478,7 @@
     /* leading dot — turns lime on hover as a focus cue */
     .cb-hint::before {
       content: '';
-      width: 4px; height: 4px;
+      width: 3px; height: 3px;
       border-radius: 50%;
       background: rgba(255,255,255,0.28);
       flex-shrink: 0;
@@ -4274,7 +4559,11 @@
       caret-color: var(--cb-caret-color, rgba(255,255,255,0.6));
       transition: color 0.25s ease, opacity 0.3s ease;
     }
-    .cb-input::placeholder { color: var(--cb-placeholder, rgba(255,255,255,0.4)); }
+    .cb-input::placeholder { color: var(--cb-placeholder, rgba(255,255,255,0.4)); font-family: 'JetBrains Mono', monospace; }
+    @keyframes cb-ph-out { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes cb-ph-in  { from { opacity: 0; } to { opacity: 1; } }
+    .cb-input.ph-hiding::placeholder  { animation: cb-ph-out 0.28s ease forwards; }
+    .cb-input.ph-showing::placeholder { animation: cb-ph-in  0.28s ease forwards; }
 
     /* send button — slides in left→right when text present */
     /* frosted-glass "Ask" CTA — blurred brand circle clipped at the bottom,
@@ -4473,9 +4762,9 @@
       --cp-glass:      rgba(240,237,232,0.05);
       --cp-glass-edge: rgba(240,237,232,0.14);
       position: fixed;
-      right: 24px;
-      top: 88px;
-      bottom: 20px;
+      right: 20px;
+      top: 94px;
+      bottom: 10px;
       width: 388px;
       background:
         radial-gradient(120% 80% at 50% -8%, rgba(240,237,232,0.05) 0%, transparent 46%),
@@ -4483,9 +4772,7 @@
       border: 1px solid rgba(240,237,232,0.08);
       border-radius: 24px;
       box-shadow:
-        inset 0 1px 0 rgba(240,237,232,0.06),
-        0 4px 8px rgba(0,0,0,0.30),
-        0 28px 80px rgba(0,0,0,0.55);
+        inset 0 1px 0 rgba(240,237,232,0.06);
       display: flex;
       flex-direction: column;
       z-index: 1100;
@@ -4507,27 +4794,33 @@
       overflow: clip;
       isolation: isolate;
     }
-    /* SIGNATURE — rainbow aurora rising from the floor of the chat space (section 2),
-       clipped to its bottom seam and masked to fade upward. Reuses the Ask-button conic
-       wheel + ask-wheel-spin (slowed right down). .cp-glow is the clipped reveal band; the
-       spin keyframe carries translateX(-50%) so the static transform survives the spin. */
+    /* SIGNATURE — rainbow aurora as a circular orb rising from the floor of the chat
+       space, clipped to the bottom seam (the messages floor, just above the dock). It
+       rests dim + low; while the assistant is working it brightens to full and spins fast.
+       The spin keyframe carries translateX(-50%) so centering survives the rotation. */
     .cp-glow {
-      position: absolute; left: 0; right: 0; bottom: 100%;   /* the seam above the dock = section-2 floor */
-      height: 150px; overflow: hidden;
+      position: absolute; left: -30px; right: -30px; bottom: 100%;   /* wider than the panel so side blur clips off-view; seam = messages floor */
+      height: 300px; overflow: hidden;                               /* clips the orb's lower half at the floor */
       pointer-events: none; z-index: 0;
-      -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.5) 45%, transparent 100%);
-              mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.5) 45%, transparent 100%);
     }
     .cp-wheel-glow {
-      position: absolute; left: 50%; bottom: -180%;          /* ~30% of the wheel reveals in the band */
-      width: 150%; aspect-ratio: 1 / 1; transform: translateX(-50%);
+      position: absolute; left: 50%; bottom: -380px;         /* sunk so only the wide dome clears the floor */
+      width: 480px; height: 480px; transform: translateX(-50%);
       border-radius: 50%;
       background: conic-gradient(from 0deg,
         #ff4757, #ff6b35, #ffd32a, #2ed573, #1e90ff, #a29bfe, #fd79a8, #ff4757);
-      filter: blur(30px) saturate(130%);
-      opacity: 0.5;
+      filter: blur(60px) saturate(125%);
+      opacity: 0.05;                                         /* rest: ~90% dimmer than the active orb */
       animation: ask-wheel-spin 26s linear infinite;
+      transition: opacity 0.7s ease, bottom 0.7s cubic-bezier(0.22,1,0.36,1), filter 0.7s ease;
       will-change: transform; backface-visibility: hidden;
+    }
+    /* assistant working — full intensity, raised so more of the orb shows, fast spin */
+    .cp.cp-busy .cp-wheel-glow {
+      opacity: 0.5;
+      bottom: -310px;
+      filter: blur(60px) saturate(135%);
+      animation-duration: 3.5s;
     }
     .cp-info, .cp-close { position: relative; z-index: 1; }
     .cp-avatar {
@@ -4562,7 +4855,8 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      position: relative; z-index: 2;   /* above the section-2 floor glow */
+      position: relative; z-index: 2;
+      min-height: 0;
     }
     .cp-msgs::-webkit-scrollbar { width: 3px; }
     .cp-msgs::-webkit-scrollbar-thumb { background: var(--cp-hairline); border-radius: 3px; }
@@ -4581,16 +4875,16 @@
       position: relative;                                  /* caret/ring context (folded from old gutter rule) */
       padding: 11px 15px;
       border-radius: 16px;
-      font-size: 15.5px;                                   /* +20% type */
+      font-size: 17px;
       line-height: 1.55;
       color: var(--cp-ink);
     }
     .cp-msg.user .cp-bubble {
-      background: var(--primary);
+      background: #789F04;
       color: #16181c;
       font-weight: 500;
       border-bottom-right-radius: 5px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.30), 0 6px 16px rgba(230,242,141,0.10);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.30);
     }
     .cp-msg.assistant .cp-bubble {
       background: var(--cp-glass);
@@ -4598,12 +4892,95 @@
               backdrop-filter: blur(16px) saturate(120%);
       border: 1px solid var(--cp-hairline);
       border-top-left-radius: 6px;
-      box-shadow: inset 0 1px 0 var(--cp-glass-edge), 0 8px 24px rgba(0,0,0,0.28);
+      box-shadow: none;
       contain: layout paint;                               /* scope per-word reflow */
     }
     .cp-bubble strong { font-weight: 700; }
     .cp-bubble ul { margin: 5px 0 4px 0; padding-left: 16px; display: flex; flex-direction: column; gap: 3px; }
     .cp-bubble li { line-height: 1.5; }
+
+    /* ── scroll-fade wrapper + top gradient ── */
+    .cp-msgs-wrap {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .cp-fade-top {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 48px;
+      background: linear-gradient(to bottom, var(--cp-surface) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 5;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    .cp-msgs-wrap.cp-scrolled .cp-fade-top { opacity: 1; }
+
+    /* ── assistant frame: bubble + meta stack ── */
+    .cp-frame { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+    /* ── hover meta: timestamp + copy ── */
+    .cp-msg-meta {
+      display: flex; align-items: center; gap: 5px;
+      height: 0; overflow: visible;
+      opacity: 0; transform: translateY(2px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      pointer-events: none;
+    }
+    .cp-msg:hover .cp-msg-meta { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .cp-msg.user .cp-msg-meta { justify-content: flex-end; }
+    .cp-msg-time {
+      font-family: var(--font-mono); font-size: 10px;
+      color: var(--cp-ink-dim); letter-spacing: 0.02em; user-select: none;
+    }
+    .cp-copy {
+      width: 20px; height: 20px;
+      background: transparent; border: 1px solid var(--cp-hairline); border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      color: var(--cp-ink-dim); padding: 0; flex-shrink: 0;
+    }
+    .cp-copy:hover { background: rgba(240,237,232,0.08); border-color: rgba(240,237,232,0.22); color: var(--cp-ink); }
+    .cp-copy.cp-copied { border-color: var(--primary); color: var(--primary); }
+    .cp-copy svg { width: 10px; height: 10px; fill: currentColor; pointer-events: none; }
+
+    /* ── AI-generated follow-up chips ── */
+    .cp-followups { display: flex; flex-direction: column; gap: 4px; padding-top: 14px; }
+    .cp-fq-label {
+      font-family: var(--font-mono); font-size: 9.5px; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--cp-ink-dim);
+      margin-bottom: 4px;
+      animation: cp-rise 0.35s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .cp-fq {
+      background: transparent;
+      border: none;
+      border-left: 2px solid var(--primary);
+      border-radius: 0 8px 8px 0;
+      padding: 9px 12px;
+      font-family: var(--font-heading); font-size: 13px; font-weight: 400;
+      color: var(--cp-ink-dim);
+      cursor: pointer; text-align: left; line-height: 1.45;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+      animation: cp-rise 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .cp-fq::after {
+      content: '→';
+      font-size: 13px; color: var(--primary);
+      opacity: 0; flex-shrink: 0;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+    .cp-fq:nth-child(2) { animation-delay: 0.07s; }
+    .cp-fq:nth-child(3) { animation-delay: 0.14s; }
+    .cp-fq:hover { background: rgba(230,242,141,0.05); color: var(--cp-ink); }
+    .cp-fq:hover::after { opacity: 1; transform: translateX(3px); }
+    .cp-fq:active { transform: scale(0.99); }
 
     .cp-cursor {
       display: inline-block; width: 2px; height: 1em;
@@ -4619,7 +4996,7 @@
 
     /* thinking shell — mono status beside the spinning photo, on the bare panel */
     .cp-msg.assistant .cp-bubble.cp-thinking {
-      display: inline-flex; align-items: center; min-height: 18px;
+      display: inline-flex; align-items: center; gap: 10px; min-height: 18px;
       background: transparent; border: none; box-shadow: none;
       -webkit-backdrop-filter: none; backdrop-filter: none; padding: 2px 0;
     }
@@ -4649,18 +5026,25 @@
     .cp-cursor.cp-retract { animation: cp-caret-out 0.3s cubic-bezier(0.22,1,0.36,1) forwards; }
     @keyframes cp-caret-out { from { opacity: 1; transform: scaleY(1); } to { opacity: 0; transform: scaleY(0.4); } }
 
-    /* spinning lime loader ring around the photo avatar while thinking */
-    .cp-ava-loading::before {
-      content: ''; position: absolute; inset: -3px; border-radius: 50%;
-      background: conic-gradient(from 0deg, transparent 0deg, transparent 200deg,
-        var(--primary) 320deg, #fff 360deg);
-      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 0);
-              mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 0);
-      animation: cp-ring-spin 0.9s linear infinite;
-      will-change: transform;
+    /* "thinking" loader — small photo icon + three lime squares that lift + pulse in sequence */
+    .cp-think-ava {
+      width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: block;
+      border: 1px solid rgba(240,237,232,0.18); flex-shrink: 0;
     }
-    @keyframes cp-ring-spin { to { transform: rotate(360deg); } }
-    .cp-ava-loading .cp-ava-img { opacity: 0.72; }
+    .cp-squares { display: inline-flex; align-items: flex-end; gap: 5px; height: 13px; }
+    .cp-squares i {
+      width: 9px; height: 9px; border-radius: 3px; display: block;
+      background: var(--primary);
+      box-shadow: 0 0 9px rgba(230,242,141,0.45);
+      animation: cp-sq-pulse 1.05s cubic-bezier(0.4,0,0.2,1) infinite;
+      will-change: transform, opacity;
+    }
+    .cp-squares i:nth-child(2) { animation-delay: 0.15s; }
+    .cp-squares i:nth-child(3) { animation-delay: 0.30s; }
+    @keyframes cp-sq-pulse {
+      0%, 70%, 100% { transform: translateY(0) scale(0.66); opacity: 0.45; }
+      35%           { transform: translateY(-4px) scale(1);  opacity: 1;    }
+    }
 
     /* word-by-word reveal — transform + opacity only (cheap, no blur) */
     .cp-word { display: inline; animation: cp-word-in 0.22s cubic-bezier(0.22,1,0.36,1) both; }
@@ -4712,9 +5096,8 @@
       .cp-status { -webkit-text-fill-color: var(--cp-ink-dim); color: var(--cp-ink-dim); background: none; }
       .cp-cursor.cp-live { opacity: 1; box-shadow: none; }
       .cp-pill:focus-within { transform: none; }
-      .cp-wheel-glow { animation: none; opacity: 0.20; }
-      .cp-ava-loading::before { animation: none;
-        background: conic-gradient(var(--primary), rgba(230,242,141,0.25)); }
+      .cp-wheel-glow { animation: none; opacity: 0.05; }
+      .cp-squares i { animation: none; opacity: 0.75; transform: scale(0.85); }
       .cp-word { animation: none; }
     }
 
@@ -4781,6 +5164,7 @@
       color: rgba(255,255,255,0.92);
       caret-color: rgba(255,255,255,0.6);
       min-height: 36px; max-height: 105px;
+      transition: height 0.14s cubic-bezier(0.22,1,0.36,1);
     }
     .cp-textarea::placeholder { color: rgba(255,255,255,0.4); }
     .cp-pill .cb-send:disabled { opacity: 0.45; pointer-events: none; }
@@ -4970,6 +5354,404 @@
       #glassLoader { transition: opacity .3s ease; }
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       WORK SECTION  s02  —  Figma spec rebuild
+       Viewport: 1440 × 1024  |  Content frame: 1256 × 946
+       Left card: 542 × 742 (#252525)  |  Gap: 40px  |  Right: 879 × 742
+       ═══════════════════════════════════════════════════════════ */
+
+    /* ── Font tokens ──────────────────────────────────────────── */
+    .s02-h2 {
+      font-family: var(--font-heading);
+      font-size: 25px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    .s02-body {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ── Scroll driver ────────────────────────────────────────── */
+    .work-hscroll-wrapper {
+      position: relative;
+      margin: 0;
+    }
+    .work-hscroll-wrapper[data-card-count="3"] { height: 300vh; }
+    .work-hscroll-wrapper[data-card-count="1"] { height: 100vh; }
+    .work-hscroll-wrapper + .work-hscroll-wrapper { margin-top: 2px; }
+
+    /* ── Sticky clip frame ────────────────────────────────────── */
+    .work-hscroll-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: #1E1E1E;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    /* ── Translating track (full-width strip of slides) ───────── */
+    .work-full-track {
+      display: flex;
+      height: 100%;
+      will-change: transform;
+      flex-shrink: 0;
+    }
+
+    /* ── Each slide = full sticky width ──────────────────────── */
+    .work-full-slide {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      background: #1E1E1E;
+      padding-left: 40px;
+      overflow: hidden;
+    }
+
+    /* Intro slide: row ─ summary card (542px) + case study card (879px) */
+    .work-full-slide--intro {
+      flex-direction: row;
+      gap: 0;
+    }
+
+    /* ── Summary card — always dark, fixed 542 × 742 ─────────── */
+    .work-summary-card {
+      width: 542px;
+      height: min(742px, calc(100vh - 80px));
+      flex-shrink: 0;
+      background: #252525;
+      border-radius: 14px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top-left layer blur glow (Figma: Layer blur 500, #789F04) */
+    .work-summary-card::before {
+      content: '';
+      position: absolute;
+      top: -120px;
+      left: -120px;
+      width: 300px;
+      height: 300px;
+      background: #789F04;
+      border-radius: 50%;
+      filter: blur(130px);
+      opacity: 0.55;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .work-summary-card > * { position: relative; z-index: 1; }
+
+    /* ── Card header: title + view tabs ─────────────────────── */
+    .work-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-shrink: 0;
+    }
+    .work-card-title {
+      font-family: var(--font-heading);
+      font-size: 25px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+      margin: 0;
+      white-space: nowrap;
+    }
+    /* Desktop / Tablet view tabs */
+    .work-view-tabs {
+      display: flex;
+      gap: 2px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 7px;
+      padding: 3px;
+      flex-shrink: 0;
+    }
+    .work-view-tab {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.45);
+      cursor: default;
+      border: none;
+      background: transparent;
+      pointer-events: none;
+      letter-spacing: 0.03em;
+    }
+    .work-view-tab.active {
+      background: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.9);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .work-view-tab svg { flex-shrink: 0; color: #789F04; }
+    /* Meta chips row below the header */
+    .work-meta-chips {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 0;
+      flex-shrink: 0;
+    }
+    .work-meta-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: rgba(255,255,255,0.55);
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+    .work-meta-chip svg { color: #789F04; flex-shrink: 0; }
+
+    /* ── Dashed orbit ring around blob ───────────────────────── */
+    .work-blob-stage::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 168px;
+      height: 168px;
+      transform: translate(-50%, -50%);
+      border: 1.5px dashed rgba(255,255,255,0.18);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .work-blob-ring-dot {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      background: rgba(200,200,200,0.30);
+      border-radius: 50%;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .work-blob-ring-dot--top    { top: calc(50% - 84px); left: 50%; transform: translate(-50%, -50%); }
+    .work-blob-ring-dot--bottom { top: calc(50% + 84px); left: 50%; transform: translate(-50%, -50%); }
+    .work-blob-ring-dot--left   { top: 50%; left: calc(50% - 84px); transform: translate(-50%, -50%); }
+    .work-blob-ring-dot--right  { top: 50%; left: calc(50% + 84px); transform: translate(-50%, -50%); }
+
+    /* ── Static blob stage with 4 positioned pills ────────────── */
+    .work-blob-stage {
+      position: relative;
+      width: 100%;
+      height: 210px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .work-blob-video {
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+    .work-blob-video video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    /* Summary card is always dark — always show the dark blob */
+    .work-blob-video .proj-vid-dark { display: block; }
+
+    .work-blob-pill {
+      position: absolute;
+      background: #1E1E1E;
+      color: rgba(255,255,255,0.88);
+      font-family: var(--font-mono);
+      font-size: 10.55px;
+      padding: 4.4px 13.19px;
+      border-radius: 100px;
+      line-height: 1.4;
+      z-index: 3;
+      text-align: center;
+    }
+    .work-blob-pill--top {
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    .work-blob-pill--bottom {
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    .work-blob-pill--left {
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+    }
+    .work-blob-pill--right {
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+    }
+
+    /* ── Description text ──────────────────────────────────────── */
+    .work-desc-text {
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.65);
+      margin: 0 0 50px 0;
+      flex-shrink: 0;
+    }
+    .work-desc-highlight {
+      background: #789F04;
+      color: #1a1a1a;
+      font-weight: 600;
+      padding: 0 1px;
+      border-radius: 2px;
+    }
+
+    /* ── Role items ────────────────────────────────────────────── */
+    .work-roles {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: auto;
+    }
+    .work-role-item {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      color: rgba(255,255,255,0.82);
+    }
+    .work-role-icon {
+      width: 20.8px;
+      height: 18.4px;
+      flex-shrink: 0;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── Case study card (right, 879 × 742) ────────────────────── */
+    .work-cs-card {
+      width: 879px;
+      height: min(742px, calc(100vh - 80px));
+      flex-shrink: 0;
+      margin-left: 40px;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid rgba(37,37,37,0.1);
+    }
+    [data-theme="dark"] .work-cs-card { border-color: rgba(255,255,255,0.07); }
+    .work-cs-card .product-area {
+      flex: 1 1 0;
+      min-height: 0;
+    }
+    .work-cs-card .case-study-bottom { flex-shrink: 0; }
+
+    /* ── Solo slides (Studio, Analytics) ───────────────────────── */
+    .work-full-slide--solo {
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      padding-right: 40px;
+    }
+    .work-cs-card--solo {
+      width: 100%;
+      height: min(742px, calc(100vh - 80px));
+      flex-shrink: 0;
+      margin-left: 0;
+    }
+
+    /* ── Progress dots ──────────────────────────────────────────── */
+    .work-float-dots {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 20;
+      pointer-events: none;
+    }
+    .work-prog-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(37,37,37,0.22);
+      transition: width 0.35s ease, background 0.35s ease, border-radius 0.35s ease;
+    }
+    .work-prog-dot.active { width: 20px; border-radius: 3px; background: #789F04; }
+
+    /* ── Stat row (bottom of case study cards) ──────────────────── */
+    .cs-stat-row {
+      display: flex;
+      gap: 0;
+      padding: 18px 30px 22px;
+      border-top: 1px solid rgba(37,37,37,0.08);
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .cs-stat-row { border-top-color: rgba(255,255,255,0.06); }
+    .cs-stat { flex: 1; display: flex; flex-direction: column; gap: 5px; padding-right: 20px; }
+    .cs-stat + .cs-stat { padding-left: 20px; border-left: 1px solid rgba(37,37,37,0.08); }
+    [data-theme="dark"] .cs-stat + .cs-stat { border-left-color: rgba(255,255,255,0.06); }
+    .cs-stat-value {
+      font-family: var(--font-heading); font-size: clamp(16px, 1.8vw, 26px);
+      font-weight: 800; color: #789F04; line-height: 1; letter-spacing: -0.02em;
+    }
+    [data-theme="dark"] .cs-stat-value { color: var(--primary); }
+    .cs-stat-label {
+      font-family: var(--font-mono); font-size: 9.5px; font-weight: 500;
+      color: #747474; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    [data-theme="dark"] .cs-stat-label { color: rgba(255,255,255,0.4); }
+
+    /* ── Mobile / tablet ────────────────────────────────────────── */
+    @media (max-width: 1023px) {
+      .work-hscroll-wrapper { height: auto !important; }
+      .work-hscroll-sticky {
+        position: relative; height: auto; overflow: visible;
+        flex-direction: column; align-items: stretch;
+      }
+      .work-full-track { flex-direction: column; transform: none !important; width: 100%; }
+      .work-full-slide, .work-full-slide--intro {
+        flex: none; width: 100%; height: auto;
+        flex-direction: column; align-items: stretch;
+        padding: 16px; overflow: visible;
+      }
+      .work-summary-card { width: 100%; height: auto; }
+      .work-cs-card { width: 100%; height: auto; margin-left: 0; margin-top: 12px; }
+      .work-cs-card .product-area { height: 300px; }
+      .work-blob-stage { height: 180px; }
+      .work-float-dots { display: none; }
+    }
+
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
@@ -4982,6 +5764,9 @@
 </head>
 
 <body>
+
+  <!-- ─── SCROLL PROGRESS BAR ─── -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
   <!-- ─── GLASS LOADING SCREEN ─── -->
   <div id="glassLoader" role="status" aria-label="Loading">
@@ -5132,22 +5917,23 @@
   <!-- TOP NAV -->
   <nav class="top-nav" id="topNav">
     <div class="nav-brand">
-      <span class="nav-logo">Bhanu Kowshik</span>
+      <span class="nav-logo"><span class="nav-wave" id="navWave"></span>Bhanu Kowshik</span>
       <div class="nav-callme">
         <span class="nav-callme-label">You can call me</span>
         <span class="nav-callme-name">Bhanu :)</span>
       </div>
     </div>
     <div class="nav-links">
+      <span class="nav-indicator" id="navIndicator"></span>
       <a class="nav-work" href="#s2Section">WORK</a>
       <a class="nav-work" href="#aboutSection">ABOUT</a>
       <a class="nav-work" href="./resume.pdf" target="_blank" rel="noopener">RESUME</a>
       <a class="nav-work" href="#contactSection">CONTACT</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
       <a class="nav-chip" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">
         <span class="nav-chip-dot"></span>Side project · 48hr build ↗
       </a>
-    </div>
-    <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
         <span class="tt-track">
           <span class="tt-star tt-star-1"></span>
@@ -5191,132 +5977,51 @@
 
         <div class="hero-screen-left">
 
-        <div class="greeting reveal" id="greeting"><span id="greetingText"></span><span id="lottieWave"></span><span class="cursor"></span></div>
+        <div class="greeting reveal" id="greeting" style="display:none;height:0;overflow:hidden"><span id="greetingText"></span><span id="lottieWave"></span><span class="cursor"></span></div>
 
         <h1 class="hero-heading reveal">
-          I design for ambiguous and undefined problems, experiences that Convert, <span class="hv hv-scale">Scale<i class="hv-h tl"></i><i class="hv-h tr"></i><i class="hv-h bl"></i><i class="hv-h br"></i><span class="hv-cursor" aria-hidden="true"><svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 20 L3 5 L7 8.8 L9.5 3.5 L11.6 4.4 L9.1 9.5 L14.5 9.5 Z" fill="#ffffff" stroke="#222222" stroke-width="1.3" stroke-linejoin="round"/></svg></span></span>, and Connect through first principles &amp; obsessive detail to craft <span class="tool-cluster" aria-hidden="true"><span class="tool-ic tool-figma"></span><span class="tool-ic tool-claude"></span><span class="tool-ic tool-github"></span></span>
-        </h1>
+          I design solutions where problems are ambiguous &amp; flow is undefined, turning them into experiences that <span class="hv hv-scale">Scale<i class="hv-h tl"></i><i class="hv-h tr"></i><i class="hv-h bl"></i><i class="hv-h br"></i><span class="hv-cursor" aria-hidden="true"><svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 20 L3 5 L7 8.8 L9.5 3.5 L11.6 4.4 L9.1 9.5 L14.5 9.5 Z" fill="#ffffff" stroke="#222222" stroke-width="1.3" stroke-linejoin="round"/></svg></span></span>, <span class="hv-grp"><span class="hv hv-convert">Convert</span><img class="hv-ic hv-ic-convert" src="hero-icons/convert-check.svg" alt="" aria-hidden="true"></span>, <span class="hv-grp"><span class="hv hv-connect">Connect</span><img class="hv-ic hv-ic-connect" src="hero-icons/connect-link.svg" alt="" aria-hidden="true"></span> through first principles &amp; obsessive detail to craft.        </h1>
+
+        <!-- hero CTA buttons -->
+        <div class="hero-ctas reveal">
+          <a class="hero-cta hero-cta-primary" href="#s2Section">View Work</a>
+        </div>
 
         <div class="hero-subtext hero-facts reveal">
-          <div class="hfact"><span class="hfact-k">Designing since</span><span class="hfact-v">5+ Years</span></div>
-          <div class="hfact"><span class="hfact-k">Worked in</span><span class="hfact-v">0 to 1, B2B, B2C and SaaS</span></div>
+          <div class="hfact"><span class="hfact-k">Role</span><span class="hfact-v">Product Designer</span></div>
+          <div class="hfact"><span class="hfact-k">Designing since</span><span class="hfact-v">5 + Years</span></div>
+          <div class="hfact"><span class="hfact-k">Proven work in</span><span class="hfact-v">0 to 1, B2B, B2C &amp; SaaS</span></div>
           <div class="hfact"><span class="hfact-k">Based in</span><span class="hfact-v">San Francisco</span></div>
+        </div>
+
+        <!-- mobile polaroid carousel — hidden on desktop, slow right→left scroll on tablet/mobile -->
+        <div class="hero-carousel" aria-hidden="true">
+          <div class="hero-carousel-track">
+            <div class="hero-carousel-wrap" style="--r:-5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Winning a pitch competition</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:4deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitching myself in</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-3deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">Work showcase at conference</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:3deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed for the future</span></div></div>
+            <!-- duplicate set for seamless infinite loop -->
+            <div class="hero-carousel-wrap" style="--r:-5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Winning a pitch competition</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:4deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitching myself in</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-3deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">Work showcase at conference</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:3deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed for the future</span></div></div>
+          </div>
         </div>
 
         </div><!-- /hero-screen-left -->
 
-        <!-- vertical photo carousel (top → bottom), right of section 1 -->
+        <!-- scattered polaroid cluster, right of section 1 (matches Figma) -->
         <div class="hero-photos" aria-hidden="true">
-          <div class="hero-photos-track">
-            <img class="hero-photo" src="photos/pic-evertutor.jpg" alt="" loading="lazy">
-            <img class="hero-photo" src="photos/pic-rowing.jpg" alt="" loading="lazy">
-            <img class="hero-photo" src="photos/pic-stressie.jpg" alt="" loading="lazy">
-            <img class="hero-photo" src="photos/pic-check.jpg" alt="" loading="lazy">
-            <img class="hero-photo" src="photos/pic-evertutor.jpg" alt="" loading="lazy">
-            <img class="hero-photo" src="photos/pic-rowing.jpg" alt="" loading="lazy">
-            <img class="hero-photo" src="photos/pic-stressie.jpg" alt="" loading="lazy">
-            <img class="hero-photo" src="photos/pic-check.jpg" alt="" loading="lazy">
-          </div>
+          <div class="polaroid p1"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Winning a pitch competition</span></div></div>
+          <div class="polaroid p2"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitching myself in</span></div></div>
+          <div class="polaroid p3"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">Work showcase at conference</span></div></div>
+          <div class="polaroid p4"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed for the future</span></div></div>
         </div>
+
 
         </div><!-- /hero-screen -->
 
-        <!-- ── SECTION HEADING — 01 / Selected Work ─────────────────── -->
-        <div class="section-eyebrow">
-          <span class="se-num">01</span>
-          <span class="se-line"></span>
-          <span class="se-label">Selected Work</span>
-        </div>
-
-        <!-- ── PROJECT CARD STACK — parallax pile of project cards ──────
-             Cards stack on top of each other on scroll (sticky pile).
-             Currently one card (EverTutor); add siblings with --i:1,2…
-             to grow the stack. Old hero-frame / sticky-note JS is kept
-             but self-guards (returns early when #stickyStack is absent). -->
-        <div class="proj-stack" id="projStack">
-
-          <!-- ── EverTutor ────────────────────────────────────────── -->
-          <article class="proj-card" id="projEverTutor" style="--i:0">
-            <div class="proj-card-inner">
-
-              <!-- LEFT: copy -->
-              <div class="proj-copy">
-                <h3 class="proj-title">EverTutor</h3>
-                <p class="proj-desc">World&rsquo;s first <mark class="proj-mark">multi modal 1:1 voice first AI tutor</mark> powered by 3 tools working as one system to create, serve, and measure adaptive tutoring.</p>
-
-                <div class="proj-meta">
-                  <div class="proj-meta-row">
-                    <span class="proj-meta-item">
-                      <svg class="proj-ic proj-ic--light" viewBox="0 0 26 23" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12.9423 14C13.0432 14.0001 13.0432 14.0001 13.1461 14.0002C15.4143 14.007 17.4942 14.488 19.5329 15.4799C19.5852 15.505 19.6375 15.5301 19.6914 15.556C22.2146 16.7807 24.8695 19.0562 25.9922 21.6812C26.0249 22.0421 25.9553 22.3327 25.7702 22.6426C25.4656 22.9211 25.2821 22.9713 24.8669 22.9648C24.5198 22.9356 24.2876 22.7289 24.0544 22.4866C23.9149 22.2951 23.7985 22.093 23.681 21.8876C23.279 21.218 22.8098 20.6413 22.2781 20.0705C22.2224 20.0102 22.2224 20.0102 22.1655 19.9488C19.8482 17.47 16.5103 16.1609 13.1543 16.0437C10.0853 16.0113 7.07819 17.1019 4.75715 19.104C4.69127 19.16 4.62539 19.216 4.55751 19.2736C3.43769 20.249 2.55677 21.4101 1.8003 22.6826C1.58525 22.9263 1.32044 22.966 1.00771 23C0.657636 22.9632 0.501049 22.8763 0.235619 22.6477C-0.0158556 22.2997 -0.0273058 22.0444 0.0253475 21.6366C0.112879 21.2832 0.31307 21.0125 0.523261 20.7198C0.589447 20.6246 0.589447 20.6246 0.65697 20.5276C2.14346 18.4091 3.98492 16.748 6.29125 15.5604C6.3658 15.522 6.3658 15.522 6.44185 15.4828C8.46686 14.4557 10.6801 13.9945 12.9423 14Z" fill="currentColor"/>
-                        <circle cx="13" cy="7" r="7" fill="#789F04"/>
-                        <circle cx="13" cy="7" r="6" stroke="#465D00" stroke-width="2"/>
-                      </svg>
-                      <img class="proj-ic proj-ic--dark" src="ic-profile-dark.svg" alt="" aria-hidden="true" />
-                      Sole Product Designer
-                    </span>
-                    <span class="proj-meta-item">
-                      <img class="proj-ic proj-ic--bolt proj-ic--light" src="icon-thunder.svg" alt="" aria-hidden="true" />
-                      <img class="proj-ic proj-ic--bolt proj-ic--dark" src="ic-bolt-dark.svg" alt="" aria-hidden="true" />
-                      0 to 1 (all 3 tools)
-                    </span>
-                  </div>
-                  <div class="proj-meta-row">
-                    <span class="proj-meta-item">
-                      <svg class="proj-ic proj-ic--light" viewBox="0 0 29 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 12H11C11.5523 12 12 12.4477 12 13V23H2V13C2 12.4823 2.39333 12.0562 2.89746 12.0049L3 12Z" stroke="currentColor" stroke-width="2"/>
-                        <path d="M18 1H26C26.5523 1 27 1.44772 27 2V23H17V2C17 1.48232 17.3933 1.05621 17.8975 1.00488L18 1Z" fill="#789F04"/>
-                        <path d="M18 1H26C26.5523 1 27 1.44772 27 2V23H17V2C17 1.48232 17.3933 1.05621 17.8975 1.00488L18 1Z" stroke="#465D00" stroke-width="2"/>
-                        <line x1="1" y1="23" x2="28" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                      </svg>
-                      <img class="proj-ic proj-ic--dark" src="ic-bar-dark.svg" alt="" aria-hidden="true" />
-                      2000+ Daily Active Users, 96% creation-time cut
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- RIGHT: orbit visual -->
-              <div class="proj-orbit" aria-hidden="true">
-                <div class="proj-stage" id="projStage">
-
-                  <!-- dashed orbit ring -->
-                  <svg class="proj-ring" viewBox="0 0 480 480" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="240" cy="240" r="160" stroke="rgba(130,130,130,0.34)" stroke-width="1.4" stroke-dasharray="3 7"/>
-                  </svg>
-
-                  <!-- glass sphere — theme-aware video (WebM VP9-alpha + H.264 MP4
-                       fallback, circle-clipped so Safari shows no box) -->
-                  <div class="proj-sphere-img" aria-hidden="true">
-                    <video class="proj-sphere-vid proj-vid-light" autoplay muted loop playsinline preload="auto">
-                      <source src="blob-light.webm" type="video/webm" />
-                      <source src="blob-light.mp4" type="video/mp4" />
-                    </video>
-                    <video class="proj-sphere-vid proj-vid-dark" autoplay muted loop playsinline preload="auto">
-                      <source src="blob-dark.webm" type="video/webm" />
-                      <source src="blob-dark.mp4" type="video/mp4" />
-                    </video>
-                  </div>
-
-                  <!-- orbiting "voice" nodes: a connection dot + a speech bubble
-                       whose tail always points back at the blob. Revolve in full
-                       circles (JS — see PROJECT ORBIT script). -->
-                  <div class="proj-nodes" id="projNodes">
-                    <span class="proj-dot"></span>
-                    <span class="proj-dot"></span>
-                    <span class="proj-dot"></span>
-                    <span class="proj-bubble">ET Analytics<i class="proj-tail"></i></span>
-                    <span class="proj-bubble">ET Studio<i class="proj-tail"></i></span>
-                    <span class="proj-bubble">ET Live<i class="proj-tail"></i></span>
-                  </div>
-
-                </div><!-- /proj-stage -->
-              </div><!-- /proj-orbit -->
-
-            </div><!-- /proj-card-inner -->
-          </article><!-- /proj-card EverTutor -->
-
-        </div><!-- /proj-stack -->
 
       </div><!-- /hero -->
 
@@ -5326,214 +6031,252 @@
         <div class="skills-track" id="skillsTrack"></div>
       </div>
 
-      <!-- ── SECTION DIVIDER ────────────────────────────────────── -->
+      <!-- ── WORK SECTION anchor ── -->
       <div id="s2Section" style="position:relative;top:-70px;pointer-events:none;"></div>
-      <div class="section-divider" id="sdFrame">
-        <div class="sd-guide-h"></div>
-        <div class="sd-guide-v"></div>
-        <div class="sd-selected" id="sdSelected">
-          <span class="sd-handle tl"></span>
-          <span class="sd-handle tr"></span>
-          <span class="sd-handle bl"></span>
-          <span class="sd-handle br"></span>
-          Work That Moved the Needle
-        </div>
-        <div class="sd-measure" id="sdMeasureL"></div>
-        <div class="sd-measure" id="sdMeasureR"></div>
-      </div>
 
-      <!-- ── PROJECT STACK — sticky pile of case-study cards ─────── -->
-      <div class="cs-stack" id="csStack">
+      <!-- ── WORK SECTION — sticky horizontal scroll ─────────────── -->
 
-      <!-- ── CASE STUDY CARD 1 — EverTutor Live ──────────────────── -->
-      <div class="case-study-card reveal" id="csCardLive" style="--i:0">
+      <!-- ── EVERTUTOR ──────────────────────────────────────────────── -->
+      <div class="work-hscroll-wrapper" id="etHScroll" data-card-count="3">
+        <div class="work-hscroll-sticky" id="etSticky">
 
-        <!-- Product area with scrolling tags bar -->
-        <div class="product-area product-area-live">
-          <div class="tags-bar-overlay">
-            <div class="tags-bar-track" id="tagsBarTrackLive"></div>
-          </div>
-          <img
-            id="productImgLive"
-            class="product-img-live"
-            src="Student home page Updated.png"
-            alt="EverTutor Live UI"
-          />
-        </div>
-
-        <!-- Caption + headline + CTA + metrics -->
-        <div class="case-study-bottom">
-          <div class="caption-row reveal"><p class="case-study-caption">1.1 EverTutor Live (AI Tutor Experience Platform)</p><span class="shipped-pill">Shipped</span></div>
-
-          <div class="case-study-hl-row reveal">
-            <p class="case-study-headline">Built the AI tutor experience from scratch: real-time 1:1 personalization, Bloom's 2 Sigma in production, scaling across 8+ schools and ~2,000 students</p>
-            <a class="explore-btn" href="./evertutor-live.html">Explore the system <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M4 12L12 4M12 4H6.5M12 4V9.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <div class="work-float-dots" id="etProgDots">
+            <span class="work-prog-dot active" data-i="0"></span>
+            <span class="work-prog-dot" data-i="1"></span>
+            <span class="work-prog-dot" data-i="2"></span>
           </div>
 
-          <div class="metric-cards">
-            <div class="metric-row">
-              <div class="metric-card reveal">
-                <p class="metric-value">Operationalized <mark>Bloom's 2 Sigma</mark> at scale</p>
-                <p class="metric-desc">Personalized 1:1 tutoring with measurable learning outcome alignment (~97%)</p>
+          <div class="work-full-track" id="etFullTrack">
+
+            <!-- ── Slide 0: Summary card + ET Live ─────────────────── -->
+            <div class="work-full-slide work-full-slide--intro" id="csCardLive">
+
+              <!-- LEFT: dark summary card (542 × 742) -->
+              <div class="work-summary-card">
+
+                <!-- Header row: title + Desktop/Tablet view tabs -->
+                <div class="work-card-header">
+                  <h2 class="work-card-title">1.EverTutor System</h2>
+                  <div class="work-view-tabs">
+                    <button class="work-view-tab active">
+                      <svg width="13" height="10" viewBox="0 0 13 10" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="12" height="7.5" rx="1.2" stroke="currentColor"/><path d="M4.5 9.5H8.5M6.5 8V9.5" stroke="currentColor" stroke-linecap="round"/></svg>
+                      Desktop
+                    </button>
+                    <button class="work-view-tab">
+                      <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="7" height="11" rx="1.2" stroke="currentColor"/><circle cx="4" cy="9.5" r="0.7" fill="currentColor"/></svg>
+                      Tablet
+                    </button>
+                  </div>
+                </div>
+                <!-- Meta chips row -->
+                <!-- Static blob + 4 pills -->
+                <div class="work-blob-stage">
+                  <span class="work-blob-ring-dot work-blob-ring-dot--top"></span>
+                  <span class="work-blob-ring-dot work-blob-ring-dot--bottom"></span>
+                  <span class="work-blob-ring-dot work-blob-ring-dot--left"></span>
+                  <span class="work-blob-ring-dot work-blob-ring-dot--right"></span>
+                  <span class="work-blob-pill work-blob-pill--top">World&rsquo;s first voice 1st tutoring model</span>
+                  <span class="work-blob-pill work-blob-pill--left">13 months</span>
+                  <div class="work-blob-video" aria-hidden="true">
+                    <video class="proj-vid-light" autoplay muted loop playsinline preload="auto">
+                      <source src="blob-light.webm" type="video/webm" />
+                      <source src="blob-light.mp4" type="video/mp4" />
+                    </video>
+                    <video class="proj-vid-dark" autoplay muted loop playsinline preload="auto">
+                      <source src="blob-dark.webm" type="video/webm" />
+                      <source src="blob-dark.mov" type="video/quicktime" />
+                    </video>
+                  </div>
+                  <span class="work-blob-pill work-blob-pill--right">3 Tools</span>
+                  <span class="work-blob-pill work-blob-pill--bottom">Acquisition offer just from prototype</span>
+                </div>
+
+                <!-- Description -->
+                <p class="work-desc-text">World&rsquo;s first <mark class="work-desc-highlight">multi modal 1:1 voice first AI tutor</mark> powered by 3 tools working as one system to create, serve, and measure adaptive tutoring.</p>
+
+                <!-- Roles (JetBrains 15px, 30px gap from icon) -->
+                <div class="work-roles">
+                  <div class="work-role-item">
+                    <svg class="work-role-icon" viewBox="0 0 26 23" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.9423 14C13.0432 14.0001 13.0432 14.0001 13.1461 14.0002C15.4143 14.007 17.4942 14.488 19.5329 15.4799C19.5852 15.505 19.6375 15.5301 19.6914 15.556C22.2146 16.7807 24.8695 19.0562 25.9922 21.6812C26.0249 22.0421 25.9553 22.3327 25.7702 22.6426C25.4656 22.9211 25.2821 22.9713 24.8669 22.9648C24.5198 22.9356 24.2876 22.7289 24.0544 22.4866C23.9149 22.2951 23.7985 22.093 23.681 21.8876C23.279 21.218 22.8098 20.6413 22.2781 20.0705C22.2224 20.0102 22.2224 20.0102 22.1655 19.9488C19.8482 17.47 16.5103 16.1609 13.1543 16.0437C10.0853 16.0113 7.07819 17.1019 4.75715 19.104C4.69127 19.16 4.62539 19.216 4.55751 19.2736C3.43769 20.249 2.55677 21.4101 1.8003 22.6826C1.58525 22.9263 1.32044 22.966 1.00771 23C0.657636 22.9632 0.501049 22.8763 0.235619 22.6477C-0.0158556 22.2997 -0.0273058 22.0444 0.0253475 21.6366C0.112879 21.2832 0.31307 21.0125 0.523261 20.7198C0.589447 20.6246 0.589447 20.6246 0.65697 20.5276C2.14346 18.4091 3.98492 16.748 6.29125 15.5604C6.3658 15.522 6.3658 15.522 6.44185 15.4828C8.46686 14.4557 10.6801 13.9945 12.9423 14Z" fill="currentColor"/><circle cx="13" cy="7" r="7" fill="#789F04"/><circle cx="13" cy="7" r="6" stroke="#465D00" stroke-width="2"/></svg>
+                    Sole Product Designer
+                  </div>
+                  <div class="work-role-item">
+                    <svg class="work-role-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z" fill="#789F04" stroke="#465D00" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                    0 to 1 (all 3 tools)
+                  </div>
+                  <div class="work-role-item">
+                    <svg class="work-role-icon" viewBox="0 0 29 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 12H11C11.5523 12 12 12.4477 12 13V23H2V13C2 12.4823 2.39333 12.0562 2.89746 12.0049L3 12Z" stroke="currentColor" stroke-width="2"/><path d="M18 1H26C26.5523 1 27 1.44772 27 2V23H17V2C17 1.48232 17.3933 1.05621 17.8975 1.00488L18 1Z" fill="#789F04" stroke="#465D00" stroke-width="2"/><line x1="1" y1="23" x2="28" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    2000+ Daily Active Users, 96% creation-time cut
+                  </div>
+                </div>
+
+              </div><!-- /work-summary-card ET -->
+
+              <!-- RIGHT: ET Live case study card (879 × 742, overflows) -->
+              <div class="work-cs-card">
+                <div class="product-area product-area-live">
+                  <div class="tags-bar-overlay">
+                    <div class="tags-bar-track" id="tagsBarTrackLive"></div>
+                  </div>
+                  <img id="productImgLive" class="product-img-live" src="Student home page Updated.png" alt="EverTutor Live UI"/>
+                </div>
+                <div class="case-study-bottom">
+                  <div class="caption-row reveal"><p class="case-study-caption">1.1 EverTutor Live (Serving experience)</p><span class="shipped-pill">Shipped</span></div>
+                  <div class="case-study-hl-row reveal">
+                    <p class="case-study-headline">First of its kind, a voice-first AI that gives every learner a fully adaptive 1:1 experience, taken from prototype to PMF</p>
+                  </div>
+                  <div class="cs-stat-row">
+                    <div class="cs-stat"><span class="cs-stat-value">2000+</span><span class="cs-stat-label">Everyday Sessions</span></div>
+                    <div class="cs-stat"><span class="cs-stat-value">Proven 2&times;</span><span class="cs-stat-label">Performance Gain</span></div>
+                    <div class="cs-stat"><span class="cs-stat-value">$250 &rarr; $5/hr</span><span class="cs-stat-label">Cost of 1:1 Support</span></div>
+                  </div>
+                </div>
+              </div><!-- /work-cs-card ET Live -->
+
+            </div><!-- /slide 0 -->
+
+            <!-- ── Slide 1: ET Studio ───────────────────────────────── -->
+            <div class="work-full-slide work-full-slide--solo" id="csCardStudio">
+              <div class="work-cs-card work-cs-card--solo">
+                <div class="product-area">
+                  <div class="tags-bar-overlay">
+                    <div class="tags-bar-track" id="tagsBarTrack"></div>
+                  </div>
+                  <video id="productVid" class="product-video" src="./et-studio-recording.mov" muted loop playsinline disablepictureinpicture disableremoteplayback preload="auto"></video>
+                </div>
+                <div class="case-study-bottom">
+                  <div class="caption-row reveal"><p class="case-study-caption">1.2 EverTutor Studio (Creation platform)</p><span class="shipped-pill">Shipped</span></div>
+                  <div class="case-study-hl-row reveal">
+                    <p class="case-study-headline">Designed the authoring tool that made it possible, reducing lesson creation from 100+ hours to ~4 hours, without sacrificing quality</p>
+                  </div>
+                  <div class="cs-stat-row">
+                    <div class="cs-stat"><span class="cs-stat-value">96%</span><span class="cs-stat-label">Creation-time cut</span></div>
+                    <div class="cs-stat"><span class="cs-stat-value">700+</span><span class="cs-stat-label">Lessons produced</span></div>
+                    <div class="cs-stat"><span class="cs-stat-value">40hr &rarr; 2hr</span><span class="cs-stat-label">Onboarding time</span></div>
+                  </div>
+                </div>
               </div>
-              <div class="metric-card reveal">
-                <p class="metric-value"><mark>~300+ active tutoring hours</mark> daily</p>
-                <p class="metric-desc">Continuous real-time AI Tutor interactions across live classrooms</p>
+            </div><!-- /slide 1 ET Studio -->
+
+            <!-- ── Slide 2: ET Analytics ───────────────────────────── -->
+            <div class="work-full-slide work-full-slide--solo" id="csCardAnalytics">
+              <div class="work-cs-card work-cs-card--solo">
+                <div class="product-area product-area-analytics">
+                  <div class="tags-bar-overlay">
+                    <div class="tags-bar-track" id="tagsBarTrackAnalytics"></div>
+                  </div>
+                  <img id="productImgAnalytics" class="product-img-analytics" src="Dashboard Updated.png" alt="EverTutor Analytics Dashboard"/>
+                </div>
+                <div class="case-study-bottom">
+                  <div class="caption-row"><p class="case-study-caption">1.3 EverTutor Analytics (Analytics platform)</p><span class="shipped-pill">Shipped</span></div>
+                  <div class="case-study-hl-row">
+                    <p class="case-study-headline">Designed the analytics layer that closed the loop, turning raw student behavior into actionable insights for educators in real time</p>
+                    <div class="connect-frame">Connect for details</div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="metric-row">
-              <div class="metric-card reveal">
-                <p class="metric-value">From static lessons → <mark>adaptive instruction</mark></p>
-                <p class="metric-desc">Real-time personalization based on student responses</p>
-              </div>
-              <div class="metric-card reveal">
-                <p class="metric-value"><mark>Multimodal</mark> interaction model</p>
-                <p class="metric-desc">Voice-first system extended with multimodal inputs to support diverse student interaction preferences</p>
-              </div>
-            </div>
-          </div>
-        </div>
+            </div><!-- /slide 2 ET Analytics -->
 
-      </div><!-- /case-study-card-live -->
+          </div><!-- /etFullTrack -->
+        </div><!-- /work-hscroll-sticky ET -->
+      </div><!-- /work-hscroll-wrapper ET -->
 
-      <!-- ── CASE STUDY CARD 2 — EverTutor Studio ──────────────────── -->
-      <div class="case-study-card reveal" id="csCardStudio" style="--i:1">
+      <!-- ── STRESSIE ───────────────────────────────────────────────── -->
+      <div class="work-hscroll-wrapper" id="stressieHScroll" data-card-count="1">
+        <div class="work-hscroll-sticky" id="stressieSticky">
+          <div class="work-full-track" id="stressieFullTrack">
 
-        <!-- Product recording with scrolling tags bar -->
-        <div class="product-area">
+            <div class="work-full-slide work-full-slide--intro" id="csCardStressie">
 
-          <!-- scrolling tags strip at top -->
-          <div class="tags-bar-overlay">
-            <div class="tags-bar-track" id="tagsBarTrack"></div>
-          </div>
+              <!-- LEFT: dark summary card -->
+              <div class="work-summary-card">
 
-          <!-- ambient recording — NOT an interactive player
-               muted + playsinline are required for browser autoplay policy -->
-          <video
-            id="productVid"
-            class="product-video"
-            src="./et-studio-recording.mov"
-            muted
-            loop
-            playsinline
-            disablepictureinpicture
-            disableremoteplayback
-            preload="auto"
-          ></video>
+                <div class="work-card-header">
+                  <h2 class="work-card-title">2.Stressie</h2>
+                  <div class="work-view-tabs">
+                    <button class="work-view-tab active">
+                      <svg width="13" height="10" viewBox="0 0 13 10" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="12" height="7.5" rx="1.2" stroke="currentColor"/><path d="M4.5 9.5H8.5M6.5 8V9.5" stroke="currentColor" stroke-linecap="round"/></svg>
+                      Desktop
+                    </button>
+                    <button class="work-view-tab">
+                      <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="7" height="11" rx="1.2" stroke="currentColor"/><circle cx="4" cy="9.5" r="0.7" fill="currentColor"/></svg>
+                      Tablet
+                    </button>
+                  </div>
+                </div>
+                <!-- Meta chips row -->
+                <div class="work-blob-stage">
+                  <span class="work-blob-ring-dot work-blob-ring-dot--top"></span>
+                  <span class="work-blob-ring-dot work-blob-ring-dot--bottom"></span>
+                  <span class="work-blob-ring-dot work-blob-ring-dot--left"></span>
+                  <span class="work-blob-ring-dot work-blob-ring-dot--right"></span>
+                  <span class="work-blob-pill work-blob-pill--top">Harvard Innovation Labs</span>
+                  <span class="work-blob-pill work-blob-pill--left">Full redesign</span>
+                  <div class="work-blob-video" aria-hidden="true">
+                    <video class="proj-vid-light" autoplay muted loop playsinline preload="auto">
+                      <source src="blob-light.webm" type="video/webm" />
+                      <source src="blob-light.mp4" type="video/mp4" />
+                    </video>
+                    <video class="proj-vid-dark" autoplay muted loop playsinline preload="auto">
+                      <source src="blob-dark.webm" type="video/webm" />
+                      <source src="blob-dark.mov" type="video/quicktime" />
+                    </video>
+                  </div>
+                  <span class="work-blob-pill work-blob-pill--right">17.4% eng.</span>
+                  <span class="work-blob-pill work-blob-pill--bottom">Live at Amazon &amp; InKind</span>
+                </div>
 
-        </div>
+                <p class="work-desc-text">From pilot research to a <mark class="work-desc-highlight">Harvard-incubated product</mark> &mdash; a full redesign of workplace stress management, now live at Amazon and InKind.</p>
 
-        <!-- Caption + headline + CTA + metrics -->
-        <div class="case-study-bottom">
-          <div class="caption-row reveal"><p class="case-study-caption">1.2 EverTutor Studio (AI Tutor Creation Platform)</p><span class="shipped-pill">Shipped</span></div>
+                <div class="work-roles">
+                  <div class="work-role-item">
+                    <svg class="work-role-icon" viewBox="0 0 26 23" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.9423 14C13.0432 14.0001 13.0432 14.0001 13.1461 14.0002C15.4143 14.007 17.4942 14.488 19.5329 15.4799C19.5852 15.505 19.6375 15.5301 19.6914 15.556C22.2146 16.7807 24.8695 19.0562 25.9922 21.6812C26.0249 22.0421 25.9553 22.3327 25.7702 22.6426C25.4656 22.9211 25.2821 22.9713 24.8669 22.9648C24.5198 22.9356 24.2876 22.7289 24.0544 22.4866C23.9149 22.2951 23.7985 22.093 23.681 21.8876C23.279 21.218 22.8098 20.6413 22.2781 20.0705C22.2224 20.0102 22.2224 20.0102 22.1655 19.9488C19.8482 17.47 16.5103 16.1609 13.1543 16.0437C10.0853 16.0113 7.07819 17.1019 4.75715 19.104C4.69127 19.16 4.62539 19.216 4.55751 19.2736C3.43769 20.249 2.55677 21.4101 1.8003 22.6826C1.58525 22.9263 1.32044 22.966 1.00771 23C0.657636 22.9632 0.501049 22.8763 0.235619 22.6477C-0.0158556 22.2997 -0.0273058 22.0444 0.0253475 21.6366C0.112879 21.2832 0.31307 21.0125 0.523261 20.7198C0.589447 20.6246 0.589447 20.6246 0.65697 20.5276C2.14346 18.4091 3.98492 16.748 6.29125 15.5604C6.3658 15.522 6.3658 15.522 6.44185 15.4828C8.46686 14.4557 10.6801 13.9945 12.9423 14Z" fill="currentColor"/><circle cx="13" cy="7" r="7" fill="#789F04"/><circle cx="13" cy="7" r="6" stroke="#465D00" stroke-width="2"/></svg>
+                    Sole Product Designer
+                  </div>
+                  <div class="work-role-item">
+                    <svg class="work-role-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z" fill="#789F04" stroke="#465D00" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                    0 to 1 (app + system)
+                  </div>
+                  <div class="work-role-item">
+                    <svg class="work-role-icon" viewBox="0 0 29 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 12H11C11.5523 12 12 12.4477 12 13V23H2V13C2 12.4823 2.39333 12.0562 2.89746 12.0049L3 12Z" stroke="currentColor" stroke-width="2"/><path d="M18 1H26C26.5523 1 27 1.44772 27 2V23H17V2C17 1.48232 17.3933 1.05621 17.8975 1.00488L18 1Z" fill="#789F04" stroke="#465D00" stroke-width="2"/><line x1="1" y1="23" x2="28" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    17.4% engagement rate vs ~2% industry avg
+                  </div>
+                </div>
 
-          <div class="case-study-hl-row reveal">
-            <p class="case-study-headline">Designed the authoring tool that made it possible, reducing lesson creation from 100+ hours to ~4 hours, without sacrificing quality</p>
-            <a class="explore-btn" href="./evertutor-studio.html">Explore the system <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M4 12L12 4M12 4H6.5M12 4V9.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-          </div>
+              </div><!-- /work-summary-card Stressie -->
 
-          <div class="metric-cards">
-            <div class="metric-row">
-              <div class="metric-card reveal">
-                <p class="metric-value">Reduced lesson creation from <mark>100+ hrs → ~4 hrs</mark></p>
-                <p class="metric-desc">Replaced fragmented tools with a structured lesson system</p>
-              </div>
-              <div class="metric-card reveal">
-                <p class="metric-value"><mark>700+ lessons</mark> produced in 3,128 hrs</p>
-                <p class="metric-desc">Proven at scale across real classroom pilots and multiple subjects</p>
-              </div>
-            </div>
-            <div class="metric-row">
-              <div class="metric-card reveal">
-                <p class="metric-value"><mark>40–50 hrs → ~2 hrs</mark> onboarding for content designers</p>
-                <p class="metric-desc">Enabled non-technical educators to create lessons within hours</p>
-              </div>
-              <div class="metric-card reveal">
-                <p class="metric-value"><mark>Full control</mark> over AI Tutor behavior</p>
-                <p class="metric-desc">Real-time control of pacing, explanations, and scaffolding</p>
-              </div>
-            </div>
-          </div>
-        </div>
+              <!-- RIGHT: Stressie case study card -->
+              <div class="work-cs-card">
+                <div class="product-area product-area-stressie">
+                  <div class="tags-bar-overlay">
+                    <div class="tags-bar-track" id="tagsBarTrackStressie"></div>
+                  </div>
+                  <div class="stressie-phones-row" id="stressiePhoneRow">
+                    <img class="stressie-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Summary%20of%20the%20project/Home%20Screen%20Image.png" alt="Stressie home" />
+                    <img class="stressie-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%201.png" alt="Stressie onboarding 1" />
+                    <img class="stressie-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%202.png" alt="Stressie onboarding 2" />
+                    <img class="stressie-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%203.png" alt="Stressie onboarding 3" />
+                  </div>
+                  <span class="shipped-pill-overlay">Shipped</span>
+                </div>
+                <div class="case-study-bottom">
+                  <div class="caption-row reveal"><p class="case-study-caption">2.1 Stressie (Workplace stress management)</p><span class="shipped-pill">Shipped</span></div>
+                  <div class="case-study-hl-row reveal">
+                    <p class="case-study-headline">Took workplace stress from a vague problem to a Harvard-incubated product, redesigned end-to-end from pilot research, now live at Amazon and InKind</p>
+                  </div>
+                  <div class="cs-stat-row">
+                    <div class="cs-stat"><span class="cs-stat-value">17.4%</span><span class="cs-stat-label">Engagement vs ~2% avg</span></div>
+                    <div class="cs-stat"><span class="cs-stat-value">Harvard Labs</span><span class="cs-stat-label">Incubated</span></div>
+                    <div class="cs-stat"><span class="cs-stat-value">2 Live Pilots</span><span class="cs-stat-label">Amazon &amp; InKind</span></div>
+                  </div>
+                </div>
+              </div><!-- /work-cs-card Stressie -->
 
-      </div><!-- /case-study-card-studio -->
+            </div><!-- /slide Stressie -->
+          </div><!-- /stressieFullTrack -->
+        </div><!-- /work-hscroll-sticky Stressie -->
+      </div><!-- /work-hscroll-wrapper Stressie -->
 
-      <!-- ── CASE STUDY CARD 3 — EverTutor Analytics ─────────────── -->
-      <div class="case-study-card reveal" id="csCardAnalytics" style="--i:2">
-
-            <div class="product-area product-area-analytics">
-              <div class="tags-bar-overlay">
-                <div class="tags-bar-track" id="tagsBarTrackAnalytics"></div>
-              </div>
-              <img
-                id="productImgAnalytics"
-                class="product-img-analytics"
-                src="Dashboard Updated.png"
-                alt="EverTutor Analytics Dashboard"
-              />
-            </div>
-
-            <div class="case-study-bottom">
-              <div class="caption-row"><p class="case-study-caption">1.3 EverTutor Analytics (AI Tutor Analytics Platform)</p><span class="shipped-pill">Shipped</span></div>
-
-              <div class="case-study-hl-row">
-                <p class="case-study-headline">Designed the analytics layer that closed the loop, turning raw student behavior into actionable insights for educators in real time</p>
-                <div class="connect-frame">Connect for details</div>
-              </div>
-            </div>
-
-      </div><!-- /csCardAnalytics -->
-
-      <!-- ── CASE STUDY CARD 4 — Stressie ───────────────────────── -->
-      <div class="case-study-card reveal" id="csCardStressie" style="--i:3">
-
-        <div class="product-area product-area-stressie">
-          <div class="tags-bar-overlay">
-            <div class="tags-bar-track" id="tagsBarTrackStressie"></div>
-          </div>
-          <div class="stressie-phones-row" id="stressiePhoneRow">
-            <img class="stressie-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Summary%20of%20the%20project/Home%20Screen%20Image.png" alt="Stressie home" />
-            <img class="stressie-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%201.png" alt="Stressie onboarding 1" />
-            <img class="stressie-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%202.png" alt="Stressie onboarding 2" />
-            <img class="stressie-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%203.png" alt="Stressie onboarding 3" />
-          </div>
-          <span class="shipped-pill-overlay">Shipped</span>
-        </div>
-
-        <div class="case-study-bottom">
-
-          <div class="case-study-hl-row reveal">
-            <p class="case-study-headline">Took workplace stress from a vague problem to a Harvard-incubated product, redesigned end-to-end from pilot research, now live at Amazon and InKind</p>
-            <a class="explore-btn" href="./stressie-studio.html">Explore the case study <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M4 12L12 4M12 4H6.5M12 4V9.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-          </div>
-
-          <div class="metric-cards">
-            <div class="metric-row">
-              <div class="metric-card reveal">
-                <p class="metric-value"><mark>17.4%</mark> engagement rate vs ~2% industry average</p>
-                <p class="metric-desc">Measured across the Version 1 pilot with 50 Austin Police Department officers</p>
-              </div>
-              <div class="metric-card reveal">
-                <p class="metric-value">Incubated at <mark>Harvard Innovation Labs</mark></p>
-                <p class="metric-desc">Selected and supported by one of the world's leading startup incubators</p>
-              </div>
-            </div>
-            <div class="metric-row">
-              <div class="metric-card reveal">
-                <p class="metric-value">Piloting at <mark>Amazon &amp; InKind</mark></p>
-                <p class="metric-desc">Active enterprise pilots validating the redesigned experience with real workplace users</p>
-              </div>
-              <div class="metric-card reveal">
-                <p class="metric-value"><mark>Full redesign</mark> from V1 pilot research</p>
-                <p class="metric-desc">Rebuilt IA, visual language, and onboarding based on structured pilot feedback from 50 users</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /csCardStressie -->
-
-      </div><!-- /cs-stack -->
 
       <!-- ── ABOUT ──────────────────────────────────────────────── -->
       <div class="about-section reveal" id="aboutSection">
@@ -5833,7 +6576,7 @@
     const lottieWaveEl   = document.getElementById('lottieWave');
     const cursorEl       = document.querySelector('#greeting .cursor');
 
-    const phrase = "Hi! This is Bhanu";
+    const phrase = "Hi ! This is Bhanu.";
     let charIdx = 0;
 
     const waveAnim = lottie.loadAnimation({
@@ -5863,6 +6606,21 @@
 
     greetingTextEl.textContent = '';
     setTimeout(tick, 800);
+
+    /* nav wave — plays once on load */
+    const navWaveEl = document.getElementById('navWave');
+    if (navWaveEl) {
+      const navWaveAnim = lottie.loadAnimation({
+        container: navWaveEl,
+        renderer : 'svg',
+        loop     : false,
+        autoplay : false,
+        path     : 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f44b/lottie.json'
+      });
+      navWaveAnim.addEventListener('DOMLoaded', () => {
+        setTimeout(() => navWaveAnim.play(), 400);
+      });
+    }
 
 
     /* ═══════════════════════════════════════════════════════════
@@ -6469,6 +7227,7 @@
       '.hf-metric-headline','.hf-metric-sub','.hf-section-label',
       '.greeting','.cs-headline','.case-study-meta',
       '.footer-label','.footer-value',
+      '.cp-bubble','.cp-msgs',
     ].join(',');
 
     const CTA_SEL     = 'a[href], button, [role="button"]';
@@ -7419,9 +8178,99 @@
     function start() { if (!running) { running = true; raf = requestAnimationFrame(loop); } }
     function stop()  { running = false; if (raf) cancelAnimationFrame(raf); raf = null; }
 
-    // Static placement only — bubbles no longer revolve (animation removed).
-    place(0);
-    window.addEventListener('resize', function () { place(0); }, { passive: true });
+    start();
+    window.addEventListener('resize', function () { place(performance.now()); }, { passive: true });
+  })();
+
+  /* ── STRESSIE ORBIT — same pattern, different stage ─────────── */
+  (function () {
+    var stage = document.getElementById('stressieOrbitStage');
+    var wrap  = document.getElementById('stressieOrbitNodes');
+    if (!stage || !wrap) return;
+
+    var dots    = [].slice.call(wrap.querySelectorAll('.proj-dot'));
+    var bubbles = [].slice.call(wrap.querySelectorAll('.proj-bubble'));
+    var tails   = bubbles.map(function (b) { return b.querySelector('.proj-tail'); });
+    if (bubbles.length < 3) return;
+
+    var D2R    = Math.PI / 180;
+    var START  = [45 * D2R, 165 * D2R, 285 * D2R];
+    var PERIOD = 54;
+    var OMEGA  = (2 * Math.PI) / PERIOD;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function place(now) {
+      var W = stage.clientWidth, H = stage.clientHeight;
+      if (!W) return;
+      var cx = W / 2, cy = H / 2;
+      var Rd = W * 0.333, Rb = W * 0.385;
+      var spin = reduce ? 0 : (now / 1000) * OMEGA;
+      for (var i = 0; i < 3; i++) {
+        var a = START[i] + spin, ca = Math.cos(a), sa = Math.sin(a);
+        dots[i].style.transform = 'translate(' + (cx + Rd * ca) + 'px,' + (cy + Rd * sa) + 'px) translate(-50%,-50%)';
+        var bx = cx + Rb * ca, by = cy + Rb * sa;
+        bubbles[i].style.transform = 'translate(' + bx + 'px,' + by + 'px) translate(-50%,-50%)';
+        var bw = bubbles[i].offsetWidth, bh = bubbles[i].offsetHeight;
+        var dx = cx - bx, dy = cy - by, dl = Math.hypot(dx, dy) || 1;
+        var ux = dx / dl, uy = dy / dl;
+        var tX = Math.abs(ux) > 1e-3 ? (bw / 2) / Math.abs(ux) : 1e9;
+        var tY = Math.abs(uy) > 1e-3 ? (bh / 2) / Math.abs(uy) : 1e9;
+        var edge = Math.min(tX, tY);
+        var ex = bw / 2 + ux * edge, ey = bh / 2 + uy * edge;
+        tails[i].style.transform = 'translate(' + ex + 'px,' + ey + 'px) translate(-50%,-50%) rotate(' + (Math.atan2(uy, ux) / D2R) + 'deg)';
+      }
+    }
+    var raf = null;
+    function loop(now) { place(now); raf = requestAnimationFrame(loop); }
+    loop(0);
+    window.addEventListener('resize', function () { place(performance.now()); }, { passive: true });
+  })();
+
+  /* ── WORK SECTION — scroll-driven full-panel horizontal pan ─── */
+  (function () {
+    function initHScroll(wrapperId, fullTrackId, dotsId) {
+      var wrapper   = document.getElementById(wrapperId);
+      var fullTrack = document.getElementById(fullTrackId);
+      if (!wrapper || !fullTrack) return;
+      var sticky    = wrapper.querySelector('.work-hscroll-sticky');
+      var dotsEl    = dotsId ? document.getElementById(dotsId) : null;
+      var dots      = dotsEl ? [].slice.call(dotsEl.querySelectorAll('.work-prog-dot')) : [];
+      var cardCount   = parseInt(wrapper.dataset.cardCount, 10) || 1;
+      var transitions = cardCount - 1;
+      if (transitions < 1) return;
+
+      function update() {
+        var rect       = wrapper.getBoundingClientRect();
+        var scrollable = wrapper.offsetHeight - window.innerHeight;
+        var progress   = Math.max(0, Math.min(1, -rect.top / scrollable));
+        var slideW     = sticky ? sticky.offsetWidth : window.innerWidth;
+        fullTrack.style.transform = 'translateX(' + (-(progress * transitions * slideW)) + 'px)';
+        var active = Math.min(transitions, Math.round(progress * transitions));
+        dots.forEach(function (d, i) { d.classList.toggle('active', i === active); });
+      }
+
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update, { passive: true });
+      update();
+    }
+
+    initHScroll('etHScroll', 'etFullTrack', 'etProgDots');
+  })();
+
+  /* ── WORK SECTION — Desktop/Tablet view tabs ────────────────── */
+  (function () {
+    var tabGroups = document.querySelectorAll('.work-view-tabs');
+    tabGroups.forEach(function (group) {
+      var tabs = group.querySelectorAll('.work-view-tab');
+      var slide = group.closest('.work-full-slide');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          tabs.forEach(function (t) { t.classList.remove('active'); });
+          tab.classList.add('active');
+          if (slide) slide.setAttribute('data-view', tab.dataset.view);
+        });
+      });
+    });
   })();
 
   /* ── HAMBURGER MENU ──────────────────────────────────────────── */
@@ -7606,6 +8455,18 @@
     }
   })();
 
+  /* ── Tool icons: sync src with theme (CSS background-image blocks in Safari) ── */
+  (function syncToolIcons() {
+    function update() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.querySelectorAll('.tool-ic[data-dark]').forEach(function(img) {
+        img.src = dark ? img.dataset.dark : img.dataset.light;
+      });
+    }
+    update();
+    new MutationObserver(update).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  })();
+
   /* ── Fix nav position: move nav out of will-change:transform ancestor (browser extension compat) ── */
   (function fixNavContainingBlock() {
     function fix() {
@@ -7732,7 +8593,7 @@
       </div>
       <div class="cb-row">
         <img class="cb-photo" src="photo.jpg" alt="Bhanu" />
-        <input class="cb-input" id="cbInput" type="text" placeholder="Ask me something…" autocomplete="off" spellcheck="false" />
+        <input class="cb-input" id="cbInput" type="text" placeholder="" autocomplete="off" spellcheck="false" />
         <button class="cb-mic" id="cbMic" aria-label="Voice input">
           <svg class="cb-mic-ic" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
           <svg class="cb-stop-ic" viewBox="0 0 24 24"><rect x="7.5" y="7.5" width="9" height="9" rx="2.5"/></svg>
@@ -7756,11 +8617,9 @@
       <button class="cp-close" id="cpClose" aria-label="Close chat">×</button>
     </div>
 
-    <div class="cp-msgs" id="cpMsgs">
-      <div class="cp-msg assistant cp-done">
-        <span class="cp-ava" aria-hidden="true"><img class="cp-ava-img" src="photo.jpg" alt=""></span>
-        <div class="cp-bubble">Hey! I'm Bhanu's portfolio AI. Ask me about his projects, how he thinks about design, or what kind of role he's looking for.</div>
-      </div>
+    <div class="cp-msgs-wrap">
+      <div class="cp-fade-top" aria-hidden="true"></div>
+      <div class="cp-msgs" id="cpMsgs"></div>
     </div>
     <div id="cpSR" aria-live="polite" aria-atomic="true"
       style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;"></div>
@@ -7966,6 +8825,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       var overflow = cpMsgs.scrollHeight - cpMsgs.clientHeight;
       var atBottom = overflow - cpMsgs.scrollTop < 24;
       cpMsgs.classList.toggle('cp-has-more', overflow > 24 && !atBottom);
+      cpMsgs.parentNode.classList.toggle('cp-scrolled', cpMsgs.scrollTop > 8);
     }
     cpMsgs.addEventListener('scroll', updateMoreCue, { passive: true });
 
@@ -8068,7 +8928,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     function makeStreamCtx(shellEl) {
       return { el: shellEl, ctrl: null, raw: '', full: '', queue: [], started: false,
                done: false, finalized: false, aborted: false,
-               wordsEl: null, caretEl: null, rafId: 0, lastTs: 0 };
+               bubbleEl: null, shown: '', rafId: 0, lastTs: 0 };
     }
 
     var CP_WORD_RE = /\S+\s+/g;
@@ -8079,17 +8939,16 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (ctx.done && ctx.raw) { ctx.queue.push(ctx.raw); ctx.raw = ''; }   // flush final partial word
     }
 
-    /* strip inline markdown from the VISIBLE stream only; renderMd restores it at finalize */
-    function cleanToken(tok) {
-      return tok.replace(/\*\*/g, '')
-                .replace(/(^|\s)[*_]{1,2}(?=\S)/g, '$1')
-                .replace(/(\S)[*_]{1,2}(?=\s|$)/g, '$1')
-                .replace(/^\s*[-*]\s+/, '');
-    }
     function appendWord(ctx, token) {
-      var s = document.createElement('span');
-      s.className = 'cp-word'; s.textContent = cleanToken(token);
-      ctx.wordsEl.insertBefore(s, ctx.caretEl);            // words flow before the trailing caret
+      ctx.shown += token;                                  // accumulate revealed source (keeps newlines)
+      ctx.bubbleEl.innerHTML = renderMd(ctx.shown);        // live markdown — paragraphs/bullets/bold form AS it streams
+      var caret = document.createElement('span');
+      caret.className = 'cp-cursor cp-live';
+      var last = ctx.bubbleEl.lastElementChild;
+      if (last && last.tagName === 'UL' && last.lastElementChild)
+        last.lastElementChild.appendChild(caret);          // caret rides the last bullet
+      else
+        ctx.bubbleEl.appendChild(caret);                   // …or trails the last paragraph
     }
 
     var CP_WORD_INTERVAL = REDUCE ? 0 : 28;   // ms between words → steady ~36 wps, Claude-Code-like
@@ -8114,26 +8973,83 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (!ctx.started) {                                  // ── first token: honest handoff ──
         ctx.started = true;
         stopThinking();
-        ctx.el.querySelector('.cp-ava').classList.remove('cp-ava-loading');   // ring → static photo
+        cpShowPhoto(ctx.el);                               // squares loader → Bhanu's photo avatar
         var b = ctx.el.querySelector('.cp-bubble');
         b.classList.remove('cp-thinking'); b.classList.add('cp-streaming');
         b.setAttribute('aria-hidden', 'true');             // stays hidden while words churn
         b.innerHTML = '';
-        ctx.wordsEl = document.createElement('span'); ctx.wordsEl.className = 'cp-words';
-        ctx.caretEl = document.createElement('span'); ctx.caretEl.className = 'cp-cursor cp-live';
-        ctx.wordsEl.appendChild(ctx.caretEl); b.appendChild(ctx.wordsEl);
+        ctx.bubbleEl = b; ctx.shown = '';                  // markdown renders straight into the bubble, word by word
       }
       drainWords(ctx); startPump(ctx);
+    }
+
+    function renderFollowUps(shellEl, questions) {
+      var frame = shellEl.querySelector('.cp-frame');
+      if (!frame) return;
+      var fqs = document.createElement('div');
+      fqs.className = 'cp-followups';
+      var lbl = document.createElement('div');
+      lbl.className = 'cp-fq-label';
+      lbl.textContent = 'Follow-up:';
+      fqs.appendChild(lbl);
+      questions.forEach(function (q, i) {
+        var btn = document.createElement('button');
+        btn.className = 'cp-fq';
+        btn.style.animationDelay = (i * 0.07) + 's';
+        btn.textContent = q;
+        btn.addEventListener('click', function () {
+          cpMsgs.querySelectorAll('.cp-followups').forEach(function (el) { el.remove(); });
+          appendMsg('user', q);
+          messages.push({ role: 'user', content: q });
+          streamReply();
+        });
+        fqs.appendChild(btn);
+      });
+      frame.appendChild(fqs);
+      updateMoreCue();
+    }
+
+    function fetchFollowUps(ctx) {
+      var fqMsgs = messages.concat([{
+        role: 'user',
+        content: 'Suggest exactly 3 short follow-up questions a recruiter might ask next. Return ONLY a JSON array of 3 strings. Each under 60 characters, no trailing punctuation.'
+      }]);
+      fetch(API_BASE + '/api/chat', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 200,
+          system: SYSTEM,
+          messages: fqMsgs,
+          stream: false
+        })
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var text = (data.content && data.content[0] && data.content[0].text) || '';
+        text = text.replace(/```[\w]*\n?/g, '').replace(/```/g, '').trim();
+        var qs;
+        try { qs = JSON.parse(text); } catch (e) {
+          qs = text.split('\n')
+            .map(function (l) { return l.replace(/^[\d\.\-\*\s\["']+|[\]"',\s]+$/g, '').trim(); })
+            .filter(function (l) { return l.length > 5; });
+        }
+        if (!Array.isArray(qs) || !qs.length) return;
+        renderFollowUps(ctx.el, qs.slice(0, 3));
+      })
+      .catch(function () {});
     }
 
     function reallyFinalize(ctx) {
       if (ctx.finalized || ctx.aborted) return;
       ctx.finalized = true; ctx.rafId = 0; stopThinking();
+      cpEl.classList.remove('cp-busy');                    // rainbow orb → rest: ~90% dimmer, sinks low
       var b = ctx.el.querySelector('.cp-bubble');
       if (!ctx.started) {                                  // no token ever arrived
         b.className = 'cp-bubble'; b.removeAttribute('aria-hidden');
         b.textContent = 'No response — try again.';
-        ctx.el.querySelector('.cp-ava').classList.remove('cp-ava-loading');
+        cpShowPhoto(ctx.el);
         ctx.el.classList.add('cp-done');
         if (activeCtx === ctx) activeCtx = null;
         return;
@@ -8144,6 +9060,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (cpSR) cpSR.textContent = ctx.full;               // announce the complete answer ONCE
       updateMoreCue();
       if (activeCtx === ctx) activeCtx = null;
+      fetchFollowUps(ctx);
     }
 
     /* ── Streaming reply ── */
@@ -8156,6 +9073,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       var ctrl = new AbortController();
       var ctx  = makeStreamCtx(appendStreamBubble());
       ctx.ctrl = ctrl; activeCtx = ctx;
+      cpEl.classList.add('cp-busy');                       // rainbow orb → full intensity + fast spin
       requestAnimationFrame(function () { scrollAssistantIntoView(ctx.el); });   // position once, then hold
 
       try {
@@ -8209,6 +9127,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         ctx.aborted = true; ctx.done = true;
         if (ctx.rafId) cancelAnimationFrame(ctx.rafId);
         stopThinking();
+        cpEl.classList.remove('cp-busy');
         if (activeCtx === ctx) activeCtx = null;
         if (err.name === 'AbortError') {
           ctx.el.remove();                                   // panel closed mid-stream — silent
@@ -8223,6 +9142,28 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     }
 
     /* ── DOM helpers ── */
+    var COPY_IC  = '<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+    var CHECK_IC = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+
+    function makeMeta() {
+      var now = new Date();
+      var t = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      var m = document.createElement('div');
+      m.className = 'cp-msg-meta'; m.setAttribute('aria-hidden', 'true');
+      m.innerHTML = '<span class="cp-msg-time">' + t + '</span>' +
+        '<button class="cp-copy" tabindex="-1">' + COPY_IC + '</button>';
+      m.querySelector('.cp-copy').addEventListener('click', function () {
+        var bubble = m.closest('.cp-msg').querySelector('.cp-bubble');
+        var txt = (bubble.innerText || bubble.textContent).trim();
+        navigator.clipboard.writeText(txt).then(function () {
+          var btn = m.querySelector('.cp-copy');
+          btn.innerHTML = CHECK_IC; btn.classList.add('cp-copied');
+          setTimeout(function () { btn.innerHTML = COPY_IC; btn.classList.remove('cp-copied'); }, 1800);
+        });
+      });
+      return m;
+    }
+
     function appendMsg(role, text) {
       var div = document.createElement('div');
       div.className = 'cp-msg cp-enter ' + role;
@@ -8235,17 +9176,31 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     function appendStreamBubble() {
       var div = document.createElement('div');
       div.className = 'cp-msg assistant cp-enter';
-      div.innerHTML =
-        '<span class="cp-ava cp-ava-loading" aria-hidden="true">' +
-          '<img class="cp-ava-img" src="photo.jpg" alt="">' +
-        '</span>' +
+      var frame = document.createElement('div');
+      frame.className = 'cp-frame';
+      frame.innerHTML =
         '<div class="cp-bubble cp-thinking" aria-hidden="true">' +
+          '<img class="cp-think-ava" src="photo.jpg" alt="" aria-hidden="true">' +
+          '<span class="cp-squares" aria-hidden="true"><i></i><i></i><i></i></span>' +
           '<span class="cp-status"></span>' +
         '</div>';
+      div.appendChild(frame);
       cpMsgs.appendChild(div);
       div.addEventListener('animationend', function (e) { if (e.target === div) div.classList.remove('cp-enter'); }, { once: true });
       startThinking(div.querySelector('.cp-status'));
       return div;
+    }
+
+    /* swap the squares loader for Bhanu's photo avatar once the real answer begins */
+    function cpShowPhoto(shellEl) {
+      var sq = shellEl.querySelector('.cp-squares');
+      if (sq) sq.remove();
+      if (!shellEl.querySelector('.cp-ava')) {
+        var ava = document.createElement('span');
+        ava.className = 'cp-ava'; ava.setAttribute('aria-hidden', 'true');
+        ava.innerHTML = '<img class="cp-ava-img" src="photo.jpg" alt="">';
+        shellEl.insertBefore(ava, shellEl.firstChild);
+      }
     }
 
     function esc(s) {
@@ -8258,7 +9213,11 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       var lines = s.split('\n'), out = [], inList = false;
       for (var i = 0; i < lines.length; i++) {
         var l = lines[i];
-        if (/^- (.+)/.test(l)) {
+        var h = l.match(/^#{1,4}\s+(.+)/);                  // # / ## / ### headings → bold line
+        if (h) {
+          if (inList) { out.push('</ul>'); inList = false; }
+          out.push('<strong>' + h[1] + '</strong>');
+        } else if (/^- (.+)/.test(l)) {
           if (!inList) { out.push('<ul>'); inList = true; }
           out.push('<li>' + l.replace(/^- /, '') + '</li>');
         } else {
@@ -8287,10 +9246,11 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (state) voiceToast.classList.add('vt-' + state);
       if (msg && voiceToastMsg) voiceToastMsg.textContent = msg;
       if (recordTarget === 'panel' && cpMsgs) {
-        // inside the chat panel, pinned just above the chat space
-        var pr = cpMsgs.getBoundingClientRect();
-        voiceToast.style.bottom = 'auto';
-        voiceToast.style.top  = (pr.top + 10) + 'px';
+        // inside the chat panel, pinned just above the input dock (bottom of the chat space)
+        var dock = (cpEl || document).querySelector('.cp-input-row');
+        var pr = (dock || cpMsgs).getBoundingClientRect();
+        voiceToast.style.top  = 'auto';
+        voiceToast.style.bottom = (window.innerHeight - pr.top + 10) + 'px';
         voiceToast.style.left = (pr.left + pr.width / 2) + 'px';
       } else {
         // pin just above the floating ask bar
@@ -8527,34 +9487,46 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
     /* ── Rotating placeholder ── */
     var PLACEHOLDERS = [
-      'Ask how I built a $70M product from zero as the only designer…',
-      'Ask how I designed a scalable lesson tool in 6 hours…',
-      'Ask how I made an AI feel human enough to teach…',
-      'Ask what I learned from 50 police officers tearing apart my work…',
-      'Ask how I built a handwriting system from scratch in 48 hours…',
-      'Ask why usability without craft is just a wireframe…',
-      'Ask how I led a 10-person team without being an educator…',
+      "What's the most complex problem you've designed through?",
+      "Walk me through a 0→1 product you shipped",
+      "How do you design when the problem is still ambiguous?",
+      "What metrics did your work actually move?",
+      "How do you push back when the brief is wrong?",
+      "What does your handoff to engineers look like?",
+      "Tell me about a tradeoff you made under pressure",
     ];
     (function () {
-      var idx = 0, charIdx = 0, typing = true;
+      var idx = 0, charIdx = 0, typing = true, paused = false, t;
       function tick() {
-        if (document.activeElement === cbInput || document.body.classList.contains('chat-open')) {
-          setTimeout(tick, 300); return;
+        if (paused || document.body.classList.contains('chat-open')) {
+          t = setTimeout(tick, 300); return;
         }
         var target = PLACEHOLDERS[idx];
         if (typing) {
           charIdx++;
           cbInput.placeholder = target.slice(0, charIdx);
-          if (charIdx >= target.length) { typing = false; setTimeout(tick, 2600); return; }
-          setTimeout(tick, 38);
+          if (charIdx >= target.length) { typing = false; t = setTimeout(tick, 2600); return; }
+          t = setTimeout(tick, 38);
         } else {
           charIdx--;
           cbInput.placeholder = target.slice(0, charIdx);
-          if (charIdx <= 0) { typing = true; idx = (idx + 1) % PLACEHOLDERS.length; setTimeout(tick, 400); return; }
-          setTimeout(tick, 18);
+          if (charIdx <= 0) { typing = true; idx = (idx + 1) % PLACEHOLDERS.length; t = setTimeout(tick, 400); return; }
+          t = setTimeout(tick, 18);
         }
       }
-      setTimeout(tick, 1400);
+      cbInput.addEventListener('focus', function () {
+        paused = true;
+        clearTimeout(t);
+        cbInput.placeholder = '';
+      });
+      cbInput.addEventListener('blur', function () {
+        if (!cbInput.value) {
+          paused = false;
+          charIdx = 0; typing = true;
+          t = setTimeout(tick, 600);
+        }
+      });
+      t = setTimeout(tick, 1400);
     })();
 
   })();
@@ -9126,6 +10098,73 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       window.addEventListener('glassloaderhidden', () => setTimeout(releaseGPU, 1100));
       setTimeout(releaseGPU, 8000);   // hard fallback, well past the loader's own cap
     }
+  </script>
+
+  <script>
+  (function() {
+    var indicator = document.getElementById('navIndicator');
+    var navLinks  = document.querySelector('.nav-links');
+    var workLinks = Array.from(document.querySelectorAll('.nav-work'));
+
+    function moveIndicator(linkEl) {
+      workLinks.forEach(function(l) { l.classList.remove('nav-active'); });
+      if (!linkEl || !navLinks || !indicator) return;
+      linkEl.classList.add('nav-active');
+      var containerRect = navLinks.getBoundingClientRect();
+      var linkRect      = linkEl.getBoundingClientRect();
+      indicator.style.left  = (linkRect.left - containerRect.left) + 'px';
+      indicator.style.width = linkRect.width + 'px';
+      indicator.classList.add('visible');
+    }
+
+    // Click: immediately snap indicator
+    workLinks.forEach(function(link) {
+      link.addEventListener('click', function() { moveIndicator(link); });
+    });
+
+    // Reposition on resize
+    window.addEventListener('resize', function() {
+      var active = document.querySelector('.nav-work.nav-active');
+      if (active) moveIndicator(active);
+    });
+
+    // Scroll spy
+    var sectionMap = [
+      { id: 'contactSection', href: '#contactSection' },
+      { id: 'aboutSection',   href: '#aboutSection'   },
+      { id: 's2Section',      href: '#s2Section'       },
+    ];
+
+    if ('IntersectionObserver' in window) {
+      sectionMap.forEach(function(item) {
+        var el   = document.getElementById(item.id);
+        var link = workLinks.find(function(l) { return l.getAttribute('href') === item.href; });
+        if (!el || !link) return;
+        new IntersectionObserver(function(entries) {
+          entries.forEach(function(e) { if (e.isIntersecting) moveIndicator(link); });
+        }, { threshold: 0.15, rootMargin: '-56px 0px -35% 0px' }).observe(el);
+      });
+    }
+
+    // Default to WORK on load
+    window.addEventListener('load', function() {
+      var workLink = workLinks.find(function(l) { return l.getAttribute('href') === '#s2Section'; });
+      if (workLink) moveIndicator(workLink);
+    });
+  })();
+  </script>
+
+  <script>
+    (function() {
+      var bar = document.getElementById('scrollProgress');
+      function updateProgress() {
+        var scrollTop = window.scrollY || document.documentElement.scrollTop;
+        var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        var pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        bar.style.width = pct + '%';
+      }
+      window.addEventListener('scroll', updateProgress, { passive: true });
+    })();
   </script>
 
 </body>
