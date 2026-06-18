@@ -74,6 +74,20 @@ Key files (all under the worktree path):
 
 ---
 
+## Layout — Master Frame Rule
+
+The `.card` (master frame) always floats centered over the dotted mesh background. Padding is set on `.page` using percentages so the mesh is always visible on both sides.
+
+| Breakpoint | `.page` horizontal padding | Card width |
+|---|---|---|
+| Desktop ≥ 1024px | `10%` each side | 80% of viewport |
+| iPad / tablet ≤ 1023px | `10%` each side | 80% of viewport |
+| Mobile ≤ 767px | `5%` each side | 90% of viewport |
+
+**Never change these to fixed pixel values on desktop/tablet.** The percentage ensures the mesh is always visible regardless of screen size (e.g. 1920px → 192px each side, 1440px → 144px each side).
+
+---
+
 ## When in Doubt
 
 Ask. Never assume a deletion or rewrite is safe. The user would rather be asked an extra question than lose hours of work.
