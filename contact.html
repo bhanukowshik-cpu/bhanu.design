@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Bhanu Kowshik</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;1,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:      #E6F28D;
+      --secondary:    #252525;
+      --bg:           #FFFCF8;
+      --font-heading: 'Montserrat', sans-serif;
+      --font-mono:    'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: #FFFCF8;
+      background-image: radial-gradient(circle, rgba(0,0,0,0.16) 1px, transparent 1px);
+      background-size: 16px 16px;
+      background-attachment: fixed;
+      min-height: 100vh;
+      font-family: var(--font-heading);
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAV ───────────────────────────────────────────────── */
+    .top-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 32px;
+      background: transparent;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .top-nav.scrolled {
+      background: rgba(255,252,248,0.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      border-radius: 0 0 20px 20px;
+    }
+    .nav-brand { display: flex; flex-direction: column; gap: 1px; text-decoration: none; }
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--secondary);
+      letter-spacing: 0.02em;
+    }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-work {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      color: var(--secondary);
+      text-decoration: none;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    .nav-work:hover, .nav-work.active { opacity: 1; }
+
+    /* ── MAIN ──────────────────────────────────────────────── */
+    .page {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 94px 24px 80px;
+    }
+
+    .contact-card {
+      background: #ffffff;
+      border-radius: 30px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 12px 40px rgba(0,0,0,0.10);
+      padding: 72px 80px;
+      max-width: 780px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+
+    .contact-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      color: rgba(37,37,37,0.38);
+      text-transform: uppercase;
+    }
+
+    .contact-heading {
+      font-family: var(--font-heading);
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      line-height: 1.18;
+      color: var(--secondary);
+      letter-spacing: -0.02em;
+    }
+
+    .contact-heading .highlight {
+      background: var(--primary);
+      border-radius: 6px;
+      padding: 0 6px;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .contact-icon {
+      width: 44px;
+      height: 44px;
+      background: #F5F5F0;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .contact-icon svg { display: block; }
+
+    .contact-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .contact-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.10em;
+      color: rgba(37,37,37,0.38);
+      text-transform: uppercase;
+    }
+
+    .contact-value {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--secondary);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .contact-value:hover { opacity: 0.5; }
+
+    .copy-btn {
+      margin-left: auto;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      opacity: 0.4;
+      transition: opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+    }
+    .copy-btn:hover { opacity: 1; background: #F5F5F0; }
+    .copy-btn .icon-check { display: none; }
+    .copy-btn.copied .icon-clipboard { display: none; }
+    .copy-btn.copied .icon-check { display: block; }
+
+    .contact-divider {
+      width: 100%;
+      height: 1px;
+      background: #EFEFEF;
+    }
+
+    /* ── FOOTER ────────────────────────────────────────────── */
+    .site-footer {
+      background: #1A1917;
+      padding: 22px 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .footer-text {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.10em;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ── RESPONSIVE ────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .contact-card { padding: 40px 28px; gap: 36px; }
+      .nav-links { display: none; }
+      .contact-heading { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="top-nav" id="topNav">
+    <a class="nav-brand" href="./index.html">
+      <span class="nav-logo">Bhanu Kowshik</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-work" href="./index.html#s2Section">WORK</a>
+      <a class="nav-work" href="./resume.pdf" target="_blank" rel="noopener">RESUME</a>
+      <a class="nav-work active" href="./contact.html">CONTACT</a>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="contact-card">
+
+      <span class="contact-eyebrow">Get in touch</span>
+
+      <h1 class="contact-heading">
+        Let's make complex flows seem<br>
+        simple to use and bring&nbsp;<span class="highlight">delight.</span>
+      </h1>
+
+      <div class="contact-links">
+
+        <div class="contact-row">
+          <div class="contact-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#252525" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="3"/>
+              <polyline points="2,4 12,13 22,4"/>
+            </svg>
+          </div>
+          <div class="contact-detail">
+            <span class="contact-label">Email</span>
+            <a class="contact-value" href="mailto:kowshikbhanu1000@gmail.com">kowshikbhanu1000@gmail.com</a>
+          </div>
+          <button class="copy-btn" aria-label="Copy email" data-copy="kowshikbhanu1000@gmail.com">
+            <svg class="icon-clipboard" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#252525" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 17 20 7"/></svg>
+          </button>
+        </div>
+
+        <div class="contact-divider"></div>
+
+        <div class="contact-row">
+          <div class="contact-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#252525" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.64 3.35 2 2 0 0 1 3.61 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 5.49 5.49l.96-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <div class="contact-detail">
+            <span class="contact-label">Phone</span>
+            <a class="contact-value" href="tel:+15128448316">+1 (512) 844-8316</a>
+          </div>
+          <button class="copy-btn" aria-label="Copy phone" data-copy="+15128448316">
+            <svg class="icon-clipboard" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#252525" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 17 20 7"/></svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <span class="footer-text">© 2025 Bhanu Kowshik — Product Designer</span>
+  </footer>
+
+  <script>
+    /* nav scroll effect */
+    const nav = document.getElementById('topNav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+
+    /* copy buttons */
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const text = btn.dataset.copy;
+        navigator.clipboard.writeText(text).then(() => {
+          btn.classList.add('copied');
+          setTimeout(() => btn.classList.remove('copied'), 2000);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

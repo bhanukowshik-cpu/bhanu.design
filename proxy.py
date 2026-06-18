@@ -10,8 +10,27 @@ Then open http://localhost:8080/chat-test.html
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
+import os
 import urllib.request
 import urllib.error
+
+
+def load_dotenv():
+    """Load KEY=VALUE pairs from a sibling .env into os.environ (no overwrite)."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    try:
+        with open(path) as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, _, val = line.partition("=")
+                os.environ.setdefault(key.strip(), val.strip())
+    except FileNotFoundError:
+        pass
+
+
+load_dotenv()
 
 
 class ProxyHandler(BaseHTTPRequestHandler):
@@ -44,7 +63,8 @@ class ProxyHandler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length))
 
-        api_key = body.pop("apiKey", "")
+        # Accept key from request body (chat-test.html) or env var (index.html)
+        api_key = body.pop("apiKey", "") or os.environ.get("ANTHROPIC_API_KEY", "")
         payload = json.dumps(body).encode()
 
         req = urllib.request.Request(
@@ -92,7 +112,8 @@ class ProxyHandler(BaseHTTPRequestHandler):
         """Pass multipart audio body through to Whisper as-is."""
         length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(length)
-        api_key = self.headers.get("X-OpenAI-Key", "")
+        # Accept key from header (chat-test.html) or env var (index.html)
+        api_key = self.headers.get("X-OpenAI-Key", "") or os.environ.get("OPENAI_API_KEY", "")
         content_type = self.headers.get("Content-Type", "")
 
         req = urllib.request.Request(
