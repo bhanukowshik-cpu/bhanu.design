@@ -6132,6 +6132,32 @@
     }
     .s2-animating .s2-scroll-cue { opacity: 0; }
 
+    /* ── Proj-cue: fixed viewport-bottom hint during proj-card phases ── */
+    #proj-scroll-cue {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      z-index: 30;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    #proj-scroll-cue.visible { opacity: 1; }
+    #proj-scroll-cue svg { animation: s2-cue-bounce 1.6s ease-in-out infinite; }
+
+    /* ── ET Glimpse dim during proj-card reveal ── */
+    .ws-et-hero { transition: opacity 0.5s ease, filter 0.5s ease; }
+    .ws-section.ws-dimmed .ws-et-hero {
+      opacity: 0.15;
+      filter: grayscale(1);
+    }
+    .ws-section.ws-dimmed:hover .ws-et-hero {
+      opacity: 1;
+      filter: grayscale(0);
+      transition-delay: 0s;
+    }
+
     .ws-et-title {
       font-family: var(--font-heading);
       font-size: 30px;
@@ -6430,12 +6456,28 @@
       font-weight: 700;
       color: #E5F28D;
       text-decoration: none;
-      border: 1px solid rgba(163,230,53,0.38);
-      border-radius: 8px;
-      padding: 9px 16px;
-      transition: background 0.2s, border-color 0.2s;
+      border: none;
+      border-radius: 40px;
+      padding: 9px 20px;
+      background:
+        linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+        linear-gradient(270deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.3) 21.1%, rgba(0,0,0,0.3) 84.9%, rgba(0,0,0,0.3) 100%);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      box-shadow:
+        rgba(255, 255, 255, 0.7)  6.67px  6.67px 3.36px -6.21px inset,
+        rgba(255, 61,  61,  0.5) -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140, 180, 190)       -2.00px  2.39px 18px   -2.60px inset;
+      transition: filter 0.25s cubic-bezier(0,0,0.2,1), transform 0.25s cubic-bezier(0,0,0.2,1), box-shadow 0.25s cubic-bezier(0,0,0.2,1);
     }
-    .ws-cta:hover { background: rgba(163,230,53,0.10); border-color: rgba(163,230,53,0.65); }
+    .ws-cta:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow:
+        rgba(255, 255, 255, 0.85)  6.67px  6.67px 3.36px -6.21px inset,
+        rgba(255, 61,  61,  0.65) -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140, 200, 215)        -2.00px  2.39px 22px   -2.60px inset;
+    }
     @media (min-width: 1600px) {
       .ws-et-title { font-size: 40px; line-height: 1.15; }
     }
@@ -6569,7 +6611,7 @@
     .proj-card {
       position: relative;
       z-index: 10;
-      background: #252525;
+      background: #181818;
       display: grid;
       grid-template-columns: 55fr 45fr;
       min-height: 460px;
@@ -6577,6 +6619,7 @@
       overflow: hidden;
       border: none;
       box-shadow: none;
+      margin: 0 40px;
       will-change: opacity, transform;
     }
     [data-theme="dark"] .proj-card { box-shadow: none; border: none; }
@@ -6584,7 +6627,7 @@
       position: relative;
       overflow: hidden;
       order: 2;
-      background: url('Porject Background image/Dark green.png') center/cover no-repeat;
+      background: url('Porject Background image/Light Green.png') center/cover no-repeat;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -6652,11 +6695,13 @@
       gap: 8px;
       align-self: flex-start;
       padding: 11px 22px;
-      background: rgba(255,255,255,0.09);
-      backdrop-filter: blur(20px) saturate(160%);
-      -webkit-backdrop-filter: blur(20px) saturate(160%);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 10px;
+      background:
+        linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+        linear-gradient(270deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.3) 21.1%, rgba(0,0,0,0.3) 84.9%, rgba(0,0,0,0.3) 100%);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      border: none;
+      border-radius: 40px;
       color: #FFFCF8;
       font-family: var(--font-mono);
       font-size: 13px;
@@ -6664,7 +6709,19 @@
       text-decoration: none;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      transition: background 0.2s, border-color 0.2s;
+      box-shadow:
+        rgba(255, 255, 255, 0.7)  6.67px  6.67px 3.36px -6.21px inset,
+        rgba(255, 61,  61,  0.5) -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140, 180, 190)       -2.00px  2.39px 18px   -2.60px inset;
+      transition: filter 0.25s cubic-bezier(0,0,0.2,1), transform 0.25s cubic-bezier(0,0,0.2,1), box-shadow 0.25s cubic-bezier(0,0,0.2,1);
+    }
+    .proj-cta:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow:
+        rgba(255, 255, 255, 0.85)  6.67px  6.67px 3.36px -6.21px inset,
+        rgba(255, 61,  61,  0.65) -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140, 200, 215)        -2.00px  2.39px 22px   -2.60px inset;
     }
     .tm-marquee-wrap {
       overflow: hidden;
@@ -6916,9 +6973,6 @@
         <a class="nav-work" href="./resume.pdf" target="_blank" rel="noopener">RESUME</a>
         <a class="nav-work" href="#contactSection">CONTACT</a>
       </div>
-      <a class="nav-chip" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">
-        <span class="nav-chip-dot"></span>Side project · 48hr build ↗
-      </a>
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
         <span class="tt-track">
           <span class="tt-star tt-star-1"></span>
@@ -6947,9 +7001,6 @@
     <a href="#aboutSection">About</a>
     <a href="./resume.pdf" target="_blank" rel="noopener">Resume</a>
     <a href="#contactSection">Contact</a>
-    <a href="https://dearly-rho.vercel.app" target="_blank" rel="noopener" class="mobile-side-chip">
-      <span class="mobile-chip-dot"></span>Side project · 48hr build ↗
-    </a>
   </div>
 
   <div class="page">
@@ -7260,6 +7311,15 @@
         </div>
 
       </div><!-- /carousel-sticky -->
+
+      <!-- Fixed scroll cue for proj-card phases (escapes overflow:clip) -->
+      <div id="proj-scroll-cue" aria-hidden="true">
+        <span class="s2-cue-label">Scroll</span>
+        <svg width="14" height="20" viewBox="0 0 14 20" fill="none">
+          <line x1="7" y1="1" x2="7" y2="15" stroke="#E5F28D" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.6"/>
+          <polyline points="3,11 7,15 11,11" fill="none" stroke="#E5F28D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.6"/>
+        </svg>
+      </div>
 
       <!-- ── PROJECT CARDS ──────────────────────────────── -->
 
@@ -11544,6 +11604,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var pc       = document.querySelector('.proj-card');
     var pcSpacer = document.getElementById('pc-spacer');
     var card     = document.querySelector('.card');
+    var projCue  = document.getElementById('proj-scroll-cue');
     if (!snapEl || !cs || !pc || !card) return;
 
     var NAV_H   = 54, SCALE_MIN = 0.7;
@@ -11583,8 +11644,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         el.style.zIndex   = isPC ? '10' : '5';
         if (spacer) spacer.style.height = h + 'px';
       }
-      el.style.left  = cardLeft + 'px';
-      el.style.width = cardWidth + 'px';
+      el.style.left  = isPC ? (cardLeft + 40) + 'px' : cardLeft + 'px';
+      el.style.width = isPC ? (cardWidth - 80) + 'px' : cardWidth + 'px';
     }
 
     function unfixEl(el, spacer) {
@@ -11629,11 +11690,27 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       var sy = window.scrollY || document.documentElement.scrollTop;
       prevScrollY = sy;
 
-      /* Scroll cue: visible at snap rest; hide once user scrolls past snap */
+      /* Approach cue: visible at snap rest; hide once user scrolls past snap */
       if (snapped && sy > snapDocTop + 5) {
         snapEl.classList.add('s2-animating');
       } else {
         snapEl.classList.remove('s2-animating');
+      }
+
+      /* Proj cue: show during Phase 3 (scale+rise) and Phase 4 (reveal) */
+      if (projCue) {
+        if (snapped && sy > snapDocTop + 5 && sy <= projEnd) {
+          projCue.classList.add('visible');
+        } else {
+          projCue.classList.remove('visible');
+        }
+      }
+
+      /* ET Glimpse dim: active during Phase 4 (proj-card entering) */
+      if (snapped && sy > scaleEnd && sy <= projEnd) {
+        cs.classList.add('ws-dimmed');
+      } else {
+        cs.classList.remove('ws-dimmed');
       }
 
       /* ── Before snap: natural flow, nothing fixed ── */
