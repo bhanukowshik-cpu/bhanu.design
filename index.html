@@ -6158,8 +6158,10 @@
       border: 1px solid rgba(255,252,248,0.18);
       border-radius: 6px;
       padding: 7px 14px;
+      gap: 7px;
       letter-spacing: 0.03em;
     }
+    .ws-role-tag img { display: block; flex-shrink: 0; }
     /* sub-case study cards */
     .ws-sub-section {
       position: relative; z-index: 1;
@@ -6455,6 +6457,185 @@
       .fw-split-title { font-size: 18px; }
       .fw-split-eyebrow { font-size: 8px; letter-spacing: 0.10em; }
       .fw-card { flex: 0 0 calc(66.6% - 8px); }
+    }
+
+    /* ── TESTIMONIALS ────────────────────────────────────────── */
+    .tm-section {
+      padding: 64px 40px 72px;
+      position: relative;
+    }
+    /* subtle canvas-dot background for the section */
+    .tm-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(37,37,37,0.07) 1px, transparent 1px);
+      background-size: 18px 18px;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    .tm-header {
+      margin-bottom: 48px;
+      position: relative;
+    }
+    .tm-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .tm-eyebrow-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #0D99FF;
+      font-weight: 600;
+    }
+    .tm-eyebrow-line {
+      width: 40px;
+      height: 1px;
+      background: #0D99FF;
+      opacity: 0.45;
+    }
+    .tm-headline {
+      font-family: var(--font-heading);
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--secondary);
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+    /* Grid: left large + right 2-stack */
+    .tm-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 20px;
+      align-items: start;
+      position: relative;
+    }
+    .tm-col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    /* The Figma frame card */
+    .tm-frame {
+      position: relative;
+      border: 1.5px solid #0D99FF;
+      border-radius: 1px;
+      padding: 32px 30px 28px;
+      background: rgba(255,252,248,0.72);
+      backdrop-filter: blur(2px);
+      margin-top: 22px; /* room for label above border */
+    }
+    /* Frame name label — sits above the border, left-aligned, like Figma */
+    .tm-frame-name {
+      position: absolute;
+      top: -20px;
+      left: 0;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: #0D99FF;
+      letter-spacing: 0.04em;
+      font-weight: 500;
+      white-space: nowrap;
+      user-select: none;
+    }
+    /* Corner resize handles */
+    .tm-handle {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border: 1.5px solid #0D99FF;
+      background: #fff;
+      border-radius: 1px;
+    }
+    .tm-handle.tl { top: -3.5px; left: -3.5px; }
+    .tm-handle.tr { top: -3.5px; right: -3.5px; }
+    .tm-handle.bl { bottom: -3.5px; left: -3.5px; }
+    .tm-handle.br { bottom: -3.5px; right: -3.5px; }
+    /* Mid-edge handles */
+    .tm-handle.tm { top: -3.5px; left: 50%; transform: translateX(-50%); }
+    .tm-handle.bm { bottom: -3.5px; left: 50%; transform: translateX(-50%); }
+    .tm-handle.ml { top: 50%; left: -3.5px; transform: translateY(-50%); }
+    .tm-handle.mr { top: 50%; right: -3.5px; transform: translateY(-50%); }
+    /* Quote content */
+    .tm-quote {
+      font-family: var(--font-heading);
+      font-size: 15.5px;
+      font-weight: 500;
+      line-height: 1.7;
+      color: var(--secondary);
+      margin: 0 0 24px;
+      font-style: normal;
+    }
+    .tm-frame--large .tm-quote {
+      font-size: 17px;
+      line-height: 1.72;
+    }
+    .tm-quote::before { content: '\201C'; }
+    .tm-quote::after  { content: '\201D'; }
+    .tm-attr {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(37,37,37,0.10);
+    }
+    .tm-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--primary);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+    .tm-attr-info { display: flex; flex-direction: column; gap: 1px; }
+    .tm-name {
+      font-family: var(--font-heading);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+    .tm-role {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--secondary);
+      opacity: 0.45;
+      letter-spacing: 0.03em;
+    }
+    /* Dark mode */
+    [data-theme="dark"] .tm-section::before {
+      background-image: radial-gradient(circle, rgba(255,252,248,0.07) 1px, transparent 1px);
+    }
+    [data-theme="dark"] .tm-frame {
+      background: rgba(37,37,37,0.55);
+      border-color: #0D99FF;
+    }
+    [data-theme="dark"] .tm-handle { background: #252525; }
+    [data-theme="dark"] .tm-headline { color: #FFFCF8; }
+    [data-theme="dark"] .tm-quote { color: rgba(255,252,248,0.88); }
+    [data-theme="dark"] .tm-name { color: #FFFCF8; }
+    [data-theme="dark"] .tm-attr { border-color: rgba(255,252,248,0.10); }
+    [data-theme="dark"] .tm-avatar { background: rgba(230,242,141,0.18); color: var(--primary); }
+    /* Responsive */
+    @media (max-width: 1023px) {
+      .tm-section  { padding: 52px 32px 60px; }
+      .tm-headline { font-size: 26px; }
+    }
+    @media (max-width: 767px) {
+      .tm-section  { padding: 44px 20px 52px; }
+      .tm-headline { font-size: 22px; }
+      .tm-grid     { grid-template-columns: 1fr; }
+      .tm-quote         { font-size: 14.5px; }
+      .tm-frame--large .tm-quote { font-size: 14.5px; }
     }
 
   </style>
@@ -6755,10 +6936,10 @@
           <div class="ws-et-left">
             <h2 class="ws-et-title">EverTutor<br>AI System</h2>
             <div class="ws-et-tags">
-              <span class="ws-role-tag">Sole Product Designer</span>
+              <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Profile dark theme.svg" width="16" height="14" alt="" aria-hidden="true">Sole Product Designer</span>
               <div class="ws-et-tag-row">
-                <span class="ws-role-tag">0 to 1</span>
-                <span class="ws-role-tag">Desktop &middot; B2B</span>
+                <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Thunder Dark Theme.svg" width="10" height="16" alt="" aria-hidden="true">0 to 1</span>
+                <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Desktop Icon.svg" width="16" height="13" alt="" aria-hidden="true">Desktop &middot; B2B</span>
               </div>
             </div>
           </div>
