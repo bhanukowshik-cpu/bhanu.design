@@ -6104,6 +6104,30 @@
       opacity: 1; transform: none; transition-delay: 0.7s;
     }
 
+    /* ── Scroll cue (section 2) ── */
+    .s2-scroll-cue {
+      position: absolute;
+      bottom: 28px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      pointer-events: none; z-index: 20;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+    .s2-cue-label {
+      font-family: var(--font-mono);
+      font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: rgba(229, 242, 141, 0.5);
+    }
+    .s2-scroll-cue svg {
+      animation: s2-cue-bounce 1.6s ease-in-out infinite;
+    }
+    @keyframes s2-cue-bounce {
+      0%, 100% { transform: translateY(0); opacity: 0.45; }
+      50%       { transform: translateY(6px); opacity: 1; }
+    }
+    .s2-animating .s2-scroll-cue { opacity: 0; }
+
     .ws-et-title {
       font-family: var(--font-heading);
       font-size: 30px;
@@ -6628,167 +6652,101 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       transition: background 0.2s, border-color 0.2s;
-    }
-    .proj-cta:hover {
-      background: rgba(255,255,255,0.15);
-      border-color: rgba(255,255,255,0.28);
-    }
-
-    /* ── TESTIMONIALS / FIGMA-FRAME CAROUSEL ───────────── */
-    .tm-section {
-      background: #0D0D0D;
-      padding: 72px 0 80px;
-      position: relative;
+    .tm-marquee-wrap {
       overflow: hidden;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 4px 0;
     }
-    .tm-header { padding: 0 48px; margin-bottom: 56px; }
-    .tm-eyebrow-tag {
-      font-family: var(--font-mono); font-size: 9.5px;
-      letter-spacing: 0.22em; text-transform: uppercase;
-      color: #1A73E8; opacity: 0.7; display: block; margin-bottom: 7px;
-    }
-    .tm-headline {
-      font-family: var(--font-heading); font-size: 30px; font-weight: 700;
-      color: #FFFCF8; margin: 0; letter-spacing: -0.01em;
-    }
-    /* Stage */
-    .tc-stage { position: relative; }
-    /* Track — houses the absolutely-positioned cards */
-    .tc-track {
-      position: relative; height: 310px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    /* ── Individual card ─────────────────────────────────── */
-    .tc-card {
-      position: absolute;
-      /* Center via margin: auto on all four sides + fixed size */
-      left: 0; right: 0; top: 0; bottom: 0;
-      margin: auto;
-      width: 520px;
-      height: 230px;
+    .tm-row { display: flex; overflow: hidden; }
+    .tm-row-inner { display: flex; flex-shrink: 0; }
+    .tm-scroll-left  { animation: tmScrollLeft  32s linear infinite; }
+    .tm-scroll-right { animation: tmScrollRight 36s linear infinite; }
+    @keyframes tmScrollLeft  { from { transform: translateX(0); }    to { transform: translateX(-50%); } }
+    @keyframes tmScrollRight { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+    .tm-marquee-wrap:hover .tm-row-inner { animation-play-state: paused; }
+    .tm-card {
+      position: relative;
       background: #252525;
       border: 2px solid #1A73E8;
       border-radius: 1px;
-      padding: 28px 28px 22px;
-      display: flex; flex-direction: column;
+      padding: 22px 20px 20px;
+      flex-shrink: 0;
+      width: 320px;
+      margin-right: 14px;
       box-sizing: border-box;
-      /* Default invisible */
-      opacity: 0; transform: scale(0.6);
-      filter: blur(6px); pointer-events: none; z-index: 1;
-      transition: opacity 0.52s ease, transform 0.52s cubic-bezier(0.4,0,0.2,1), filter 0.52s ease;
     }
-    .tc-card.pos-active {
-      opacity: 1; transform: scale(1); filter: none;
-      pointer-events: auto; z-index: 3;
+    .tm-fh {
+      position: absolute;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #252525;
+      border: 1.5px solid #1A73E8;
     }
-    .tc-card.pos-prev {
-      opacity: 0.20; transform: translateX(-66%) scale(0.83);
-      filter: blur(1.5px); z-index: 2;
+    .tm-fh.tl { top: -5px; left: -5px; }
+    .tm-fh.tr { top: -5px; right: -5px; }
+    .tm-fh.bl { bottom: -5px; left: -5px; }
+    .tm-fh.br { bottom: -5px; right: -5px; }
+    .tm-logo {
+      font-family: var(--font-mono);
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 12px; display: block;
     }
-    .tc-card.pos-next {
-      opacity: 0.20; transform: translateX(66%) scale(0.83);
-      filter: blur(1.5px); z-index: 2;
+    .tm-logo--et  { color: #5EEAD4; }
+    .tm-logo--st  { color: #F87171; }
+    .tm-logo--stu { color: #A78BFA; }
+    .tm-quote {
+      font-family: var(--font-heading);
+      font-size: 13px; line-height: 1.7;
+      color: rgba(255,255,255,0.85);
+      margin: 0 0 16px;
     }
-    /* ── Figma frame decorations ─────────────────────────── */
-    .tc-ff-tab {
-      position: absolute; top: -22px; left: -2px;
-      background: #1A73E8; color: #fff;
-      font-family: var(--font-mono); font-size: 10px; font-weight: 500;
-      padding: 3px 9px; border-radius: 3px 3px 0 0;
-      white-space: nowrap; pointer-events: none; letter-spacing: 0.03em;
-    }
-    .tc-ff-h {
-      position: absolute; width: 10px; height: 10px;
-      background: #fff; border: 2px solid #1A73E8; border-radius: 50%;
-      pointer-events: none; z-index: 1;
-    }
-    .tc-ff-h.tl { top: -5px; left: -5px; }
-    .tc-ff-h.tr { top: -5px; right: -5px; }
-    .tc-ff-h.bl { bottom: -5px; left: -5px; }
-    .tc-ff-h.br { bottom: -5px; right: -5px; }
-    .tc-ff-m {
-      position: absolute; background: #fff;
-      border: 1.5px solid #1A73E8; border-radius: 3px;
-      pointer-events: none; z-index: 1;
-    }
-    .tc-ff-m.t { width:22px; height:8px;  top:-4px;    left:50%; transform:translateX(-50%); }
-    .tc-ff-m.b { width:22px; height:8px;  bottom:-4px; left:50%; transform:translateX(-50%); }
-    .tc-ff-m.l { width:8px;  height:22px; left:-4px;   top:50%;  transform:translateY(-50%); }
-    .tc-ff-m.r { width:8px;  height:22px; right:-4px;  top:50%;  transform:translateY(-50%); }
-    /* ── Card content ────────────────────────────────────── */
-    .tc-quote {
-      font-family: var(--font-heading); font-size: 15px;
-      font-weight: 500; line-height: 1.72; font-style: italic;
-      color: rgba(255,252,248,0.82); margin: 0; flex: 1;
-    }
-    .tc-attr {
-      display: flex; align-items: center; gap: 10px;
-      padding-top: 16px; margin-top: 16px;
-      border-top: 1px solid rgba(255,255,255,0.07);
-    }
-    .tc-avatar {
-      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-      background: rgba(26,115,232,0.14);
-      border: 1px solid rgba(26,115,232,0.32);
+    .tm-attr { display: flex; align-items: center; gap: 10px; }
+    .tm-av {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #1A73E8;
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-mono); font-size: 9px;
-      font-weight: 700; color: #1A73E8;
+      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+      color: #fff; flex-shrink: 0;
     }
-    .tc-info { display: flex; flex-direction: column; gap: 2px; }
-    .tc-name { font-family: var(--font-heading); font-size: 12px; font-weight: 700; color: #FFFCF8; }
-    .tc-role { font-family: var(--font-mono); font-size: 8.5px; color: rgba(255,252,248,0.28); letter-spacing: 0.03em; }
-    /* ── Progress bar ────────────────────────────────────── */
-    .tc-progress {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      height: 2px; background: rgba(26,115,232,0.12);
-    }
-    .tc-progress-fill {
-      height: 100%; width: 0%;
-      background: #1A73E8; border-radius: 0 1px 1px 0;
-    }
-    @keyframes tc-fill { from { width: 0% } to { width: 100% } }
-    .tc-card.pos-active .tc-progress-fill { animation: tc-fill 6s linear forwards; }
-    /* ── Arrows ──────────────────────────────────────────── */
-    .tc-arrow {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      width: 40px; height: 40px; border-radius: 50%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
-      color: rgba(255,255,255,0.45);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; z-index: 10;
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
-    }
-    .tc-arrow:hover {
-      background: rgba(26,115,232,0.14);
-      border-color: rgba(26,115,232,0.45); color: #fff;
-    }
-    .tc-arrow svg { width: 15px; height: 15px; }
-    .tc-prev { left: 24px; }
-    .tc-next { right: 24px; }
-    /* ── Dots ────────────────────────────────────────────── */
-    .tc-dots {
-      display: flex; justify-content: center; gap: 8px; margin-top: 32px;
-    }
-    .tc-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: rgba(255,255,255,0.14); border: none; padding: 0;
-      cursor: pointer; transition: background 0.3s, transform 0.3s;
-    }
-    .tc-dot.active { background: #1A73E8; transform: scale(1.35); }
-    /* Dark mode: already dark */
+    .tm-name { font-family: var(--font-heading); font-size: 12.5px; font-weight: 600; color: #fff; display: block; }
+    .tm-role { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4); display: block; margin-top: 2px; }
     [data-theme="dark"] .tm-section { background: #080808; }
     @media (max-width: 1023px) {
       .tm-header { padding: 0 32px; }
-      .tc-card { width: 440px; }
-      .tc-track { height: 330px; }
+      .tm-card   { width: 280px; }
     }
     @media (max-width: 767px) {
       .tm-header { padding: 0 20px; margin-bottom: 36px; }
-      .tc-card { width: calc(100vw - 100px); }
-      .tc-card.pos-prev { transform: translateX(-72%) scale(0.78); }
-      .tc-card.pos-next { transform: translateX(72%) scale(0.78); }
-      .tc-track { height: 360px; }
+      .tm-card   { width: 240px; }
+    }
+      color: rgba(255,255,255,0.85);
+      margin: 0 0 16px;
+    }
+    .tm-attr { display: flex; align-items: center; gap: 10px; }
+    .tm-av {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #1A73E8;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+      color: #fff; flex-shrink: 0;
+    }
+    .tm-name { font-family: var(--font-heading); font-size: 12.5px; font-weight: 600; color: #fff; display: block; }
+    .tm-role { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4); display: block; margin-top: 2px; }
+    [data-theme="dark"] .tm-section { background: #080808; }
+    @media (max-width: 1023px) {
+      .tm-header { padding: 0 32px; }
+      .tm-mgrid  { gap: 10px; padding: 0 32px; }
+    }
+    @media (max-width: 767px) {
+      .tm-header { padding: 0 20px; margin-bottom: 36px; }
+      .tm-mgrid  { grid-template-columns: 1fr; padding: 0 20px; }
+      .tm-col:nth-child(2), .tm-col:nth-child(3) { display: none; }
+      .tm-marquee-wrap { height: 480px; }
     }
 
 
@@ -7302,6 +7260,15 @@
 
         </section>
 
+        <!-- Scroll cue: visible during approach + at snap rest; hides on scroll -->
+        <div class="s2-scroll-cue" aria-hidden="true">
+          <span class="s2-cue-label">Scroll</span>
+          <svg width="14" height="20" viewBox="0 0 14 20" fill="none">
+            <line x1="7" y1="1" x2="7" y2="15" stroke="#E5F28D" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.6"/>
+            <polyline points="3,11 7,15 11,11" fill="none" stroke="#E5F28D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.6"/>
+          </svg>
+        </div>
+
       </div><!-- /carousel-sticky -->
 
       <!-- ── PROJECT CARDS ──────────────────────────────── -->
@@ -7327,119 +7294,148 @@
       <div id="pc-spacer" style="height:0;flex-shrink:0" aria-hidden="true"></div>
       <div id="anim-exit-space" style="height:300px;flex-shrink:0" aria-hidden="true"></div>
 
-      <!-- ── TESTIMONIALS / FIGMA-FRAME CAROUSEL ─────── -->
+      <!-- ── TESTIMONIALS MARQUEE GRID ─────────────────────── -->
       <section class="tm-section" id="testimonialsSection">
 
         <div class="tm-header">
           <span class="tm-eyebrow-tag">Kind Words</span>
-          <h2 class="tm-headline">People I've built with</h2>
+          <h2 class="tm-headline">People I&#8217;ve built with</h2>
         </div>
 
-        <div class="tc-stage">
-          <div class="tc-track">
-
-          <div class="tc-card" data-idx="0">
-            <div class="tc-ff-tab">Testimonial / Anil</div>
-            <span class="tc-ff-h tl"></span><span class="tc-ff-h tr"></span>
-            <span class="tc-ff-h bl"></span><span class="tc-ff-h br"></span>
-            <span class="tc-ff-m t"></span><span class="tc-ff-m b"></span>
-            <span class="tc-ff-m l"></span><span class="tc-ff-m r"></span>
-            <p class="tc-quote">Bhanu doesn&#8217;t just design screens &#8212; he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He&#8217;s the one engineers actually trust.</p>
-            <div class="tc-attr">
-              <div class="tc-avatar">AK</div>
-              <div class="tc-info">
-                <span class="tc-name">Anil Kumar</span>
-                <span class="tc-role">Engineering Lead · EverTutor</span>
+        <div class="tm-marquee-wrap">
+          <!-- Row 1: right to left -->
+          <div class="tm-row">
+            <div class="tm-row-inner tm-scroll-left">
+              <div class="tm-card">
+                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+                <span class="tm-logo tm-logo--et">EverTutor</span>
+                <p class="tm-quote">Bhanu doesn&#8217;t just design screens &#8212; he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He&#8217;s the one engineers actually trust.</p>
+                <div class="tm-attr">
+                  <div class="tm-av">AK</div>
+                  <div><span class="tm-name">Anil Kumar</span><span class="tm-role">Engineering Lead &middot; EverTutor</span></div>
+                </div>
+              </div>
+              <div class="tm-card">
+                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+                <span class="tm-logo tm-logo--st">Stressie</span>
+                <p class="tm-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
+                <div class="tm-attr">
+                  <div class="tm-av">PM</div>
+                  <div><span class="tm-name">Priya Menon</span><span class="tm-role">Head of Product &middot; Stressie</span></div>
+                </div>
+              </div>
+              <div class="tm-card">
+                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+                <span class="tm-logo tm-logo--stu">Studio</span>
+                <p class="tm-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs &#8212; just clear decisions backed by solid research and real user data.</p>
+                <div class="tm-attr">
+                  <div class="tm-av">MW</div>
+                  <div><span class="tm-name">Marcus Webb</span><span class="tm-role">Senior Engineer &middot; Studio</span></div>
+                </div>
+              </div>
+              <div class="tm-card">
+                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+                <span class="tm-logo tm-logo--et">EverTutor</span>
+                <p class="tm-quote">Bhanu doesn&#8217;t just design screens &#8212; he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He&#8217;s the one engineers actually trust.</p>
+                <div class="tm-attr">
+                  <div class="tm-av">AK</div>
+                  <div><span class="tm-name">Anil Kumar</span><span class="tm-role">Engineering Lead &middot; EverTutor</span></div>
+                </div>
+              </div>
+              <div class="tm-card">
+                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+                <span class="tm-logo tm-logo--st">Stressie</span>
+                <p class="tm-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
+                <div class="tm-attr">
+                  <div class="tm-av">PM</div>
+                  <div><span class="tm-name">Priya Menon</span><span class="tm-role">Head of Product &middot; Stressie</span></div>
+                </div>
+              </div>
+              <div class="tm-card">
+                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+                <span class="tm-logo tm-logo--stu">Studio</span>
+                <p class="tm-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs &#8212; just clear decisions backed by solid research and real user data.</p>
+                <div class="tm-attr">
+                  <div class="tm-av">MW</div>
+                  <div><span class="tm-name">Marcus Webb</span><span class="tm-role">Senior Engineer &middot; Studio</span></div>
+                </div>
               </div>
             </div>
-            <div class="tc-progress"><div class="tc-progress-fill"></div></div>
           </div>
-
-          <div class="tc-card" data-idx="1">
-            <div class="tc-ff-tab">Testimonial / Priya</div>
-            <span class="tc-ff-h tl"></span><span class="tc-ff-h tr"></span>
-            <span class="tc-ff-h bl"></span><span class="tc-ff-h br"></span>
-            <span class="tc-ff-m t"></span><span class="tc-ff-m b"></span>
-            <span class="tc-ff-m l"></span><span class="tc-ff-m r"></span>
-            <p class="tc-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
-            <div class="tc-attr">
-              <div class="tc-avatar">PM</div>
-              <div class="tc-info">
-                <span class="tc-name">Priya Menon</span>
-                <span class="tc-role">Head of Product · Stressie</span>
+          <!-- Row 2: left to right -->
+          <div class="tm-row">
+            <div class="tm-row-inner tm-scroll-right">
+              <div class="tm-card">
+                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+                <span class="tm-logo tm-logo--stu">Studio</span>
+                <p class="tm-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs &#8212; just clear decisions backed by solid research and real user data.</p>
+                <div class="tm-attr">
+                  <div class="tm-av">MW</div>
+                  <div><span class="tm-name">Marcus Webb</span><span class="tm-role">Senior Engineer &middot; Studio</span></div>
+                </div>
+              </div>
+              <div class="tm-card">
+                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+                <span class="tm-logo tm-logo--et">EverTutor</span>
+                <p class="tm-quote">Bhanu doesn&#8217;t just design screens &#8212; he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He&#8217;s the one engineers actually trust.</p>
+                <div class="tm-attr">
+                  <div class="tm-av">AK</div>
+                  <div><span class="tm-name">Anil Kumar</span><span class="tm-role">Engineering Lead &middot; EverTutor</span></div>
+                </div>
+              </div>
+              <div class="tm-card">
+                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+                <span class="tm-logo tm-logo--st">Stressie</span>
+                <p class="tm-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
+                <div class="tm-attr">
+                  <div class="tm-av">PM</div>
+                  <div><span class="tm-name">Priya Menon</span><span class="tm-role">Head of Product &middot; Stressie</span></div>
+                </div>
+              </div>
+              <div class="tm-card">
+                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+                <span class="tm-logo tm-logo--stu">Studio</span>
+                <p class="tm-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs &#8212; just clear decisions backed by solid research and real user data.</p>
+                <div class="tm-attr">
+                  <div class="tm-av">MW</div>
+                  <div><span class="tm-name">Marcus Webb</span><span class="tm-role">Senior Engineer &middot; Studio</span></div>
+                </div>
+              </div>
+              <div class="tm-card">
+                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+                <span class="tm-logo tm-logo--et">EverTutor</span>
+                <p class="tm-quote">Bhanu doesn&#8217;t just design screens &#8212; he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He&#8217;s the one engineers actually trust.</p>
+                <div class="tm-attr">
+                  <div class="tm-av">AK</div>
+                  <div><span class="tm-name">Anil Kumar</span><span class="tm-role">Engineering Lead &middot; EverTutor</span></div>
+                </div>
+              </div>
+              <div class="tm-card">
+                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+                <span class="tm-logo tm-logo--st">Stressie</span>
+                <p class="tm-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
+                <div class="tm-attr">
+                  <div class="tm-av">PM</div>
+                  <div><span class="tm-name">Priya Menon</span><span class="tm-role">Head of Product &middot; Stressie</span></div>
+                </div>
               </div>
             </div>
-            <div class="tc-progress"><div class="tc-progress-fill"></div></div>
           </div>
-
-          <div class="tc-card" data-idx="2">
-            <div class="tc-ff-tab">Testimonial / Marcus</div>
-            <span class="tc-ff-h tl"></span><span class="tc-ff-h tr"></span>
-            <span class="tc-ff-h bl"></span><span class="tc-ff-h br"></span>
-            <span class="tc-ff-m t"></span><span class="tc-ff-m b"></span>
-            <span class="tc-ff-m l"></span><span class="tc-ff-m r"></span>
-            <p class="tc-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs &#8212; just clear decisions backed by solid research and real user data.</p>
-            <div class="tc-attr">
-              <div class="tc-avatar">MW</div>
-              <div class="tc-info">
-                <span class="tc-name">Marcus Webb</span>
-                <span class="tc-role">Senior Engineer · Studio</span>
-              </div>
-            </div>
-            <div class="tc-progress"><div class="tc-progress-fill"></div></div>
-          </div>
-          </div><!-- /tc-track -->
-
-          <button class="tc-arrow tc-prev" aria-label="Previous"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="tc-arrow tc-next" aria-label="Next"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </div><!-- /tc-stage -->
-
-        <div class="tc-dots">
-          <button class="tc-dot" aria-label="Quote 1"></button>
-          <button class="tc-dot" aria-label="Quote 2"></button>
-          <button class="tc-dot" aria-label="Quote 3"></button>
         </div>
 
       </section><!-- /testimonials -->
-
-
-      <!-- ── ABOUT ──────────────────────────────────────────────── -->
-      <div class="about-section reveal" id="aboutSection">
-
-        <div class="av2-about-label">About Me</div>
-
-        <div class="av2-text-block">
-          <h2 class="av2-headline">The best design decisions I've made weren't made alone</h2>
-          <p class="av2-philosophy">Engineers, users, even the person who says "this feels weird": everyone has a design idea. My job is knowing which ones to build</p>
-        </div>
-
-        <div class="av2-pills">
-          <span class="av2-pill">5+ Years Experience</span>
-          <span class="av2-pill">0→1 Product Design</span>
-          <span class="av2-pill">Metric Driven</span>
-          <span class="av2-pill">AI Systems</span>
-        </div>
-
-        <div class="av2-photo-marquee-wrap">
-          <div class="av2-photo-marquee">
-            <div class="av2-photo-marquee-track">
-              <div class="av2-marquee-photo"><img src="personal-rowing.jpg" alt="Rowing"></div>
-              <div class="av2-marquee-photo"><img src="personal-evertutor.jpg" alt="EverTutor"></div>
-              <div class="av2-marquee-photo"><img src="personal-stressie.jpg" alt="Stressie"></div>
-              <div class="av2-marquee-photo"><img src="personal-chess.jpg" alt="Chess"></div>
-              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-rowing.jpg" alt=""></div>
-              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-evertutor.jpg" alt=""></div>
-              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-stressie.jpg" alt=""></div>
-              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-chess.jpg" alt=""></div>
-              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-rowing.jpg" alt=""></div>
-              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-evertutor.jpg" alt=""></div>
-              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-stressie.jpg" alt=""></div>
-              <div class="av2-marquee-photo" aria-hidden="true"><img src="personal-chess.jpg" alt=""></div>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /about -->
 
     </div><!-- /card -->
   </div><!-- /page -->
@@ -11533,75 +11529,6 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   })();
 
   </script>
-  <!-- ── TESTIMONIAL CAROUSEL ─────────────────────────── -->
-  <script>
-  (function () {
-    var cards   = Array.from(document.querySelectorAll('.tc-card'));
-    var dots    = Array.from(document.querySelectorAll('.tc-dot'));
-    var section = document.getElementById('testimonialsSection');
-    var total   = cards.length;
-    var cur     = 0;
-    var timer;
-
-    function update(n) {
-      var prev = (n - 1 + total) % total;
-      var nxt  = (n + 1) % total;
-
-      cards.forEach(function(card, i) {
-        card.classList.remove('pos-active', 'pos-prev', 'pos-next');
-        if      (i === n)    card.classList.add('pos-active');
-        else if (i === prev) card.classList.add('pos-prev');
-        else if (i === nxt)  card.classList.add('pos-next');
-      });
-
-      /* Restart progress fill animation on the newly-active card */
-      var fill = cards[n].querySelector('.tc-progress-fill');
-      if (fill) {
-        fill.style.animation = 'none';
-        void fill.offsetHeight;
-        fill.style.animation = 'tc-fill 6s linear forwards';
-      }
-
-      dots.forEach(function(d, i) { d.classList.toggle('active', i === n); });
-      cur = n;
-    }
-
-    function go(dir) {
-      clearInterval(timer);
-      update((cur + dir + total) % total);
-      startTimer();
-    }
-
-    function startTimer() {
-      clearInterval(timer);
-      timer = setInterval(function () { go(1); }, 6000);
-    }
-
-    document.querySelector('.tc-prev').addEventListener('click', function () { go(-1); });
-    document.querySelector('.tc-next').addEventListener('click', function () { go(1); });
-
-    dots.forEach(function (dot, i) {
-      dot.addEventListener('click', function () {
-        clearInterval(timer);
-        update(i);
-        startTimer();
-      });
-    });
-
-    if (section) {
-      section.addEventListener('mouseenter', function () { clearInterval(timer); });
-      section.addEventListener('mouseleave', startTimer);
-    }
-
-    /* Initial state — no transition on first paint */
-    cards.forEach(function(c) { c.style.transition = 'none'; });
-    update(0);
-    void document.querySelector('.tc-track').offsetHeight;
-    cards.forEach(function(c) { c.style.transition = ''; });
-
-    startTimer();
-  })();
-  </script>
 
   <script>
   /* ── Section 2 snap + scroll story ──────────────────────────────────────
@@ -11702,6 +11629,13 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
       var sy = window.scrollY || document.documentElement.scrollTop;
       prevScrollY = sy;
+
+      /* Scroll cue: visible at snap rest; hide once user scrolls past snap */
+      if (snapped && sy > snapDocTop + 5) {
+        snapEl.classList.add('s2-animating');
+      } else {
+        snapEl.classList.remove('s2-animating');
+      }
 
       /* ── Before snap: natural flow, nothing fixed ── */
       if (!snapped || sy < snapDocTop) {
