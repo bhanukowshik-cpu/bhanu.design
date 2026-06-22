@@ -4334,6 +4334,9 @@
       max-width: 54px;
       height: 54px;
       border-radius: 16px !important;
+      left: auto;
+      right: 24px;
+      margin-inline: 0;
     }
     .cb-wrap.cb-fab .cb {
       width: 54px;
@@ -10856,25 +10859,32 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
     // Collapse chat bar to rotating FAB when user scrolls into section 2+
     (function() {
-      var etsys = document.querySelector('.etsys-section');
-      var fabBtn = document.getElementById('cbFabBtn');
-      if (!etsys || !cbWrap || !fabBtn) return;
+      var etsys   = document.querySelector('.etsys-section');
+      var fabWrap = document.getElementById('cbWrap');
+      var fabBtn  = document.getElementById('cbFabBtn');
+      if (!etsys || !fabWrap || !fabBtn) return;
 
       var userExpanded = false;
 
-      new IntersectionObserver(function(entries) {
-        var into = entries[0].isIntersecting;
-        if (into && !userExpanded && !document.body.classList.contains('chat-open')) {
-          cbWrap.classList.add('cb-fab');
-        } else if (!into) {
-          cbWrap.classList.remove('cb-fab');
+      function checkFab() {
+        if (document.body.classList.contains('chat-open')) return;
+        var rect = etsys.getBoundingClientRect();
+        var inView = rect.top < window.innerHeight * 0.85 && rect.bottom > window.innerHeight * 0.15;
+        if (inView && !userExpanded) {
+          fabWrap.classList.add('cb-fab');
+        } else if (!inView) {
+          fabWrap.classList.remove('cb-fab');
           userExpanded = false;
         }
-      }, { threshold: 0.15 }).observe(etsys);
+      }
+
+      window.addEventListener('scroll', checkFab, { passive: true });
+      checkFab(); /* initial pass — same pattern as scroll-animations.js */
 
       fabBtn.addEventListener('click', function() {
         userExpanded = true;
-        cbWrap.classList.remove('cb-fab');
+        fabWrap.classList.remove('cb-fab');
+        lastState = 'full';
         setTimeout(function() {
           var inp = document.getElementById('cbInput');
           if (inp) inp.focus();
