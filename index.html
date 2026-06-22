@@ -6043,7 +6043,11 @@
     }
 
     /* ── Carousel wrap ── */
-    .carousel-sticky { position: sticky; top: 54px; z-index: 5; }
+    .carousel-sticky {
+      position: relative; z-index: 5;
+      transform-origin: top center;
+      will-change: transform, opacity;
+    }
 
     /* ── Work Section V3 — Section 2 ──────────────────────────── */
     .ws-section {
@@ -6522,12 +6526,13 @@
       z-index: 10;
       background: #181818;
       display: grid;
-      grid-template-columns: 43fr 57fr;
-      min-height: 480px;
-      border-radius: 20px 20px 0 0;
+      grid-template-columns: 65fr 35fr;
+      min-height: 460px;
+      border-radius: 20px;
       overflow: hidden;
+      margin: 0 40px;
+      will-change: opacity, transform;
     }
-    .proj-card + .proj-card { margin-top: 4px; }
     .proj-video-wrap {
       position: relative;
       overflow: hidden;
@@ -6544,49 +6549,48 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 28px;
-      padding: 52px 48px;
+      gap: 24px;
+      padding: 52px 52px;
     }
-    .proj-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 600;
-      color: rgba(255,252,248,0.38);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
+    .proj-eyebrow { display: none; }
     .proj-title {
       font-family: var(--font-heading);
-      font-size: 34px;
+      font-size: 36px;
       font-weight: 700;
       color: #F5F5F7;
       line-height: 1.15;
       margin: 0;
     }
     .proj-desc {
-      font-size: 16px;
+      font-size: 18px;
       line-height: 1.7;
-      color: rgba(255,252,248,0.65);
+      color: #FFFCF8;
+      font-weight: 500;
       margin: 0;
     }
     .proj-metrics {
       display: flex;
-      gap: 32px;
+      gap: 10px;
       flex-wrap: wrap;
     }
-    .proj-metric { display: flex; flex-direction: column; gap: 4px; }
-    .proj-metric-val {
+    .proj-metric-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 16px;
+      background: rgba(229,242,141,0.08);
+      border: 1px solid rgba(229,242,141,0.22);
+      border-radius: 100px;
       font-family: var(--font-mono);
-      font-size: 26px;
+      font-size: 13px;
       font-weight: 700;
       color: #E5F28D;
-      line-height: 1;
+      white-space: nowrap;
     }
-    .proj-metric-lbl {
-      font-family: var(--font-mono);
+    .proj-metric-pill-lbl {
+      font-weight: 400;
+      color: rgba(255,252,248,0.55);
       font-size: 12px;
-      color: rgba(255,252,248,0.45);
-      letter-spacing: 0.03em;
     }
     .proj-cta {
       display: inline-flex;
@@ -6613,128 +6617,160 @@
       border-color: rgba(255,255,255,0.28);
     }
 
-    /* ── TESTIMONIALS / DEPTH BENTO ────────────────────── */
+    /* ── TESTIMONIALS / FIGMA-FRAME CAROUSEL ───────────── */
     .tm-section {
-      background: #111;
-      padding: 72px 40px 80px;
+      background: #0D0D0D;
+      padding: 72px 0 80px;
       position: relative;
       overflow: hidden;
     }
-    .tm-section::before {
-      content: '';
-      position: absolute;
-      top: 55%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 700px; height: 380px;
-      background: radial-gradient(ellipse, rgba(230,242,141,0.055) 0%, transparent 68%);
-      pointer-events: none;
-    }
-    .tm-header { margin-bottom: 44px; }
+    .tm-header { padding: 0 48px; margin-bottom: 56px; }
     .tm-eyebrow-tag {
-      font-family: var(--font-mono);
-      font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase;
-      color: var(--primary); opacity: 0.5; display: block; margin-bottom: 7px;
+      font-family: var(--font-mono); font-size: 9.5px;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: #1A73E8; opacity: 0.7; display: block; margin-bottom: 7px;
     }
     .tm-headline {
-      font-family: var(--font-heading);
-      font-size: 30px; font-weight: 700; color: #FFFCF8;
-      margin: 0; letter-spacing: -0.01em;
+      font-family: var(--font-heading); font-size: 30px; font-weight: 700;
+      color: #FFFCF8; margin: 0; letter-spacing: -0.01em;
     }
-    /* Bento grid */
-    .dc-grid {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      grid-template-rows: auto auto;
-      gap: 12px;
-      align-items: start;
-    }
-    /* Card base */
-    .dc-card {
-      background: #1B1B1B;
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 18px;
-      padding: 28px;
-      position: relative;
-      overflow: hidden;
-      display: flex; flex-direction: column;
-      transition: border-color 0.35s ease;
-      will-change: transform;
-    }
-    /* Overhead shine — subtle top highlight */
-    .dc-card::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 50% -30%, rgba(255,255,255,0.045) 0%, transparent 65%);
-      pointer-events: none; border-radius: inherit;
-    }
-    /* Gradient border flash on hover */
-    .dc-card::after {
-      content: '';
-      position: absolute; inset: 0;
-      border-radius: inherit;
-      box-shadow: inset 0 0 0 1px rgba(230,242,141,0.0);
-      transition: box-shadow 0.35s ease;
-      pointer-events: none;
-    }
-    .dc-card:hover { border-color: rgba(255,255,255,0.12); }
-    .dc-card:hover::after { box-shadow: inset 0 0 0 1px rgba(230,242,141,0.18); }
-    /* Featured spans 2 rows */
-    .dc-card--featured { grid-row: span 2; }
-    /* Giant watermark initial */
-    .dc-watermark {
-      position: absolute; bottom: -24px; right: 4px;
-      font-family: var(--font-heading);
-      font-size: 200px; font-weight: 900; line-height: 1;
-      color: rgba(255,255,255,0.022);
-      pointer-events: none; user-select: none;
-    }
-    /* Opening mark */
-    .dc-open-mark {
-      font-family: Georgia, serif;
-      font-size: 32px; line-height: 1;
-      color: var(--primary); opacity: 0.65;
-      margin-bottom: 14px; display: block;
-    }
-    /* Quote */
-    .dc-quote {
-      font-family: var(--font-heading);
-      font-size: 14.5px; font-weight: 500; line-height: 1.72;
-      color: rgba(255,252,248,0.78); font-style: italic;
-      margin: 0; flex: 1;
-    }
-    .dc-card--featured .dc-quote { font-size: 19px; color: rgba(255,252,248,0.88); }
-    /* Attribution */
-    .dc-attr {
-      display: flex; align-items: center; gap: 11px;
-      padding-top: 20px; margin-top: 20px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-    .dc-card--featured .dc-attr { margin-top: auto; padding-top: 24px; }
-    .dc-avatar {
-      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
-      background: rgba(230,242,141,0.09);
-      border: 1px solid rgba(230,242,141,0.18);
+    /* Stage */
+    .tc-stage { position: relative; }
+    /* Track — houses the absolutely-positioned cards */
+    .tc-track {
+      position: relative; height: 310px;
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
-      color: var(--primary);
     }
-    .dc-card--featured .dc-avatar { width: 40px; height: 40px; font-size: 11px; }
-    .dc-info { display: flex; flex-direction: column; gap: 2px; }
-    .dc-name { font-family: var(--font-heading); font-size: 12.5px; font-weight: 700; color: #FFFCF8; }
-    .dc-role { font-family: var(--font-mono); font-size: 9px; color: rgba(255,252,248,0.28); letter-spacing: 0.03em; }
-    [data-theme="dark"] .tm-section  { background: #0D0D0D; }
-    [data-theme="dark"] .dc-card     { background: #171717; }
+    /* ── Individual card ─────────────────────────────────── */
+    .tc-card {
+      position: absolute;
+      /* Center via margin: auto on all four sides + fixed size */
+      left: 0; right: 0; top: 0; bottom: 0;
+      margin: auto;
+      width: 520px;
+      height: 230px;
+      background: #252525;
+      border: 2px solid #1A73E8;
+      border-radius: 1px;
+      padding: 28px 28px 22px;
+      display: flex; flex-direction: column;
+      box-sizing: border-box;
+      /* Default invisible — JS owns transitions + will-change */
+      opacity: 0; transform: scale(0.6);
+      filter: blur(6px); pointer-events: none;
+    }
+    .tc-card.pos-active {
+      opacity: 1; transform: scale(1); filter: none;
+      pointer-events: auto; z-index: 3;
+    }
+    .tc-card.pos-prev {
+      opacity: 0.20; transform: translateX(-66%) scale(0.83);
+      filter: blur(1.5px); z-index: 2;
+    }
+    .tc-card.pos-next {
+      opacity: 0.20; transform: translateX(66%) scale(0.83);
+      filter: blur(1.5px); z-index: 2;
+    }
+    /* ── Figma frame decorations ─────────────────────────── */
+    .tc-ff-tab {
+      position: absolute; top: -22px; left: -2px;
+      background: #1A73E8; color: #fff;
+      font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+      padding: 3px 9px; border-radius: 3px 3px 0 0;
+      white-space: nowrap; pointer-events: none; letter-spacing: 0.03em;
+    }
+    .tc-ff-h {
+      position: absolute; width: 10px; height: 10px;
+      background: #fff; border: 2px solid #1A73E8; border-radius: 50%;
+      pointer-events: none; z-index: 1;
+    }
+    .tc-ff-h.tl { top: -5px; left: -5px; }
+    .tc-ff-h.tr { top: -5px; right: -5px; }
+    .tc-ff-h.bl { bottom: -5px; left: -5px; }
+    .tc-ff-h.br { bottom: -5px; right: -5px; }
+    .tc-ff-m {
+      position: absolute; background: #fff;
+      border: 1.5px solid #1A73E8; border-radius: 3px;
+      pointer-events: none; z-index: 1;
+    }
+    .tc-ff-m.t { width:22px; height:8px;  top:-4px;    left:50%; transform:translateX(-50%); }
+    .tc-ff-m.b { width:22px; height:8px;  bottom:-4px; left:50%; transform:translateX(-50%); }
+    .tc-ff-m.l { width:8px;  height:22px; left:-4px;   top:50%;  transform:translateY(-50%); }
+    .tc-ff-m.r { width:8px;  height:22px; right:-4px;  top:50%;  transform:translateY(-50%); }
+    /* ── Card content ────────────────────────────────────── */
+    .tc-quote {
+      font-family: var(--font-heading); font-size: 15px;
+      font-weight: 500; line-height: 1.72; font-style: italic;
+      color: rgba(255,252,248,0.82); margin: 0; flex: 1;
+    }
+    .tc-attr {
+      display: flex; align-items: center; gap: 10px;
+      padding-top: 16px; margin-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .tc-avatar {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(26,115,232,0.14);
+      border: 1px solid rgba(26,115,232,0.32);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-size: 9px;
+      font-weight: 700; color: #1A73E8;
+    }
+    .tc-info { display: flex; flex-direction: column; gap: 2px; }
+    .tc-name { font-family: var(--font-heading); font-size: 12px; font-weight: 700; color: #FFFCF8; }
+    .tc-role { font-family: var(--font-mono); font-size: 8.5px; color: rgba(255,252,248,0.28); letter-spacing: 0.03em; }
+    /* ── Progress bar ────────────────────────────────────── */
+    .tc-progress {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 2px; background: rgba(26,115,232,0.12);
+    }
+    .tc-progress-fill {
+      height: 100%; width: 0%;
+      background: #1A73E8; border-radius: 0 1px 1px 0;
+    }
+    @keyframes tc-fill { from { width: 0% } to { width: 100% } }
+    .tc-card.pos-active .tc-progress-fill { animation: tc-fill 6s linear forwards; }
+    /* ── Arrows ──────────────────────────────────────────── */
+    .tc-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.45);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 10;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .tc-arrow:hover {
+      background: rgba(26,115,232,0.14);
+      border-color: rgba(26,115,232,0.45); color: #fff;
+    }
+    .tc-arrow svg { width: 15px; height: 15px; }
+    .tc-prev { left: 24px; }
+    .tc-next { right: 24px; }
+    /* ── Dots ────────────────────────────────────────────── */
+    .tc-dots {
+      display: flex; justify-content: center; gap: 8px; margin-top: 32px;
+    }
+    .tc-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.14); border: none; padding: 0;
+      cursor: pointer; transition: background 0.3s, transform 0.3s;
+    }
+    .tc-dot.active { background: #1A73E8; transform: scale(1.35); }
+    /* Dark mode: already dark */
+    [data-theme="dark"] .tm-section { background: #080808; }
     @media (max-width: 1023px) {
-      .tm-section { padding: 56px 32px 64px; }
-      .tm-headline { font-size: 26px; }
-      .dc-card--featured .dc-quote { font-size: 17px; }
+      .tm-header { padding: 0 32px; }
+      .tc-card { width: 440px; }
+      .tc-track { height: 330px; }
     }
     @media (max-width: 767px) {
-      .tm-section { padding: 44px 20px 52px; }
-      .tm-headline { font-size: 22px; }
-      .dc-grid { grid-template-columns: 1fr; }
-      .dc-card--featured { grid-row: span 1; }
-      .dc-watermark { font-size: 140px; }
+      .tm-header { padding: 0 20px; margin-bottom: 36px; }
+      .tc-card { width: calc(100vw - 100px); }
+      .tc-card.pos-prev { transform: translateX(-72%) scale(0.78); }
+      .tc-card.pos-next { transform: translateX(72%) scale(0.78); }
+      .tc-track { height: 360px; }
     }
 
 
@@ -7249,6 +7285,7 @@
         </section>
 
       </div><!-- /carousel-sticky -->
+      <div id="cs-spacer" style="height:0;flex-shrink:0" aria-hidden="true"></div>
 
       <!-- ── PROJECT CARDS ──────────────────────────────── -->
 
@@ -7260,79 +7297,90 @@
           </video>
         </div>
         <div class="proj-content">
-          <span class="proj-eyebrow">1.1 &nbsp;·&nbsp; EverTutor AI System</span>
           <h3 class="proj-title">EverTutor Live</h3>
           <p class="proj-desc">Voice-first AI tutoring — from zero to product-market fit. Sole designer across research, system design, and launch.</p>
           <div class="proj-metrics">
-            <div class="proj-metric">
-              <span class="proj-metric-val">2,000+</span>
-              <span class="proj-metric-lbl">Daily Active Users</span>
-            </div>
-            <div class="proj-metric">
-              <span class="proj-metric-val">−96%</span>
-              <span class="proj-metric-lbl">Workflow time</span>
-            </div>
-            <div class="proj-metric">
-              <span class="proj-metric-val">$300k</span>
-              <span class="proj-metric-lbl">ARR</span>
-            </div>
+            <span class="proj-metric-pill">2,000+ <span class="proj-metric-pill-lbl">Daily Active Users</span></span>
+            <span class="proj-metric-pill">−96% <span class="proj-metric-pill-lbl">Workflow time</span></span>
+            <span class="proj-metric-pill">$300k <span class="proj-metric-pill-lbl">ARR</span></span>
           </div>
           <a class="proj-cta" href="evertutor-live.html">View Case Study &rarr;</a>
         </div>
       </div>
+      <div id="pc-spacer" style="height:0;flex-shrink:0" aria-hidden="true"></div>
+      <div id="anim-exit-space" style="height:300px;flex-shrink:0" aria-hidden="true"></div>
 
-      <!-- ── TESTIMONIALS / DEPTH BENTO ───────────────── -->
-      <section class="tm-section reveal" id="testimonialsSection">
+      <!-- ── TESTIMONIALS / FIGMA-FRAME CAROUSEL ─────── -->
+      <section class="tm-section" id="testimonialsSection">
 
         <div class="tm-header">
           <span class="tm-eyebrow-tag">Kind Words</span>
           <h2 class="tm-headline">People I've built with</h2>
         </div>
 
-        <div class="dc-grid" id="dcGrid">
+        <div class="tc-stage">
+          <div class="tc-track">
 
-          <!-- Featured -->
-          <div class="dc-card dc-card--featured" id="dcFeatured">
-            <span class="dc-watermark">A</span>
-            <span class="dc-open-mark">"</span>
-            <p class="dc-quote">Bhanu doesn't just design screens — he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. I've shipped with a lot of designers; he's the one engineers actually trust.</p>
-            <div class="dc-attr">
-              <div class="dc-avatar">AK</div>
-              <div class="dc-info">
-                <span class="dc-name">Anil Kumar</span>
-                <span class="dc-role">Engineering Lead · EverTutor</span>
+          <div class="tc-card" data-idx="0">
+            <div class="tc-ff-tab">Testimonial / Anil</div>
+            <span class="tc-ff-h tl"></span><span class="tc-ff-h tr"></span>
+            <span class="tc-ff-h bl"></span><span class="tc-ff-h br"></span>
+            <span class="tc-ff-m t"></span><span class="tc-ff-m b"></span>
+            <span class="tc-ff-m l"></span><span class="tc-ff-m r"></span>
+            <p class="tc-quote">Bhanu doesn&#8217;t just design screens &#8212; he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He&#8217;s the one engineers actually trust.</p>
+            <div class="tc-attr">
+              <div class="tc-avatar">AK</div>
+              <div class="tc-info">
+                <span class="tc-name">Anil Kumar</span>
+                <span class="tc-role">Engineering Lead · EverTutor</span>
               </div>
             </div>
+            <div class="tc-progress"><div class="tc-progress-fill"></div></div>
           </div>
 
-          <!-- Card 2 -->
-          <div class="dc-card" id="dcCard2">
-            <span class="dc-watermark">P</span>
-            <span class="dc-open-mark">"</span>
-            <p class="dc-quote">He has a gift for making complex flows feel obvious in hindsight. Our support tickets dropped 30% in the first month alone.</p>
-            <div class="dc-attr">
-              <div class="dc-avatar">PM</div>
-              <div class="dc-info">
-                <span class="dc-name">Priya Menon</span>
-                <span class="dc-role">Head of Product · Stressie</span>
+          <div class="tc-card" data-idx="1">
+            <div class="tc-ff-tab">Testimonial / Priya</div>
+            <span class="tc-ff-h tl"></span><span class="tc-ff-h tr"></span>
+            <span class="tc-ff-h bl"></span><span class="tc-ff-h br"></span>
+            <span class="tc-ff-m t"></span><span class="tc-ff-m b"></span>
+            <span class="tc-ff-m l"></span><span class="tc-ff-m r"></span>
+            <p class="tc-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
+            <div class="tc-attr">
+              <div class="tc-avatar">PM</div>
+              <div class="tc-info">
+                <span class="tc-name">Priya Menon</span>
+                <span class="tc-role">Head of Product · Stressie</span>
               </div>
             </div>
+            <div class="tc-progress"><div class="tc-progress-fill"></div></div>
           </div>
 
-          <!-- Card 3 -->
-          <div class="dc-card" id="dcCard3">
-            <span class="dc-watermark">M</span>
-            <span class="dc-open-mark">"</span>
-            <p class="dc-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs — just clear decisions backed by solid research.</p>
-            <div class="dc-attr">
-              <div class="dc-avatar">MW</div>
-              <div class="dc-info">
-                <span class="dc-name">Marcus Webb</span>
-                <span class="dc-role">Senior Engineer · Studio</span>
+          <div class="tc-card" data-idx="2">
+            <div class="tc-ff-tab">Testimonial / Marcus</div>
+            <span class="tc-ff-h tl"></span><span class="tc-ff-h tr"></span>
+            <span class="tc-ff-h bl"></span><span class="tc-ff-h br"></span>
+            <span class="tc-ff-m t"></span><span class="tc-ff-m b"></span>
+            <span class="tc-ff-m l"></span><span class="tc-ff-m r"></span>
+            <p class="tc-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs &#8212; just clear decisions backed by solid research and real user data.</p>
+            <div class="tc-attr">
+              <div class="tc-avatar">MW</div>
+              <div class="tc-info">
+                <span class="tc-name">Marcus Webb</span>
+                <span class="tc-role">Senior Engineer · Studio</span>
               </div>
             </div>
+            <div class="tc-progress"><div class="tc-progress-fill"></div></div>
           </div>
+          </div><!-- /tc-track -->
 
+          <button class="tc-arrow tc-prev" aria-label="Previous"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="tc-arrow tc-next" aria-label="Next"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div><!-- /tc-stage -->
+
+        <div class="tc-dots">
+          <button class="tc-dot" aria-label="Quote 1"></button>
+          <button class="tc-dot" aria-label="Quote 2"></button>
+          <button class="tc-dot" aria-label="Quote 3"></button>
         </div>
 
       </section><!-- /testimonials -->
@@ -9996,10 +10044,12 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (firstMsg) { appendMsg('user', firstMsg); messages.push({ role: 'user', content: firstMsg }); streamReply(); }
       setTimeout(function () { cpTA.focus(); }, 600);
     }
+    window._openChat = openChat;
 
     function closeChat() {
       document.body.classList.remove('chat-open');
       cpEl.setAttribute('aria-hidden', 'true');
+      if (window._restoreFab) window._restoreFab();
       if (activeCtx) {                                      // tear down any in-flight stream
         activeCtx.aborted = true; activeCtx.finalized = true;
         if (activeCtx.ctrl) activeCtx.ctrl.abort();
@@ -11352,11 +11402,28 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         userExpanded = true;
         fabWrap.classList.remove('cb-fab');
         lastState = 'full';
-        setTimeout(function() {
-          var inp = document.getElementById('cbInput');
-          if (inp) inp.focus();
-        }, 460);
+        window._fabOpened = true;
+        if (window._openChat) window._openChat();
       });
+
+      /* Called by closeChat() to decide what state to restore */
+      window._restoreFab = function() {
+        if (!window._fabOpened) return;
+        window._fabOpened = false;
+        var hero    = document.querySelector('.hero');
+        var contact = document.getElementById('contactSection');
+        var vh      = window.innerHeight;
+        function sectionInView(el) {
+          if (!el) return false;
+          var r = el.getBoundingClientRect();
+          return r.top < vh * 0.85 && r.bottom > vh * 0.15;
+        }
+        userExpanded = false;
+        /* Hero or contact visible → stay as wide bar (just reset userExpanded) */
+        if (sectionInView(hero) || sectionInView(contact)) return;
+        /* Otherwise restore FAB immediately */
+        fabWrap.classList.add('cb-fab');
+      };
     })();
 
   })();
@@ -11449,38 +11516,223 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   })();
 
   </script>
-  <!-- ── TESTIMONIAL PARALLAX ─────────────────────────── -->
+  <!-- ── TESTIMONIAL CAROUSEL ─────────────────────────── -->
   <script>
-  (function() {
-    var section  = document.getElementById('testimonialsSection');
-    var featured = document.getElementById('dcFeatured');
-    var card2    = document.getElementById('dcCard2');
-    var card3    = document.getElementById('dcCard3');
-    if (!section || !featured) return;
+  (function () {
+    var cards   = Array.from(document.querySelectorAll('.tc-card'));
+    var dots    = Array.from(document.querySelectorAll('.tc-dot'));
+    var section = document.getElementById('testimonialsSection');
+    var total   = cards.length;
+    var cur     = 0;
+    var timer;
+    var TR = 'opacity 0.52s ease, transform 0.52s cubic-bezier(0.4,0,0.2,1), filter 0.52s ease';
 
-    var ticking = false;
-    var mx = 0, my = 0;
+    var STATES = {
+      active: { opacity:'1',    transform:'scale(1)',                    filter:'none',       z:'3', ptr:'auto'  },
+      prev:   { opacity:'0.20', transform:'translateX(-66%) scale(0.83)',filter:'blur(1.5px)',z:'2', ptr:'none'  },
+      next:   { opacity:'0.20', transform:'translateX(66%) scale(0.83)', filter:'blur(1.5px)',z:'2', ptr:'none'  },
+      hidden: { opacity:'0',    transform:'scale(0.6)',                  filter:'blur(6px)', z:'1', ptr:'none'  },
+    };
 
-    section.addEventListener('mousemove', function(e) {
-      var r = section.getBoundingClientRect();
-      mx = (e.clientX - r.left  - r.width  / 2) / r.width;
-      my = (e.clientY - r.top   - r.height / 2) / r.height;
-      if (!ticking) {
-        requestAnimationFrame(function() {
-          featured.style.transform = 'translate(' + (mx * -7).toFixed(2)  + 'px,' + (my * -5).toFixed(2)  + 'px)';
-          card2.style.transform    = 'translate(' + (mx * -18).toFixed(2) + 'px,' + (my * -13).toFixed(2) + 'px)';
-          card3.style.transform    = 'translate(' + (mx * -11).toFixed(2) + 'px,' + (my * -17).toFixed(2) + 'px)';
-          ticking = false;
-        });
-        ticking = true;
+    function update(n) {
+      var prev = (n - 1 + total) % total;
+      var next = (n + 1) % total;
+
+      /* 1 — Cancel all running CSS transitions in one pass */
+      cards.forEach(function(c) { c.style.transition = 'none'; });
+
+      /* 2 — Single reflow: commits current visual state, cancels animation timelines */
+      void document.querySelector('.tc-track').offsetHeight;
+
+      /* 3 — Apply new states + re-enable transitions */
+      cards.forEach(function(card, i) {
+        var key = (i === n) ? 'active' : (i === prev) ? 'prev' : (i === next) ? 'next' : 'hidden';
+        var s = STATES[key];
+        card.style.transition    = TR;
+        card.style.opacity       = s.opacity;
+        card.style.transform     = s.transform;
+        card.style.filter        = s.filter;
+        card.style.zIndex        = s.z;
+        card.style.pointerEvents = s.ptr;
+        card.classList.remove('pos-active', 'pos-prev', 'pos-next');
+        if (key === 'active') card.classList.add('pos-active');
+      });
+
+      /* 4 — Restart progress bar on active card */
+      var fill = cards[n].querySelector('.tc-progress-fill');
+      if (fill) { fill.style.animation = 'none'; void fill.offsetHeight; fill.style.animation = ''; }
+
+      dots.forEach(function (d, i) { d.classList.toggle('active', i === n); });
+      cur = n;
+    }
+
+    function go(dir) {
+      clearInterval(timer);
+      update((cur + dir + total) % total);
+      startTimer();
+    }
+
+    function startTimer() {
+      clearInterval(timer);
+      timer = setInterval(function () { go(1); }, 6000);
+    }
+
+    document.querySelector('.tc-prev').addEventListener('click', function () { go(-1); });
+    document.querySelector('.tc-next').addEventListener('click', function () { go(1); });
+
+    dots.forEach(function (dot, i) {
+      dot.addEventListener('click', function () {
+        clearInterval(timer);
+        update(i);
+        startTimer();
+      });
+    });
+
+    if (section) {
+      section.addEventListener('mouseenter', function () { clearInterval(timer); });
+      section.addEventListener('mouseleave', startTimer);
+    }
+
+    update(0);
+    startTimer();
+  })();
+  </script>
+
+  <script>
+  /* ── Section 2 scroll story ──────────────────────────────────────────────
+     Uses position:fixed (not sticky) to escape .card overflow:clip.
+     Phase 1  blank      : section 2 enters, ET Glimpse invisible
+     Phase 2  appear     : ET Glimpse fades in at viewport center
+     Phase 3  scale+rise : scales 1→0.7, rises center→nav-top
+     Phase 4  reveal     : proj-card fades in below fixed glimpse
+     Phase 5  exit       : both fade out, testimonials take over
+  ──────────────────────────────────────────────────────────────────────── */
+  (function () {
+    var cs       = document.querySelector('.carousel-sticky');
+    var pc       = document.querySelector('.proj-card');
+    var csSpacer = document.getElementById('cs-spacer');
+    var pcSpacer = document.getElementById('pc-spacer');
+    var card     = document.querySelector('.card');
+    if (!cs || !pc || !card) return;
+
+    var NAV_H    = 54, SCALE_MIN = 0.7;
+    var FADE_R   = 200;
+    var SCALE_R  = 350;
+    var PROJ_R   = 380;
+    var EXIT_R   = 300;
+
+    cs.style.opacity   = '0';
+    pc.style.opacity   = '0';
+    pc.style.transform = 'translateY(44px)';
+
+    function docTop(el) {
+      var t = 0; while (el) { t += el.offsetTop; el = el.offsetParent; } return t;
+    }
+
+    /* Measure once at load (elements in normal flow, scrollY≈0) */
+    var csDocTop0 = docTop(cs);
+    var pcDocTop0 = docTop(pc);
+    var csH0      = cs.offsetHeight;
+    var pcH0      = pc.offsetHeight;
+
+    var vpH, centerTop, cardLeft, cardWidth;
+    var fadeStart, fadeEnd, scaleEnd, projEnd, exitPoint;
+
+    function recalc() {
+      vpH       = window.innerHeight;
+      centerTop = Math.max(NAV_H + 20, (vpH - csH0) / 2);
+      var r     = card.getBoundingClientRect();
+      cardLeft  = r.left;
+      cardWidth = r.width;
+      fadeStart = csDocTop0 - centerTop;
+      fadeEnd   = fadeStart + FADE_R;
+      scaleEnd  = fadeEnd   + SCALE_R;
+      projEnd   = scaleEnd  + PROJ_R;
+      exitPoint = projEnd   + EXIT_R;
+    }
+
+    function fixEl(el, spacer, h, isPC) {
+      if (el.style.position !== 'fixed') {
+        el.style.position = 'fixed';
+        el.style.zIndex   = isPC ? '10' : '5';
+        spacer.style.height = h + 'px';
       }
-    });
+      /* always update so resize is handled */
+      el.style.left  = isPC ? (cardLeft + 40) + 'px' : cardLeft + 'px';
+      el.style.width = isPC ? (cardWidth - 80) + 'px' : cardWidth + 'px';
+    }
 
-    section.addEventListener('mouseleave', function() {
-      featured.style.transform = '';
-      card2.style.transform    = '';
-      card3.style.transform    = '';
-    });
+    function unfixEl(el, spacer) {
+      if (el.style.position !== 'fixed') return;
+      el.style.position = el.style.left = el.style.width =
+        el.style.top = el.style.zIndex = '';
+      spacer.style.height = '0';
+    }
+
+    recalc();
+
+    var raf = false;
+    function update() {
+      raf = false;
+      var sy = window.scrollY || document.documentElement.scrollTop;
+
+      /* Phase 1 — blank */
+      if (sy < fadeStart) {
+        unfixEl(cs, csSpacer); cs.style.transform = ''; cs.style.opacity = '0';
+        unfixEl(pc, pcSpacer); pc.style.opacity = '0'; pc.style.transform = 'translateY(44px)';
+        return;
+      }
+
+      /* After exit — hide, let testimonials flow normally */
+      if (sy > exitPoint) {
+        unfixEl(cs, csSpacer); cs.style.opacity = '0';
+        unfixEl(pc, pcSpacer); pc.style.opacity = '0';
+        return;
+      }
+
+      /* Phase 2 — fade in at center */
+      fixEl(cs, csSpacer, csH0, false);
+      if (sy <= fadeEnd) {
+        var fp = (sy - fadeStart) / FADE_R;
+        cs.style.top = centerTop + 'px'; cs.style.transform = 'scale(1)'; cs.style.opacity = fp;
+        pc.style.opacity = '0'; pc.style.transform = 'translateY(44px)';
+        return;
+      }
+
+      /* Phase 3 — scale + rise */
+      if (sy <= scaleEnd) {
+        var p     = (sy - fadeEnd) / SCALE_R;
+        var scale = 1 - (1 - SCALE_MIN) * p;
+        var top   = centerTop + (NAV_H - centerTop) * p;
+        cs.style.top = top + 'px'; cs.style.transform = 'scale(' + scale + ')'; cs.style.opacity = '1';
+        pc.style.opacity = '0'; pc.style.transform = 'translateY(44px)';
+        return;
+      }
+
+      /* Phases 4 + 5 — proj-card reveal then exit fade */
+      cs.style.top = NAV_H + 'px'; cs.style.transform = 'scale(' + SCALE_MIN + ')';
+      fixEl(pc, pcSpacer, pcH0, true);
+      var pcTop = NAV_H + csH0 * SCALE_MIN + 16;
+      pc.style.top = pcTop + 'px';
+
+      if (sy <= projEnd) {
+        /* Phase 4 — proj-card reveal */
+        var p4  = (sy - scaleEnd) / PROJ_R;
+        var pfp = p4 < 0.1 ? 0 : p4 > 0.7 ? 1 : (p4 - 0.1) / 0.6;
+        cs.style.opacity = '1';
+        pc.style.opacity = pfp; pc.style.transform = 'translateY(' + ((1 - pfp) * 44) + 'px)';
+      } else {
+        /* Phase 5 — exit fade-out */
+        var p5 = Math.min(1, (sy - projEnd) / EXIT_R);
+        cs.style.opacity = 1 - p5;
+        pc.style.opacity = 1 - p5; pc.style.transform = 'none';
+      }
+    }
+
+    function onScroll() { if (!raf) { raf = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', function () { recalc(); update(); });
+    update();
   })();
   </script>
 
