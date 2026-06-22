@@ -6753,17 +6753,17 @@
             <div class="ws-et-metrics">
               <div class="ws-et-metric-row">
                 <div class="ws-et-metric">
-                  <span class="ws-et-val">2000+</span>
+                  <span class="ws-et-val" data-count="2000" data-suffix="+">2000+</span>
                   <span class="ws-et-lbl">Daily Active Users</span>
                 </div>
                 <div class="ws-et-mdivider"></div>
                 <div class="ws-et-metric">
-                  <span class="ws-et-val">&minus;96%</span>
+                  <span class="ws-et-val" data-count="96" data-prefix="−" data-suffix="%">−96%</span>
                   <span class="ws-et-lbl">Workflow time</span>
                 </div>
               </div>
               <div class="ws-et-metric">
-                <span class="ws-et-val">0&rarr;$300k</span>
+                <span class="ws-et-val" data-count="300" data-prefix="0→$" data-suffix="k">0→$300k</span>
                 <span class="ws-et-lbl">ARR</span>
               </div>
             </div>
@@ -10909,6 +10909,52 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   </script>
 
   <script src="scroll-animations.js" defer></script>
+
+  <script>
+  (function() {
+    // Ease-out cubic
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+    var metrics = [
+      { selector: '.ws-et-val[data-count]', done: false }
+    ];
+
+    function animateCount(el) {
+      var target   = parseFloat(el.dataset.count);
+      var prefix   = el.dataset.prefix  || '';
+      var suffix   = el.dataset.suffix  || '';
+      var duration = 1400;
+      var start    = null;
+
+      function step(ts) {
+        if (!start) start = ts;
+        var elapsed  = ts - start;
+        var progress = Math.min(elapsed / duration, 1);
+        var eased    = easeOut(progress);
+        var current  = Math.round(eased * target);
+        el.textContent = prefix + current.toLocaleString() + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    var triggered = false;
+    var observer  = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting && !triggered) {
+          triggered = true;
+          observer.disconnect();
+          document.querySelectorAll('.ws-et-val[data-count]').forEach(function(el) {
+            animateCount(el);
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+
+    var section = document.querySelector('.ws-section');
+    if (section) observer.observe(section);
+  })();
+  </script>
 
 </body>
 </html>
