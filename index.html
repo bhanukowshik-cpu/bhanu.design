@@ -6045,8 +6045,9 @@
     /* ── Carousel wrap ── */
     .carousel-sticky {
       position: relative; z-index: 5;
-      transform-origin: top center;
-      will-change: transform, opacity;
+      height: 100vh;
+      display: flex; align-items: center;
+      overflow: hidden;
     }
 
     /* ── Work Section V3 — Section 2 ──────────────────────────── */
@@ -6054,7 +6055,9 @@
       background: #1E1E1E;
       position: relative;
       overflow: hidden;
-      padding-bottom: 80px;
+      width: 100%;
+      transform-origin: top center;
+      will-change: transform, opacity;
     }
 
     /* EverTutor hero — 3-col grid: left info | blob | right info */
@@ -6087,6 +6090,20 @@
       text-align: right;
       gap: 28px;
     }
+
+    /* ── Section 2 entrance animation ── */
+    .ws-et-left, .ws-et-right {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .s2-entered .ws-et-left {
+      opacity: 1; transform: none; transition-delay: 0.5s;
+    }
+    .s2-entered .ws-et-right {
+      opacity: 1; transform: none; transition-delay: 0.7s;
+    }
+
     .ws-et-title {
       font-family: var(--font-heading);
       font-size: 30px;
@@ -6655,9 +6672,10 @@
       padding: 28px 28px 22px;
       display: flex; flex-direction: column;
       box-sizing: border-box;
-      /* Default invisible — JS owns transitions + will-change */
+      /* Default invisible */
       opacity: 0; transform: scale(0.6);
-      filter: blur(6px); pointer-events: none;
+      filter: blur(6px); pointer-events: none; z-index: 1;
+      transition: opacity 0.52s ease, transform 0.52s cubic-bezier(0.4,0,0.2,1), filter 0.52s ease;
     }
     .tc-card.pos-active {
       opacity: 1; transform: scale(1); filter: none;
@@ -7285,7 +7303,6 @@
         </section>
 
       </div><!-- /carousel-sticky -->
-      <div id="cs-spacer" style="height:0;flex-shrink:0" aria-hidden="true"></div>
 
       <!-- ── PROJECT CARDS ──────────────────────────────── -->
 
@@ -11525,44 +11542,27 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var total   = cards.length;
     var cur     = 0;
     var timer;
-    var TR = 'opacity 0.52s ease, transform 0.52s cubic-bezier(0.4,0,0.2,1), filter 0.52s ease';
-
-    var STATES = {
-      active: { opacity:'1',    transform:'scale(1)',                    filter:'none',       z:'3', ptr:'auto'  },
-      prev:   { opacity:'0.20', transform:'translateX(-66%) scale(0.83)',filter:'blur(1.5px)',z:'2', ptr:'none'  },
-      next:   { opacity:'0.20', transform:'translateX(66%) scale(0.83)', filter:'blur(1.5px)',z:'2', ptr:'none'  },
-      hidden: { opacity:'0',    transform:'scale(0.6)',                  filter:'blur(6px)', z:'1', ptr:'none'  },
-    };
 
     function update(n) {
       var prev = (n - 1 + total) % total;
-      var next = (n + 1) % total;
+      var nxt  = (n + 1) % total;
 
-      /* 1 — Cancel all running CSS transitions in one pass */
-      cards.forEach(function(c) { c.style.transition = 'none'; });
-
-      /* 2 — Single reflow: commits current visual state, cancels animation timelines */
-      void document.querySelector('.tc-track').offsetHeight;
-
-      /* 3 — Apply new states + re-enable transitions */
       cards.forEach(function(card, i) {
-        var key = (i === n) ? 'active' : (i === prev) ? 'prev' : (i === next) ? 'next' : 'hidden';
-        var s = STATES[key];
-        card.style.transition    = TR;
-        card.style.opacity       = s.opacity;
-        card.style.transform     = s.transform;
-        card.style.filter        = s.filter;
-        card.style.zIndex        = s.z;
-        card.style.pointerEvents = s.ptr;
         card.classList.remove('pos-active', 'pos-prev', 'pos-next');
-        if (key === 'active') card.classList.add('pos-active');
+        if      (i === n)    card.classList.add('pos-active');
+        else if (i === prev) card.classList.add('pos-prev');
+        else if (i === nxt)  card.classList.add('pos-next');
       });
 
-      /* 4 — Restart progress bar on active card */
+      /* Restart progress fill animation on the newly-active card */
       var fill = cards[n].querySelector('.tc-progress-fill');
-      if (fill) { fill.style.animation = 'none'; void fill.offsetHeight; fill.style.animation = ''; }
+      if (fill) {
+        fill.style.animation = 'none';
+        void fill.offsetHeight;
+        fill.style.animation = 'tc-fill 6s linear forwards';
+      }
 
-      dots.forEach(function (d, i) { d.classList.toggle('active', i === n); });
+      dots.forEach(function(d, i) { d.classList.toggle('active', i === n); });
       cur = n;
     }
 
@@ -11593,35 +11593,37 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       section.addEventListener('mouseleave', startTimer);
     }
 
+    /* Initial state — no transition on first paint */
+    cards.forEach(function(c) { c.style.transition = 'none'; });
     update(0);
+    void document.querySelector('.tc-track').offsetHeight;
+    cards.forEach(function(c) { c.style.transition = ''; });
+
     startTimer();
   })();
   </script>
 
   <script>
-  /* ── Section 2 scroll story ──────────────────────────────────────────────
-     Uses position:fixed (not sticky) to escape .card overflow:clip.
-     Phase 1  blank      : section 2 enters, ET Glimpse invisible
-     Phase 2  appear     : ET Glimpse fades in at viewport center
-     Phase 3  scale+rise : scales 1→0.7, rises center→nav-top
-     Phase 4  reveal     : proj-card fades in below fixed glimpse
-     Phase 5  exit       : both fade out, testimonials take over
+  /* ── Section 2 snap + scroll story ──────────────────────────────────────
+     Snap  : when section 2 is 20% visible (scrolling DOWN from s1), auto-
+             scroll to align it flush with the viewport, then play entrance.
+     Entry : blob + waveform already visible; left/right content fades in.
+     Phase 3  scale+rise : ws-section (fixed) scales 1→0.7, rises to nav
+     Phase 4  reveal     : proj-card fades in below
+     Phase 5  exit       : both fade out as testimonials scroll in
   ──────────────────────────────────────────────────────────────────────── */
   (function () {
-    var cs       = document.querySelector('.carousel-sticky');
+    var snapEl   = document.querySelector('.carousel-sticky'); /* 100vh snap section */
+    var cs       = document.querySelector('.ws-section');      /* inner animated element */
     var pc       = document.querySelector('.proj-card');
-    var csSpacer = document.getElementById('cs-spacer');
     var pcSpacer = document.getElementById('pc-spacer');
     var card     = document.querySelector('.card');
-    if (!cs || !pc || !card) return;
+    if (!snapEl || !cs || !pc || !card) return;
 
-    var NAV_H    = 54, SCALE_MIN = 0.7;
-    var FADE_R   = 200;
-    var SCALE_R  = 350;
-    var PROJ_R   = 380;
-    var EXIT_R   = 300;
+    var NAV_H   = 54, SCALE_MIN = 0.7;
+    var SCALE_R = 350, PROJ_R = 380, EXIT_R = 300;
 
-    cs.style.opacity   = '0';
+    /* proj-card starts hidden */
     pc.style.opacity   = '0';
     pc.style.transform = 'translateY(44px)';
 
@@ -11629,14 +11631,13 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       var t = 0; while (el) { t += el.offsetTop; el = el.offsetParent; } return t;
     }
 
-    /* Measure once at load (elements in normal flow, scrollY≈0) */
-    var csDocTop0 = docTop(cs);
-    var pcDocTop0 = docTop(pc);
-    var csH0      = cs.offsetHeight;
-    var pcH0      = pc.offsetHeight;
+    /* Measure once at load (natural flow, scrollY≈0) */
+    var snapDocTop = docTop(snapEl);   /* top of the 100vh section in document */
+    var csH0       = cs.offsetHeight;  /* natural height of ws-section (~500px) */
+    var pcH0       = pc.offsetHeight;
 
     var vpH, centerTop, cardLeft, cardWidth;
-    var fadeStart, fadeEnd, scaleEnd, projEnd, exitPoint;
+    var scaleEnd, projEnd, exitPoint;
 
     function recalc() {
       vpH       = window.innerHeight;
@@ -11644,20 +11645,18 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       var r     = card.getBoundingClientRect();
       cardLeft  = r.left;
       cardWidth = r.width;
-      fadeStart = csDocTop0 - centerTop;
-      fadeEnd   = fadeStart + FADE_R;
-      scaleEnd  = fadeEnd   + SCALE_R;
-      projEnd   = scaleEnd  + PROJ_R;
-      exitPoint = projEnd   + EXIT_R;
+      /* animation milestones relative to snap scroll position */
+      scaleEnd  = snapDocTop + SCALE_R;
+      projEnd   = scaleEnd   + PROJ_R;
+      exitPoint = projEnd    + EXIT_R;
     }
 
     function fixEl(el, spacer, h, isPC) {
       if (el.style.position !== 'fixed') {
         el.style.position = 'fixed';
         el.style.zIndex   = isPC ? '10' : '5';
-        spacer.style.height = h + 'px';
+        if (spacer) spacer.style.height = h + 'px';
       }
-      /* always update so resize is handled */
       el.style.left  = isPC ? (cardLeft + 40) + 'px' : cardLeft + 'px';
       el.style.width = isPC ? (cardWidth - 80) + 'px' : cardWidth + 'px';
     }
@@ -11666,42 +11665,65 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (el.style.position !== 'fixed') return;
       el.style.position = el.style.left = el.style.width =
         el.style.top = el.style.zIndex = '';
-      spacer.style.height = '0';
+      if (spacer) spacer.style.height = '0';
     }
+
+    /* ── Snap logic ─────────────────────────────────────────────────────── */
+    var snapped  = false;
+    var snapping = false;
+    var prevScrollY = 0;
+
+    var io = new IntersectionObserver(function (entries) {
+      var e = entries[0];
+      /* Only fire when entering from section 1 (scrolling down) */
+      if (e.isIntersecting && e.intersectionRatio >= 0.2 &&
+          !snapped && !snapping && window.scrollY >= prevScrollY) {
+        snapping = true;
+        window.scrollTo({ top: snapDocTop, behavior: 'smooth' });
+        /* After smooth scroll settles (~650 ms), trigger entrance */
+        setTimeout(function () {
+          snapping = false;
+          snapped  = true;
+          snapEl.classList.add('s2-entered');
+          io.disconnect();
+          update(); /* re-run update at settled scroll position */
+        }, 700);
+      }
+    }, { threshold: [0.2] });
+
+    io.observe(snapEl);
 
     recalc();
 
     var raf = false;
     function update() {
       raf = false;
+      if (snapping) return; /* don't animate during the snap scroll */
+
       var sy = window.scrollY || document.documentElement.scrollTop;
+      prevScrollY = sy;
 
-      /* Phase 1 — blank */
-      if (sy < fadeStart) {
-        unfixEl(cs, csSpacer); cs.style.transform = ''; cs.style.opacity = '0';
-        unfixEl(pc, pcSpacer); pc.style.opacity = '0'; pc.style.transform = 'translateY(44px)';
-        return;
-      }
-
-      /* After exit — hide, let testimonials flow normally */
-      if (sy > exitPoint) {
-        unfixEl(cs, csSpacer); cs.style.opacity = '0';
-        unfixEl(pc, pcSpacer); pc.style.opacity = '0';
-        return;
-      }
-
-      /* Phase 2 — fade in at center */
-      fixEl(cs, csSpacer, csH0, false);
-      if (sy <= fadeEnd) {
-        var fp = (sy - fadeStart) / FADE_R;
-        cs.style.top = centerTop + 'px'; cs.style.transform = 'scale(1)'; cs.style.opacity = fp;
+      /* ── Before snap: natural flow, nothing fixed ── */
+      if (!snapped || sy < snapDocTop) {
+        unfixEl(cs, null);
+        cs.style.transform = ''; cs.style.opacity = '';
+        unfixEl(pc, pcSpacer);
         pc.style.opacity = '0'; pc.style.transform = 'translateY(44px)';
         return;
       }
 
-      /* Phase 3 — scale + rise */
+      /* ── After exit: release fixed elements ── */
+      if (sy > exitPoint) {
+        unfixEl(cs, null); cs.style.opacity = '0';
+        unfixEl(pc, pcSpacer); pc.style.opacity = '0';
+        return;
+      }
+
+      /* ── Phase 3: scale + rise ── */
+      fixEl(cs, null, csH0, false);
+
       if (sy <= scaleEnd) {
-        var p     = (sy - fadeEnd) / SCALE_R;
+        var p     = (sy - snapDocTop) / SCALE_R;
         var scale = 1 - (1 - SCALE_MIN) * p;
         var top   = centerTop + (NAV_H - centerTop) * p;
         cs.style.top = top + 'px'; cs.style.transform = 'scale(' + scale + ')'; cs.style.opacity = '1';
@@ -11709,20 +11731,20 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         return;
       }
 
-      /* Phases 4 + 5 — proj-card reveal then exit fade */
-      cs.style.top = NAV_H + 'px'; cs.style.transform = 'scale(' + SCALE_MIN + ')';
+      /* ── Phases 4 + 5: proj-card reveal → exit fade ── */
+      cs.style.top = NAV_H + 'px'; cs.style.transform = 'scale(' + SCALE_MIN + ')'; cs.style.opacity = '1';
       fixEl(pc, pcSpacer, pcH0, true);
       var pcTop = NAV_H + csH0 * SCALE_MIN + 16;
       pc.style.top = pcTop + 'px';
 
       if (sy <= projEnd) {
-        /* Phase 4 — proj-card reveal */
+        /* Phase 4 */
         var p4  = (sy - scaleEnd) / PROJ_R;
         var pfp = p4 < 0.1 ? 0 : p4 > 0.7 ? 1 : (p4 - 0.1) / 0.6;
         cs.style.opacity = '1';
         pc.style.opacity = pfp; pc.style.transform = 'translateY(' + ((1 - pfp) * 44) + 'px)';
       } else {
-        /* Phase 5 — exit fade-out */
+        /* Phase 5 — exit fade */
         var p5 = Math.min(1, (sy - projEnd) / EXIT_R);
         cs.style.opacity = 1 - p5;
         pc.style.opacity = 1 - p5; pc.style.transform = 'none';
