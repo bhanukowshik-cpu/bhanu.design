@@ -6018,6 +6018,34 @@
     }
 
     /* EverTutor hero — 3-col grid: left info | blob | right info */
+    .ws-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 56px 60px 0;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .ws-ey-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,252,248,0.38);
+      letter-spacing: 0.12em;
+    }
+    .ws-ey-line {
+      width: 48px;
+      height: 1px;
+      background: rgba(255,252,248,0.20);
+    }
+    .ws-ey-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,252,248,0.38);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
     .ws-et-hero {
       position: relative; z-index: 1;
       display: grid;
@@ -6032,7 +6060,7 @@
     .ws-et-left {
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: 48px;
     }
     .ws-et-center {
       display: flex;
@@ -6060,7 +6088,7 @@
     .ws-et-metrics {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 28px;
     }
     .ws-et-metric-row {
       display: flex;
@@ -6104,14 +6132,19 @@
       justify-content: flex-end;
     }
     .ws-et-desc {
-      font-size: 21px;
-      line-height: 1.65;
+      font-size: 18px;
+      line-height: 1.7;
       color: rgba(255,252,248,0.72);
       margin: 0;
     }
     .ws-et-desc strong {
       color: #FFFCF8;
       font-weight: 700;
+    }
+    .ws-et-desc em {
+      font-style: italic;
+      font-weight: 600;
+      color: #FFFCF8;
     }
     /* orb / blob */
     .ws-orb-wrap {
@@ -6475,79 +6508,128 @@
       .fw-card { flex: 0 0 calc(66.6% - 8px); }
     }
 
-    /* ── TESTIMONIALS / MARQUEE ─────────────────────────── */
+    /* ── TESTIMONIALS / DEPTH BENTO ────────────────────── */
     .tm-section {
-      background: #161616;
-      padding: 68px 0 76px;
+      background: #111;
+      padding: 72px 40px 80px;
       position: relative;
       overflow: hidden;
-      /* fade edges so marquee dissolves at card boundary */
-      -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
-      mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
     }
-    .tm-header {
-      padding: 0 48px;
-      margin-bottom: 54px;
+    .tm-section::before {
+      content: '';
+      position: absolute;
+      top: 55%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 380px;
+      background: radial-gradient(ellipse, rgba(230,242,141,0.055) 0%, transparent 68%);
+      pointer-events: none;
     }
+    .tm-header { margin-bottom: 44px; }
     .tm-eyebrow-tag {
       font-family: var(--font-mono);
-      font-size: 9.5px; letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--primary); opacity: 0.5;
-      display: block; margin-bottom: 6px;
+      font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--primary); opacity: 0.5; display: block; margin-bottom: 7px;
     }
     .tm-headline {
       font-family: var(--font-heading);
-      font-size: 30px; font-weight: 700;
-      color: #FFFCF8; margin: 0;
-      letter-spacing: -0.01em;
+      font-size: 30px; font-weight: 700; color: #FFFCF8;
+      margin: 0; letter-spacing: -0.01em;
     }
-    /* Marquee */
-    .mq-rows { display: flex; flex-direction: column; gap: 2px; }
-    .mq-row  { overflow: hidden; }
-    .mq-track {
-      display: flex;
-      width: max-content;
-      white-space: nowrap;
+    /* Bento grid */
+    .dc-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-rows: auto auto;
+      gap: 12px;
+      align-items: start;
+    }
+    /* Card base */
+    .dc-card {
+      background: #1B1B1B;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 18px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      transition: border-color 0.35s ease;
       will-change: transform;
     }
-    @keyframes mq-L { from { transform: translateX(0);    } to { transform: translateX(-50%); } }
-    @keyframes mq-R { from { transform: translateX(-50%); } to { transform: translateX(0);    } }
-    .mq-row:nth-child(1) .mq-track { animation: mq-L 36s linear infinite; }
-    .mq-row:nth-child(2) .mq-track { animation: mq-R 28s linear infinite; }
-    .mq-row:nth-child(3) .mq-track { animation: mq-L 42s linear infinite; }
-    .tm-section:hover .mq-track    { animation-play-state: paused; }
-    /* Text */
-    .mq-item {
+    /* Overhead shine — subtle top highlight */
+    .dc-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% -30%, rgba(255,255,255,0.045) 0%, transparent 65%);
+      pointer-events: none; border-radius: inherit;
+    }
+    /* Gradient border flash on hover */
+    .dc-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      box-shadow: inset 0 0 0 1px rgba(230,242,141,0.0);
+      transition: box-shadow 0.35s ease;
+      pointer-events: none;
+    }
+    .dc-card:hover { border-color: rgba(255,255,255,0.12); }
+    .dc-card:hover::after { box-shadow: inset 0 0 0 1px rgba(230,242,141,0.18); }
+    /* Featured spans 2 rows */
+    .dc-card--featured { grid-row: span 2; }
+    /* Giant watermark initial */
+    .dc-watermark {
+      position: absolute; bottom: -24px; right: 4px;
       font-family: var(--font-heading);
-      font-size: clamp(30px, 4vw, 56px);
-      font-weight: 700; font-style: italic;
-      white-space: nowrap;
-      padding-right: 2.5em;
-      display: inline-block;
-      line-height: 1.3;
+      font-size: 200px; font-weight: 900; line-height: 1;
+      color: rgba(255,255,255,0.022);
+      pointer-events: none; user-select: none;
     }
-    .mq-row:nth-child(1) .mq-item { color: rgba(255,252,248,0.90); }
-    .mq-row:nth-child(2) .mq-item { color: rgba(255,252,248,0.28); }
-    .mq-row:nth-child(3) .mq-item { color: rgba(255,252,248,0.65); }
-    .mq-attr {
-      font-style: normal;
-      font-size: 0.40em;
-      font-weight: 600;
-      letter-spacing: 0.04em;
+    /* Opening mark */
+    .dc-open-mark {
+      font-family: Georgia, serif;
+      font-size: 32px; line-height: 1;
+      color: var(--primary); opacity: 0.65;
+      margin-bottom: 14px; display: block;
+    }
+    /* Quote */
+    .dc-quote {
+      font-family: var(--font-heading);
+      font-size: 14.5px; font-weight: 500; line-height: 1.72;
+      color: rgba(255,252,248,0.78); font-style: italic;
+      margin: 0; flex: 1;
+    }
+    .dc-card--featured .dc-quote { font-size: 19px; color: rgba(255,252,248,0.88); }
+    /* Attribution */
+    .dc-attr {
+      display: flex; align-items: center; gap: 11px;
+      padding-top: 20px; margin-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .dc-card--featured .dc-attr { margin-top: auto; padding-top: 24px; }
+    .dc-avatar {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(230,242,141,0.09);
+      border: 1px solid rgba(230,242,141,0.18);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
       color: var(--primary);
-      opacity: 0.75;
-      vertical-align: middle;
-      margin-left: 0.6em;
     }
-    .mq-diamond {
-      font-style: normal;
-      color: rgba(230,242,141,0.2);
-      margin-right: 0.3em;
+    .dc-card--featured .dc-avatar { width: 40px; height: 40px; font-size: 11px; }
+    .dc-info { display: flex; flex-direction: column; gap: 2px; }
+    .dc-name { font-family: var(--font-heading); font-size: 12.5px; font-weight: 700; color: #FFFCF8; }
+    .dc-role { font-family: var(--font-mono); font-size: 9px; color: rgba(255,252,248,0.28); letter-spacing: 0.03em; }
+    [data-theme="dark"] .tm-section  { background: #0D0D0D; }
+    [data-theme="dark"] .dc-card     { background: #171717; }
+    @media (max-width: 1023px) {
+      .tm-section { padding: 56px 32px 64px; }
+      .tm-headline { font-size: 26px; }
+      .dc-card--featured .dc-quote { font-size: 17px; }
     }
-    [data-theme="dark"] .tm-section { background: #111; }
     @media (max-width: 767px) {
-      .tm-header { padding: 0 24px; margin-bottom: 36px; }
+      .tm-section { padding: 44px 20px 52px; }
+      .tm-headline { font-size: 22px; }
+      .dc-grid { grid-template-columns: 1fr; }
+      .dc-card--featured { grid-row: span 1; }
+      .dc-watermark { font-size: 140px; }
     }
 
 
@@ -6843,6 +6925,11 @@
       <!-- ── WORK SECTION V3 ──────────────────────────────────── -->
       <section class="ws-section">
 
+        <div class="ws-eyebrow">
+          <span class="ws-ey-num">01</span>
+          <span class="ws-ey-line"></span>
+          <span class="ws-ey-label">Featured Work</span>
+        </div>
         <!-- EverTutor hero: left title+metrics | center blob | right tags+desc -->
         <div class="ws-et-hero">
 
@@ -6964,14 +7051,11 @@
               <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Profile dark theme.svg" width="16" height="14" alt="" aria-hidden="true">Sole Product Designer</span>
               <div class="ws-et-tag-row">
                 <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Thunder Dark Theme.svg" width="10" height="16" alt="" aria-hidden="true">0 to 1</span>
-                <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Desktop Icon.svg" width="16" height="13" alt="" aria-hidden="true">Desktop &middot; B2B</span>
+                <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Desktop Icon.svg" width="16" height="13" alt="" aria-hidden="true">Desktop &middot; B2B &middot; B2C</span>
               </div>
             </div>
             <p class="ws-et-desc">
-              World&rsquo;s 1st multimodal 1:1<br>
-              voice-first AI tutor powered<br>
-              by 3 tools working as one<br>
-              <strong>billion tutors, billion minds.</strong>
+              World&rsquo;s 1st multi modal 1:1 voice first AI tutor powered by <em>3 tools working as one system</em> to enable billion tutors for billion minds.
             </p>
           </div>
 
@@ -7064,18 +7148,58 @@
 
       </section>
 
-      <!-- ── TESTIMONIALS / MARQUEE ────────────────── -->
+      <!-- ── TESTIMONIALS / DEPTH BENTO ───────────────── -->
       <section class="tm-section reveal" id="testimonialsSection">
 
         <div class="tm-header">
           <span class="tm-eyebrow-tag">Kind Words</span>
-          <h2 class="tm-headline">People I’ve built with</h2>
+          <h2 class="tm-headline">People I've built with</h2>
         </div>
 
-        <div class="mq-rows">
-          <div class="mq-row"><div class="mq-track"><span class="mq-item">He doesn’t just design screens — he designs how the team thinks.<span class="mq-attr">— Anil Kumar, Engineering Lead</span>&thinsp;<span class="mq-diamond">◆</span>&ensp;</span><span class="mq-item">He doesn’t just design screens — he designs how the team thinks.<span class="mq-attr">— Anil Kumar, Engineering Lead</span>&thinsp;<span class="mq-diamond">◆</span>&ensp;</span></div></div>
-          <div class="mq-row"><div class="mq-track"><span class="mq-item">Complex flows that feel obvious in hindsight. Support tickets down 30%.<span class="mq-attr">— Priya Menon, Head of Product</span>&thinsp;<span class="mq-diamond">◆</span>&ensp;</span><span class="mq-item">Complex flows that feel obvious in hindsight. Support tickets down 30%.<span class="mq-attr">— Priya Menon, Head of Product</span>&thinsp;<span class="mq-diamond">◆</span>&ensp;</span></div></div>
-          <div class="mq-row"><div class="mq-track"><span class="mq-item">Designs ready to build. No gaps, no hand-wavy specs.<span class="mq-attr">— Marcus Webb, Senior Engineer</span>&thinsp;<span class="mq-diamond">◆</span>&ensp;</span><span class="mq-item">Designs ready to build. No gaps, no hand-wavy specs.<span class="mq-attr">— Marcus Webb, Senior Engineer</span>&thinsp;<span class="mq-diamond">◆</span>&ensp;</span></div></div>
+        <div class="dc-grid" id="dcGrid">
+
+          <!-- Featured -->
+          <div class="dc-card dc-card--featured" id="dcFeatured">
+            <span class="dc-watermark">A</span>
+            <span class="dc-open-mark">"</span>
+            <p class="dc-quote">Bhanu doesn't just design screens — he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. I've shipped with a lot of designers; he's the one engineers actually trust.</p>
+            <div class="dc-attr">
+              <div class="dc-avatar">AK</div>
+              <div class="dc-info">
+                <span class="dc-name">Anil Kumar</span>
+                <span class="dc-role">Engineering Lead · EverTutor</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="dc-card" id="dcCard2">
+            <span class="dc-watermark">P</span>
+            <span class="dc-open-mark">"</span>
+            <p class="dc-quote">He has a gift for making complex flows feel obvious in hindsight. Our support tickets dropped 30% in the first month alone.</p>
+            <div class="dc-attr">
+              <div class="dc-avatar">PM</div>
+              <div class="dc-info">
+                <span class="dc-name">Priya Menon</span>
+                <span class="dc-role">Head of Product · Stressie</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="dc-card" id="dcCard3">
+            <span class="dc-watermark">M</span>
+            <span class="dc-open-mark">"</span>
+            <p class="dc-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs — just clear decisions backed by solid research.</p>
+            <div class="dc-attr">
+              <div class="dc-avatar">MW</div>
+              <div class="dc-info">
+                <span class="dc-name">Marcus Webb</span>
+                <span class="dc-role">Senior Engineer · Studio</span>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </section><!-- /testimonials -->
@@ -11191,6 +11315,40 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     requestAnimationFrame(animate);
   })();
 
+  </script>
+  <!-- ── TESTIMONIAL PARALLAX ─────────────────────────── -->
+  <script>
+  (function() {
+    var section  = document.getElementById('testimonialsSection');
+    var featured = document.getElementById('dcFeatured');
+    var card2    = document.getElementById('dcCard2');
+    var card3    = document.getElementById('dcCard3');
+    if (!section || !featured) return;
+
+    var ticking = false;
+    var mx = 0, my = 0;
+
+    section.addEventListener('mousemove', function(e) {
+      var r = section.getBoundingClientRect();
+      mx = (e.clientX - r.left  - r.width  / 2) / r.width;
+      my = (e.clientY - r.top   - r.height / 2) / r.height;
+      if (!ticking) {
+        requestAnimationFrame(function() {
+          featured.style.transform = 'translate(' + (mx * -7).toFixed(2)  + 'px,' + (my * -5).toFixed(2)  + 'px)';
+          card2.style.transform    = 'translate(' + (mx * -18).toFixed(2) + 'px,' + (my * -13).toFixed(2) + 'px)';
+          card3.style.transform    = 'translate(' + (mx * -11).toFixed(2) + 'px,' + (my * -17).toFixed(2) + 'px)';
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    section.addEventListener('mouseleave', function() {
+      featured.style.transform = '';
+      card2.style.transform    = '';
+      card3.style.transform    = '';
+    });
+  })();
   </script>
 
 </body>
