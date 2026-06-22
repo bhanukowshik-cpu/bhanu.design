@@ -168,8 +168,8 @@
     }
     /* ─── SCROLL PROGRESS BAR — top of page ───────────────── */
     .scroll-progress {
-      position: fixed;
-      top: 0; left: 0;
+      position: absolute;
+      bottom: 0; left: 0;
       width: 0%;
       height: 2px;
       background: linear-gradient(to right, #E6F28D, rgba(230,242,141,0.6));
@@ -1405,6 +1405,7 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 500;
+      overflow: hidden;
       background: var(--nav-bg);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
@@ -1426,8 +1427,8 @@
     }
     .top-nav.scrolled {
       top: 12px;
-      left: 12px;
-      right: 12px;
+      left: calc(10% + 12px);
+      right: calc(10% + 12px);
       background: var(--nav-bg-sc);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
@@ -1513,7 +1514,7 @@
       .nav-links      { display: none; }
       .nav-hamburger  { display: flex; }
       .top-nav        { padding: 8px 20px; }
-      .top-nav.scrolled { left: 12px; right: 12px; padding: 8px 20px; }
+      .top-nav.scrolled { left: calc(5% + 12px); right: calc(5% + 12px); padding: 8px 20px; }
     }
     .nav-brand {
       position: relative;
@@ -2469,7 +2470,7 @@
       .hero-frame          { min-height: 460px; }
       .sticky-stack        { width: 444px; height: 444px; }
       .sticky-note         { width: 362px; height: 362px; top: 41px; left: 41px; padding: 29px 29px 24px; }
-      .top-nav.scrolled    { left: 12px; right: 12px; }
+      .top-nav.scrolled    { left: calc(10% + 12px); right: calc(10% + 12px); }
     }
 
 
@@ -6015,81 +6016,114 @@
       overflow: hidden;
       padding-bottom: 80px;
     }
-    .ws-section::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background:
-        radial-gradient(ellipse 55% 45% at 0% 0%,
-          rgba(120,159,4,0.20) 0%,
-          rgba(120,159,4,0.08) 40%,
-          transparent 68%),
-        radial-gradient(ellipse 55% 45% at 100% 0%,
-          rgba(120,159,4,0.20) 0%,
-          rgba(120,159,4,0.08) 40%,
-          transparent 68%);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .ws-header {
+
+    /* EverTutor hero — 3-col grid: left info | blob | right info */
+    .ws-et-hero {
       position: relative; z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 56px 60px 0;
-    }
-    .ws-label {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.20em;
-      color: rgba(255,252,248,0.28);
-      font-weight: 600;
-    }
-    .ws-count {
-      font-family: var(--font-heading);
-      font-size: 11px;
-      letter-spacing: 0.20em;
-      color: rgba(255,252,248,0.14);
-      font-weight: 700;
-    }
-    .ws-project {
-      position: relative; z-index: 1;
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 56px 60px 0;
-    }
-    .ws-project-inner {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 48px;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
+      min-height: 560px;
+      padding: 80px 60px;
+      max-width: 1400px;
+      margin: 0 auto;
+      gap: 0 80px;
     }
-    .ws-project-inner > * { min-width: 0; }
-    .ws-visual {
-      background: rgba(255,252,248,0.03);
-      border: 1px solid rgba(255,252,248,0.06);
-      border-radius: 18px;
-      min-height: 380px;
+    .ws-et-left {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .ws-et-center {
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
-      overflow: hidden;
     }
+    .ws-et-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+      gap: 28px;
+    }
+    .ws-et-title {
+      font-family: var(--font-heading);
+      font-size: 54px;
+      font-weight: 800;
+      color: #FFFCF8;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+    .ws-et-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .ws-et-metric-row {
+      display: flex;
+      align-items: center;
+    }
+    .ws-et-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .ws-et-val {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      font-weight: 700;
+      color: #789F04;
+      line-height: 1;
+    }
+    .ws-et-lbl {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(255,252,248,0.38);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .ws-et-mdivider {
+      width: 1px;
+      height: 32px;
+      background: rgba(255,252,248,0.12);
+      margin: 0 20px;
+      flex-shrink: 0;
+    }
+    .ws-et-tags {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    .ws-et-tag-row {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .ws-et-desc {
+      font-size: 17px;
+      line-height: 1.72;
+      color: rgba(255,252,248,0.72);
+      margin: 0;
+    }
+    .ws-et-desc strong {
+      color: #FFFCF8;
+      font-weight: 700;
+    }
+    /* orb / blob */
     .ws-orb-wrap {
       position: relative;
-      width: 260px;
-      height: 260px;
+      width: 340px;
+      height: 340px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .ws-orb-bg {
       position: absolute;
-      width: 160px;
-      height: 160px;
+      width: 200px;
+      height: 200px;
       border-radius: 50%;
       background: rgba(5,5,5,0.88);
       filter: blur(28px);
@@ -6100,62 +6134,21 @@
       border-radius: 50%;
       border: 1px solid #789F04;
     }
-    .ws-ring-1 { width: 176px; height: 176px; opacity: 0.65; }
-    .ws-ring-2 { width: 218px; height: 218px; opacity: 0.35; }
-    .ws-ring-3 { width: 260px; height: 260px; opacity: 0.18; }
+    .ws-ring-1 { width: 220px; height: 220px; opacity: 0.65; }
+    .ws-ring-2 { width: 280px; height: 280px; opacity: 0.35; }
+    .ws-ring-3 { width: 340px; height: 340px; opacity: 0.18; }
     .ws-orb-img {
-      width: 163px;
-      height: 163px;
+      width: 200px;
+      height: 200px;
       object-fit: cover;
       border-radius: 50%;
       position: relative;
       z-index: 1;
       display: block;
     }
-    .ws-phones-row {
-      display: flex;
-      gap: 12px;
-      align-items: flex-end;
-      padding: 24px;
-    }
-    .ws-phone-img {
-      width: 118px;
-      border-radius: 22px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.55);
-    }
-    .ws-phone-img:nth-child(2) { transform: translateY(-18px); }
-    .ws-info {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-    .ws-num {
-      font-family: var(--font-heading);
-      font-size: 80px;
-      font-weight: 800;
-      color: rgba(120,159,4,0.10);
-      line-height: 1;
-      display: block;
-      letter-spacing: -0.03em;
-    }
-    .ws-title {
-      font-family: var(--font-heading);
-      font-size: 34px;
-      font-weight: 700;
-      color: #FFFCF8;
-      margin: -18px 0 0;
-      line-height: 1.1;
-      letter-spacing: -0.01em;
-    }
-    .ws-roles {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-    }
     .ws-role-tag {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 600;
@@ -6166,57 +6159,17 @@
       padding: 5px 10px;
       letter-spacing: 0.03em;
     }
-    .ws-role-tag svg { flex-shrink: 0; }
-    .ws-desc {
-      font-size: 15px;
-      line-height: 1.72;
-      color: rgba(255,252,248,0.58);
-      margin: 0;
+    /* sub-case study cards */
+    .ws-sub-section {
+      position: relative; z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 60px 60px;
     }
-    .ws-desc strong { color: rgba(255,252,248,0.88); font-weight: 600; }
-    .ws-metrics {
-      display: flex;
-      gap: 24px;
-      border-top: 1px solid rgba(255,252,248,0.07);
-      padding-top: 18px;
-    }
-    .ws-metric { display: flex; flex-direction: column; gap: 4px; }
-    .ws-metric-val {
-      font-family: var(--font-heading);
-      font-size: 22px;
-      font-weight: 700;
-      color: #789F04;
-      line-height: 1;
-    }
-    .ws-metric-lbl {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: rgba(255,252,248,0.38);
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-    .ws-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      align-self: flex-start;
-      font-family: var(--font-heading);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      color: #789F04;
-      text-decoration: none;
-      border: 1px solid rgba(120,159,4,0.38);
-      border-radius: 8px;
-      padding: 9px 16px;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .ws-cta:hover { background: rgba(120,159,4,0.10); border-color: rgba(120,159,4,0.65); }
     .ws-sub-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 14px;
-      margin-top: 28px;
     }
     .ws-sub-card {
       border-radius: 12px;
@@ -6256,10 +6209,11 @@
       color: rgba(255,252,248,0.38);
       margin: 0;
     }
+    /* Stressie / shared project styles */
     .ws-project-divider {
       position: relative; z-index: 1;
-      max-width: 1280px;
-      margin: 56px auto 0;
+      max-width: 1400px;
+      margin: 0 auto 56px;
       padding: 0 60px;
     }
     .ws-project-divider::after {
@@ -6268,31 +6222,149 @@
       height: 1px;
       background: rgba(255,252,248,0.06);
     }
+    .ws-project {
+      position: relative; z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 56px 60px 0;
+    }
+    .ws-project-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .ws-project-inner > * { min-width: 0; }
+    .ws-project--alt .ws-visual { order: -1; }
+    .ws-visual {
+      background: rgba(255,252,248,0.03);
+      border: 1px solid rgba(255,252,248,0.06);
+      border-radius: 18px;
+      min-height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .ws-phones-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      padding: 24px;
+    }
+    .ws-phone-img {
+      width: 118px;
+      border-radius: 22px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+    }
+    .ws-phone-img:nth-child(2) { transform: translateY(-18px); }
+    .ws-info {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .ws-num {
+      font-family: var(--font-heading);
+      font-size: 80px;
+      font-weight: 800;
+      color: rgba(120,159,4,0.10);
+      line-height: 1;
+      display: block;
+      letter-spacing: -0.03em;
+    }
+    .ws-title {
+      font-family: var(--font-heading);
+      font-size: 34px;
+      font-weight: 700;
+      color: #FFFCF8;
+      margin: -18px 0 0;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+    }
+    .ws-roles { display: flex; flex-wrap: wrap; gap: 7px; }
+    .ws-desc {
+      font-size: 15px;
+      line-height: 1.72;
+      color: rgba(255,252,248,0.58);
+      margin: 0;
+    }
+    .ws-desc strong { color: rgba(255,252,248,0.88); font-weight: 600; }
+    .ws-metrics {
+      display: flex;
+      gap: 24px;
+      border-top: 1px solid rgba(255,252,248,0.07);
+      padding-top: 18px;
+    }
+    .ws-metric { display: flex; flex-direction: column; gap: 4px; }
+    .ws-metric-val {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      font-weight: 700;
+      color: #789F04;
+      line-height: 1;
+    }
+    .ws-metric-lbl {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: rgba(255,252,248,0.38);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .ws-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      align-self: flex-start;
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 700;
+      color: #789F04;
+      text-decoration: none;
+      border: 1px solid rgba(120,159,4,0.38);
+      border-radius: 8px;
+      padding: 9px 16px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .ws-cta:hover { background: rgba(120,159,4,0.10); border-color: rgba(120,159,4,0.65); }
     @media (max-width: 1280px) {
-      .ws-header  { padding: 48px 40px 0; }
-      .ws-project { padding: 48px 40px 0; }
-      .ws-project-divider { padding: 0 40px; margin-top: 48px; }
+      .ws-et-hero    { padding: 60px 40px; gap: 0 60px; }
+      .ws-sub-section { padding: 0 40px 48px; }
+      .ws-project    { padding: 48px 40px 0; }
+      .ws-project-divider { padding: 0 40px; }
     }
     @media (max-width: 1023px) {
+      .ws-et-hero {
+        grid-template-columns: 1fr;
+        gap: 40px 0;
+        padding: 48px 40px;
+        min-height: auto;
+        text-align: center;
+      }
+      .ws-et-left  { align-items: center; }
+      .ws-et-right { align-items: center; text-align: center; }
+      .ws-et-tags  { align-items: center; }
+      .ws-et-tag-row { justify-content: center; }
       .ws-project-inner { grid-template-columns: 1fr; gap: 28px; }
       .ws-project--alt .ws-visual { order: -1; }
-      .ws-visual { min-height: 260px; }
-      .ws-sub-row { margin-top: 20px; }
-      .ws-orb-wrap { width: 220px; height: 220px; }
-      .ws-ring-1 { width: 148px; height: 148px; }
-      .ws-ring-2 { width: 184px; height: 184px; }
-      .ws-ring-3 { width: 220px; height: 220px; }
-      .ws-orb-img { width: 138px; height: 138px; }
+      .ws-visual   { min-height: 260px; }
+      .ws-orb-wrap { width: 260px; height: 260px; }
+      .ws-ring-1   { width: 168px; height: 168px; }
+      .ws-ring-2   { width: 212px; height: 212px; }
+      .ws-ring-3   { width: 260px; height: 260px; }
+      .ws-orb-img  { width: 156px; height: 156px; }
     }
     @media (max-width: 767px) {
-      .ws-header  { padding: 40px 24px 0; }
-      .ws-project { padding: 40px 24px 0; }
-      .ws-project-divider { padding: 0 24px; margin-top: 40px; }
-      .ws-title      { font-size: 26px; margin-top: -12px; }
-      .ws-num        { font-size: 60px; }
+      .ws-et-hero  { padding: 40px 24px; gap: 32px 0; }
+      .ws-sub-section { padding: 0 24px 40px; }
+      .ws-et-title { font-size: 40px; }
+      .ws-project  { padding: 40px 24px 0; }
+      .ws-project-divider { padding: 0 24px; }
+      .ws-sub-row  { grid-template-columns: 1fr; }
+      .ws-title    { font-size: 26px; margin-top: -12px; }
+      .ws-num      { font-size: 60px; }
       .ws-metric-val { font-size: 18px; }
-      .ws-sub-row    { grid-template-columns: 1fr; }
-      .ws-phone-img  { width: 90px; }
+      .ws-phone-img { width: 90px; }
     }
 
     .fw-split {
@@ -6393,9 +6465,6 @@
 </head>
 
 <body>
-
-  <!-- ─── SCROLL PROGRESS BAR ─── -->
-  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
   <!-- ─── GLASS LOADING SCREEN ─── -->
   <div id="glassLoader" role="status" aria-label="Loading">
@@ -6582,6 +6651,7 @@
         <span></span><span></span><span></span>
       </button>
     </div>
+    <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
   </nav>
 
   <div class="mobile-menu-backdrop" id="menuBackdrop"></div>
@@ -6674,54 +6744,61 @@
 
       <!-- ── WORK SECTION V3 ──────────────────────────────────── -->
       <section class="ws-section">
-        <div class="ws-header">
-          <span class="ws-label">SELECTED WORK</span>
-          <span class="ws-count">02</span>
-        </div>
 
-        <!-- Project 1: EverTutor System -->
-        <div class="ws-project">
-          <div class="ws-project-inner">
+        <!-- EverTutor hero: left title+metrics | center blob | right tags+desc -->
+        <div class="ws-et-hero">
 
-            <div class="ws-visual">
-              <div class="ws-orb-wrap">
-                <div class="ws-orb-bg"></div>
-                <div class="ws-ring ws-ring-1"></div>
-                <div class="ws-ring ws-ring-2"></div>
-                <div class="ws-ring ws-ring-3"></div>
-                <img class="ws-orb-img" src="Parallax cards/EverTutor Glimpse/Tutor Blob dark mode.gif" alt="EverTutor AI System" loading="lazy" />
+          <div class="ws-et-left">
+            <h2 class="ws-et-title">EverTutor<br>AI System</h2>
+            <div class="ws-et-metrics">
+              <div class="ws-et-metric-row">
+                <div class="ws-et-metric">
+                  <span class="ws-et-val">2000+</span>
+                  <span class="ws-et-lbl">Daily Active Users</span>
+                </div>
+                <div class="ws-et-mdivider"></div>
+                <div class="ws-et-metric">
+                  <span class="ws-et-val">&minus;96%</span>
+                  <span class="ws-et-lbl">Workflow time</span>
+                </div>
+              </div>
+              <div class="ws-et-metric">
+                <span class="ws-et-val">0&rarr;$300k</span>
+                <span class="ws-et-lbl">ARR</span>
               </div>
             </div>
-
-            <div class="ws-info">
-              <span class="ws-num">01</span>
-              <h2 class="ws-title">EverTutor AI System</h2>
-              <div class="ws-roles">
-                <span class="ws-role-tag">Sole Product Designer</span>
-                <span class="ws-role-tag">0 to 1</span>
-                <span class="ws-role-tag">Desktop · B2B + B2C</span>
-              </div>
-              <p class="ws-desc">World&rsquo;s first <strong>multimodal 1:1 voice-first AI tutor</strong> — 3 tools working as one system to create, serve, and measure adaptive tutoring at scale.</p>
-              <div class="ws-metrics">
-                <div class="ws-metric">
-                  <span class="ws-metric-val">2000+</span>
-                  <span class="ws-metric-lbl">Daily Active Users</span>
-                </div>
-                <div class="ws-metric">
-                  <span class="ws-metric-val">−96%</span>
-                  <span class="ws-metric-lbl">Workflow time</span>
-                </div>
-                <div class="ws-metric">
-                  <span class="ws-metric-val">Acq. offer</span>
-                  <span class="ws-metric-lbl">from prototype</span>
-                </div>
-              </div>
-              <a class="ws-cta" href="evertutor-live.html">View Case Study →</a>
-            </div>
-
           </div>
 
-          <!-- Sub-case studies -->
+          <div class="ws-et-center">
+            <div class="ws-orb-wrap">
+              <div class="ws-orb-bg"></div>
+              <div class="ws-ring ws-ring-1"></div>
+              <div class="ws-ring ws-ring-2"></div>
+              <div class="ws-ring ws-ring-3"></div>
+              <img class="ws-orb-img" src="Parallax cards/EverTutor Glimpse/Tutor Blob dark mode.gif" alt="EverTutor AI System" loading="lazy" />
+            </div>
+          </div>
+
+          <div class="ws-et-right">
+            <div class="ws-et-tags">
+              <span class="ws-role-tag">Sole Product Designer</span>
+              <div class="ws-et-tag-row">
+                <span class="ws-role-tag">0 to 1</span>
+                <span class="ws-role-tag">Desktop &middot; B2B</span>
+              </div>
+            </div>
+            <p class="ws-et-desc">
+              World&rsquo;s 1st multimodal 1:1<br>
+              voice-first AI tutor powered<br>
+              by 3 tools working as one<br>
+              <strong>billion tutors, billion minds.</strong>
+            </p>
+          </div>
+
+        </div>
+
+        <!-- EverTutor sub-case studies -->
+        <div class="ws-sub-section">
           <div class="ws-sub-row">
             <div class="ws-sub-card">
               <div class="ws-sub-video">
@@ -6732,7 +6809,7 @@
               <div class="ws-sub-info">
                 <span class="ws-sub-num">1.1</span>
                 <p class="ws-sub-title">EverTutor Live</p>
-                <p class="ws-sub-desc">Voice-first AI tutor · prototype to PMF</p>
+                <p class="ws-sub-desc">Voice-first AI tutor &middot; prototype to PMF</p>
               </div>
             </div>
             <div class="ws-sub-card">
@@ -6744,7 +6821,7 @@
               <div class="ws-sub-info">
                 <span class="ws-sub-num">1.2</span>
                 <p class="ws-sub-title">EverTutor Studio</p>
-                <p class="ws-sub-desc">100+ hrs → 4 hrs lesson creation</p>
+                <p class="ws-sub-desc">100+ hrs &rarr; 4 hrs lesson creation</p>
               </div>
             </div>
             <div class="ws-sub-card">
@@ -6774,9 +6851,9 @@
               <div class="ws-roles">
                 <span class="ws-role-tag">Sole Product Designer</span>
                 <span class="ws-role-tag">0 to 1</span>
-                <span class="ws-role-tag">Mobile · B2B</span>
+                <span class="ws-role-tag">Mobile &middot; B2B</span>
               </div>
-              <p class="ws-desc">From pilot research to a <strong>Harvard-incubated product</strong> — a full redesign of workplace stress management, now live at Amazon and InKind.</p>
+              <p class="ws-desc">From pilot research to a <strong>Harvard-incubated product</strong> &mdash; a full redesign of workplace stress management, now live at Amazon and InKind.</p>
               <div class="ws-metrics">
                 <div class="ws-metric">
                   <span class="ws-metric-val">17.4%</span>
@@ -6791,7 +6868,7 @@
                   <span class="ws-metric-lbl">Amazon &amp; InKind</span>
                 </div>
               </div>
-              <a class="ws-cta" href="stressie-studio.html">View Case Study →</a>
+              <a class="ws-cta" href="stressie-studio.html">View Case Study &rarr;</a>
             </div>
 
             <div class="ws-visual ws-visual--phones">
