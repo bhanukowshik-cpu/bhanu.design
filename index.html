@@ -5444,8 +5444,8 @@
         linear-gradient(270deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.3) 21.1%, rgba(0,0,0,0.3) 84.9%, rgba(0,0,0,0.3) 100%);
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
-      border-radius: 40px;
-      padding: 0.04em 0.8em; margin-right: 0.16em;
+      border-radius: 14px;
+      padding: 0.18em 0.8em; margin-right: 0.16em;
       box-shadow:
         rgba(255, 255, 255, 0.7)  6.67px  6.67px 3.36px -6.21px inset,
         rgba(255, 61,  61,  0.5) -6.70px -6.00px 3.36px -6.73px inset,
@@ -6453,8 +6453,8 @@
       color: #E5F28D;
       text-decoration: none;
       border: none;
-      border-radius: 40px;
-      padding: 9px 28px;
+      border-radius: 14px;
+      padding: 14px 28px;
       background:
         linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
         linear-gradient(270deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.3) 21.1%, rgba(0,0,0,0.3) 84.9%, rgba(0,0,0,0.3) 100%);
@@ -6689,14 +6689,14 @@
       align-items: center;
       gap: 8px;
       align-self: flex-start;
-      padding: 11px 32px;
+      padding: 16px 32px;
       background:
         linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
         linear-gradient(270deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.3) 21.1%, rgba(0,0,0,0.3) 84.9%, rgba(0,0,0,0.3) 100%);
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
       border: none;
-      border-radius: 40px;
+      border-radius: 14px;
       color: #FFFCF8;
       font-family: var(--font-mono);
       font-size: 13px;
@@ -11600,6 +11600,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var pcSpacer = document.getElementById('pc-spacer');
     var card     = document.querySelector('.card');
     var projCue  = document.getElementById('proj-scroll-cue');
+    var etLeft   = document.querySelector('.ws-et-left');
+    var etRight  = document.querySelector('.ws-et-right');
     if (!snapEl || !cs || !pc || !card) return;
 
     var NAV_H   = 54, SCALE_MIN = 0.7;
@@ -11712,6 +11714,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (!snapped || sy < snapDocTop) {
         unfixEl(cs, null);
         cs.style.transform = ''; cs.style.opacity = '';
+        if (etLeft)  etLeft.style.opacity  = '';
+        if (etRight) etRight.style.opacity = '';
         unfixEl(pc, pcSpacer);
         pc.style.opacity = '0'; pc.style.transform = 'translateY(44px)';
         return;
@@ -11720,6 +11724,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       /* ── After exit: release fixed elements ── */
       if (sy > exitPoint) {
         unfixEl(cs, null); cs.style.opacity = '0';
+        if (etLeft)  etLeft.style.opacity  = '';
+        if (etRight) etRight.style.opacity = '';
         unfixEl(pc, pcSpacer); pc.style.opacity = '0';
         return;
       }
@@ -11732,6 +11738,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         var scale = 1 - (1 - SCALE_MIN) * p;
         var top   = centerTop + (NAV_H - centerTop) * p;
         cs.style.top = top + 'px'; cs.style.transform = 'scale(' + scale + ')'; cs.style.opacity = '1';
+        if (etLeft)  etLeft.style.opacity  = '';
+        if (etRight) etRight.style.opacity = '';
         pc.style.opacity = '0'; pc.style.transform = 'translateY(44px)';
         return;
       }
@@ -11743,15 +11751,19 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       pc.style.top = pcTop + 'px';
 
       if (sy <= projEnd) {
-        /* Phase 4 */
+        /* Phase 4 — proj-card reveals; ET Glimpse dimmed */
         var p4  = (sy - scaleEnd) / PROJ_R;
         var pfp = p4 < 0.1 ? 0 : p4 > 0.7 ? 1 : (p4 - 0.1) / 0.6;
         cs.style.opacity = '1';
+        if (etLeft)  etLeft.style.opacity  = '';
+        if (etRight) etRight.style.opacity = '';
         pc.style.opacity = pfp; pc.style.transform = 'translateY(' + ((1 - pfp) * 44) + 'px)';
       } else {
-        /* Phase 5 — exit fade */
+        /* Phase 5 — blob stays; left/right text + proj-card fade out */
         var p5 = Math.min(1, (sy - projEnd) / EXIT_R);
-        cs.style.opacity = 1 - p5;
+        cs.style.opacity = '1';
+        if (etLeft)  etLeft.style.opacity  = 1 - p5;
+        if (etRight) etRight.style.opacity = 1 - p5;
         pc.style.opacity = 1 - p5; pc.style.transform = 'none';
       }
     }
