@@ -6940,7 +6940,7 @@
               <div class="ws-orb-bg"></div>
               <div class="ws-orb-glow"></div>
               <svg class="ws-waveform" width="340" height="340" viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <g stroke="#FFFCF8" stroke-width="2.5" stroke-linecap="round" opacity="0.75">
+                <g stroke="#A3E635" stroke-width="2.5" stroke-linecap="round" opacity="0.75">
                   <line x1="170.00" y1="61.42" x2="170.00" y2="38.58" />
                   <line x1="178.48" y1="62.29" x2="180.35" y2="38.44" />
                   <line x1="187.05" y1="62.35" x2="190.49" y2="40.60" />
@@ -11317,104 +11317,13 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         line.setAttribute('y1', (cy + (r - half) * Math.sin(angle)).toFixed(2));
         line.setAttribute('x2', (cx + (r + half) * Math.cos(angle)).toFixed(2));
         line.setAttribute('y2', (cy + (r + half) * Math.sin(angle)).toFixed(2));
-        line.setAttribute('stroke', i % 2 === 0 ? '#FFFCF8' : '#BAE6FD');
+        line.setAttribute('stroke', i % 2 === 0 ? '#A3E635' : '#4ADE80');
       });
       requestAnimationFrame(animate);
     }
     requestAnimationFrame(animate);
   })();
 
-  </script>
-
-  <!-- ── VOICE NOTE PLAYER ────────────────────────────── -->
-  <script>
-  (function() {
-    var synth = window.speechSynthesis;
-    var activeCard = null;
-    var activeUtt = null;
-
-    function animateWaveform(card, playing) {
-      var bars = card.querySelectorAll('.vc-wf rect');
-      if (playing) {
-        bars.forEach(function(bar, i) {
-          var originalY = parseFloat(bar.getAttribute('y'));
-          var originalH = parseFloat(bar.getAttribute('height'));
-          var cx = parseFloat(bar.getAttribute('x'));
-          bar._origY = originalY;
-          bar._origH = originalH;
-          var phase = i * 0.25;
-          bar._animId = null;
-          var start = null;
-          function step(ts) {
-            if (!start) start = ts;
-            var t = (ts - start) / 1000;
-            var scale = 0.5 + 0.5 * Math.abs(Math.sin(t * 3.5 + phase));
-            var newH = Math.max(3, originalH * scale);
-            var newY = (40 - newH) / 2;
-            bar.setAttribute('height', newH.toFixed(1));
-            bar.setAttribute('y', newY.toFixed(1));
-            bar._animId = requestAnimationFrame(step);
-          }
-          bar._animId = requestAnimationFrame(step);
-        });
-      } else {
-        bars.forEach(function(bar) {
-          if (bar._animId) cancelAnimationFrame(bar._animId);
-          if (bar._origY !== undefined) {
-            bar.setAttribute('y', bar._origY);
-            bar.setAttribute('height', bar._origH);
-          }
-        });
-      }
-    }
-
-    function stopCurrent() {
-      if (synth.speaking) synth.cancel();
-      if (activeCard) {
-        animateWaveform(activeCard, false);
-        var btn = activeCard.querySelector('.vc-play-btn');
-        btn.innerHTML = '<svg viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 10,6 0,12" fill="currentColor"/></svg>';
-        activeCard = null;
-      }
-    }
-
-    document.querySelectorAll('.vc-play-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var card = btn.closest('.vc-card');
-
-        if (activeCard === card) { stopCurrent(); return; }
-        stopCurrent();
-
-        var quote = card.querySelector('.vc-quote').textContent;
-        var utt = new SpeechSynthesisUtterance(quote);
-        utt.rate = 0.92;
-        utt.pitch = 1.0;
-
-        // Try to pick a good voice
-        var voices = synth.getVoices();
-        var preferred = voices.find(function(v) {
-          return v.lang.startsWith('en') && !v.name.toLowerCase().includes('compact');
-        });
-        if (preferred) utt.voice = preferred;
-
-        utt.onend = utt.onerror = function() {
-          animateWaveform(card, false);
-          btn.innerHTML = '<svg viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 10,6 0,12" fill="currentColor"/></svg>';
-          activeCard = null;
-        };
-
-        activeCard = card;
-        btn.innerHTML = '<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="0" width="3" height="10" rx="1" fill="currentColor"/><rect x="6" y="0" width="3" height="10" rx="1" fill="currentColor"/></svg>';
-        animateWaveform(card, true);
-        synth.speak(utt);
-      });
-    });
-
-    // Voices may load async
-    if (synth.onvoiceschanged !== undefined) {
-      synth.onvoiceschanged = function() {};
-    }
-  })();
   </script>
 
 </body>
