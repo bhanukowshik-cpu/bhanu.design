@@ -6474,148 +6474,128 @@
       .fw-card { flex: 0 0 calc(66.6% - 8px); }
     }
 
-    /* ── TESTIMONIALS / VOICE NOTE ─────────────────────── */
+    /* ── TESTIMONIALS / CAROUSEL ───────────────────────── */
     .tm-section {
-      background: #181818;
-      padding: 72px 40px 80px;
+      background: #161616;
+      padding: 80px 40px 72px;
       position: relative;
       overflow: hidden;
+      text-align: center;
     }
+    /* Big ghosted quote mark — background art */
     .tm-section::before {
-      content: '';
+      content: '"';
       position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 700px; height: 350px;
-      background: radial-gradient(ellipse, rgba(230,242,141,0.07) 0%, transparent 70%);
+      top: -30px; left: 50%;
+      transform: translateX(-50%);
+      font-family: Georgia, serif;
+      font-size: 380px;
+      line-height: 1;
+      color: rgba(230,242,141,0.035);
       pointer-events: none;
+      user-select: none;
     }
     .tm-eyebrow-tag {
       font-family: var(--font-mono);
-      font-size: 9.5px; letter-spacing: 0.20em;
+      font-size: 9.5px; letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--primary); opacity: 0.6;
-      display: block; margin-bottom: 8px;
-    }
-    .tm-headline {
-      font-family: var(--font-heading);
-      font-size: 30px; font-weight: 700;
-      color: #FFFCF8; margin: 0 0 44px;
-      letter-spacing: -0.01em;
-    }
-    /* Grid */
-    .vc-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-    /* Card */
-    .vc-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 14px;
-      padding: 16px;
-      display: flex; flex-direction: column; gap: 12px;
-      transition: transform 0.28s ease, background 0.28s ease, border-color 0.28s ease;
-    }
-    .vc-card:hover {
-      transform: translateY(-4px);
-      background: rgba(255,255,255,0.06);
-      border-color: rgba(230,242,141,0.16);
-    }
-    /* Header */
-    .vc-head {
-      display: flex; align-items: center; gap: 10px;
-    }
-    .vc-avatar {
-      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
-      background: rgba(230,242,141,0.09);
-      border: 1px solid rgba(230,242,141,0.18);
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
-      color: var(--primary); letter-spacing: 0.02em;
-    }
-    .vc-head-text { flex: 1; min-width: 0; }
-    .vc-name {
-      display: block;
-      font-family: var(--font-heading);
-      font-size: 12.5px; font-weight: 700; color: #FFFCF8;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .vc-role {
-      display: block;
-      font-family: var(--font-mono);
-      font-size: 8.5px; color: rgba(255,252,248,0.32);
-      letter-spacing: 0.03em; margin-top: 1px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .vc-head-right {
-      display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0;
-    }
-    .vc-time {
-      font-family: var(--font-mono);
-      font-size: 8px; color: rgba(255,252,248,0.24); letter-spacing: 0.04em;
-    }
-    .vc-ticks {
-      font-size: 10px; color: var(--primary); opacity: 0.65; letter-spacing: -2px;
-    }
-    /* Player bubble */
-    .vc-player {
-      display: flex; align-items: center; gap: 9px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 10px;
-      padding: 8px 12px;
-    }
-    .vc-play-btn {
-      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-      background: rgba(230,242,141,0.11);
-      border: 1px solid rgba(230,242,141,0.20);
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s, transform 0.2s;
-      cursor: pointer;
-    }
-    .vc-card:hover .vc-play-btn {
-      background: rgba(230,242,141,0.18);
-      transform: scale(1.07);
-    }
-    .vc-play-btn svg { width: 8px; height: 10px; color: var(--primary); margin-left: 2px; }
-    .vc-wf { flex: 1; height: 36px; display: block; }
-    .vc-dur {
-      font-family: var(--font-mono);
-      font-size: 8.5px; color: rgba(255,252,248,0.28);
-      flex-shrink: 0; letter-spacing: 0.05em;
-    }
-    /* Transcript */
-    .vc-transcript { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; }
-    .vc-tr-label {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-family: var(--font-mono);
-      font-size: 7.5px; letter-spacing: 0.13em; text-transform: uppercase;
       color: var(--primary); opacity: 0.5;
-      margin-bottom: 6px;
+      display: block; margin-bottom: 52px;
+      position: relative;
     }
-    .vc-tr-label::before {
-      content: '';
-      width: 4px; height: 4px; border-radius: 50%;
-      background: var(--primary);
+    /* Slides wrapper — fixed height so layout doesn't shift */
+    .qc-slides {
+      position: relative;
+      min-height: 220px;
+      max-width: 740px;
+      margin: 0 auto 40px;
     }
-    .vc-quote {
+    .qc-slide {
+      position: absolute;
+      inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      pointer-events: none;
+    }
+    .qc-slide.active {
+      opacity: 1; transform: translateY(0);
+      pointer-events: auto;
+    }
+    .qc-quote-text {
       font-family: var(--font-heading);
-      font-size: 13.5px; font-weight: 500; line-height: 1.68;
-      color: rgba(255,252,248,0.72); margin: 0; font-style: italic;
+      font-size: 24px; font-weight: 600;
+      line-height: 1.65; font-style: italic;
+      color: rgba(255,252,248,0.90);
+      margin: 0 0 28px;
     }
-    [data-theme="dark"] .tm-section { background: #141414; }
+    .qc-attr {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+    }
+    .qc-attr-line {
+      width: 28px; height: 1px;
+      background: rgba(230,242,141,0.4);
+      margin-bottom: 10px;
+    }
+    .qc-name {
+      font-family: var(--font-heading);
+      font-size: 13px; font-weight: 700; color: #FFFCF8;
+    }
+    .qc-role {
+      font-family: var(--font-mono);
+      font-size: 9.5px; color: rgba(255,252,248,0.32);
+      letter-spacing: 0.04em;
+    }
+    /* Counter + dots row */
+    .qc-footer {
+      display: flex; align-items: center;
+      justify-content: center; gap: 16px;
+      margin-bottom: 20px;
+    }
+    .qc-dots {
+      display: flex; gap: 7px; align-items: center;
+    }
+    .qc-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: none; cursor: pointer; padding: 0;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .qc-dot.active {
+      background: var(--primary);
+      transform: scale(1.3);
+    }
+    .qc-counter {
+      font-family: var(--font-mono);
+      font-size: 9px; color: rgba(255,252,248,0.22);
+      letter-spacing: 0.08em; min-width: 32px;
+    }
+    /* Progress bar */
+    .qc-progress-wrap {
+      max-width: 180px; margin: 0 auto;
+      height: 1px; background: rgba(255,255,255,0.08);
+      border-radius: 1px; overflow: hidden;
+    }
+    .qc-progress-bar {
+      height: 100%; width: 0%;
+      background: var(--primary);
+      border-radius: 1px;
+      transition: width linear;
+    }
+    /* Dark mode: already dark */
+    [data-theme="dark"] .tm-section { background: #111; }
     @media (max-width: 1023px) {
-      .tm-section { padding: 56px 32px 64px; }
-      .tm-headline { font-size: 26px; }
-      .vc-grid { gap: 10px; }
-      .vc-quote { font-size: 12.5px; }
+      .tm-section { padding: 64px 32px 56px; }
+      .qc-quote-text { font-size: 21px; }
+      .qc-slides { min-height: 240px; }
     }
     @media (max-width: 767px) {
-      .tm-section { padding: 44px 20px 52px; }
-      .tm-headline { font-size: 22px; margin-bottom: 32px; }
-      .vc-grid { grid-template-columns: 1fr; }
+      .tm-section { padding: 52px 20px 48px; }
+      .qc-quote-text { font-size: 18px; }
+      .qc-slides { min-height: 280px; }
     }
 
 
@@ -6915,7 +6895,7 @@
         <div class="ws-et-hero">
 
           <div class="ws-et-left">
-            <h2 class="ws-et-title">EverTutor<br>AI System</h2>
+            <h2 class="ws-et-title">EverTutor AI System</h2>
             <div class="ws-et-metrics">
               <div class="ws-et-metric-row">
                 <div class="ws-et-metric">
@@ -6929,8 +6909,8 @@
                 </div>
               </div>
               <div class="ws-et-metric">
-                <span class="ws-et-val" data-count="300" data-prefix="0→$" data-suffix="k">0→$300k</span>
-                <span class="ws-et-lbl">ARR</span>
+                <span class="ws-et-val" data-count="300" data-prefix="0→$" data-suffix="k ARR">0→$300k ARR</span>
+                <span class="ws-et-lbl">Sole Product Designer</span>
               </div>
             </div>
           </div>
@@ -7132,83 +7112,53 @@
 
       </section>
 
-      <!-- ── TESTIMONIALS / VOICE NOTE ──────────── -->
+      <!-- ── TESTIMONIALS / CAROUSEL ────────────────────── -->
       <section class="tm-section reveal" id="testimonialsSection">
 
         <span class="tm-eyebrow-tag">Kind Words</span>
-        <h2 class="tm-headline">People I’ve built with</h2>
 
-        <div class="vc-grid">
+        <div class="qc-slides" id="qcSlides">
 
-          <div class="vc-card">
-            <div class="vc-head">
-              <div class="vc-avatar">AK</div>
-              <div class="vc-head-text">
-                <span class="vc-name">Anil Kumar</span>
-                <span class="vc-role">Engineering Lead · EverTutor</span>
-              </div>
-              <div class="vc-head-right">
-                <span class="vc-time">Jun 2024</span>
-                <span class="vc-ticks">✓✓</span>
-              </div>
-            </div>
-            <div class="vc-player">
-              <button class="vc-play-btn" aria-label="Play voice note"><svg viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 10,6 0,12" fill="currentColor"/></svg></button>
-              <svg class="vc-wf" viewBox="0 0 160 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.0" y="18.0" width="2.5" height="4" rx="1.2" fill="#E6F28D"/><rect x="4.0" y="17.0" width="2.5" height="6" rx="1.2" fill="#E6F28D"/><rect x="8.0" y="15.0" width="2.5" height="10" rx="1.2" fill="#E6F28D"/><rect x="12.0" y="13.0" width="2.5" height="14" rx="1.2" fill="#E6F28D"/><rect x="16.0" y="10.0" width="2.5" height="20" rx="1.2" fill="#E6F28D"/><rect x="20.0" y="6.0" width="2.5" height="28" rx="1.2" fill="#E6F28D"/><rect x="24.0" y="9.0" width="2.5" height="22" rx="1.2" fill="#E6F28D"/><rect x="28.0" y="12.0" width="2.5" height="16" rx="1.2" fill="#E6F28D"/><rect x="32.0" y="15.0" width="2.5" height="10" rx="1.2" fill="#E6F28D"/><rect x="36.0" y="17.0" width="2.5" height="6" rx="1.2" fill="#E6F28D"/><rect x="40.0" y="14.0" width="2.5" height="12" rx="1.2" fill="#E6F28D"/><rect x="44.0" y="11.0" width="2.5" height="18" rx="1.2" fill="#E6F28D"/><rect x="48.0" y="7.0" width="2.5" height="26" rx="1.2" fill="#E6F28D"/><rect x="52.0" y="3.0" width="2.5" height="34" rx="1.2" fill="#E6F28D"/><rect x="56.0" y="5.0" width="2.5" height="30" rx="1.2" fill="#E6F28D"/><rect x="60.0" y="8.0" width="2.5" height="24" rx="1.2" fill="#E6F28D"/><rect x="64.0" y="12.0" width="2.5" height="16" rx="1.2" fill="#E6F28D"/><rect x="68.0" y="16.0" width="2.5" height="8" rx="1.2" fill="#E6F28D"/><rect x="72.0" y="18.0" width="2.5" height="4" rx="1.2" fill="#E6F28D"/><rect x="76.0" y="15.0" width="2.5" height="10" rx="1.2" fill="#E6F28D"/><rect x="80.0" y="10.0" width="2.5" height="20" rx="1.2" fill="#E6F28D"/><rect x="84.0" y="4.0" width="2.5" height="32" rx="1.2" fill="#E6F28D"/><rect x="88.0" y="6.0" width="2.5" height="28" rx="1.2" fill="#E6F28D"/><rect x="92.0" y="10.0" width="2.5" height="20" rx="1.2" fill="#E6F28D"/><rect x="96.0" y="13.0" width="2.5" height="14" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="100.0" y="16.0" width="2.5" height="8" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="104.0" y="17.0" width="2.5" height="6" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="108.0" y="12.0" width="2.5" height="16" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="112.0" y="8.0" width="2.5" height="24" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="116.0" y="5.0" width="2.5" height="30" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="120.0" y="7.0" width="2.5" height="26" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="124.0" y="11.0" width="2.5" height="18" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="128.0" y="15.0" width="2.5" height="10" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="132.0" y="18.0" width="2.5" height="4" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="136.0" y="16.0" width="2.5" height="8" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="140.0" y="12.0" width="2.5" height="16" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="144.0" y="9.0" width="2.5" height="22" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="148.0" y="11.0" width="2.5" height="18" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="152.0" y="15.0" width="2.5" height="10" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="156.0" y="17.0" width="2.5" height="6" rx="1.2" fill="rgba(255,255,255,0.14)"/></svg>
-              <span class="vc-dur">0:23</span>
-            </div>
-            <div class="vc-transcript">
-              <span class="vc-tr-label">Auto-transcript · Beta</span>
-              <p class="vc-quote">Bhanu doesn’t just design screens — he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He’s the one engineers actually trust.</p>
+          <div class="qc-slide">
+            <p class="qc-quote-text">Bhanu doesn't just design screens — he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He's the one engineers actually trust.</p>
+            <div class="qc-attr">
+              <div class="qc-attr-line"></div>
+              <span class="qc-name">Anil Kumar</span>
+              <span class="qc-role">Engineering Lead · EverTutor</span>
             </div>
           </div>
 
-          <div class="vc-card">
-            <div class="vc-head">
-              <div class="vc-avatar">PM</div>
-              <div class="vc-head-text">
-                <span class="vc-name">Priya Menon</span>
-                <span class="vc-role">Head of Product · Stressie</span>
-              </div>
-              <div class="vc-head-right">
-                <span class="vc-time">Aug 2024</span>
-                <span class="vc-ticks">✓✓</span>
-              </div>
-            </div>
-            <div class="vc-player">
-              <button class="vc-play-btn" aria-label="Play voice note"><svg viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 10,6 0,12" fill="currentColor"/></svg></button>
-              <svg class="vc-wf" viewBox="0 0 160 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.0" y="17.5" width="2.5" height="5" rx="1.2" fill="#E6F28D"/><rect x="4.0" y="16.0" width="2.5" height="8" rx="1.2" fill="#E6F28D"/><rect x="8.0" y="13.0" width="2.5" height="14" rx="1.2" fill="#E6F28D"/><rect x="12.0" y="9.0" width="2.5" height="22" rx="1.2" fill="#E6F28D"/><rect x="16.0" y="5.0" width="2.5" height="30" rx="1.2" fill="#E6F28D"/><rect x="20.0" y="7.0" width="2.5" height="26" rx="1.2" fill="#E6F28D"/><rect x="24.0" y="11.0" width="2.5" height="18" rx="1.2" fill="#E6F28D"/><rect x="28.0" y="15.0" width="2.5" height="10" rx="1.2" fill="#E6F28D"/><rect x="32.0" y="17.0" width="2.5" height="6" rx="1.2" fill="#E6F28D"/><rect x="36.0" y="15.0" width="2.5" height="10" rx="1.2" fill="#E6F28D"/><rect x="40.0" y="10.0" width="2.5" height="20" rx="1.2" fill="#E6F28D"/><rect x="44.0" y="4.0" width="2.5" height="32" rx="1.2" fill="#E6F28D"/><rect x="48.0" y="2.0" width="2.5" height="36" rx="1.2" fill="#E6F28D"/><rect x="52.0" y="6.0" width="2.5" height="28" rx="1.2" fill="#E6F28D"/><rect x="56.0" y="11.0" width="2.5" height="18" rx="1.2" fill="#E6F28D"/><rect x="60.0" y="15.0" width="2.5" height="10" rx="1.2" fill="#E6F28D"/><rect x="64.0" y="17.5" width="2.5" height="5" rx="1.2" fill="#E6F28D"/><rect x="68.0" y="16.0" width="2.5" height="8" rx="1.2" fill="#E6F28D"/><rect x="72.0" y="11.0" width="2.5" height="18" rx="1.2" fill="#E6F28D"/><rect x="76.0" y="6.0" width="2.5" height="28" rx="1.2" fill="#E6F28D"/><rect x="80.0" y="3.0" width="2.5" height="34" rx="1.2" fill="#E6F28D"/><rect x="84.0" y="8.0" width="2.5" height="24" rx="1.2" fill="#E6F28D"/><rect x="88.0" y="13.0" width="2.5" height="14" rx="1.2" fill="#E6F28D"/><rect x="92.0" y="16.0" width="2.5" height="8" rx="1.2" fill="#E6F28D"/><rect x="96.0" y="17.5" width="2.5" height="5" rx="1.2" fill="#E6F28D"/><rect x="100.0" y="15.0" width="2.5" height="10" rx="1.2" fill="#E6F28D"/><rect x="104.0" y="9.0" width="2.5" height="22" rx="1.2" fill="#E6F28D"/><rect x="108.0" y="5.0" width="2.5" height="30" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="112.0" y="6.0" width="2.5" height="28" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="116.0" y="12.0" width="2.5" height="16" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="120.0" y="16.0" width="2.5" height="8" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="124.0" y="17.5" width="2.5" height="5" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="128.0" y="15.0" width="2.5" height="10" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="132.0" y="11.0" width="2.5" height="18" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="136.0" y="7.0" width="2.5" height="26" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="140.0" y="9.0" width="2.5" height="22" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="144.0" y="13.0" width="2.5" height="14" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="148.0" y="16.0" width="2.5" height="8" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="152.0" y="17.5" width="2.5" height="5" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="156.0" y="18.0" width="2.5" height="4" rx="1.2" fill="rgba(255,255,255,0.14)"/></svg>
-              <span class="vc-dur">0:18</span>
-            </div>
-            <div class="vc-transcript">
-              <span class="vc-tr-label">Auto-transcript · Beta</span>
-              <p class="vc-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
+          <div class="qc-slide">
+            <p class="qc-quote-text">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
+            <div class="qc-attr">
+              <div class="qc-attr-line"></div>
+              <span class="qc-name">Priya Menon</span>
+              <span class="qc-role">Head of Product · Stressie</span>
             </div>
           </div>
 
-          <div class="vc-card">
-            <div class="vc-head">
-              <div class="vc-avatar">MW</div>
-              <div class="vc-head-text">
-                <span class="vc-name">Marcus Webb</span>
-                <span class="vc-role">Senior Engineer · Studio</span>
-              </div>
-              <div class="vc-head-right">
-                <span class="vc-time">Oct 2024</span>
-                <span class="vc-ticks">✓✓</span>
-              </div>
-            </div>
-            <div class="vc-player">
-              <button class="vc-play-btn" aria-label="Play voice note"><svg viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 10,6 0,12" fill="currentColor"/></svg></button>
-              <svg class="vc-wf" viewBox="0 0 160 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.0" y="18.0" width="2.5" height="4" rx="1.2" fill="#E6F28D"/><rect x="4.0" y="16.0" width="2.5" height="8" rx="1.2" fill="#E6F28D"/><rect x="8.0" y="12.0" width="2.5" height="16" rx="1.2" fill="#E6F28D"/><rect x="12.0" y="8.0" width="2.5" height="24" rx="1.2" fill="#E6F28D"/><rect x="16.0" y="4.0" width="2.5" height="32" rx="1.2" fill="#E6F28D"/><rect x="20.0" y="6.0" width="2.5" height="28" rx="1.2" fill="#E6F28D"/><rect x="24.0" y="11.0" width="2.5" height="18" rx="1.2" fill="#E6F28D"/><rect x="28.0" y="15.0" width="2.5" height="10" rx="1.2" fill="#E6F28D"/><rect x="32.0" y="17.5" width="2.5" height="5" rx="1.2" fill="#E6F28D"/><rect x="36.0" y="16.0" width="2.5" height="8" rx="1.2" fill="#E6F28D"/><rect x="40.0" y="11.0" width="2.5" height="18" rx="1.2" fill="#E6F28D"/><rect x="44.0" y="6.0" width="2.5" height="28" rx="1.2" fill="#E6F28D"/><rect x="48.0" y="2.0" width="2.5" height="36" rx="1.2" fill="#E6F28D"/><rect x="52.0" y="5.0" width="2.5" height="30" rx="1.2" fill="#E6F28D"/><rect x="56.0" y="10.0" width="2.5" height="20" rx="1.2" fill="#E6F28D"/><rect x="60.0" y="14.0" width="2.5" height="12" rx="1.2" fill="#E6F28D"/><rect x="64.0" y="17.5" width="2.5" height="5" rx="1.2" fill="#E6F28D"/><rect x="68.0" y="16.0" width="2.5" height="8" rx="1.2" fill="#E6F28D"/><rect x="72.0" y="10.0" width="2.5" height="20" rx="1.2" fill="#E6F28D"/><rect x="76.0" y="5.0" width="2.5" height="30" rx="1.2" fill="#E6F28D"/><rect x="80.0" y="7.0" width="2.5" height="26" rx="1.2" fill="#E6F28D"/><rect x="84.0" y="12.0" width="2.5" height="16" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="88.0" y="16.0" width="2.5" height="8" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="92.0" y="18.0" width="2.5" height="4" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="96.0" y="16.0" width="2.5" height="8" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="100.0" y="11.0" width="2.5" height="18" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="104.0" y="7.0" width="2.5" height="26" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="108.0" y="4.0" width="2.5" height="32" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="112.0" y="7.0" width="2.5" height="26" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="116.0" y="13.0" width="2.5" height="14" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="120.0" y="17.0" width="2.5" height="6" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="124.0" y="18.0" width="2.5" height="4" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="128.0" y="16.0" width="2.5" height="8" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="132.0" y="12.0" width="2.5" height="16" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="136.0" y="9.0" width="2.5" height="22" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="140.0" y="12.0" width="2.5" height="16" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="144.0" y="15.0" width="2.5" height="10" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="148.0" y="17.0" width="2.5" height="6" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="152.0" y="18.0" width="2.5" height="4" rx="1.2" fill="rgba(255,255,255,0.14)"/><rect x="156.0" y="18.5" width="2.5" height="3" rx="1.2" fill="rgba(255,255,255,0.14)"/></svg>
-              <span class="vc-dur">0:15</span>
-            </div>
-            <div class="vc-transcript">
-              <span class="vc-tr-label">Auto-transcript · Beta</span>
-              <p class="vc-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs — just clear decisions backed by solid research and real user data.</p>
+          <div class="qc-slide">
+            <p class="qc-quote-text">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs — just clear decisions backed by solid research and real user data.</p>
+            <div class="qc-attr">
+              <div class="qc-attr-line"></div>
+              <span class="qc-name">Marcus Webb</span>
+              <span class="qc-role">Senior Engineer · Studio</span>
             </div>
           </div>
 
+        </div>
+
+        <div class="qc-footer">
+          <span class="qc-counter" id="qcCounter">01 / 03</span>
+          <div class="qc-dots" id="qcDots">
+            <button class="qc-dot" aria-label="Quote 1"></button>
+            <button class="qc-dot" aria-label="Quote 2"></button>
+            <button class="qc-dot" aria-label="Quote 3"></button>
+          </div>
+        </div>
+
+        <div class="qc-progress-wrap">
+          <div class="qc-progress-bar" id="qcBar"></div>
         </div>
 
       </section><!-- /testimonials -->
@@ -11325,6 +11275,133 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   })();
 
   </script>
+  <!-- ── QUOTE CAROUSEL ──────────────────────────────────── -->
+  <script>
+  (function() {
+    var slides   = document.querySelectorAll('.qc-slide');
+    var dots     = document.querySelectorAll('.qc-dot');
+    var counter  = document.getElementById('qcCounter');
+    var bar      = document.getElementById('qcBar');
+    var section  = document.getElementById('testimonialsSection');
+    var DURATION = 5000;
+    var current  = 0;
+    var timer, startTime, animFrame, paused = false;
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function go(n) {
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      current = (n + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+      counter.textContent = pad(current + 1) + ' / ' + pad(slides.length);
+    }
+
+    function tickBar(ts) {
+      if (paused) { startTime = ts - (DURATION * parseFloat(bar.style.width || 0) / 100); }
+      var pct = Math.min(100, (ts - startTime) / DURATION * 100);
+      bar.style.width = pct + '%';
+      if (pct < 100) {
+        animFrame = requestAnimationFrame(tickBar);
+      } else {
+        go(current + 1);
+        startProgress();
+      }
+    }
+
+    function startProgress() {
+      cancelAnimationFrame(animFrame);
+      bar.style.transition = 'none';
+      bar.style.width = '0%';
+      requestAnimationFrame(function(ts) {
+        startTime = ts;
+        animFrame = requestAnimationFrame(tickBar);
+      });
+    }
+
+    dots.forEach(function(dot, i) {
+      dot.addEventListener('click', function() {
+        go(i);
+        startProgress();
+      });
+    });
+
+    if (section) {
+      section.addEventListener('mouseenter', function() { paused = true; });
+      section.addEventListener('mouseleave', function() { paused = false; });
+    }
+
+    go(0);
+    startProgress();
+  })();
+  </script>
+
+
+</body>
+</html>
+  <!-- ── QUOTE CAROUSEL ──────────────────────────────────── -->
+  <script>
+  (function() {
+    var slides   = document.querySelectorAll('.qc-slide');
+    var dots     = document.querySelectorAll('.qc-dot');
+    var counter  = document.getElementById('qcCounter');
+    var bar      = document.getElementById('qcBar');
+    var section  = document.getElementById('testimonialsSection');
+    var DURATION = 5000;
+    var current  = 0;
+    var timer, startTime, animFrame, paused = false;
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function go(n) {
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      current = (n + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+      counter.textContent = pad(current + 1) + ' / ' + pad(slides.length);
+    }
+
+    function tickBar(ts) {
+      if (paused) { startTime = ts - (DURATION * parseFloat(bar.style.width || 0) / 100); }
+      var pct = Math.min(100, (ts - startTime) / DURATION * 100);
+      bar.style.width = pct + '%';
+      if (pct < 100) {
+        animFrame = requestAnimationFrame(tickBar);
+      } else {
+        go(current + 1);
+        startProgress();
+      }
+    }
+
+    function startProgress() {
+      cancelAnimationFrame(animFrame);
+      bar.style.transition = 'none';
+      bar.style.width = '0%';
+      requestAnimationFrame(function(ts) {
+        startTime = ts;
+        animFrame = requestAnimationFrame(tickBar);
+      });
+    }
+
+    dots.forEach(function(dot, i) {
+      dot.addEventListener('click', function() {
+        go(i);
+        startProgress();
+      });
+    });
+
+    if (section) {
+      section.addEventListener('mouseenter', function() { paused = true; });
+      section.addEventListener('mouseleave', function() { paused = false; });
+    }
+
+    go(0);
+    startProgress();
+  })();
+  </script>
+
 
 </body>
 </html>
