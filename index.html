@@ -6565,25 +6565,30 @@
     .proj-card {
       position: relative;
       z-index: 10;
-      background: #181818;
+      background: #252525;
       display: grid;
-      grid-template-columns: 65fr 35fr;
+      grid-template-columns: 55fr 45fr;
       min-height: 460px;
       border-radius: 20px;
       overflow: hidden;
-      margin: 0 40px;
+      border: none;
+      box-shadow: none;
       will-change: opacity, transform;
     }
+    [data-theme="dark"] .proj-card { box-shadow: none; border: none; }
     .proj-video-wrap {
       position: relative;
       overflow: hidden;
       order: 2;
-      background: #111;
+      background: #252525;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .proj-video-wrap video {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
     }
     .proj-content {
@@ -6611,27 +6616,28 @@
     }
     .proj-metrics {
       display: flex;
-      gap: 10px;
+      gap: 28px;
+      align-items: flex-start;
       flex-wrap: wrap;
     }
-    .proj-metric-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 16px;
-      background: rgba(229,242,141,0.08);
-      border: 1px solid rgba(229,242,141,0.22);
-      border-radius: 100px;
+    .proj-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .proj-metric-val {
       font-family: var(--font-mono);
-      font-size: 13px;
+      font-size: 36px;
       font-weight: 700;
       color: #E5F28D;
-      white-space: nowrap;
+      line-height: 1;
     }
-    .proj-metric-pill-lbl {
+    .proj-metric-lbl {
+      font-family: var(--font-mono);
+      font-size: 13px;
       font-weight: 400;
       color: rgba(255,252,248,0.55);
-      font-size: 12px;
+      letter-spacing: 0.02em;
     }
     .proj-cta {
       display: inline-flex;
@@ -6652,6 +6658,7 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       transition: background 0.2s, border-color 0.2s;
+    }
     .tm-marquee-wrap {
       overflow: hidden;
       -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
@@ -6723,30 +6730,6 @@
     @media (max-width: 767px) {
       .tm-header { padding: 0 20px; margin-bottom: 36px; }
       .tm-card   { width: 240px; }
-    }
-      color: rgba(255,255,255,0.85);
-      margin: 0 0 16px;
-    }
-    .tm-attr { display: flex; align-items: center; gap: 10px; }
-    .tm-av {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: #1A73E8;
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
-      color: #fff; flex-shrink: 0;
-    }
-    .tm-name { font-family: var(--font-heading); font-size: 12.5px; font-weight: 600; color: #fff; display: block; }
-    .tm-role { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4); display: block; margin-top: 2px; }
-    [data-theme="dark"] .tm-section { background: #080808; }
-    @media (max-width: 1023px) {
-      .tm-header { padding: 0 32px; }
-      .tm-mgrid  { gap: 10px; padding: 0 32px; }
-    }
-    @media (max-width: 767px) {
-      .tm-header { padding: 0 20px; margin-bottom: 36px; }
-      .tm-mgrid  { grid-template-columns: 1fr; padding: 0 20px; }
-      .tm-col:nth-child(2), .tm-col:nth-child(3) { display: none; }
-      .tm-marquee-wrap { height: 480px; }
     }
 
 
@@ -7284,9 +7267,18 @@
           <h3 class="proj-title">EverTutor Live</h3>
           <p class="proj-desc">Voice-first AI tutoring — from zero to product-market fit. Sole designer across research, system design, and launch.</p>
           <div class="proj-metrics">
-            <span class="proj-metric-pill">2,000+ <span class="proj-metric-pill-lbl">Daily Active Users</span></span>
-            <span class="proj-metric-pill">−96% <span class="proj-metric-pill-lbl">Workflow time</span></span>
-            <span class="proj-metric-pill">$300k <span class="proj-metric-pill-lbl">ARR</span></span>
+            <div class="proj-metric">
+              <span class="proj-metric-val">2,000+</span>
+              <span class="proj-metric-lbl">Daily Active Users</span>
+            </div>
+            <div class="proj-metric">
+              <span class="proj-metric-val">−96%</span>
+              <span class="proj-metric-lbl">Workflow time</span>
+            </div>
+            <div class="proj-metric">
+              <span class="proj-metric-val">$300k</span>
+              <span class="proj-metric-lbl">ARR</span>
+            </div>
           </div>
           <a class="proj-cta" href="evertutor-live.html">View Case Study &rarr;</a>
         </div>
@@ -11584,8 +11576,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         el.style.zIndex   = isPC ? '10' : '5';
         if (spacer) spacer.style.height = h + 'px';
       }
-      el.style.left  = isPC ? (cardLeft + 40) + 'px' : cardLeft + 'px';
-      el.style.width = isPC ? (cardWidth - 80) + 'px' : cardWidth + 'px';
+      el.style.left  = cardLeft + 'px';
+      el.style.width = cardWidth + 'px';
     }
 
     function unfixEl(el, spacer) {
