@@ -4364,15 +4364,48 @@
       display: flex;
     }
     @keyframes cb-fab-spin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
+      from { transform: rotateY(0deg); }
+      to   { transform: rotateY(360deg); }
+    }
+    .cb-fab-btn {
+      perspective: 300px;
     }
     .cb-fab-btn svg {
       width: 22px;
       height: 22px;
-      color: rgba(255,252,248,0.88);
-      animation: cb-fab-spin 9s linear infinite;
+      color: rgba(255,252,248,0.95);
+      animation: cb-fab-spin 4s linear infinite;
       flex-shrink: 0;
+    }
+    /* Rainbow glow behind the fab icon */
+    .cb-wrap.cb-fab .cb-fab-btn::before {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      left: 50%; top: 50%;
+      width: 220%; aspect-ratio: 1 / 1;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      filter: blur(10px);
+      background: conic-gradient(
+        from 0deg,
+        #ff4757, #ff6b35, #ffd32a, #2ed573, #1e90ff, #a29bfe, #fd79a8, #ff4757
+      );
+      opacity: 0.65;
+      animation: ask-wheel-spin 6s linear infinite;
+      will-change: transform;
+    }
+    /* Glass surface matching the Ask me anything button */
+    .cb-wrap.cb-fab .cb.glass-pill {
+      background: rgba(255,255,255,0.12) !important;
+      background-image: none !important;
+      backdrop-filter: blur(14px) saturate(160%) !important;
+      -webkit-backdrop-filter: blur(14px) saturate(160%) !important;
+      box-shadow:
+        inset 1.5px 2px 3px rgba(255,255,255,0.90),
+        inset 0 0 0 1px rgba(255,255,255,0.28),
+        0 12px 40px rgba(0,0,0,0.28) !important;
+      overflow: hidden;
     }
 
     /* ── Apple Liquid Glass ─────────────────────────────────── */
@@ -6009,6 +6042,10 @@
       .work-float-dots { display: none; }
     }
 
+    /* ── Carousel wrap ── */
+    .carousel-wrap { position: relative; }
+    .carousel-sticky { position: sticky; top: 54px; z-index: 5; }
+
     /* ── Work Section V3 — Section 2 ──────────────────────────── */
     .ws-section {
       background: #1E1E1E;
@@ -6891,11 +6928,15 @@
         <div class="skills-track" id="skillsTrack"></div>
       </div>
 
-      <!-- ── WORK SECTION anchor ── -->
-      <div id="s2Section" style="position:relative;top:-70px;pointer-events:none;"></div>
+    </div><!-- /card -->
 
-      <!-- ── WORK SECTION V3 ──────────────────────────────────── -->
-      <section class="ws-section">
+    <!-- ── CAROUSEL SECTION ──────────────────────────────────────── -->
+    <div class="carousel-wrap">
+      <div id="s2Section" style="position:relative;top:-70px;pointer-events:none;"></div>
+      <div class="carousel-sticky">
+
+        <!-- ── WORK SECTION V3 ──────────────────────────────────── -->
+        <section class="ws-section">
 
         <!-- EverTutor hero: left title+metrics | center blob | right tags+desc -->
         <div class="ws-et-hero">
@@ -7113,7 +7154,13 @@
           </div>
         </div>
 
-      </section>
+        </section>
+
+      </div><!-- /carousel-sticky -->
+    </div><!-- /carousel-wrap -->
+
+    <!-- ── BOTTOM CARD ──────────────────────────────────────────── -->
+    <div class="card" data-bg-canvas="color">
 
       <!-- ── TESTIMONIALS / DEPTH BENTO ───────────────── -->
       <section class="tm-section reveal" id="testimonialsSection">
