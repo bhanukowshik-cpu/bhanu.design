@@ -6130,6 +6130,15 @@
       filter: blur(28px);
       z-index: 0;
     }
+    .ws-orb-glow {
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(163,230,53,0.28) 0%, rgba(163,230,53,0.10) 45%, transparent 70%);
+      filter: blur(22px);
+      z-index: 0;
+    }
     .ws-ring {
       position: absolute;
       border-radius: 50%;
@@ -6465,10 +6474,27 @@
       .fw-card { flex: 0 0 calc(66.6% - 8px); }
     }
 
-    /* ── TESTIMONIALS / EDITORIAL ────────────────────────── */
+    /* ── TESTIMONIALS ─────────────────────────────────────── */
     .tm-section {
-      background: var(--primary);
-      padding: 64px 40px 72px;
+      background: #181818;
+      padding: 72px 40px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Ambient center bloom */
+    .tm-section::before {
+      content: '';
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(230,242,141,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .tm-header {
+      margin-bottom: 48px;
       position: relative;
     }
     .tm-eyebrow-tag {
@@ -6476,103 +6502,117 @@
       font-size: 9.5px;
       letter-spacing: 0.20em;
       text-transform: uppercase;
-      color: rgba(37,37,37,0.42);
+      color: var(--primary);
+      opacity: 0.6;
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .tm-headline {
       font-family: var(--font-heading);
       font-size: 30px;
       font-weight: 700;
-      color: var(--secondary);
-      margin: 0 0 48px;
+      color: #FFFCF8;
+      margin: 0;
       letter-spacing: -0.01em;
     }
-    .pow-q-list {
-      display: flex;
-      flex-direction: column;
-    }
-    .pow-q-item {
+    /* 3-col card grid */
+    .pow-grid {
       display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 48px;
-      align-items: center;
-      padding: 36px 0;
-      border-top: 1px solid rgba(37,37,37,0.14);
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
       position: relative;
     }
-    .pow-q-item:last-child {
-      border-bottom: 1px solid rgba(37,37,37,0.14);
+    /* Glass card */
+    .pow-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-top: 2px solid rgba(230,242,141,0.45);
+      border-radius: 4px;
+      padding: 28px 26px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+      transition: transform 0.3s ease, border-top-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     }
-    .pow-q-mark {
-      position: absolute;
-      top: 18px;
-      left: -4px;
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 110px;
+    .pow-card:hover {
+      transform: translateY(-5px);
+      border-top-color: rgba(230,242,141,0.85);
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(230,242,141,0.08);
+    }
+    /* Opening quote mark */
+    .pow-card-mark {
+      font-family: Georgia, serif;
+      font-size: 38px;
       line-height: 1;
-      color: rgba(37,37,37,0.07);
-      pointer-events: none;
+      color: var(--primary);
+      opacity: 0.75;
       user-select: none;
     }
-    .pow-q-text {
+    /* Quote text */
+    .pow-card-quote {
       font-family: var(--font-heading);
-      font-size: 20px;
+      font-size: 15.5px;
       font-weight: 500;
-      line-height: 1.70;
-      color: var(--secondary);
-      font-style: italic;
+      line-height: 1.72;
+      color: rgba(255,252,248,0.82);
       margin: 0;
-      padding-left: 14px;
+      flex: 1;
     }
-    .pow-q-attr {
-      text-align: right;
-      min-width: 168px;
-      flex-shrink: 0;
+    /* Attribution */
+    .pow-card-attr {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,0.07);
     }
-    .pow-q-name {
-      display: block;
-      font-family: var(--font-heading);
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--secondary);
-      margin-bottom: 3px;
-    }
-    .pow-q-role {
-      display: block;
+    .pow-card-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(230,242,141,0.12);
+      border: 1px solid rgba(230,242,141,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-family: var(--font-mono);
       font-size: 10px;
-      color: var(--secondary);
-      opacity: 0.48;
+      font-weight: 700;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+    .pow-card-info { display: flex; flex-direction: column; gap: 1px; }
+    .pow-card-name {
+      font-family: var(--font-heading);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #FFFCF8;
+    }
+    .pow-card-role {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      color: rgba(255,252,248,0.38);
       letter-spacing: 0.03em;
     }
-    /* Dark mode: deep forest-tinted black */
-    [data-theme="dark"] .tm-section       { background: #1B2400; }
-    [data-theme="dark"] .tm-eyebrow-tag   { color: rgba(230,242,141,0.38); }
-    [data-theme="dark"] .tm-headline      { color: #E6F28D; }
-    [data-theme="dark"] .pow-q-item       { border-color: rgba(230,242,141,0.10); }
-    [data-theme="dark"] .pow-q-mark       { color: rgba(230,242,141,0.05); }
-    [data-theme="dark"] .pow-q-text       { color: rgba(255,252,248,0.88); }
-    [data-theme="dark"] .pow-q-name       { color: #FFFCF8; }
-    [data-theme="dark"] .pow-q-role       { color: rgba(255,252,248,0.45); opacity: 1; }
+    /* Light mode: keep dark for contrast moment */
+    /* Dark mode: same section, slightly different bloom */
+    [data-theme="dark"] .tm-section { background: #141414; }
+    [data-theme="dark"] .tm-section::before {
+      background: radial-gradient(ellipse, rgba(230,242,141,0.05) 0%, transparent 70%);
+    }
     /* Responsive */
     @media (max-width: 1023px) {
-      .tm-section  { padding: 52px 32px 60px; }
+      .tm-section { padding: 56px 32px 64px; }
       .tm-headline { font-size: 26px; }
-      .pow-q-text  { font-size: 18px; }
-      .pow-q-item  { gap: 32px; }
+      .pow-grid { gap: 12px; }
+      .pow-card-quote { font-size: 14.5px; }
     }
     @media (max-width: 767px) {
-      .tm-section  { padding: 44px 20px 52px; }
-      .tm-headline { font-size: 22px; margin-bottom: 32px; }
-      .pow-q-item  {
-        grid-template-columns: 1fr;
-        gap: 14px;
-        padding: 28px 0;
-      }
-      .pow-q-attr  { text-align: left; }
-      .pow-q-text  { font-size: 16.5px; }
-      .pow-q-mark  { font-size: 80px; top: 14px; }
+      .tm-section { padding: 44px 20px 52px; }
+      .tm-headline { font-size: 22px; }
+      .pow-grid { grid-template-columns: 1fr; }
     }
 
 
@@ -6895,6 +6935,7 @@
           <div class="ws-et-center">
             <div class="ws-orb-wrap">
               <div class="ws-orb-bg"></div>
+              <div class="ws-orb-glow"></div>
               <svg class="ws-waveform" width="340" height="340" viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <g stroke="#A3E635" stroke-width="2.5" stroke-linecap="round" opacity="0.75">
                   <line x1="170.00" y1="64.00" x2="170.00" y2="41.16" />
@@ -7090,38 +7131,49 @@
 
       </section>
 
-      <!-- ── TESTIMONIALS / EDITORIAL ─────────────────── -->
+      <!-- ── TESTIMONIALS ────────────────────────────────── -->
       <section class="tm-section reveal" id="testimonialsSection">
 
-        <span class="tm-eyebrow-tag">Kind Words</span>
-        <h2 class="tm-headline">People I've built with</h2>
+        <div class="tm-header">
+          <span class="tm-eyebrow-tag">Kind Words</span>
+          <h2 class="tm-headline">People I've built with</h2>
+        </div>
 
-        <div class="pow-q-list">
+        <div class="pow-grid">
 
-          <div class="pow-q-item">
-            <span class="pow-q-mark">“</span>
-            <p class="pow-q-text">Bhanu doesn't just design screens — he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. I've shipped with a lot of designers; he's the one engineers actually trust.</p>
-            <div class="pow-q-attr">
-              <span class="pow-q-name">Anil Kumar</span>
-              <span class="pow-q-role">Engineering Lead · EverTutor</span>
+          <div class="pow-card">
+            <span class="pow-card-mark">"</span>
+            <p class="pow-card-quote">Bhanu doesn't just design screens — he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. I've shipped with a lot of designers; he's the one engineers actually trust.</p>
+            <div class="pow-card-attr">
+              <div class="pow-card-avatar">AK</div>
+              <div class="pow-card-info">
+                <span class="pow-card-name">Anil Kumar</span>
+                <span class="pow-card-role">Engineering Lead · EverTutor</span>
+              </div>
             </div>
           </div>
 
-          <div class="pow-q-item">
-            <span class="pow-q-mark">“</span>
-            <p class="pow-q-text">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
-            <div class="pow-q-attr">
-              <span class="pow-q-name">Priya Menon</span>
-              <span class="pow-q-role">Head of Product · Stressie</span>
+          <div class="pow-card">
+            <span class="pow-card-mark">"</span>
+            <p class="pow-card-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
+            <div class="pow-card-attr">
+              <div class="pow-card-avatar">PM</div>
+              <div class="pow-card-info">
+                <span class="pow-card-name">Priya Menon</span>
+                <span class="pow-card-role">Head of Product · Stressie</span>
+              </div>
             </div>
           </div>
 
-          <div class="pow-q-item">
-            <span class="pow-q-mark">“</span>
-            <p class="pow-q-text">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs — just clear decisions backed by solid research and real user data.</p>
-            <div class="pow-q-attr">
-              <span class="pow-q-name">Marcus Webb</span>
-              <span class="pow-q-role">Senior Engineer · Studio</span>
+          <div class="pow-card">
+            <span class="pow-card-mark">"</span>
+            <p class="pow-card-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs — just clear decisions backed by solid research and real user data.</p>
+            <div class="pow-card-attr">
+              <div class="pow-card-avatar">MW</div>
+              <div class="pow-card-info">
+                <span class="pow-card-name">Marcus Webb</span>
+                <span class="pow-card-role">Senior Engineer · Studio</span>
+              </div>
             </div>
           </div>
 
@@ -11228,8 +11280,11 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       lines.forEach(function(line, i) {
         var angle = angles[i];
         var h = getHeight(i, t);
-        line.setAttribute('x2', (cx + (r + h) * Math.cos(angle)).toFixed(2));
-        line.setAttribute('y2', (cy + (r + h) * Math.sin(angle)).toFixed(2));
+        var half = h / 2;
+        line.setAttribute('x1', (cx + (r - half) * Math.cos(angle)).toFixed(2));
+        line.setAttribute('y1', (cy + (r - half) * Math.sin(angle)).toFixed(2));
+        line.setAttribute('x2', (cx + (r + half) * Math.cos(angle)).toFixed(2));
+        line.setAttribute('y2', (cy + (r + half) * Math.sin(angle)).toFixed(2));
       });
       requestAnimationFrame(animate);
     }
