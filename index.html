@@ -5449,7 +5449,10 @@
       box-shadow:
         rgba(255, 255, 255, 0.7)  6.67px  6.67px 3.36px -6.21px inset,
         rgba(255, 61,  61,  0.5) -6.70px -6.00px 3.36px -6.73px inset,
-        rgb(140, 180, 190)       -2.00px  2.39px 18px   -2.60px inset;
+        rgba(34,  211, 238, 0.55) -8px   6px 16px -4px inset,
+        rgba(99,  102, 241, 0.50) -2px   5px 14px -5px inset,
+        rgba(168, 85,  247, 0.45)  2px   5px 14px -5px inset,
+        rgba(236, 72,  153, 0.40)  8px   4px 12px -6px inset;
     }
 
     /* ── Dimension lines ── */
@@ -6128,31 +6131,6 @@
     }
     .s2-animating .s2-scroll-cue { opacity: 0; }
 
-    /* ── Proj-cue: fixed viewport-bottom hint during proj-card phases ── */
-    #proj-scroll-cue {
-      position: fixed;
-      bottom: 24px; left: 50%;
-      transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 7px;
-      z-index: 30;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s ease;
-    }
-    #proj-scroll-cue.visible { opacity: 1; }
-    #proj-scroll-cue svg { animation: s2-cue-bounce 1.6s ease-in-out infinite; }
-
-    /* ── ET Glimpse dim during proj-card reveal ── */
-    .ws-et-hero { transition: opacity 0.5s ease, filter 0.5s ease; }
-    .ws-section.ws-dimmed .ws-et-hero {
-      opacity: 0.15;
-      filter: grayscale(1);
-    }
-    .ws-section.ws-dimmed:hover .ws-et-hero {
-      opacity: 1;
-      filter: grayscale(0);
-      transition-delay: 0s;
-    }
 
     .ws-et-title {
       font-family: var(--font-heading);
@@ -6472,7 +6450,9 @@
       box-shadow:
         rgba(255, 255, 255, 0.85)  6.67px  6.67px 3.36px -6.21px inset,
         rgba(255, 61,  61,  0.65) -6.70px -6.00px 3.36px -6.73px inset,
-        rgb(140, 200, 215)        -2.00px  2.39px 22px   -2.60px inset;
+        rgb(140, 200, 215)        -2.00px  2.39px 22px   -2.60px inset,
+        0 0 16px 4px  rgba(230, 242, 141, 0.50),
+        0 0 36px 10px rgba(230, 242, 141, 0.26);
     }
     @media (min-width: 1600px) {
       .ws-et-title { font-size: 40px; line-height: 1.15; }
@@ -6517,118 +6497,65 @@
       .ws-phone-img { width: 90px; }
     }
 
-    .fw-split {
-      display: flex;
-      width: 100%;
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      background: #1E1E1E;
-      overflow: hidden;
+    /* ── Featured Work section ────────────────────────────────── */
+    .fw-section {
+      padding: 100px 0 80px;
     }
-    .fw-split-label {
-      flex: 0 0 30%;
-      width: 30%;
-      padding: 40px 32px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-      border-right: 1px solid rgba(255,255,255,0.07);
+    .fw-header {
+      text-align: center;
+      margin-bottom: 56px;
     }
-    .fw-split-eyebrow {
+    .fw-eyebrow-label {
+      display: block;
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 500;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--primary);
-      margin-bottom: 16px;
+      color: rgba(37,37,37,0.4);
+      margin-bottom: 14px;
     }
-    .fw-split-title {
+    [data-theme="dark"] .fw-eyebrow-label { color: rgba(255,252,248,0.4); }
+    .fw-title {
       font-family: var(--font-heading);
-      font-size: clamp(22px, 2.8vw, 48px);
+      font-size: clamp(40px, 5.5vw, 72px);
       font-weight: 700;
-      line-height: 1.1;
-      color: rgba(255,255,255,0.9);
+      color: var(--secondary);
+      line-height: 1;
+      letter-spacing: -2px;
+      margin: 0;
     }
-    .fw-split-dots {
-      display: flex;
-      gap: 6px;
-      margin-top: auto;
-    }
-    .fw-sdot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.2);
-      transition: width 0.35s ease, background 0.35s ease, border-radius 0.35s ease;
-    }
-    .fw-sdot.active { width: 20px; border-radius: 3px; background: #789F04; }
-    .fw-split-cards {
-      flex: 1 1 100%;
-      min-width: 0;
-      overflow: hidden;
-    }
-    /* Glimpse/overview cards are pinned to their designed 542px width */
-    #csCardGlimpse,
-    #csCardStressieOverview { flex: 0 0 542px; }
-    .fw-cards-track {
-      display: flex;
-      gap: 20px;
-      height: 100%;
-      will-change: transform;
-      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    /* 1 full card + 0.5 peek: width = (container − 1 gap) × 2/3 ≈ 66.67% − 13.3px */
-    .fw-card {
-      flex: 0 0 calc(38% - 7px);
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .fw-card .work-summary-card { width: 100%; height: min(602px, calc(80vh - 56px)); }
-    .fw-card .work-cs-card      { width: 100%; height: min(602px, calc(80vh - 56px)); }
-    @media (max-width: 1023px) {
-      .fw-split-label { padding: 28px 18px; }
-      .fw-card { flex: 0 0 calc(66.6% - 8px); }
-      .fw-cards-track { gap: 12px; }
-    }
-    @media (max-width: 767px) {
-      .fw-split { height: 100svh; }
-      .fw-split-label { padding: 20px 12px; }
-      .fw-split-title { font-size: 18px; }
-      .fw-split-eyebrow { font-size: 8px; letter-spacing: 0.10em; }
-      .fw-card { flex: 0 0 calc(66.6% - 8px); }
-    }
-
-    /* ── PROJECT CARDS ─────────────────────────────────── */
-    .proj-card {
-      position: relative;
-      z-index: 10;
-      background: #181818;
+    [data-theme="dark"] .fw-title { color: #FFFCF8; }
+    .fw-grid {
       display: grid;
-      grid-template-columns: 55fr 45fr;
-      min-height: 460px;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .fw-card {
+      background: #181818;
       border-radius: 20px;
       overflow: hidden;
-      border: none;
-      box-shadow: none;
-      will-change: opacity, transform;
+      opacity: 0;
+      transform: translateY(72px);
+      transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    [data-theme="dark"] .proj-card { box-shadow: none; border: none; }
-    .proj-video-wrap {
+    .fw-card.fw-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fw-card-top {
       position: relative;
       overflow: hidden;
-      order: 2;
       background: url('Porject Background image/Light Green.png') center/cover no-repeat;
+      aspect-ratio: 4/3;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 28px;
+      padding-top: 46px;
     }
-    .proj-video-wrap video {
+    .fw-card-top video {
       width: 100%;
       height: auto;
       max-height: 100%;
@@ -6636,28 +6563,40 @@
       display: block;
       border-radius: 10px;
     }
-    .proj-content {
+    .fw-card-bottom {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      gap: 24px;
-      padding: 52px 52px;
+      gap: 20px;
+      padding: 32px 32px;
     }
-    .proj-eyebrow { display: none; }
-    .proj-title {
-      font-family: var(--font-heading);
-      font-size: 36px;
-      font-weight: 700;
-      color: #F5F5F7;
-      line-height: 1.15;
-      margin: 0;
-    }
-    .proj-desc {
-      font-size: 18px;
-      line-height: 1.7;
-      color: #FFFCF8;
+    .fw-card-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
       font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(229,242,141,0.6);
       margin: 0;
+    }
+    .fw-card-title {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      font-weight: 700;
+      color: #FFFCF8;
+      line-height: 1.3;
+      margin: 0;
+    }
+    .fw-card--placeholder .fw-card-top {
+      background: #222;
+      justify-content: center;
+      align-items: center;
+    }
+    .fw-placeholder-label {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: rgba(255,252,248,0.2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
     }
     .proj-metrics {
       display: flex;
@@ -6716,7 +6655,9 @@
       box-shadow:
         rgba(255, 255, 255, 0.85)  6.67px  6.67px 3.36px -6.21px inset,
         rgba(255, 61,  61,  0.65) -6.70px -6.00px 3.36px -6.73px inset,
-        rgb(140, 200, 215)        -2.00px  2.39px 22px   -2.60px inset;
+        rgb(140, 200, 215)        -2.00px  2.39px 22px   -2.60px inset,
+        0 0 16px 4px  rgba(230, 242, 141, 0.50),
+        0 0 36px 10px rgba(230, 242, 141, 0.26);
     }
     .tm-marquee-wrap {
       overflow: hidden;
@@ -7307,48 +7248,94 @@
 
       </div><!-- /carousel-sticky -->
 
-      <!-- Fixed scroll cue for proj-card phases (escapes overflow:clip) -->
-      <div id="proj-scroll-cue" aria-hidden="true">
-        <span class="s2-cue-label">Scroll</span>
-        <svg width="14" height="20" viewBox="0 0 14 20" fill="none">
-          <line x1="7" y1="1" x2="7" y2="15" stroke="#E5F28D" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.6"/>
-          <polyline points="3,11 7,15 11,11" fill="none" stroke="#E5F28D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.6"/>
-        </svg>
-      </div>
-
-      <!-- ── PROJECT CARDS ──────────────────────────────── -->
-
-      <!-- Card 1: EverTutor Live -->
-      <div class="proj-card">
-        <div class="proj-video-wrap">
-          <video autoplay muted loop playsinline preload="auto">
-            <source src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
-          </video>
+      <!-- ── FEATURED WORK ───────────────────────────────────────── -->
+      <section class="fw-section">
+        <div class="fw-header">
+          <span class="fw-eyebrow-label">Selected Work</span>
+          <h2 class="fw-title">Featured Work</h2>
         </div>
-        <div class="proj-content">
-          <h3 class="proj-title">EverTutor Live</h3>
-          <p class="proj-desc">Voice-first AI tutoring — from zero to product-market fit. Sole designer across research, system design, and launch.</p>
-          <div class="proj-metrics">
-            <div class="proj-metric">
-              <span class="proj-metric-val">2,000+</span>
-              <span class="proj-metric-lbl">Daily Active Users</span>
+        <div class="fw-grid">
+
+          <!-- Card 1: EverTutor Live -->
+          <div class="fw-card" data-fw-delay="0">
+            <div class="fw-card-top">
+              <div class="tags-bar-overlay" aria-hidden="true">
+                <div class="tags-bar-track" id="tagsBarTrackLive"></div>
+              </div>
+              <video autoplay muted loop playsinline preload="auto">
+                <source src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
+              </video>
             </div>
-            <div class="proj-metric">
-              <span class="proj-metric-val">−96%</span>
-              <span class="proj-metric-lbl">Workflow time</span>
-            </div>
-            <div class="proj-metric">
-              <span class="proj-metric-val">$300k</span>
-              <span class="proj-metric-lbl">ARR</span>
+            <div class="fw-card-bottom">
+              <p class="fw-card-eyebrow">1.1 EverTutor Live</p>
+              <h3 class="fw-card-title">First of its kind, a voice-first AI that gives every learner a fully adaptive 1:1 experience, taken from prototype to PMF.</h3>
+              <div class="proj-metrics">
+                <div class="proj-metric">
+                  <span class="proj-metric-val">2000+</span>
+                  <span class="proj-metric-lbl">Everyday Sessions</span>
+                </div>
+                <div class="proj-metric">
+                  <span class="proj-metric-val">Proven 2x</span>
+                  <span class="proj-metric-lbl">Performance Gain</span>
+                </div>
+                <div class="proj-metric">
+                  <span class="proj-metric-val">$250&nbsp;&rarr;&nbsp;$5/hr</span>
+                  <span class="proj-metric-lbl">Cost of 1:1 Support</span>
+                </div>
+              </div>
+              <a class="proj-cta" href="evertutor-live.html">View Case Study &rarr;</a>
             </div>
           </div>
-          <a class="proj-cta" href="evertutor-live.html">View Case Study &rarr;</a>
+
+          <!-- Card 2: EverTutor Studio -->
+          <div class="fw-card fw-card--placeholder" data-fw-delay="1">
+            <div class="fw-card-top">
+              <span class="fw-placeholder-label">EverTutor Studio — coming soon</span>
+            </div>
+            <div class="fw-card-bottom">
+              <p class="fw-card-eyebrow">1.2 EverTutor Studio</p>
+              <h3 class="fw-card-title">AI-powered teaching studio that lets educators build, manage, and deploy personalised learning at scale.</h3>
+              <div class="proj-metrics">
+                <div class="proj-metric">
+                  <span class="proj-metric-val">3x</span>
+                  <span class="proj-metric-lbl">Faster content creation</span>
+                </div>
+                <div class="proj-metric">
+                  <span class="proj-metric-val">500+</span>
+                  <span class="proj-metric-lbl">Educators onboarded</span>
+                </div>
+              </div>
+              <a class="proj-cta" href="evertutor-studio.html">View Case Study &rarr;</a>
+            </div>
+          </div>
+
+          <!-- Card 3: Stressie -->
+          <div class="fw-card fw-card--placeholder" data-fw-delay="2">
+            <div class="fw-card-top">
+              <span class="fw-placeholder-label">Stressie — coming soon</span>
+            </div>
+            <div class="fw-card-bottom">
+              <p class="fw-card-eyebrow">2.1 Stressie</p>
+              <h3 class="fw-card-title">A mental wellness companion that turns daily stress check-ins into actionable insight — redesigned from the ground up.</h3>
+              <div class="proj-metrics">
+                <div class="proj-metric">
+                  <span class="proj-metric-val">−30%</span>
+                  <span class="proj-metric-lbl">Support tickets</span>
+                </div>
+                <div class="proj-metric">
+                  <span class="proj-metric-val">4.8★</span>
+                  <span class="proj-metric-lbl">App store rating</span>
+                </div>
+              </div>
+              <a class="proj-cta" href="stressie-studio.html">View Case Study &rarr;</a>
+            </div>
+          </div>
+
         </div>
-      </div>
-      <div id="pc-spacer" style="height:0;flex-shrink:0" aria-hidden="true"></div>
-      <div id="anim-exit-space" style="height:300px;flex-shrink:0" aria-hidden="true"></div>
+      </section>
 
       <!-- ── TESTIMONIALS MARQUEE GRID ─────────────────────── -->
+
       <section class="tm-section" id="testimonialsSection">
 
         <div class="tm-header">
@@ -11585,43 +11572,28 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   </script>
 
   <script>
-  /* ── Section 2 snap + scroll story ──────────────────────────────────────
-     Snap  : when section 2 is 20% visible (scrolling DOWN from s1), auto-
-             scroll to align it flush with the viewport, then play entrance.
-     Entry : blob + waveform already visible; left/right content fades in.
-     Phase 3  scale+rise : ws-section (fixed) scales 1→0.7, rises to nav
-     Phase 4  reveal     : proj-card fades in below
-     Phase 5  exit       : both fade out as testimonials scroll in
+  /* ── Section 2 snap + scroll story ─────────────────────────────────────
+     Snap  : when section 2 is 20% visible (scrolling DOWN), auto-scroll
+             to align it flush with the viewport, then play entrance.
+     Phase A (scale+rise): ws-section scales 1→0.7 and rises to nav bar.
+     Phase B (exit fade) : ET Glimpse fades out, section unfixes.
   ──────────────────────────────────────────────────────────────────────── */
   (function () {
-    var snapEl   = document.querySelector('.carousel-sticky'); /* 100vh snap section */
-    var cs       = document.querySelector('.ws-section');      /* inner animated element */
-    var pc       = document.querySelector('.proj-card');
-    var pcSpacer = document.getElementById('pc-spacer');
-    var card     = document.querySelector('.card');
-    var projCue  = document.getElementById('proj-scroll-cue');
-    var etLeft   = document.querySelector('.ws-et-left');
-    var etRight  = document.querySelector('.ws-et-right');
-    if (!snapEl || !cs || !pc || !card) return;
+    var snapEl = document.querySelector('.carousel-sticky');
+    var cs     = document.querySelector('.ws-section');
+    var card   = document.querySelector('.card');
+    if (!snapEl || !cs || !card) return;
 
-    var NAV_H   = 54, SCALE_MIN = 0.7;
-    var SCALE_R = 350, PROJ_R = 380, EXIT_R = 300;
-
-    /* proj-card starts hidden */
-    pc.style.opacity   = '0';
-    pc.style.transform = 'translateY(44px)';
+    var NAV_H    = 54, SCALE_MIN = 0.7;
+    var SCALE_R  = 350, EXIT_R = 220;
 
     function docTop(el) {
       var t = 0; while (el) { t += el.offsetTop; el = el.offsetParent; } return t;
     }
 
-    /* Measure once at load (natural flow, scrollY≈0) */
-    var snapDocTop = docTop(snapEl);   /* top of the 100vh section in document */
-    var csH0       = cs.offsetHeight;  /* natural height of ws-section (~500px) */
-    var pcH0       = pc.offsetHeight;
-
-    var vpH, centerTop, cardLeft, cardWidth;
-    var scaleEnd, projEnd, exitPoint;
+    var snapDocTop = docTop(snapEl);
+    var csH0       = cs.offsetHeight;
+    var vpH, centerTop, cardLeft, cardWidth, scaleEnd, exitPoint;
 
     function recalc() {
       vpH       = window.innerHeight;
@@ -11629,143 +11601,93 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       var r     = card.getBoundingClientRect();
       cardLeft  = r.left;
       cardWidth = r.width;
-      /* animation milestones relative to snap scroll position */
       scaleEnd  = snapDocTop + SCALE_R;
-      projEnd   = scaleEnd   + PROJ_R;
-      exitPoint = projEnd    + EXIT_R;
+      exitPoint = scaleEnd   + EXIT_R;
     }
 
-    function fixEl(el, spacer, h, isPC) {
+    function fixEl(el) {
       if (el.style.position !== 'fixed') {
         el.style.position = 'fixed';
-        el.style.zIndex   = isPC ? '10' : '5';
-        if (spacer) spacer.style.height = h + 'px';
+        el.style.zIndex   = '5';
       }
-      el.style.left  = isPC ? (cardLeft + 40) + 'px' : cardLeft + 'px';
-      el.style.width = isPC ? (cardWidth - 80) + 'px' : cardWidth + 'px';
+      el.style.left  = cardLeft + 'px';
+      el.style.width = cardWidth + 'px';
     }
 
-    function unfixEl(el, spacer) {
+    function unfixEl(el) {
       if (el.style.position !== 'fixed') return;
       el.style.position = el.style.left = el.style.width =
         el.style.top = el.style.zIndex = '';
-      if (spacer) spacer.style.height = '0';
     }
 
-    /* ── Snap logic ─────────────────────────────────────────────────────── */
-    var snapped  = false;
-    var snapping = false;
-    var prevScrollY = 0;
+    var snapped = false, snapping = false, prevScrollY = 0;
 
     var io = new IntersectionObserver(function (entries) {
       var e = entries[0];
-      /* Only fire when entering from section 1 (scrolling down) */
       if (e.isIntersecting && e.intersectionRatio >= 0.2 &&
           !snapped && !snapping && window.scrollY >= prevScrollY) {
         snapping = true;
         window.scrollTo({ top: snapDocTop, behavior: 'smooth' });
-        /* After smooth scroll settles (~650 ms), trigger entrance */
         setTimeout(function () {
           snapping = false;
           snapped  = true;
           snapEl.classList.add('s2-entered');
           io.disconnect();
-          update(); /* re-run update at settled scroll position */
+          update();
         }, 700);
       }
     }, { threshold: [0.2] });
 
     io.observe(snapEl);
-
     recalc();
 
     var raf = false;
     function update() {
       raf = false;
-      if (snapping) return; /* don't animate during the snap scroll */
+      if (snapping) return;
 
       var sy = window.scrollY || document.documentElement.scrollTop;
       prevScrollY = sy;
 
-      /* Approach cue: visible at snap rest; hide once user scrolls past snap */
+      /* Hide approach cue once animation begins */
       if (snapped && sy > snapDocTop + 5) {
         snapEl.classList.add('s2-animating');
       } else {
         snapEl.classList.remove('s2-animating');
       }
 
-      /* Proj cue: show during Phase 3 (scale+rise) and Phase 4 (reveal) */
-      if (projCue) {
-        if (snapped && sy > snapDocTop + 5 && sy <= projEnd) {
-          projCue.classList.add('visible');
-        } else {
-          projCue.classList.remove('visible');
-        }
-      }
-
-      /* ET Glimpse dim: active during Phase 4 (proj-card entering) */
-      if (snapped && sy > scaleEnd && sy <= projEnd) {
-        cs.classList.add('ws-dimmed');
-      } else {
-        cs.classList.remove('ws-dimmed');
-      }
-
-      /* ── Before snap: natural flow, nothing fixed ── */
+      /* Before snap: natural flow */
       if (!snapped || sy < snapDocTop) {
-        unfixEl(cs, null);
-        cs.style.transform = ''; cs.style.opacity = '';
-        if (etLeft)  etLeft.style.opacity  = '';
-        if (etRight) etRight.style.opacity = '';
-        unfixEl(pc, pcSpacer);
-        pc.style.opacity = '0'; pc.style.transform = 'translateY(44px)';
+        unfixEl(cs);
+        cs.style.transform = '';
+        cs.style.opacity   = '';
         return;
       }
 
-      /* ── After exit: release fixed elements ── */
+      /* After exit: release */
       if (sy > exitPoint) {
-        unfixEl(cs, null); cs.style.opacity = '0';
-        if (etLeft)  etLeft.style.opacity  = '';
-        if (etRight) etRight.style.opacity = '';
-        unfixEl(pc, pcSpacer); pc.style.opacity = '0';
+        unfixEl(cs);
+        cs.style.opacity = '0';
         return;
       }
 
-      /* ── Phase 3: scale + rise ── */
-      fixEl(cs, null, csH0, false);
-
+      /* Phase A: scale + rise */
+      fixEl(cs);
       if (sy <= scaleEnd) {
         var p     = (sy - snapDocTop) / SCALE_R;
         var scale = 1 - (1 - SCALE_MIN) * p;
         var top   = centerTop + (NAV_H - centerTop) * p;
-        cs.style.top = top + 'px'; cs.style.transform = 'scale(' + scale + ')'; cs.style.opacity = '1';
-        if (etLeft)  etLeft.style.opacity  = '';
-        if (etRight) etRight.style.opacity = '';
-        pc.style.opacity = '0'; pc.style.transform = 'translateY(44px)';
+        cs.style.top       = top + 'px';
+        cs.style.transform = 'scale(' + scale + ')';
+        cs.style.opacity   = '1';
         return;
       }
 
-      /* ── Phases 4 + 5: proj-card reveal → exit fade ── */
-      cs.style.top = NAV_H + 'px'; cs.style.transform = 'scale(' + SCALE_MIN + ')'; cs.style.opacity = '1';
-      fixEl(pc, pcSpacer, pcH0, true);
-      var pcTop = NAV_H + csH0 * SCALE_MIN + 16;
-      pc.style.top = pcTop + 'px';
-
-      if (sy <= projEnd) {
-        /* Phase 4 — proj-card reveals; ET Glimpse dimmed */
-        var p4  = (sy - scaleEnd) / PROJ_R;
-        var pfp = p4 < 0.1 ? 0 : p4 > 0.7 ? 1 : (p4 - 0.1) / 0.6;
-        cs.style.opacity = '1';
-        if (etLeft)  etLeft.style.opacity  = '';
-        if (etRight) etRight.style.opacity = '';
-        pc.style.opacity = pfp; pc.style.transform = 'translateY(' + ((1 - pfp) * 44) + 'px)';
-      } else {
-        /* Phase 5 — blob stays; left/right text + proj-card fade out */
-        var p5 = Math.min(1, (sy - projEnd) / EXIT_R);
-        cs.style.opacity = '1';
-        if (etLeft)  etLeft.style.opacity  = 1 - p5;
-        if (etRight) etRight.style.opacity = 1 - p5;
-        pc.style.opacity = 1 - p5; pc.style.transform = 'none';
-      }
+      /* Phase B: ET Glimpse exit fade */
+      cs.style.top       = NAV_H + 'px';
+      cs.style.transform = 'scale(' + SCALE_MIN + ')';
+      var p5 = Math.min(1, (sy - scaleEnd) / EXIT_R);
+      cs.style.opacity = (1 - p5).toFixed(3);
     }
 
     function onScroll() { if (!raf) { raf = true; requestAnimationFrame(update); } }
@@ -11773,7 +11695,34 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     window.addEventListener('resize', function () { recalc(); update(); });
     update();
   })();
+
+  /* ── Featured Work cards — sequential rise-in on scroll ─────────── */
+  /* IO skipped: .card ancestor has overflow:clip which blocks IO viewport
+     intersection. Use getBoundingClientRect on scroll instead. */
+  (function () {
+    var cards = Array.from(document.querySelectorAll('.fw-card'));
+    if (!cards.length) return;
+    var trigger = document.querySelector('.fw-header') || cards[0];
+    var revealed = false;
+
+    function check() {
+      if (revealed) return;
+      var r = trigger.getBoundingClientRect();
+      if (r.top < window.innerHeight * 0.85) {
+        revealed = true;
+        window.removeEventListener('scroll', check, true);
+        cards.forEach(function (card, i) {
+          setTimeout(function () { card.classList.add('fw-visible'); }, i * 300);
+        });
+      }
+    }
+
+    window.addEventListener('scroll', check, { passive: true, capture: true });
+    check();
+  })();
   </script>
 
+
+</html>
 </body>
 </html>
