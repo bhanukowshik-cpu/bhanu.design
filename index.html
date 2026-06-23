@@ -6045,22 +6045,12 @@
       .work-float-dots { display: none; }
     }
 
-    /* ── Carousel wrap ── */
-    .carousel-sticky {
-      position: relative; z-index: 5;
-      height: 100vh;
-      display: flex; align-items: center;
-      overflow: hidden;
-    }
-
     /* ── Work Section V3 — Section 2 ──────────────────────────── */
     .ws-section {
       background: #1E1E1E;
       position: relative;
       overflow: hidden;
       width: 100%;
-      transform-origin: top center;
-      will-change: transform, opacity;
     }
 
     /* EverTutor hero — 3-col grid: left info | blob | right info */
@@ -6094,42 +6084,54 @@
       gap: 28px;
     }
 
-    /* ── Section 2 entrance animation ── */
-    .ws-et-left, .ws-et-right {
+    /* ── Section 2 redesign — Featured Work ─────────────────── */
+    .s2-fw-header {
+      padding: 80px 0 60px;
+      text-align: center;
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
+      transform: translateY(24px);
+      transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1),
+                  transform 0.9s cubic-bezier(0.22,1,0.36,1);
     }
-    .s2-entered .ws-et-left {
-      opacity: 1; transform: none; transition-delay: 0.5s;
+    .s2-fw-header.s2-fwh-in { opacity: 1; transform: none; }
+
+    /* Full glimpse wrapper */
+    .s2-glimpse-full { position: relative; }
+
+    /* Compact strip — sticks at nav bottom while cards scroll */
+    .s2-compact-strip {
+      position: sticky;
+      top: 54px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 48px;
+      background: #1E1E1E;
+      border-bottom: 1px solid rgba(255,252,248,0.07);
     }
-    .s2-entered .ws-et-right {
-      opacity: 1; transform: none; transition-delay: 0.7s;
+    .s2-cs-blob {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      flex-shrink: 0;
+      border-radius: 50%;
+    }
+    .s2-cs-title {
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: 700;
+      color: #FFFCF8;
+      margin: 0;
+      letter-spacing: -0.5px;
     }
 
-    /* ── Scroll cue (section 2) ── */
-    .s2-scroll-cue {
-      position: absolute;
-      bottom: 28px; left: 50%;
-      transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 7px;
-      pointer-events: none; z-index: 20;
-      opacity: 1;
-      transition: opacity 0.4s ease;
+    /* Cards zone: dark bg continues from glimpse */
+    .s2-cards-zone {
+      background: #1E1E1E;
+      padding-bottom: 80px;
     }
-    .s2-cue-label {
-      font-family: var(--font-mono);
-      font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
-      color: rgba(229, 242, 141, 0.5);
-    }
-    .s2-scroll-cue svg {
-      animation: s2-cue-bounce 1.6s ease-in-out infinite;
-    }
-    @keyframes s2-cue-bounce {
-      0%, 100% { transform: translateY(0); opacity: 0.45; }
-      50%       { transform: translateY(6px); opacity: 1; }
-    }
-    .s2-animating .s2-scroll-cue { opacity: 0; }
+    .s2-cards-zone .fw-grid { padding: 32px 48px 0; }
 
 
     .ws-et-title {
@@ -6498,13 +6500,6 @@
     }
 
     /* ── Featured Work section ────────────────────────────────── */
-    .fw-section {
-      padding: 100px 0 80px;
-    }
-    .fw-header {
-      text-align: center;
-      margin-bottom: 56px;
-    }
     .fw-eyebrow-label {
       display: block;
       font-family: var(--font-mono);
@@ -6536,13 +6531,7 @@
       border-radius: 20px;
       overflow: hidden;
       opacity: 0;
-      transform: translateY(72px);
-      transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
-                  transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .fw-card.fw-visible {
-      opacity: 1;
-      transform: translateY(0);
+      transform: translateY(40px);
     }
     .fw-card-top {
       position: relative;
@@ -7014,10 +7003,20 @@
       </div>
 
       <div id="s2Section" style="position:relative;top:-70px;pointer-events:none;"></div>
-      <div class="carousel-sticky">
+
+      <!-- ── SECTION 2: FEATURED WORK ─────────────────────────────── -->
+
+      <!-- A: "Featured Work" title — fades in on scroll -->
+      <div class="s2-fw-header" id="s2FwHeader">
+        <span class="fw-eyebrow-label">Selected Work</span>
+        <h2 class="fw-title">Featured Work</h2>
+      </div>
+
+      <!-- B: ET Glimpse — full width, fades out as it exits viewport -->
+      <div class="s2-glimpse-full" id="s2GlimpseFull">
 
         <!-- ── WORK SECTION V3 ──────────────────────────────────── -->
-        <section class="ws-section">
+        <section class="ws-section" id="wsSection">
 
         <!-- EverTutor hero: left title+metrics | center blob | right tags+desc -->
         <div class="ws-et-hero">
@@ -7237,22 +7236,13 @@
 
         </section>
 
-        <!-- Scroll cue: visible during approach + at snap rest; hides on scroll -->
-        <div class="s2-scroll-cue" aria-hidden="true">
-          <span class="s2-cue-label">Scroll</span>
-          <svg width="14" height="20" viewBox="0 0 14 20" fill="none">
-            <line x1="7" y1="1" x2="7" y2="15" stroke="#E5F28D" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.6"/>
-            <polyline points="3,11 7,15 11,11" fill="none" stroke="#E5F28D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.6"/>
-          </svg>
-        </div>
+      </div><!-- /s2-glimpse-full -->
 
-      </div><!-- /carousel-sticky -->
-
-      <!-- ── FEATURED WORK ───────────────────────────────────────── -->
-      <section class="fw-section">
-        <div class="fw-header">
-          <span class="fw-eyebrow-label">Selected Work</span>
-          <h2 class="fw-title">Featured Work</h2>
+      <!-- C: Cards reveal zone — compact strip (sticky) + cards grid -->
+      <div class="s2-cards-zone" id="s2CardsZone">
+        <div class="s2-compact-strip" id="s2CompactStrip">
+          <img class="s2-cs-blob" src="Parallax cards/EverTutor Glimpse/Tutor Blob Dark Mode.png" alt="" aria-hidden="true">
+          <h2 class="s2-cs-title">EverTutor AI System</h2>
         </div>
         <div class="fw-grid">
 
@@ -7332,7 +7322,7 @@
           </div>
 
         </div>
-      </section>
+      </div><!-- /s2-cards-zone -->
 
       <!-- ── TESTIMONIALS MARQUEE GRID ─────────────────────── -->
 
@@ -11572,153 +11562,78 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   </script>
 
   <script>
-  /* ── Section 2 snap + scroll story ─────────────────────────────────────
-     Snap  : when section 2 is 20% visible (scrolling DOWN), auto-scroll
-             to align it flush with the viewport, then play entrance.
-     Phase A (scale+rise): ws-section scales 1→0.7 and rises to nav bar.
-     Phase B (exit fade) : ET Glimpse fades out, section unfixes.
-  ──────────────────────────────────────────────────────────────────────── */
+  /* ── Section 2: Featured Work scroll animations ──────────────────────
+     A: "Featured Work" title fades in as it enters viewport
+     B: Full ET Glimpse scrolls in (normal flow), fades out as it exits
+     C: Compact strip (position:sticky) + fw-cards revealed sequentially
+  ──────────────────────────────────────────────────────────────────── */
   (function () {
-    var snapEl = document.querySelector('.carousel-sticky');
-    var cs     = document.querySelector('.ws-section');
-    var card   = document.querySelector('.card');
-    if (!snapEl || !cs || !card) return;
+    var fwHeader    = document.getElementById('s2FwHeader');
+    var glimpseFull = document.getElementById('s2GlimpseFull');
+    var cards       = Array.from(document.querySelectorAll('.fw-card'));
 
-    var NAV_H    = 54, SCALE_MIN = 0.7;
-    var SCALE_R  = 350, EXIT_R = 220;
+    if (!fwHeader) return;
 
-    function docTop(el) {
-      var t = 0; while (el) { t += el.offsetTop; el = el.offsetParent; } return t;
-    }
+    /* ── Initial card states ── */
+    cards.forEach(function (c) {
+      c.style.opacity   = '0';
+      c.style.transform = 'translateY(40px)';
+    });
 
-    var snapDocTop = docTop(snapEl);
-    var csH0       = cs.offsetHeight;
-    var vpH, centerTop, cardLeft, cardWidth, scaleEnd, exitPoint;
+    var fwHDone   = false;
+    var revealed  = cards.map(function () { return false; });
 
-    function recalc() {
-      vpH       = window.innerHeight;
-      centerTop = Math.max(NAV_H + 20, (vpH - csH0) / 2);
-      var r     = card.getBoundingClientRect();
-      cardLeft  = r.left;
-      cardWidth = r.width;
-      scaleEnd  = snapDocTop + SCALE_R;
-      exitPoint = scaleEnd   + EXIT_R;
-    }
+    function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+    function easeOut(t) { return 1 - (1 - t) * (1 - t); }
 
-    function fixEl(el) {
-      if (el.style.position !== 'fixed') {
-        el.style.position = 'fixed';
-        el.style.zIndex   = '5';
+    function update() {
+      var vpH = window.innerHeight;
+
+      /* A: FW title fade-in */
+      if (!fwHDone) {
+        var hr = fwHeader.getBoundingClientRect();
+        if (hr.top < vpH * 0.82) {
+          fwHDone = true;
+          fwHeader.classList.add('s2-fwh-in');
+        }
       }
-      el.style.left  = cardLeft + 'px';
-      el.style.width = cardWidth + 'px';
-    }
 
-    function unfixEl(el) {
-      if (el.style.position !== 'fixed') return;
-      el.style.position = el.style.left = el.style.width =
-        el.style.top = el.style.zIndex = '';
-    }
-
-    var snapped = false, snapping = false, prevScrollY = 0;
-
-    var io = new IntersectionObserver(function (entries) {
-      var e = entries[0];
-      if (e.isIntersecting && e.intersectionRatio >= 0.2 &&
-          !snapped && !snapping && window.scrollY >= prevScrollY) {
-        snapping = true;
-        window.scrollTo({ top: snapDocTop, behavior: 'smooth' });
-        setTimeout(function () {
-          snapping = false;
-          snapped  = true;
-          snapEl.classList.add('s2-entered');
-          io.disconnect();
-          update();
-        }, 700);
+      /* B: Full glimpse fades out as it exits viewport upward */
+      if (glimpseFull) {
+        var gr     = glimpseFull.getBoundingClientRect();
+        var fadeStart = vpH * 0.5;   /* start fading when top hits mid-screen */
+        var fadeEnd   = -80;          /* fully gone when 80px above viewport   */
+        if (gr.top < fadeStart) {
+          var p = clamp((fadeStart - gr.top) / (fadeStart - fadeEnd), 0, 1);
+          glimpseFull.style.opacity = easeOut(p) > 0.98 ? '0' : (1 - easeOut(p)).toFixed(3);
+        } else {
+          glimpseFull.style.opacity = '';
+        }
       }
-    }, { threshold: [0.2] });
 
-    io.observe(snapEl);
-    recalc();
+      /* C: Cards reveal one-by-one as they enter viewport */
+      cards.forEach(function (card, i) {
+        if (revealed[i]) return;
+        var r = card.getBoundingClientRect();
+        if (r.top < vpH * 0.88) {
+          revealed[i] = true;
+          card.style.transition = 'opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1)';
+          /* stagger: each card a little after previous */
+          setTimeout(function () {
+            card.style.opacity   = '1';
+            card.style.transform = 'translateY(0)';
+          }, i * 120);
+        }
+      });
+    }
 
     var raf = false;
-    function update() {
-      raf = false;
-      if (snapping) return;
-
-      var sy = window.scrollY || document.documentElement.scrollTop;
-      prevScrollY = sy;
-
-      /* Hide approach cue once animation begins */
-      if (snapped && sy > snapDocTop + 5) {
-        snapEl.classList.add('s2-animating');
-      } else {
-        snapEl.classList.remove('s2-animating');
-      }
-
-      /* Before snap: natural flow */
-      if (!snapped || sy < snapDocTop) {
-        unfixEl(cs);
-        cs.style.transform = '';
-        cs.style.opacity   = '';
-        return;
-      }
-
-      /* After exit: release */
-      if (sy > exitPoint) {
-        unfixEl(cs);
-        cs.style.opacity = '0';
-        return;
-      }
-
-      /* Phase A: scale + rise */
-      fixEl(cs);
-      if (sy <= scaleEnd) {
-        var p     = (sy - snapDocTop) / SCALE_R;
-        var scale = 1 - (1 - SCALE_MIN) * p;
-        var top   = centerTop + (NAV_H - centerTop) * p;
-        cs.style.top       = top + 'px';
-        cs.style.transform = 'scale(' + scale + ')';
-        cs.style.opacity   = '1';
-        return;
-      }
-
-      /* Phase B: ET Glimpse exit fade */
-      cs.style.top       = NAV_H + 'px';
-      cs.style.transform = 'scale(' + SCALE_MIN + ')';
-      var p5 = Math.min(1, (sy - scaleEnd) / EXIT_R);
-      cs.style.opacity = (1 - p5).toFixed(3);
+    function onScroll() {
+      if (!raf) { raf = true; requestAnimationFrame(function () { raf = false; update(); }); }
     }
 
-    function onScroll() { if (!raf) { raf = true; requestAnimationFrame(update); } }
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', function () { recalc(); update(); });
     update();
-  })();
-
-  /* ── Featured Work cards — sequential rise-in on scroll ─────────── */
-  /* IO skipped: .card ancestor has overflow:clip which blocks IO viewport
-     intersection. Use getBoundingClientRect on scroll instead. */
-  (function () {
-    var cards = Array.from(document.querySelectorAll('.fw-card'));
-    if (!cards.length) return;
-    var trigger = document.querySelector('.fw-header') || cards[0];
-    var revealed = false;
-
-    function check() {
-      if (revealed) return;
-      var r = trigger.getBoundingClientRect();
-      if (r.top < window.innerHeight * 0.85) {
-        revealed = true;
-        window.removeEventListener('scroll', check, true);
-        cards.forEach(function (card, i) {
-          setTimeout(function () { card.classList.add('fw-visible'); }, i * 300);
-        });
-      }
-    }
-
-    window.addEventListener('scroll', check, { passive: true, capture: true });
-    check();
   })();
   </script>
 
