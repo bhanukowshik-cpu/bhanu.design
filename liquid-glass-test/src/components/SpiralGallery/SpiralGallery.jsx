@@ -9,7 +9,11 @@ uniform float uBend;
 varying vec2 vUv;
 void main() {
   vec3 pos = position;
-  pos.z += sin(pos.x * 3.14159 * 0.5) * uBend;
+  // Sphere wrap: push every vertex backward by r² — the paraboloid approximation
+  // of pressing the card against an invisible sphere.  Both X and Y contribute
+  // so the card curves like a satellite dish rather than a banana.
+  float r2 = pos.x * pos.x + pos.y * pos.y;
+  pos.z -= uBend * r2 * 0.22;
   vUv = uv;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 }
@@ -78,7 +82,7 @@ export default function SpiralGallery({ cards }) {
       const cardIndex = slot % cards.length;
       const card      = cards[cardIndex];
 
-      const geo      = new THREE.PlaneGeometry(CARD_W, CARD_H, 24, 14);
+      const geo      = new THREE.PlaneGeometry(CARD_W, CARD_H, 32, 20);
       const fallback = makeFallback(card.color);
       const tex      = loader.load(card.image, undefined, undefined,
         () => { mat.uniforms.uTexture.value = fallback; }
@@ -138,7 +142,7 @@ export default function SpiralGallery({ cards }) {
         const edgeMult = Math.min(1, yEdge * 30);
 
         // Heavy bend, strong scale fall-off — creates dominant center + curled sides
-        mat.uniforms.uBend.value       = dist * 2.5;
+        mat.uniforms.uBend.value       = dist * 6.0;
         mat.uniforms.uOpacity.value    = Math.max(0.4, 1 - dist * 0.3) * edgeMult;
         mat.uniforms.uBrightness.value = Math.max(0.18, 1 - dist * 0.72) * edgeMult;
         mesh.scale.setScalar(Math.max(0.3, 1 - dist * 0.5));
