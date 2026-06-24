@@ -20,14 +20,14 @@ export default function RadialWaveform() {
       (i / NUM_BARS) * 2 * Math.PI - Math.PI / 2
     )
     const phases = Array.from({ length: NUM_BARS }, () => Math.random() * Math.PI * 2)
-    const speeds = Array.from({ length: NUM_BARS }, () => 0.6 + Math.random() * 1.0)
+    const speeds = Array.from({ length: NUM_BARS }, () => 1.0 + Math.random() * 1.8)
 
     function getHeight(i: number, t: number) {
       const h =
-        9 * Math.sin(t * speeds[i]       + phases[i]) +
-        4 * Math.sin(t * speeds[i] * 1.8 + phases[i] + 1.3) +
-        2 * Math.sin(t * speeds[i] * 2.7 + phases[i] + 0.7)
-      return Math.max(3, Math.min(26, 12 + h))
+        11  * Math.sin(t * speeds[i]       + phases[i]) +
+         5  * Math.sin(t * speeds[i] * 1.8 + phases[i] + 1.3) +
+         2.5 * Math.sin(t * speeds[i] * 2.7 + phases[i] + 0.7)
+      return Math.max(4, Math.min(32, 14 + h))
     }
 
     let startTime: number | null = null

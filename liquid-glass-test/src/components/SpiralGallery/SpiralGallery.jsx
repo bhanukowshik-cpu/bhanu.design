@@ -61,6 +61,8 @@ export default function SpiralGallery({ cards }) {
   const mountRef        = useRef(null);
   const blobGlowRef     = useRef(null);
   const blobWaveformRef = useRef(null);
+  const blobLeftRef     = useRef(null);
+  const blobRightRef    = useRef(null);
 
   useEffect(() => {
     const el = mountRef.current;
@@ -144,6 +146,7 @@ export default function SpiralGallery({ cards }) {
 
     // Blob overlay tracking — screen-projected position and radius of slot 0
     let blobSX = 0, blobSY = 0, blobDist = 1, blobScreenRadius = 120;
+    let cardsReveal = 0; // project cards hidden on entry; reveal after first scroll
     const tmpV = new THREE.Vector3();
 
     function updateCards(progress) {
@@ -197,8 +200,9 @@ export default function SpiralGallery({ cards }) {
 
         mat.uniforms.uFlatness.value   = Math.max(0, 1 - dist / 0.1);
         mat.uniforms.uBlur.value       = Math.min(1, dist * 2.5);
-        mat.uniforms.uOpacity.value    = Math.max(0.2, 1 - dist * 0.7) * edgeMult;
-        mat.uniforms.uBrightness.value = Math.max(0.2, 1 - dist * 0.7) * edgeMult;
+        const baseVis = Math.max(0.2, 1 - dist * 0.7) * edgeMult;
+        mat.uniforms.uOpacity.value    = baseVis * (slot === 0 ? 1 : cardsReveal);
+        mat.uniforms.uBrightness.value = baseVis * (slot === 0 ? 1 : cardsReveal);
         mesh.renderOrder = 1 - dist;
       });
     }
@@ -253,6 +257,8 @@ export default function SpiralGallery({ cards }) {
     const tickerFn = (time) => {
       lenis.raf(time * 1000);
       currentProgress += (targetProgress - currentProgress) * 0.07;
+      // Fade in project cards once user scrolls away from the initial blob-only view
+      cardsReveal += ((currentProgress < 2.2 ? 1 : 0) - cardsReveal) * 0.06;
       updateCards(currentProgress);
       renderer.render(scene, camera);
 
@@ -268,6 +274,24 @@ export default function SpiralGallery({ cards }) {
         wave.style.top  = blobSY.toFixed(1) + 'px';
         wave.style.transform = `translate(-50%, -50%) scale(${waveScale.toFixed(3)})`;
         wave.style.opacity = opacity;
+      }
+      // Position content panels outside the waveform ring on each side
+      const waveEdge = 120 * waveScale;
+      const leftPanel = blobLeftRef.current;
+      if (leftPanel) {
+        const w = Math.max(0, blobSX - waveEdge - 24);
+        leftPanel.style.width   = w.toFixed(0) + 'px';
+        leftPanel.style.top     = blobSY.toFixed(1) + 'px';
+        leftPanel.style.opacity = opacity;
+      }
+      const rightPanel = blobRightRef.current;
+      if (rightPanel) {
+        const l = blobSX + waveEdge + 24;
+        const w = Math.max(0, el.clientWidth - l);
+        rightPanel.style.left   = l.toFixed(0) + 'px';
+        rightPanel.style.width  = w.toFixed(0) + 'px';
+        rightPanel.style.top    = blobSY.toFixed(1) + 'px';
+        rightPanel.style.opacity = opacity;
       }
     };
     gsap.ticker.add(tickerFn);
@@ -348,6 +372,63 @@ export default function SpiralGallery({ cards }) {
         }}
       >
         <RadialWaveform />
+      </div>
+
+      {/* Blob left content — EverTutor AI System metrics */}
+      <div
+        ref={blobLeftRef}
+        style={{
+          position: 'absolute', zIndex: 4, pointerEvents: 'none',
+          left: 0, top: 0,
+          transform: 'translateY(-50%)',
+          width: 0, opacity: 0,
+          padding: '0 20px 0 24px',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+        }}
+      >
+        <div style={{ color: 'rgba(229,242,141,0.65)', fontFamily: "'JetBrains Mono', monospace", fontSize: '9px', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '14px', whiteSpace: 'nowrap' }}>
+          EverTutor AI System
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px', marginBottom: '14px' }}>
+          <div>
+            <div style={{ color: '#E5F28D', fontFamily: "'Montserrat', sans-serif", fontSize: '22px', fontWeight: 700, lineHeight: 1 }}>2,000+</div>
+            <div style={{ color: 'rgba(255,252,248,0.4)', fontSize: '9px', lineHeight: 1.4, marginTop: '4px' }}>Daily Active<br/>Users</div>
+          </div>
+          <div>
+            <div style={{ color: '#E5F28D', fontFamily: "'Montserrat', sans-serif", fontSize: '22px', fontWeight: 700, lineHeight: 1 }}>-96%</div>
+            <div style={{ color: 'rgba(255,252,248,0.4)', fontSize: '9px', lineHeight: 1.4, marginTop: '4px' }}>Workflow<br/>time</div>
+          </div>
+        </div>
+        <div>
+          <div style={{ color: '#E5F28D', fontFamily: "'Montserrat', sans-serif", fontSize: '16px', fontWeight: 700, lineHeight: 1, whiteSpace: 'nowrap' }}>0→$300k ARR</div>
+          <div style={{ color: 'rgba(255,252,248,0.35)', fontSize: '9px', marginTop: '4px', whiteSpace: 'nowrap' }}>as Sole Product Designer</div>
+        </div>
+      </div>
+
+      {/* Blob right content — role tags + description */}
+      <div
+        ref={blobRightRef}
+        style={{
+          position: 'absolute', zIndex: 4, pointerEvents: 'none',
+          left: 0, top: 0,
+          transform: 'translateY(-50%)',
+          width: 0, opacity: 0,
+          padding: '0 24px 0 20px',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginBottom: '14px' }}>
+          {['Sole Product Designer', '0 to 1', 'Desktop · B2B · B2C'].map(label => (
+            <div key={label} style={{ display: 'inline-block', border: '1px solid rgba(255,252,248,0.18)', borderRadius: '20px', padding: '3px 10px', color: 'rgba(255,252,248,0.65)', fontSize: '10px', width: 'fit-content', whiteSpace: 'nowrap' }}>
+              {label}
+            </div>
+          ))}
+        </div>
+        <p style={{ color: 'rgba(255,252,248,0.45)', fontFamily: "'JetBrains Mono', monospace", fontSize: '10px', lineHeight: 1.65, margin: 0 }}>
+          World's 1st multi modal<br/>1:1 voice first AI tutor<br/>powered by 3 tools
+        </p>
       </div>
     </div>
   );
