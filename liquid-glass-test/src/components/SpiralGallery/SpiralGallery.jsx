@@ -146,8 +146,8 @@ export default function SpiralGallery({ cards }) {
     let globalYOffset   = -20;  // all cards below viewport until entry
     let entryTriggered  = false;
 
-    // Blob overlay tracking — screen-projected position of slot 0
-    let blobSX = 0, blobSY = 0, blobDist = 1;
+    // Blob overlay tracking — screen-projected position and radius of slot 0
+    let blobSX = 0, blobSY = 0, blobDist = 1, blobScreenRadius = 120;
     const tmpV = new THREE.Vector3();
 
     function updateCards(progress) {
@@ -170,21 +170,30 @@ export default function SpiralGallery({ cards }) {
         if (angDiff < -Math.PI) angDiff += Math.PI * 2;
         const dist = Math.abs(angDiff) / Math.PI;
 
-        // Track blob card screen position for the HTML overlay
-        if (slot === 0) {
-          tmpV.set(posX, posY + globalYOffset, posZ);
-          tmpV.project(camera);
-          blobSX = (tmpV.x + 1) / 2 * el.clientWidth;
-          blobSY = (1 - (tmpV.y + 1) / 2) * el.clientHeight;
-          blobDist = dist;
-        }
-
         // Sharp edge fade to hide Y teleport at helix wrap point
         const yEdge    = Math.min(tFrac, 1 - tFrac) * 2;
         const edgeMult = Math.min(1, yEdge * 30);
 
         // Scale: front card is dominant, background cards smaller
         const scale = Math.max(0.45, 1 - dist * 0.4);
+
+        // Track blob card screen position + screen radius for the HTML overlay
+        // (must be after scale is defined)
+        if (slot === 0) {
+          tmpV.set(posX, posY + globalYOffset, posZ);
+          tmpV.project(camera);
+          blobSX = (tmpV.x + 1) / 2 * el.clientWidth;
+          blobSY = (1 - (tmpV.y + 1) / 2) * el.clientHeight;
+          blobDist = dist;
+          // Project the right edge to get blob's screen-space radius
+          tmpV.set(
+            posX + (BLOB_W / 2) * Math.sin(angle) * scale,
+            posY + globalYOffset,
+            posZ - (BLOB_W / 2) * Math.cos(angle) * scale
+          );
+          tmpV.project(camera);
+          blobScreenRadius = Math.abs((tmpV.x + 1) / 2 * el.clientWidth - blobSX);
+        }
 
         mat.uniforms.uCenter.value.set(posX, posY + globalYOffset, posZ);
         mat.uniforms.uRight.value.set( Math.sin(angle) * scale, 0, -Math.cos(angle) * scale);
@@ -255,8 +264,15 @@ export default function SpiralGallery({ cards }) {
       const opacity = Math.max(0, 1 - blobDist / 0.35).toFixed(3);
       const glow = blobGlowRef.current;
       if (glow) { glow.style.left = blobSX.toFixed(1) + 'px'; glow.style.top = blobSY.toFixed(1) + 'px'; glow.style.opacity = opacity; }
+      // Scale waveform so the ring (RADIUS=120 in canvas) sits just outside the blob edge
+      const waveScale = Math.max(1, (blobScreenRadius + 28) / 120);
       const wave = blobWaveformRef.current;
-      if (wave) { wave.style.left = blobSX.toFixed(1) + 'px'; wave.style.top = blobSY.toFixed(1) + 'px'; wave.style.opacity = opacity; }
+      if (wave) {
+        wave.style.left = blobSX.toFixed(1) + 'px';
+        wave.style.top  = blobSY.toFixed(1) + 'px';
+        wave.style.transform = `translate(-50%, -50%) scale(${waveScale.toFixed(3)})`;
+        wave.style.opacity = opacity;
+      }
     };
     gsap.ticker.add(tickerFn);
     gsap.ticker.lagSmoothing(0);
