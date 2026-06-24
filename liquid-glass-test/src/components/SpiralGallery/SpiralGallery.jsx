@@ -190,7 +190,7 @@ export default function SpiralGallery({ cards }) {
         mat.uniforms.uBlur.value       = Math.min(1, dist * 2.5);
         mat.uniforms.uOpacity.value    = Math.max(0.2, 1 - dist * 0.7) * edgeMult;
         mat.uniforms.uBrightness.value = Math.max(0.2, 1 - dist * 0.7) * edgeMult;
-        mesh.renderOrder = 1 - dist;
+        mesh.renderOrder = posY + globalYOffset;
       });
     }
 
