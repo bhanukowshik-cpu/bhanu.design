@@ -53,7 +53,11 @@ void main() {
   tex += texture2D(uTexture, vUv + vec2( b,  b))          * 0.15;
   float sphereShade = 0.45 + 0.55 * max(0.0, vFacing);
   float shade = mix(sphereShade, 1.0, vFlat);
-  gl_FragColor = vec4(tex.rgb * uBrightness * shade, tex.a * uOpacity);
+  // Fade left/right edges of non-front cards so horizontal overlap stays invisible
+  float xEdge = min(vUv.x, 1.0 - vUv.x) * 2.0;
+  float xFade = smoothstep(0.0, 0.3, xEdge);
+  float sideFade = mix(xFade, 1.0, vFlat);
+  gl_FragColor = vec4(tex.rgb * uBrightness * shade, tex.a * uOpacity * sideFade);
 }
 `;
 
