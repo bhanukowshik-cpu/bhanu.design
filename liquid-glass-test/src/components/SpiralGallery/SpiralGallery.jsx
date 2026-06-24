@@ -8,7 +8,7 @@ import RadialWaveform from '../RadialWaveform/RadialWaveform';
 const TOTAL_SLOTS  = 10;
 const TURNS        = 1;
 const RADIUS       = 4.5;   // sphere radius — must match shader below
-const HELIX_HEIGHT = 16.0;  // step (16/10=1.6) > card height threshold so adjacent cards clear front border
+const HELIX_HEIGHT = 22.0;  // step (22/10=2.2) > CARD_H (2.025) so adjacent cards clear each other cleanly
 const ROW_GAP      = 0.3;   // small extra drop between front wrap and back wrap
 const CARD_W       = 3.6;
 const CARD_H       = 2.025; // 16:9
@@ -190,7 +190,7 @@ export default function SpiralGallery({ cards }) {
         mat.uniforms.uBlur.value       = Math.min(1, dist * 2.5);
         mat.uniforms.uOpacity.value    = Math.max(0.2, 1 - dist * 0.7) * edgeMult;
         mat.uniforms.uBrightness.value = Math.max(0.2, 1 - dist * 0.7) * edgeMult;
-        mesh.renderOrder = posY + globalYOffset;
+        mesh.renderOrder = 1 - dist;
       });
     }
 
