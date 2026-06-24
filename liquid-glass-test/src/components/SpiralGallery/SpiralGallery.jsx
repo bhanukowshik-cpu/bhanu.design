@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import Lenis from '@studio-freight/lenis';
+import ListeningBars from '../ListeningBars/ListeningBars';
 
 // ── Layout constants ──────────────────────────────────────────────────────────
 const TOTAL_SLOTS  = 10;
@@ -56,7 +57,8 @@ void main() {
 `;
 
 export default function SpiralGallery({ cards }) {
-  const mountRef = useRef(null);
+  const mountRef      = useRef(null);
+  const blobOverlayRef = useRef(null);
 
   useEffect(() => {
     const el = mountRef.current;
@@ -137,6 +139,10 @@ export default function SpiralGallery({ cards }) {
     let globalYOffset   = -20;  // all cards below viewport until entry
     let entryTriggered  = false;
 
+    // Blob overlay tracking — screen-projected position of slot 0
+    let blobSX = 0, blobSY = 0, blobDist = 1;
+    const tmpV = new THREE.Vector3();
+
     function updateCards(progress) {
       meshes.forEach(({ mesh, mat, cardIndex }, slot) => {
         const t     = (slot + progress) / TOTAL_SLOTS;
@@ -156,6 +162,15 @@ export default function SpiralGallery({ cards }) {
         if (angDiff >  Math.PI) angDiff -= Math.PI * 2;
         if (angDiff < -Math.PI) angDiff += Math.PI * 2;
         const dist = Math.abs(angDiff) / Math.PI;
+
+        // Track blob card screen position for the HTML overlay
+        if (slot === 0) {
+          tmpV.set(posX, posY + globalYOffset, posZ);
+          tmpV.project(camera);
+          blobSX = (tmpV.x + 1) / 2 * el.clientWidth;
+          blobSY = (1 - (tmpV.y + 1) / 2) * el.clientHeight;
+          blobDist = dist;
+        }
 
         // Sharp edge fade to hide Y teleport at helix wrap point
         const yEdge    = Math.min(tFrac, 1 - tFrac) * 2;
@@ -228,6 +243,14 @@ export default function SpiralGallery({ cards }) {
       currentProgress += (targetProgress - currentProgress) * 0.07;
       updateCards(currentProgress);
       renderer.render(scene, camera);
+
+      // Move blob overlay to follow the Three.js blob card
+      const overlay = blobOverlayRef.current;
+      if (overlay) {
+        overlay.style.left = blobSX.toFixed(1) + 'px';
+        overlay.style.top  = blobSY.toFixed(1) + 'px';
+        overlay.style.opacity = Math.max(0, 1 - blobDist / 0.35).toFixed(3);
+      }
     };
     gsap.ticker.add(tickerFn);
     gsap.ticker.lagSmoothing(0);
@@ -270,6 +293,52 @@ export default function SpiralGallery({ cards }) {
 
       {/* WebGL canvas */}
       <div ref={mountRef} style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
+
+      {/* Blob overlay — glow + waveform, follows the Three.js blob card */}
+      <div
+        ref={blobOverlayRef}
+        style={{
+          position: 'absolute',
+          zIndex: 5,
+          pointerEvents: 'none',
+          left: 0,
+          top: 0,
+          transform: 'translate(-50%, -50%)',
+          width: '340px',
+          height: '340px',
+        }}
+      >
+        {/* Dark bg shadow */}
+        <div style={{
+          position: 'absolute',
+          width: '200px', height: '200px',
+          top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          borderRadius: '50%',
+          background: 'rgba(5,5,5,0.88)',
+          filter: 'blur(28px)',
+        }} />
+        {/* Green glow */}
+        <div style={{
+          position: 'absolute',
+          width: '280px', height: '280px',
+          top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(163,230,53,0.55) 0%, rgba(163,230,53,0.25) 40%, transparent 70%)',
+          filter: 'blur(30px)',
+        }} />
+        {/* Waveform bars below the orb */}
+        <div style={{
+          position: 'absolute',
+          bottom: '28px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          color: '#E6F28D',
+        }}>
+          <ListeningBars isListening={false} audioLevel={0} />
+        </div>
+      </div>
     </div>
   );
 }
