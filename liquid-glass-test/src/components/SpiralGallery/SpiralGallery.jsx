@@ -225,7 +225,7 @@ export default function SpiralGallery({ cards }) {
         entryTriggered = true;
         observer.disconnect();
         gsap.to(entryObj, {
-          y: 0,
+          y: -0.6,
           duration: 2.8,
           delay: 1.2,
           ease: 'power3.out',
