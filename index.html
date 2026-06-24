@@ -6135,25 +6135,6 @@
       background: #1E1E1E;
     }
 
-    /* Blob intro — sits above the Three.js canvas, rises from below */
-    .s2-blob-intro {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, calc(-50% + 110vh));
-      z-index: 10;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 340px;
-      height: 340px;
-      transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .s2-blob-intro.s2-blob-in {
-      transform: translate(-50%, -50%);
-    }
-
     /* Video + content row */
     .s2-video-section {
       display: flex;
@@ -7071,12 +7052,6 @@
       <!-- B: Spiral Gallery — blob enters first, then spiral unfurls -->
       <div class="s2-cards-zone" id="s2CardsZone" style="position:relative;overflow:hidden;">
         <div id="spiral-root" style="width:100%;height:100vh;position:relative;overflow:hidden;"></div>
-        <!-- Blob intro — rises from bottom before spiral animates in -->
-        <div class="s2-blob-intro" id="s2BlobIntro">
-          <div class="ws-orb-bg"></div>
-          <div class="ws-orb-glow"></div>
-          <img class="ws-orb-img" src="Parallax cards/EverTutor Glimpse/Tutor Blob Dark Mode.png" alt="" />
-        </div>
       </div>
 
       <!-- C: Blob + left/right content -->
@@ -11643,24 +11618,6 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
     window.addEventListener('scroll', onScroll, { passive: true });
     update();
-  })();
-  </script>
-
-  <script>
-  /* ── Blob intro trigger ──────────────────────────────────────── */
-  (function () {
-    var blob = document.getElementById('s2BlobIntro');
-    var zone = document.getElementById('s2CardsZone');
-    if (!blob || !zone) return;
-    var triggered = false;
-    var obs = new IntersectionObserver(function (entries) {
-      if (entries[0].isIntersecting && !triggered) {
-        triggered = true;
-        blob.classList.add('s2-blob-in');
-        obs.disconnect();
-      }
-    }, { threshold: 0.1 });
-    obs.observe(zone);
   })();
   </script>
 

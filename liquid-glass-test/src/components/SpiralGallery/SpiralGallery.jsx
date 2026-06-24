@@ -76,13 +76,15 @@ export default function SpiralGallery({ cards }) {
     camera.position.set(0, 0, 10.5);
     camera.lookAt(0, 0, 0);
 
-    // Solid-color fallback when image 404s
+    // Solid-color fallback when image 404s; transparent canvas for blob slot
     function makeFallback(hex) {
       const cv = document.createElement('canvas');
       cv.width = 64; cv.height = 36;
       const ctx = cv.getContext('2d');
-      ctx.fillStyle = hex;
-      ctx.fillRect(0, 0, 64, 36);
+      if (hex !== 'transparent') {
+        ctx.fillStyle = hex;
+        ctx.fillRect(0, 0, 64, 36);
+      }
       const t = new THREE.CanvasTexture(cv);
       t.colorSpace = THREE.SRGBColorSpace;
       return t;
@@ -95,7 +97,9 @@ export default function SpiralGallery({ cards }) {
       const cardIndex = slot % cards.length;
       const card      = cards[cardIndex];
 
-      const geo      = new THREE.PlaneGeometry(CARD_W, CARD_H, 48, 32);
+      // Slot 0 is the blob — square card so the circular orb isn't squashed
+      const cardH = (slot === 0) ? CARD_W : CARD_H;
+      const geo      = new THREE.PlaneGeometry(CARD_W, cardH, 48, 32);
       const fallback = makeFallback(card.color);
       const tex      = loader.load(card.image, undefined, undefined,
         () => { mat.uniforms.uTexture.value = fallback; }
@@ -126,57 +130,32 @@ export default function SpiralGallery({ cards }) {
     }
 
     // ── Progress ──────────────────────────────────────────────────────────────
-    // progress=2.5 puts slot 0 (blob placeholder) exactly at front (t=0.25).
-    // Slot 0 is always invisible in Three.js — the blob HTML element covers it.
+    // progress=2.5 puts slot 0 (blob card) exactly at front (t=0.25).
     // Clamped to [−6.5, 2.5]: covers 10 positions (blob + 9 project cards), no looping.
     let targetProgress  = 2.5;
     let currentProgress = 2.5;
     let globalYOffset   = -20;  // all cards below viewport until entry
     let entryTriggered  = false;
 
-    const blobEl = document.getElementById('s2BlobIntro');
-
     function updateCards(progress) {
-      let minProjectDist = Infinity;
-
       meshes.forEach(({ mesh, mat, cardIndex }, slot) => {
         const t     = (slot + progress) / TOTAL_SLOTS;
-        const angle = t * TURNS * Math.PI * 2; // raw — angle cycles naturally
+        const angle = t * TURNS * Math.PI * 2;
 
-        // Offset 0.5 centers the whole staircase: avg tFrac=0.5 → avg posY=0
         const tFrac = ((t % 1) + 1) % 1;
         const posX  = RADIUS * Math.cos(angle);
         const posZ  = RADIUS * Math.sin(angle);
 
-        // angMod needed before posY so we can compute the inter-row gap
         const angModEarly = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
         const gapT    = Math.max(0, Math.min(1, (angModEarly - Math.PI * 0.85) / (Math.PI * 0.3)));
-        // Fold tFrac so the staircase spreads symmetrically: 5 slots above front, 4 below
         const devFrac = ((tFrac + 0.25) % 1) - 0.5;
         const posY    = -devFrac * HELIX_HEIGHT - gapT * ROW_GAP;
 
-        // Angular distance from front (π/2 = camera-facing on +Z axis)
         const angMod = angModEarly;
         let angDiff  = angMod - Math.PI / 2;
         if (angDiff >  Math.PI) angDiff -= Math.PI * 2;
         if (angDiff < -Math.PI) angDiff += Math.PI * 2;
-        const dist = Math.abs(angDiff) / Math.PI; // 0 = front, 1 = back
-
-        // Slot 0 is the blob placeholder — always invisible in Three.js
-        if (slot === 0) {
-          mat.uniforms.uCenter.value.set(posX, posY + globalYOffset, posZ);
-          mat.uniforms.uRight.value.set(Math.sin(angle) * 1, 0, -Math.cos(angle) * 1);
-          mat.uniforms.uUp.value.set(0, 1, 0);
-          mat.uniforms.uFlatness.value   = 0;
-          mat.uniforms.uBlur.value       = 0;
-          mat.uniforms.uOpacity.value    = 0;
-          mat.uniforms.uBrightness.value = 0;
-          mesh.renderOrder = 0;
-          return;
-        }
-
-        // Track closest project card for blob fade
-        if (dist < minProjectDist) minProjectDist = dist;
+        const dist = Math.abs(angDiff) / Math.PI;
 
         // Sharp edge fade to hide Y teleport at helix wrap point
         const yEdge    = Math.min(tFrac, 1 - tFrac) * 2;
@@ -185,27 +164,16 @@ export default function SpiralGallery({ cards }) {
         // Scale: front card is dominant, background cards smaller
         const scale = Math.max(0.45, 1 - dist * 0.4);
 
-        // Feed world-space card orientation into shader — ONE shared sphere at origin
         mat.uniforms.uCenter.value.set(posX, posY + globalYOffset, posZ);
         mat.uniforms.uRight.value.set( Math.sin(angle) * scale, 0, -Math.cos(angle) * scale);
         mat.uniforms.uUp.value.set(0, scale, 0);
 
-        // Front card is flat; all others sphere-curved — smooth ramp over dist 0→0.1
         mat.uniforms.uFlatness.value   = Math.max(0, 1 - dist / 0.1);
-
         mat.uniforms.uBlur.value       = Math.min(1, dist * 2.5);
         mat.uniforms.uOpacity.value    = Math.max(0.2, 1 - dist * 0.7) * edgeMult;
         mat.uniforms.uBrightness.value = Math.max(0.2, 1 - dist * 0.7) * edgeMult;
         mesh.renderOrder = 1 - dist;
       });
-
-      // Fade blob out as a project card approaches front.
-      // At rest (progress=2.5), nearest project cards are ~0.2 away → blob fully visible.
-      // Threshold 0.05..0.2: smooth fade as any card closes in.
-      if (blobEl) {
-        const blobOpacity = Math.max(0, Math.min(1, (minProjectDist - 0.05) / 0.15));
-        blobEl.style.opacity = blobOpacity.toFixed(3);
-      }
     }
 
     // ── Auto-advance ─────────────────────────────────────────────────────────
@@ -224,14 +192,11 @@ export default function SpiralGallery({ cards }) {
     // auto-advance starts after entry animation settles (see IntersectionObserver)
 
     // ── Entry animation — triggered when section scrolls into view ────────────
-    // Cards rise from below after the blob HTML element lands (CSS transition ~1.1s).
-    // No spin: progress stays at 2.5 (blob slot at front, invisible), blob HTML shows.
     const entryObj = { y: -20 };
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && !entryTriggered) {
         entryTriggered = true;
         observer.disconnect();
-        // Rise from below with a delay so blob lands first
         gsap.to(entryObj, {
           y: 0,
           duration: 2.8,
