@@ -1,69 +1,64 @@
 import { useEffect, useRef } from 'react'
 
-interface Props {
-  isListening?: boolean
-  audioLevel?: number
-}
+// Exact same rules as the ws-waveform SVG animation in index.html
+const NUM_BARS = 80
+const CX       = 170
+const CY       = 170
+const RADIUS   = 120   // bars straddle this radius (extend h/2 inward, h/2 outward)
+const SIZE     = 340   // matches the original SVG viewBox
 
-const NUM_BARS = 72     // one bar every 5°
-const INNER_R  = 178    // inner radius: just outside the orb boundary
-const MIN_L    = 4      // minimum bar length (px)
-const MAX_L    = 22     // maximum bar length (px)
-const BAR_W    = 2.5    // stroke width (px)
-const SIZE     = 460    // canvas width & height (px) — square
-
-export default function RadialWaveform({ isListening = false, audioLevel = 0 }: Props) {
+export default function RadialWaveform() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const stateRef  = useRef({ isListening, audioLevel })
-  const timeRef   = useRef(0)
   const rafRef    = useRef(0)
-
-  useEffect(() => { stateRef.current = { isListening, audioLevel } }, [isListening, audioLevel])
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')!
-    const cx = SIZE / 2
-    const cy = SIZE / 2
 
-    function tick() {
-      const { isListening, audioLevel } = stateRef.current
-      timeRef.current += 0.016  // ~1 rad/s rotation
-      const t = timeRef.current
+    const angles = Array.from({ length: NUM_BARS }, (_, i) =>
+      (i / NUM_BARS) * 2 * Math.PI - Math.PI / 2
+    )
+    const phases = Array.from({ length: NUM_BARS }, () => Math.random() * Math.PI * 2)
+    const speeds = Array.from({ length: NUM_BARS }, () => 0.6 + Math.random() * 1.0)
+
+    function getHeight(i: number, t: number) {
+      const h =
+        9 * Math.sin(t * speeds[i]       + phases[i]) +
+        4 * Math.sin(t * speeds[i] * 1.8 + phases[i] + 1.3) +
+        2 * Math.sin(t * speeds[i] * 2.7 + phases[i] + 0.7)
+      return Math.max(3, Math.min(26, 12 + h))
+    }
+
+    let startTime: number | null = null
+
+    function animate(ts: number) {
+      if (!startTime) startTime = ts
+      const t = (ts - startTime) / 1000
 
       ctx.clearRect(0, 0, SIZE, SIZE)
-      ctx.lineCap = 'round'
-      ctx.lineWidth = BAR_W
+      ctx.lineWidth  = 2.5
+      ctx.lineCap    = 'round'
+      ctx.globalAlpha = 0.75
 
       for (let i = 0; i < NUM_BARS; i++) {
-        const angle = (i / NUM_BARS) * Math.PI * 2 - Math.PI / 2  // start at 12 o'clock
+        const angle = angles[i]
+        const h    = getHeight(i, t)
+        const half = h / 2
+        const cos  = Math.cos(angle)
+        const sin  = Math.sin(angle)
 
-        // Two-harmonic rotating wave for organic feel
-        const wave = 0.6 * Math.sin(angle * 2 + t) + 0.4 * Math.sin(angle * 3 - t * 0.7)
-        const norm = (wave + 1) / 2  // 0…1
-
-        const barLen = isListening
-          ? MIN_L + (MAX_L - MIN_L) * Math.min(1, audioLevel * 0.8 + norm * 0.4)
-          : MIN_L + (MAX_L - MIN_L) * norm * 0.7
-
-        const cos = Math.cos(angle)
-        const sin = Math.sin(angle)
-
-        // Taller bars are more opaque
-        const opacity = 0.35 + 0.65 * norm
-        ctx.strokeStyle = `rgba(163, 230, 53, ${opacity.toFixed(2)})`
-
+        ctx.strokeStyle = i % 2 === 0 ? '#E5F28D' : '#4ADE80'
         ctx.beginPath()
-        ctx.moveTo(cx + cos * INNER_R, cy + sin * INNER_R)
-        ctx.lineTo(cx + cos * (INNER_R + barLen), cy + sin * (INNER_R + barLen))
+        ctx.moveTo(CX + (RADIUS - half) * cos, CY + (RADIUS - half) * sin)
+        ctx.lineTo(CX + (RADIUS + half) * cos, CY + (RADIUS + half) * sin)
         ctx.stroke()
       }
 
-      rafRef.current = requestAnimationFrame(tick)
+      rafRef.current = requestAnimationFrame(animate)
     }
 
-    rafRef.current = requestAnimationFrame(tick)
+    rafRef.current = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(rafRef.current)
   }, [])
 

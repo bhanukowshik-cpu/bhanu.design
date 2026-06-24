@@ -304,8 +304,8 @@ export default function SpiralGallery({ cards }) {
           left: 0,
           top: 0,
           transform: 'translate(-50%, -50%)',
-          width: '460px',
-          height: '460px',
+          width: '340px',
+          height: '340px',
         }}
       >
         {/* Dark bg shadow */}
