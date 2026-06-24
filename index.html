@@ -3689,6 +3689,310 @@
       .av2-photo-tall { grid-row: span 1; }
     }
 
+    /* ─── ABOUT ME TAB PANEL ────────────────────────────────── */
+    .am-section {
+      padding: 80px 40px 72px;
+    }
+    .am-inner {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: 28px;
+      align-items: start;
+    }
+    /* Apple AAP timing tokens */
+    .am-section {
+      --aap-min-height: 56px;
+      --aap-border-radius: 28px;
+      --aap-bg: rgba(232,232,237,0.72);
+      --aap-glow: rgba(0,0,0,0.11) 0px 0px 0.5px 0px inset;
+      --aap-text: rgb(29,29,31);
+      --aap-pane-out-dur: 300ms; --aap-pane-out-delay: 0ms;
+      --aap-pane-in-dur:  600ms; --aap-pane-in-delay: 250ms;
+      --aap-pane-y: 28px;       --aap-pane-y-dur: 400ms;
+      --card-btn-fade-out-dur: 400ms; --card-btn-fade-out-delay: 350ms;
+      --card-content-in-opacity-dur: 600ms; --card-content-in-opacity-delay: 250ms;
+      --card-content-in-y-dur: 400ms;      --card-content-in-y-delay: 0ms;
+      --card-content-y: 28px;
+      --card-btn-fade-in-dur: 50ms; --card-btn-fade-in-delay: 0ms;
+    }
+    /* ── Pill controls container ── */
+    .am-controls { position: relative; }
+    .am-intro-el {
+      position: absolute;
+      width: 56px; height: 56px;
+      border-radius: 56px;
+      background: var(--aap-bg);
+      opacity: 0; transform: scale(0.01);
+      top: 0; left: 0;
+      z-index: -1;
+      will-change: opacity, transform;
+      pointer-events: none;
+    }
+    .am-control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      list-style: none;
+      padding: 0; margin: 0;
+    }
+    /* ── Individual pill ── */
+    .am-control-item {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      width: fit-content;
+      min-height: var(--aap-min-height);
+      flex-shrink: 0;
+      border-radius: var(--aap-border-radius);
+      overflow: visible;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    .am-item-bg-wrap {
+      position: absolute; inset: 0;
+      border-radius: var(--aap-border-radius);
+      overflow: hidden;
+      z-index: 0; pointer-events: none;
+    }
+    .am-item-bg {
+      position: absolute; inset: 0;
+      border-radius: var(--aap-border-radius);
+      background: var(--aap-bg);
+      box-shadow: var(--aap-glow);
+      -webkit-backdrop-filter: blur(20px) saturate(1.8);
+      backdrop-filter: blur(20px) saturate(1.8);
+      transition: background-color 0.25s linear;
+    }
+    /* ── Pill button ── */
+    .am-item-btn {
+      position: relative; z-index: 2;
+      display: flex; align-items: center;
+      gap: 8px;
+      height: var(--aap-min-height);
+      padding-inline: 18px 46px;
+      background: none; border: none;
+      cursor: pointer; white-space: nowrap;
+      opacity: 1;
+      transition: opacity var(--card-btn-fade-out-dur) ease-in-out var(--card-btn-fade-out-delay);
+    }
+    .am-control-item.expanded .am-item-btn {
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--card-btn-fade-in-dur) ease-in-out var(--card-btn-fade-in-delay);
+    }
+    .am-item-label {
+      font-family: var(--font-heading);
+      font-size: 15px; font-weight: 600;
+      color: var(--aap-text);
+      line-height: 1.3;
+      user-select: none;
+    }
+    /* ── ⊕ icon ── */
+    .am-item-icon {
+      position: absolute; right: 14px;
+      top: 50%; transform: translateY(-50%);
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .am-item-icon svg { width: 22px; height: 22px; overflow: visible; }
+    .am-item-icon .bar-v {
+      transition: transform 300ms ease-in-out;
+      transform-origin: 10px 10px;
+    }
+    .am-control-item.expanded .bar-v { transform: rotate(90deg); }
+    /* ── Content mask ── */
+    .am-item-mask {
+      border-radius: var(--aap-border-radius);
+      overflow: hidden;
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 1;
+    }
+    .am-control-item.expanded .am-item-mask { pointer-events: auto; }
+    .am-item-content { width: 100%; height: 100%; }
+    /* ── Content inner ── */
+    .am-item-inner {
+      opacity: 0; visibility: hidden;
+      transform: translateY(var(--card-content-y));
+      transition:
+        opacity  var(--card-content-in-opacity-dur) ease-in-out var(--card-content-in-opacity-delay),
+        transform var(--card-content-in-y-dur)      ease-in-out var(--card-content-in-y-delay),
+        visibility 0ms linear var(--card-content-in-opacity-dur);
+      padding: 24px 22px;
+    }
+    .am-control-item.expanded .am-item-inner {
+      opacity: 1; visibility: visible; transform: translateY(0);
+      transition:
+        opacity  var(--card-content-in-opacity-dur) ease-in-out var(--card-content-in-opacity-delay),
+        transform var(--card-content-in-y-dur)      ease-in-out var(--card-content-in-y-delay),
+        visibility 0ms linear 0ms;
+    }
+    .am-item-inner-title {
+      font-family: var(--font-heading);
+      font-size: 16px; font-weight: 700;
+      color: var(--aap-text);
+      letter-spacing: -0.02em; line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .am-item-inner-body {
+      font-family: var(--font-mono);
+      font-size: 11.5px; font-weight: 400;
+      color: rgba(29,29,31,0.58);
+      line-height: 1.75;
+    }
+    /* Dark mode pills */
+    [data-theme="dark"] .am-item-bg       { background: rgba(58,58,63,0.72); }
+    [data-theme="dark"] .am-item-label    { color: var(--secondary); }
+    [data-theme="dark"] .am-item-inner-title { color: var(--secondary); }
+    [data-theme="dark"] .am-item-inner-body  { color: rgba(240,237,232,0.45); }
+    [data-theme="dark"] .am-item-icon svg circle { stroke: rgba(240,237,232,0.6); }
+    [data-theme="dark"] .am-item-icon svg line   { stroke: rgba(240,237,232,0.6); }
+    .am-panel {
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 20px;
+      min-height: 560px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Default (off-screen below) + enter animation — Apple: 600ms / 250ms delay */
+    .am-panel-pane {
+      position: absolute;
+      inset: 0;
+      padding: 40px 44px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(var(--am-pane-y));
+      transition:
+        opacity   var(--am-pane-in-dur) ease                        var(--am-pane-in-delay),
+        transform var(--am-pane-y-dur)  cubic-bezier(0.16,1,0.3,1) var(--am-pane-in-delay);
+    }
+    .am-panel-pane.is-active { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    /* Exit — Apple: 300ms / 0ms delay */
+    .am-panel-pane.is-leaving {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(calc(var(--am-pane-y) * -1));
+      transition:
+        opacity   var(--am-pane-out-dur) ease                        var(--am-pane-out-delay),
+        transform var(--am-pane-y-dur)   cubic-bezier(0.16,1,0.3,1) var(--am-pane-out-delay);
+    }
+    .am-panel-placeholder {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: rgba(29,29,31,0.22);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      text-align: center;
+      white-space: nowrap;
+      margin: 0;
+    }
+    [data-theme="dark"] .am-panel          { border-color: rgba(255,255,255,0.07); }
+    [data-theme="dark"] .am-panel-placeholder { color: rgba(240,237,232,0.18); }
+    /* Panel content styles */
+    .am-pane-pull {
+      font-family: var(--font-heading);
+      font-size: 17px;
+      font-weight: 700;
+      color: rgba(29,29,31,0.82);
+      letter-spacing: -0.02em;
+      line-height: 1.35;
+      margin: 0 0 20px;
+    }
+    .am-pane-divider {
+      height: 1px;
+      background: rgba(29,29,31,0.09);
+      margin: 24px 0;
+    }
+    [data-theme="dark"] .am-pane-pull   { color: rgba(240,237,232,0.88); }
+    [data-theme="dark"] .am-pane-divider { background: rgba(240,237,232,0.09); }
+    .am-pane-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(29,29,31,0.38);
+      margin: 0 0 20px;
+    }
+    .am-pane-body {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(29,29,31,0.7);
+      line-height: 1.85;
+      margin: 0 0 28px;
+      max-width: 42ch;
+    }
+    .am-pane-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+    }
+    .am-pane-tag {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: rgba(29,29,31,0.55);
+      background: rgba(29,29,31,0.06);
+      border: 1px solid rgba(29,29,31,0.1);
+      border-radius: 100px;
+      padding: 5px 12px;
+    }
+    .am-pane-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .am-pane-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .am-pane-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(29,29,31,0.28);
+      letter-spacing: 0.08em;
+      padding-top: 2px;
+      flex-shrink: 0;
+    }
+    .am-pane-item-text {
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(29,29,31,0.82);
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+    .am-pane-item-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: rgba(29,29,31,0.45);
+      line-height: 1.6;
+      margin-top: 3px;
+    }
+    /* Dark mode panel content */
+    [data-theme="dark"] .am-pane-eyebrow    { color: rgba(240,237,232,0.35); }
+    [data-theme="dark"] .am-pane-body       { color: rgba(240,237,232,0.65); }
+    [data-theme="dark"] .am-pane-tag        { color: rgba(240,237,232,0.5); background: rgba(240,237,232,0.06); border-color: rgba(240,237,232,0.1); }
+    [data-theme="dark"] .am-pane-num        { color: rgba(240,237,232,0.25); }
+    [data-theme="dark"] .am-pane-item-text  { color: rgba(240,237,232,0.82); }
+    [data-theme="dark"] .am-pane-item-sub   { color: rgba(240,237,232,0.4); }
+    /* Responsive */
+    @media (max-width: 640px) {
+      .am-section { padding: 48px 20px; }
+      .am-inner   { grid-template-columns: 1fr; }
+      .am-panel   { min-height: 300px; }
+    }
+
     /* ─── STICKY STACK ──────────────────────────────────────── */
     .sticky-stack {
       position: relative;
@@ -6686,44 +6990,73 @@
         0 0 16px 4px  rgba(230, 242, 141, 0.50),
         0 0 36px 10px rgba(230, 242, 141, 0.26);
     }
-    .tm-marquee-wrap {
-      overflow: hidden;
-      -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
-      mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      padding: 4px 0;
+    /* ── Testimonial card stack ── */
+    .tm-section { padding: 80px 0 100px; }
+    .tm-header  { text-align: center; margin-bottom: 52px; padding: 0 24px; }
+    .tm-eyebrow-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--secondary); opacity: 0.45;
+      border: 1px solid currentColor; border-radius: 20px;
+      padding: 4px 12px; margin-bottom: 14px;
     }
-    .tm-row { display: flex; overflow: hidden; }
-    .tm-row-inner { display: flex; flex-shrink: 0; }
-    .tm-scroll-left  { animation: tmScrollLeft  32s linear infinite; }
-    .tm-scroll-right { animation: tmScrollRight 36s linear infinite; }
-    @keyframes tmScrollLeft  { from { transform: translateX(0); }    to { transform: translateX(-50%); } }
-    @keyframes tmScrollRight { from { transform: translateX(-50%); } to { transform: translateX(0); } }
-    .tm-marquee-wrap:hover .tm-row-inner { animation-play-state: paused; }
-    .tm-card {
-      position: relative;
+    .tm-headline {
+      font-family: var(--font-heading);
+      font-size: clamp(28px, 3.5vw, 42px); font-weight: 700;
+      color: var(--secondary); margin: 0;
+    }
+    .tm-stack-scene {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 12px 0 48px;
+    }
+    /* top-peek stack: back cards show their top edges above the front card */
+    .tm-stack { position: relative; width: 420px; height: 320px; }
+    .tm-sc {
+      position: absolute;
+      top: 0; left: 0; width: 420px;
       background: #252525;
       border: 2px solid #1A73E8;
-      border-radius: 1px;
-      padding: 22px 20px 20px;
-      flex-shrink: 0;
-      width: 320px;
-      margin-right: 14px;
+      border-radius: 18px;
+      padding: 26px 24px 22px;
       box-sizing: border-box;
+      transition: transform 0.62s cubic-bezier(0.4,0,0.2,1), opacity 0.55s ease;
+      will-change: transform, opacity;
     }
-    .tm-fh {
-      position: absolute;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #252525;
-      border: 1.5px solid #1A73E8;
+    /* pos=0 is front: pushed down so back cards peek above it */
+    .tm-sc[data-pos="0"] {
+      z-index: 10;
+      transform: translateY(58px) scale(1);
+      opacity: 1;
     }
-    .tm-fh.tl { top: -5px; left: -5px; }
-    .tm-fh.tr { top: -5px; right: -5px; }
-    .tm-fh.bl { bottom: -5px; left: -5px; }
-    .tm-fh.br { bottom: -5px; right: -5px; }
+    .tm-sc[data-pos="1"] {
+      z-index: 9;
+      transform: translateY(30px) scale(0.955);
+      opacity: 1; pointer-events: none;
+    }
+    .tm-sc[data-pos="2"] {
+      z-index: 8;
+      transform: translateY(6px) scale(0.91);
+      opacity: 1; pointer-events: none;
+    }
+    /* hidden staging position — same visual as pos=2 but invisible, so re-entry is a pure fade */
+    .tm-sc[data-pos="3"], .tm-sc[data-pos="4"], .tm-sc[data-pos="5"] {
+      z-index: 7;
+      transform: translateY(6px) scale(0.91);
+      opacity: 0; pointer-events: none;
+    }
+    /* exit: front card slides out the bottom */
+    .tm-sc-exit {
+      z-index: 11 !important;
+      transform: translateY(160%) scale(0.92) !important;
+      opacity: 0 !important;
+      transition: transform 0.52s cubic-bezier(0.4,0,1,1) !important,
+                  opacity 0.32s ease 0.1s !important;
+      pointer-events: none !important;
+    }
+    /* corner screws hidden for rounded cards */
+    .tm-sc .tm-fh { display: none; }
     .tm-logo {
       font-family: var(--font-mono);
       font-size: 10.5px; font-weight: 700;
@@ -6749,14 +7082,29 @@
     }
     .tm-name { font-family: var(--font-heading); font-size: 12.5px; font-weight: 600; color: #fff; display: block; }
     .tm-role { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4); display: block; margin-top: 2px; }
-    [data-theme="dark"] .tm-section { background: #080808; }
+    .tm-dots { display: flex; gap: 8px; margin-top: 28px; }
+    .tm-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      border: none; cursor: pointer; padding: 0;
+      background: rgba(37,37,37,0.18);
+      transition: background 0.3s, transform 0.3s;
+    }
+    .tm-dot.active { background: #1A73E8; transform: scale(1.35); }
+    .tm-dot:hover:not(.active) { background: rgba(37,37,37,0.4); }
+    [data-theme="dark"] .tm-section  { background: #080808; }
+    [data-theme="dark"] .tm-eyebrow-tag { color: rgba(255,255,255,0.45); border-color: rgba(255,255,255,0.15); opacity: 1; }
+    [data-theme="dark"] .tm-headline { color: #fff; }
+    [data-theme="dark"] .tm-dot      { background: rgba(255,255,255,0.2); }
+    [data-theme="dark"] .tm-dot:hover:not(.active) { background: rgba(255,255,255,0.45); }
     @media (max-width: 1023px) {
       .tm-header { padding: 0 32px; }
-      .tm-card   { width: 280px; }
+      .tm-stack  { width: 360px; height: 330px; }
+      .tm-sc     { width: 360px; }
     }
     @media (max-width: 767px) {
       .tm-header { padding: 0 20px; margin-bottom: 36px; }
-      .tm-card   { width: 240px; }
+      .tm-stack  { width: 300px; height: 360px; }
+      .tm-sc     { width: 300px; padding: 20px 18px 18px; }
     }
 
 
@@ -7043,6 +7391,7 @@
       <div id="s2Section" style="position:relative;top:-70px;pointer-events:none;"></div>
 
       <!-- ── SECTION 2: FEATURED WORK ─────────────────────────────── -->
+      <div class="s2-work-container">
 
       <!-- A: "Featured Work" title — fades in on scroll -->
       <div class="s2-fw-header" id="s2FwHeader">
@@ -7054,11 +7403,10 @@
         <div id="spiral-root" style="width:100%;height:100vh;position:relative;overflow:hidden;"></div>
       </div>
 
-      <!-- C: Blob + left/right content -->
-      <div class="s2-glimpse-full" id="s2GlimpseFull">
+      <!-- C: Blob + left/right content (static ws-section removed; content now in spiral gallery panels) -->
+      <div class="s2-glimpse-full" id="s2GlimpseFull" style="display:none">
 
-        <!-- ── WORK SECTION V3 ──────────────────────────────────── -->
-        <section class="ws-section" id="wsSection">
+        <section class="ws-section" id="wsSection" style="display:none">
 
         <!-- EverTutor hero: left title+metrics | center blob | right tags+desc -->
         <div class="ws-et-hero">
@@ -7308,6 +7656,165 @@
         </div>
       </div>
 
+      </div><!-- /s2-work-container -->
+
+      <!-- ── ABOUT ME SECTION ─────────────────────────────── -->
+      <section class="am-section" id="aboutSection">
+        <div class="am-inner">
+
+          <!-- LEFT: Apple-style pill accordion -->
+          <div class="am-controls" id="amControls">
+            <div class="am-intro-el" id="amIntroEl"></div>
+            <ul class="am-control-group">
+
+              <li class="am-control-item" data-am-tab="about" data-index="0">
+                <div class="am-item-bg-wrap"><span class="am-item-bg"></span></div>
+                <button class="am-item-btn">
+                  <span class="am-item-label">A little about me</span>
+                  <span class="am-item-icon"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="9.25" stroke="rgb(29,29,31)" stroke-width="1.5"/><line class="bar-h" x1="5.5" y1="10" x2="14.5" y2="10" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/><line class="bar-v" x1="10" y1="5.5" x2="10" y2="14.5" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                </button>
+                <div class="am-item-mask"><div class="am-item-content"><div class="am-item-inner">
+                  <div class="am-item-inner-title">A little about me</div>
+                  <p class="am-item-inner-body">I grew up between two worlds — drawn to systems, but fascinated by people. I'd spend hours debugging something just to understand it, then redraw the whole thing because the layout bothered me. That tension never resolved. I've stopped trying. Outside work I'm hiking with bad phone signal, obsessing over a typeface nobody else notices, or losing track of time in a chess opening.</p>
+                </div></div></div>
+              </li>
+
+              <li class="am-control-item" data-am-tab="principles" data-index="1">
+                <div class="am-item-bg-wrap"><span class="am-item-bg"></span></div>
+                <button class="am-item-btn">
+                  <span class="am-item-label">My Operating principles</span>
+                  <span class="am-item-icon"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="9.25" stroke="rgb(29,29,31)" stroke-width="1.5"/><line class="bar-h" x1="5.5" y1="10" x2="14.5" y2="10" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/><line class="bar-v" x1="10" y1="5.5" x2="10" y2="14.5" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                </button>
+                <div class="am-item-mask"><div class="am-item-content"><div class="am-item-inner">
+                  <div class="am-item-inner-title">My Operating principles</div>
+                  <p class="am-item-inner-body">Design is every decision you make before you open Figma. I believe clarity is a form of respect, that speed of trust matters more than speed of delivery, and that the best solutions always look inevitable in hindsight. I'd rather change my mind and ship the better thing than be right and ship the wrong one.</p>
+                </div></div></div>
+              </li>
+
+              <li class="am-control-item" data-am-tab="next-role" data-index="2">
+                <div class="am-item-bg-wrap"><span class="am-item-bg"></span></div>
+                <button class="am-item-btn">
+                  <span class="am-item-label">What I am looking for in my next role</span>
+                  <span class="am-item-icon"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="9.25" stroke="rgb(29,29,31)" stroke-width="1.5"/><line class="bar-h" x1="5.5" y1="10" x2="14.5" y2="10" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/><line class="bar-v" x1="10" y1="5.5" x2="10" y2="14.5" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                </button>
+                <div class="am-item-mask"><div class="am-item-content"><div class="am-item-inner">
+                  <div class="am-item-inner-title">What I am looking for in my next role</div>
+                  <p class="am-item-inner-body">A team that ships fast but thinks deeply. A product with a real problem at its core — one I can feel, not just measure. Room to own both the craft and the strategy. And engineers who ask why, not just what. The best things I've built came from that kind of trust in the room.</p>
+                </div></div></div>
+              </li>
+
+            </ul>
+          </div>
+
+          <!-- RIGHT: Dynamic content panel -->
+          <div class="am-panel">
+            <div class="am-panel-pane is-active" data-am-pane="about">
+              <p class="am-pane-eyebrow">Outside work</p>
+              <p class="am-pane-pull">&ldquo;Drawn to systems, fascinated by people.&rdquo;</p>
+              <p class="am-pane-body">I grew up between two worlds. I'd spend hours debugging code just to understand how it worked, then redraw the whole thing on paper because the layout bothered me. That tension never left — and I've stopped trying to resolve it.</p>
+              <p class="am-pane-body">Outside work I'm likely hiking somewhere with bad phone signal, obsessing over a typeface nobody else notices, or deep in a chess opening that absolutely doesn't need another hour of my time.</p>
+              <div class="am-pane-divider"></div>
+              <p class="am-pane-eyebrow" style="margin-bottom:12px;">Things I can't stop thinking about</p>
+              <div class="am-pane-tags">
+                <span class="am-pane-tag">Hiking</span>
+                <span class="am-pane-tag">Coffee ritual</span>
+                <span class="am-pane-tag">Mechanical keyboards</span>
+                <span class="am-pane-tag">Cinema</span>
+                <span class="am-pane-tag">Chess</span>
+                <span class="am-pane-tag">Type design</span>
+                <span class="am-pane-tag">Building things</span>
+                <span class="am-pane-tag">Long walks</span>
+              </div>
+            </div>
+
+            <div class="am-panel-pane" data-am-pane="principles">
+              <p class="am-pane-eyebrow">How I work</p>
+              <p class="am-pane-pull">&ldquo;The best design decisions don't look like decisions at all.&rdquo;</p>
+              <ul class="am-pane-list">
+                <li class="am-pane-item">
+                  <span class="am-pane-num">01</span>
+                  <div>
+                    <div class="am-pane-item-text">Start with the problem, not the solution</div>
+                    <div class="am-pane-item-sub">Most bad design is a good answer to the wrong question. I spend more time on the brief than most people spend on the design.</div>
+                  </div>
+                </li>
+                <li class="am-pane-item">
+                  <span class="am-pane-num">02</span>
+                  <div>
+                    <div class="am-pane-item-text">Clarity is a form of respect</div>
+                    <div class="am-pane-item-sub">If a user has to think too hard, I haven't done my job. Simplicity isn't a style choice — it's the work.</div>
+                  </div>
+                </li>
+                <li class="am-pane-item">
+                  <span class="am-pane-num">03</span>
+                  <div>
+                    <div class="am-pane-item-text">Speed of trust &gt; speed of delivery</div>
+                    <div class="am-pane-item-sub">Ship fast, but never at the cost of the team's confidence in the work. A decision people don't believe in gets undone twice.</div>
+                  </div>
+                </li>
+                <li class="am-pane-item">
+                  <span class="am-pane-num">04</span>
+                  <div>
+                    <div class="am-pane-item-text">Make the invisible visible</div>
+                    <div class="am-pane-item-sub">Great UX is the absence of friction. My job is to show the team what users will never be able to articulate themselves.</div>
+                  </div>
+                </li>
+                <li class="am-pane-item">
+                  <span class="am-pane-num">05</span>
+                  <div>
+                    <div class="am-pane-item-text">Opinions, held loosely</div>
+                    <div class="am-pane-item-sub">Strong point of view. Weak attachment to being right. I'd rather change my mind and ship the better thing.</div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="am-panel-pane" data-am-pane="next-role">
+              <p class="am-pane-eyebrow">What I&rsquo;m looking for</p>
+              <p class="am-pane-pull">&ldquo;I want to build something I'd be embarrassed not to work on.&rdquo;</p>
+              <ul class="am-pane-list">
+                <li class="am-pane-item">
+                  <span class="am-pane-num">—</span>
+                  <div>
+                    <div class="am-pane-item-text">A team that ships fast but thinks deeply</div>
+                    <div class="am-pane-item-sub">Velocity without intention is just noise. I want both in the same room.</div>
+                  </div>
+                </li>
+                <li class="am-pane-item">
+                  <span class="am-pane-num">—</span>
+                  <div>
+                    <div class="am-pane-item-text">A real problem at the core</div>
+                    <div class="am-pane-item-sub">I want to feel the impact of the work, not just see it in a dashboard. Users over metrics.</div>
+                  </div>
+                </li>
+                <li class="am-pane-item">
+                  <span class="am-pane-num">—</span>
+                  <div>
+                    <div class="am-pane-item-text">Ownership of craft and strategy</div>
+                    <div class="am-pane-item-sub">I do my best work when I can shape the problem and the solution. Not just the pixels.</div>
+                  </div>
+                </li>
+                <li class="am-pane-item">
+                  <span class="am-pane-num">—</span>
+                  <div>
+                    <div class="am-pane-item-text">Engineers who ask why, not just what</div>
+                    <div class="am-pane-item-sub">The best products I've shipped came from engineers who cared about the experience as much as the implementation.</div>
+                  </div>
+                </li>
+                <li class="am-pane-item">
+                  <span class="am-pane-num">—</span>
+                  <div>
+                    <div class="am-pane-item-text">Space to do something new</div>
+                    <div class="am-pane-item-sub">I'm not looking to maintain. I want to build something that didn't exist before I walked in.</div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       <!-- ── TESTIMONIALS MARQUEE GRID ─────────────────────── -->
 
       <section class="tm-section" id="testimonialsSection">
@@ -7317,138 +7824,51 @@
           <h2 class="tm-headline">People I&#8217;ve built with</h2>
         </div>
 
-        <div class="tm-marquee-wrap">
-          <!-- Row 1: right to left -->
-          <div class="tm-row">
-            <div class="tm-row-inner tm-scroll-left">
-              <div class="tm-card">
-                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
-                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-                <span class="tm-logo tm-logo--et">EverTutor</span>
-                <p class="tm-quote">Bhanu doesn&#8217;t just design screens &#8212; he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He&#8217;s the one engineers actually trust.</p>
-                <div class="tm-attr">
-                  <div class="tm-av">AK</div>
-                  <div><span class="tm-name">Anil Kumar</span><span class="tm-role">Engineering Lead &middot; EverTutor</span></div>
-                </div>
-              </div>
-              <div class="tm-card">
-                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
-                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-                <span class="tm-logo tm-logo--st">Stressie</span>
-                <p class="tm-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
-                <div class="tm-attr">
-                  <div class="tm-av">PM</div>
-                  <div><span class="tm-name">Priya Menon</span><span class="tm-role">Head of Product &middot; Stressie</span></div>
-                </div>
-              </div>
-              <div class="tm-card">
-                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
-                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-                <span class="tm-logo tm-logo--stu">Studio</span>
-                <p class="tm-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs &#8212; just clear decisions backed by solid research and real user data.</p>
-                <div class="tm-attr">
-                  <div class="tm-av">MW</div>
-                  <div><span class="tm-name">Marcus Webb</span><span class="tm-role">Senior Engineer &middot; Studio</span></div>
-                </div>
-              </div>
-              <div class="tm-card">
-                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
-                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-                <span class="tm-logo tm-logo--et">EverTutor</span>
-                <p class="tm-quote">Bhanu doesn&#8217;t just design screens &#8212; he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He&#8217;s the one engineers actually trust.</p>
-                <div class="tm-attr">
-                  <div class="tm-av">AK</div>
-                  <div><span class="tm-name">Anil Kumar</span><span class="tm-role">Engineering Lead &middot; EverTutor</span></div>
-                </div>
-              </div>
-              <div class="tm-card">
-                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
-                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-                <span class="tm-logo tm-logo--st">Stressie</span>
-                <p class="tm-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
-                <div class="tm-attr">
-                  <div class="tm-av">PM</div>
-                  <div><span class="tm-name">Priya Menon</span><span class="tm-role">Head of Product &middot; Stressie</span></div>
-                </div>
-              </div>
-              <div class="tm-card">
-                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
-                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-                <span class="tm-logo tm-logo--stu">Studio</span>
-                <p class="tm-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs &#8212; just clear decisions backed by solid research and real user data.</p>
-                <div class="tm-attr">
-                  <div class="tm-av">MW</div>
-                  <div><span class="tm-name">Marcus Webb</span><span class="tm-role">Senior Engineer &middot; Studio</span></div>
-                </div>
+        <div class="tm-stack-scene">
+          <div class="tm-stack" id="tmStack">
+
+            <div class="tm-sc" data-pos="0">
+              <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+              <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+              <span class="tm-logo tm-logo--et">EverTutor</span>
+              <p class="tm-quote">Bhanu doesn&#8217;t just design screens &#8212; he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He&#8217;s the one engineers actually trust.</p>
+              <div class="tm-attr">
+                <div class="tm-av">AK</div>
+                <div><span class="tm-name">Anil Kumar</span><span class="tm-role">Engineering Lead &middot; EverTutor</span></div>
               </div>
             </div>
-          </div>
-          <!-- Row 2: left to right -->
-          <div class="tm-row">
-            <div class="tm-row-inner tm-scroll-right">
-              <div class="tm-card">
-                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
-                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-                <span class="tm-logo tm-logo--stu">Studio</span>
-                <p class="tm-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs &#8212; just clear decisions backed by solid research and real user data.</p>
-                <div class="tm-attr">
-                  <div class="tm-av">MW</div>
-                  <div><span class="tm-name">Marcus Webb</span><span class="tm-role">Senior Engineer &middot; Studio</span></div>
-                </div>
-              </div>
-              <div class="tm-card">
-                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
-                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-                <span class="tm-logo tm-logo--et">EverTutor</span>
-                <p class="tm-quote">Bhanu doesn&#8217;t just design screens &#8212; he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He&#8217;s the one engineers actually trust.</p>
-                <div class="tm-attr">
-                  <div class="tm-av">AK</div>
-                  <div><span class="tm-name">Anil Kumar</span><span class="tm-role">Engineering Lead &middot; EverTutor</span></div>
-                </div>
-              </div>
-              <div class="tm-card">
-                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
-                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-                <span class="tm-logo tm-logo--st">Stressie</span>
-                <p class="tm-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
-                <div class="tm-attr">
-                  <div class="tm-av">PM</div>
-                  <div><span class="tm-name">Priya Menon</span><span class="tm-role">Head of Product &middot; Stressie</span></div>
-                </div>
-              </div>
-              <div class="tm-card">
-                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
-                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-                <span class="tm-logo tm-logo--stu">Studio</span>
-                <p class="tm-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs &#8212; just clear decisions backed by solid research and real user data.</p>
-                <div class="tm-attr">
-                  <div class="tm-av">MW</div>
-                  <div><span class="tm-name">Marcus Webb</span><span class="tm-role">Senior Engineer &middot; Studio</span></div>
-                </div>
-              </div>
-              <div class="tm-card">
-                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
-                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-                <span class="tm-logo tm-logo--et">EverTutor</span>
-                <p class="tm-quote">Bhanu doesn&#8217;t just design screens &#8212; he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He&#8217;s the one engineers actually trust.</p>
-                <div class="tm-attr">
-                  <div class="tm-av">AK</div>
-                  <div><span class="tm-name">Anil Kumar</span><span class="tm-role">Engineering Lead &middot; EverTutor</span></div>
-                </div>
-              </div>
-              <div class="tm-card">
-                <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
-                <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-                <span class="tm-logo tm-logo--st">Stressie</span>
-                <p class="tm-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
-                <div class="tm-attr">
-                  <div class="tm-av">PM</div>
-                  <div><span class="tm-name">Priya Menon</span><span class="tm-role">Head of Product &middot; Stressie</span></div>
-                </div>
+
+            <div class="tm-sc" data-pos="1">
+              <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+              <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+              <span class="tm-logo tm-logo--st">Stressie</span>
+              <p class="tm-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
+              <div class="tm-attr">
+                <div class="tm-av">PM</div>
+                <div><span class="tm-name">Priya Menon</span><span class="tm-role">Head of Product &middot; Stressie</span></div>
               </div>
             </div>
+
+            <div class="tm-sc" data-pos="2">
+              <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+              <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+              <span class="tm-logo tm-logo--stu">Studio</span>
+              <p class="tm-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs &#8212; just clear decisions backed by solid research and real user data.</p>
+              <div class="tm-attr">
+                <div class="tm-av">MW</div>
+                <div><span class="tm-name">Marcus Webb</span><span class="tm-role">Senior Engineer &middot; Studio</span></div>
+              </div>
+            </div>
+
+          </div><!-- /tmStack -->
+
+          <div class="tm-dots" id="tmDots">
+            <button class="tm-dot active" data-idx="0" aria-label="Testimonial 1"></button>
+            <button class="tm-dot" data-idx="1" aria-label="Testimonial 2"></button>
+            <button class="tm-dot" data-idx="2" aria-label="Testimonial 3"></button>
           </div>
-        </div>
+
+        </div><!-- /tm-stack-scene -->
 
       </section><!-- /testimonials -->
 
@@ -9516,6 +9936,163 @@
         if (!isOpen) item.classList.add('is-open');
       });
     });
+  })();
+
+  /* ── About Me — Apple pill accordion + right panel ─────── */
+  (function () {
+    var controls = document.getElementById('amControls');
+    if (!controls) return;
+
+    var introEl = document.getElementById('amIntroEl');
+    var items   = Array.from(controls.querySelectorAll('.am-control-item'));
+    var panel   = controls.closest('.am-inner').querySelector('.am-panel');
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var currentOpen = null;
+
+    /* Measure expanded width from the container so it fills the left column */
+    function getExpandedW() {
+      return controls.offsetWidth || 320;
+    }
+
+    /* Clone-based height measurement — no transition interference */
+    function measureH(item) {
+      var inner = item.querySelector('.am-item-inner');
+      var clone = inner.cloneNode(true);
+      clone.style.cssText =
+        'position:fixed;top:-9999px;left:0;' +
+        'width:' + getExpandedW() + 'px;' +
+        'opacity:0;visibility:hidden;transform:none;transition:none;' +
+        'padding:24px 22px;box-sizing:border-box';
+      document.body.appendChild(clone);
+      var h = clone.offsetHeight;
+      document.body.removeChild(clone);
+      return h;
+    }
+
+    /* Store collapsed pill widths before entrance animation */
+    var collapsedW = new Map();
+    items.forEach(function (item) { collapsedW.set(item, item.offsetWidth); });
+
+    /* ── Expand ── */
+    function expand(item) {
+      var cw = collapsedW.get(item) || item.offsetWidth;
+      var ew = getExpandedW();
+      var eh = measureH(item);
+
+      item.style.transition = 'none';
+      item.style.width  = cw + 'px';
+      item.style.height = '56px';
+      item.offsetHeight;
+
+      item.style.transition =
+        'width 333ms cubic-bezier(0.4,0,0.2,1),' +
+        'height 333ms cubic-bezier(0.4,0,0.2,1)';
+      item.style.width  = ew + 'px';
+      item.style.height = eh + 'px';
+      item.classList.add('expanded');
+    }
+
+    /* ── Collapse ── */
+    function collapse(item, cb) {
+      var cw = collapsedW.get(item) || 200;
+      item.classList.remove('expanded');
+      item.style.transition =
+        'width 333ms cubic-bezier(0.4,0,0.2,1),' +
+        'height 333ms cubic-bezier(0.4,0,0.2,1)';
+      item.style.width  = cw + 'px';
+      item.style.height = '56px';
+      setTimeout(function () {
+        item.style.transition = 'none';
+        item.style.width = '';
+        item.style.height = '';
+        item.offsetHeight;
+        item.style.transition = '';
+        if (cb) cb();
+      }, 350);
+    }
+
+    /* ── Switch right panel pane ── */
+    function switchPane(key) {
+      if (!panel) return;
+      var current = panel.querySelector('.am-panel-pane.is-active');
+      var next    = panel.querySelector('[data-am-pane="' + key + '"]');
+      if (!next || current === next) return;
+      if (current) {
+        current.classList.remove('is-active');
+        current.classList.add('is-leaving');
+        var leaving = current;
+        setTimeout(function () { leaving.classList.remove('is-leaving'); }, 300);
+      }
+      setTimeout(function () { next.classList.add('is-active'); }, 30);
+    }
+
+    /* ── Click handler ── */
+    items.forEach(function (item) {
+      item.addEventListener('click', function (e) {
+        if (e.target.closest('a')) return;
+
+        if (item.classList.contains('expanded')) {
+          collapse(item);
+          currentOpen = null;
+          return;
+        }
+
+        var key = item.dataset.amTab;
+
+        if (currentOpen && currentOpen !== item) {
+          var prev = currentOpen;
+          currentOpen = null;
+          collapse(prev, function () {
+            expand(item);
+            switchPane(key);
+            currentOpen = item;
+          });
+        } else {
+          expand(item);
+          switchPane(key);
+          currentOpen = item;
+        }
+      });
+    });
+
+    /* ── Entrance animation (IntersectionObserver) ── */
+    function runEntrance() {
+      if (reducedMotion) {
+        introEl.style.transition = 'opacity 300ms ease-out';
+      } else {
+        introEl.style.transition =
+          'opacity 300ms ease-out,' +
+          'transform 500ms cubic-bezier(0.34,1.56,0.64,1)';
+      }
+      introEl.style.opacity   = '1';
+      introEl.style.transform = 'scale(1)';
+
+      items.forEach(function (item, i) {
+        var delay = 100 + i * 80;
+        item.style.transition = reducedMotion
+          ? 'opacity 400ms ease-out'
+          : 'opacity 400ms ease-out, transform 400ms cubic-bezier(0.4,0,0.2,1)';
+        item.style.transitionDelay = delay + 'ms';
+        item.style.opacity   = '1';
+        item.style.transform = 'translateY(0)';
+      });
+
+      var clearAt = 100 + items.length * 80 + 400 + 100;
+      setTimeout(function () {
+        items.forEach(function (item) {
+          item.style.transitionDelay = '';
+          item.style.transition      = '';
+        });
+      }, clearAt);
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) {
+        runEntrance();
+        observer.disconnect();
+      }
+    }, { threshold: 0.2 });
+    observer.observe(controls);
   })();
 
   /* ── Dark / Light mode toggle ─────────────────────────────────────────── */
@@ -11622,6 +12199,199 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   </script>
 
   <script src="/spiral-gallery/spiral.js" defer></script>
+
+  <script>
+  /* ── Testimonial card stack with drag ── */
+  (function () {
+    var stack  = document.getElementById('tmStack');
+    var dotsEl = document.getElementById('tmDots');
+    if (!stack) return;
+
+    var cards = Array.from(stack.querySelectorAll('.tm-sc'));
+    var dots  = dotsEl ? Array.from(dotsEl.querySelectorAll('.tm-dot')) : [];
+    var n     = cards.length;
+    var front = 0;
+    var timer = null;
+    var anim  = false;
+
+    /* CSS transform values for each named slot */
+    var POS_FRONT = 'translateY(58px) scale(1)';
+    var POS_BACK  = 'translateY(6px) scale(0.91)';
+
+    function applyPos() {
+      cards.forEach(function (c, i) {
+        c.dataset.pos = (i - front + n) % n;
+      });
+    }
+
+    function updateDots() {
+      dots.forEach(function (d, i) { d.classList.toggle('active', i === front); });
+    }
+
+    /* Auto-advance: front card exits downward (~200% below), other cards
+       shift forward, then the exiting card rises into the back slot. */
+    function advance() {
+      if (anim) return;
+      anim = true;
+
+      /* Find the current front card */
+      var card = null;
+      for (var j = 0; j < cards.length; j++) {
+        if (cards[j].dataset.pos === '0') { card = cards[j]; break; }
+      }
+      if (!card) { anim = false; return; }
+
+      /* Phase 1: slide front card down and off (ease-in acceleration) */
+      card.style.transition = 'transform 0.38s cubic-bezier(0.4, 0, 1, 1)';
+      card.style.transform  = 'translateY(224px) scale(1)';
+      card.style.zIndex     = '12'; /* stay above stack while exiting */
+
+      /* Shift remaining cards to their new positions simultaneously */
+      front = (front + 1) % n;
+      cards.forEach(function (c, idx) {
+        if (c !== card) c.dataset.pos = (idx - front + n) % n;
+      });
+      updateDots();
+
+      /* Phase 2: rise from below into the back slot */
+      setTimeout(function () {
+        card.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        card.style.zIndex     = '7'; /* go behind all cards */
+        card.style.transform  = POS_BACK;
+
+        /* Clean up: hand control back to CSS */
+        setTimeout(function () {
+          var cardIdx = cards.indexOf(card);
+          card.dataset.pos      = (cardIdx - front + n) % n;
+          card.style.transition = '';
+          card.style.transform  = '';
+          card.style.zIndex     = '';
+          anim = false;
+        }, 520);
+      }, 400);
+    }
+
+    /* Drag-triggered advance: dragged card flies from its current position
+       into the back slot via inline style; other cards update normally. */
+    function advanceWithCard(card) {
+      var prevFront = front;
+      front = (front + 1) % n;
+      updateDots();
+
+      /* Fly dragged card to back-of-stack position */
+      card.style.transition = 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)';
+      card.style.transform  = POS_BACK;
+      card.style.zIndex     = '7'; /* behind all others during travel */
+
+      /* Remaining cards shift via CSS */
+      cards.forEach(function (c, i) {
+        if (c !== card) c.dataset.pos = (i - front + n) % n;
+      });
+
+      setTimeout(function () {
+        /* Hand control back to CSS */
+        card.style.transition = '';
+        card.style.transform  = '';
+        card.style.zIndex     = '';
+        card.dataset.pos = (prevFront - front + n) % n; /* = n-1 */
+        anim = false;
+      }, 480);
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      timer = setInterval(advance, 4200);
+    }
+
+    /* ── Drag ─────────────────────────────────── */
+    var dragCard  = null;
+    var dragSX = 0, dragSY = 0;
+    var dragX  = 0, dragY  = 0;
+    var THRESHOLD = 80;
+
+    function onDown(e) {
+      if (anim || dragCard) return;
+      var target = e.target.closest ? e.target.closest('.tm-sc') : null;
+      if (!target || target.dataset.pos !== '0') return;
+      dragCard = target;
+      var p = e.touches ? e.touches[0] : e;
+      dragSX = p.clientX; dragSY = p.clientY;
+      dragX  = 0;         dragY  = 0;
+      dragCard.style.transition = 'none';
+      dragCard.style.zIndex     = '15';
+      clearInterval(timer);
+      e.preventDefault();
+    }
+
+    function onMove(e) {
+      if (!dragCard) return;
+      var p = e.touches ? e.touches[0] : e;
+      dragX = p.clientX - dragSX;
+      dragY = p.clientY - dragSY;
+      var tilt = dragX * 0.06;
+      /* keep card anchored at its base y=58px offset while dragging */
+      dragCard.style.transform =
+        'translate(' + dragX + 'px, ' + (58 + dragY) + 'px) rotate(' + tilt + 'deg)';
+      e.preventDefault();
+    }
+
+    function onUp() {
+      if (!dragCard) return;
+      var card = dragCard;
+      dragCard = null;
+      var dist = Math.sqrt(dragX * dragX + dragY * dragY);
+
+      if (dist > THRESHOLD) {
+        anim = true;
+        advanceWithCard(card);
+      } else {
+        /* Snap back to front position with a spring */
+        card.style.transition = 'transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        card.style.transform  = POS_FRONT;
+        setTimeout(function () {
+          card.style.transition = '';
+          card.style.transform  = '';
+          card.style.zIndex     = '';
+        }, 430);
+      }
+
+      resetTimer();
+    }
+
+    stack.addEventListener('mousedown',  onDown);
+    stack.addEventListener('touchstart', onDown, { passive: false });
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('mouseup',   onUp);
+    window.addEventListener('touchend',  onUp);
+
+    /* ── Dot clicks ──────────────────────────── */
+    dots.forEach(function (dot, i) {
+      dot.addEventListener('click', function () {
+        if (i === front) return;
+        clearInterval(timer);
+        cards.forEach(function (c) { c.style.transition = 'none'; });
+        anim = false;
+        front = i;
+        applyPos();
+        updateDots();
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            cards.forEach(function (c) { c.style.transition = ''; });
+            resetTimer();
+          });
+        });
+      });
+    });
+
+    stack.addEventListener('mouseenter', function () { clearInterval(timer); timer = null; });
+    stack.addEventListener('mouseleave', function () { if (!dragCard) resetTimer(); });
+
+    applyPos();
+    updateDots();
+    resetTimer();
+  })();
+  </script>
 
 </body>
 </html>

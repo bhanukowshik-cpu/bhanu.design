@@ -390,26 +390,26 @@ export default function SpiralGallery({ cards }) {
           overflow: 'hidden',
         }}
       >
-        {/* Title — 40px Montserrat bold */}
-        <div style={{ color: '#E5F28D', fontFamily: "'Montserrat', sans-serif", fontSize: '40px', fontWeight: 700, lineHeight: 1.1, marginBottom: '20px' }}>
+        {/* Title — 40px Montserrat, #F5F5F7 (matches ws-et-title) */}
+        <div style={{ color: '#F5F5F7', fontFamily: "'Montserrat', sans-serif", fontSize: '40px', fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.5px', marginBottom: '28px' }}>
           EverTutor AI System
         </div>
-        {/* Metrics row with vertical divider */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '16px' }}>
-          <div>
+        {/* Metrics row with vertical divider — matches ws-et-metric-row */}
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '28px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <div style={{ color: '#E5F28D', fontFamily: "'JetBrains Mono', monospace", fontSize: '36px', fontWeight: 700, lineHeight: 1 }}>2,000+</div>
-            <div style={{ color: 'rgba(255,252,248,0.5)', fontSize: '12px', marginTop: '6px' }}>Daily Active Users</div>
+            <div style={{ color: 'rgba(255,252,248,0.60)', fontFamily: "'JetBrains Mono', monospace", fontSize: '15px', fontWeight: 500, letterSpacing: '0.02em' }}>Daily Active Users</div>
           </div>
-          <div style={{ width: '1px', background: 'rgba(255,252,248,0.15)', alignSelf: 'stretch', margin: '0 20px', flexShrink: 0 }} />
-          <div>
+          <div style={{ width: '1px', height: '44px', background: 'rgba(255,252,248,0.15)', margin: '0 24px', flexShrink: 0 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <div style={{ color: '#E5F28D', fontFamily: "'JetBrains Mono', monospace", fontSize: '36px', fontWeight: 700, lineHeight: 1 }}>-96%</div>
-            <div style={{ color: 'rgba(255,252,248,0.5)', fontSize: '12px', marginTop: '6px' }}>Workflow time</div>
+            <div style={{ color: 'rgba(255,252,248,0.60)', fontFamily: "'JetBrains Mono', monospace", fontSize: '15px', fontWeight: 500, letterSpacing: '0.02em' }}>Workflow time</div>
           </div>
         </div>
         {/* ARR metric */}
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <div style={{ color: '#E5F28D', fontFamily: "'JetBrains Mono', monospace", fontSize: '36px', fontWeight: 700, lineHeight: 1 }}>0→$300k ARR</div>
-          <div style={{ color: 'rgba(255,252,248,0.45)', fontSize: '12px', marginTop: '6px' }}>as Sole Product Designer</div>
+          <div style={{ color: 'rgba(255,252,248,0.60)', fontFamily: "'JetBrains Mono', monospace", fontSize: '15px', fontWeight: 500, letterSpacing: '0.02em' }}>as Sole Product Designer</div>
         </div>
       </div>
 
@@ -426,36 +426,27 @@ export default function SpiralGallery({ cards }) {
           overflow: 'hidden',
         }}
       >
-        {/* Tags — 16px Montserrat with icons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-          {/* Row 1: full-width tag */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', border: '1px solid rgba(255,252,248,0.2)', borderRadius: '100px', padding: '6px 14px', color: 'rgba(255,252,248,0.82)', width: 'fit-content', background: 'rgba(255,252,248,0.05)' }}>
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="6.5" cy="3.5" r="2.5" fill="currentColor"/>
-              <path d="M1 12c0-3.04 2.46-5.5 5.5-5.5S12 8.96 12 12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-            </svg>
-            <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '16px', fontWeight: 500, whiteSpace: 'nowrap' }}>Sole Product Designer</span>
-          </div>
-          {/* Row 2: two tags side by side */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', border: '1px solid rgba(255,252,248,0.2)', borderRadius: '100px', padding: '6px 14px', color: 'rgba(255,252,248,0.82)', width: 'fit-content', background: 'rgba(255,252,248,0.05)' }}>
-              <svg width="11" height="14" viewBox="0 0 11 14" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M6.5 0L1 7.5h4.5L3.5 14l7-8.5H6L6.5 0z"/>
-              </svg>
-              <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '16px', fontWeight: 500, whiteSpace: 'nowrap' }}>0 to 1</span>
-            </div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', border: '1px solid rgba(255,252,248,0.2)', borderRadius: '100px', padding: '6px 14px', color: 'rgba(255,252,248,0.82)', width: 'fit-content', background: 'rgba(255,252,248,0.05)' }}>
-              <svg width="13" height="12" viewBox="0 0 13 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 0H2C.9 0 0 .9 0 2v6c0 1.1.9 2 2 2h2.5l2 2.5L8.5 10H11c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2z"/>
-              </svg>
-              <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '16px', fontWeight: 500, whiteSpace: 'nowrap' }}>Desktop · B2B · B2C</span>
-            </div>
+        {/* Tags — JetBrains Mono 15px, border-radius 6px — matches ws-role-tag */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '28px' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', fontFamily: "'JetBrains Mono', monospace", fontSize: '15px', fontWeight: 500, color: 'rgba(255,252,248,0.80)', background: 'rgba(255,252,248,0.08)', border: '1px solid rgba(255,252,248,0.18)', borderRadius: '6px', padding: '7px 14px', letterSpacing: '0.03em', width: 'fit-content', whiteSpace: 'nowrap' }}>
+            <img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Profile dark theme.svg" width="16" height="14" alt="" aria-hidden="true" />
+            Sole Product Designer
+          </span>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', fontFamily: "'JetBrains Mono', monospace", fontSize: '15px', fontWeight: 500, color: 'rgba(255,252,248,0.80)', background: 'rgba(255,252,248,0.08)', border: '1px solid rgba(255,252,248,0.18)', borderRadius: '6px', padding: '7px 14px', letterSpacing: '0.03em', width: 'fit-content', whiteSpace: 'nowrap' }}>
+              <img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Thunder Dark Theme.svg" width="10" height="16" alt="" aria-hidden="true" />
+              0 to 1
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', fontFamily: "'JetBrains Mono', monospace", fontSize: '15px', fontWeight: 500, color: 'rgba(255,252,248,0.80)', background: 'rgba(255,252,248,0.08)', border: '1px solid rgba(255,252,248,0.18)', borderRadius: '6px', padding: '7px 14px', letterSpacing: '0.03em', width: 'fit-content', whiteSpace: 'nowrap' }}>
+              <img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Desktop Icon.svg" width="16" height="13" alt="" aria-hidden="true" />
+              Desktop · B2B · B2C
+            </span>
           </div>
         </div>
-        {/* Description — 18px Montserrat, "3 tools working as one system" italic bold */}
-        <p style={{ color: 'rgba(255,252,248,0.82)', fontFamily: "'Montserrat', sans-serif", fontSize: '18px', lineHeight: 1.6, margin: 0 }}>
+        {/* Description — 18px, #FFFCF8, em italic bold — matches ws-et-desc */}
+        <p style={{ color: '#FFFCF8', fontSize: '18px', lineHeight: 1.7, margin: 0 }}>
           World's 1st multi modal 1:1 voice first AI tutor powered by{' '}
-          <strong style={{ fontStyle: 'italic' }}>3 tools working as one system</strong>
+          <em style={{ fontStyle: 'italic', fontWeight: 700 }}>3 tools working as one system</em>
           {' '}to enable billion tutors for billion minds.
         </p>
       </div>
