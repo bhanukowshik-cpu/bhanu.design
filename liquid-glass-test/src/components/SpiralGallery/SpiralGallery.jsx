@@ -146,7 +146,7 @@ export default function SpiralGallery({ cards }) {
 
     // Blob overlay tracking — screen-projected position and radius of slot 0
     let blobSX = 0, blobSY = 0, blobDist = 1, blobScreenRadius = 120;
-    let cardsReveal = 0; // project cards hidden on entry; reveal after first scroll
+    let cardsReveal = 0, cardsRevealTarget = 0; // project cards hidden during entry animation
     const tmpV = new THREE.Vector3();
 
     function updateCards(progress) {
@@ -235,8 +235,11 @@ export default function SpiralGallery({ cards }) {
           ease: 'power3.out',
           onUpdate: () => { globalYOffset = entryObj.y; },
         });
-        // Begin auto-advance once cards have settled
-        setTimeout(resetAutoAdvance, 4500);
+        // Reveal project cards and begin auto-advance once entry animation settles
+        setTimeout(() => {
+          cardsRevealTarget = 1;
+          resetAutoAdvance();
+        }, 4500);
       }
     }, { threshold: 0.1 });
     observer.observe(el);
@@ -257,8 +260,8 @@ export default function SpiralGallery({ cards }) {
     const tickerFn = (time) => {
       lenis.raf(time * 1000);
       currentProgress += (targetProgress - currentProgress) * 0.07;
-      // Fade in project cards once user scrolls away from the initial blob-only view
-      cardsReveal += ((currentProgress < 2.2 ? 1 : 0) - cardsReveal) * 0.06;
+      // Fade in project cards after entry animation settles (cardsRevealTarget set via setTimeout)
+      cardsReveal += (cardsRevealTarget - cardsReveal) * 0.04;
       updateCards(currentProgress);
       renderer.render(scene, camera);
 
