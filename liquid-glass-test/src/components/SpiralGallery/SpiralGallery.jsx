@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import Lenis from '@studio-freight/lenis';
-import ListeningBars from '../ListeningBars/ListeningBars';
+import RadialWaveform from '../RadialWaveform/RadialWaveform';
 
 // ── Layout constants ──────────────────────────────────────────────────────────
 const TOTAL_SLOTS  = 10;
@@ -294,7 +294,7 @@ export default function SpiralGallery({ cards }) {
       {/* WebGL canvas */}
       <div ref={mountRef} style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
 
-      {/* Blob overlay — glow + waveform, follows the Three.js blob card */}
+      {/* Blob overlay — glow + radial waveform, follows the Three.js blob card */}
       <div
         ref={blobOverlayRef}
         style={{
@@ -304,8 +304,8 @@ export default function SpiralGallery({ cards }) {
           left: 0,
           top: 0,
           transform: 'translate(-50%, -50%)',
-          width: '340px',
-          height: '340px',
+          width: '460px',
+          height: '460px',
         }}
       >
         {/* Dark bg shadow */}
@@ -328,16 +328,8 @@ export default function SpiralGallery({ cards }) {
           background: 'radial-gradient(circle, rgba(163,230,53,0.55) 0%, rgba(163,230,53,0.25) 40%, transparent 70%)',
           filter: 'blur(30px)',
         }} />
-        {/* Waveform bars below the orb */}
-        <div style={{
-          position: 'absolute',
-          bottom: '28px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          color: '#E6F28D',
-        }}>
-          <ListeningBars isListening={false} audioLevel={0} />
-        </div>
+        {/* Radial waveform ring */}
+        <RadialWaveform />
       </div>
     </div>
   );
