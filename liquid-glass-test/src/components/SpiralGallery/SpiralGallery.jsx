@@ -388,6 +388,7 @@ export default function SpiralGallery({ cards }) {
           padding: '0 20px 0 24px',
           boxSizing: 'border-box',
           overflow: 'hidden',
+          display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
         }}
       >
         {/* Title — 40px Montserrat, #F5F5F7 (matches ws-et-title) */}
