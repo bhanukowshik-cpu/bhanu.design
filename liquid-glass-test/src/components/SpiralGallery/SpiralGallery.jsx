@@ -10,8 +10,9 @@ const TURNS        = 1;
 const RADIUS       = 4.5;   // sphere radius — must match shader below
 const HELIX_HEIGHT = 16.0;  // step (16/10=1.6) > card height threshold so adjacent cards clear front border
 const ROW_GAP      = 0.3;   // small extra drop between front wrap and back wrap
-const CARD_W       = 2.9;
-const CARD_H       = 1.63;  // 16:9
+const CARD_W       = 3.6;
+const CARD_H       = 2.025; // 16:9
+const BLOB_W       = 1.8;   // blob card — smaller than project cards
 
 // ── Shaders ───────────────────────────────────────────────────────────────────
 // RADIUS is injected via template literal so shader always matches the JS constant.
@@ -57,19 +58,20 @@ void main() {
 `;
 
 export default function SpiralGallery({ cards }) {
-  const mountRef      = useRef(null);
-  const blobOverlayRef = useRef(null);
+  const mountRef        = useRef(null);
+  const blobGlowRef     = useRef(null);
+  const blobWaveformRef = useRef(null);
 
   useEffect(() => {
     const el = mountRef.current;
     const W  = el.clientWidth  || window.innerWidth;
     const H  = el.clientHeight || window.innerHeight;
 
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    // Renderer — transparent so the glow div behind it shows through the blob's alpha
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, premultipliedAlpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(W, H);
-    renderer.setClearColor(0x1e1e1e, 1);
+    renderer.setClearColor(0x000000, 0);
     el.appendChild(renderer.domElement);
 
     // Scene & Camera
@@ -99,9 +101,10 @@ export default function SpiralGallery({ cards }) {
       const cardIndex = slot % cards.length;
       const card      = cards[cardIndex];
 
-      // Slot 0 is the blob — square card so the circular orb isn't squashed
-      const cardH = (slot === 0) ? CARD_W : CARD_H;
-      const geo      = new THREE.PlaneGeometry(CARD_W, cardH, 48, 32);
+      // Slot 0 is the blob — smaller square card; project cards use CARD_W × CARD_H
+      const cardW = (slot === 0) ? BLOB_W : CARD_W;
+      const cardH = (slot === 0) ? BLOB_W : CARD_H;
+      const geo      = new THREE.PlaneGeometry(cardW, cardH, 48, 32);
       const fallback = makeFallback(card.color);
       const tex      = loader.load(card.image, undefined, undefined,
         () => { mat.uniforms.uTexture.value = fallback; }
@@ -244,13 +247,12 @@ export default function SpiralGallery({ cards }) {
       updateCards(currentProgress);
       renderer.render(scene, camera);
 
-      // Move blob overlay to follow the Three.js blob card
-      const overlay = blobOverlayRef.current;
-      if (overlay) {
-        overlay.style.left = blobSX.toFixed(1) + 'px';
-        overlay.style.top  = blobSY.toFixed(1) + 'px';
-        overlay.style.opacity = Math.max(0, 1 - blobDist / 0.35).toFixed(3);
-      }
+      // Move glow (behind canvas) and waveform (in front) to follow blob card
+      const opacity = Math.max(0, 1 - blobDist / 0.35).toFixed(3);
+      const glow = blobGlowRef.current;
+      if (glow) { glow.style.left = blobSX.toFixed(1) + 'px'; glow.style.top = blobSY.toFixed(1) + 'px'; glow.style.opacity = opacity; }
+      const wave = blobWaveformRef.current;
+      if (wave) { wave.style.left = blobSX.toFixed(1) + 'px'; wave.style.top = blobSY.toFixed(1) + 'px'; wave.style.opacity = opacity; }
     };
     gsap.ticker.add(tickerFn);
     gsap.ticker.lagSmoothing(0);
@@ -284,51 +286,51 @@ export default function SpiralGallery({ cards }) {
       background: '#1E1E1E',
       position: 'relative', overflow: 'hidden',
     }}>
-      {/* Dot grid */}
+      {/* Dot grid — z0 */}
       <div style={{
         position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none',
         backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)',
         backgroundSize: '28px 28px',
       }} />
 
-      {/* WebGL canvas */}
-      <div ref={mountRef} style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
-
-      {/* Blob overlay — glow + radial waveform, follows the Three.js blob card */}
+      {/* Blob glow — z2, BEHIND the transparent Three.js canvas so it glows through the blob's alpha */}
       <div
-        ref={blobOverlayRef}
+        ref={blobGlowRef}
         style={{
-          position: 'absolute',
-          zIndex: 5,
-          pointerEvents: 'none',
-          left: 0,
-          top: 0,
+          position: 'absolute', zIndex: 2, pointerEvents: 'none',
+          left: 0, top: 0,
           transform: 'translate(-50%, -50%)',
-          width: '340px',
-          height: '340px',
+          width: '340px', height: '340px',
         }}
       >
-        {/* Dark bg shadow */}
         <div style={{
-          position: 'absolute',
-          width: '200px', height: '200px',
-          top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
+          position: 'absolute', width: '160px', height: '160px',
+          top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
           borderRadius: '50%',
-          background: 'rgba(5,5,5,0.88)',
+          background: 'rgba(5,5,5,0.88)', filter: 'blur(24px)',
+        }} />
+        <div style={{
+          position: 'absolute', width: '260px', height: '260px',
+          top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(163,230,53,0.60) 0%, rgba(163,230,53,0.28) 40%, transparent 70%)',
           filter: 'blur(28px)',
         }} />
-        {/* Green glow */}
-        <div style={{
-          position: 'absolute',
-          width: '280px', height: '280px',
-          top: '50%', left: '50%',
+      </div>
+
+      {/* WebGL canvas — z3, transparent bg so glow shows through blob alpha */}
+      <div ref={mountRef} style={{ position: 'absolute', inset: 0, zIndex: 3 }} />
+
+      {/* Blob waveform ring — z5, in front of canvas, centered on blob */}
+      <div
+        ref={blobWaveformRef}
+        style={{
+          position: 'absolute', zIndex: 5, pointerEvents: 'none',
+          left: 0, top: 0,
           transform: 'translate(-50%, -50%)',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(163,230,53,0.55) 0%, rgba(163,230,53,0.25) 40%, transparent 70%)',
-          filter: 'blur(30px)',
-        }} />
-        {/* Radial waveform ring */}
+          width: '340px', height: '340px',
+        }}
+      >
         <RadialWaveform />
       </div>
     </div>
