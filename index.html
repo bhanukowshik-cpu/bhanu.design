@@ -6086,8 +6086,12 @@
 
     /* ── Section 2 redesign — Featured Work ─────────────────── */
     .s2-fw-header {
-      padding: 80px 0 60px;
+      padding: 28px 0 24px;
       text-align: center;
+      position: sticky;
+      top: 60px;
+      z-index: 9;
+      background: inherit;
       opacity: 0;
       transform: translateY(24px);
       transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1),
@@ -6126,12 +6130,65 @@
       letter-spacing: -0.5px;
     }
 
-    /* Cards zone: dark bg continues from glimpse */
+    /* Cards zone: dark bg */
     .s2-cards-zone {
       background: #1E1E1E;
-      padding-bottom: 80px;
     }
-    .s2-cards-zone .fw-grid { padding: 32px 48px 0; }
+
+    /* Blob intro — sits above the Three.js canvas, rises from below */
+    .s2-blob-intro {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, calc(-50% + 110vh));
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 340px;
+      height: 340px;
+      transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .s2-blob-intro.s2-blob-in {
+      transform: translate(-50%, -50%);
+    }
+
+    /* Video + content row */
+    .s2-video-section {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      background: #1E1E1E;
+      padding: 60px 48px 80px;
+    }
+    .s2-video-left {
+      flex: 0 0 58%;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .s2-video-left video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .s2-video-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 0 0 48px;
+    }
+    .s2-video-title {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      font-weight: 700;
+      color: #F0EDE8;
+      line-height: 1.3;
+      letter-spacing: -0.4px;
+      margin: 10px 0 24px;
+    }
 
 
     .ws-et-title {
@@ -7008,11 +7065,21 @@
 
       <!-- A: "Featured Work" title — fades in on scroll -->
       <div class="s2-fw-header" id="s2FwHeader">
-        <span class="fw-eyebrow-label">Selected Work</span>
         <h2 class="fw-title">Featured Work</h2>
       </div>
 
-      <!-- B: ET Glimpse — full width, fades out as it exits viewport -->
+      <!-- B: Spiral Gallery — blob enters first, then spiral unfurls -->
+      <div class="s2-cards-zone" id="s2CardsZone" style="position:relative;overflow:hidden;">
+        <div id="spiral-root" style="width:100%;height:100vh;position:relative;overflow:hidden;"></div>
+        <!-- Blob intro — rises from bottom before spiral animates in -->
+        <div class="s2-blob-intro" id="s2BlobIntro">
+          <div class="ws-orb-bg"></div>
+          <div class="ws-orb-glow"></div>
+          <img class="ws-orb-img" src="Parallax cards/EverTutor Glimpse/Tutor Blob Dark Mode.png" alt="" />
+        </div>
+      </div>
+
+      <!-- C: Blob + left/right content -->
       <div class="s2-glimpse-full" id="s2GlimpseFull">
 
         <!-- ── WORK SECTION V3 ──────────────────────────────────── -->
@@ -7238,91 +7305,33 @@
 
       </div><!-- /s2-glimpse-full -->
 
-      <!-- C: Cards reveal zone — compact strip (sticky) + cards grid -->
-      <div class="s2-cards-zone" id="s2CardsZone">
-        <div class="s2-compact-strip" id="s2CompactStrip">
-          <img class="s2-cs-blob" src="Parallax cards/EverTutor Glimpse/Tutor Blob Dark Mode.png" alt="" aria-hidden="true">
-          <h2 class="s2-cs-title">EverTutor AI System</h2>
+      <!-- D: Video + content — EverTutor Live -->
+      <div class="s2-video-section">
+        <div class="s2-video-left">
+          <video autoplay muted loop playsinline preload="auto">
+            <source src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
+          </video>
         </div>
-        <div class="fw-grid">
-
-          <!-- Card 1: EverTutor Live -->
-          <div class="fw-card" data-fw-delay="0">
-            <div class="fw-card-top">
-              <div class="tags-bar-overlay" aria-hidden="true">
-                <div class="tags-bar-track" id="tagsBarTrackLive"></div>
-              </div>
-              <video autoplay muted loop playsinline preload="auto">
-                <source src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
-              </video>
+        <div class="s2-video-right">
+          <p class="fw-card-eyebrow">1.1 EverTutor Live</p>
+          <h3 class="s2-video-title">First of its kind — a voice-first AI that gives every learner a fully adaptive 1:1 experience, taken from prototype to PMF.</h3>
+          <div class="proj-metrics">
+            <div class="proj-metric">
+              <span class="proj-metric-val">2000+</span>
+              <span class="proj-metric-lbl">Everyday Sessions</span>
             </div>
-            <div class="fw-card-bottom">
-              <p class="fw-card-eyebrow">1.1 EverTutor Live</p>
-              <h3 class="fw-card-title">First of its kind, a voice-first AI that gives every learner a fully adaptive 1:1 experience, taken from prototype to PMF.</h3>
-              <div class="proj-metrics">
-                <div class="proj-metric">
-                  <span class="proj-metric-val">2000+</span>
-                  <span class="proj-metric-lbl">Everyday Sessions</span>
-                </div>
-                <div class="proj-metric">
-                  <span class="proj-metric-val">Proven 2x</span>
-                  <span class="proj-metric-lbl">Performance Gain</span>
-                </div>
-                <div class="proj-metric">
-                  <span class="proj-metric-val">$250&nbsp;&rarr;&nbsp;$5/hr</span>
-                  <span class="proj-metric-lbl">Cost of 1:1 Support</span>
-                </div>
-              </div>
-              <a class="proj-cta" href="evertutor-live.html">View Case Study &rarr;</a>
+            <div class="proj-metric">
+              <span class="proj-metric-val">Proven 2x</span>
+              <span class="proj-metric-lbl">Performance Gain</span>
+            </div>
+            <div class="proj-metric">
+              <span class="proj-metric-val">$250&nbsp;&rarr;&nbsp;$5/hr</span>
+              <span class="proj-metric-lbl">Cost of 1:1 Support</span>
             </div>
           </div>
-
-          <!-- Card 2: EverTutor Studio -->
-          <div class="fw-card fw-card--placeholder" data-fw-delay="1">
-            <div class="fw-card-top">
-              <span class="fw-placeholder-label">EverTutor Studio — coming soon</span>
-            </div>
-            <div class="fw-card-bottom">
-              <p class="fw-card-eyebrow">1.2 EverTutor Studio</p>
-              <h3 class="fw-card-title">AI-powered teaching studio that lets educators build, manage, and deploy personalised learning at scale.</h3>
-              <div class="proj-metrics">
-                <div class="proj-metric">
-                  <span class="proj-metric-val">3x</span>
-                  <span class="proj-metric-lbl">Faster content creation</span>
-                </div>
-                <div class="proj-metric">
-                  <span class="proj-metric-val">500+</span>
-                  <span class="proj-metric-lbl">Educators onboarded</span>
-                </div>
-              </div>
-              <a class="proj-cta" href="evertutor-studio.html">View Case Study &rarr;</a>
-            </div>
-          </div>
-
-          <!-- Card 3: Stressie -->
-          <div class="fw-card fw-card--placeholder" data-fw-delay="2">
-            <div class="fw-card-top">
-              <span class="fw-placeholder-label">Stressie — coming soon</span>
-            </div>
-            <div class="fw-card-bottom">
-              <p class="fw-card-eyebrow">2.1 Stressie</p>
-              <h3 class="fw-card-title">A mental wellness companion that turns daily stress check-ins into actionable insight — redesigned from the ground up.</h3>
-              <div class="proj-metrics">
-                <div class="proj-metric">
-                  <span class="proj-metric-val">−30%</span>
-                  <span class="proj-metric-lbl">Support tickets</span>
-                </div>
-                <div class="proj-metric">
-                  <span class="proj-metric-val">4.8★</span>
-                  <span class="proj-metric-lbl">App store rating</span>
-                </div>
-              </div>
-              <a class="proj-cta" href="stressie-studio.html">View Case Study &rarr;</a>
-            </div>
-          </div>
-
+          <a class="proj-cta" href="evertutor-live.html">View Case Study &rarr;</a>
         </div>
-      </div><!-- /s2-cards-zone -->
+      </div>
 
       <!-- ── TESTIMONIALS MARQUEE GRID ─────────────────────── -->
 
@@ -11637,7 +11646,26 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   })();
   </script>
 
+  <script>
+  /* ── Blob intro trigger ──────────────────────────────────────── */
+  (function () {
+    var blob = document.getElementById('s2BlobIntro');
+    var zone = document.getElementById('s2CardsZone');
+    if (!blob || !zone) return;
+    var triggered = false;
+    var obs = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting && !triggered) {
+        triggered = true;
+        blob.classList.add('s2-blob-in');
+        obs.disconnect();
+      }
+    }, { threshold: 0.1 });
+    obs.observe(zone);
+  })();
+  </script>
 
-</html>
+  <script src="/spiral-gallery/spiral.js" defer></script>
+
 </body>
+</html>
 </html>

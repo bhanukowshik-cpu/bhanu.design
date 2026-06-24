@@ -1,21 +1,36 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import Lenis from '@studio-freight/lenis';
 
+// ── Layout constants ──────────────────────────────────────────────────────────
+const TOTAL_SLOTS  = 10;
+const TURNS        = 1;
+const RADIUS       = 4.5;   // sphere radius — must match shader below
+const HELIX_HEIGHT = 16.0;  // step (16/10=1.6) > card height threshold so adjacent cards clear front border
+const ROW_GAP      = 0.3;   // small extra drop between front wrap and back wrap
+const CARD_W       = 2.9;
+const CARD_H       = 1.63;  // 16:9
+
 // ── Shaders ───────────────────────────────────────────────────────────────────
+// RADIUS is injected via template literal so shader always matches the JS constant.
 const vertexShader = `
-uniform float uBend;
-varying vec2 vUv;
+uniform vec3  uCenter;
+uniform vec3  uRight;
+uniform vec3  uUp;
+uniform float uFlatness;
+varying vec2  vUv;
+varying float vFacing;
+varying float vFlat;
+
 void main() {
-  vec3 pos = position;
-  // Sphere wrap: push every vertex backward by r² — the paraboloid approximation
-  // of pressing the card against an invisible sphere.  Both X and Y contribute
-  // so the card curves like a satellite dish rather than a banana.
-  float r2 = pos.x * pos.x + pos.y * pos.y;
-  pos.z -= uBend * r2 * 0.22;
+  vec3 worldPos  = uCenter + uRight * position.x + uUp * position.y;
+  vec3 onSphere  = ${RADIUS} * normalize(worldPos);
+  vec3 finalPos  = mix(onSphere, worldPos, uFlatness);
+  vFacing = normalize(onSphere).z;
+  vFlat   = uFlatness;
   vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+  gl_Position = projectionMatrix * viewMatrix * vec4(finalPos, 1.0);
 }
 `;
 
@@ -23,27 +38,25 @@ const fragmentShader = `
 uniform sampler2D uTexture;
 uniform float uOpacity;
 uniform float uBrightness;
-varying vec2 vUv;
+uniform float uBlur;
+varying vec2  vUv;
+varying float vFacing;
+varying float vFlat;
 void main() {
-  vec4 tex = texture2D(uTexture, vUv);
-  gl_FragColor = vec4(tex.rgb * uBrightness, tex.a * uOpacity);
+  float b = uBlur * 0.018;
+  vec4 tex  = texture2D(uTexture, vUv)                    * 0.40;
+  tex += texture2D(uTexture, vUv + vec2(-b, -b))          * 0.15;
+  tex += texture2D(uTexture, vUv + vec2( b, -b))          * 0.15;
+  tex += texture2D(uTexture, vUv + vec2(-b,  b))          * 0.15;
+  tex += texture2D(uTexture, vUv + vec2( b,  b))          * 0.15;
+  float sphereShade = 0.45 + 0.55 * max(0.0, vFacing);
+  float shade = mix(sphereShade, 1.0, vFlat);
+  gl_FragColor = vec4(tex.rgb * uBrightness * shade, tex.a * uOpacity);
 }
 `;
 
-// ── Layout constants ──────────────────────────────────────────────────────────
-const TOTAL_SLOTS  = 4;
-const TURNS        = 1;
-const RADIUS       = 2.2;
-const HELIX_HEIGHT = 3.8;
-const CARD_W       = 2.4;
-const CARD_H       = 1.35;  // 16:9
-
 export default function SpiralGallery({ cards }) {
-  const mountRef    = useRef(null);
-  // Initial front card at progress=0.1: slot 1 (dist≈0.05, angle≈99°), cardIndex=1
-  const [activeCard, setActiveCard] = useState(cards[1]);
-  const [panelVisible, setPanelVisible] = useState(true);
-  const activeIndexRef = useRef(1);
+  const mountRef = useRef(null);
 
   useEffect(() => {
     const el = mountRef.current;
@@ -54,13 +67,13 @@ export default function SpiralGallery({ cards }) {
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(W, H);
-    renderer.setClearColor(0x080808, 1);
+    renderer.setClearColor(0x1e1e1e, 1);
     el.appendChild(renderer.domElement);
 
     // Scene & Camera
     const scene  = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(58, W / H, 0.1, 100);
-    camera.position.set(0, 0, 5.5);
+    camera.position.set(0, 0, 10.5);
     camera.lookAt(0, 0, 0);
 
     // Solid-color fallback when image 404s
@@ -82,7 +95,7 @@ export default function SpiralGallery({ cards }) {
       const cardIndex = slot % cards.length;
       const card      = cards[cardIndex];
 
-      const geo      = new THREE.PlaneGeometry(CARD_W, CARD_H, 32, 20);
+      const geo      = new THREE.PlaneGeometry(CARD_W, CARD_H, 48, 32);
       const fallback = makeFallback(card.color);
       const tex      = loader.load(card.image, undefined, undefined,
         () => { mat.uniforms.uTexture.value = fallback; }
@@ -94,73 +107,104 @@ export default function SpiralGallery({ cards }) {
         fragmentShader,
         uniforms: {
           uTexture:    { value: tex },
-          uBend:       { value: 0 },
+          uCenter:     { value: new THREE.Vector3() },
+          uRight:      { value: new THREE.Vector3() },
+          uUp:         { value: new THREE.Vector3(0, 1, 0) },
+          uFlatness:   { value: 0 },
           uOpacity:    { value: 1 },
           uBrightness: { value: 1 },
+          uBlur:       { value: 0 },
         },
         transparent: true,
         side: THREE.DoubleSide,
       });
 
       const mesh = new THREE.Mesh(geo, mat);
+      mesh.frustumCulled = false; // vertices placed by shader, not mesh.position
       scene.add(mesh);
       meshes.push({ mesh, mat, cardIndex });
     }
 
     // ── Progress ──────────────────────────────────────────────────────────────
-    // Start at 0.1 so no slot has tFrac=0 (which would make it invisible via edgeMult)
-    let targetProgress  = 0.1;
-    let currentProgress = 0.1;
+    // progress=2.5 puts slot 0 (blob placeholder) exactly at front (t=0.25).
+    // Slot 0 is always invisible in Three.js — the blob HTML element covers it.
+    // Clamped to [−6.5, 2.5]: covers 10 positions (blob + 9 project cards), no looping.
+    let targetProgress  = 2.5;
+    let currentProgress = 2.5;
+    let globalYOffset   = -20;  // all cards below viewport until entry
+    let entryTriggered  = false;
+
+    const blobEl = document.getElementById('s2BlobIntro');
 
     function updateCards(progress) {
-      let bestDist  = Infinity;
-      let bestIndex = activeIndexRef.current;
+      let minProjectDist = Infinity;
 
       meshes.forEach(({ mesh, mat, cardIndex }, slot) => {
         const t     = (slot + progress) / TOTAL_SLOTS;
         const angle = t * TURNS * Math.PI * 2; // raw — angle cycles naturally
 
-        // Y: negated so diagonal runs lower-left → upper-right (matching reference)
-        // Offset 0.25 so front card (tFrac≈0.25) lands at posY=0 (screen center)
+        // Offset 0.5 centers the whole staircase: avg tFrac=0.5 → avg posY=0
         const tFrac = ((t % 1) + 1) % 1;
         const posX  = RADIUS * Math.cos(angle);
-        const posY  = -(tFrac - 0.25) * HELIX_HEIGHT;
         const posZ  = RADIUS * Math.sin(angle);
 
-        mesh.position.set(posX, posY, posZ);
-        mesh.lookAt(camera.position);
+        // angMod needed before posY so we can compute the inter-row gap
+        const angModEarly = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        const gapT    = Math.max(0, Math.min(1, (angModEarly - Math.PI * 0.85) / (Math.PI * 0.3)));
+        // Fold tFrac so the staircase spreads symmetrically: 5 slots above front, 4 below
+        const devFrac = ((tFrac + 0.25) % 1) - 0.5;
+        const posY    = -devFrac * HELIX_HEIGHT - gapT * ROW_GAP;
 
-        // Angular distance from front (angle mod 2π = π/2 faces camera at +Z)
-        const angMod = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        // Angular distance from front (π/2 = camera-facing on +Z axis)
+        const angMod = angModEarly;
         let angDiff  = angMod - Math.PI / 2;
         if (angDiff >  Math.PI) angDiff -= Math.PI * 2;
         if (angDiff < -Math.PI) angDiff += Math.PI * 2;
         const dist = Math.abs(angDiff) / Math.PI; // 0 = front, 1 = back
 
-        // Sharp edge fade: hides the Y teleport; only fades first/last 3% of range
-        const yEdge    = Math.min(tFrac, 1 - tFrac) * 2; // 0 at edges, 1 at center
+        // Slot 0 is the blob placeholder — always invisible in Three.js
+        if (slot === 0) {
+          mat.uniforms.uCenter.value.set(posX, posY + globalYOffset, posZ);
+          mat.uniforms.uRight.value.set(Math.sin(angle) * 1, 0, -Math.cos(angle) * 1);
+          mat.uniforms.uUp.value.set(0, 1, 0);
+          mat.uniforms.uFlatness.value   = 0;
+          mat.uniforms.uBlur.value       = 0;
+          mat.uniforms.uOpacity.value    = 0;
+          mat.uniforms.uBrightness.value = 0;
+          mesh.renderOrder = 0;
+          return;
+        }
+
+        // Track closest project card for blob fade
+        if (dist < minProjectDist) minProjectDist = dist;
+
+        // Sharp edge fade to hide Y teleport at helix wrap point
+        const yEdge    = Math.min(tFrac, 1 - tFrac) * 2;
         const edgeMult = Math.min(1, yEdge * 30);
 
-        // Heavy bend, strong scale fall-off — creates dominant center + curled sides
-        mat.uniforms.uBend.value       = dist * 6.0;
-        mat.uniforms.uOpacity.value    = Math.max(0.4, 1 - dist * 0.3) * edgeMult;
-        mat.uniforms.uBrightness.value = Math.max(0.18, 1 - dist * 0.72) * edgeMult;
-        mesh.scale.setScalar(Math.max(0.3, 1 - dist * 0.5));
-        mesh.renderOrder = 1 - dist;
+        // Scale: front card is dominant, background cards smaller
+        const scale = Math.max(0.45, 1 - dist * 0.4);
 
-        if (dist < bestDist) {
-          bestDist  = dist;
-          bestIndex = cardIndex;
-        }
+        // Feed world-space card orientation into shader — ONE shared sphere at origin
+        mat.uniforms.uCenter.value.set(posX, posY + globalYOffset, posZ);
+        mat.uniforms.uRight.value.set( Math.sin(angle) * scale, 0, -Math.cos(angle) * scale);
+        mat.uniforms.uUp.value.set(0, scale, 0);
+
+        // Front card is flat; all others sphere-curved — smooth ramp over dist 0→0.1
+        mat.uniforms.uFlatness.value   = Math.max(0, 1 - dist / 0.1);
+
+        mat.uniforms.uBlur.value       = Math.min(1, dist * 2.5);
+        mat.uniforms.uOpacity.value    = Math.max(0.2, 1 - dist * 0.7) * edgeMult;
+        mat.uniforms.uBrightness.value = Math.max(0.2, 1 - dist * 0.7) * edgeMult;
+        mesh.renderOrder = 1 - dist;
       });
 
-      if (bestIndex !== activeIndexRef.current) {
-        activeIndexRef.current = bestIndex;
-        setPanelVisible(false);
-        setTimeout(() => {
-          setActiveCard(cards[bestIndex]);
-          setPanelVisible(true);
-        }, 200);
+      // Fade blob out as a project card approaches front.
+      // At rest (progress=2.5), nearest project cards are ~0.2 away → blob fully visible.
+      // Threshold 0.05..0.2: smooth fade as any card closes in.
+      if (blobEl) {
+        const blobOpacity = Math.max(0, Math.min(1, (minProjectDist - 0.05) / 0.15));
+        blobEl.style.opacity = blobOpacity.toFixed(3);
       }
     }
 
@@ -169,11 +213,37 @@ export default function SpiralGallery({ cards }) {
     function resetAutoAdvance() {
       if (autoTimer) clearTimeout(autoTimer);
       autoTimer = setTimeout(() => {
-        targetProgress -= 1;
-        resetAutoAdvance();
+        const newP = targetProgress - 1;
+        if (newP >= -6.5) {
+          targetProgress = newP;
+          resetAutoAdvance(); // keep advancing until last card
+        }
+        // at -6.5 (slot 9 at front) → stop; not infinite
       }, 8000);
     }
-    resetAutoAdvance();
+    // auto-advance starts after entry animation settles (see IntersectionObserver)
+
+    // ── Entry animation — triggered when section scrolls into view ────────────
+    // Cards rise from below after the blob HTML element lands (CSS transition ~1.1s).
+    // No spin: progress stays at 2.5 (blob slot at front, invisible), blob HTML shows.
+    const entryObj = { y: -20 };
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !entryTriggered) {
+        entryTriggered = true;
+        observer.disconnect();
+        // Rise from below with a delay so blob lands first
+        gsap.to(entryObj, {
+          y: 0,
+          duration: 2.8,
+          delay: 1.2,
+          ease: 'power3.out',
+          onUpdate: () => { globalYOffset = entryObj.y; },
+        });
+        // Begin auto-advance once cards have settled
+        setTimeout(resetAutoAdvance, 4500);
+      }
+    }, { threshold: 0.1 });
+    observer.observe(el);
 
     // ── Scroll ────────────────────────────────────────────────────────────────
     const lenis = new Lenis({ smoothWheel: true, wheelMultiplier: 0 });
@@ -181,6 +251,8 @@ export default function SpiralGallery({ cards }) {
     function onWheel(e) {
       e.preventDefault();
       targetProgress -= e.deltaY * 0.015;
+      // Clamp: progress=2.5 → blob at front; progress=-6.5 → slot 9 at front
+      targetProgress = Math.max(-6.5, Math.min(2.5, targetProgress));
       resetAutoAdvance();
     }
     el.addEventListener('wheel', onWheel, { passive: false });
@@ -195,7 +267,7 @@ export default function SpiralGallery({ cards }) {
     gsap.ticker.add(tickerFn);
     gsap.ticker.lagSmoothing(0);
 
-    updateCards(0);
+    updateCards(currentProgress);
 
     function onResize() {
       const w = el.clientWidth;
@@ -207,6 +279,7 @@ export default function SpiralGallery({ cards }) {
     window.addEventListener('resize', onResize);
 
     return () => {
+      observer.disconnect();
       window.removeEventListener('resize', onResize);
       el.removeEventListener('wheel', onWheel);
       gsap.ticker.remove(tickerFn);
@@ -219,8 +292,8 @@ export default function SpiralGallery({ cards }) {
 
   return (
     <div style={{
-      width: '100vw', height: '100vh',
-      background: '#080808',
+      width: '100%', height: '100vh',
+      background: '#1E1E1E',
       position: 'relative', overflow: 'hidden',
     }}>
       {/* Dot grid */}
@@ -232,44 +305,6 @@ export default function SpiralGallery({ cards }) {
 
       {/* WebGL canvas */}
       <div ref={mountRef} style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
-
-      {/* Info panel */}
-      <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 10,
-        padding: '48px 48px 44px',
-        background: 'linear-gradient(to top, rgba(8,8,8,0.96) 0%, rgba(8,8,8,0.55) 65%, transparent 100%)',
-        opacity: panelVisible ? 1 : 0,
-        transition: 'opacity 200ms ease',
-        pointerEvents: panelVisible ? 'auto' : 'none',
-      }}>
-        <p style={{
-          margin: 0, fontSize: 11, letterSpacing: '0.18em',
-          color: activeCard.color, textTransform: 'uppercase', fontFamily: 'monospace',
-        }}>
-          {activeCard.sub}
-        </p>
-        <h2 style={{
-          margin: '6px 0 10px', fontSize: 30, fontWeight: 700,
-          color: '#fff', fontFamily: 'sans-serif', letterSpacing: '-0.02em',
-        }}>
-          {activeCard.title}
-        </h2>
-        <p style={{
-          margin: '0 0 22px', fontSize: 14, color: 'rgba(255,255,255,0.55)',
-          maxWidth: 500, lineHeight: 1.65, fontFamily: 'sans-serif',
-        }}>
-          {activeCard.desc}
-        </p>
-        <button style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6,
-          padding: '9px 20px', borderRadius: 999,
-          background: activeCard.color, color: '#fff',
-          border: 'none', cursor: 'pointer',
-          fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', fontFamily: 'monospace',
-        }}>
-          VIEW →
-        </button>
-      </div>
     </div>
   );
 }
