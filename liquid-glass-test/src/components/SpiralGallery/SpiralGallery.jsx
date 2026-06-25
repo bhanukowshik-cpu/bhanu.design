@@ -98,6 +98,7 @@ export default function SpiralGallery({ cards }) {
 
     const loader = new THREE.TextureLoader();
     const meshes = [];
+    const videoEls = [];
 
     for (let slot = 0; slot < TOTAL_SLOTS; slot++) {
       const cardIndex = slot % cards.length;
@@ -108,10 +109,22 @@ export default function SpiralGallery({ cards }) {
       const cardH = (slot === 0) ? BLOB_W : CARD_H;
       const geo      = new THREE.PlaneGeometry(cardW, cardH, 48, 32);
       const fallback = makeFallback(card.color);
-      const tex      = loader.load(card.image, undefined, undefined,
-        () => { mat.uniforms.uTexture.value = fallback; }
-      );
-      tex.colorSpace = THREE.SRGBColorSpace;
+
+      let tex;
+      if (card.video) {
+        const vid = document.createElement('video');
+        vid.src = card.video; vid.loop = true; vid.muted = true;
+        vid.playsInline = true; vid.autoplay = true;
+        vid.play().catch(() => {});
+        videoEls.push(vid);
+        tex = new THREE.VideoTexture(vid);
+        tex.colorSpace = THREE.SRGBColorSpace;
+      } else {
+        tex = loader.load(card.image, undefined, undefined,
+          () => { mat.uniforms.uTexture.value = fallback; }
+        );
+        tex.colorSpace = THREE.SRGBColorSpace;
+      }
 
       const mat = new THREE.ShaderMaterial({
         vertexShader,
@@ -138,7 +151,8 @@ export default function SpiralGallery({ cards }) {
 
     // ── Progress ──────────────────────────────────────────────────────────────
     // progress=2.5 puts slot 0 (blob card) exactly at front (t=0.25).
-    // Clamped to [−6.5, 2.5]: covers 10 positions (blob + 9 project cards), no looping.
+    // PROGRESS_MIN = 2.5 - (cards.length-1): shows last unique card without repeating.
+    const PROGRESS_MIN = 2.5 - (cards.length - 1);
     let targetProgress  = 2.5;
     let currentProgress = 2.5;
     let globalYOffset   = -20;  // all cards below viewport until entry
@@ -213,11 +227,10 @@ export default function SpiralGallery({ cards }) {
       if (autoTimer) clearTimeout(autoTimer);
       autoTimer = setTimeout(() => {
         const newP = targetProgress - 1;
-        if (newP >= -6.5) {
+        if (newP >= PROGRESS_MIN) {
           targetProgress = newP;
-          resetAutoAdvance(); // keep advancing until last card
+          resetAutoAdvance();
         }
-        // at -6.5 (slot 9 at front) → stop; not infinite
       }, 8000);
     }
     // auto-advance starts after entry animation settles (see IntersectionObserver)
@@ -251,7 +264,7 @@ export default function SpiralGallery({ cards }) {
       e.preventDefault();
       targetProgress -= e.deltaY * 0.015;
       // Clamp: progress=2.5 → blob at front; progress=-6.5 → slot 9 at front
-      targetProgress = Math.max(-6.5, Math.min(2.5, targetProgress));
+      targetProgress = Math.max(PROGRESS_MIN, Math.min(2.5, targetProgress));
       resetAutoAdvance();
     }
     el.addEventListener('wheel', onWheel, { passive: false });
@@ -312,6 +325,7 @@ export default function SpiralGallery({ cards }) {
     window.addEventListener('resize', onResize);
 
     return () => {
+      videoEls.forEach(v => { v.pause(); v.src = ''; });
       observer.disconnect();
       window.removeEventListener('resize', onResize);
       el.removeEventListener('wheel', onWheel);
