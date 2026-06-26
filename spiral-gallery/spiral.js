@@ -14,12 +14,12 @@
 
     // ── Cards ─────────────────────────────────────────────────────────────
     var CARDS = [
-      { label: 'EverTutor',    src: '/images/blob.png'                             },
-      { label: 'ET Live',      src: '/images/et-live.png'                          },
-      { label: 'ET Studio',    src: '/images/et-studio.png'                        },
-      { label: 'ET Analytics', src: '/images/et-analytics.png'                     },
-      { label: 'Dearly',       src: '/images/dearly.png'                           },
-      { label: 'Stressie',     src: 'https://picsum.photos/seed/stressie/1280/720' },
+      { label: 'EverTutor',    src: '/images/blob.png',          video: false },
+      { label: 'ET Live',      src: '/images/et-live.mp4',       video: true  },
+      { label: 'ET Studio',    src: '/images/et-studio.mp4',     video: true  },
+      { label: 'ET Analytics', src: '/images/et-analytics.mp4',  video: true  },
+      { label: 'Dearly',       src: '/images/dearly.mp4',        video: true  },
+      { label: 'Stressie',     src: '/images/stressie.mp4',      video: true  },
     ];
     var allCards = CARDS.concat(CARDS);
 
@@ -162,19 +162,34 @@ void main() {
     });
 
     // ── Texture loading ───────────────────────────────────────────────────
-    var loader = new THREE.TextureLoader();
-    loader.crossOrigin = 'anonymous';
+    var loader  = new THREE.TextureLoader();
+    var videoEls = [];
 
     CARDS.forEach(function (card, ci) {
-      loader.load(card.src, function (tex) {
+      var dup = ci + CARDS.length;
+      if (card.video) {
+        var vid = document.createElement('video');
+        vid.src = card.src; vid.loop = true; vid.muted = true;
+        vid.playsInline = true; vid.autoplay = true;
+        vid.play().catch(function () {});
+        videoEls.push(vid);
+        var tex = new THREE.VideoTexture(vid);
         tex.minFilter = THREE.LinearFilter;
         tex.magFilter = THREE.LinearFilter;
-        uniforms[ci].uTexture.value = tex;
-        uniforms[ci].uImageSizes.value.set(tex.image.width, tex.image.height);
-        var dup = ci + CARDS.length;
+        uniforms[ci].uTexture.value  = tex;
+        uniforms[ci].uImageSizes.value.set(1280, 720);
         uniforms[dup].uTexture.value = tex;
-        uniforms[dup].uImageSizes.value.set(tex.image.width, tex.image.height);
-      });
+        uniforms[dup].uImageSizes.value.set(1280, 720);
+      } else {
+        loader.load(card.src, function (tex) {
+          tex.minFilter = THREE.LinearFilter;
+          tex.magFilter = THREE.LinearFilter;
+          uniforms[ci].uTexture.value = tex;
+          uniforms[ci].uImageSizes.value.set(tex.image.width, tex.image.height);
+          uniforms[dup].uTexture.value = tex;
+          uniforms[dup].uImageSizes.value.set(tex.image.width, tex.image.height);
+        });
+      }
     });
 
     // ── Scroll ────────────────────────────────────────────────────────────
