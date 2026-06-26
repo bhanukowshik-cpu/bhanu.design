@@ -257,8 +257,12 @@
       background: rgba(0,0,0,0.06);
       color: #252525;
       box-shadow:
-        inset 1.5px 2px 3px rgba(255,255,255,0.80),
-        inset 0 0 0 1px rgba(0,0,0,0.10);
+        rgba(230,242,141,0.10) -1.996px 2.391px 18.109px -2.622px inset,
+        rgba(230,242,141,0.40) -5.73px  -4px    3.36px   -2.73px  inset,
+        rgba(255,255,255,0.30)  6.671px  6.671px 3.363px -6.214px inset,
+        rgba(230,242,141,0.50)  0px      1px    12.2px   -5px     inset,
+        rgba(230,242,141,0.40) -6.727px -6.727px 3.363px -6.727px inset,
+        rgba(255,255,255,0.30)  6.671px  6.671px 3.363px -6.214px inset;
       backdrop-filter: blur(10px) saturate(150%);
       -webkit-backdrop-filter: blur(10px) saturate(150%);
       transition: transform 0.18s cubic-bezier(0.16,1,0.3,1),
@@ -6390,12 +6394,8 @@
 
     /* ── Section 2 redesign — Featured Work ─────────────────── */
     .s2-fw-header {
-      padding: 28px 0 24px;
+      padding: 80px 0 60px;
       text-align: center;
-      position: sticky;
-      top: 60px;
-      z-index: 9;
-      background: inherit;
       opacity: 0;
       transform: translateY(24px);
       transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1),
@@ -6991,11 +6991,16 @@
         0 0 36px 10px rgba(230, 242, 141, 0.26);
     }
     /* ── Testimonial card stack ── */
-    .tm-section { padding: 80px 0 100px; }
-    .tm-header  { text-align: center; margin-bottom: 52px; padding: 0 24px; }
+    /* ── Testimonial section — full-viewport card stack ── */
+    .tm-section {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 0;
+    }
+    .tm-header { text-align: center; margin-bottom: 48px; padding: 0 24px; }
     .tm-eyebrow-tag {
-      display: inline-block;
-      font-family: var(--font-mono);
+      display: inline-block; font-family: var(--font-mono);
       font-size: 10.5px; font-weight: 700;
       letter-spacing: 0.12em; text-transform: uppercase;
       color: var(--secondary); opacity: 0.45;
@@ -7007,82 +7012,113 @@
       font-size: clamp(28px, 3.5vw, 42px); font-weight: 700;
       color: var(--secondary); margin: 0;
     }
-    .tm-stack-scene {
-      display: flex; flex-direction: column; align-items: center;
-      padding: 12px 0 48px;
-    }
-    /* top-peek stack: back cards show their top edges above the front card */
-    .tm-stack { position: relative; width: 420px; height: 320px; }
+    .tm-stack-scene { display: flex; flex-direction: column; align-items: center; width: min(880px, calc(100% - 40px)); }
+    /* Stack container: height = card height + front-card offset */
+    .tm-stack { position: relative; width: 100%; height: 608px; }
     .tm-sc {
-      position: absolute;
-      top: 0; left: 0; width: 420px;
-      background: #252525;
-      border: 2px solid #1A73E8;
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 496px;
+      border: 1.5px solid rgba(255,255,255,0.10);
       border-radius: 18px;
-      padding: 26px 24px 22px;
-      box-sizing: border-box;
+      box-sizing: border-box; overflow: visible;
       transition: transform 0.62s cubic-bezier(0.4,0,0.2,1), opacity 0.55s ease;
       will-change: transform, opacity;
     }
-    /* pos=0 is front: pushed down so back cards peek above it */
-    .tm-sc[data-pos="0"] {
-      z-index: 10;
-      transform: translateY(58px) scale(1);
-      opacity: 1;
+    /* ::after disabled — colour bloom now lives inside .tm-art-frame::after */
+    .tm-sc::after { content: ''; display: none; }
+    .tm-sc::before { content: ''; display: none; }
+    /* Art frame: illustration container */
+    .tm-art-frame {
+      position: relative; flex: 1;
+      border-radius: 10px; overflow: hidden;
+      background: #F5F3EF;
     }
-    .tm-sc[data-pos="1"] {
-      z-index: 9;
-      transform: translateY(30px) scale(0.955);
-      opacity: 1; pointer-events: none;
+    .tm-art-frame::after {
+      content: ''; position: absolute; inset: 0;
+      border-radius: inherit; pointer-events: none; z-index: 1;
     }
-    .tm-sc[data-pos="2"] {
-      z-index: 8;
-      transform: translateY(6px) scale(0.91);
-      opacity: 1; pointer-events: none;
+    .tm-art-img {
+      position: relative; z-index: 3;
+      width: 100%; height: 100%;
+      object-fit: contain; padding: 14px;
+      box-sizing: border-box; display: block;
     }
-    /* hidden staging position — same visual as pos=2 but invisible, so re-entry is a pure fade */
-    .tm-sc[data-pos="3"], .tm-sc[data-pos="4"], .tm-sc[data-pos="5"] {
-      z-index: 7;
-      transform: translateY(6px) scale(0.91);
-      opacity: 0; pointer-events: none;
+    /* Per-card colour bloom inside the illustration frame */
+    .tm-sc[data-color="purple"] .tm-art-frame::after { background: radial-gradient(ellipse 160% 140% at 115% 118%, rgba(196,181,253,0.95) 0%, transparent 68%), radial-gradient(ellipse 110% 100% at 95% 115%, rgba(237,233,254,0.80) 0%, transparent 62%), radial-gradient(ellipse 90% 80% at 118% 88%, rgba(216,180,254,0.70) 0%, transparent 58%), radial-gradient(ellipse 70% 62% at 82% 105%, rgba(249,168,212,0.48) 0%, transparent 55%); }
+    .tm-sc[data-color="peach"]  .tm-art-frame::after { background: radial-gradient(ellipse 160% 140% at 115% 118%, rgba(253,186,116,0.95) 0%, transparent 68%), radial-gradient(ellipse 110% 100% at 95% 115%, rgba(255,243,210,0.80) 0%, transparent 62%), radial-gradient(ellipse 90% 80% at 118% 88%, rgba(254,215,170,0.75) 0%, transparent 58%), radial-gradient(ellipse 70% 62% at 82% 105%, rgba(252,165,165,0.50) 0%, transparent 55%); }
+    .tm-sc[data-color="green"]  .tm-art-frame::after { background: radial-gradient(ellipse 160% 140% at 115% 118%, rgba(110,231,183,0.95) 0%, transparent 68%), radial-gradient(ellipse 110% 100% at 95% 115%, rgba(220,252,231,0.80) 0%, transparent 62%), radial-gradient(ellipse 90% 80% at 118% 88%, rgba(167,243,208,0.75) 0%, transparent 58%), radial-gradient(ellipse 70% 62% at 82% 105%, rgba(186,230,253,0.50) 0%, transparent 55%); }
+    .tm-sc[data-color="blue"]   .tm-art-frame::after { background: radial-gradient(ellipse 160% 140% at 115% 118%, rgba(147,197,253,0.95) 0%, transparent 68%), radial-gradient(ellipse 110% 100% at 95% 115%, rgba(219,234,254,0.80) 0%, transparent 62%), radial-gradient(ellipse 90% 80% at 118% 88%, rgba(196,181,253,0.70) 0%, transparent 58%), radial-gradient(ellipse 70% 62% at 82% 105%, rgba(186,230,253,0.58) 0%, transparent 55%); }
+    /* Canvas grain element — sits between gradient and illustration so illustration stays white */
+    .tm-grain { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2; }
+    /* Card body sits above noise */
+    .tm-body {
+      position: relative; z-index: 2;
+      display: flex; height: 100%;
+      padding: 28px 28px 24px; gap: 20px;
+      border-radius: inherit; overflow: hidden;
     }
-    /* exit: front card slides out the bottom */
-    .tm-sc-exit {
-      z-index: 11 !important;
-      transform: translateY(160%) scale(0.92) !important;
-      opacity: 0 !important;
-      transition: transform 0.52s cubic-bezier(0.4,0,1,1) !important,
-                  opacity 0.32s ease 0.1s !important;
-      pointer-events: none !important;
+    .tm-text-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .tm-art-col {
+      width: 230px; flex-shrink: 0;
+      display: flex; align-items: stretch;
     }
-    /* corner screws hidden for rounded cards */
-    .tm-sc .tm-fh { display: none; }
-    .tm-logo {
-      font-family: var(--font-mono);
-      font-size: 10.5px; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      margin-bottom: 12px; display: block;
+    /* All cards dark — colour bloom lives inside .tm-art-frame */
+    .tm-sc[data-color="purple"],
+    .tm-sc[data-color="peach"],
+    .tm-sc[data-color="green"],
+    .tm-sc[data-color="blue"],
+    .tm-sc[data-color="pink"] { background: #141418; }
+    /* Accent colours — pastel tones for dark background */
+    .tm-sc[data-color="purple"] .tm-qmark,
+    .tm-sc[data-color="purple"] .tm-name { color: #c4b5fd; }
+    .tm-sc[data-color="peach"]  .tm-qmark,
+    .tm-sc[data-color="peach"]  .tm-name { color: #fdba74; }
+    .tm-sc[data-color="green"]  .tm-qmark,
+    .tm-sc[data-color="green"]  .tm-name { color: #6ee7b7; }
+    .tm-sc[data-color="blue"]   .tm-qmark,
+    .tm-sc[data-color="blue"]   .tm-name { color: #93c5fd; }
+    .tm-sc[data-color="pink"]   .tm-qmark,
+    .tm-sc[data-color="pink"]   .tm-name { color: #f9a8d4; }
+    /* Figma-style corner handles */
+    .tm-sc .tm-fh {
+      position: absolute; width: 8px; height: 8px;
+      background: #1e1e28; border: 1.5px solid rgba(255,255,255,0.35); z-index: 5;
     }
-    .tm-logo--et  { color: #5EEAD4; }
-    .tm-logo--st  { color: #F87171; }
-    .tm-logo--stu { color: #A78BFA; }
+    .tm-sc .tm-fh.tl { top: -4px; left: -4px; }
+    .tm-sc .tm-fh.tr { top: -4px; right: -4px; }
+    .tm-sc .tm-fh.bl { bottom: -4px; left: -4px; }
+    .tm-sc .tm-fh.br { bottom: -4px; right: -4px; }
+    /* Stack positions */
+    .tm-sc[data-pos="0"] { z-index: 10; transform: translateY(80px) scale(1); opacity: 1; }
+    .tm-sc[data-pos="1"] { z-index: 9;  transform: translateY(54px) scale(0.962); opacity: 1; pointer-events: none; }
+    .tm-sc[data-pos="2"] { z-index: 8;  transform: translateY(30px) scale(0.924); opacity: 1; pointer-events: none; }
+    .tm-sc[data-pos="3"] { z-index: 7;  transform: translateY(10px) scale(0.886); opacity: 1; pointer-events: none; }
+    .tm-sc[data-pos="4"], .tm-sc[data-pos="5"] {
+      z-index: 6; transform: translateY(10px) scale(0.886); opacity: 0; pointer-events: none;
+    }
+    /* Large opening quote mark */
+    .tm-qmark {
+      font-size: 40px; line-height: 1; display: block;
+      margin-bottom: 6px; font-family: Georgia, 'Times New Roman', serif;
+    }
+    /* Quote body */
     .tm-quote {
       font-family: var(--font-heading);
-      font-size: 13px; line-height: 1.7;
-      color: rgba(255,255,255,0.85);
-      margin: 0 0 16px;
+      font-size: 13px; line-height: 1.68;
+      color: rgba(255, 255, 255, 0.75);
+      margin: 0; flex: 1; overflow: hidden;
     }
-    .tm-attr { display: flex; align-items: center; gap: 10px; }
-    .tm-av {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: #1A73E8;
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
-      color: #fff; flex-shrink: 0;
+    /* Author block */
+    .tm-attr { margin-top: 10px; }
+    .tm-name {
+      font-family: var(--font-heading); font-size: 13px; font-weight: 700; display: block;
     }
-    .tm-name { font-family: var(--font-heading); font-size: 12.5px; font-weight: 600; color: #fff; display: block; }
-    .tm-role { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4); display: block; margin-top: 2px; }
-    .tm-dots { display: flex; gap: 8px; margin-top: 28px; }
+    .tm-role {
+      font-family: var(--font-mono); font-size: 10px;
+      color: rgba(255, 255, 255, 0.42); display: block; margin-top: 3px;
+    }
+    /* Navigation dots */
+    .tm-dots { display: flex; gap: 8px; margin-top: 24px; }
     .tm-dot {
       width: 8px; height: 8px; border-radius: 50%;
       border: none; cursor: pointer; padding: 0;
@@ -7091,20 +7127,31 @@
     }
     .tm-dot.active { background: #1A73E8; transform: scale(1.35); }
     .tm-dot:hover:not(.active) { background: rgba(37,37,37,0.4); }
-    [data-theme="dark"] .tm-section  { background: #080808; }
-    [data-theme="dark"] .tm-eyebrow-tag { color: rgba(255,255,255,0.45); border-color: rgba(255,255,255,0.15); opacity: 1; }
-    [data-theme="dark"] .tm-headline { color: #fff; }
-    [data-theme="dark"] .tm-dot      { background: rgba(255,255,255,0.2); }
+    /* Dark mode */
+    [data-theme="dark"] .tm-section        { background: #080808; }
+    [data-theme="dark"] .tm-eyebrow-tag    { color: rgba(255,255,255,0.45); border-color: rgba(255,255,255,0.15); opacity: 1; }
+    [data-theme="dark"] .tm-headline       { color: #fff; }
+    [data-theme="dark"] .tm-dot            { background: rgba(255,255,255,0.2); }
     [data-theme="dark"] .tm-dot:hover:not(.active) { background: rgba(255,255,255,0.45); }
+    [data-theme="dark"] .tm-sc .tm-fh      { background: #252525; }
     @media (max-width: 1023px) {
       .tm-header { padding: 0 32px; }
-      .tm-stack  { width: 360px; height: 330px; }
-      .tm-sc     { width: 360px; }
+      .tm-stack-scene { width: min(620px, calc(100% - 32px)); }
+      .tm-stack  { height: 452px; }
+      .tm-sc     { height: 340px; }
+      .tm-art-col { width: 170px; }
+      .tm-quote  { font-size: 11.5px; }
+      .tm-qmark  { font-size: 34px; }
     }
     @media (max-width: 767px) {
       .tm-header { padding: 0 20px; margin-bottom: 36px; }
-      .tm-stack  { width: 300px; height: 360px; }
-      .tm-sc     { width: 300px; padding: 20px 18px 18px; }
+      .tm-stack-scene { width: calc(100% - 24px); }
+      .tm-stack  { height: 312px; }
+      .tm-sc     { height: 200px; }
+      .tm-body   { padding: 16px 18px 14px; }
+      .tm-quote  { font-size: 10.5px; }
+      .tm-qmark  { font-size: 28px; }
+      .tm-art-col { display: none; }
     }
 
 
@@ -7390,17 +7437,17 @@
 
       <div id="s2Section" style="position:relative;top:-70px;pointer-events:none;"></div>
 
-      <!-- ── SECTION 2: FEATURED WORK ─────────────────────────────── -->
-      <div class="s2-work-container">
-
-      <!-- A: "Featured Work" title — fades in on scroll -->
+      <!-- ── Featured Work heading — standalone small frame ── -->
       <div class="s2-fw-header" id="s2FwHeader">
         <h2 class="fw-title">Featured Work</h2>
       </div>
 
-      <!-- B: Spiral Gallery — blob enters first, then spiral unfurls -->
-      <div class="s2-cards-zone" id="s2CardsZone" style="position:relative;overflow:hidden;">
-        <div id="spiral-root" style="width:100%;height:100vh;position:relative;overflow:hidden;"></div>
+      <!-- ── SECTION 2: FEATURED WORK — full-viewport spiral ── -->
+      <div class="s2-work-container">
+
+      <!-- Spiral Gallery — full viewport, blob centered -->
+      <div class="s2-cards-zone" id="s2CardsZone" style="position:relative;">
+        <div id="spiral-root" style="width:100%;height:100vh;position:relative;"></div>
       </div>
 
       <!-- C: Blob + left/right content (static ws-section removed; content now in spiral gallery panels) -->
@@ -7827,38 +7874,90 @@
         <div class="tm-stack-scene">
           <div class="tm-stack" id="tmStack">
 
-            <div class="tm-sc" data-pos="0">
+            <!-- Card 1: Lupita · Stressie · Purple -->
+            <div class="tm-sc" data-pos="0" data-color="purple">
               <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
               <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-              <span class="tm-logo tm-logo--et">EverTutor</span>
-              <p class="tm-quote">Bhanu doesn&#8217;t just design screens &#8212; he designs how the team thinks about problems. Working with him pushed us to ask better questions at every step. He&#8217;s the one engineers actually trust.</p>
-              <div class="tm-attr">
-                <div class="tm-av">AK</div>
-                <div><span class="tm-name">Anil Kumar</span><span class="tm-role">Engineering Lead &middot; EverTutor</span></div>
+              <div class="tm-body">
+                <div class="tm-text-col">
+                  <span class="tm-qmark">&#8220;</span>
+                  <p class="tm-quote">I met Bhanu as he was pitching his design skills at a founder event. I had never witnessed that and after a long interview project based process, asked him to join our team. Eventually, Bhanu became our Founding UX/UI designer at Stressie where he led aspects of customer discovery, behavior analytics, and design of our first product which eventually pre-launched into the market and has been the foundation for our traction since.<br><br>I thank my lucky stars everyday for bringing you into our path at Stressie.</p>
+                  <div class="tm-attr">
+                    <span class="tm-name">Lupita</span>
+                    <span class="tm-role">Co-Founder &amp; CEO &middot; Stressie</span>
+                  </div>
+                </div>
+                <div class="tm-art-col">
+                  <div class="tm-art-frame">
+                    <img src="Testrimonial%20Icons/Lupita%20Stressie.svg?v=2" class="tm-art-img" alt="Lupita">
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="tm-sc" data-pos="1">
+            <!-- Card 2: Subash · EverTutor · Peach -->
+            <div class="tm-sc" data-pos="1" data-color="peach">
               <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
               <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-              <span class="tm-logo tm-logo--st">Stressie</span>
-              <p class="tm-quote">He has a gift for making complex flows feel obvious in hindsight. After his onboarding redesign, our support tickets dropped 30% in the first month alone.</p>
-              <div class="tm-attr">
-                <div class="tm-av">PM</div>
-                <div><span class="tm-name">Priya Menon</span><span class="tm-role">Head of Product &middot; Stressie</span></div>
+              <div class="tm-body">
+                <div class="tm-text-col">
+                  <span class="tm-qmark">&#8220;</span>
+                  <p class="tm-quote">I&#8217;ve worked with a lot of designers across fast-moving 0&#8594;1 environments, and Bhanu stands apart. At EverTutor, he wasn&#8217;t just executing on design briefs &#8212; he was shaping the product vision, pushing back when something didn&#8217;t serve the user, and holding a ridiculously high bar for craft even when timelines were brutal.<br><br>What struck me most was his ability to hold ambiguity without flinching. In a product that was constantly evolving &#8212; new modalities, shifting priorities, a team moving at startup speed.</p>
+                  <div class="tm-attr">
+                    <span class="tm-name">Subash Rajaseelan</span>
+                    <span class="tm-role">CEO &middot; EverTutor</span>
+                  </div>
+                </div>
+                <div class="tm-art-col">
+                  <div class="tm-art-frame">
+                    <img src="Testrimonial%20Icons/Subash%20EverTutor.svg?v=2" class="tm-art-img" alt="Subash">
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="tm-sc" data-pos="2">
+            <!-- Card 3: Shaini · EverTutor · Green -->
+            <div class="tm-sc" data-pos="2" data-color="green">
               <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
               <span class="tm-fh bl"></span><span class="tm-fh br"></span>
-              <span class="tm-logo tm-logo--stu">Studio</span>
-              <p class="tm-quote">Bhanu delivers designs that are ready to build. No gaps, no hand-wavy specs &#8212; just clear decisions backed by solid research and real user data.</p>
-              <div class="tm-attr">
-                <div class="tm-av">MW</div>
-                <div><span class="tm-name">Marcus Webb</span><span class="tm-role">Senior Engineer &middot; Studio</span></div>
+              <div class="tm-body">
+                <div class="tm-text-col">
+                  <span class="tm-qmark">&#8220;</span>
+                  <p class="tm-quote">Thank you Bhanu for being such a great mentor. The way you onboarded and guided me from the beginning made a huge difference. Your patience and ability to explain complex concepts clearly helped me grow more in those few months than I had in years.</p>
+                  <div class="tm-attr">
+                    <span class="tm-name">Shaini</span>
+                    <span class="tm-role">Content Designer &middot; EverTutor</span>
+                  </div>
+                </div>
+                <div class="tm-art-col">
+                  <div class="tm-art-frame">
+                    <img src="Testrimonial%20Icons/Shaini%20Designer.svg?v=2" class="tm-art-img" alt="Shaini">
+                  </div>
+                </div>
               </div>
             </div>
+
+            <!-- Card 4: AnuShree · EverTutor · Blue -->
+            <div class="tm-sc" data-pos="3" data-color="blue">
+              <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+              <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+              <div class="tm-body">
+                <div class="tm-text-col">
+                  <span class="tm-qmark">&#8220;</span>
+                  <p class="tm-quote">It was a great experience working with you. Your design sensibility and the way you approached user problems always inspired me to think deeper about the work. Hope to collaborate again someday in the future.</p>
+                  <div class="tm-attr">
+                    <span class="tm-name">AnuShree</span>
+                    <span class="tm-role">Content Designer &middot; EverTutor</span>
+                  </div>
+                </div>
+                <div class="tm-art-col">
+                  <div class="tm-art-frame">
+                    <img src="Testrimonial%20Icons/Anushree%20Designer.svg?v=2" class="tm-art-img" alt="AnuShree">
+                  </div>
+                </div>
+              </div>
+            </div>
+
 
           </div><!-- /tmStack -->
 
@@ -7866,6 +7965,7 @@
             <button class="tm-dot active" data-idx="0" aria-label="Testimonial 1"></button>
             <button class="tm-dot" data-idx="1" aria-label="Testimonial 2"></button>
             <button class="tm-dot" data-idx="2" aria-label="Testimonial 3"></button>
+            <button class="tm-dot" data-idx="3" aria-label="Testimonial 4"></button>
           </div>
 
         </div><!-- /tm-stack-scene -->
@@ -11981,7 +12081,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
     // Collapse chat bar to rotating FAB when user scrolls into section 2+
     (function() {
-      var etsys   = document.querySelector('.ws-section');
+      var etsys   = document.getElementById('spiral-root') || document.querySelector('.ws-section');
       var fabWrap = document.getElementById('cbWrap');
       var fabBtn  = document.getElementById('cbFabBtn');
       if (!etsys || !fabWrap || !fabBtn) return;
@@ -12001,17 +12101,15 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       }
 
       window.addEventListener('scroll', checkFab, { passive: true });
-      checkFab(); /* initial pass — same pattern as scroll-animations.js */
+      checkFab();
 
       fabBtn.addEventListener('click', function() {
         userExpanded = true;
         fabWrap.classList.remove('cb-fab');
-        lastState = 'full';
         window._fabOpened = true;
         if (window._openChat) window._openChat();
       });
 
-      /* Called by closeChat() to decide what state to restore */
       window._restoreFab = function() {
         if (!window._fabOpened) return;
         window._fabOpened = false;
@@ -12024,9 +12122,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
           return r.top < vh * 0.85 && r.bottom > vh * 0.15;
         }
         userExpanded = false;
-        /* Hero or contact visible → stay as wide bar (just reset userExpanded) */
         if (sectionInView(hero) || sectionInView(contact)) return;
-        /* Otherwise restore FAB immediately */
         fabWrap.classList.add('cb-fab');
       };
     })();
@@ -12198,9 +12294,70 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   })();
   </script>
 
+  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="/spiral-gallery/spiral.js" defer></script>
 
   <script>
+  /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
+  (function () {
+    var COLOR_RGB = {
+      purple: [196, 181, 253],
+      peach:  [253, 186, 116],
+      green:  [110, 231, 183],
+      blue:   [147, 197, 253],
+      pink:   [249, 168, 212]
+    };
+
+    function paintGrain(frame, colorKey) {
+      var existing = frame.querySelector('.tm-grain');
+      if (existing) existing.remove();
+
+      var W = frame.offsetWidth  || 170;
+      var H = frame.offsetHeight || 255;
+      var rgb = COLOR_RGB[colorKey] || [200, 200, 200];
+
+      var cvs = document.createElement('canvas');
+      cvs.width  = W;
+      cvs.height = H;
+      cvs.className = 'tm-grain';
+      cvs.style.opacity = '0.55';
+
+      var ctx = cvs.getContext('2d');
+
+      /* Dense random pixel noise in the card's colour */
+      var img = ctx.createImageData(W, H);
+      var d   = img.data;
+      var r = rgb[0], g = rgb[1], b = rgb[2];
+      for (var i = 0; i < d.length; i += 4) {
+        d[i]     = r;
+        d[i + 1] = g;
+        d[i + 2] = b;
+        d[i + 3] = Math.random() < 0.6 ? Math.floor(Math.random() * 200 + 55) : 0;
+      }
+      ctx.putImageData(img, 0, 0);
+
+      /* Mask via destination-in: dense at bottom-right, dissolves toward top-left */
+      ctx.globalCompositeOperation = 'destination-in';
+      var diag = Math.sqrt(W * W + H * H);
+      var grad = ctx.createRadialGradient(W, H, 0, W, H, diag * 0.90);
+      grad.addColorStop(0,    'rgba(0,0,0,1)');
+      grad.addColorStop(0.25, 'rgba(0,0,0,0.92)');
+      grad.addColorStop(0.55, 'rgba(0,0,0,0.50)');
+      grad.addColorStop(0.80, 'rgba(0,0,0,0.18)');
+      grad.addColorStop(1,    'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      frame.appendChild(cvs);
+    }
+
+    document.querySelectorAll('.tm-art-frame').forEach(function(frame) {
+      var card = frame.closest('.tm-sc');
+      if (card) paintGrain(frame, card.dataset.color);
+    });
+  })();
+
   /* ── Testimonial card stack with drag ── */
   (function () {
     var stack  = document.getElementById('tmStack');
@@ -12215,8 +12372,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var anim  = false;
 
     /* CSS transform values for each named slot */
-    var POS_FRONT = 'translateY(58px) scale(1)';
-    var POS_BACK  = 'translateY(6px) scale(0.91)';
+    var POS_FRONT = 'translateY(80px) scale(1)';
+    var POS_BACK  = 'translateY(12px) scale(0.92)';
 
     function applyPos() {
       cards.forEach(function (c, i) {
@@ -12243,7 +12400,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
       /* Phase 1: slide front card down and off (ease-in acceleration) */
       card.style.transition = 'transform 0.38s cubic-bezier(0.4, 0, 1, 1)';
-      card.style.transform  = 'translateY(224px) scale(1)';
+      card.style.transform  = 'translateY(260px) scale(1)';
       card.style.zIndex     = '12'; /* stay above stack while exiting */
 
       /* Shift remaining cards to their new positions simultaneously */
