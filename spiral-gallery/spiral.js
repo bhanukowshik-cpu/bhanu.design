@@ -18,8 +18,8 @@
       { label: 'ET Live',      img: '/images/thumb-1.jpg',   video: '/images/et-live.mp4'       },
       { label: 'ET Studio',    img: '/images/thumb-2.jpg',   video: '/images/et-studio.mp4'     },
       { label: 'ET Analytics', img: '/images/thumb-3.jpg',   video: '/images/et-analytics.mp4'  },
-      { label: 'Dearly',       img: '/images/thumb-4.jpg',   video: '/images/dearly.mp4'        },
       { label: 'Stressie',     img: '/images/thumb-5.jpg',   video: '/images/stressie.mp4'      },
+      { label: 'Dearly',       img: '/images/thumb-4.jpg',   video: '/images/dearly.mp4'        },
     ];
     var allCards = CARDS.concat(CARDS);
 
@@ -54,18 +54,18 @@
         href: '#',
       },
       {
-        eyebrow: '05', label: 'Dearly',
-        src: '/images/dearly.mp4', video: true, poster: '/images/dearly.png',
-        desc: 'Animated handwriting messages with your real voice and photos attached, sent as a unique link. Built in 48 hours.',
-        metrics: [{ val: '140', lbl: 'Letters' }, { val: '35★', lbl: '5-Star' }, { val: '48hrs', lbl: 'Built In' }],
-        href: '#',
-      },
-      {
-        eyebrow: '06', label: 'Stressie',
+        eyebrow: '05', label: 'Stressie',
         src: '/images/stressie.mp4', video: true, poster: null,
         desc: 'Harvard-incubated workplace stress app. Full redesign from the ground up — engagement hit 17.4% vs ~2% industry average.',
         metrics: [{ val: '17.4%', lbl: 'Engage' }, { val: '$600k', lbl: 'Funding' }, { val: 'Amzn', lbl: '& InKind' }],
         href: 'stressie-studio.html',
+      },
+      {
+        eyebrow: '06', label: 'Dearly',
+        src: '/images/dearly.mp4', video: true, poster: '/images/dearly.png',
+        desc: 'Animated handwriting messages with your real voice and photos attached, sent as a unique link. Built in 48 hours.',
+        metrics: [{ val: '140', lbl: 'Letters' }, { val: '35★', lbl: '5-Star' }, { val: '48hrs', lbl: 'Built In' }],
+        href: '#',
       },
     ];
 
