@@ -6522,6 +6522,7 @@
     }
 
     /* Bottom project tab strip — shoots up on section entry */
+    /* Outer wrapper — handles the shoot-up animation only */
     .s2-project-tabs {
       position: absolute;
       bottom: 40px;
@@ -6530,64 +6531,77 @@
       z-index: 20;
       display: flex;
       align-items: center;
-      background: rgba(22,22,22,0.88);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 5px 5px 5px 14px;
+      gap: 8px;
       transition: transform 0.85s cubic-bezier(0.16,1,0.3,1);
       white-space: nowrap;
     }
     .s2-project-tabs.s2-tabs-in {
       transform: translateX(-50%) translateY(0);
     }
-    .s2-tabs-list { display: flex; align-items: center; gap: 1px; }
+    /* Glass pill — wraps only the tab buttons */
+    .s2-tabs-list {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: rgba(22,22,22,0.82);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 100px;
+      padding: 5px 6px;
+    }
     .s2-tab-btn {
       font-family: var(--font-mono);
       font-size: 10px;
-      letter-spacing: 0.07em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      padding: 6px 13px;
-      border-radius: 8px;
+      padding: 6px 11px;
+      border-radius: 100px;
       border: none;
       background: transparent;
-      color: rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.38);
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
       white-space: nowrap;
     }
     .s2-tab-btn:hover:not(.s2-tab-active) {
-      background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.65);
     }
     .s2-tab-btn.s2-tab-active {
-      background: rgba(255,255,255,0.11);
+      background: rgba(255,255,255,0.14);
       color: #fff;
     }
     .s2-tabs-divider {
-      width: 1px; height: 13px;
+      width: 1px; height: 14px;
       background: rgba(255,255,255,0.1);
-      flex-shrink: 0; margin: 0 1px;
+      flex-shrink: 0; margin: 0 2px;
     }
+    /* Thicker separator between ET family and other projects */
+    .s2-tabs-divider.s2-group-sep {
+      height: 20px;
+      background: rgba(255,255,255,0.18);
+      margin: 0 4px;
+    }
+    /* Circular nav buttons — float to the right of the pill */
     .s2-tabs-nav {
       display: flex;
       flex-direction: column;
-      gap: 2px;
-      margin-left: 8px;
-      padding-left: 10px;
-      border-left: 1px solid rgba(255,255,255,0.1);
+      gap: 4px;
     }
     .s2-tnav-btn {
-      width: 28px; height: 22px;
-      border: none; border-radius: 6px;
-      background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.4);
+      width: 30px; height: 30px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 50%;
+      background: rgba(22,22,22,0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      color: rgba(255,255,255,0.55);
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.15s, color 0.15s;
     }
-    .s2-tnav-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+    .s2-tnav-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
     .s2-tnav-btn svg { width: 9px; height: 9px; fill: currentColor; }
 
     /* Full glimpse wrapper */
@@ -12627,7 +12641,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     S2_DATA.forEach(function (card, i) {
       if (i > 0) {
         var sep = document.createElement('div');
-        sep.className = 's2-tabs-divider';
+        /* Thicker separator between ET family (0-3) and other projects (4-5) */
+        sep.className = 's2-tabs-divider' + (i === 4 ? ' s2-group-sep' : '');
         tabsList.appendChild(sep);
       }
       var btn = document.createElement('button');
