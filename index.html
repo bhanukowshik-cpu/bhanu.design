@@ -6394,14 +6394,201 @@
 
     /* ── Section 2 redesign — Featured Work ─────────────────── */
     .s2-fw-header {
-      padding: 80px 0 60px;
-      text-align: center;
+      padding: 40px 48px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       opacity: 0;
       transform: translateY(24px);
       transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1),
                   transform 0.9s cubic-bezier(0.22,1,0.36,1);
     }
     .s2-fw-header.s2-fwh-in { opacity: 1; transform: none; }
+
+    /* "Featured Work" label — mono 20px, overrides large heading styles */
+    .s2-fw-header .fw-title {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      line-height: 1.2;
+      margin: 0;
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      -webkit-text-fill-color: rgba(255,252,248,0.65);
+      color: rgba(255,252,248,0.65);
+    }
+
+    /* View toggle (SPIRAL / LIST) */
+    .s2-view-toggle { display: flex; gap: 8px; flex-shrink: 0; }
+    .s2-vt-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.45);
+    }
+    .s2-vt-btn.s2-vt-active {
+      border-color: rgba(255,255,255,0.65);
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* ── Section 2 content overlay panels ────────────────────────────── */
+    .s2-left-panel,
+    .s2-right-panel {
+      position: absolute;
+      top: 50%;
+      transform: translateY(calc(-50% + 60px));
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease,
+                  transform 0.65s cubic-bezier(0.16,1,0.3,1);
+      max-width: 240px;
+    }
+    .s2-left-panel  { left: 48px; }
+    .s2-right-panel { right: 48px; text-align: left; }
+    .s2-left-panel.s2-panel-in,
+    .s2-right-panel.s2-panel-in {
+      opacity: 1;
+      transform: translateY(-50%);
+    }
+
+    /* Left panel: title + metrics */
+    .s2cl-title {
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 20px;
+      line-height: 1.2;
+    }
+    .s2cl-metrics { display: flex; flex-direction: column; gap: 14px; }
+    .s2cl-metric  { display: flex; flex-direction: column; gap: 2px; }
+    .s2cl-metric-val {
+      font-family: var(--font-mono);
+      font-size: 24px;
+      font-weight: 700;
+      color: #E6F28D;
+      line-height: 1;
+    }
+    .s2cl-metric-lbl {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,252,248,0.35);
+    }
+    .s2cl-cta {
+      display: inline-block;
+      margin-top: 18px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,252,248,0.45);
+      text-decoration: none;
+      pointer-events: all;
+      transition: color 0.2s;
+    }
+    .s2cl-cta:hover { color: #E6F28D; }
+
+    /* Right panel: tags + description */
+    .s2cr-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+    .s2cr-tag {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: rgba(255,252,248,0.5);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 20px;
+      padding: 4px 11px;
+    }
+    .s2cr-desc {
+      font-family: var(--font-heading);
+      font-size: 13px;
+      line-height: 1.65;
+      color: rgba(255,252,248,0.45);
+      margin: 0;
+    }
+
+    /* Bottom project tab strip — shoots up on section entry */
+    .s2-project-tabs {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(130%);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      background: rgba(22,22,22,0.88);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 5px 5px 5px 14px;
+      transition: transform 0.85s cubic-bezier(0.16,1,0.3,1);
+      white-space: nowrap;
+    }
+    .s2-project-tabs.s2-tabs-in {
+      transform: translateX(-50%) translateY(0);
+    }
+    .s2-tabs-list { display: flex; align-items: center; gap: 1px; }
+    .s2-tab-btn {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 6px 13px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .s2-tab-btn:hover:not(.s2-tab-active) {
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.6);
+    }
+    .s2-tab-btn.s2-tab-active {
+      background: rgba(255,255,255,0.11);
+      color: #fff;
+    }
+    .s2-tabs-divider {
+      width: 1px; height: 13px;
+      background: rgba(255,255,255,0.1);
+      flex-shrink: 0; margin: 0 1px;
+    }
+    .s2-tabs-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-left: 8px;
+      padding-left: 10px;
+      border-left: 1px solid rgba(255,255,255,0.1);
+    }
+    .s2-tnav-btn {
+      width: 28px; height: 22px;
+      border: none; border-radius: 6px;
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.4);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .s2-tnav-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+    .s2-tnav-btn svg { width: 9px; height: 9px; fill: currentColor; }
 
     /* Full glimpse wrapper */
     .s2-glimpse-full { position: relative; }
@@ -7440,6 +7627,10 @@
       <!-- ── Featured Work heading — standalone small frame ── -->
       <div class="s2-fw-header" id="s2FwHeader">
         <h2 class="fw-title">Featured Work</h2>
+        <div class="s2-view-toggle">
+          <button class="s2-vt-btn s2-vt-active" id="s2SpiralBtn">SPIRAL</button>
+          <button class="s2-vt-btn" id="s2ListBtn">LIST</button>
+        </div>
       </div>
 
       <!-- ── SECTION 2: FEATURED WORK — full-viewport spiral ── -->
@@ -7448,6 +7639,32 @@
       <!-- Spiral Gallery — full viewport, blob centered -->
       <div class="s2-cards-zone" id="s2CardsZone" style="position:relative;">
         <div id="spiral-root" style="width:100%;height:100vh;position:relative;"></div>
+
+        <!-- Left content panel: title + metrics of frontmost card -->
+        <div class="s2-left-panel" id="s2LeftPanel">
+          <h3 class="s2cl-title" id="s2ClTitle"></h3>
+          <div class="s2cl-metrics" id="s2ClMetrics"></div>
+          <a class="s2cl-cta" id="s2ClCta" href="#">View Case Study →</a>
+        </div>
+
+        <!-- Right content panel: tags + description of frontmost card -->
+        <div class="s2-right-panel" id="s2RightPanel">
+          <div class="s2cr-tags" id="s2CrTags"></div>
+          <p class="s2cr-desc" id="s2CrDesc"></p>
+        </div>
+
+        <!-- Bottom tab strip — shoots up on section entry -->
+        <div class="s2-project-tabs" id="s2ProjectTabs">
+          <div class="s2-tabs-list" id="s2TabsList"></div>
+          <div class="s2-tabs-nav">
+            <button class="s2-tnav-btn" id="s2NavUp" aria-label="Previous project">
+              <svg viewBox="0 0 10 10"><path d="M5 3L1 7h8z"/></svg>
+            </button>
+            <button class="s2-tnav-btn" id="s2NavDown" aria-label="Next project">
+              <svg viewBox="0 0 10 10"><path d="M5 7L1 3h8z"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- C: Blob + left/right content (static ws-section removed; content now in spiral gallery panels) -->
@@ -12291,6 +12508,222 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
     window.addEventListener('scroll', onScroll, { passive: true });
     update();
+  })();
+
+  /* ── Section 2: SPIRAL / LIST toggle wiring ──────────────────────────── */
+  (function () {
+    var spiralRoot = document.getElementById('spiral-root');
+    var spiralBtn  = document.getElementById('s2SpiralBtn');
+    var listBtn    = document.getElementById('s2ListBtn');
+    if (!spiralRoot || !spiralBtn || !listBtn) return;
+
+    function setView(view) {
+      spiralBtn.classList.toggle('s2-vt-active', view === 'spiral');
+      listBtn.classList.toggle('s2-vt-active',   view === 'list');
+      spiralRoot.dispatchEvent(new CustomEvent('s2:setView', { detail: { view: view } }));
+      var isList = view === 'list';
+      ['s2LeftPanel', 's2RightPanel', 's2ProjectTabs', 's2FrontLabel'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.style.visibility = isList ? 'hidden' : '';
+      });
+    }
+
+    spiralBtn.addEventListener('click', function () { setView('spiral'); });
+    listBtn.addEventListener('click',   function () { setView('list');   });
+  })();
+
+  /* ── Section 2: Project panels + bottom tab strip ────────────────────── */
+  (function () {
+    var S2_DATA = [
+      {
+        tab: 'EverTutor',
+        title: 'EverTutor AI System',
+        metrics: [
+          { val: '2000+', lbl: 'Daily Active Users' },
+          { val: '−96%',  lbl: 'Workflow time'       },
+          { val: '$300k ARR', lbl: 'Sole Designer'   }
+        ],
+        tags: ['Voice AI Tutor', 'EdTech', 'B2C · Mobile'],
+        desc: "World's first multi-modal 1:1 voice AI tutor — 3 tools as one system enabling a billion minds.",
+        href: 'evertutor-live.html'
+      },
+      {
+        tab: 'ET Live',
+        title: 'EverTutor Live',
+        metrics: [
+          { val: '85%', lbl: 'Session Completion' },
+          { val: '2×',  lbl: 'Faster Mastery'     },
+          { val: '$5/hr', lbl: 'vs $250 Before'   }
+        ],
+        tags: ['Adaptive AI Tutoring', 'Real-time', 'B2C · Mobile'],
+        desc: 'Voice-first AI tutor — students master topics in 30 min vs 60 in a classroom. Taken from prototype to PMF.',
+        href: 'evertutor-live.html'
+      },
+      {
+        tab: 'ET Studio',
+        title: 'EverTutor Studio',
+        metrics: [
+          { val: '104→4hrs', lbl: 'Per Lesson' },
+          { val: '12',       lbl: 'Schools'    },
+          { val: '8',        lbl: 'Districts'  }
+        ],
+        tags: ['Content Creation', 'AI Tools', 'B2B · EdTech'],
+        desc: 'Lesson creation tool designed overnight. Cut content production from 104 hours down to 4.',
+        href: 'evertutor-studio.html'
+      },
+      {
+        tab: 'ET Analytics',
+        title: 'EverTutor Analytics',
+        metrics: [
+          { val: 'Live',    lbl: 'In Production' },
+          { val: 'Dog-ear', lbl: 'System'        },
+          { val: '0',       lbl: 'Extra Clicks'  }
+        ],
+        tags: ['Data Visualization', 'Real-time', 'B2B Dashboard'],
+        desc: 'Real-time student insights. The dog-ear system — complexity on demand, clean by default.',
+        href: '#'
+      },
+      {
+        tab: 'Dearly',
+        title: 'Dearly',
+        metrics: [
+          { val: '140',  lbl: 'Letters Written' },
+          { val: '35★',  lbl: '5-Star Ratings'  },
+          { val: '48hrs', lbl: 'Built In'        }
+        ],
+        tags: ['Animated Messages', 'Voice', 'Consumer App'],
+        desc: 'Animated handwriting with your real voice and photos — sent as a unique link. Built in 48 hours.',
+        href: '#'
+      },
+      {
+        tab: 'Stressie',
+        title: 'Stressie',
+        metrics: [
+          { val: '17.4%', lbl: 'Engagement Rate'    },
+          { val: '$600k', lbl: 'Funding'             },
+          { val: 'Amazon', lbl: '& InKind Live'      }
+        ],
+        tags: ['Wellness App', 'Harvard-incubated', 'B2B SaaS'],
+        desc: 'Harvard-incubated workplace stress app. Full redesign — engagement hit 17.4% vs ~2% industry average.',
+        href: 'stressie-studio.html'
+      }
+    ];
+
+    var spiralRoot  = document.getElementById('spiral-root');
+    var tabsList    = document.getElementById('s2TabsList');
+    var leftPanel   = document.getElementById('s2LeftPanel');
+    var rightPanel  = document.getElementById('s2RightPanel');
+    var projectTabs = document.getElementById('s2ProjectTabs');
+    var clTitle     = document.getElementById('s2ClTitle');
+    var clMetrics   = document.getElementById('s2ClMetrics');
+    var clCta       = document.getElementById('s2ClCta');
+    var crTags      = document.getElementById('s2CrTags');
+    var crDesc      = document.getElementById('s2CrDesc');
+
+    if (!spiralRoot || !tabsList) return;
+
+    /* Build tab buttons */
+    var tabBtns = [];
+    S2_DATA.forEach(function (card, i) {
+      if (i > 0) {
+        var sep = document.createElement('div');
+        sep.className = 's2-tabs-divider';
+        tabsList.appendChild(sep);
+      }
+      var btn = document.createElement('button');
+      btn.className = 's2-tab-btn' + (i === 0 ? ' s2-tab-active' : '');
+      btn.textContent = card.tab;
+      btn.addEventListener('click', function () {
+        spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', { detail: { idx: i } }));
+      });
+      tabsList.appendChild(btn);
+      tabBtns.push(btn);
+    });
+
+    var currentIdx = 0;
+    var updateTimer = null;
+
+    /* Up / Down nav */
+    var navUp = document.getElementById('s2NavUp');
+    var navDn = document.getElementById('s2NavDown');
+    if (navUp) navUp.addEventListener('click', function () {
+      spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', {
+        detail: { idx: (currentIdx - 1 + S2_DATA.length) % S2_DATA.length }
+      }));
+    });
+    if (navDn) navDn.addEventListener('click', function () {
+      spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', {
+        detail: { idx: (currentIdx + 1) % S2_DATA.length }
+      }));
+    });
+
+    /* Update panels when frontmost card changes */
+    function updatePanels(idx) {
+      var card = S2_DATA[idx];
+      currentIdx = idx;
+
+      tabBtns.forEach(function (b, i) { b.classList.toggle('s2-tab-active', i === idx); });
+
+      /* Slide panels out */
+      if (leftPanel)  leftPanel.classList.remove('s2-panel-in');
+      if (rightPanel) rightPanel.classList.remove('s2-panel-in');
+
+      clearTimeout(updateTimer);
+      updateTimer = setTimeout(function () {
+        /* Populate left panel */
+        if (clTitle)   clTitle.textContent = card.title;
+        if (clMetrics) {
+          clMetrics.innerHTML = '';
+          card.metrics.forEach(function (m) {
+            var d = document.createElement('div');
+            d.className = 's2cl-metric';
+            d.innerHTML = '<span class="s2cl-metric-val">' + m.val + '</span>'
+                        + '<span class="s2cl-metric-lbl">' + m.lbl + '</span>';
+            clMetrics.appendChild(d);
+          });
+        }
+        if (clCta) {
+          clCta.href = card.href;
+          clCta.style.display = card.href === '#' ? 'none' : 'inline-block';
+        }
+
+        /* Populate right panel */
+        if (crTags) {
+          crTags.innerHTML = '';
+          card.tags.forEach(function (t) {
+            var s = document.createElement('span');
+            s.className = 's2cr-tag';
+            s.textContent = t;
+            crTags.appendChild(s);
+          });
+        }
+        if (crDesc) crDesc.textContent = card.desc;
+
+        /* Slide panels in */
+        if (leftPanel)  leftPanel.classList.add('s2-panel-in');
+        if (rightPanel) rightPanel.classList.add('s2-panel-in');
+      }, 180);
+    }
+
+    /* Listen for spiral frontmost card changes */
+    window.addEventListener('s2:frontCard', function (e) { updatePanels(e.detail.idx); });
+
+    /* Shoot up tab strip when section scrolls into view */
+    var tabsShown = false;
+    var cardsZone = document.getElementById('s2CardsZone');
+    if (cardsZone && projectTabs) {
+      var obs = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting && !tabsShown) {
+          tabsShown = true;
+          obs.disconnect();
+          setTimeout(function () { projectTabs.classList.add('s2-tabs-in'); }, 450);
+        }
+      }, { threshold: 0.25 });
+      obs.observe(cardsZone);
+    }
+
+    /* Init with card 0 */
+    setTimeout(function () { updatePanels(0); }, 900);
   })();
   </script>
 
