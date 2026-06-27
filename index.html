@@ -7240,15 +7240,15 @@
     }
     .tm-tab {
       font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-      letter-spacing: 0.06em; text-transform: uppercase;
+      letter-spacing: 0.02em;
       border: none; cursor: pointer; border-radius: 999px;
-      padding: 9px 22px; color: rgba(255,255,255,0.42);
+      padding: 9px 22px; color: #fff;
       background: transparent;
       transition: color 0.22s;
       position: relative;
     }
     .tm-tab.active {
-      color: rgba(255,255,255,0.92);
+      color: #fff;
       background:
         linear-gradient(0deg, rgba(0,0,0,0.30), rgba(0,0,0,0.30)),
         linear-gradient(270deg, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.30) 100%);
@@ -7263,17 +7263,14 @@
       background: rgba(20,20,24,0.88);
       border-color: rgba(255,255,255,0.08);
     }
-    .tm-stack-scene { display: flex; flex-direction: column; align-items: center; width: min(960px, calc(100% - 40px)); }
-    /* Stack container: height = card height + front-card offset */
-    .tm-stack { position: relative; width: 100%; height: 580px; }
+    .tm-stack-scene { display: flex; flex-direction: column; align-items: center; width: min(1000px, calc(100% - 40px)); }
+    .tm-stack { display: flex; gap: 20px; width: 100%; }
     .tm-sc {
-      position: absolute; top: 0; left: 0;
-      width: 100%; height: 460px;
+      position: relative; flex: 1;
       border: 1.5px solid rgba(255,255,255,0.10);
       border-radius: 18px;
-      box-sizing: border-box; overflow: visible;
-      transition: transform 0.62s cubic-bezier(0.4,0,0.2,1), opacity 0.55s ease;
-      will-change: transform, opacity;
+      box-sizing: border-box; overflow: hidden;
+      transition: opacity 0.4s ease;
     }
     /* ::after disabled — colour bloom now lives inside .tm-art-frame::after */
     .tm-sc::after { content: ''; display: none; }
@@ -7281,7 +7278,7 @@
     /* Art frame: illustration container */
     .tm-art-frame {
       position: relative;
-      width: 220px; height: 220px; flex-shrink: 0;
+      width: 200px; height: 200px; flex-shrink: 0;
       border-radius: 12px; overflow: hidden;
       background: #F5F3EF;
     }
@@ -7305,14 +7302,15 @@
     /* Card body sits above noise */
     .tm-body {
       position: relative; z-index: 2;
-      display: flex; height: 100%;
-      padding: 28px 28px 24px; gap: 20px;
+      display: flex;
+      padding: 28px 28px 24px; gap: 24px;
       border-radius: inherit; overflow: hidden;
+      min-height: 320px;
     }
     .tm-text-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
     .tm-art-col {
-      width: 220px; flex-shrink: 0;
-      display: flex; align-items: flex-start;
+      width: 200px; flex-shrink: 0;
+      display: flex; align-items: center;
     }
     /* All cards dark — colour bloom lives inside .tm-art-frame */
     .tm-sc[data-color="purple"],
@@ -7340,14 +7338,8 @@
     .tm-sc .tm-fh.tr { top: -4px; right: -4px; }
     .tm-sc .tm-fh.bl { bottom: -4px; left: -4px; }
     .tm-sc .tm-fh.br { bottom: -4px; right: -4px; }
-    /* Stack positions */
-    .tm-sc[data-pos="0"] { z-index: 10; transform: translateY(80px) scale(1); opacity: 1; }
-    .tm-sc[data-pos="1"] { z-index: 9;  transform: translateY(54px) scale(0.962); opacity: 1; pointer-events: none; }
-    .tm-sc[data-pos="2"] { z-index: 8;  transform: translateY(30px) scale(0.924); opacity: 1; pointer-events: none; }
-    .tm-sc[data-pos="3"] { z-index: 7;  transform: translateY(10px) scale(0.886); opacity: 1; pointer-events: none; }
-    .tm-sc[data-pos="4"], .tm-sc[data-pos="5"] {
-      z-index: 6; transform: translateY(10px) scale(0.886); opacity: 0; pointer-events: none;
-    }
+    /* Hidden group cards */
+    .tm-sc[data-pos="99"] { display: none; }
     /* Large opening quote mark */
     .tm-qmark {
       font-size: 40px; line-height: 1; display: block;
@@ -7369,16 +7361,7 @@
       font-family: var(--font-mono); font-size: 10px;
       color: rgba(255, 255, 255, 0.42); display: block; margin-top: 3px;
     }
-    /* Navigation dots */
-    .tm-dots { display: flex; gap: 8px; margin-top: 24px; }
-    .tm-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      border: none; cursor: pointer; padding: 0;
-      background: rgba(37,37,37,0.18);
-      transition: background 0.3s, transform 0.3s;
-    }
-    .tm-dot.active { background: #1A73E8; transform: scale(1.35); }
-    .tm-dot:hover:not(.active) { background: rgba(37,37,37,0.4); }
+    .tm-dots { display: none; }
     /* Dark mode */
     [data-theme="dark"] .tm-section        { background: #080808; }
     [data-theme="dark"] .tm-eyebrow-tag    { color: rgba(255,255,255,0.45); border-color: rgba(255,255,255,0.15); opacity: 1; }
@@ -7388,23 +7371,17 @@
     [data-theme="dark"] .tm-sc .tm-fh      { background: #252525; }
     @media (max-width: 1023px) {
       .tm-header { padding: 0 32px; }
-      .tm-stack-scene { width: min(680px, calc(100% - 32px)); }
-      .tm-stack  { height: 500px; }
-      .tm-sc     { height: 380px; }
-      .tm-art-col { width: 160px; }
-      .tm-art-frame { width: 160px; height: 160px; }
+      .tm-stack-scene { width: min(720px, calc(100% - 32px)); }
+      .tm-art-col { width: 140px; }
+      .tm-art-frame { width: 140px; height: 140px; }
       .tm-quote  { font-size: 13px; }
       .tm-qmark  { font-size: 34px; }
     }
     @media (max-width: 767px) {
-      .tm-header { padding: 0 20px; margin-bottom: 36px; }
-      .tm-stack-scene { width: calc(100% - 24px); }
-      .tm-stack  { height: 312px; }
-      .tm-sc     { height: 200px; }
-      .tm-body   { padding: 16px 18px 14px; }
-      .tm-quote  { font-size: 10.5px; }
-      .tm-qmark  { font-size: 28px; }
+      .tm-stack { flex-direction: column; }
+      .tm-body { min-height: 0; padding: 20px; }
       .tm-art-col { display: none; }
+      .tm-quote { font-size: 12px; }
     }
 
 
@@ -8199,7 +8176,7 @@
                   <p class="tm-quote">I&#8217;ve worked with a lot of designers across fast-moving 0&#8594;1 environments, and Bhanu stands apart. At EverTutor, he wasn&#8217;t just executing on design briefs &#8212; he was shaping the product vision, pushing back when something didn&#8217;t serve the user, and holding a ridiculously high bar for craft even when timelines were brutal.<br><br>What struck me most was his ability to hold ambiguity without flinching. In a product that was constantly evolving &#8212; new modalities, shifting priorities, a team moving at startup speed.</p>
                   <div class="tm-attr">
                     <span class="tm-name">Subash Rajaseelan</span>
-                    <span class="tm-role">CEO &middot; EverTutor</span>
+                    <span class="tm-role">Chief of Staff &amp; PM &middot; EverTutor</span>
                   </div>
                 </div>
                 <div class="tm-art-col">
@@ -12867,232 +12844,67 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     });
   })();
 
-  /* ── Testimonial card stack with drag ── */
+  /* ── Testimonial tabs with auto-advance ── */
   (function () {
     var stack  = document.getElementById('tmStack');
-    var dotsEl = document.getElementById('tmDots');
     var tabsEl = document.getElementById('tmTabs');
-    if (!stack) return;
+    if (!stack || !tabsEl) return;
 
     var allCards = Array.from(stack.querySelectorAll('.tm-sc'));
-    var dots  = dotsEl ? Array.from(dotsEl.querySelectorAll('.tm-dot')) : [];
-    var currentGroup = 'reported';
-    var cards = [];
-    var n     = 0;
-    var front = 0;
-    var timer = null;
-    var anim  = false;
+    var tabBtns  = Array.from(tabsEl.querySelectorAll('.tm-tab'));
+    var groups   = ['reported', 'managed'];
+    var current  = 0;
+    var timer    = null;
 
-    function setGroup(group) {
-      currentGroup = group;
-      anim = false;
-      front = 0;
-      clearInterval(timer);
-      /* Show only matching cards; hide others */
-      allCards.forEach(function (c) {
-        c.style.transition = '';
-        c.style.transform  = '';
-        c.style.zIndex     = '';
-        if (c.dataset.group === group) {
-          c.style.display = '';
-        } else {
-          c.style.display = 'none';
-          c.dataset.pos = '99';
-        }
-      });
-      cards = allCards.filter(function (c) { return c.dataset.group === group; });
-      n = cards.length;
-      applyPos();
-      updateDots();
-      resetTimer();
-    }
-
-    /* Tab click */
-    if (tabsEl) {
-      tabsEl.addEventListener('click', function (e) {
-        var btn = e.target.closest('.tm-tab');
-        if (!btn) return;
-        tabsEl.querySelectorAll('.tm-tab').forEach(function (t) { t.classList.remove('active'); });
-        btn.classList.add('active');
-        setGroup(btn.dataset.group);
-      });
-    }
-
-    /* CSS transform values for each named slot */
-    var POS_FRONT = 'translateY(80px) scale(1)';
-    var POS_BACK  = 'translateY(12px) scale(0.92)';
-
-    function applyPos() {
-      cards.forEach(function (c, i) {
-        c.dataset.pos = (i - front + n) % n;
-      });
-    }
-
-    function updateDots() {
-      dots.forEach(function (d, i) { d.classList.toggle('active', i === front); });
-    }
-
-    /* Auto-advance: front card exits downward (~200% below), other cards
-       shift forward, then the exiting card rises into the back slot. */
-    function advance() {
-      if (anim) return;
-      anim = true;
-
-      /* Find the current front card */
-      var card = null;
-      for (var j = 0; j < cards.length; j++) {
-        if (cards[j].dataset.pos === '0') { card = cards[j]; break; }
+    function showGroup(idx, instant) {
+      current = idx;
+      var group = groups[idx];
+      tabBtns.forEach(function (t, i) { t.classList.toggle('active', i === idx); });
+      if (instant) {
+        allCards.forEach(function (c) {
+          var show = c.dataset.group === group;
+          c.style.display = show ? '' : 'none';
+          c.style.opacity = '1';
+        });
+        return;
       }
-      if (!card) { anim = false; return; }
-
-      /* Phase 1: slide front card down and off (ease-in acceleration) */
-      card.style.transition = 'transform 0.38s cubic-bezier(0.4, 0, 1, 1)';
-      card.style.transform  = 'translateY(260px) scale(1)';
-      card.style.zIndex     = '12'; /* stay above stack while exiting */
-
-      /* Shift remaining cards to their new positions simultaneously */
-      front = (front + 1) % n;
-      cards.forEach(function (c, idx) {
-        if (c !== card) c.dataset.pos = (idx - front + n) % n;
+      /* Fade out visible cards, swap, fade in */
+      allCards.forEach(function (c) {
+        if (c.style.display !== 'none') c.style.opacity = '0';
       });
-      updateDots();
-
-      /* Phase 2: rise from below into the back slot */
       setTimeout(function () {
-        card.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-        card.style.zIndex     = '7'; /* go behind all cards */
-        card.style.transform  = POS_BACK;
-
-        /* Clean up: hand control back to CSS */
-        setTimeout(function () {
-          var cardIdx = cards.indexOf(card);
-          card.dataset.pos      = (cardIdx - front + n) % n;
-          card.style.transition = '';
-          card.style.transform  = '';
-          card.style.zIndex     = '';
-          anim = false;
-        }, 520);
-      }, 400);
+        allCards.forEach(function (c) {
+          if (c.dataset.group === group) {
+            c.style.display = '';
+            requestAnimationFrame(function () { c.style.opacity = '1'; });
+          } else {
+            c.style.display = 'none';
+            c.style.opacity = '1';
+          }
+        });
+      }, 300);
     }
 
-    /* Drag-triggered advance: dragged card flies from its current position
-       into the back slot via inline style; other cards update normally. */
-    function advanceWithCard(card) {
-      var prevFront = front;
-      front = (front + 1) % n;
-      updateDots();
+    tabsEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('.tm-tab');
+      if (!btn) return;
+      var idx = tabBtns.indexOf(btn);
+      if (idx < 0 || idx === current) return;
+      showGroup(idx);
+      resetTimer();
+    });
 
-      /* Fly dragged card to back-of-stack position */
-      card.style.transition = 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)';
-      card.style.transform  = POS_BACK;
-      card.style.zIndex     = '7'; /* behind all others during travel */
-
-      /* Remaining cards shift via CSS */
-      cards.forEach(function (c, i) {
-        if (c !== card) c.dataset.pos = (i - front + n) % n;
-      });
-
-      setTimeout(function () {
-        /* Hand control back to CSS */
-        card.style.transition = '';
-        card.style.transform  = '';
-        card.style.zIndex     = '';
-        card.dataset.pos = (prevFront - front + n) % n; /* = n-1 */
-        anim = false;
-      }, 480);
+    function advance() {
+      showGroup((current + 1) % groups.length);
     }
 
     function resetTimer() {
       clearInterval(timer);
-      timer = setInterval(advance, 4200);
+      timer = setInterval(advance, 5000);
     }
 
-    /* ── Drag ─────────────────────────────────── */
-    var dragCard  = null;
-    var dragSX = 0, dragSY = 0;
-    var dragX  = 0, dragY  = 0;
-    var THRESHOLD = 80;
-
-    function onDown(e) {
-      if (anim || dragCard) return;
-      var target = e.target.closest ? e.target.closest('.tm-sc') : null;
-      if (!target || target.dataset.pos !== '0') return;
-      dragCard = target;
-      var p = e.touches ? e.touches[0] : e;
-      dragSX = p.clientX; dragSY = p.clientY;
-      dragX  = 0;         dragY  = 0;
-      dragCard.style.transition = 'none';
-      dragCard.style.zIndex     = '15';
-      clearInterval(timer);
-      e.preventDefault();
-    }
-
-    function onMove(e) {
-      if (!dragCard) return;
-      var p = e.touches ? e.touches[0] : e;
-      dragX = p.clientX - dragSX;
-      dragY = p.clientY - dragSY;
-      var tilt = dragX * 0.06;
-      /* keep card anchored at its base y=58px offset while dragging */
-      dragCard.style.transform =
-        'translate(' + dragX + 'px, ' + (58 + dragY) + 'px) rotate(' + tilt + 'deg)';
-      e.preventDefault();
-    }
-
-    function onUp() {
-      if (!dragCard) return;
-      var card = dragCard;
-      dragCard = null;
-      var dist = Math.sqrt(dragX * dragX + dragY * dragY);
-
-      if (dist > THRESHOLD) {
-        anim = true;
-        advanceWithCard(card);
-      } else {
-        /* Snap back to front position with a spring */
-        card.style.transition = 'transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        card.style.transform  = POS_FRONT;
-        setTimeout(function () {
-          card.style.transition = '';
-          card.style.transform  = '';
-          card.style.zIndex     = '';
-        }, 430);
-      }
-
-      resetTimer();
-    }
-
-    stack.addEventListener('mousedown',  onDown);
-    stack.addEventListener('touchstart', onDown, { passive: false });
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('touchmove', onMove, { passive: false });
-    window.addEventListener('mouseup',   onUp);
-    window.addEventListener('touchend',  onUp);
-
-    /* ── Dot clicks ──────────────────────────── */
-    dots.forEach(function (dot, i) {
-      dot.addEventListener('click', function () {
-        if (i === front) return;
-        clearInterval(timer);
-        cards.forEach(function (c) { c.style.transition = 'none'; });
-        anim = false;
-        front = i;
-        applyPos();
-        updateDots();
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () {
-            cards.forEach(function (c) { c.style.transition = ''; });
-            resetTimer();
-          });
-        });
-      });
-    });
-
-    stack.addEventListener('mouseenter', function () { clearInterval(timer); timer = null; });
-    stack.addEventListener('mouseleave', function () { if (!dragCard) resetTimer(); });
-
-    /* Boot with the first group */
-    setGroup('reported');
+    showGroup(0, true);
+    resetTimer();
   })();
   </script>
 
