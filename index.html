@@ -6394,16 +6394,27 @@
 
     /* ── Section 2 redesign — Featured Work ─────────────────── */
     .s2-fw-header {
-      padding: 40px 48px 28px;
+      padding: 40px 48px 20px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 16px;
       opacity: 0;
       transform: translateY(24px);
       transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1),
                   transform 0.9s cubic-bezier(0.22,1,0.36,1);
     }
     .s2-fw-header.s2-fwh-in { opacity: 1; transform: none; }
+    /* Title row: "Featured Work" centered, SPIRAL/LIST anchored right */
+    .s2-fwh-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .s2-fwh-row .s2-view-toggle {
+      position: absolute;
+      right: 0;
+    }
 
     /* "Featured Work" label — mono 20px, overrides large heading styles */
     .s2-fw-header .fw-title {
@@ -6521,22 +6532,20 @@
       margin: 0;
     }
 
-    /* Bottom project tab strip — shoots up on section entry */
-    /* Outer wrapper — handles the shoot-up animation only */
+    /* Project tab strip — sits below Featured Work header, right-aligned */
     .s2-project-tabs {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%) translateY(130%);
-      z-index: 20;
+      align-self: flex-end;
       display: flex;
       align-items: center;
       gap: 8px;
-      transition: transform 0.85s cubic-bezier(0.16,1,0.3,1);
-      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.85s cubic-bezier(0.16,1,0.3,1);
     }
     .s2-project-tabs.s2-tabs-in {
-      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      transform: none;
     }
     /* Glass pill — wraps only the tab buttons */
     .s2-tabs-list {
@@ -7639,10 +7648,24 @@
 
       <!-- ── Featured Work heading — standalone small frame ── -->
       <div class="s2-fw-header" id="s2FwHeader">
-        <h2 class="fw-title">Featured Work</h2>
-        <div class="s2-view-toggle">
-          <button class="s2-vt-btn s2-vt-active" id="s2SpiralBtn">SPIRAL</button>
-          <button class="s2-vt-btn" id="s2ListBtn">LIST</button>
+        <div class="s2-fwh-row">
+          <h2 class="fw-title">Featured Work</h2>
+          <div class="s2-view-toggle">
+            <button class="s2-vt-btn s2-vt-active" id="s2SpiralBtn">SPIRAL</button>
+            <button class="s2-vt-btn" id="s2ListBtn">LIST</button>
+          </div>
+        </div>
+        <!-- Tab strip — right-aligned below title -->
+        <div class="s2-project-tabs" id="s2ProjectTabs">
+          <div class="s2-tabs-list" id="s2TabsList"></div>
+          <div class="s2-tabs-nav">
+            <button class="s2-tnav-btn" id="s2NavUp" aria-label="Previous project">
+              <svg viewBox="0 0 10 10"><path d="M5 3L1 7h8z"/></svg>
+            </button>
+            <button class="s2-tnav-btn" id="s2NavDown" aria-label="Next project">
+              <svg viewBox="0 0 10 10"><path d="M5 7L1 3h8z"/></svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -7666,18 +7689,6 @@
           <p class="s2cr-desc" id="s2CrDesc"></p>
         </div>
 
-        <!-- Bottom tab strip — shoots up on section entry -->
-        <div class="s2-project-tabs" id="s2ProjectTabs">
-          <div class="s2-tabs-list" id="s2TabsList"></div>
-          <div class="s2-tabs-nav">
-            <button class="s2-tnav-btn" id="s2NavUp" aria-label="Previous project">
-              <svg viewBox="0 0 10 10"><path d="M5 3L1 7h8z"/></svg>
-            </button>
-            <button class="s2-tnav-btn" id="s2NavDown" aria-label="Next project">
-              <svg viewBox="0 0 10 10"><path d="M5 7L1 3h8z"/></svg>
-            </button>
-          </div>
-        </div>
       </div>
 
       <!-- C: Blob + left/right content (static ws-section removed; content now in spiral gallery panels) -->
