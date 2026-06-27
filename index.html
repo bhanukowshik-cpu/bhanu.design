@@ -7218,16 +7218,36 @@
       padding: 4px 12px; margin-bottom: 14px;
     }
     .tm-headline {
-      font-family: var(--font-heading);
-      font-size: clamp(28px, 3.5vw, 42px); font-weight: 700;
+      font-family: var(--font-mono);
+      font-size: clamp(24px, 3vw, 38px); font-weight: 700;
       color: var(--secondary); margin: 0;
     }
-    .tm-stack-scene { display: flex; flex-direction: column; align-items: center; width: min(880px, calc(100% - 40px)); }
+    /* Tab strip */
+    .tm-tabs {
+      display: flex; gap: 6px; margin-bottom: 32px;
+      background: rgba(37,37,37,0.06); border-radius: 100px;
+      padding: 4px;
+    }
+    .tm-tab {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      border: none; cursor: pointer; border-radius: 100px;
+      padding: 8px 18px; color: rgba(37,37,37,0.5);
+      background: transparent;
+      transition: background 0.22s, color 0.22s;
+    }
+    .tm-tab.active {
+      background: var(--secondary); color: #fff;
+    }
+    [data-theme="dark"] .tm-tabs { background: rgba(255,255,255,0.07); }
+    [data-theme="dark"] .tm-tab { color: rgba(255,255,255,0.45); }
+    [data-theme="dark"] .tm-tab.active { background: #fff; color: #111; }
+    .tm-stack-scene { display: flex; flex-direction: column; align-items: center; width: min(960px, calc(100% - 40px)); }
     /* Stack container: height = card height + front-card offset */
-    .tm-stack { position: relative; width: 100%; height: 608px; }
+    .tm-stack { position: relative; width: 100%; height: 580px; }
     .tm-sc {
       position: absolute; top: 0; left: 0;
-      width: 100%; height: 496px;
+      width: 100%; height: 460px;
       border: 1.5px solid rgba(255,255,255,0.10);
       border-radius: 18px;
       box-sizing: border-box; overflow: visible;
@@ -7239,8 +7259,9 @@
     .tm-sc::before { content: ''; display: none; }
     /* Art frame: illustration container */
     .tm-art-frame {
-      position: relative; flex: 1;
-      border-radius: 10px; overflow: hidden;
+      position: relative;
+      width: 220px; height: 220px; flex-shrink: 0;
+      border-radius: 12px; overflow: hidden;
       background: #F5F3EF;
     }
     .tm-art-frame::after {
@@ -7250,8 +7271,8 @@
     .tm-art-img {
       position: relative; z-index: 3;
       width: 100%; height: 100%;
-      object-fit: contain; padding: 14px;
-      box-sizing: border-box; display: block;
+      object-fit: cover; padding: 0;
+      display: block;
     }
     /* Per-card colour bloom inside the illustration frame */
     .tm-sc[data-color="purple"] .tm-art-frame::after { background: radial-gradient(ellipse 160% 140% at 115% 118%, rgba(196,181,253,0.95) 0%, transparent 68%), radial-gradient(ellipse 110% 100% at 95% 115%, rgba(237,233,254,0.80) 0%, transparent 62%), radial-gradient(ellipse 90% 80% at 118% 88%, rgba(216,180,254,0.70) 0%, transparent 58%), radial-gradient(ellipse 70% 62% at 82% 105%, rgba(249,168,212,0.48) 0%, transparent 55%); }
@@ -7269,8 +7290,8 @@
     }
     .tm-text-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
     .tm-art-col {
-      width: 230px; flex-shrink: 0;
-      display: flex; align-items: stretch;
+      width: 220px; flex-shrink: 0;
+      display: flex; align-items: flex-start;
     }
     /* All cards dark — colour bloom lives inside .tm-art-frame */
     .tm-sc[data-color="purple"],
@@ -7314,7 +7335,7 @@
     /* Quote body */
     .tm-quote {
       font-family: var(--font-heading);
-      font-size: 13px; line-height: 1.68;
+      font-size: 15px; line-height: 1.68;
       color: rgba(255, 255, 255, 0.75);
       margin: 0; flex: 1; overflow: hidden;
     }
@@ -7346,11 +7367,12 @@
     [data-theme="dark"] .tm-sc .tm-fh      { background: #252525; }
     @media (max-width: 1023px) {
       .tm-header { padding: 0 32px; }
-      .tm-stack-scene { width: min(620px, calc(100% - 32px)); }
-      .tm-stack  { height: 452px; }
-      .tm-sc     { height: 340px; }
-      .tm-art-col { width: 170px; }
-      .tm-quote  { font-size: 11.5px; }
+      .tm-stack-scene { width: min(680px, calc(100% - 32px)); }
+      .tm-stack  { height: 500px; }
+      .tm-sc     { height: 380px; }
+      .tm-art-col { width: 160px; }
+      .tm-art-frame { width: 160px; height: 160px; }
+      .tm-quote  { font-size: 13px; }
       .tm-qmark  { font-size: 34px; }
     }
     @media (max-width: 767px) {
@@ -8110,14 +8132,19 @@
 
         <div class="tm-header">
           <span class="tm-eyebrow-tag">Kind Words</span>
-          <h2 class="tm-headline">People I&#8217;ve built with</h2>
+          <h2 class="tm-headline">People I work with</h2>
+        </div>
+
+        <div class="tm-tabs" id="tmTabs">
+          <button class="tm-tab active" data-group="reported">People I reported to</button>
+          <button class="tm-tab" data-group="managed">Designers I managed</button>
         </div>
 
         <div class="tm-stack-scene">
           <div class="tm-stack" id="tmStack">
 
             <!-- Card 1: Lupita · Stressie · Purple -->
-            <div class="tm-sc" data-pos="0" data-color="purple">
+            <div class="tm-sc" data-pos="0" data-color="purple" data-group="reported">
               <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
               <span class="tm-fh bl"></span><span class="tm-fh br"></span>
               <div class="tm-body">
@@ -8138,7 +8165,7 @@
             </div>
 
             <!-- Card 2: Subash · EverTutor · Peach -->
-            <div class="tm-sc" data-pos="1" data-color="peach">
+            <div class="tm-sc" data-pos="1" data-color="peach" data-group="reported">
               <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
               <span class="tm-fh bl"></span><span class="tm-fh br"></span>
               <div class="tm-body">
@@ -8159,7 +8186,7 @@
             </div>
 
             <!-- Card 3: Shaini · EverTutor · Green -->
-            <div class="tm-sc" data-pos="2" data-color="green">
+            <div class="tm-sc" data-pos="4" data-color="green" data-group="managed">
               <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
               <span class="tm-fh bl"></span><span class="tm-fh br"></span>
               <div class="tm-body">
@@ -8180,7 +8207,7 @@
             </div>
 
             <!-- Card 4: AnuShree · EverTutor · Blue -->
-            <div class="tm-sc" data-pos="3" data-color="blue">
+            <div class="tm-sc" data-pos="5" data-color="blue" data-group="managed">
               <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
               <span class="tm-fh bl"></span><span class="tm-fh br"></span>
               <div class="tm-body">
@@ -8206,8 +8233,6 @@
           <div class="tm-dots" id="tmDots">
             <button class="tm-dot active" data-idx="0" aria-label="Testimonial 1"></button>
             <button class="tm-dot" data-idx="1" aria-label="Testimonial 2"></button>
-            <button class="tm-dot" data-idx="2" aria-label="Testimonial 3"></button>
-            <button class="tm-dot" data-idx="3" aria-label="Testimonial 4"></button>
           </div>
 
         </div><!-- /tm-stack-scene -->
@@ -12821,14 +12846,52 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   (function () {
     var stack  = document.getElementById('tmStack');
     var dotsEl = document.getElementById('tmDots');
+    var tabsEl = document.getElementById('tmTabs');
     if (!stack) return;
 
-    var cards = Array.from(stack.querySelectorAll('.tm-sc'));
+    var allCards = Array.from(stack.querySelectorAll('.tm-sc'));
     var dots  = dotsEl ? Array.from(dotsEl.querySelectorAll('.tm-dot')) : [];
-    var n     = cards.length;
+    var currentGroup = 'reported';
+    var cards = [];
+    var n     = 0;
     var front = 0;
     var timer = null;
     var anim  = false;
+
+    function setGroup(group) {
+      currentGroup = group;
+      anim = false;
+      front = 0;
+      clearInterval(timer);
+      /* Show only matching cards; hide others */
+      allCards.forEach(function (c) {
+        c.style.transition = '';
+        c.style.transform  = '';
+        c.style.zIndex     = '';
+        if (c.dataset.group === group) {
+          c.style.display = '';
+        } else {
+          c.style.display = 'none';
+          c.dataset.pos = '99';
+        }
+      });
+      cards = allCards.filter(function (c) { return c.dataset.group === group; });
+      n = cards.length;
+      applyPos();
+      updateDots();
+      resetTimer();
+    }
+
+    /* Tab click */
+    if (tabsEl) {
+      tabsEl.addEventListener('click', function (e) {
+        var btn = e.target.closest('.tm-tab');
+        if (!btn) return;
+        tabsEl.querySelectorAll('.tm-tab').forEach(function (t) { t.classList.remove('active'); });
+        btn.classList.add('active');
+        setGroup(btn.dataset.group);
+      });
+    }
 
     /* CSS transform values for each named slot */
     var POS_FRONT = 'translateY(80px) scale(1)';
@@ -13003,9 +13066,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     stack.addEventListener('mouseenter', function () { clearInterval(timer); timer = null; });
     stack.addEventListener('mouseleave', function () { if (!dragCard) resetTimer(); });
 
-    applyPos();
-    updateDots();
-    resetTimer();
+    /* Boot with the first group */
+    setGroup('reported');
   })();
   </script>
 
