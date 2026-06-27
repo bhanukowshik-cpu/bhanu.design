@@ -6392,6 +6392,11 @@
       gap: 28px;
     }
 
+    /* ── Section 2 wrapper — contains header + spiral + list ── */
+    .s2-section-wrap {
+      background: linear-gradient(to bottom, #080808 0%, #1E1E1E 28%);
+    }
+
     /* ── Section 2 redesign — Featured Work ─────────────────── */
     .s2-fw-header {
       padding: 40px 48px 20px;
@@ -7222,26 +7227,42 @@
       font-size: clamp(24px, 3vw, 38px); font-weight: 700;
       color: var(--secondary); margin: 0;
     }
-    /* Tab strip */
+    /* Tab strip — glassmorphic bar matching the scrolled top-nav */
     .tm-tabs {
-      display: flex; gap: 6px; margin-bottom: 32px;
-      background: rgba(37,37,37,0.06); border-radius: 100px;
-      padding: 4px;
+      display: flex; gap: 4px; margin-bottom: 32px;
+      background: rgba(37,37,37,0.82);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 999px;
+      padding: 5px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
     }
     .tm-tab {
       font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-      letter-spacing: 0.04em; text-transform: uppercase;
-      border: none; cursor: pointer; border-radius: 100px;
-      padding: 8px 18px; color: rgba(37,37,37,0.5);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      border: none; cursor: pointer; border-radius: 999px;
+      padding: 9px 22px; color: rgba(255,255,255,0.42);
       background: transparent;
-      transition: background 0.22s, color 0.22s;
+      transition: color 0.22s;
+      position: relative;
     }
     .tm-tab.active {
-      background: var(--secondary); color: #fff;
+      color: rgba(255,255,255,0.92);
+      background:
+        linear-gradient(0deg, rgba(0,0,0,0.30), rgba(0,0,0,0.30)),
+        linear-gradient(270deg, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.30) 100%);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      box-shadow:
+        rgba(255,255,255,0.70)  6.67px  6.67px 3.36px -6.21px inset,
+        rgba(255,61,61,0.50)   -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140,180,190)       -2.00px  2.39px 18px   -2.60px inset;
     }
-    [data-theme="dark"] .tm-tabs { background: rgba(255,255,255,0.07); }
-    [data-theme="dark"] .tm-tab { color: rgba(255,255,255,0.45); }
-    [data-theme="dark"] .tm-tab.active { background: #fff; color: #111; }
+    [data-theme="dark"] .tm-tabs {
+      background: rgba(20,20,24,0.88);
+      border-color: rgba(255,255,255,0.08);
+    }
     .tm-stack-scene { display: flex; flex-direction: column; align-items: center; width: min(960px, calc(100% - 40px)); }
     /* Stack container: height = card height + front-card offset */
     .tm-stack { position: relative; width: 100%; height: 580px; }
@@ -7669,7 +7690,9 @@
 
       <div id="s2Section" style="position:relative;top:-70px;pointer-events:none;"></div>
 
-      <!-- ── Featured Work heading — standalone small frame ── -->
+      <section class="s2-section-wrap">
+
+      <!-- ── Featured Work heading ── -->
       <div class="s2-fw-header" id="s2FwHeader">
         <div class="s2-fwh-row">
           <h2 class="fw-title">Featured Work</h2>
@@ -7968,6 +7991,8 @@
       </div>
 
       </div><!-- /s2-work-container -->
+
+      </section><!-- /s2-section-wrap -->
 
       <!-- ── ABOUT ME SECTION ─────────────────────────────── -->
       <section class="am-section" id="aboutSection">
