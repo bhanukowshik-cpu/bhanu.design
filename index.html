@@ -7263,14 +7263,16 @@
       background: rgba(20,20,24,0.88);
       border-color: rgba(255,255,255,0.08);
     }
-    .tm-stack-scene { display: flex; flex-direction: column; align-items: center; width: min(1000px, calc(100% - 40px)); }
-    .tm-stack { display: flex; gap: 20px; width: 100%; }
+    .tm-stack-scene { display: flex; flex-direction: column; align-items: center; width: min(960px, calc(100% - 40px)); }
+    .tm-stack { position: relative; width: 100%; height: 608px; }
     .tm-sc {
-      position: relative; flex: 1;
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 496px;
       border: 1.5px solid rgba(255,255,255,0.10);
       border-radius: 18px;
-      box-sizing: border-box; overflow: hidden;
-      transition: opacity 0.4s ease;
+      box-sizing: border-box; overflow: visible;
+      transition: transform 0.62s cubic-bezier(0.4,0,0.2,1), opacity 0.55s ease;
+      will-change: transform, opacity;
     }
     /* ::after disabled — colour bloom now lives inside .tm-art-frame::after */
     .tm-sc::after { content: ''; display: none; }
@@ -7302,10 +7304,9 @@
     /* Card body sits above noise */
     .tm-body {
       position: relative; z-index: 2;
-      display: flex;
+      display: flex; height: 100%;
       padding: 28px 28px 24px; gap: 24px;
       border-radius: inherit; overflow: hidden;
-      min-height: 320px;
     }
     .tm-text-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
     .tm-art-col {
@@ -7338,8 +7339,11 @@
     .tm-sc .tm-fh.tr { top: -4px; right: -4px; }
     .tm-sc .tm-fh.bl { bottom: -4px; left: -4px; }
     .tm-sc .tm-fh.br { bottom: -4px; right: -4px; }
-    /* Hidden group cards */
-    .tm-sc[data-pos="99"] { display: none; }
+    /* Stack positions — all 4 always visible */
+    .tm-sc[data-pos="0"] { z-index: 10; transform: translateY(80px) scale(1);     opacity: 1; }
+    .tm-sc[data-pos="1"] { z-index: 9;  transform: translateY(54px) scale(0.962); opacity: 1; pointer-events: none; }
+    .tm-sc[data-pos="2"] { z-index: 8;  transform: translateY(30px) scale(0.924); opacity: 1; pointer-events: none; }
+    .tm-sc[data-pos="3"] { z-index: 7;  transform: translateY(10px) scale(0.886); opacity: 1; pointer-events: none; }
     /* Large opening quote mark */
     .tm-qmark {
       font-size: 40px; line-height: 1; display: block;
@@ -7371,17 +7375,23 @@
     [data-theme="dark"] .tm-sc .tm-fh      { background: #252525; }
     @media (max-width: 1023px) {
       .tm-header { padding: 0 32px; }
-      .tm-stack-scene { width: min(720px, calc(100% - 32px)); }
-      .tm-art-col { width: 140px; }
-      .tm-art-frame { width: 140px; height: 140px; }
-      .tm-quote  { font-size: 13px; }
+      .tm-stack-scene { width: min(620px, calc(100% - 32px)); }
+      .tm-stack  { height: 452px; }
+      .tm-sc     { height: 340px; }
+      .tm-art-col { width: 160px; }
+      .tm-art-frame { width: 160px; height: 160px; }
+      .tm-quote  { font-size: 11.5px; }
       .tm-qmark  { font-size: 34px; }
     }
     @media (max-width: 767px) {
-      .tm-stack { flex-direction: column; }
-      .tm-body { min-height: 0; padding: 20px; }
+      .tm-header { padding: 0 20px; margin-bottom: 36px; }
+      .tm-stack-scene { width: calc(100% - 24px); }
+      .tm-stack  { height: 312px; }
+      .tm-sc     { height: 200px; }
+      .tm-body   { padding: 16px 18px 14px; }
+      .tm-quote  { font-size: 10.5px; }
+      .tm-qmark  { font-size: 28px; }
       .tm-art-col { display: none; }
-      .tm-quote { font-size: 12px; }
     }
 
 
@@ -8188,7 +8198,7 @@
             </div>
 
             <!-- Card 3: Shaini · EverTutor · Green -->
-            <div class="tm-sc" data-pos="4" data-color="green" data-group="managed">
+            <div class="tm-sc" data-pos="2" data-color="green" data-group="managed">
               <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
               <span class="tm-fh bl"></span><span class="tm-fh br"></span>
               <div class="tm-body">
@@ -8209,7 +8219,7 @@
             </div>
 
             <!-- Card 4: AnuShree · EverTutor · Blue -->
-            <div class="tm-sc" data-pos="5" data-color="blue" data-group="managed">
+            <div class="tm-sc" data-pos="3" data-color="blue" data-group="managed">
               <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
               <span class="tm-fh bl"></span><span class="tm-fh br"></span>
               <div class="tm-body">
@@ -12844,66 +12854,186 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     });
   })();
 
-  /* ── Testimonial tabs with auto-advance ── */
+  /* ── Testimonial card stack with tab tracking ── */
   (function () {
     var stack  = document.getElementById('tmStack');
     var tabsEl = document.getElementById('tmTabs');
-    if (!stack || !tabsEl) return;
+    if (!stack) return;
 
-    var allCards = Array.from(stack.querySelectorAll('.tm-sc'));
-    var tabBtns  = Array.from(tabsEl.querySelectorAll('.tm-tab'));
-    var groups   = ['reported', 'managed'];
-    var current  = 0;
-    var timer    = null;
+    var cards   = Array.from(stack.querySelectorAll('.tm-sc'));
+    var tabBtns = tabsEl ? Array.from(tabsEl.querySelectorAll('.tm-tab')) : [];
+    var n       = cards.length;
+    var front   = 0;
+    var timer   = null;
+    var anim    = false;
 
-    function showGroup(idx, instant) {
-      current = idx;
-      var group = groups[idx];
-      tabBtns.forEach(function (t, i) { t.classList.toggle('active', i === idx); });
-      if (instant) {
-        allCards.forEach(function (c) {
-          var show = c.dataset.group === group;
-          c.style.display = show ? '' : 'none';
-          c.style.opacity = '1';
-        });
-        return;
-      }
-      /* Fade out visible cards, swap, fade in */
-      allCards.forEach(function (c) {
-        if (c.style.display !== 'none') c.style.opacity = '0';
+    var POS_FRONT = 'translateY(80px) scale(1)';
+    var POS_BACK  = 'translateY(12px) scale(0.92)';
+
+    function applyPos() {
+      cards.forEach(function (c, i) {
+        c.dataset.pos = (i - front + n) % n;
       });
-      setTimeout(function () {
-        allCards.forEach(function (c) {
-          if (c.dataset.group === group) {
-            c.style.display = '';
-            requestAnimationFrame(function () { c.style.opacity = '1'; });
-          } else {
-            c.style.display = 'none';
-            c.style.opacity = '1';
-          }
-        });
-      }, 300);
     }
 
-    tabsEl.addEventListener('click', function (e) {
-      var btn = e.target.closest('.tm-tab');
-      if (!btn) return;
-      var idx = tabBtns.indexOf(btn);
-      if (idx < 0 || idx === current) return;
-      showGroup(idx);
-      resetTimer();
-    });
+    function updateTabs() {
+      /* Highlight the tab matching the current front card's group */
+      var frontGroup = cards[front].dataset.group;
+      tabBtns.forEach(function (t) {
+        t.classList.toggle('active', t.dataset.group === frontGroup);
+      });
+    }
 
     function advance() {
-      showGroup((current + 1) % groups.length);
+      if (anim) return;
+      anim = true;
+
+      var card = null;
+      for (var j = 0; j < n; j++) {
+        if (cards[j].dataset.pos === '0') { card = cards[j]; break; }
+      }
+      if (!card) { anim = false; return; }
+
+      card.style.transition = 'transform 0.38s cubic-bezier(0.4,0,1,1)';
+      card.style.transform  = 'translateY(260px) scale(1)';
+      card.style.zIndex     = '12';
+
+      front = (front + 1) % n;
+      cards.forEach(function (c, idx) {
+        if (c !== card) c.dataset.pos = (idx - front + n) % n;
+      });
+      updateTabs();
+
+      setTimeout(function () {
+        card.style.transition = 'transform 0.5s cubic-bezier(0.4,0,0.2,1)';
+        card.style.zIndex     = '7';
+        card.style.transform  = POS_BACK;
+
+        setTimeout(function () {
+          var ci = cards.indexOf(card);
+          card.dataset.pos      = (ci - front + n) % n;
+          card.style.transition = '';
+          card.style.transform  = '';
+          card.style.zIndex     = '';
+          anim = false;
+        }, 520);
+      }, 400);
+    }
+
+    function advanceWithCard(card) {
+      var prevFront = front;
+      front = (front + 1) % n;
+      updateTabs();
+
+      card.style.transition = 'transform 0.45s cubic-bezier(0.4,0,0.2,1)';
+      card.style.transform  = POS_BACK;
+      card.style.zIndex     = '7';
+
+      cards.forEach(function (c, i) {
+        if (c !== card) c.dataset.pos = (i - front + n) % n;
+      });
+
+      setTimeout(function () {
+        card.style.transition = '';
+        card.style.transform  = '';
+        card.style.zIndex     = '';
+        card.dataset.pos = (prevFront - front + n) % n;
+        anim = false;
+      }, 480);
     }
 
     function resetTimer() {
       clearInterval(timer);
-      timer = setInterval(advance, 5000);
+      timer = setInterval(advance, 4200);
     }
 
-    showGroup(0, true);
+    /* Tab click: jump to the first card belonging to that group */
+    if (tabsEl) {
+      tabsEl.addEventListener('click', function (e) {
+        var btn = e.target.closest('.tm-tab');
+        if (!btn) return;
+        var targetGroup = btn.dataset.group;
+        /* Find index of first card in that group */
+        var targetIdx = -1;
+        for (var i = 0; i < n; i++) {
+          if (cards[i].dataset.group === targetGroup) { targetIdx = i; break; }
+        }
+        if (targetIdx < 0) return;
+        clearInterval(timer);
+        cards.forEach(function (c) { c.style.transition = 'none'; });
+        anim = false;
+        front = targetIdx;
+        applyPos();
+        updateTabs();
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            cards.forEach(function (c) { c.style.transition = ''; });
+            resetTimer();
+          });
+        });
+      });
+    }
+
+    /* Drag */
+    var dragCard = null, dragSX = 0, dragSY = 0, dragX = 0, dragY = 0;
+    var THRESHOLD = 80;
+
+    function onDown(e) {
+      if (anim || dragCard) return;
+      var target = e.target.closest ? e.target.closest('.tm-sc') : null;
+      if (!target || target.dataset.pos !== '0') return;
+      dragCard = target;
+      var p = e.touches ? e.touches[0] : e;
+      dragSX = p.clientX; dragSY = p.clientY;
+      dragX = 0; dragY = 0;
+      dragCard.style.transition = 'none';
+      dragCard.style.zIndex     = '15';
+      clearInterval(timer);
+      e.preventDefault();
+    }
+
+    function onMove(e) {
+      if (!dragCard) return;
+      var p = e.touches ? e.touches[0] : e;
+      dragX = p.clientX - dragSX;
+      dragY = p.clientY - dragSY;
+      dragCard.style.transform =
+        'translate(' + dragX + 'px,' + (58 + dragY) + 'px) rotate(' + (dragX * 0.06) + 'deg)';
+      e.preventDefault();
+    }
+
+    function onUp() {
+      if (!dragCard) return;
+      var card = dragCard;
+      dragCard = null;
+      var dist = Math.sqrt(dragX * dragX + dragY * dragY);
+      if (dist > THRESHOLD) {
+        anim = true;
+        advanceWithCard(card);
+      } else {
+        card.style.transition = 'transform 0.42s cubic-bezier(0.34,1.56,0.64,1)';
+        card.style.transform  = POS_FRONT;
+        setTimeout(function () {
+          card.style.transition = '';
+          card.style.transform  = '';
+          card.style.zIndex     = '';
+        }, 430);
+      }
+      resetTimer();
+    }
+
+    stack.addEventListener('mousedown',  onDown);
+    stack.addEventListener('touchstart', onDown, { passive: false });
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('mouseup',   onUp);
+    window.addEventListener('touchend',  onUp);
+
+    stack.addEventListener('mouseenter', function () { clearInterval(timer); });
+    stack.addEventListener('mouseleave', function () { if (!dragCard) resetTimer(); });
+
+    applyPos();
+    updateTabs();
     resetTimer();
   })();
   </script>
