@@ -3857,6 +3857,10 @@
       min-height: 560px;
       position: relative;
       overflow: hidden;
+      transition: min-height 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    .am-panel:has([data-am-pane="design-dna"].is-active) {
+      min-height: 900px;
     }
     /* Default (off-screen below) + enter animation — Apple: 600ms / 250ms delay */
     .am-panel-pane {
@@ -3995,6 +3999,185 @@
       .am-section { padding: 48px 20px; }
       .am-inner   { grid-template-columns: 1fr; }
       .am-panel   { min-height: 300px; }
+    }
+
+    /* ─── DESIGN DNA T-SHAPE ────────────────────────────────── */
+    .dna-t-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-rows: repeat(6, auto);
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .dna-cell {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 14px 8px 12px;
+      border-radius: 14px;
+      background: rgba(29,29,31,0.04);
+      border: 1px solid rgba(29,29,31,0.08);
+      cursor: default;
+      overflow: visible;
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+    /* Green gradient glow from bottom-left on hover */
+    .dna-cell::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 13px;
+      background: radial-gradient(ellipse at -5% 115%,
+        rgba(101, 185, 80, 0.32) 0%,
+        rgba(180, 222, 90, 0.18) 40%,
+        transparent 75%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+    /* Noise grain overlay */
+    .dna-cell::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 13px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+      opacity: 0;
+      mix-blend-mode: overlay;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+    .dna-cell:hover {
+      border-color: rgba(101, 180, 60, 0.28);
+      background: rgba(180, 220, 80, 0.05);
+    }
+    .dna-cell:hover::before { opacity: 1; }
+    .dna-cell:hover::after  { opacity: 1; }
+    /* Intersection cell (Experience Design — depth marker) */
+    .dna-cell.dna-depth-anchor {
+      background: rgba(29,29,31,0.07);
+      border-color: rgba(29,29,31,0.16);
+    }
+    .dna-cell.dna-depth-anchor::before {
+      background: radial-gradient(ellipse at -5% 115%,
+        rgba(60, 160, 50, 0.4) 0%,
+        rgba(140, 200, 70, 0.22) 45%,
+        transparent 75%);
+    }
+    /* Grid placement */
+    .dna-b1 { grid-column: 1; grid-row: 1; }
+    .dna-b2 { grid-column: 2; grid-row: 1; }
+    .dna-b3 { grid-column: 3; grid-row: 1; }
+    .dna-b4 { grid-column: 4; grid-row: 1; }
+    .dna-b5 { grid-column: 5; grid-row: 1; }
+    .dna-d1 { grid-column: 3; grid-row: 2; }
+    .dna-d2 { grid-column: 3; grid-row: 3; }
+    .dna-d3 { grid-column: 3; grid-row: 4; }
+    .dna-d4 { grid-column: 3; grid-row: 5; }
+    .dna-d5 { grid-column: 3; grid-row: 6; }
+    /* Vertical connector line between depth cells */
+    .dna-depth-line {
+      grid-column: 3;
+      grid-row: 2 / 7;
+      position: relative;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .dna-depth-line::before {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%; width: 1px;
+      background: rgba(29,29,31,0.1);
+      transform: translateX(-50%);
+    }
+    /* Icon */
+    .dna-icon {
+      width: 32px; height: 32px;
+      object-fit: contain;
+      display: block;
+      flex-shrink: 0;
+    }
+    /* Label */
+    .dna-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: rgba(29,29,31,0.55);
+      text-align: center;
+      line-height: 1.3;
+      margin-top: 8px;
+    }
+    /* Tooltip callout */
+    .dna-tip {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      width: 160px;
+      background: rgb(29,29,31);
+      color: rgba(255,255,255,0.88);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      line-height: 1.5;
+      padding: 10px 12px;
+      border-radius: 10px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 100;
+      white-space: normal;
+      text-align: left;
+    }
+    /* Arrow pointing down from tooltip */
+    .dna-tip::after {
+      content: '';
+      position: absolute;
+      top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: rgb(29,29,31);
+    }
+    .dna-cell:hover .dna-tip {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    /* Clamp tooltips on edge cells */
+    .dna-b1 .dna-tip, .dna-b2 .dna-tip { left: 0; transform: translateX(0) translateY(4px); }
+    .dna-b1 .dna-tip::after, .dna-b2 .dna-tip::after { left: 20%; }
+    .dna-b4 .dna-tip, .dna-b5 .dna-tip { left: auto; right: 0; transform: translateX(0) translateY(4px); }
+    .dna-b4 .dna-tip::after, .dna-b5 .dna-tip::after { left: auto; right: 12%; }
+    .dna-b1:hover .dna-tip, .dna-b2:hover .dna-tip { transform: translateX(0) translateY(0); }
+    .dna-b4:hover .dna-tip, .dna-b5:hover .dna-tip { transform: translateX(0) translateY(0); }
+    /* Dark mode */
+    [data-theme="dark"] .dna-cell {
+      background: rgba(240,237,232,0.05);
+      border-color: rgba(240,237,232,0.08);
+    }
+    [data-theme="dark"] .dna-cell.dna-depth-anchor {
+      background: rgba(240,237,232,0.09);
+      border-color: rgba(240,237,232,0.16);
+    }
+    [data-theme="dark"] .dna-cell:hover {
+      border-color: rgba(140, 210, 80, 0.35);
+      background: rgba(160, 210, 70, 0.08);
+    }
+    [data-theme="dark"] .dna-label { color: rgba(240,237,232,0.45); }
+    [data-theme="dark"] .dna-depth-line::before { background: rgba(240,237,232,0.1); }
+    [data-theme="dark"] .dna-tip {
+      background: rgb(230,227,222);
+      color: rgba(29,29,31,0.88);
+    }
+    [data-theme="dark"] .dna-tip::after { border-top-color: rgb(230,227,222); }
+    /* Responsive: smaller text, tighter grid on narrow screens */
+    @media (max-width: 640px) {
+      .dna-t-grid { gap: 5px; }
+      .dna-icon   { width: 24px; height: 24px; }
+      .dna-label  { font-size: 7.5px; }
+      .dna-cell   { padding: 10px 4px 8px; border-radius: 10px; }
     }
 
     /* ─── STICKY STACK ──────────────────────────────────────── */
@@ -6427,12 +6610,13 @@
 
     /* ── Section 2 wrapper — contains header + spiral + list ── */
     .s2-section-wrap {
-      background: #111111;
+      background: #0C0C0C;
       height: calc(100vh - 80px);
       overflow: hidden;
       display: flex;
       flex-direction: column;
       scroll-snap-align: start;
+      position: relative;
     }
 
     /* ── Section 2 redesign — Featured Work ─────────────────── */
@@ -6446,6 +6630,8 @@
       transform: translateY(24px);
       transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1),
                   transform 0.9s cubic-bezier(0.22,1,0.36,1);
+      position: relative;
+      z-index: 2;
     }
     .s2-fw-header.s2-fwh-in { opacity: 1; transform: none; }
     /* Title row: "Featured Work" centered, SPIRAL/LIST anchored right */
@@ -6781,6 +6967,35 @@
     }
     .s2-tnav-btn svg { width: 9px; height: 9px; fill: currentColor; }
 
+    /* Stacked up/down project nav — same glass style as testimonial arrows, pinned right */
+    .s2-side-nav {
+      position: absolute; right: 24px; top: 50%; transform: translateY(-50%);
+      z-index: 5;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .s2-side-nav-btn {
+      width: 62px; height: 62px; border-radius: 999px; border: none;
+      background:
+        linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+        linear-gradient(270deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.3) 100%);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      box-shadow:
+        rgba(255,255,255,0.7)   6.67px  6.67px 3.36px -6.21px inset,
+        rgba(230,242,141,0.45) -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140,180,190)       -2.00px  2.39px 18px   -2.60px inset;
+      color: rgba(255,255,255,0.8);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: color 0.2s, box-shadow 0.2s;
+    }
+    .s2-side-nav-btn:hover {
+      color: #fff;
+      box-shadow:
+        rgba(255,255,255,0.9)   6.67px  6.67px 3.36px -6.21px inset,
+        rgba(230,242,141,0.65) -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140,180,190)       -2.00px  2.39px 24px   -2.60px inset;
+    }
+
     /* Full glimpse wrapper */
     .s2-glimpse-full { position: relative; }
 
@@ -6818,11 +7033,12 @@
       min-height: 0;
       position: relative;
       overflow: hidden;
+      z-index: 2;
     }
     .s2-cards-zone {
       position: absolute;
       inset: 0;
-      background: #111111;
+      background: #0C0C0C;
     }
 
     /* Video + content row */
@@ -7586,10 +7802,10 @@
     .tm-sc .tm-fh.bl { bottom: -4px; left: -4px; }
     .tm-sc .tm-fh.br { bottom: -4px; right: -4px; }
     /* Stack positions — all 4 always visible */
-    .tm-sc[data-pos="0"] { z-index: 10; transform: translateY(66px) scale(1);     opacity: 1; }
-    .tm-sc[data-pos="1"] { z-index: 9;  transform: translateY(44px) scale(0.962); opacity: 1; pointer-events: none; }
-    .tm-sc[data-pos="2"] { z-index: 8;  transform: translateY(24px) scale(0.924); opacity: 1; pointer-events: none; }
-    .tm-sc[data-pos="3"] { z-index: 7;  transform: translateY(8px)  scale(0.886); opacity: 1; pointer-events: none; }
+    .tm-sc[data-pos="0"] { z-index: 10; transform: translateY(66px) scale(1);      opacity: 1; }
+    .tm-sc[data-pos="1"] { z-index: 9;  transform: translateY(36px) scale(0.962); opacity: 1; pointer-events: none; }
+    .tm-sc[data-pos="2"] { z-index: 8;  transform: translateY(6px)  scale(0.924); opacity: 1; pointer-events: none; }
+    .tm-sc[data-pos="3"] { z-index: 7;  transform: translateY(-22px) scale(0.886); opacity: 1; pointer-events: none; }
     /* Large opening quote mark */
     .tm-qmark {
       font-size: clamp(32px, 3.5vw, 56px); line-height: 0.8; display: block;
@@ -8006,6 +8222,21 @@
 
       <section class="s2-section-wrap">
 
+      <!-- Stacked up/down project nav — right side -->
+      <div class="s2-side-nav">
+        <button class="s2-side-nav-btn" id="s2SideNavPrev" aria-label="Previous project">
+          <svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M4 9L9 4L14 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 14V4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+        <button class="s2-side-nav-btn" id="s2SideNavNext" aria-label="Next project">
+          <svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M4 9L9 14L14 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 4V14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <!-- Canvas covers full section — renders behind header and work container -->
+      <div class="s2-cards-zone" id="s2CardsZone">
+        <div id="spiral-root" style="width:100%;height:100%;position:relative;"></div>
+      </div>
+
       <!-- ── Featured Work heading ── -->
       <div class="s2-fw-header" id="s2FwHeader">
         <div class="s2-fwh-row">
@@ -8031,11 +8262,6 @@
 
       <!-- ── SECTION 2: FEATURED WORK — full-viewport spiral ── -->
       <div class="s2-work-container">
-
-      <!-- Spiral Gallery — full viewport, blob centered -->
-      <div class="s2-cards-zone" id="s2CardsZone">
-        <div id="spiral-root" style="width:100%;height:100%;position:relative;"></div>
-      </div>
 
       <!-- Project info bar — slides up from bottom when front card changes -->
       <div id="s2ProjectBar" class="s2-project-bar">
@@ -8355,6 +8581,18 @@
                 </div></div></div>
               </li>
 
+              <li class="am-control-item" data-am-tab="design-dna" data-index="3">
+                <div class="am-item-bg-wrap"><span class="am-item-bg"></span></div>
+                <button class="am-item-btn">
+                  <span class="am-item-label">My design DNA</span>
+                  <span class="am-item-icon"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="9.25" stroke="rgb(29,29,31)" stroke-width="1.5"/><line class="bar-h" x1="5.5" y1="10" x2="14.5" y2="10" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/><line class="bar-v" x1="10" y1="5.5" x2="10" y2="14.5" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                </button>
+                <div class="am-item-mask"><div class="am-item-content"><div class="am-item-inner">
+                  <div class="am-item-inner-title">My design DNA</div>
+                  <p class="am-item-inner-body">I&rsquo;m a T-shaped designer: deep expertise in experience design, with enough breadth across product, research, systems, and engineering to be dangerous in all of them. The T isn&rsquo;t a title — it&rsquo;s how I think.</p>
+                </div></div></div>
+              </li>
+
             </ul>
           </div>
 
@@ -8462,6 +8700,70 @@
                 </li>
               </ul>
             </div>
+            <div class="am-panel-pane" data-am-pane="design-dna">
+              <p class="am-pane-eyebrow">How I&rsquo;m shaped</p>
+              <p class="am-pane-pull">&ldquo;Deep roots, wide reach.&rdquo;</p>
+              <p class="am-pane-body" style="margin-bottom:0;">I think in systems, feel in stories. The T is how I work — deep expertise in experience design, with enough breadth across every discipline that touches it to hold my own in any room.</p>
+
+              <div class="dna-t-grid">
+
+                <!-- ROW 1: breadth bar -->
+                <div class="dna-cell dna-b1">
+                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Customer.svg" class="dna-icon" alt="">
+                  <span class="dna-label">Customer Discovery</span>
+                  <div class="dna-tip">Finding what users actually need, not what they say they want.</div>
+                </div>
+                <div class="dna-cell dna-b2">
+                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Strategy.svg" class="dna-icon" alt="">
+                  <span class="dna-label">Product Strategy</span>
+                  <div class="dna-tip">Connecting design decisions to business outcomes that matter.</div>
+                </div>
+                <div class="dna-cell dna-b3 dna-depth-anchor">
+                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Experience%20Design.svg" class="dna-icon" alt="">
+                  <span class="dna-label">Experience Design</span>
+                  <div class="dna-tip">My core craft. Where depth lives.</div>
+                </div>
+                <div class="dna-cell dna-b4">
+                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/product%20Build.svg" class="dna-icon" alt="">
+                  <span class="dna-label">Product Builder</span>
+                  <div class="dna-tip">Moving from 0→1 with engineering teams. Shipping is a design decision.</div>
+                </div>
+                <div class="dna-cell dna-b5">
+                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg" class="dna-icon" alt="">
+                  <span class="dna-label">Engineering Collab</span>
+                  <div class="dna-tip">Working with engineers as partners, not handoff recipients.</div>
+                </div>
+
+                <!-- COLUMN 3: depth stem -->
+                <div class="dna-cell dna-d1">
+                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Research.svg" class="dna-icon" alt="">
+                  <span class="dna-label">Research</span>
+                  <div class="dna-tip">Synthesizing signals into clear design direction.</div>
+                </div>
+                <div class="dna-cell dna-d2">
+                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/principles.svg" class="dna-icon" alt="">
+                  <span class="dna-label">First Principles</span>
+                  <div class="dna-tip">Breaking complex problems down to their fundamental truths.</div>
+                </div>
+                <div class="dna-cell dna-d3">
+                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg" class="dna-icon" alt="">
+                  <span class="dna-label">Systems Thinking</span>
+                  <div class="dna-tip">Designing for scale, not just the screen in front of you.</div>
+                </div>
+                <div class="dna-cell dna-d4">
+                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg" class="dna-icon" alt="">
+                  <span class="dna-label">Builder Mindset</span>
+                  <div class="dna-tip">Bias toward momentum. Iteration over perfection.</div>
+                </div>
+                <div class="dna-cell dna-d5">
+                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg" class="dna-icon" alt="">
+                  <span class="dna-label">Measured Impact</span>
+                  <div class="dna-tip">Tying design to metrics that actually change the trajectory.</div>
+                </div>
+
+              </div>
+            </div>
+
           </div>
 
         </div>
@@ -13079,6 +13381,18 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         detail: { idx: (currentIdx + 1) % S2_DATA.length }
       }));
     });
+    var sideNavPrev = document.getElementById('s2SideNavPrev');
+    var sideNavNext = document.getElementById('s2SideNavNext');
+    if (sideNavPrev) sideNavPrev.addEventListener('click', function () {
+      spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', {
+        detail: { idx: (currentIdx - 1 + S2_DATA.length) % S2_DATA.length }
+      }));
+    });
+    if (sideNavNext) sideNavNext.addEventListener('click', function () {
+      spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', {
+        detail: { idx: (currentIdx + 1) % S2_DATA.length }
+      }));
+    });
 
     /* Count a metric value from 0 up to its number, preserving prefix/suffix */
     function countUpMetric(el, rawVal, delay) {
@@ -13264,7 +13578,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var anim    = false;
 
     var POS_FRONT = 'translateY(80px) scale(1)';
-    var POS_BACK  = 'translateY(12px) scale(0.92)';
+    var POS_BACK  = 'translateY(-22px) scale(0.886)';
 
     function applyPos() {
       cards.forEach(function (c, i) {
