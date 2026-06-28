@@ -44,7 +44,7 @@
     }
 
     [data-theme="dark"] {
-      --bg:           #252525;
+      --bg:           #1A1A1A;
       --primary:      #789F04;
       --accent:       #789F04;
       --white:        #0C0C0C;
@@ -6511,14 +6511,14 @@
       position: absolute;
       bottom: 28px;
       left: 50%;
-      width: min(1000px, calc(100% - 80px));
+      width: min(1250px, calc(100% - 64px));
       z-index: 10;
       display: flex;
       flex-direction: column;
-      background: rgba(14,14,14,0.88);
+      background: rgba(14,14,14,0.55);
       border-radius: 20px;
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
       padding: 28px 32px;
       pointer-events: none;
       opacity: 0;
@@ -6645,10 +6645,10 @@
     }
     .s2-bar-metric-lbl {
       font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.10em;
+      font-size: 12px;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: rgba(255,252,248,0.40);
+      color: rgba(255,252,248,0.65);
     }
     /* Frosted glass CTA */
     .s2-bar-cta {
@@ -7385,6 +7385,12 @@
       align-items: center; justify-content: center;
       padding: 60px 0;
       scroll-snap-align: start;
+      background-color: #111111;
+      background-image:
+        radial-gradient(65% 60% at 50% 46%, transparent 0%, transparent 45%, rgba(17,17,17,0.6) 72%, rgba(17,17,17,0.96) 90%),
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 52px 52px, 52px 52px;
     }
     .tm-header { text-align: center; margin-bottom: 48px; padding: 0 24px; }
     .tm-eyebrow-tag {
@@ -7685,7 +7691,7 @@
         rgb(140,180,190)       -2.00px  2.39px 24px   -2.60px inset;
     }
     /* Dark mode */
-    [data-theme="dark"] .tm-section        { background: #0C0C0C; }
+    [data-theme="dark"] .tm-section        { background-color: #111111; }
     [data-theme="dark"] .tm-eyebrow-tag    { color: rgba(255,255,255,0.45); border-color: rgba(255,255,255,0.15); opacity: 1; }
     [data-theme="dark"] .tm-headline       { color: #fff; }
     [data-theme="dark"] .tm-dot            { background: rgba(255,255,255,0.2); }
@@ -8029,8 +8035,22 @@
       <!-- Spiral Gallery — full viewport, blob centered -->
       <div class="s2-cards-zone" id="s2CardsZone">
         <div id="spiral-root" style="width:100%;height:100%;position:relative;"></div>
+      </div>
 
-
+      <!-- Project info bar — slides up from bottom when front card changes -->
+      <div id="s2ProjectBar" class="s2-project-bar">
+        <div class="s2-bar-top-row">
+          <div class="s2-bar-title-col">
+            <h3 class="s2-bar-title" id="s2BarTitle"></h3>
+            <p class="s2-bar-desc" id="s2BarDesc"></p>
+          </div>
+          <div class="s2-bar-tags" id="s2BarTags"></div>
+        </div>
+        <div class="s2-bar-rule"></div>
+        <div class="s2-bar-bottom-row">
+          <div class="s2-bar-metrics" id="s2BarMetrics"></div>
+          <a class="s2-bar-cta" id="s2BarCta" href="#">View Case Study →</a>
+        </div>
       </div>
 
       <!-- C: Blob + left/right content (static ws-section removed; content now in spiral gallery panels) -->
@@ -12956,7 +12976,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         metrics: [
           { val: '85%', lbl: 'Session Completion' },
           { val: '2×',  lbl: 'Faster Mastery'     },
-          { val: '$5/hr', lbl: 'vs $250 Before'   }
+          { val: '$250→$5/hr', lbl: '1:1 Tutor Cost'   }
         ],
         tags: ['Shipped', 'Adaptive AI Tutoring', 'Real-time', 'B2C · Mobile'],
         desc: 'Voice-first AI tutor — students master topics in 30 min vs 60 in a classroom. Taken from prototype to PMF.',
@@ -13423,25 +13443,28 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     updateTabs();
     resetTimer();
 
-    /* Progress arc — restart on the front card after each advance */
-    function restartArc() {
+    /* Progress arc — MutationObserver watches data-pos; fires on every advance source */
+    function restartArc(frontCard) {
       document.querySelectorAll('.tm-arc-fill').forEach(function(el) {
         el.classList.remove('tm-arc-running');
-        void el.getBoundingClientRect(); /* force reflow to reset animation */
+        void el.getBoundingClientRect();
       });
-      var frontCard = cards[front];
       if (frontCard) {
         var arc = frontCard.querySelector('.tm-arc-fill');
         if (arc) arc.classList.add('tm-arc-running');
       }
     }
 
-    /* Patch advance/advanceWithCard to restart arc */
-    var _origAdvance = advance;
-    advance = function() {
-      _origAdvance.apply(this, arguments);
-      setTimeout(restartArc, 420);
-    };
+    var arcObserver = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        if (m.attributeName === 'data-pos' && m.target.dataset.pos === '0') {
+          setTimeout(function() { restartArc(m.target); }, 60);
+        }
+      });
+    });
+    cards.forEach(function(c) {
+      arcObserver.observe(c, { attributes: true, attributeFilter: ['data-pos'] });
+    });
 
     /* Mouse parallax on stack */
     stack.addEventListener('mousemove', function(e) {
@@ -13462,7 +13485,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       });
     });
 
-    restartArc();
+    restartArc(cards[front]);
 
     /* Entrance animation — add .tm-visible when section scrolls into view */
     var tmSection = document.getElementById('testimonialsSection');
