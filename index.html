@@ -2618,232 +2618,231 @@
       .ld-contact-sep       { display: none; }
     }
 
-    /* ─── FOOTER ────────────────────────────────────────────────── */
+    /* ─── FOOTER (Sui-style: CTA + columns + grain skyline) ───────── */
     .site-footer {
-      background: #252525;
-      padding: 72px 40px 32px;
+      position: relative;
+      background: #1D1D1D;
       display: flex;
       flex-direction: column;
-      gap: 40px;
-      position: relative;
+      padding: 0;
       overflow: hidden;
+      isolation: isolate;
     }
 
-    /* ── background wordmark ── */
-    .footer-wordmark {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translateX(-50%) translateY(-50%);
+    /* ── top: CTA (left) + link columns (right) ── */
+    .footer-main {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      gap: 64px;
+      flex-wrap: wrap;
+      padding: 84px 48px 0;
+    }
+    .footer-lead {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      max-width: 520px;
+    }
+
+    /* ── live availability status pill ── */
+    .footer-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      align-self: flex-start;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.62);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 100px;
+      padding: 8px 16px;
+    }
+    .footer-status-time { color: rgba(255,255,255,0.40); }
+
+    .footer-cta {
+      margin: 0;
       font-family: var(--font-heading);
-      font-size: 18vw;
-      font-weight: 900;
-      letter-spacing: -0.05em;
-      color: rgba(255,255,255,0.055);
-      white-space: nowrap;
-      line-height: 1;
-      z-index: 0;
-      pointer-events: none;
-      user-select: none;
-      -webkit-mask-image:
-        linear-gradient(to bottom, black 10%, transparent 82%),
-        linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%);
-      -webkit-mask-composite: destination-in;
-      mask-image:
-        linear-gradient(to bottom, black 10%, transparent 82%),
-        linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%);
-      mask-composite: intersect;
+      font-size: clamp(30px, 3.6vw, 48px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: var(--color-white);
     }
+    .footer-cta-sub {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.55);
+    }
+    .footer-cta-mail {
+      color: var(--primary);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(230,242,141,0.40);
+      padding-bottom: 1px;
+      transition: border-color 0.2s ease;
+    }
+    .footer-cta-mail:hover { border-color: var(--primary); }
 
-    /* ── two-col layout ── */
-    .footer-top {
+    /* ── link columns ── */
+    .footer-cols {
+      display: flex;
+      gap: 56px;
+      flex-wrap: wrap;
+    }
+    .footer-col {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      min-width: 124px;
+    }
+    .footer-col-head {
+      margin-bottom: 4px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.42);
+    }
+    .fc-slash { color: var(--primary); }
+    .footer-col-link {
+      position: relative;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.62);
+      text-decoration: none;
+      padding-left: 18px;
+      transition: color 0.18s ease, padding-left 0.18s ease;
+    }
+    .footer-col-link::before {
+      content: "\2514";
+      position: absolute;
+      left: 0;
+      color: rgba(255,255,255,0.22);
+      transition: color 0.18s ease;
+    }
+    .footer-col-link:hover { color: var(--color-white); padding-left: 22px; }
+    .footer-col-link:hover::before { color: var(--primary); }
+
+    /* ── sub-bar: socials + copyright ── */
+    .footer-sub {
+      position: relative;
+      z-index: 2;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 48px;
-      position: relative;
-      z-index: 1;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 64px;
+      padding: 24px 48px;
+      border-top: 1px solid rgba(255,255,255,0.08);
     }
-    .footer-left {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      flex: 1;
+    .footer-socials { display: flex; gap: 10px; }
+    .footer-soc {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      color: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.10);
+      transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
     }
-    .footer-eyebrow {
-      font-family: var(--font-heading);
-      font-size: 9.5px;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      color: rgba(255,255,255,0.28);
-      text-transform: uppercase;
-    }
-    .footer-heading {
-      font-family: var(--font-heading);
-      font-size: clamp(26px, 3.2vw, 42px);
-      font-weight: 700;
-      line-height: 1.5;
-      letter-spacing: -0.02em;
-      color: var(--color-white);
-      max-width: 520px;
-    }
-    .footer-heading .fh-highlight {
-      background: var(--primary);
+    .footer-soc:hover {
       color: #1A1917;
-      border-radius: 6px;
-      padding: 0 8px;
-      white-space: nowrap;
+      background: var(--primary);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .footer-copyright {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      color: rgba(255,255,255,0.30);
     }
 
-    /* ── right: credential pills ── */
-    .footer-right {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      flex-shrink: 0;
-      align-items: stretch;
-    }
-    .footer-cred-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 100px;
-      padding: 18px 18px 18px 28px;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .footer-cred-value {
-      font-family: var(--font-mono);
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--color-white);
-      cursor: default;
-      user-select: text;
-      white-space: nowrap;
-      flex: 1;
-    }
-    /* ── external link pills ── */
-    .footer-link-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 100px;
-      padding: 18px 18px 18px 28px;
-      width: 100%;
-      text-decoration: none;
-      transition: background 0.2s ease, border-color 0.2s ease;
-      cursor: pointer !important;
-      box-sizing: border-box;
-    }
-    .footer-link-row:hover {
-      background: rgba(255,255,255,0.08);
-      border-color: rgba(255,255,255,0.18);
-    }
-    .footer-link-value {
-      font-family: var(--font-mono);
-      font-size: 14px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.65);
-      flex: 1;
-      white-space: nowrap;
-      transition: color 0.2s ease;
-    }
-    .footer-link-row:hover .footer-link-value { color: rgba(255,255,255,0.90); }
-    .footer-link-icon {
-      flex-shrink: 0;
-      opacity: 0.55;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-    .footer-link-row:hover .footer-link-icon {
-      opacity: 1;
-      transform: translate(2px,-2px);
-    }
-    .footer-links-pair {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      width: 100%;
-    }
-    .footer-links-pair .footer-link-row {
-      width: 100%;
-      padding: 22px 14px 22px 20px;
-      gap: 8px;
-    }
     .ph-dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #4ade80;
+      background: #9bd309;
       flex-shrink: 0;
       animation: ph-pulse 2.2s ease-in-out infinite;
     }
     @keyframes ph-pulse {
-      0%   { box-shadow: 0 0 0 0 rgba(74,222,128,0.60); }
-      60%  { box-shadow: 0 0 0 7px rgba(74,222,128,0); }
-      100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+      0%   { box-shadow: 0 0 0 0 rgba(155,211,9,0.55); }
+      60%  { box-shadow: 0 0 0 7px rgba(155,211,9,0); }
+      100% { box-shadow: 0 0 0 0 rgba(155,211,9,0); }
     }
 
-    /* ── bottom bar ── */
-    /* ── footer tangled-line graphic ── */
-    .footer-line-graphic {
-      width: 100%;
-      height: 70px;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .footer-line-graphic svg {
-      display: block;
-      height: 70px;
-    }
-
-    .footer-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 28px;
-      border-top: none;
+    /* ── grainy gradient skyline (the lime glow + noise blocks) ── */
+    .footer-grain {
       position: relative;
       z-index: 1;
+      width: 100%;
+      height: 280px;
+      margin-top: 8px;
+      overflow: hidden;
     }
-    .site-footer .footer-tagline {
+    .footer-grain-glow {
+      position: absolute;
+      left: 50%;
+      bottom: -30%;
+      transform: translateX(-50%);
+      width: 95%;
+      height: 150%;
+      background: radial-gradient(closest-side,
+        rgba(230,242,141,0.50) 0%,
+        rgba(230,242,141,0.16) 48%,
+        transparent 72%);
+      filter: blur(26px);
+      pointer-events: none;
+    }
+    .footer-grain-bars {
+      position: absolute;
+      inset: 0;
       display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: 0.10em;
-      color: rgba(255,255,255,0.25);
-      text-transform: uppercase;
+      align-items: flex-end;
+      gap: 5px;
+      padding: 0 6px;
+      -webkit-mask-image: linear-gradient(to top, #000 0%, #000 32%, transparent 100%);
+      mask-image: linear-gradient(to top, #000 0%, #000 32%, transparent 100%);
     }
-    .footer-label {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      font-weight: 400;
-      letter-spacing: 0.01em;
-      color: rgba(255,255,255,0.28);
+    .fg-bar {
+      flex: 1 1 0;
+      min-width: 0;
+      border-radius: 3px 3px 0 0;
+      background: linear-gradient(to top,
+        rgba(230,242,141,0.95) 0%,
+        rgba(230,242,141,0.34) 46%,
+        rgba(230,242,141,0) 94%);
     }
-    .footer-divider {
-      width: 1px; height: 12px;
-      background: rgba(255,255,255,0.15);
-      flex-shrink: 0;
+    .footer-grain-noise {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 150px 150px;
+      opacity: 0.42;
+      mix-blend-mode: overlay;
+      pointer-events: none;
     }
-    .site-footer a.footer-email {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      color: rgba(255,255,255,0.5);
-      text-decoration: none;
-      text-transform: none;
-      transition: opacity 0.2s ease;
+    @media (prefers-reduced-motion: reduce) {
+      .ph-dot { animation: none; }
     }
-    .site-footer a.footer-email:hover { opacity: 0.6; }
+
     .footer-copy-btn {
       position: relative;
       display: inline-flex;
@@ -2884,20 +2883,18 @@
 
     /* ── Footer responsive overrides (must come AFTER base footer CSS) ── */
     @media (max-width: 767px) {
-      .site-footer          { padding: 48px 20px 24px; gap: 20px; }
-      .footer-top           { flex-direction: column; gap: 28px; }
-      .footer-heading       { font-size: 24px; line-height: 1.4; }
-      .footer-right         { width: 100%; gap: 10px; }
-      .footer-cred-row      { padding: 14px 14px 14px 18px; gap: 8px; width: 100%; box-sizing: border-box; overflow: hidden; }
-      .footer-cred-value    { font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-      .footer-copy-btn      { width: 22px; height: 22px; flex-shrink: 0; }
-      .footer-links-pair    { grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; box-sizing: border-box; }
-      .footer-links-pair .footer-link-row { padding: 14px 14px 14px 18px; gap: 8px; box-sizing: border-box; overflow: hidden; }
-      .footer-link-value    { font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-      .footer-link-icon     { width: 22px; height: 22px; flex-shrink: 0; }
-      .footer-line-graphic  { height: 44px; }
-      .footer-line-graphic svg { height: 44px; }
-      .footer-bottom        { flex-direction: column; gap: 4px; align-items: center; justify-content: center; padding-top: 8px; }
+      .footer-main          { flex-direction: column; gap: 40px; padding: 52px 22px 0; }
+      .footer-status        { font-size: 10px; padding: 7px 13px; gap: 7px; }
+      .footer-cta           { font-size: 28px; }
+      .footer-cta-sub       { font-size: 13px; }
+      .footer-cols          { gap: 32px 48px; }
+      .footer-col           { min-width: 110px; }
+      .footer-copy-btn      { width: 24px; height: 24px; flex-shrink: 0; }
+      .footer-sub           { flex-direction: column; align-items: flex-start; gap: 16px; margin-top: 44px; padding: 22px 22px; }
+      .footer-grain         { height: 200px; }
+    }
+    @media (max-width: 480px) {
+      .footer-cols          { flex-direction: column; gap: 28px; }
     }
 
     /* modern pill toast */
@@ -3696,6 +3693,11 @@
     /* ─── ABOUT ME TAB PANEL ────────────────────────────────── */
     .am-section {
       padding: 80px 40px 72px;
+      scroll-snap-align: start;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     .am-inner {
       display: grid;
@@ -3861,10 +3863,16 @@
     }
     /* Design DNA pane floats free — no container chrome (Apple-style) */
     .am-panel:has([data-am-pane="design-dna"].is-active) {
-      min-height: 680px;
+      min-height: 600px;
       border-color: transparent;
       overflow: visible;
     }
+    /* When DNA is open, hug the pills column so the grid gets full width */
+    .am-inner:has([data-am-pane="design-dna"].is-active) {
+      grid-template-columns: max-content 1fr;
+    }
+    /* DNA grid uses the full pane width — no side padding */
+    .am-panel-pane[data-am-pane="design-dna"] { padding: 0; }
     /* Default (off-screen below) + enter animation — Apple: 600ms / 250ms delay */
     .am-panel-pane {
       position: absolute;
@@ -4007,24 +4015,27 @@
     /* ─── DESIGN DNA T-SHAPE ────────────────────────────────── */
     .dna-t-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      grid-template-rows: repeat(6, auto);
-      gap: 8px;
-      margin-top: 20px;
+      grid-template-columns: repeat(5, 140px);
+      grid-template-rows: repeat(6, 90px);
+      gap: 10px;
+      margin-top: 0;
     }
     .dna-cell {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      padding: 14px 8px 12px;
+      justify-content: center;
+      padding: 8px 6px;
       border-radius: 14px;
-      background: rgba(29,29,31,0.04);
-      border: 1px solid rgba(29,29,31,0.08);
+      background: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.8);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
       cursor: default;
       overflow: visible;
-      transition: border-color 0.3s ease, background 0.3s ease;
+      transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
     }
     /* Green gradient glow from bottom-left on hover */
     .dna-cell::before {
@@ -4058,17 +4069,6 @@
     }
     .dna-cell:hover::before { opacity: 1; }
     .dna-cell:hover::after  { opacity: 1; }
-    /* Intersection cell (Experience Design — depth marker) */
-    .dna-cell.dna-depth-anchor {
-      background: rgba(29,29,31,0.07);
-      border-color: rgba(29,29,31,0.16);
-    }
-    .dna-cell.dna-depth-anchor::before {
-      background: radial-gradient(ellipse at -5% 115%,
-        rgba(60, 160, 50, 0.4) 0%,
-        rgba(140, 200, 70, 0.22) 45%,
-        transparent 75%);
-    }
     /* Grid placement */
     .dna-b1 { grid-column: 1; grid-row: 1; }
     .dna-b2 { grid-column: 2; grid-row: 1; }
@@ -4096,23 +4096,26 @@
       background: rgba(29,29,31,0.1);
       transform: translateX(-50%);
     }
-    /* Icon */
+    /* Icon — black SVG recolored via mask + per-skill gradient */
     .dna-icon {
-      width: 32px; height: 32px;
-      object-fit: contain;
+      width: 38px; height: 38px;
       display: block;
       flex-shrink: 0;
+      background: linear-gradient(150deg, var(--c1,#9a9a9a), var(--c2,#5f5f5f));
+      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+      -webkit-mask-position: center;  mask-position: center;
+      -webkit-mask-size: contain;     mask-size: contain;
     }
-    /* Label */
+    /* Label — colored to match the icon */
     .dna-label {
-      font-family: var(--font-mono);
-      font-size: 9px;
+      font-family: var(--font-heading);
+      font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.04em;
-      color: rgba(29,29,31,0.55);
+      letter-spacing: -0.01em;
+      color: var(--lc, rgba(29,29,31,0.6));
       text-align: center;
-      line-height: 1.3;
-      margin-top: 8px;
+      line-height: 1.25;
+      margin-top: 9px;
     }
     /* Tooltip callout */
     .dna-tip {
@@ -4157,31 +4160,24 @@
     .dna-b4:hover .dna-tip, .dna-b5:hover .dna-tip { transform: translateX(0) translateY(0); }
     /* Dark mode */
     [data-theme="dark"] .dna-cell {
-      background: rgba(240,237,232,0.05);
-      border-color: rgba(240,237,232,0.08);
-    }
-    [data-theme="dark"] .dna-cell.dna-depth-anchor {
-      background: rgba(240,237,232,0.09);
-      border-color: rgba(240,237,232,0.16);
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.13);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07);
     }
     [data-theme="dark"] .dna-cell:hover {
-      border-color: rgba(140, 210, 80, 0.35);
-      background: rgba(160, 210, 70, 0.08);
+      border-color: rgba(140, 210, 80, 0.4);
+      background: rgba(160, 210, 70, 0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
     }
-    [data-theme="dark"] .dna-label { color: rgba(240,237,232,0.45); }
     [data-theme="dark"] .dna-depth-line::before { background: rgba(240,237,232,0.1); }
     [data-theme="dark"] .dna-tip {
       background: rgb(230,227,222);
       color: rgba(29,29,31,0.88);
     }
     [data-theme="dark"] .dna-tip::after { border-top-color: rgb(230,227,222); }
-    /* Responsive: smaller text, tighter grid on narrow screens */
-    @media (max-width: 640px) {
-      .dna-t-grid { gap: 5px; }
-      .dna-icon   { width: 24px; height: 24px; }
-      .dna-label  { font-size: 7.5px; }
-      .dna-cell   { padding: 10px 4px 8px; border-radius: 10px; }
-    }
+    /* Per-skill icon/label colors are set inline via --c1/--c2/--lc on each cell */
 
     /* ─── STICKY STACK ──────────────────────────────────────── */
     .sticky-stack {
@@ -4661,42 +4657,9 @@
     [data-theme="dark"] #ccDot            { background: rgba(240,237,232,0.92); }
     [data-theme="dark"] .hero-hi          { color: #1A1917; }
 
-    /* ─── DARK MODE — FOOTER INVERSION ──────────────────────── */
-    [data-theme="dark"] .site-footer {
-      background: #FFFCF8;
-    }
-    [data-theme="dark"] .footer-wordmark  { color: rgba(37,37,37,0.06); }
-    [data-theme="dark"] .footer-eyebrow   { color: rgba(37,37,37,0.42); }
-    [data-theme="dark"] .footer-heading   { color: #252525; }
-    [data-theme="dark"] .footer-cred-row {
-      background: rgba(37,37,37,0.05);
-      border-color: rgba(37,37,37,0.12);
-    }
-    [data-theme="dark"] .footer-cred-value { color: #252525; }
-    [data-theme="dark"] .footer-copy-btn   { opacity: 0.65; }
-    [data-theme="dark"] .footer-copy-btn:hover {
-      opacity: 1;
-      box-shadow: 0 0 0 10px rgba(37,37,37,0.08);
-      background: rgba(37,37,37,0.08);
-    }
-    [data-theme="dark"] .footer-copy-btn .icon-clipboard { filter: invert(1); }
-    [data-theme="dark"] .footer-link-row {
-      background: rgba(37,37,37,0.04);
-      border-color: rgba(37,37,37,0.10);
-    }
-    [data-theme="dark"] .footer-link-row:hover {
-      background: rgba(37,37,37,0.09);
-      border-color: rgba(37,37,37,0.18);
-    }
-    [data-theme="dark"] .footer-link-value { color: rgba(37,37,37,0.65); }
-    [data-theme="dark"] .footer-link-row:hover .footer-link-value { color: rgba(37,37,37,0.9); }
-    [data-theme="dark"] .footer-link-icon  { filter: invert(1); opacity: 0.7; }
-    [data-theme="dark"] .footer-link-row:hover .footer-link-icon { opacity: 1; }
-    [data-theme="dark"] .footer-line-graphic { filter: invert(1) opacity(0.3); }
-    [data-theme="dark"] .site-footer .footer-tagline { color: rgba(37,37,37,0.38); }
-    [data-theme="dark"] .footer-label       { color: rgba(37,37,37,0.38); }
-    [data-theme="dark"] .footer-divider     { background: rgba(37,37,37,0.15); }
-    [data-theme="dark"] .site-footer a.footer-email { color: rgba(37,37,37,0.5); }
+    /* ─── DARK MODE — FOOTER ──────────────────────────────────
+       The footer is a permanent dark "stage" in both themes so the
+       lime grain glow always reads. No inversion needed. ──────── */
     [data-theme="dark"] #ccLabel          { border-color: rgba(240,237,232,0.1); }
     [data-theme="dark"] .cc-lbl-text      { color: var(--secondary); }
     [data-theme="dark"] .nav-chip         { color: var(--secondary); }
@@ -6646,7 +6609,8 @@
     }
     .s2-fwh-row .s2-view-toggle {
       position: absolute;
-      right: 0;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     /* "Featured Work" label — mono 20px, overrides large heading styles */
@@ -8225,17 +8189,8 @@
 
       <section class="s2-section-wrap">
 
-      <!-- Stacked up/down project nav — right side -->
-      <div class="s2-side-nav">
-        <button class="s2-side-nav-btn" id="s2SideNavPrev" aria-label="Previous project">
-          <svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M4 9L9 4L14 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 14V4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </button>
-        <button class="s2-side-nav-btn" id="s2SideNavNext" aria-label="Next project">
-          <svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M4 9L9 14L14 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 4V14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </button>
-      </div>
 
-      <!-- Canvas covers full section — renders behind header and work container -->
+<!-- Canvas covers full section — renders behind header and work container -->
       <div class="s2-cards-zone" id="s2CardsZone">
         <div id="spiral-root" style="width:100%;height:100%;position:relative;"></div>
       </div>
@@ -8247,18 +8202,6 @@
           <div class="s2-view-toggle">
             <button class="s2-vt-btn s2-vt-active" id="s2SpiralBtn">SPIRAL</button>
             <button class="s2-vt-btn" id="s2ListBtn">LIST</button>
-          </div>
-        </div>
-        <!-- Tab strip — right-aligned below title -->
-        <div class="s2-project-tabs" id="s2ProjectTabs">
-          <div class="s2-tabs-list" id="s2TabsList"></div>
-          <div class="s2-tabs-nav">
-            <button class="s2-tnav-btn" id="s2NavUp" aria-label="Previous project">
-              <svg viewBox="0 0 10 10"><path d="M5 3L1 7h8z"/></svg>
-            </button>
-            <button class="s2-tnav-btn" id="s2NavDown" aria-label="Next project">
-              <svg viewBox="0 0 10 10"><path d="M5 7L1 3h8z"/></svg>
-            </button>
           </div>
         </div>
       </div>
@@ -8707,55 +8650,55 @@
               <div class="dna-t-grid">
 
                 <!-- ROW 1: breadth bar -->
-                <div class="dna-cell dna-b1">
-                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Customer.svg" class="dna-icon" alt="">
+                <div class="dna-cell dna-b1" style="--c1:#86DE5C;--c2:#2FA24E;--lc:#43C167">
+                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Customer.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Customer.svg')"></span>
                   <span class="dna-label">Customer Discovery</span>
                   <div class="dna-tip">Finding what users actually need, not what they say they want.</div>
                 </div>
-                <div class="dna-cell dna-b2">
-                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Strategy.svg" class="dna-icon" alt="">
+                <div class="dna-cell dna-b2" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8">
+                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Strategy.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Strategy.svg')"></span>
                   <span class="dna-label">Product Strategy</span>
                   <div class="dna-tip">Connecting design decisions to business outcomes that matter.</div>
                 </div>
-                <div class="dna-cell dna-b3 dna-depth-anchor">
-                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Experience%20Design.svg" class="dna-icon" alt="">
+                <div class="dna-cell dna-b3" style="--c1:#B486F2;--c2:#7C3AED;--lc:#9D6BF0">
+                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Experience%20Design.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Experience%20Design.svg')"></span>
                   <span class="dna-label">Experience Design</span>
                   <div class="dna-tip">My core craft. Where depth lives.</div>
                 </div>
-                <div class="dna-cell dna-b4">
-                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/product%20Build.svg" class="dna-icon" alt="">
+                <div class="dna-cell dna-b4" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E">
+                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Build.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Build.svg')"></span>
                   <span class="dna-label">Product Builder</span>
                   <div class="dna-tip">Moving from 0→1 with engineering teams. Shipping is a design decision.</div>
                 </div>
-                <div class="dna-cell dna-b5">
-                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg" class="dna-icon" alt="">
+                <div class="dna-cell dna-b5" style="--c1:#6FE0A0;--c2:#1FA55E;--lc:#34BE72">
+                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg')"></span>
                   <span class="dna-label">Engineering Collab</span>
                   <div class="dna-tip">Working with engineers as partners, not handoff recipients.</div>
                 </div>
 
                 <!-- COLUMN 3: depth stem -->
-                <div class="dna-cell dna-d1">
-                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Research.svg" class="dna-icon" alt="">
+                <div class="dna-cell dna-d1" style="--c1:#5FD9B4;--c2:#149E78;--lc:#1FC096">
+                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg')"></span>
                   <span class="dna-label">Research</span>
                   <div class="dna-tip">Synthesizing signals into clear design direction.</div>
                 </div>
-                <div class="dna-cell dna-d2">
-                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/principles.svg" class="dna-icon" alt="">
+                <div class="dna-cell dna-d2" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8">
+                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/principles.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/principles.svg')"></span>
                   <span class="dna-label">First Principles</span>
                   <div class="dna-tip">Breaking complex problems down to their fundamental truths.</div>
                 </div>
-                <div class="dna-cell dna-d3">
-                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg" class="dna-icon" alt="">
+                <div class="dna-cell dna-d3" style="--c1:#CD7CEE;--c2:#B0379E;--lc:#CB5AD0">
+                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg')"></span>
                   <span class="dna-label">Systems Thinking</span>
                   <div class="dna-tip">Designing for scale, not just the screen in front of you.</div>
                 </div>
-                <div class="dna-cell dna-d4">
-                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg" class="dna-icon" alt="">
+                <div class="dna-cell dna-d4" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E">
+                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')"></span>
                   <span class="dna-label">Builder Mindset</span>
                   <div class="dna-tip">Bias toward momentum. Iteration over perfection.</div>
                 </div>
-                <div class="dna-cell dna-d5">
-                  <img src="T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg" class="dna-icon" alt="">
+                <div class="dna-cell dna-d5" style="--c1:#5FE0CE;--c2:#12A38E;--lc:#1FC0A8">
+                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg')"></span>
                   <span class="dna-label">Measured Impact</span>
                   <div class="dna-tip">Tying design to metrics that actually change the trajectory.</div>
                 </div>
@@ -8918,62 +8861,73 @@
 
   <footer class="site-footer" id="contactSection">
 
-    <!-- background wordmark -->
-    <span class="footer-wordmark" aria-hidden="true">BHANU</span>
+    <!-- ── top: CTA (left) + link columns (right) ── -->
+    <div class="footer-main">
 
-    <!-- two-col: left = tagline, right = creds -->
-    <div class="footer-top">
-
-      <div class="footer-left">
-        <span class="footer-eyebrow">Get in touch</span>
-        <h2 class="footer-heading">
-          Numbers tell you what's working. People tell you why. Let's chase <span class="fh-highlight">both together</span>
-        </h2>
-      </div>
-
-      <div class="footer-right">
-        <div class="footer-cred-row">
-          <span class="footer-cred-value">kowshikbhanu1000@gmail.com</span>
+      <div class="footer-lead">
+        <span class="footer-status">
+          <span class="ph-dot"></span>
+          <span class="footer-status-text">Available for work · Austin, TX</span>
+          <span class="footer-status-time" id="footerClock"></span>
+        </span>
+        <h2 class="footer-cta">Building something cool?</h2>
+        <p class="footer-cta-sub">
+          Shoot me a message at
+          <a class="footer-cta-mail" href="mailto:kowshikbhanu1000@gmail.com">kowshikbhanu1000@gmail.com</a>
           <button class="footer-copy-btn" data-copy="kowshikbhanu1000@gmail.com" data-toast="mail" aria-label="Copy email">
-            <svg class="icon-clipboard" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <svg class="icon-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="4 12 9 17 20 7"/></svg>
+            <svg class="icon-clipboard" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9bd309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="4 12 9 17 20 7"/></svg>
           </button>
-        </div>
-        <div class="footer-cred-row">
-          <span class="footer-cred-value">+1 (512) 844-8316</span>
-          <button class="footer-copy-btn" data-copy="+15128448316" data-toast="phone" aria-label="Copy phone">
-            <svg class="icon-clipboard" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <svg class="icon-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="4 12 9 17 20 7"/></svg>
-          </button>
-        </div>
-        <div class="footer-links-pair">
-          <a href="https://www.linkedin.com/in/bhanukowshik/" target="_blank" rel="noopener" class="footer-link-row">
-            <span class="footer-link-value">LinkedIn</span>
-            <svg class="footer-link-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><polyline points="7 7 17 7 17 17"/></svg>
-          </a>
-          <a href="https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal" target="_blank" rel="noopener" class="footer-link-row">
-            <span class="ph-dot"></span>
-            <span class="footer-link-value">Product Hunt</span>
-            <svg class="footer-link-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><polyline points="7 7 17 7 17 17"/></svg>
-          </a>
-        </div>
+        </p>
       </div>
 
+      <nav class="footer-cols" aria-label="Footer">
+        <div class="footer-col">
+          <span class="footer-col-head">Work<span class="fc-slash">/</span></span>
+          <a class="footer-col-link" href="evertutor-live.html">EverTutor Live</a>
+          <a class="footer-col-link" href="evertutor-studio.html">EverTutor Studio</a>
+          <a class="footer-col-link" href="stressie-studio.html">Stressie</a>
+          <a class="footer-col-link" href="#s2Section">All projects</a>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-head">Explore<span class="fc-slash">/</span></span>
+          <a class="footer-col-link" href="#s2Section">Featured work</a>
+          <a class="footer-col-link" href="#aboutSection">About me</a>
+          <a class="footer-col-link" href="./resume.pdf" target="_blank" rel="noopener">Résumé</a>
+          <a class="footer-col-link" href="#contactSection">Contact</a>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-head">Connect<span class="fc-slash">/</span></span>
+          <a class="footer-col-link" href="https://www.linkedin.com/in/bhanukowshik/" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="footer-col-link" href="https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal" target="_blank" rel="noopener">Product Hunt</a>
+          <a class="footer-col-link" href="mailto:kowshikbhanu1000@gmail.com">Email</a>
+          <a class="footer-col-link" href="tel:+15128448316">+1 (512) 844-8316</a>
+        </div>
+      </nav>
+
     </div>
 
-    <!-- tangled-to-straight line graphic -->
-    <div class="footer-line-graphic" aria-hidden="true">
-      <svg width="4000" height="70" viewBox="0 0 4000 70" fill="none" preserveAspectRatio="xMinYMid meet" xmlns="http://www.w3.org/2000/svg">
-        <g transform="translate(20 0)">
-          <path d="M4,35 C10,16 28,4 46,12 C64,20 66,42 50,54 C34,66 10,64 2,50 C-6,36 -2,14 14,8 C30,2 58,12 62,30 C66,48 56,64 36,64 C16,64 4,48 6,34 C8,20 22,14 36,22 C50,30 54,48 44,56 C34,64 20,62 16,50 C12,38 18,26 28,26 C38,26 46,36 48,48 C50,60 56,54 64,46 C70,40 74,37 110,35 L4000,35" stroke="rgba(255,255,255,0.22)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </g>
-      </svg>
+    <!-- ── sub-bar: socials + copyright ── -->
+    <div class="footer-sub">
+      <div class="footer-socials">
+        <a class="footer-soc" href="https://www.linkedin.com/in/bhanukowshik/" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.11 1 2.5 1s2.48 1.12 2.48 2.5zM.2 8h4.6v13H.2V8zm7.4 0h4.41v1.78h.06c.61-1.16 2.1-2.38 4.32-2.38 4.62 0 5.47 3.04 5.47 7V21h-4.6v-6.6c0-1.57-.03-3.6-2.2-3.6-2.2 0-2.54 1.72-2.54 3.49V21h-4.6V8z"/></svg>
+        </a>
+        <a class="footer-soc" href="https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal" target="_blank" rel="noopener" aria-label="Product Hunt">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="1.8"/><path d="M9 7h4.2a2.8 2.8 0 0 1 0 5.6H9V7zm0 5.6V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="footer-soc" href="mailto:kowshikbhanu1000@gmail.com" aria-label="Email">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        </a>
+      </div>
+      <span class="footer-copyright">© 2026 Bhanu Kowshik · Made with a lot of Chai</span>
     </div>
 
-    <!-- bottom bar -->
-    <div class="footer-bottom">
-      <span class="footer-label">Made with a lot of Chai</span>
-      <span class="footer-label">© 2026 Bhanu Kowshik</span>
+    <!-- ── grainy gradient skyline (built by JS, decorative) ── -->
+    <div class="footer-grain" aria-hidden="true">
+      <div class="footer-grain-glow"></div>
+      <div class="footer-grain-bars" id="footerBars"></div>
+      <div class="footer-grain-noise"></div>
     </div>
 
   </footer>
@@ -10369,6 +10323,36 @@
         if (btn) triggerCopy(btn);
       });
     });
+
+    /* live local time (Austin / US Central) */
+    const clock = document.getElementById('footerClock');
+    function tickClock() {
+      if (!clock) return;
+      try {
+        clock.textContent = new Date().toLocaleTimeString('en-US', {
+          timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit'
+        }) + ' CST';
+      } catch (e) {}
+    }
+    tickClock();
+    setInterval(tickClock, 15000);
+
+    /* build the grainy gradient skyline — taller & brighter toward centre */
+    const barsHost = document.getElementById('footerBars');
+    if (barsHost) {
+      const N = 13;
+      for (let i = 0; i < N; i++) {
+        const t = N > 1 ? i / (N - 1) : 0.5;        // 0..1 across the row
+        const centre = 1 - Math.abs(t - 0.5) * 2;   // 0 at edges, 1 at centre
+        const rnd = Math.abs(Math.sin((i + 1) * 12.9898) * 43758.5453) % 1;
+        const h = Math.min(98, 26 + centre * 56 + rnd * 18);
+        const bar = document.createElement('span');
+        bar.className = 'fg-bar';
+        bar.style.height = h.toFixed(1) + '%';
+        bar.style.opacity = (0.14 + centre * 0.82).toFixed(2);
+        barsHost.appendChild(bar);
+      }
+    }
   })();
 
   /* ── STICKY STACK + HERO FRAME ─────────────────────────────── */
@@ -11017,8 +11001,23 @@
     /* ── Expand ── */
     function expand(item) {
       var cw = collapsedW.get(item) || item.offsetWidth;
-      var ew = getExpandedW();
-      var eh = measureH(item);
+      var ew, eh;
+      if (item.dataset.amTab === 'design-dna') {
+        /* Design DNA has no body copy — hug its title instead of filling the column */
+        var inner = item.querySelector('.am-item-inner');
+        var clone = inner.cloneNode(true);
+        clone.style.cssText =
+          'position:fixed;top:-9999px;left:0;width:max-content;' +
+          'opacity:0;visibility:hidden;transform:none;transition:none;' +
+          'padding:24px 22px;box-sizing:border-box';
+        document.body.appendChild(clone);
+        ew = Math.ceil(clone.getBoundingClientRect().width);
+        eh = clone.offsetHeight;
+        document.body.removeChild(clone);
+      } else {
+        ew = getExpandedW();
+        eh = measureH(item);
+      }
 
       item.style.transition = 'none';
       item.style.width  = cw + 'px';
