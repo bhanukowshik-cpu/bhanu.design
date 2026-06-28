@@ -8,9 +8,14 @@
     if (typeof THREE === 'undefined') { console.warn('[spiral] Three.js not loaded'); return; }
     if (typeof gsap  === 'undefined') { console.warn('[spiral] GSAP not loaded');     return; }
 
-    el.style.background      = '#1E1E1E';
-    el.style.backgroundImage = 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)';
-    el.style.backgroundSize  = '28px 28px';
+    /* Grid on the container — behind the WebGL canvas so card geometry covers it naturally */
+    el.style.backgroundColor = '#111111';
+    el.style.backgroundImage = [
+      'radial-gradient(ellipse 65% 60% at 50% 46%, transparent 0%, transparent 45%, rgba(8,8,8,0.60) 72%, rgba(8,8,8,0.96) 90%)',
+      'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)',
+      'linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)'
+    ].join(', ');
+    el.style.backgroundSize = '100% 100%, 52px 52px, 52px 52px';
 
     // ── Cards ─────────────────────────────────────────────────────────────
     var CARDS = [
@@ -23,48 +28,78 @@
     ];
     var allCards = CARDS.concat(CARDS);
 
-    // ── List view card data ───────────────────────────────────────────────
+    // ── List view card data — single source of truth: matches S2_DATA in index.html
     var LIST_CARDS = [
       {
-        eyebrow: '01', label: 'EverTutor AI System',
+        eyebrow: '01', label: 'EverTutor AI System', type: 'Product Design',
         src: '/images/blob-dark.png', video: false,
-        desc: "World's first multi-modal 1:1 voice AI tutor — 3 tools working as one system to enable a billion tutors for a billion minds.",
-        metrics: [{ val: '2000+', lbl: 'Users' }, { val: '−96%', lbl: 'Saved' }, { val: '$300k', lbl: 'ARR' }],
+        hero: { val: '2000+', lbl: 'Daily Active Users' },
+        desc: "World's first multi-modal 1:1 voice AI tutor — 3 tools as one system enabling a billion minds.",
+        metrics: [
+          { val: '2000+',     lbl: 'Daily Active Users' },
+          { val: '−96%',      lbl: 'Workflow Time'       },
+          { val: '$300k ARR', lbl: 'Sole Designer'       }
+        ],
         href: 'evertutor-live.html',
       },
       {
-        eyebrow: '02', label: 'EverTutor Live',
+        eyebrow: '02', label: 'EverTutor Live', type: '0→1 Product',
         src: '/images/et-live.mp4', video: true, poster: '/images/et-live.png',
-        desc: 'Voice-first AI tutor taken from prototype to PMF. Students master topics in 30 min vs 60 in a classroom.',
-        metrics: [{ val: '85%', lbl: 'Rate' }, { val: '2×', lbl: 'Faster' }, { val: '$5/hr', lbl: 'vs $250' }],
+        hero: { val: '85%', lbl: 'Session Completion' },
+        desc: 'Voice-first AI tutor — students master topics in 30 min vs 60 in a classroom. Taken from prototype to PMF.',
+        metrics: [
+          { val: '85%',   lbl: 'Session Completion' },
+          { val: '2×',    lbl: 'Faster Mastery'     },
+          { val: '$5/hr', lbl: 'vs $250 Before'     }
+        ],
         href: 'evertutor-live.html',
       },
       {
-        eyebrow: '03', label: 'EverTutor Studio',
+        eyebrow: '03', label: 'EverTutor Studio', type: 'Design Systems',
         src: '/images/et-studio.mp4', video: true, poster: '/images/et-studio.png',
-        desc: 'Lesson creation tool designed overnight. Cut content production from 104 hours down to 4 — first lesson built in ~2 hours.',
-        metrics: [{ val: '104→4', lbl: 'Hrs/Les.' }, { val: '12', lbl: 'Schools' }, { val: '8', lbl: 'District' }],
+        hero: { val: '104→4hrs', lbl: 'Per Lesson' },
+        desc: 'Lesson creation tool designed overnight. Cut content production from 104 hours down to 4.',
+        metrics: [
+          { val: '104→4hrs', lbl: 'Per Lesson' },
+          { val: '12',       lbl: 'Schools'    },
+          { val: '8',        lbl: 'Districts'  }
+        ],
         href: 'evertutor-studio.html',
       },
       {
-        eyebrow: '04', label: 'EverTutor Analytics',
+        eyebrow: '04', label: 'EverTutor Analytics', type: 'Data UX',
         src: '/images/et-analytics.mp4', video: true, poster: '/images/et-analytics.png',
-        desc: 'Real-time student insights. The dog-ear system — complexity on demand, clean by default. Fully in production.',
-        metrics: [{ val: 'Live', lbl: 'Shipped' }, { val: 'Clean', lbl: 'Dog-ear' }, { val: '0', lbl: 'Bugs' }],
+        hero: { val: 'Live', lbl: 'In Production' },
+        desc: 'Real-time student insights. The dog-ear system — complexity on demand, clean by default.',
+        metrics: [
+          { val: 'Live',    lbl: 'In Production' },
+          { val: 'Dog-ear', lbl: 'System'        },
+          { val: '0',       lbl: 'Extra Clicks'  }
+        ],
         href: '#',
       },
       {
-        eyebrow: '05', label: 'Stressie',
+        eyebrow: '05', label: 'Stressie', type: 'Redesign',
         src: '/images/stressie.mp4', video: true, poster: null,
-        desc: 'Harvard-incubated workplace stress app. Full redesign from the ground up — engagement hit 17.4% vs ~2% industry average.',
-        metrics: [{ val: '17.4%', lbl: 'Engage' }, { val: '$600k', lbl: 'Funding' }, { val: 'Amzn', lbl: '& InKind' }],
+        hero: { val: '17.4%', lbl: 'Engagement Rate' },
+        desc: 'Harvard-incubated workplace stress app. Full redesign — engagement hit 17.4% vs ~2% industry average.',
+        metrics: [
+          { val: '17.4%',  lbl: 'Engagement Rate' },
+          { val: '$600k',  lbl: 'Funding'          },
+          { val: 'Amazon', lbl: '& InKind Live'    }
+        ],
         href: 'stressie-studio.html',
       },
       {
-        eyebrow: '06', label: 'Dearly',
+        eyebrow: '06', label: 'Dearly', type: 'Solo Build',
         src: '/images/dearly.mp4', video: true, poster: '/images/dearly.png',
-        desc: 'Animated handwriting messages with your real voice and photos attached, sent as a unique link. Built in 48 hours.',
-        metrics: [{ val: '140', lbl: 'Letters' }, { val: '35★', lbl: '5-Star' }, { val: '48hrs', lbl: 'Built In' }],
+        hero: { val: '48hrs', lbl: 'Built In' },
+        desc: 'Animated handwriting with your real voice and photos — sent as a unique link. Built in 48 hours.',
+        metrics: [
+          { val: '140',   lbl: 'Letters Written' },
+          { val: '35★',   lbl: '5-Star Ratings'  },
+          { val: '48hrs', lbl: 'Built In'         }
+        ],
         href: '#',
       },
     ];
@@ -105,6 +140,8 @@ uniform vec2  uPlaneSizes;
 uniform vec2  uImageSizes;
 uniform float uRevealProgress;
 uniform float uVideoReveal;
+uniform float uFogOpacity;
+uniform float uAuroraStrength;
 
 varying vec2 vUv;
 
@@ -188,7 +225,11 @@ void main() {
   float alpha      = 1.0 - smoothstep(0.0, 0.002, sdf);
   alpha           *= smoothstep(0.1, 1.0, uRevealProgress);
 
-  gl_FragColor = vec4(color.rgb, alpha);
+  // Bottom aurora — green glow rising from bottom edge, EverTutor card only
+  float auroraFade = pow(1.0 - smoothstep(0.0, 0.5, vUv.y), 1.5);
+  color.rgb += vec3(0.15, 0.85, 0.40) * auroraFade * uAuroraStrength;
+
+  gl_FragColor = vec4(color.rgb * uFogOpacity, alpha);
 }
 `;
 
@@ -236,6 +277,8 @@ void main() {
         uRevealProgress: { value: 0 },
         uVideoReveal:    { value: 0 },
         uScrollSpeed:    { value: 0 },
+        uFogOpacity:      { value: 1 },
+        uAuroraStrength:  { value: 0 },
       };
       uniforms.push(u);
       hiddenProgress.push(1);
@@ -256,32 +299,50 @@ void main() {
     var loader   = new THREE.TextureLoader();
     var videoEls = []; // one per CARDS entry (null if no video)
 
+    // EverTutor animated canvas (blob-light + waveform, white bg)
+    var blobAnimCanvas = null;
+    var blobAnimCtx    = null;
+    var blobAnimTex    = null;
+    var blobAnimImg    = null;
+
     CARDS.forEach(function (card, ci) {
       var dup = ci + CARDS.length;
 
-      // Static poster image for all cards
-      loader.load(card.img, function (tex) {
-        tex.minFilter = THREE.LinearFilter;
-        tex.magFilter = THREE.LinearFilter;
-        uniforms[ci].uTexture.value = tex;
-        uniforms[ci].uImageSizes.value.set(tex.image.width, tex.image.height);
-        uniforms[dup].uTexture.value = tex;
-        uniforms[dup].uImageSizes.value.set(tex.image.width, tex.image.height);
-      });
-
-      // Video texture — created but not played until card is frontmost
       if (card.video) {
+        // Video cards: put video directly on the card face.
+        // Plane is 16:9, videos are 16:9 → cover-fit ratio = 1:1, nothing cut off.
         var vid = document.createElement('video');
         vid.src = card.video; vid.loop = true; vid.muted = true;
-        vid.playsInline = true; vid.preload = 'metadata';
+        vid.playsInline = true; vid.preload = 'auto';
         videoEls.push(vid);
         var vtex = new THREE.VideoTexture(vid);
         vtex.minFilter = THREE.LinearFilter;
         vtex.magFilter = THREE.LinearFilter;
-        uniforms[ci].uVideoTexture.value  = vtex;
-        uniforms[dup].uVideoTexture.value = vtex;
+        uniforms[ci].uTexture.value        = vtex;
+        uniforms[ci].uImageSizes.value.set(1920, 1080);
+        uniforms[dup].uTexture.value       = vtex;
+        uniforms[dup].uImageSizes.value.set(1920, 1080);
+        uniforms[ci].uVideoTexture.value   = vtex;
+        uniforms[dup].uVideoTexture.value  = vtex;
       } else {
+        // EverTutor (no video): animated canvas — white bg + blob-light + waveform
         videoEls.push(null);
+
+        blobAnimCanvas        = document.createElement('canvas');
+        blobAnimCanvas.width  = 800;
+        blobAnimCanvas.height = 450;
+        blobAnimCtx           = blobAnimCanvas.getContext('2d');
+
+        blobAnimImg     = new Image();
+        blobAnimImg.src = '/images/blob-dark.png';
+
+        blobAnimTex           = new THREE.CanvasTexture(blobAnimCanvas);
+        blobAnimTex.minFilter = THREE.LinearFilter;
+        blobAnimTex.magFilter = THREE.LinearFilter;
+        uniforms[ci].uTexture.value        = blobAnimTex;
+        uniforms[ci].uImageSizes.value.set(800, 450);
+        uniforms[dup].uTexture.value       = blobAnimTex;
+        uniforms[dup].uImageSizes.value.set(800, 450);
       }
     });
 
@@ -289,13 +350,16 @@ void main() {
     var wheelDeltaY       = 0;
     var targetWheelDeltaY = 0;
     var wheelDirection    = 1;
-    var scrollOffset      = 0;
+    var scrollOffset      = 4;  // positions EverTutor (index 0) at the visually-forward B=2 slot
+    var entryTriggered    = false;
+    var ENTRY_SPEED       = 0.6;    // initial spin speed on section enter (one full card cycle)
+    var SLOW_DRIFT        = 0.0005; // gentle continuous forward drift after entry settles
 
     el.addEventListener('wheel', function (e) {
       e.preventDefault();
       snapTarget         = null;   // user wheeling cancels snap
-      targetWheelDeltaY += e.deltaY * 0.00015;
-      targetWheelDeltaY  = Math.max(-2, Math.min(2, targetWheelDeltaY));
+      targetWheelDeltaY += e.deltaY * 0.000075;
+      targetWheelDeltaY  = Math.max(-1, Math.min(1, targetWheelDeltaY));
       wheelDirection     = e.deltaY > 0 ? 1 : -1;
     }, { passive: false });
 
@@ -313,16 +377,16 @@ void main() {
     // ── Nav buttons ───────────────────────────────────────────────────────
     // ── List overlay ──────────────────────────────────────────────────────
     var listOverlay = document.createElement('div');
-    listOverlay.style.cssText = 'position:absolute;inset:0;z-index:5;overflow-y:auto;padding:72px 40px 56px;box-sizing:border-box;display:none;opacity:0;transition:opacity 0.3s;';
+    listOverlay.style.cssText = 'position:absolute;inset:0;z-index:15;overflow-y:auto;padding:72px 40px 56px;box-sizing:border-box;display:none;opacity:0;transition:opacity 0.3s;';
 
     var lvGrid = document.createElement('div');
     lvGrid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:1120px;margin:0 auto;';
 
     LIST_CARDS.forEach(function (card) {
       var cardEl = document.createElement('div');
-      cardEl.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;transition:border-color 0.25s,background 0.25s,transform 0.25s;cursor:default;';
+      cardEl.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;transition:border-color 0.3s,background 0.3s,transform 0.3s,box-shadow 0.3s;cursor:pointer;';
 
-      // ── Media ──────────────────────────────────────────────────────────────
+      // ── Media ─────────────────────────────────────────────────────────────
       var mediaWrap = document.createElement('div');
       mediaWrap.style.cssText = 'width:100%;aspect-ratio:16/9;overflow:hidden;background:#111;flex-shrink:0;position:relative;';
 
@@ -339,76 +403,109 @@ void main() {
         img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
         mediaWrap.appendChild(img);
       }
-      // eyebrow badge over the video
+
+      // Number badge — top left
       var badge = document.createElement('span');
       badge.textContent = card.eyebrow;
-      badge.style.cssText = 'position:absolute;top:14px;left:16px;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:0.12em;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);padding:4px 10px;border-radius:20px;';
+      badge.style.cssText = 'position:absolute;top:14px;left:16px;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:0.12em;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);padding:4px 10px;border-radius:20px;';
       mediaWrap.appendChild(badge);
 
-      // ── Content ────────────────────────────────────────────────────────────
+      // Type badge — top right (FAANG recruiters read this first)
+      var typeBadge = document.createElement('span');
+      typeBadge.textContent = card.type;
+      typeBadge.style.cssText = 'position:absolute;top:14px;right:16px;font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;color:#E6F28D;letter-spacing:0.08em;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);padding:4px 10px;border-radius:20px;';
+      mediaWrap.appendChild(typeBadge);
+
+      // ── Info ──────────────────────────────────────────────────────────────
       var info = document.createElement('div');
-      info.style.cssText = 'padding:24px 28px 28px;display:flex;flex-direction:column;gap:0;flex:1;';
+      info.style.cssText = 'padding:20px 22px 22px;display:flex;flex-direction:column;flex:1;';
 
       // Project name
       var name = document.createElement('h3');
       name.textContent = card.label;
-      name.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:22px;font-weight:800;color:#fff;margin:0 0 10px;line-height:1.2;letter-spacing:-0.3px;';
+      name.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:20px;font-weight:700;color:#fff;margin:0 0 16px;line-height:1.2;letter-spacing:-0.2px;';
 
-      // Description
+      // ── Hero metric — THE number that stops a recruiter's scroll ──────────
+      var heroWrap = document.createElement('div');
+      heroWrap.style.cssText = 'margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.07);';
+
+      var heroVal = document.createElement('span');
+      heroVal.textContent = card.hero.val;
+      heroVal.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:clamp(38px,4.8vw,58px);font-weight:700;color:#E6F28D;line-height:1;letter-spacing:-1.5px;display:block;';
+
+      var heroLbl = document.createElement('span');
+      heroLbl.textContent = card.hero.lbl;
+      heroLbl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:10px;font-weight:600;color:rgba(255,255,255,0.38);letter-spacing:0.1em;text-transform:uppercase;margin-top:7px;display:block;';
+
+      heroWrap.appendChild(heroVal);
+      heroWrap.appendChild(heroLbl);
+
+      // Description — one to two lines, supports the hero number
       var desc = document.createElement('p');
       desc.textContent = card.desc;
-      desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:14px;line-height:1.7;color:rgba(255,255,255,0.5);margin:0 0 22px;';
+      desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:13px;line-height:1.65;color:rgba(255,255,255,0.42);margin:0;';
 
-      // Metrics — big numbers as the hero
-      var metricsRow = document.createElement('div');
-      metricsRow.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:18px 0;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:24px;';
+      // Bottom group — chips + CTA pinned to card bottom
+      var bottomGroup = document.createElement('div');
+      bottomGroup.style.cssText = 'margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:16px;';
 
-      card.metrics.forEach(function (m, idx) {
-        var mt = document.createElement('div');
-        mt.style.cssText = 'display:flex;flex-direction:column;gap:4px;min-width:0;overflow:hidden;' + (idx > 0 ? 'padding-left:12px;border-left:1px solid rgba(255,255,255,0.08);' : '');
-        var mv = document.createElement('span');
-        mv.textContent = m.val;
-        mv.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:clamp(18px,2.2vw,32px);font-weight:700;color:#E6F28D;line-height:1;letter-spacing:-0.5px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
-        var ml = document.createElement('span');
-        ml.textContent = m.lbl;
-        ml.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:10px;font-weight:500;color:rgba(255,255,255,0.38);letter-spacing:0.05em;text-transform:uppercase;margin-top:4px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-        mt.appendChild(mv); mt.appendChild(ml);
-        metricsRow.appendChild(mt);
+      // Metrics row — all 3 metrics right above CTA
+      var chipsRow = document.createElement('div');
+      chipsRow.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px;';
+
+      card.metrics.forEach(function (m) {
+        var cell = document.createElement('div');
+        cell.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;min-width:0;';
+        var val = document.createElement('span');
+        val.textContent = m.val;
+        val.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:700;color:#E6F28D;display:block;letter-spacing:-0.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+        var lbl = document.createElement('span');
+        lbl.textContent = m.lbl;
+        lbl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:9px;font-weight:600;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+        cell.appendChild(val);
+        cell.appendChild(lbl);
+        chipsRow.appendChild(cell);
       });
 
-      // CTA
+      // CTA — clean pill button, no outer wrapper
       var ctaWrap = document.createElement('div');
-      ctaWrap.style.cssText = 'margin-top:auto;';
       if (card.href !== '#') {
         var cta = document.createElement('a');
         cta.href = card.href;
         cta.textContent = 'View Case Study →';
-        cta.className = 'proj-cta';
-        cta.style.marginTop = '0';
+        cta.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:600;letter-spacing:0.02em;border-radius:999px;padding:9px 22px;color:#fff;text-decoration:none;display:inline-block;cursor:pointer;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);transition:background 0.2s,border-color 0.2s;';
+        cta.addEventListener('mouseenter', function() { cta.style.background = 'rgba(255,255,255,0.13)'; cta.style.borderColor = 'rgba(255,255,255,0.28)'; });
+        cta.addEventListener('mouseleave', function() { cta.style.background = 'rgba(255,255,255,0.08)'; cta.style.borderColor = 'rgba(255,255,255,0.15)'; });
         ctaWrap.appendChild(cta);
       } else {
         var ctaPlaceholder = document.createElement('span');
         ctaPlaceholder.textContent = 'Case study in progress';
-        ctaPlaceholder.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:12px;color:rgba(255,255,255,0.22);letter-spacing:0.06em;';
+        ctaPlaceholder.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;color:rgba(255,255,255,0.2);letter-spacing:0.06em;';
         ctaWrap.appendChild(ctaPlaceholder);
       }
 
+      bottomGroup.appendChild(chipsRow);
+      bottomGroup.appendChild(ctaWrap);
+
       info.appendChild(name);
+      info.appendChild(heroWrap);
       info.appendChild(desc);
-      info.appendChild(metricsRow);
-      info.appendChild(ctaWrap);
+      info.appendChild(bottomGroup);
       cardEl.appendChild(mediaWrap);
       cardEl.appendChild(info);
 
+      // Hover — lime border glow signals the brand
       cardEl.addEventListener('mouseenter', function () {
-        cardEl.style.background = 'rgba(255,255,255,0.07)';
-        cardEl.style.borderColor = 'rgba(255,255,255,0.2)';
-        cardEl.style.transform = 'translateY(-3px)';
+        cardEl.style.borderColor = 'rgba(230,242,141,0.3)';
+        cardEl.style.background = 'rgba(255,255,255,0.06)';
+        cardEl.style.transform = 'translateY(-2px)';
+        cardEl.style.boxShadow = '0 12px 40px rgba(0,0,0,0.3),0 0 0 1px rgba(230,242,141,0.08)';
       });
       cardEl.addEventListener('mouseleave', function () {
-        cardEl.style.background = 'rgba(255,255,255,0.04)';
         cardEl.style.borderColor = 'rgba(255,255,255,0.1)';
+        cardEl.style.background = 'rgba(255,255,255,0.04)';
         cardEl.style.transform = 'translateY(0)';
+        cardEl.style.boxShadow = 'none';
       });
 
       lvGrid.appendChild(cardEl);
@@ -421,9 +518,15 @@ void main() {
     var frontLabelWrap = document.getElementById('s2FrontLabel');
 
     el.addEventListener('s2:setView', function (e) {
+      var cardsZone   = el.parentElement;
+      var container   = cardsZone && cardsZone.parentElement;
+      var sectionWrap = container && container.parentElement;
       if (e.detail.view === 'spiral') {
         listOverlay.style.opacity = '0';
         el.style.height = '100vh';
+        if (cardsZone)   { cardsZone.style.height = ''; cardsZone.style.overflow = ''; }
+        if (container)   { container.style.height = ''; container.style.overflow = ''; }
+        if (sectionWrap) { sectionWrap.style.height = ''; sectionWrap.style.overflow = ''; }
         setTimeout(function () { listOverlay.style.display = 'none'; }, 300);
         renderer.domElement.style.transition = 'opacity 0.3s';
         renderer.domElement.style.opacity = '1';
@@ -442,7 +545,11 @@ void main() {
           requestAnimationFrame(function () {
             listOverlay.style.opacity = '1';
             requestAnimationFrame(function () {
-              el.style.height = Math.max(window.innerHeight, listOverlay.scrollHeight) + 'px';
+              var h = Math.max(window.innerHeight, listOverlay.scrollHeight);
+              el.style.height = h + 'px';
+              if (cardsZone)   { cardsZone.style.height = h + 'px'; cardsZone.style.overflow = 'visible'; }
+              if (container)   { container.style.height = h + 'px'; container.style.overflow = 'visible'; }
+              if (sectionWrap) { sectionWrap.style.height = h + 'px'; sectionWrap.style.overflow = 'visible'; }
             });
           });
         }, 300);
@@ -458,7 +565,7 @@ void main() {
 
     // ── Front card tracking + snap-to-card ───────────────────────────────
     var lastFrontCardIdx = -1;
-    var snapTarget       = null;   // CARDS index to snap to (0‑5), null = free scroll
+    var snapTarget       = 0;      // snap EverTutor to the front on load
 
     el.addEventListener('s2:goToCard', function (e) {
       snapTarget = e.detail.idx;
@@ -467,13 +574,78 @@ void main() {
     // ── Lerp ──────────────────────────────────────────────────────────────
     function lerp(a, b, t) { return a + (b - a) * t; }
 
+    // ── Blob waveform canvas draw ─────────────────────────────────────────
+    function drawBlobWave(ctx, t, img) {
+      var W = 800, H = 450, cx = W / 2, cy = H / 2;
+      var BR  = 108; // blob clip radius
+      var NUM = 40;  // bar count
+      var GAP = 5;   // px gap between blob edge and bar start
+
+      // 1. Dark background
+      ctx.fillStyle = '#060606';
+      ctx.fillRect(0, 0, W, H);
+
+      // 2. Ring halo — starts near blob edge, fades outward
+      var halo = ctx.createRadialGradient(cx, cy, BR * 0.75, cx, cy, BR * 2.1);
+      halo.addColorStop(0,    'rgba(50,210,80,0.55)');
+      halo.addColorStop(0.30, 'rgba(40,190,70,0.28)');
+      halo.addColorStop(0.65, 'rgba(20,160,50,0.10)');
+      halo.addColorStop(1,    'rgba(10,140,40,0.00)');
+      ctx.fillStyle = halo;
+      ctx.fillRect(0, 0, W, H);
+
+      // 3. Blob
+      if (img && img.complete && img.naturalWidth > 0) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, BR, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(img, cx - BR, cy - BR, BR * 2, BR * 2);
+        ctx.restore();
+      } else {
+        ctx.beginPath();
+        ctx.arc(cx, cy, BR, 0, Math.PI * 2);
+        ctx.fillStyle = '#111'; ctx.fill();
+      }
+
+      // 4. Outward-only tick bars — start just outside blob edge, point outward
+      ctx.lineCap = 'round';
+      for (var k = 0; k < NUM; k++) {
+        var a    = (k / NUM) * Math.PI * 2 - Math.PI / 2;
+        var wave = Math.max(0, Math.min(1,
+          Math.sin(a * 2.5 + t * 1.1) * 0.32 +
+          Math.sin(a * 5.0 + t * 1.8) * 0.24 +
+          Math.sin(a * 11  + t * 2.7) * 0.14 +
+          Math.sin(a * 20  + t * 3.6) * 0.07 + 0.33
+        ));
+        var len  = 10 + wave * 28; // 10–38 px, always visible
+        var alph = 0.55 + wave * 0.45;
+        var dx = Math.cos(a), dy = Math.sin(a);
+        var r1 = BR + GAP;
+        var r2 = r1 + len;
+        var x1 = cx + dx * r1, y1 = cy + dy * r1;
+        var x2 = cx + dx * r2, y2 = cy + dy * r2;
+
+        // Glow pass — soft lime
+        ctx.lineWidth   = 4;
+        ctx.strokeStyle = 'rgba(140,255,60,' + (alph * 0.28).toFixed(2) + ')';
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+
+        // Crisp core — bright neon lime
+        ctx.lineWidth   = 1.5;
+        ctx.strokeStyle = 'rgba(185,255,80,' + alph.toFixed(2) + ')';
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      }
+    }
+
     // ── GSAP ticker ───────────────────────────────────────────────────────
     gsap.ticker.lagSmoothing(0);
 
     gsap.ticker.add(function (time, deltaTime) {
       // Snap-to-card (overrides free scroll while active)
+      // Target the B=2 slot (visually closest to camera) rather than B=0
       if (snapTarget !== null) {
-        var base   = snapTarget - centerIndex;
+        var base    = snapTarget - centerIndex - 2;
         var desired = base + Math.round((scrollOffset - base) / totalCount) * totalCount;
         var diff    = desired - scrollOffset;
         scrollOffset      += diff * 0.1;
@@ -485,10 +657,12 @@ void main() {
       // Scroll physics
       wheelDeltaY       += (targetWheelDeltaY - wheelDeltaY) * 0.1;
       scrollOffset      += wheelDeltaY;
-      if (Math.abs(targetWheelDeltaY) < 0.002) {
-        targetWheelDeltaY = wheelDirection * 0.002;
-      }
       targetWheelDeltaY *= 0.9;
+      // Once entry animation has fired, floor the speed so the helix
+      // never fully stops — it keeps a very slow continuous forward rotation.
+      if (entryTriggered && snapTarget === null && targetWheelDeltaY < SLOW_DRIFT) {
+        targetWheelDeltaY = SLOW_DRIFT;
+      }
 
       // Hover raycast — front faces only
       raycaster.setFromCamera(mouse, camera);
@@ -532,44 +706,61 @@ void main() {
         uniforms[i].uColorStrength.value  = 0.55 * hoverProgress[i];
         uniforms[i].uZoom.value           = 1 + 0.05 * hoverProgress[i];
         uniforms[i].uRevealProgress.value = (1 - hoverProgress[i] * 0.05) * (1 - hiddenProgress[i]);
+
+        // Depth fog: darken cards further from the front slot (B=2)
+        var distFromFront = Math.abs(B - 2);
+        uniforms[i].uFogOpacity.value = Math.max(0.15, 1.0 - distFromFront * 0.25);
+
+        // Bottom aurora: only on EverTutor cards, fades in as card approaches front
+        var isEverTutor = (i % CARDS.length === 0);
+        uniforms[i].uAuroraStrength.value = isEverTutor ? Math.max(0, 1.0 - distFromFront) * 0.75 : 0;
       });
 
-      // Frontmost card → slide label up + play video with bottom-wipe
+      // Frontmost card = the one closest to the camera, which sits at B=2 on the helix
       var fcFront = 0, fcMinB = Infinity;
       allCards.forEach(function (_, i) {
         if (hiddenTarget[i] > 0) return;
         var N = i - scrollOffset;
         N = ((N % totalCount) + totalCount) % totalCount;
         var B = N - centerIndex;
-        if (Math.abs(B) < fcMinB) { fcMinB = Math.abs(B); fcFront = i; }
+        if (Math.abs(B - 2) < fcMinB) { fcMinB = Math.abs(B - 2); fcFront = i; }
       });
       if (fcMinB < 0.45) {
         var fcIdx = fcFront % CARDS.length;
         if (fcIdx !== lastFrontCardIdx) {
-          // Retract video on previous front card
-          if (lastFrontCardIdx >= 0) {
-            var prevDup = lastFrontCardIdx + CARDS.length;
-            videoRevealTarget[lastFrontCardIdx] = 0;
-            videoRevealTarget[prevDup]          = 0;
-            var prevVid = videoEls[lastFrontCardIdx];
-            if (prevVid) { prevVid.pause(); prevVid.currentTime = 0; }
-          }
-
           lastFrontCardIdx = fcIdx;
-
-          // Play video and wipe it in from bottom on new front card
-          var fdup = fcIdx + CARDS.length;
-          videoRevealTarget[fcIdx] = 1;
-          videoRevealTarget[fdup]  = 1;
-          var frontVid = videoEls[fcIdx];
-          if (frontVid) { frontVid.currentTime = 0; frontVid.play().catch(function () {}); }
-
           window.dispatchEvent(new CustomEvent('s2:frontCard', { detail: { idx: fcIdx } }));
         }
       }
 
+      // Redraw EverTutor blob waveform canvas every frame
+      if (blobAnimTex) {
+        drawBlobWave(blobAnimCtx, time, blobAnimImg);
+        blobAnimTex.needsUpdate = true;
+      }
+
       renderer.render(scene, camera);
     });
+
+    // ── Entry animation: fast spin → slow drift on section enter ─────────
+    // Observes the spiral root element. On first intersect, waits until
+    // the card-reveal animation (600ms) has started, then kicks off a fast
+    // forward spin (ENTRY_SPEED) that naturally decays into SLOW_DRIFT.
+    var spiralEntryObs = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting && !entryTriggered) {
+        entryTriggered = true;
+        spiralEntryObs.disconnect();
+        // User has scrolled here — autoplay policy is satisfied; start all videos
+        CARDS.forEach(function (card, ci) {
+          if (videoEls[ci]) { videoEls[ci].play().catch(function () {}); }
+        });
+        setTimeout(function () {
+          snapTarget        = null;
+          targetWheelDeltaY = ENTRY_SPEED;
+        }, 800);
+      }
+    }, { threshold: 0.1 });
+    spiralEntryObs.observe(el);
 
     // ── Resize ────────────────────────────────────────────────────────────
     window.addEventListener('resize', function () {
