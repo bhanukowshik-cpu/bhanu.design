@@ -142,6 +142,7 @@ uniform float uRevealProgress;
 uniform float uVideoReveal;
 uniform float uFogOpacity;
 uniform float uAuroraStrength;
+uniform float uTime;
 
 varying vec2 vUv;
 
@@ -225,9 +226,20 @@ void main() {
   float alpha      = 1.0 - smoothstep(0.0, 0.002, sdf);
   alpha           *= smoothstep(0.1, 1.0, uRevealProgress);
 
-  // Bottom aurora — green glow rising from bottom edge, EverTutor card only
-  float auroraFade = pow(1.0 - smoothstep(0.0, 0.5, vUv.y), 1.5);
-  color.rgb += vec3(0.15, 0.85, 0.40) * auroraFade * uAuroraStrength;
+  // Bottom aurora rays — animated vertical columns rising from bottom
+  if (uAuroraStrength > 0.0) {
+    float auroraY = pow(1.0 - smoothstep(0.0, 0.55, vUv.y), 2.0);
+    float t = uTime * 0.35;
+    float r1 = sin(vUv.x * 20.0 + t * 1.2) * 0.5 + 0.5;
+    float r2 = sin(vUv.x * 13.0 - t * 0.8 + 1.5) * 0.5 + 0.5;
+    float r3 = sin(vUv.x *  7.0 + t * 0.5 + 3.0) * 0.5 + 0.5;
+    float rays = pow(r1 * r2 * r3, 0.4);
+    float shimmer = sin(vUv.y * 18.0 - t * 2.5) * 0.12 + 0.88;
+    rays *= shimmer;
+    // Deep green base → portfolio lime #E6F28D at ray peaks
+    vec3 auroraColor = mix(vec3(0.04, 0.42, 0.18), vec3(0.902, 0.949, 0.553), rays);
+    color.rgb += auroraColor * auroraY * uAuroraStrength;
+  }
 
   gl_FragColor = vec4(color.rgb * uFogOpacity, alpha);
 }
@@ -248,9 +260,9 @@ void main() {
     camera.position.set(0, 0, 7);
 
     // ── Spiral constants ──────────────────────────────────────────────────
-    var VERTICAL_GAP = 0.5;
-    var ANGLE_GAP    = 0.85;
-    var BASE_RADIUS  = 2.0;
+    var VERTICAL_GAP = 0.4;
+    var ANGLE_GAP    = Math.PI / 4;
+    var BASE_RADIUS  = 2.3;
     var totalCount   = allCards.length;
     var centerIndex  = Math.floor(totalCount / 2);
 
@@ -279,6 +291,7 @@ void main() {
         uScrollSpeed:    { value: 0 },
         uFogOpacity:      { value: 1 },
         uAuroraStrength:  { value: 0 },
+        uTime:            { value: 0 },
       };
       uniforms.push(u);
       hiddenProgress.push(1);
@@ -382,6 +395,9 @@ void main() {
     var lvGrid = document.createElement('div');
     lvGrid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:1120px;margin:0 auto;';
 
+    // Live blob canvas for list card 01 (driven in the GSAP ticker)
+    var listBlobCanvas = null, listBlobCtx = null;
+
     LIST_CARDS.forEach(function (card) {
       var cardEl = document.createElement('div');
       cardEl.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;transition:border-color 0.3s,background 0.3s,transform 0.3s,box-shadow 0.3s;cursor:pointer;';
@@ -398,10 +414,13 @@ void main() {
         vid.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
         mediaWrap.appendChild(vid);
       } else {
-        var img = document.createElement('img');
-        img.src = card.src; img.alt = card.label;
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
-        mediaWrap.appendChild(img);
+        // EverTutor AI System — live blob waveform, same animation as spiral card
+        var lc = document.createElement('canvas');
+        lc.width = 800; lc.height = 450;
+        lc.style.cssText = 'width:100%;height:100%;display:block;';
+        mediaWrap.appendChild(lc);
+        listBlobCanvas = lc;
+        listBlobCtx    = lc.getContext('2d');
       }
 
       // Number badge — top left
@@ -425,22 +444,7 @@ void main() {
       name.textContent = card.label;
       name.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:20px;font-weight:700;color:#fff;margin:0 0 16px;line-height:1.2;letter-spacing:-0.2px;';
 
-      // ── Hero metric — THE number that stops a recruiter's scroll ──────────
-      var heroWrap = document.createElement('div');
-      heroWrap.style.cssText = 'margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.07);';
-
-      var heroVal = document.createElement('span');
-      heroVal.textContent = card.hero.val;
-      heroVal.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:clamp(38px,4.8vw,58px);font-weight:700;color:#E6F28D;line-height:1;letter-spacing:-1.5px;display:block;';
-
-      var heroLbl = document.createElement('span');
-      heroLbl.textContent = card.hero.lbl;
-      heroLbl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:10px;font-weight:600;color:rgba(255,255,255,0.38);letter-spacing:0.1em;text-transform:uppercase;margin-top:7px;display:block;';
-
-      heroWrap.appendChild(heroVal);
-      heroWrap.appendChild(heroLbl);
-
-      // Description — one to two lines, supports the hero number
+      // Description
       var desc = document.createElement('p');
       desc.textContent = card.desc;
       desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:13px;line-height:1.65;color:rgba(255,255,255,0.42);margin:0;';
@@ -488,7 +492,6 @@ void main() {
       bottomGroup.appendChild(ctaWrap);
 
       info.appendChild(name);
-      info.appendChild(heroWrap);
       info.appendChild(desc);
       info.appendChild(bottomGroup);
       cardEl.appendChild(mediaWrap);
@@ -577,9 +580,9 @@ void main() {
     // ── Blob waveform canvas draw ─────────────────────────────────────────
     function drawBlobWave(ctx, t, img) {
       var W = 800, H = 450, cx = W / 2, cy = H / 2;
-      var BR  = 108; // blob clip radius
-      var NUM = 40;  // bar count
-      var GAP = 5;   // px gap between blob edge and bar start
+      var NUM = 40;
+
+      var BR = 122; // fixed blob radius
 
       // 1. Dark background
       ctx.fillStyle = '#060606';
@@ -608,32 +611,35 @@ void main() {
         ctx.fillStyle = '#111'; ctx.fill();
       }
 
-      // 4. Outward-only tick bars — start just outside blob edge, point outward
+      // 4. Bidirectional tick bars — expand from midpoint both inward + outward
+      var MID_OFFSET = 30; // gap from blob edge to bar centre
       ctx.lineCap = 'round';
       for (var k = 0; k < NUM; k++) {
         var a    = (k / NUM) * Math.PI * 2 - Math.PI / 2;
         var wave = Math.max(0, Math.min(1,
-          Math.sin(a * 2.5 + t * 1.1) * 0.32 +
-          Math.sin(a * 5.0 + t * 1.8) * 0.24 +
-          Math.sin(a * 11  + t * 2.7) * 0.14 +
-          Math.sin(a * 20  + t * 3.6) * 0.07 + 0.33
+          Math.sin(a * 2.5 + t * 2.8) * 0.32 +
+          Math.sin(a * 5.0 + t * 4.2) * 0.24 +
+          Math.sin(a * 11  + t * 6.0) * 0.14 +
+          Math.sin(a * 20  + t * 8.0) * 0.07 + 0.33
         ));
-        var len  = 10 + wave * 28; // 10–38 px, always visible
+        var half = 5 + wave * 16;
         var alph = 0.55 + wave * 0.45;
         var dx = Math.cos(a), dy = Math.sin(a);
-        var r1 = BR + GAP;
-        var r2 = r1 + len;
-        var x1 = cx + dx * r1, y1 = cy + dy * r1;
-        var x2 = cx + dx * r2, y2 = cy + dy * r2;
+        var rMid = BR + MID_OFFSET;
+        var x1 = cx + dx * (rMid - half), y1 = cy + dy * (rMid - half);
+        var x2 = cx + dx * (rMid + half), y2 = cy + dy * (rMid + half);
 
-        // Glow pass — soft lime
-        ctx.lineWidth   = 4;
-        ctx.strokeStyle = 'rgba(140,255,60,' + (alph * 0.28).toFixed(2) + ')';
+        // Alternate: even = #4ade80 (green), odd = #86efac (light green)
+        var gr = k % 2 === 0 ? '74,222,128' : '134,239,172';
+
+        // Glow pass
+        ctx.lineWidth   = 8;
+        ctx.strokeStyle = 'rgba(' + gr + ',' + (alph * 0.28).toFixed(2) + ')';
         ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
 
-        // Crisp core — bright neon lime
-        ctx.lineWidth   = 1.5;
-        ctx.strokeStyle = 'rgba(185,255,80,' + alph.toFixed(2) + ')';
+        // Crisp core
+        ctx.lineWidth   = 3;
+        ctx.strokeStyle = 'rgba(' + gr + ',' + alph.toFixed(2) + ')';
         ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
       }
     }
@@ -703,7 +709,7 @@ void main() {
         uniforms[i].uVideoReveal.value    = videoRevealProgress[i];
 
         uniforms[i].uScrollSpeed.value    = wheelDeltaY;
-        uniforms[i].uColorStrength.value  = 0.55 * hoverProgress[i];
+        uniforms[i].uColorStrength.value  = 0; // darkening removed
         uniforms[i].uZoom.value           = 1 + 0.05 * hoverProgress[i];
         uniforms[i].uRevealProgress.value = (1 - hoverProgress[i] * 0.05) * (1 - hiddenProgress[i]);
 
@@ -714,6 +720,7 @@ void main() {
         // Bottom aurora: only on EverTutor cards, fades in as card approaches front
         var isEverTutor = (i % CARDS.length === 0);
         uniforms[i].uAuroraStrength.value = isEverTutor ? Math.max(0, 1.0 - distFromFront) * 0.75 : 0;
+        uniforms[i].uTime.value = time;
       });
 
       // Frontmost card = the one closest to the camera, which sits at B=2 on the helix
@@ -737,6 +744,10 @@ void main() {
       if (blobAnimTex) {
         drawBlobWave(blobAnimCtx, time, blobAnimImg);
         blobAnimTex.needsUpdate = true;
+      }
+      // Mirror blob animation to list-view card 01
+      if (listBlobCtx) {
+        drawBlobWave(listBlobCtx, time, blobAnimImg);
       }
 
       renderer.render(scene, camera);
