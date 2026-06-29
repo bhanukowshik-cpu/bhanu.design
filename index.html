@@ -3860,6 +3860,13 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      /* Same ruled grid as the testimonials section — bright in the centre, fading to dark at the edges */
+      background-color: #111111;
+      background-image:
+        radial-gradient(65% 60% at 50% 50%, transparent 0%, transparent 45%, rgba(17,17,17,0.6) 72%, rgba(17,17,17,0.96) 90%),
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 52px 52px, 52px 52px;
     }
     .am-inner {
       display: grid;
@@ -4068,82 +4075,124 @@
       flex-direction: column;
       align-items: stretch;
     }
-    .oh-hero {
+    /* ── Me Outside Work: two-col layout ───────────────────────── */
+    .oh2 {
       display: grid;
-      grid-template-columns: 44% 1fr;
-      align-items: stretch;
-      min-height: 460px;
-    }
-    /* Stacked photo cards */
-    .oh-stack {
-      position: relative;
-      display: flex;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
       align-items: center;
-      justify-content: center;
-      overflow: visible;
-      padding: 32px;
+      padding: 32px 0 8px;
     }
-    .oh-card {
-      position: absolute;
-      width: 82%;
-      background: #fff;
-      border-radius: 10px;
-      padding: 9px 9px 44px;
-      box-shadow: 0 12px 48px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.1);
-      cursor: default;
-      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease;
-    }
-    .oh-card img {
-      width: 100%;
-      height: 280px;
-      object-fit: cover;
-      object-position: center 35%;
-      border-radius: 4px;
-      display: block;
-    }
-    .oh-card--3 { transform: rotate(-7deg) translate(-18px, 10px); z-index: 1; }
-    .oh-card--2 { transform: rotate(5deg)  translate(14px, -6px);  z-index: 2; }
-    .oh-card--1 { transform: rotate(-2deg) translate(0px, -2px);   z-index: 3; }
-    .oh-stack:hover .oh-card--3 { transform: rotate(-14deg) translate(-60px, 14px); box-shadow: 0 8px 28px rgba(0,0,0,0.16); }
-    .oh-stack:hover .oh-card--2 { transform: rotate(12deg)  translate(54px, -10px); box-shadow: 0 8px 28px rgba(0,0,0,0.16); }
-    .oh-stack:hover .oh-card--1 { transform: rotate(-1deg)  translate(0px, -8px);  box-shadow: 0 18px 56px rgba(0,0,0,0.26); }
-    .oh-hero-text {
+    /* Left: deck */
+    .oh2-left {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      padding: 48px 52px;
-      gap: 0;
-      background: rgba(29,29,31,0.03);
-      border-radius: 0 12px 12px 0;
+      align-items: center;
+      gap: 18px;
     }
-    .oh-greeting {
+    .oh2-deck {
+      position: relative;
+      width: 100%;
+      max-width: 340px;
+      height: 440px;
+    }
+    .oh2-card {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px 10px 52px;
+      box-shadow: 0 16px 56px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.08);
+      transition: transform 0.55s cubic-bezier(0.34,1.4,0.64,1), box-shadow 0.4s ease, opacity 0.35s ease;
+      will-change: transform;
+      touch-action: none;
+    }
+    .oh2-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+      border-radius: 6px;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    /* Stack positions — JS assigns these */
+    .oh2-card.is-back  { transform: rotate(-7deg) translate(-10px, 8px) scale(0.91); z-index: 1; }
+    .oh2-card.is-mid   { transform: rotate(5deg)  translate(8px, 4px)  scale(0.96); z-index: 2; }
+    .oh2-card.is-front { transform: rotate(-2deg) translate(0, 0)      scale(1);    z-index: 3; cursor: grab; }
+    .oh2-card.is-dragging {
+      transition: none;
+      cursor: grabbing;
+      z-index: 10;
+      box-shadow: 0 28px 80px rgba(0,0,0,0.32);
+    }
+    .oh2-hint {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(29,29,31,0.28);
+    }
+    /* Right: text */
+    .oh2-right {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .oh2-eyebrow {
       font-family: var(--font-mono);
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.16em;
       text-transform: uppercase;
       color: #86DE5C;
-      margin: 0 0 14px;
+      margin: 0 0 16px;
     }
-    .oh-name {
+    .oh2-headline {
       font-family: var(--font-heading);
-      font-size: 46px;
+      font-size: 44px;
       font-weight: 900;
       letter-spacing: -0.04em;
       line-height: 1.05;
       color: rgba(29,29,31,0.95);
-      margin: 0 0 24px;
+      margin: 0 0 22px;
     }
-    .oh-bio {
+    .oh2-body {
       font-family: var(--font-heading);
       font-size: 15px;
       font-weight: 500;
-      line-height: 1.75;
-      color: rgba(29,29,31,0.68);
-      margin: 0;
-      max-width: 38ch;
+      line-height: 1.8;
+      color: rgba(29,29,31,0.62);
+      max-width: 42ch;
+      margin: 0 0 28px;
     }
-    .oh-bio strong { color: rgba(29,29,31,0.92); font-weight: 700; }
+    .oh2-body strong { color: rgba(29,29,31,0.9); font-weight: 700; }
+    .oh2-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .oh2-tag {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: rgba(29,29,31,0.55);
+      background: rgba(29,29,31,0.05);
+      border: 1px solid rgba(29,29,31,0.1);
+      border-radius: 100px;
+      padding: 5px 14px;
+    }
+    /* Dark mode */
+    [data-theme="dark"] .oh2-card     { background: #242424; }
+    [data-theme="dark"] .oh2-hint     { color: rgba(240,237,232,0.22); }
+    [data-theme="dark"] .oh2-headline { color: rgba(240,237,232,0.96); }
+    [data-theme="dark"] .oh2-body     { color: rgba(240,237,232,0.55); }
+    [data-theme="dark"] .oh2-body strong { color: rgba(240,237,232,0.9); }
+    [data-theme="dark"] .oh2-tag      { color: rgba(240,237,232,0.45); background: rgba(240,237,232,0.06); border-color: rgba(240,237,232,0.1); }
     /* Marquee strip */
     .oh-marquee-wrap {
       border-top: 1px solid rgba(29,29,31,0.08);
@@ -4179,11 +4228,6 @@
       to   { transform: translateX(-50%); }
     }
     /* Dark mode */
-    [data-theme="dark"] .oh-hero-text  { background: rgba(240,237,232,0.03); }
-    [data-theme="dark"] .oh-greeting  { color: #86DE5C; }
-    [data-theme="dark"] .oh-name      { color: rgba(240,237,232,0.96); }
-    [data-theme="dark"] .oh-bio       { color: rgba(240,237,232,0.6); }
-    [data-theme="dark"] .oh-bio strong { color: rgba(240,237,232,0.92); }
     [data-theme="dark"] .oh-marquee-wrap { border-color: rgba(240,237,232,0.07); }
     [data-theme="dark"] .oh-marquee-item { color: rgba(240,237,232,0.32); }
     [data-theme="dark"] .oh-marquee-dot  { color: rgba(240,237,232,0.14); }
@@ -9544,44 +9588,60 @@
 
           <!-- ── Me Outside Work pane ── -->
           <div class="abt-pane" id="abt-outside">
-            <div class="oh-hero">
-              <div class="oh-stack">
-                <div class="oh-card oh-card--3">
-                  <img src="About%20Me%20section%20Images/About%20me%20section%203.jpeg" alt="Kayaking in Austin">
+            <div class="oh2">
+
+              <!-- Draggable card deck -->
+              <div class="oh2-left">
+                <div class="oh2-deck" id="ohDeck">
+                  <div class="oh2-card is-back">
+                    <img src="About%20Me%20section%20Images/About%20me%20section%203.jpeg" alt="Kayaking in Austin">
+                  </div>
+                  <div class="oh2-card is-mid">
+                    <img src="About%20Me%20section%20Images/About%20me%20section%202.jpeg" alt="By the waterfront">
+                  </div>
+                  <div class="oh2-card is-front">
+                    <img src="About%20Me%20section%20Images/About%20me%20section%201.JPG" alt="At the cat café">
+                  </div>
                 </div>
-                <div class="oh-card oh-card--2">
-                  <img src="About%20Me%20section%20Images/About%20me%20section%202.jpeg" alt="By the waterfront">
-                </div>
-                <div class="oh-card oh-card--1">
-                  <img src="About%20Me%20section%20Images/About%20me%20section%201.JPG" alt="At the cat café">
+                <p class="oh2-hint">↖ drag to reveal next</p>
+              </div>
+
+              <!-- Text -->
+              <div class="oh2-right">
+                <p class="oh2-eyebrow">Beyond the portfolio</p>
+                <h3 class="oh2-headline">Same curiosity,<br>different medium.</h3>
+                <p class="oh2-body">When the laptop closes, I trade pixels for paddle strokes &mdash; kayaking Ladybird Lake with Austin&rsquo;s skyline at my back. I&rsquo;m the person hunting the city&rsquo;s best espresso, demanding chess rematches I probably won&rsquo;t win, and befriending every cat in the room. <strong>Creativity doesn&rsquo;t clock out. It just finds new playgrounds.</strong></p>
+                <div class="oh2-tags">
+                  <span class="oh2-tag">Kayaking</span>
+                  <span class="oh2-tag">Espresso</span>
+                  <span class="oh2-tag">Chess</span>
+                  <span class="oh2-tag">Cinema</span>
+                  <span class="oh2-tag">Bowling</span>
+                  <span class="oh2-tag">Cats</span>
+                  <span class="oh2-tag">Hiking</span>
+                  <span class="oh2-tag">Type design</span>
                 </div>
               </div>
-              <div class="oh-hero-text">
-                <p class="oh-greeting">Beyond the portfolio</p>
-                <h3 class="oh-name">Designer by title.<br>Builder by instinct.</h3>
-                <p class="oh-bio">Kayaking with the Austin skyline at my back. Obsessing over the perfect espresso shot. Losing at chess and immediately asking for a rematch. I bowl terribly and love it. I adopt every cat I meet. <strong>This is me when the laptop is closed.</strong></p>
-              </div>
-            </div>
-            <div class="oh-marquee-wrap">
+
+            </div><!-- /oh2 -->
+
+            <!-- Marquee -->
+            <div class="oh-marquee-wrap" style="margin-top:24px;">
               <div class="oh-marquee-track">
                 <span class="oh-marquee-item">Kayaking</span><span class="oh-marquee-dot">&middot;</span>
-                <span class="oh-marquee-item">Building side projects</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Bowling</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Chess</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Coffee ritual</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Cinema</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Mechanical keyboards</span><span class="oh-marquee-dot">&middot;</span>
-                <span class="oh-marquee-item">Experimenting with tools</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Hiking</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Type design</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Kayaking</span><span class="oh-marquee-dot">&middot;</span>
-                <span class="oh-marquee-item">Building side projects</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Bowling</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Chess</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Coffee ritual</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Cinema</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Mechanical keyboards</span><span class="oh-marquee-dot">&middot;</span>
-                <span class="oh-marquee-item">Experimenting with tools</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Hiking</span><span class="oh-marquee-dot">&middot;</span>
                 <span class="oh-marquee-item">Type design</span><span class="oh-marquee-dot">&middot;</span>
               </div>
@@ -14960,9 +15020,15 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         this.classList.add('is-active');
         var pane = document.getElementById('abt-' + target);
         if (pane) pane.classList.add('is-active');
-        // boot WIP canvas on first reveal
+        // boot WIP canvas on first reveal (wait for fonts so text samples correctly)
         var canvas = pane && pane.querySelector('.wip-canvas');
-        if (canvas && !canvas._wipBooted) { canvas._wipBooted = true; initWipCanvas(canvas); }
+        if (canvas && !canvas._wipBooted) {
+          canvas._wipBooted = true;
+          var go = function() { initWipCanvas(canvas); };
+          if (document.fonts && document.fonts.load) {
+            document.fonts.load('800 56px Montserrat').then(go);
+          } else { go(); }
+        }
       });
     });
   })();
@@ -14993,37 +15059,36 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
       var imgData = octx.getImageData(0, 0, W, H).data;
       var targets = [];
-      var step = 4;
+      var step = 7; // bigger step = fewer, more spaced-out dots
       for (var y = 0; y < H; y += step) {
         for (var x = 0; x < W; x += step) {
           if (imgData[(y * W + x) * 4 + 3] > 100) {
-            targets.push({ x: x + Math.random() * step * 0.5,
-                           y: y + Math.random() * step * 0.5 });
+            targets.push({ x: x + (Math.random() - 0.5) * 2,
+                           y: y + (Math.random() - 0.5) * 2 });
           }
         }
       }
-      // shuffle
+      // shuffle so convergence order is random
       for (var s = targets.length - 1; s > 0; s--) {
         var j = Math.floor(Math.random() * (s + 1));
         var tmp = targets[s]; targets[s] = targets[j]; targets[j] = tmp;
       }
-      targets = targets.slice(0, Math.min(targets.length, 700));
 
       // ── particles: start scattered across entire canvas ──────────
       var particles = targets.map(function (t) {
         return {
-          tx: t.x, ty: t.y,          // final text position
-          x:  Math.random() * W,      // scattered start
+          tx: t.x, ty: t.y,
+          x:  Math.random() * W,
           y:  Math.random() * H,
           vx: 0, vy: 0,
-          r:   0.9 + Math.random() * 1.5,
+          r:   1.2 + Math.random() * 1.0,
           phase: Math.random() * Math.PI * 2,
-          freq:  0.5 + Math.random() * 0.9
+          freq:  0.4 + Math.random() * 0.7
         };
       });
 
       var startTs = null;
-      var CONVERGE = 1600; // ms for scatter→text
+      var CONVERGE = 1800; // ms for scatter→text
       var raf;
 
       function draw(ts) {
@@ -15042,42 +15107,45 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         for (var i = 0; i < particles.length; i++) {
           var p = particles[i];
 
-          // spring strength ramps up as ease increases
-          var spring = 0.02 + ease * 0.055;
-          var drag   = 0.80 + ease * 0.05;
+          // stronger spring ramps in as particles converge
+          var spring = 0.025 + ease * 0.06;
+          var drag   = 0.78  + ease * 0.07;
           var dx = p.tx - p.x, dy = p.ty - p.y;
           p.vx = p.vx * drag + dx * spring;
           p.vy = p.vy * drag + dy * spring;
 
-          // once converged, add gentle float wobble
+          // gentle float only after mostly settled
           var wobble = ease * ease;
-          p.x += p.vx + Math.sin(t * p.freq       + p.phase) * wobble * 0.5;
-          p.y += p.vy + Math.cos(t * p.freq * 1.2 + p.phase) * wobble * 0.4;
+          p.x += p.vx + Math.sin(t * p.freq       + p.phase) * wobble * 0.6;
+          p.y += p.vy + Math.cos(t * p.freq * 1.3 + p.phase) * wobble * 0.5;
 
-          // brightness pulses after settling
-          var alpha = 0.45 + 0.55 * (ease * (0.5 + 0.5 * Math.sin(t * p.freq * 2 + p.phase)));
-          var rad   = p.r  + 0.5  * Math.sin(t * p.freq + p.phase);
+          var pulse = 0.5 + 0.5 * Math.sin(t * p.freq * 2 + p.phase);
+          var alpha = ease * (0.55 + 0.45 * pulse);
+          var rad   = p.r + 0.4 * pulse;
 
-          // glow halo
-          var grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad * 5);
+          // tight glow halo — only 2.5× radius so dots stay distinct
+          var glowR = rad * 2.5;
+          var grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR);
           if (dark) {
-            grd.addColorStop(0, 'rgba(107,178,247,' + (alpha * 0.85) + ')');
-            grd.addColorStop(1, 'rgba(107,178,247,0)');
+            grd.addColorStop(0,   'rgba(107,178,247,' + (alpha * 0.7) + ')');
+            grd.addColorStop(0.5, 'rgba(107,178,247,' + (alpha * 0.2) + ')');
+            grd.addColorStop(1,   'rgba(107,178,247,0)');
           } else {
-            grd.addColorStop(0, 'rgba(251,140,50,' + (alpha * 0.75) + ')');
-            grd.addColorStop(1, 'rgba(251,140,50,0)');
+            grd.addColorStop(0,   'rgba(251,140,50,' + (alpha * 0.65) + ')');
+            grd.addColorStop(0.5, 'rgba(251,140,50,' + (alpha * 0.18) + ')');
+            grd.addColorStop(1,   'rgba(251,140,50,0)');
           }
           ctx.beginPath();
-          ctx.arc(p.x, p.y, rad * 5, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, glowR, 0, Math.PI * 2);
           ctx.fillStyle = grd;
           ctx.fill();
 
-          // core dot
+          // bright core dot
           ctx.beginPath();
           ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
           ctx.fillStyle = dark
-            ? 'rgba(200,230,255,' + (0.6 + 0.4 * alpha) + ')'
-            : 'rgba(255,185,80,'  + (0.6 + 0.4 * alpha) + ')';
+            ? 'rgba(210,235,255,' + (0.7 + 0.3 * pulse) + ')'
+            : 'rgba(255,200,110,' + (0.7 + 0.3 * pulse) + ')';
           ctx.fill();
         }
       }
@@ -15093,6 +15161,113 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     }
 
     window.initWipCanvas = initWipCanvas;
+  })();
+
+  /* ── Me Outside Work: draggable card deck ─────────────────── */
+  (function () {
+    var deck = document.getElementById('ohDeck');
+    if (!deck) return;
+
+    var cards = Array.from(deck.querySelectorAll('.oh2-card'));
+    /* order[0]=back, order[1]=mid, order[2]=front */
+    var order = [0, 1, 2];
+
+    function render(skipTransition) {
+      order.forEach(function (cardIdx, stackPos) {
+        var c = cards[cardIdx];
+        if (skipTransition) {
+          c.style.transition = 'none';
+          c.offsetHeight;
+        }
+        c.classList.remove('is-back', 'is-mid', 'is-front');
+        if      (stackPos === 0) c.classList.add('is-back');
+        else if (stackPos === 1) c.classList.add('is-mid');
+        else                     c.classList.add('is-front');
+        if (skipTransition) {
+          c.offsetHeight;
+          c.style.transition = '';
+        }
+      });
+    }
+
+    render();
+
+    var drag = { active: false, card: null, sx: 0, sy: 0 };
+
+    function getFront() { return cards[order[order.length - 1]]; }
+
+    deck.addEventListener('mousedown',  onStart);
+    deck.addEventListener('touchstart', onStart, { passive: false });
+
+    function onStart(e) {
+      var fc = getFront();
+      if (e.target.closest('.oh2-card') !== fc) return;
+      if (e.cancelable) e.preventDefault();
+      var pt = e.touches ? e.touches[0] : e;
+      drag.active = true;
+      drag.card   = fc;
+      drag.sx     = pt.clientX;
+      drag.sy     = pt.clientY;
+      fc.classList.add('is-dragging');
+      fc.classList.remove('is-front');
+      document.addEventListener('mousemove',  onMove);
+      document.addEventListener('mouseup',    onEnd);
+      document.addEventListener('touchmove',  onMove, { passive: false });
+      document.addEventListener('touchend',   onEnd);
+    }
+
+    function onMove(e) {
+      if (!drag.active) return;
+      if (e.cancelable) e.preventDefault();
+      var pt = e.touches ? e.touches[0] : e;
+      var dx = pt.clientX - drag.sx;
+      var dy = pt.clientY - drag.sy;
+      drag.card.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + (dx * 0.035) + 'deg) scale(1.04)';
+    }
+
+    function onEnd(e) {
+      if (!drag.active) return;
+      drag.active = false;
+      document.removeEventListener('mousemove',  onMove);
+      document.removeEventListener('mouseup',    onEnd);
+      document.removeEventListener('touchmove',  onMove);
+      document.removeEventListener('touchend',   onEnd);
+
+      var pt = e.changedTouches ? e.changedTouches[0] : e;
+      var dx = pt.clientX - drag.sx;
+      var dy = pt.clientY - drag.sy;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      var c = drag.card;
+
+      if (dist > 72) {
+        /* Fly off in drag direction, then go to back */
+        var angle  = Math.atan2(dy, dx);
+        var flyX   = Math.cos(angle) * 700;
+        var flyY   = Math.sin(angle) * 700;
+        c.style.transition = 'transform 0.42s cubic-bezier(0.4,0,0.8,0.6), opacity 0.32s ease';
+        c.style.transform  = 'translate(' + flyX + 'px,' + flyY + 'px) rotate(' + (dx * 0.08) + 'deg) scale(0.88)';
+        c.style.opacity    = '0';
+        c.classList.remove('is-dragging');
+
+        setTimeout(function () {
+          /* Silently move card to back of order */
+          var frontIdx = order.pop();
+          order.unshift(frontIdx);
+          /* Reset card silently (no transition) */
+          c.style.transition = 'none';
+          c.style.transform  = '';
+          c.style.opacity    = '';
+          c.offsetHeight;
+          /* Re-render with spring animation */
+          render();
+        }, 430);
+      } else {
+        /* Not dragged far enough — snap back */
+        c.classList.remove('is-dragging');
+        c.style.transform = '';
+        render();
+      }
+    }
   })();
   </script>
 </body>
