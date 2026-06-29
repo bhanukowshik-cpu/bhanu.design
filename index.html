@@ -4067,53 +4067,56 @@
       align-items: stretch;
     }
     .oh-hero {
-      display: flex;
-      flex: 1;
+      display: grid;
+      grid-template-columns: 44% 1fr;
       align-items: stretch;
-      min-height: 0;
+      min-height: 420px;
     }
     .oh-hero-photo {
-      width: 42%;
-      flex-shrink: 0;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       object-position: center top;
       display: block;
+      border-radius: 12px 0 0 12px;
     }
     .oh-hero-text {
-      flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 40px 44px;
+      padding: 48px 52px;
       gap: 0;
+      background: rgba(29,29,31,0.03);
+      border-radius: 0 12px 12px 0;
     }
     .oh-greeting {
       font-family: var(--font-mono);
       font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.14em;
+      font-weight: 700;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: rgba(29,29,31,0.35);
-      margin: 0 0 10px;
+      color: #86DE5C;
+      margin: 0 0 14px;
     }
     .oh-name {
       font-family: var(--font-heading);
-      font-size: 34px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      color: rgba(29,29,31,0.92);
-      margin: 0 0 20px;
+      font-size: 46px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      color: rgba(29,29,31,0.95);
+      margin: 0 0 24px;
     }
     .oh-bio {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      line-height: 1.85;
-      color: rgba(29,29,31,0.58);
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.75;
+      color: rgba(29,29,31,0.68);
       margin: 0;
-      max-width: 34ch;
+      max-width: 38ch;
     }
-    .oh-bio strong { color: rgba(29,29,31,0.82); font-weight: 600; }
+    .oh-bio strong { color: rgba(29,29,31,0.92); font-weight: 700; }
     /* Marquee strip */
     .oh-marquee-wrap {
       border-top: 1px solid rgba(29,29,31,0.08);
@@ -4149,10 +4152,11 @@
       to   { transform: translateX(-50%); }
     }
     /* Dark mode */
-    [data-theme="dark"] .oh-greeting  { color: rgba(240,237,232,0.3); }
-    [data-theme="dark"] .oh-name      { color: rgba(240,237,232,0.95); }
-    [data-theme="dark"] .oh-bio       { color: rgba(240,237,232,0.5); }
-    [data-theme="dark"] .oh-bio strong { color: rgba(240,237,232,0.82); }
+    [data-theme="dark"] .oh-hero-text  { background: rgba(240,237,232,0.03); }
+    [data-theme="dark"] .oh-greeting  { color: #86DE5C; }
+    [data-theme="dark"] .oh-name      { color: rgba(240,237,232,0.96); }
+    [data-theme="dark"] .oh-bio       { color: rgba(240,237,232,0.6); }
+    [data-theme="dark"] .oh-bio strong { color: rgba(240,237,232,0.92); }
     [data-theme="dark"] .oh-marquee-wrap { border-color: rgba(240,237,232,0.07); }
     [data-theme="dark"] .oh-marquee-item { color: rgba(240,237,232,0.32); }
     [data-theme="dark"] .oh-marquee-dot  { color: rgba(240,237,232,0.14); }
@@ -4395,6 +4399,52 @@
     [data-theme="dark"] .abt-tab.is-active { background: #E6F28D; color: rgba(29,29,31,0.88); }
     [data-theme="dark"] .whyme-num  { color: rgba(240,237,232,0.92); }
     [data-theme="dark"] .whyme-label { color: rgba(240,237,232,0.35); }
+    /* ── Under-construction pane ───────────────────────────────── */
+    .abt-wip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 72px 40px;
+      gap: 16px;
+    }
+    .abt-wip-icon {
+      font-size: 36px;
+      line-height: 1;
+      margin-bottom: 4px;
+      filter: grayscale(0.2);
+    }
+    .abt-wip-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #FBB45A;
+      background: rgba(251,180,90,0.12);
+      border: 1px solid rgba(251,180,90,0.25);
+      border-radius: 100px;
+      padding: 5px 14px;
+    }
+    .abt-wip-title {
+      font-family: var(--font-heading);
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: rgba(29,29,31,0.85);
+      margin: 0;
+    }
+    .abt-wip-sub {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.8;
+      color: rgba(29,29,31,0.45);
+      max-width: 36ch;
+      margin: 0;
+    }
+    [data-theme="dark"] .abt-wip-title { color: rgba(240,237,232,0.88); }
+    [data-theme="dark"] .abt-wip-sub   { color: rgba(240,237,232,0.38); }
 
     /* ── Off-hours polaroid grid ───────────────────────────────── */
     .oh-polaroids {
@@ -4808,8 +4858,8 @@
     .dna2-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
     /* Lower band shares the bar's 5-col rhythm: quote sits bottom-left, stem drops from centre (col 3), depth axis runs down col 4 */
     .dna2-lower { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; align-items: stretch; }
-    .dna2-stem { grid-column: 3 / 4; align-self: start; display: flex; flex-direction: column; gap: 12px; }
-    .dna2-axis.depth { grid-column: 4 / 5; align-self: stretch; flex-direction: column; justify-content: center; gap: 10px; }
+    .dna2-stem { grid-column: 3 / 4; grid-row: 1; align-self: start; display: flex; flex-direction: column; gap: 12px; }
+    .dna2-axis.depth { grid-column: 4 / 5; grid-row: 1; align-self: stretch; flex-direction: column; justify-content: center; gap: 10px; }
     .dna2-axis.depth .dna2-axis-label { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
 
     /* Tile — calm dark glass, accent only on hover/select */
@@ -4837,7 +4887,7 @@
 
     /* Quote panel — the big glass card in the open corner, drives off the selected tile */
     .dna2-panel {
-      grid-column: 1 / 3; align-self: end; position: relative; background: #141418; border-radius: 18px;
+      grid-column: 1 / 3; grid-row: 1; align-self: end; position: relative; background: #141418; border-radius: 18px;
       padding: 20px 22px 18px; display: flex; flex-direction: column; overflow: hidden;
       border-left: 2px solid color-mix(in srgb, var(--lc) 42%, transparent);
     }
@@ -8420,7 +8470,7 @@
         linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
       background-size: 100% 100%, 52px 52px, 52px 52px;
     }
-    .tm-header { text-align: center; margin-bottom: 48px; padding: 0 24px; }
+    .tm-header { text-align: center; margin-bottom: 12px; padding: 0 24px; }
     .tm-eyebrow-tag {
       display: inline-block; font-family: var(--font-mono);
       font-size: 10.5px; font-weight: 700;
@@ -8431,8 +8481,9 @@
     }
     .tm-headline {
       font-family: var(--font-mono);
-      font-size: clamp(24px, 3vw, 38px); font-weight: 700;
-      color: var(--secondary); margin: 0;
+      font-size: 20px; font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--secondary); opacity: 0.65; margin: 0;
     }
     /* Tab strip — gradient border + dark glass */
     .tm-tabs {
@@ -9379,7 +9430,7 @@
                 </span>
               </div>
               <div class="dna2-t">
-                <div class="dna2-axis"><span class="dna2-axis-label">Breadth &mdash; what I build</span><span class="dna2-axis-line"></span></div>
+                <div class="dna2-axis breadth"><span class="dna2-arm left"></span><span class="dna2-axis-label">Breadth &mdash; what I build</span><span class="dna2-arm right"></span></div>
                 <div class="dna2-bar">
                   <button class="dna2-tile" style="--c1:#86DE5C;--c2:#2FA24E;--lc:#43C167;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Customer.svg')">
                     <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Customer Discovery</span>
@@ -9403,14 +9454,7 @@
                   </button>
                 </div>
                 <div class="dna2-lower">
-                  <div class="dna2-panel" id="dnaPanel">
-                    <div class="dna2-cardhead"><span class="dna2-ic"></span><span class="dna2-name dna2-fade"></span></div>
-                    <span class="dna2-qmark">&ldquo;</span>
-                    <p class="dna2-quote dna2-fade"></p>
-                  </div>
-                  <div class="dna2-stemwrap">
-                    <div class="dna2-axis depth"><span class="dna2-axis-label">Depth &mdash; how I think</span></div>
-                    <div class="dna2-stem">
+                  <div class="dna2-stem">
                       <button class="dna2-tile" style="--c1:#5FD9B4;--c2:#149E78;--lc:#1FC096;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg')">
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Research</span>
                         <span class="dna2-q" hidden>I'd rather <em>kill my idea in a 20-minute interview</em> than defend it for six months in production.</span>
@@ -9431,7 +9475,12 @@
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Measured Impact</span>
                         <span class="dna2-q" hidden>If I can't tie it to a <em>number that moved</em>, it was decoration. I design for outcomes.</span>
                       </button>
-                    </div>
+                  </div>
+                  <div class="dna2-axis depth"><span class="dna2-arm up"></span><span class="dna2-axis-label">Depth &mdash; how I think</span><span class="dna2-arm down"></span></div>
+                  <div class="dna2-panel" id="dnaPanel">
+                    <div class="dna2-cardhead"><span class="dna2-ic"></span><span class="dna2-name dna2-fade"></span></div>
+                    <span class="dna2-qmark">&ldquo;</span>
+                    <p class="dna2-quote dna2-fade"></p>
                   </div>
                 </div>
               </div>
@@ -9476,98 +9525,21 @@
 
           <!-- ── What I'm Looking For pane ── -->
           <div class="abt-pane" id="abt-looking">
-            <div class="abt-std-pane">
-              <p class="am-pane-eyebrow">What I&rsquo;m looking for</p>
-              <p class="am-pane-pull">&ldquo;I want to build something I&rsquo;d be embarrassed not to work on.&rdquo;</p>
-              <ul class="am-pane-list">
-                <li class="am-pane-item">
-                  <span class="am-pane-num">&mdash;</span>
-                  <div>
-                    <div class="am-pane-item-text">A team that ships fast but thinks deeply</div>
-                    <div class="am-pane-item-sub">Velocity without intention is just noise. I want both in the same room.</div>
-                  </div>
-                </li>
-                <li class="am-pane-item">
-                  <span class="am-pane-num">&mdash;</span>
-                  <div>
-                    <div class="am-pane-item-text">A real problem at the core</div>
-                    <div class="am-pane-item-sub">I want to feel the impact of the work, not just see it in a dashboard. Users over metrics.</div>
-                  </div>
-                </li>
-                <li class="am-pane-item">
-                  <span class="am-pane-num">&mdash;</span>
-                  <div>
-                    <div class="am-pane-item-text">Ownership of craft and strategy</div>
-                    <div class="am-pane-item-sub">I do my best work when I can shape the problem and the solution. Not just the pixels.</div>
-                  </div>
-                </li>
-                <li class="am-pane-item">
-                  <span class="am-pane-num">&mdash;</span>
-                  <div>
-                    <div class="am-pane-item-text">Engineers who ask why, not just what</div>
-                    <div class="am-pane-item-sub">The best products I've shipped came from engineers who cared about the experience as much as the implementation.</div>
-                  </div>
-                </li>
-                <li class="am-pane-item">
-                  <span class="am-pane-num">&mdash;</span>
-                  <div>
-                    <div class="am-pane-item-text">Space to do something new</div>
-                    <div class="am-pane-item-sub">I'm not looking to maintain. I want to build something that didn't exist before I walked in.</div>
-                  </div>
-                </li>
-              </ul>
+            <div class="abt-wip">
+              <div class="abt-wip-icon">🚧</div>
+              <span class="abt-wip-label">In progress</span>
+              <h3 class="abt-wip-title">Something thoughtful is being built here</h3>
+              <p class="abt-wip-sub">This section is still taking shape. Check back soon — it'll be worth the wait.</p>
             </div>
           </div><!-- /abt-pane looking -->
 
           <!-- ── Why Me pane ── -->
           <div class="abt-pane" id="abt-whyme">
-            <div class="abt-std-pane">
-              <p class="am-pane-eyebrow">The case for me</p>
-              <p class="am-pane-pull">&ldquo;Great design doesn&rsquo;t just look good. It performs.&rdquo;</p>
-              <div class="whyme-stats">
-                <div class="whyme-stat">
-                  <span class="whyme-num">$600k</span>
-                  <span class="whyme-label">raised as sole designer</span>
-                </div>
-                <div class="whyme-stat">
-                  <span class="whyme-num">$500k</span>
-                  <span class="whyme-label">ARR as sole designer</span>
-                </div>
-                <div class="whyme-stat">
-                  <span class="whyme-num">0&rarr;1</span>
-                  <span class="whyme-label">multiple products shipped</span>
-                </div>
-              </div>
-              <ul class="am-pane-list" style="margin-top:28px;">
-                <li class="am-pane-item">
-                  <span class="am-pane-num">&mdash;</span>
-                  <div>
-                    <div class="am-pane-item-text">I own the full stack of design</div>
-                    <div class="am-pane-item-sub">Research, strategy, interaction, visual, and shipping alongside engineers. No hand-offs. No gaps.</div>
-                  </div>
-                </li>
-                <li class="am-pane-item">
-                  <span class="am-pane-num">&mdash;</span>
-                  <div>
-                    <div class="am-pane-item-text">I've been the only designer in the room</div>
-                    <div class="am-pane-item-sub">And the company raised real money and hit real ARR. Design wasn't decoration &mdash; it was the product.</div>
-                  </div>
-                </li>
-                <li class="am-pane-item">
-                  <span class="am-pane-num">&mdash;</span>
-                  <div>
-                    <div class="am-pane-item-text">AI-native from day one</div>
-                    <div class="am-pane-item-sub">I build with AI, design for AI, and think about what AI makes newly possible. Not as a trend &mdash; as a mindset.</div>
-                  </div>
-                </li>
-                <li class="am-pane-item">
-                  <span class="am-pane-num">&mdash;</span>
-                  <div>
-                    <div class="am-pane-item-text">I move fast without breaking trust</div>
-                    <div class="am-pane-item-sub">Speed of trust matters more than speed of delivery. I've done both at the same time.</div>
-                  </div>
-                </li>
-              </ul>
+            <div class="abt-wip">
+              <div class="abt-wip-icon">🚧</div>
+              <span class="abt-wip-label">In progress</span>
+              <h3 class="abt-wip-title">The case for me — being crafted carefully</h3>
+              <p class="abt-wip-sub">Numbers, stories, and proof points are being curated. This one matters too much to rush.</p>
             </div>
           </div><!-- /abt-pane whyme -->
 
@@ -11869,6 +11841,56 @@
     });
   })();
 
+    /* ── Design-DNA: the T — moving across a tile drives the quote panel ── */
+    (function () {
+      var dna = document.querySelector('.dna2');
+      if (!dna) return;
+      var panel = dna.querySelector('#dnaPanel');
+      var pName = panel && panel.querySelector('.dna2-name');
+      var pQuote = panel && panel.querySelector('.dna2-quote');
+      var tiles = Array.from(dna.querySelectorAll('.dna2-tile'));
+      if (!panel || !tiles.length) return;
+
+      var swapT;
+      function select(tile) {
+        if (tile.classList.contains('is-sel')) return;
+        tiles.forEach(function (t) { t.classList.remove('is-sel'); });
+        tile.classList.add('is-sel');
+        var q = tile.querySelector('.dna2-q');
+        var name = tile.querySelector('.dna2-tile-nm').textContent;
+        var quote = q ? q.innerHTML : '';
+        // carry the skill's accent + icon onto the panel
+        panel.style.setProperty('--c1', tile.style.getPropertyValue('--c1'));
+        panel.style.setProperty('--c2', tile.style.getPropertyValue('--c2'));
+        panel.style.setProperty('--lc', tile.style.getPropertyValue('--lc'));
+        panel.style.setProperty('--icon', tile.style.getPropertyValue('--icon'));
+        // soft cross-fade the text
+        panel.classList.add('is-swapping');
+        clearTimeout(swapT);
+        swapT = setTimeout(function () {
+          pName.textContent = name;
+          pQuote.innerHTML = quote;
+          panel.classList.remove('is-swapping');
+        }, 170);
+      }
+
+      tiles.forEach(function (tile) {
+        tile.addEventListener('pointerenter', function () { select(tile); });
+        tile.addEventListener('click', function () { select(tile); });
+        tile.addEventListener('focus', function () { select(tile); });
+      });
+
+      // seed with the first breadth tile, no fade
+      var first = tiles[0];
+      first.classList.add('is-sel');
+      panel.style.setProperty('--c1', first.style.getPropertyValue('--c1'));
+      panel.style.setProperty('--c2', first.style.getPropertyValue('--c2'));
+      panel.style.setProperty('--lc', first.style.getPropertyValue('--lc'));
+      panel.style.setProperty('--icon', first.style.getPropertyValue('--icon'));
+      pName.textContent = first.querySelector('.dna2-tile-nm').textContent;
+      pQuote.innerHTML = first.querySelector('.dna2-q').innerHTML;
+    })();
+
   /* ── About Me — Apple pill accordion + right panel ─────── */
   (function () {
     var controls = document.getElementById('amControls');
@@ -11991,56 +12013,6 @@
         }
       });
     });
-
-    /* ── Design-DNA: the T — moving across a tile drives the quote panel ── */
-    (function () {
-      var dna = document.querySelector('.dna2');
-      if (!dna) return;
-      var panel = dna.querySelector('#dnaPanel');
-      var pName = panel && panel.querySelector('.dna2-name');
-      var pQuote = panel && panel.querySelector('.dna2-quote');
-      var tiles = Array.from(dna.querySelectorAll('.dna2-tile'));
-      if (!panel || !tiles.length) return;
-
-      var swapT;
-      function select(tile) {
-        if (tile.classList.contains('is-sel')) return;
-        tiles.forEach(function (t) { t.classList.remove('is-sel'); });
-        tile.classList.add('is-sel');
-        var q = tile.querySelector('.dna2-q');
-        var name = tile.querySelector('.dna2-tile-nm').textContent;
-        var quote = q ? q.innerHTML : '';
-        // carry the skill's accent + icon onto the panel
-        panel.style.setProperty('--c1', tile.style.getPropertyValue('--c1'));
-        panel.style.setProperty('--c2', tile.style.getPropertyValue('--c2'));
-        panel.style.setProperty('--lc', tile.style.getPropertyValue('--lc'));
-        panel.style.setProperty('--icon', tile.style.getPropertyValue('--icon'));
-        // soft cross-fade the text
-        panel.classList.add('is-swapping');
-        clearTimeout(swapT);
-        swapT = setTimeout(function () {
-          pName.textContent = name;
-          pQuote.innerHTML = quote;
-          panel.classList.remove('is-swapping');
-        }, 170);
-      }
-
-      tiles.forEach(function (tile) {
-        tile.addEventListener('pointerenter', function () { select(tile); });
-        tile.addEventListener('click', function () { select(tile); });
-        tile.addEventListener('focus', function () { select(tile); });
-      });
-
-      // seed with the first breadth tile, no fade
-      var first = tiles[0];
-      first.classList.add('is-sel');
-      panel.style.setProperty('--c1', first.style.getPropertyValue('--c1'));
-      panel.style.setProperty('--c2', first.style.getPropertyValue('--c2'));
-      panel.style.setProperty('--lc', first.style.getPropertyValue('--lc'));
-      panel.style.setProperty('--icon', first.style.getPropertyValue('--icon'));
-      pName.textContent = first.querySelector('.dna2-tile-nm').textContent;
-      pQuote.innerHTML = first.querySelector('.dna2-q').innerHTML;
-    })();
 
     /* ── Entrance animation (IntersectionObserver) ── */
     function runEntrance() {
