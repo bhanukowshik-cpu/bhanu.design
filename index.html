@@ -154,15 +154,18 @@
       min-height: calc(100svh - 134px);
       padding-bottom: 16px;
     }
-    /* Bottom-centre bloom gradient clipped to section 1 */
+    /* Bottom-centre bloom gradient clipped to section 1.
+       The glow is lifted off the very bottom edge and fades to transparent before
+       the seam, so the space between Section 1 and Section 2 shows its true dark
+       (#0C0C0C) colour instead of a green tint. */
     .hero-screen::after {
       content: '';
       position: absolute;
       left: -40px; right: -40px; bottom: 0;
       height: 240px;
       background:
-        radial-gradient(ellipse 65% 100% at 50% 100%, rgba(230,242,141,0.21) 0%, transparent 70%),
-        linear-gradient(to top, rgba(230,242,141,0.08) 0%, transparent 60%);
+        radial-gradient(ellipse 65% 78% at 50% 78%, rgba(230,242,141,0.20) 0%, transparent 72%),
+        linear-gradient(to top, transparent 0%, transparent 18%, rgba(230,242,141,0.06) 38%, transparent 70%);
       pointer-events: none;
       z-index: 0;
     }
@@ -2623,7 +2626,7 @@
       position: relative;
       min-height: 100vh;
       min-height: 100svh;
-      background: #1D1D1D;
+      background: #121B08;
       display: flex;
       flex-direction: column;
       padding: 0;
@@ -2638,14 +2641,17 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: clamp(40px, 6vh, 72px) 56px clamp(96px, 13vh, 140px);
+      padding: clamp(40px, 6vh, 72px) 10% clamp(96px, 13vh, 140px);
     }
     .footer-spread {
       flex: 1;
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 72px;
+      gap: 56px;
       flex-wrap: wrap;
     }
     .footer-col-left {
@@ -2653,7 +2659,7 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 28px;
-      max-width: 560px;
+      max-width: 548px;
     }
     .footer-contact {
       display: flex;
@@ -2785,21 +2791,22 @@
     /* ── socials stacked under the email ── */
     .footer-socials {
       display: flex;
-      gap: 10px;
-      margin-top: 4px;
+      gap: 12px;
+      margin-top: 6px;
     }
     .footer-soc {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      color: rgba(255,255,255,0.6);
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.10);
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      color: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.18);
       transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
     }
+    .footer-soc svg { width: 20px; height: 20px; }
     .footer-soc:hover {
       color: #1A1917;
       background: var(--primary);
@@ -2807,6 +2814,9 @@
       transform: translateY(-2px);
     }
     .footer-bottombar {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -2814,8 +2824,7 @@
       padding-top: 22px;
       border-top: 1px solid rgba(255,255,255,0.08);
     }
-    .footer-copyright,
-    .footer-madewith {
+    .footer-copyright {
       font-family: var(--font-mono);
       font-size: 12px;
       letter-spacing: 0.02em;
@@ -2836,7 +2845,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      max-width: 600px;
+      max-width: 560px;
       flex: 0 1 auto;
       opacity: 0;
       transform: translateY(64px);
@@ -2856,7 +2865,7 @@
     .fn-paper {
       --rl: clamp(38px, 3.4vw, 48px);
       position: relative;
-      width: clamp(380px, 46vw, 620px);
+      width: clamp(360px, 40vw, 540px);
       max-width: 100%;
       padding: calc(var(--rl) * 0.58) 40px calc(var(--rl) * 0.58) 64px;
       background-color: #e9e4d8;
@@ -2875,9 +2884,10 @@
       background-origin: content-box, border-box;
       background-clip: content-box, border-box;
       background-repeat: repeat, no-repeat;
-      border-radius: 4px;
+      border-radius: 28px 9px 34px 12px / 12px 30px 8px 26px;
       border: 1px solid rgba(120,108,86,0.18);
-      transform: rotate(-0.6deg);
+      box-shadow: 0 16px 38px -22px rgba(0,0,0,0.50);
+      transform: rotate(-2.4deg);
     }
     .fn-letter {
       margin: 0;
@@ -2924,41 +2934,6 @@
       transition: transform 0.9s cubic-bezier(0.2,0.7,0.3,1), opacity 0.9s ease-out;
     }
     .fl-particle svg { width: 100%; height: 100%; fill: currentColor; }
-    .footer-love-count {
-      position: relative;
-      isolation: isolate;
-      margin-top: 14px;
-      display: inline-flex; align-items: baseline; gap: 8px;
-      padding: 11px 22px; border-radius: 999px;
-      color: #fff;
-      background:
-        linear-gradient(0deg,
-          rgba(255,255,255,0)    0%,
-          rgba(255,255,255,0.18) 2.45%,
-          rgba(255,255,255,0)    126.14%),
-        rgba(23,23,23,0.55);
-      -webkit-backdrop-filter: blur(20px) saturate(160%);
-      backdrop-filter: blur(20px) saturate(160%);
-      box-shadow:
-         1.1px  2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
-        -1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
-         2.0px  3.0px 2.0px  0.0px rgba(0,0,0,0.1) inset;
-    }
-    .footer-love-count::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      border-radius: inherit;
-      padding: 1px;
-      background: linear-gradient(180deg, rgba(100,100,100,0.5) 9.46%, rgba(180,180,180,0.5) 92.23%);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-    }
-    .flc-num { font-family: var(--font-mono); font-weight: 700; font-size: 15px; color: #fff; }
-    .flc-label { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.02em; color: rgba(255,255,255,0.5); }
 
     .ph-dot {
       width: 7px;
@@ -2985,50 +2960,42 @@
     .footer-grain-glow {
       position: absolute;
       left: 50%;
-      bottom: -22%;
+      bottom: -2%;
       transform: translateX(-50%);
-      width: 110%;
-      height: 130%;
-      background: radial-gradient(closest-side,
-        rgba(127,143,64,0.36) 0%,
-        rgba(127,143,64,0.10) 46%,
-        transparent 70%);
-      filter: blur(30px);
+      width: 100%;
+      height: 55%;
+      background: radial-gradient(90% 100% at 50% 100%,
+        rgba(255,255,255,1.0) 0%,
+        rgba(230,242,141,0.95) 8%,
+        rgba(180,230,60,0.55) 28%,
+        rgba(80,140,20,0.10) 52%,
+        transparent 68%);
+      filter: blur(18px);
     }
-    .footer-grain-bars {
+    .footer-grain-svg {
       position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: flex-end;
-      gap: 5px;
-      padding: 0 6px;
-      -webkit-mask-image: linear-gradient(to top, #000 0%, #000 50%, transparent 100%);
-      mask-image: linear-gradient(to top, #000 0%, #000 50%, transparent 100%);
-    }
-    .fg-bar {
-      flex: 1 1 0;
-      min-width: 0;
-      border-radius: 3px 3px 0 0;
-      background: linear-gradient(to top,
-        rgba(127,143,64,0.80) 0%,
-        rgba(127,143,64,0.22) 50%,
-        rgba(127,143,64,0) 95%);
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 44%;
+      overflow: visible;
     }
     .footer-grain-noise {
       position: absolute;
       inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 150px 150px;
-      opacity: 0.40;
-      mix-blend-mode: overlay;
+      background-size: 160px 160px;
+      opacity: 0;
+      mix-blend-mode: soft-light;
     }
     /* scrim keeps the top-left content readable over the glow */
     .footer-grain-scrim {
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(to bottom, rgba(29,29,29,0.92) 0%, rgba(29,29,29,0.35) 26%, transparent 52%),
-        linear-gradient(105deg, rgba(29,29,29,0.85) 0%, rgba(29,29,29,0.22) 42%, transparent 64%);
+        linear-gradient(to bottom, rgba(18,27,8,0.92) 0%, rgba(18,27,8,0.35) 26%, transparent 52%),
+        linear-gradient(105deg, rgba(18,27,8,0.85) 0%, rgba(18,27,8,0.22) 42%, transparent 64%);
     }
     @media (prefers-reduced-motion: reduce) {
       .ph-dot { animation: none; }
@@ -3079,7 +3046,7 @@
     }
     @media (max-width: 767px) {
       .site-footer          { min-height: 100vh; min-height: 100svh; }
-      .footer-content       { padding: 9vh 22px clamp(96px, 16vh, 150px); }
+      .footer-content       { padding: 9vh 5% clamp(96px, 16vh, 150px); }
       .footer-status        { font-size: 10px; padding: 7px 13px; gap: 7px; }
       .fc-line              { font-size: clamp(30px, 9vw, 46px); }
       .footer-contact       { width: 100%; }
@@ -3097,10 +3064,10 @@
       left: 50%;
       transform: translateX(-50%) translateY(10px) scale(0.96);
       z-index: 9999;
-      background: rgba(12, 12, 12, 0.88);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,0.09);
+      border: 1px solid rgba(0,0,0,0.08);
       border-radius: 100px;
       padding: 9px 16px 9px 10px;
       display: flex;
@@ -3110,7 +3077,7 @@
       font-size: 12px;
       font-weight: 500;
       letter-spacing: 0.04em;
-      color: rgba(255,255,255,0.88);
+      color: rgba(0,0,0,0.88);
       white-space: nowrap;
       opacity: 0;
       transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
@@ -3983,10 +3950,10 @@
     /* ── Pill button ── */
     .am-item-btn {
       position: relative; z-index: 2;
-      display: flex; align-items: center;
+      display: flex; align-items: center; justify-content: flex-start;
       gap: 8px;
       height: var(--aap-min-height);
-      padding-inline: 18px 46px;
+      padding-inline: 52px 18px;
       background: none; border: none;
       cursor: pointer; white-space: nowrap;
       opacity: 1;
@@ -4005,7 +3972,7 @@
     }
     /* ── ⊕ icon ── */
     .am-item-icon {
-      position: absolute; right: 14px;
+      position: absolute; left: 16px; right: auto;
       top: 50%; transform: translateY(-50%);
       width: 22px; height: 22px;
       display: flex; align-items: center; justify-content: center;
@@ -4070,12 +4037,126 @@
       position: relative;
       overflow: hidden;
     }
+    /* Off-hours pane needs extra room for story + photos */
+    .am-panel:has([data-am-pane="off-hours"].is-active) {
+      min-height: 560px;
+    }
     /* Design DNA pane floats free — no container chrome (Apple-style) */
     .am-panel:has([data-am-pane="design-dna"].is-active) {
       min-height: 800px;
       border-color: transparent;
       overflow: visible;
     }
+    /* Off-hours: 20% accordion, 80% content — same grid rule as DNA */
+    .am-inner:has([data-am-pane="off-hours"].is-active) {
+      grid-template-columns: 20% 1fr;
+      gap: 24px;
+    }
+    .am-inner:has([data-am-pane="off-hours"].is-active) .am-controls { min-width: 0; }
+    .am-inner:has([data-am-pane="off-hours"].is-active) .am-control-item { height: auto; }
+    .am-inner:has([data-am-pane="off-hours"].is-active) .am-item-btn {
+      height: auto; min-height: var(--aap-min-height);
+      padding-block: 10px; white-space: normal;
+    }
+    .am-inner:has([data-am-pane="off-hours"].is-active) .am-item-label { white-space: normal; }
+    /* ── Off-hours: hero photo + marquee layout ─────────────────── */
+    .am-panel-pane[data-am-pane="off-hours"] {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .oh-hero {
+      display: flex;
+      flex: 1;
+      align-items: stretch;
+      min-height: 0;
+    }
+    .oh-hero-photo {
+      width: 42%;
+      flex-shrink: 0;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+    .oh-hero-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 44px;
+      gap: 0;
+    }
+    .oh-greeting {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(29,29,31,0.35);
+      margin: 0 0 10px;
+    }
+    .oh-name {
+      font-family: var(--font-heading);
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: rgba(29,29,31,0.92);
+      margin: 0 0 20px;
+    }
+    .oh-bio {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.85;
+      color: rgba(29,29,31,0.58);
+      margin: 0;
+      max-width: 34ch;
+    }
+    .oh-bio strong { color: rgba(29,29,31,0.82); font-weight: 600; }
+    /* Marquee strip */
+    .oh-marquee-wrap {
+      border-top: 1px solid rgba(29,29,31,0.08);
+      padding: 14px 0;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .oh-marquee-track {
+      display: flex;
+      width: max-content;
+      animation: oh-scroll 22s linear infinite;
+    }
+    .oh-marquee-item {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(29,29,31,0.38);
+      padding: 0 32px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .oh-marquee-dot {
+      color: rgba(29,29,31,0.18);
+      padding: 0;
+      flex-shrink: 0;
+      font-size: 10px;
+      align-self: center;
+    }
+    @keyframes oh-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    /* Dark mode */
+    [data-theme="dark"] .oh-greeting  { color: rgba(240,237,232,0.3); }
+    [data-theme="dark"] .oh-name      { color: rgba(240,237,232,0.95); }
+    [data-theme="dark"] .oh-bio       { color: rgba(240,237,232,0.5); }
+    [data-theme="dark"] .oh-bio strong { color: rgba(240,237,232,0.82); }
+    [data-theme="dark"] .oh-marquee-wrap { border-color: rgba(240,237,232,0.07); }
+    [data-theme="dark"] .oh-marquee-item { color: rgba(240,237,232,0.32); }
+    [data-theme="dark"] .oh-marquee-dot  { color: rgba(240,237,232,0.14); }
+
     /* DNA view: narrow 20% accordion, wide content column */
     .am-inner:has([data-am-pane="design-dna"].is-active) {
       grid-template-columns: 20% 1fr;
@@ -4091,7 +4172,7 @@
     .am-inner:has([data-am-pane="design-dna"].is-active) .am-item-label { white-space: normal; }
     /* DNA content column: T-shape centered both axes */
     .am-panel-pane[data-am-pane="design-dna"] {
-      padding: 0;
+      padding: 40px 44px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -4238,6 +4319,132 @@
     [data-theme="dark"] .am-pane-num        { color: rgba(240,237,232,0.25); }
     [data-theme="dark"] .am-pane-item-text  { color: rgba(240,237,232,0.82); }
     [data-theme="dark"] .am-pane-item-sub   { color: rgba(240,237,232,0.4); }
+
+    /* ── About section: horizontal tab layout ─────────────────── */
+    .abt-nav { display: flex; justify-content: center; margin-bottom: 36px; }
+    .abt-nav-pill {
+      display: inline-flex; gap: 4px;
+      background: rgba(29,29,31,0.05);
+      border: 1px solid rgba(29,29,31,0.1);
+      border-radius: 100px;
+      padding: 5px;
+    }
+    .abt-tab {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 9px 20px;
+      border-radius: 100px;
+      border: none; background: transparent;
+      color: rgba(29,29,31,0.42);
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease;
+      white-space: nowrap;
+    }
+    .abt-tab-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      flex-shrink: 0; opacity: 0.45;
+      transition: opacity 0.18s;
+    }
+    .abt-tab:hover { color: rgba(29,29,31,0.72); background: rgba(29,29,31,0.04); }
+    .abt-tab.is-active {
+      background: #E6F28D;
+      color: rgba(29,29,31,0.88);
+      font-weight: 700;
+    }
+    .abt-tab.is-active .abt-tab-dot { opacity: 1; }
+    /* Pane visibility */
+    .abt-pane { display: none; }
+    .abt-pane.is-active {
+      display: block;
+      animation: abt-fade-in 0.32s cubic-bezier(0.16,1,0.3,1);
+    }
+    @keyframes abt-fade-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+    /* Standard (Looking For / Why Me) pane wrapper */
+    .abt-std-pane { max-width: 700px; margin: 0 auto; padding: 40px 0; }
+    /* Why Me stats row */
+    .whyme-stats {
+      display: flex; gap: 40px; flex-wrap: wrap;
+      margin: 0 0 36px;
+    }
+    .whyme-stat { display: flex; flex-direction: column; gap: 4px; }
+    .whyme-num {
+      font-family: var(--font-heading);
+      font-size: 42px; font-weight: 800;
+      letter-spacing: -0.04em;
+      color: rgba(29,29,31,0.88);
+      line-height: 1;
+    }
+    .whyme-label {
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.09em; text-transform: uppercase;
+      color: rgba(29,29,31,0.38);
+    }
+    /* Dark mode */
+    [data-theme="dark"] .abt-nav-pill {
+      background: rgba(240,237,232,0.05);
+      border-color: rgba(240,237,232,0.1);
+    }
+    [data-theme="dark"] .abt-tab { color: rgba(240,237,232,0.38); }
+    [data-theme="dark"] .abt-tab:hover { color: rgba(240,237,232,0.7); background: rgba(240,237,232,0.05); }
+    [data-theme="dark"] .abt-tab.is-active { background: #E6F28D; color: rgba(29,29,31,0.88); }
+    [data-theme="dark"] .whyme-num  { color: rgba(240,237,232,0.92); }
+    [data-theme="dark"] .whyme-label { color: rgba(240,237,232,0.35); }
+
+    /* ── Off-hours polaroid grid ───────────────────────────────── */
+    .oh-polaroids {
+      display: flex;
+      gap: 14px;
+      margin: 18px 0 20px;
+      align-items: flex-end;
+    }
+    .oh-polaroid {
+      background: #fff;
+      padding: 7px 7px 30px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.06);
+      border-radius: 2px;
+      flex: 1;
+      min-width: 0;
+      transform-origin: center bottom;
+      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease;
+      cursor: default;
+    }
+    .oh-polaroid:nth-child(1) { transform: rotate(-2.8deg); }
+    .oh-polaroid:nth-child(2) { transform: rotate(1.8deg); margin-bottom: 12px; }
+    .oh-polaroid:nth-child(3) { transform: rotate(-1.2deg); }
+    .oh-polaroid:hover {
+      transform: rotate(0deg) scale(1.05) !important;
+      box-shadow: 0 14px 42px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.09);
+      z-index: 10;
+    }
+    .oh-polaroid img {
+      width: 100%;
+      height: 155px;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+    .oh-caption {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      color: rgba(29,29,31,0.42);
+      text-align: center;
+      margin-top: 9px;
+      line-height: 1.5;
+      letter-spacing: 0.02em;
+    }
+    [data-theme="dark"] .oh-polaroid {
+      background: #2a2826;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.2);
+    }
+    [data-theme="dark"] .oh-caption { color: rgba(240,237,232,0.35); }
+
     /* Responsive */
     @media (max-width: 640px) {
       .am-section { padding: 48px 20px; }
@@ -4250,18 +4457,47 @@
       display: grid;
       grid-template-columns: repeat(5, 158px);
       grid-template-rows: repeat(6, 114px);
-      gap: 12px;
+      gap: 16px;
       margin-top: 0;
+      position: relative;
     }
-    /* Each block is a 3D cube — head-on & flat at rest, one full X-spin on hover */
+    /* Dotted connector: hovered block → detail panel */
+    .dna-wire {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 0;            /* tucks behind the cubes — weaves under them, not over */
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .dna-wire path {
+      fill: none;
+      stroke: rgba(255,255,255,0.5);
+      stroke-width: 1.6;
+      stroke-dasharray: 1.5 6;
+      stroke-linecap: round;
+      animation: dnaWireFlow 1.1s linear infinite;
+    }
+    @keyframes dnaWireFlow { to { stroke-dashoffset: -15; } }
+    .dna-wire circle { transition: opacity 0.3s ease; }
+    @media (prefers-reduced-motion: reduce) { .dna-wire path { animation: none; } }
+    /* Slot = grid cell; holds the 3D cube + its hover note (note must stay flat) */
     .dna-cell {
       position: relative;
-      transform-style: preserve-3d;
-      transform: perspective(950px) rotateX(0deg);
-      transition: transform 1s cubic-bezier(0.45,0.05,0.25,1);
       cursor: pointer;
     }
-    .dna-cell:hover { transform: perspective(950px) rotateX(360deg); }
+    .dna-cell:hover { z-index: 60; }
+    /* The cube — flat at rest, lifts toward you on hover (calm, premium) */
+    .dna-cube {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      transform: perspective(950px) translateZ(0);
+      transition: transform 0.45s cubic-bezier(0.2,0.9,0.25,1);
+    }
+    .dna-cell:hover .dna-cube { transform: perspective(950px) translateZ(42px); }
     /* Cube faces — content on all four sides, borderless glass */
     .dna-face {
       position: absolute;
@@ -4275,22 +4511,167 @@
       border-radius: 16px;
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
+      background: linear-gradient(160deg, #2f2f2f 0%, #1d1d1d 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.11),
+        inset 0 -10px 22px rgba(0,0,0,0.3),
+        0 10px 26px rgba(0,0,0,0.45);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+    /* Frosted glass rim — same signature as the pills / toggle */
+    .dna-face::before {
+      content: "";
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(160deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.04) 55%, rgba(255,255,255,0) 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    /* Key difference: a block ignites in its own colour only on hover */
+    .dna-cell:hover .dna-face {
       background:
         linear-gradient(155deg,
-          color-mix(in srgb, var(--c1) 16%, #ffffff) 0%,
-          color-mix(in srgb, var(--c2) 9%,  #f3f3f3) 100%);
+          color-mix(in srgb, var(--c1) 22%, #1b1b1b) 0%,
+          color-mix(in srgb, var(--c2) 11%, #141414) 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.9),
-        0 8px 22px color-mix(in srgb, var(--c2) 14%, transparent),
-        0 2px 6px rgba(0,0,0,0.06);
+        inset 0 1px 0 color-mix(in srgb, var(--c1) 55%, transparent),
+        inset 0 0 28px color-mix(in srgb, var(--c2) 16%, transparent),
+        0 16px 38px color-mix(in srgb, var(--c2) 28%, transparent),
+        0 6px 16px rgba(0,0,0,0.5);
     }
     .dna-f1 { transform: translateZ(57px); }
     .dna-f2 { transform: rotateX(90deg)  translateZ(57px); }
     .dna-f3 { transform: rotateX(180deg) translateZ(57px); }
     .dna-f4 { transform: rotateX(270deg) translateZ(57px); }
     @media (prefers-reduced-motion: reduce) {
-      .dna-cell, .dna-cell:hover { transition: none; transform: perspective(950px) rotateX(0deg); }
+      .dna-cube, .dna-cell:hover .dna-cube { transition: none; transform: perspective(950px) translateZ(0); }
     }
+    /* Spotlight: when one block is hovered, the rest quietly recede */
+    .dna-cell { transition: opacity 0.3s ease; }
+    .dna-t-grid:has(.dna-cell:hover) .dna-cell:not(:hover) { opacity: 0.4; }
+    /* ── Hover callout: dashed arrow + paper note signed by Bhanu ── */
+    /* Old floating callouts retired in favour of the fixed detail panel */
+    .dna-callout { display: none; }
+    /* ── Detail panel: lives in the empty bottom-left gap of the T ── */
+    .dna-detail {
+      grid-column: 1 / 3;
+      grid-row: 2 / 7;
+      align-self: end;
+      padding: 0 28px 6px 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      pointer-events: none;
+    }
+    .dna-detail.is-on .dna-detail-icon,
+    .dna-detail.is-on .dna-detail-name,
+    .dna-detail.is-on .dna-detail-summary,
+    .dna-detail.is-on .dna-detail-sig { opacity: 1; transform: translateY(0); }
+    .dna-detail-icon,
+    .dna-detail-name,
+    .dna-detail-summary,
+    .dna-detail-sig {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2,0.9,0.25,1);
+    }
+    .dna-detail-name    { transition-delay: 0.04s; }
+    .dna-detail-summary { transition-delay: 0.08s; }
+    .dna-detail-sig     { transition-delay: 0.12s; }
+    .dna-detail-icon {
+      width: 60px; height: 60px;
+      background: linear-gradient(150deg, var(--dc1,#888), var(--dc2,#555));
+      -webkit-mask: var(--dicon) center / contain no-repeat;
+      mask: var(--dicon) center / contain no-repeat;
+      margin-bottom: 16px;
+    }
+    .dna-detail-name {
+      font-family: var(--font-heading);
+      font-size: 16px; font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      color: var(--dlc, #fff);
+      margin-bottom: 9px;
+    }
+    .dna-detail-summary {
+      font-family: var(--font-serif, Georgia, serif);
+      font-size: 13px; line-height: 1.6;
+      color: rgba(255,255,255,0.82);
+      margin: 0 0 16px;
+      max-width: 300px;
+    }
+    .dna-detail-summary em { font-style: italic; }
+    .dna-detail-sig {
+      display: flex; align-items: center; gap: 9px;
+      font-family: var(--font-heading);
+      font-size: 12px; font-weight: 600;
+      color: rgba(255,255,255,0.55);
+    }
+    .dna-detail-ava { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+    [data-theme="light"] .dna-detail-name    { color: var(--dlc, #1d1d1f); }
+    [data-theme="light"] .dna-detail-summary { color: rgba(29,29,31,0.78); }
+    [data-theme="light"] .dna-detail-sig     { color: rgba(29,29,31,0.5); }
+    .dna-note {
+      position: absolute;
+      width: 196px;
+      background: #fbf7ee;
+      color: #2a2a28;
+      border-radius: 12px;
+      padding: 12px 13px 9px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+      font-family: var(--font-serif, Georgia, serif);
+      transform: rotate(-1.1deg);
+    }
+    .dna-note p {
+      margin: 0 0 9px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .dna-note em { font-style: italic; }
+    .dna-sig {
+      display: flex; align-items: center; gap: 7px;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      padding-top: 8px;
+    }
+    .dna-ava {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .dna-sig-name {
+      font-family: var(--font-heading);
+      font-size: 11px; font-weight: 600;
+      color: #555;
+    }
+    .dna-arrow {
+      position: absolute;
+      overflow: visible;
+      pointer-events: none;
+    }
+    .dna-arrow path { stroke: #8a877c; stroke-linecap: round; stroke-linejoin: round; }
+    .dna-arrow .ln { stroke-width: 2.2; stroke-dasharray: 7 6; fill: none; }
+    .dna-arrow .hd { stroke-width: 2.4; fill: none; }
+    /* Depth blocks fire RIGHT into the empty side column */
+    .cl-right .dna-note  { left: calc(100% + 56px); top: -4px; }
+    .cl-right .dna-arrow { left: calc(100% + 2px); top: 22px; width: 60px; height: 80px; }
+    /* Breadth blocks fire DOWN into the empty space below the row */
+    .cl-down .dna-note  { top: calc(100% + 52px); left: 0; }
+    .cl-down .dna-arrow { top: calc(100% - 2px); left: 44px; width: 72px; height: 60px; }
+    /* b2 / b5 extend their note leftward so it clears the stem / card edge */
+    .dna-b2 .dna-note, .dna-b5 .dna-note   { left: auto; right: 0; }
+    .dna-b2 .dna-arrow, .dna-b5 .dna-arrow { left: auto; right: 44px; transform: scaleX(-1); }
+    /* b3 (centre, over the stem) fires DOWN-RIGHT into the bottom-right quadrant */
+    .cl-dright .dna-note  { top: calc(100% + 38px); left: calc(100% + 24px); }
+    .cl-dright .dna-arrow { top: calc(100% - 6px); left: calc(100% - 28px); width: 84px; height: 74px; }
+    /* d5 sits at the bottom row — lift its note so it stays in frame */
+    .dna-d5 .dna-note    { top: auto; bottom: -4px; }
+    .dna-d5 .dna-arrow   { top: auto; bottom: 22px; transform: scaleY(-1); }
+    [data-theme="dark"] .dna-sig-name { color: #555; }
     /* Grid placement */
     .dna-b1 { grid-column: 1; grid-row: 1; }
     .dna-b2 { grid-column: 2; grid-row: 1; }
@@ -4320,24 +4701,27 @@
     }
     /* Icon — black SVG recolored via mask + per-skill gradient */
     .dna-icon {
-      width: 48px; height: 48px;
+      width: 38px; height: 38px;
       display: block;
       flex-shrink: 0;
       background: linear-gradient(150deg, var(--c1,#9a9a9a), var(--c2,#5f5f5f));
       -webkit-mask: var(--icon) center / contain no-repeat;
       mask: var(--icon) center / contain no-repeat;
     }
-    /* Label — colored to match the icon */
+    /* Label — calm off-white by default, takes its colour only when hovered */
     .dna-label {
       font-family: var(--font-heading);
-      font-size: 13px;
+      font-size: clamp(12.5px, 0.95vw, 14px);
       font-weight: 600;
-      letter-spacing: -0.01em;
-      color: var(--lc, rgba(29,29,31,0.6));
+      letter-spacing: -0.005em;
+      color: rgba(255,255,255,0.72);
       text-align: center;
       line-height: 1.25;
-      margin-top: 12px;
+      margin-top: 9px;
+      padding: 0 6px;
+      transition: color 0.3s ease;
     }
+    .dna-cell:hover .dna-label { color: var(--lc); }
     /* Tooltip callout */
     .dna-tip {
       position: absolute;
@@ -4379,15 +4763,13 @@
     .dna-b4 .dna-tip::after, .dna-b5 .dna-tip::after { left: auto; right: 12%; }
     .dna-b1:hover .dna-tip, .dna-b2:hover .dna-tip { transform: translateX(0) translateY(0); }
     .dna-b4:hover .dna-tip, .dna-b5:hover .dna-tip { transform: translateX(0) translateY(0); }
-    /* Dark mode — borderless dark glass cube faces */
+    /* Dark mode — frosted dark-glass cube faces */
     [data-theme="dark"] .dna-face {
-      background:
-        linear-gradient(155deg,
-          color-mix(in srgb, var(--c1) 20%, #1b1b1b) 0%,
-          color-mix(in srgb, var(--c2) 10%, #151515) 100%);
+      background: linear-gradient(160deg, #2f2f2f 0%, #1d1d1d 100%);
       box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--c1) 45%, transparent),
-        0 10px 30px rgba(0,0,0,0.5);
+        inset 0 1px 0 rgba(255,255,255,0.11),
+        inset 0 -10px 22px rgba(0,0,0,0.32),
+        0 10px 26px rgba(0,0,0,0.5);
     }
     [data-theme="dark"] .dna-depth-line::before { background: rgba(240,237,232,0.1); }
     [data-theme="dark"] .dna-tip {
@@ -4396,6 +4778,107 @@
     }
     [data-theme="dark"] .dna-tip::after { border-top-color: rgb(230,227,222); }
     /* Per-skill icon/label colors are set inline via --c1/--c2/--lc on each cell */
+
+    /* ═══ DESIGN DNA — the T, in testimonials glass language ═══ */
+    .dna2 { width: 100%; max-width: 920px; margin: 0 auto; }
+    /* Signature — the one photo that says "these are my words" */
+    .dna2-sig { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+    .dna2-sig img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+    .dna2-sig-txt { display: flex; flex-direction: column; line-height: 1.25; }
+    .dna2-sig-name { font-family: var(--font-heading); font-size: 13px; font-weight: 700; color: #fff; letter-spacing: -0.005em; }
+    .dna2-sig-role { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+
+    /* The T: breadth bar on top, then quote panel (left) + depth stem (right column) */
+    .dna2-t { display: flex; flex-direction: column; gap: 16px; }
+    /* Axis labels — Caveat, flanked by arrows that expand outward from the centre */
+    .dna2-axis { display: flex; align-items: center; gap: 12px; }
+    .dna2-axis.breadth { justify-content: center; }
+    .dna2-axis-label { font-family: 'Caveat', cursive; font-size: 25px; font-weight: 600; line-height: 1; letter-spacing: 0.01em; color: rgba(255,255,255,0.72); white-space: nowrap; }
+    /* Arrow arms: a fading line tipped with an outward arrowhead */
+    .dna2-arm.left, .dna2-arm.right { flex: 1; height: 1.5px; max-width: 230px; position: relative; }
+    .dna2-arm.left  { background: linear-gradient(90deg, rgba(255,255,255,0.34), transparent); }
+    .dna2-arm.right { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.34)); }
+    .dna2-arm.left::before  { content: ""; position: absolute; left: 0;  top: 50%; transform: translateY(-50%); border: 4px solid transparent; border-right: 7px solid rgba(255,255,255,0.5); border-left: 0; }
+    .dna2-arm.right::after  { content: ""; position: absolute; right: 0; top: 50%; transform: translateY(-50%); border: 4px solid transparent; border-left: 7px solid rgba(255,255,255,0.5); border-right: 0; }
+    .dna2-arm.up, .dna2-arm.down { flex: 1; width: 1.5px; min-height: 22px; position: relative; }
+    .dna2-arm.up    { background: linear-gradient(180deg, rgba(255,255,255,0.34), transparent); }
+    .dna2-arm.down  { background: linear-gradient(180deg, transparent, rgba(255,255,255,0.34)); }
+    .dna2-arm.up::before   { content: ""; position: absolute; top: 0;    left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-bottom: 7px solid rgba(255,255,255,0.5); border-top: 0; }
+    .dna2-arm.down::after  { content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-top: 7px solid rgba(255,255,255,0.5); border-bottom: 0; }
+    .dna2-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    /* Lower band shares the bar's 5-col rhythm: quote sits bottom-left, stem drops from centre (col 3), depth axis runs down col 4 */
+    .dna2-lower { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; align-items: stretch; }
+    .dna2-stem { grid-column: 3 / 4; align-self: start; display: flex; flex-direction: column; gap: 12px; }
+    .dna2-axis.depth { grid-column: 4 / 5; align-self: stretch; flex-direction: column; justify-content: center; gap: 10px; }
+    .dna2-axis.depth .dna2-axis-label { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
+
+    /* Tile — calm dark glass, accent only on hover/select */
+    /* Every block — breadth and depth — is the SAME size for a groomed T */
+    .dna2-tile {
+      position: relative; min-height: 96px; background: #141418; border-radius: 13px;
+      padding: 12px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px;
+      cursor: pointer; overflow: hidden; text-align: center;
+      border: 1px solid rgba(255,255,255,0.07);
+      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s ease, background 0.3s ease;
+    }
+    .dna2-tile-ic {
+      width: 30px; height: 30px; flex-shrink: 0;
+      background: linear-gradient(150deg, var(--c1), var(--c2));
+      -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
+      opacity: 0.9; transition: opacity 0.3s ease;
+    }
+    .dna2-tile-nm { font-family: var(--font-heading); font-size: 14px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: rgba(255,255,255,0.7); transition: color 0.3s ease; }
+    .dna2-tile::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 0; height: 2px; border-radius: 2px; background: linear-gradient(90deg, transparent, var(--lc), transparent); opacity: 0; transition: opacity 0.3s ease; }
+    .dna2-tile:hover, .dna2-tile.is-sel { transform: translateY(-2px); border-color: color-mix(in srgb, var(--lc) 52%, transparent); }
+    .dna2-tile.is-sel { background: color-mix(in srgb, var(--lc) 9%, #141418); }
+    .dna2-tile:hover .dna2-tile-nm, .dna2-tile.is-sel .dna2-tile-nm { color: var(--lc); }
+    .dna2-tile:hover .dna2-tile-ic, .dna2-tile.is-sel .dna2-tile-ic { opacity: 1; }
+    .dna2-tile.is-sel::after { opacity: 1; }
+
+    /* Quote panel — the big glass card in the open corner, drives off the selected tile */
+    .dna2-panel {
+      grid-column: 1 / 3; align-self: end; position: relative; background: #141418; border-radius: 18px;
+      padding: 20px 22px 18px; display: flex; flex-direction: column; overflow: hidden;
+      border-left: 2px solid color-mix(in srgb, var(--lc) 42%, transparent);
+    }
+    .dna2-panel::before {
+      content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit; padding: 1px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--lc) 26%, rgba(255,255,255,0.10)), rgba(255,255,255,0.03));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+    }
+    .dna2-panel::after {
+      content: ""; position: absolute; right: -16%; bottom: -28%; width: 56%; height: 80%;
+      z-index: 0; pointer-events: none;
+      background: radial-gradient(circle, color-mix(in srgb, var(--lc) 22%, transparent) 0%, transparent 66%);
+      transition: background 0.4s ease;
+    }
+    .dna2-panel > * { position: relative; z-index: 1; }
+    .dna2-cardhead { display: flex; align-items: center; gap: 11px; margin-bottom: 10px; }
+    .dna2-ic {
+      width: 32px; height: 32px; flex-shrink: 0;
+      background: linear-gradient(150deg, var(--c1), var(--c2));
+      -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
+    }
+    .dna2-name { font-family: var(--font-heading); font-size: 15px; font-weight: 700; letter-spacing: -0.01em; color: var(--lc); line-height: 1.2; }
+    .dna2-qmark { font-family: Georgia, 'Times New Roman', serif; font-size: 38px; line-height: 0; color: var(--lc); opacity: 0.85; display: block; height: 11px; margin-bottom: 2px; }
+    .dna2-quote { font-family: var(--font-heading); font-size: clamp(14px, 1.25vw, 17px); line-height: 1.55; color: #fff; margin: 0; letter-spacing: 0.005em; }
+    .dna2-quote em { font-style: normal; font-weight: 700; color: var(--lc); }
+    /* soft cross-fade when the quote swaps */
+    .dna2-fade { transition: opacity 0.18s ease; }
+    .dna2-panel.is-swapping .dna2-fade { opacity: 0; }
+
+    /* Mobile — collapse the T into a stack */
+    @media (max-width: 767px) {
+      .dna2-bar { grid-template-columns: repeat(3, 1fr); }
+      .dna2-lower { display: flex; flex-direction: column; }
+      .dna2-stem { grid-column: auto; flex-direction: row; flex-wrap: wrap; }
+      .dna2-stem .dna2-tile { flex: 1 1 28%; }
+      .dna2-panel { align-self: auto; }
+      .dna2-axis.depth { grid-column: auto; align-self: auto; flex-direction: row; justify-content: center; }
+      .dna2-axis.depth .dna2-axis-label { writing-mode: horizontal-tb; }
+    }
 
     /* ─── STICKY STACK ──────────────────────────────────────── */
     .sticky-stack {
@@ -6964,13 +7447,33 @@
       -webkit-mask-composite: xor;
       mask-composite: exclude;
     }
+    /* Sliding thumb — a single highlight pill that glides between the two buttons.
+       Position + width are driven by JS off the active button's geometry. */
+    .s2-vt-thumb {
+      position: absolute; top: 4px; bottom: 4px; left: 0; width: 0;
+      border-radius: 999px;
+      background: linear-gradient(0deg,
+        rgba(255,255,255,0)    0%,
+        rgba(255,255,255,0.18) 2.45%,
+        rgba(255,255,255,0)    126.14%
+      );
+      box-shadow:
+         1.1px  2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+        -1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+         2.0px  3.0px 2.0px  0.0px rgba(0,0,0,0.1) inset;
+      transform: translateX(0);
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1),
+                  width     0.4s cubic-bezier(0.4,0,0.2,1);
+      pointer-events: none;
+      z-index: 0;
+    }
     .s2-vt-btn {
       display: flex; align-items: center; justify-content: center;
       padding: 8px 16px;
       border-radius: 999px; border: none; cursor: pointer;
       background: transparent;
       color: rgba(255,255,255,0.55);
-      position: relative; overflow: visible;
+      position: relative; overflow: visible; z-index: 1;
       transition: color 0.25s ease;
     }
     .s2-vt-btn::after {
@@ -6984,17 +7487,10 @@
       transition: opacity 250ms cubic-bezier(0.4,0,0.2,1);
     }
     .s2-vt-btn:hover { color: rgba(255,255,255,0.8); }
+    /* Active button now only lifts the icon colour — the highlight lives on the
+       sliding .s2-vt-thumb behind it. */
     .s2-vt-btn.s2-vt-active {
       color: #fff;
-      background: linear-gradient(0deg,
-        rgba(255,255,255,0)    0%,
-        rgba(255,255,255,0.18) 2.45%,
-        rgba(255,255,255,0)    126.14%
-      );
-      box-shadow:
-         1.1px  2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
-        -1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
-         2.0px  3.0px 2.0px  0.0px rgba(0,0,0,0.1) inset;
     }
     .s2-vt-btn.s2-vt-active::after { opacity: 1; }
 
@@ -8546,12 +9042,23 @@
         <div id="spiral-root" style="width:100%;height:100%;position:relative;"></div>
       </div>
 
+      <!-- ── Up / Down helix nav ── -->
+      <div class="s2-side-nav">
+        <button class="s2-side-nav-btn" id="s2NavUp" aria-label="Previous project">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+        <button class="s2-side-nav-btn" id="s2NavDown" aria-label="Next project">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+
       <!-- ── Featured Work heading ── -->
       <div class="s2-fw-header" id="s2FwHeader">
         <div class="s2-fwh-row">
           <h2 class="fw-title">Featured Work</h2>
         </div>
         <div class="s2-view-toggle">
+          <span class="s2-vt-thumb" aria-hidden="true"></span>
           <button class="s2-vt-btn s2-vt-active" id="s2SpiralBtn" aria-label="Spiral view">
             <svg width="16" height="27" viewBox="0 0 98 165" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M58.9905 0.213218C40.1909 1.5296 25.1347 4.73829 15.6321 9.42791C7.73376 13.3771 3.003 17.9433 0.863877 23.7025C0.164548 25.5948 0 26.9523 0 30.778C0 34.8917 0.164548 35.879 1.1107 38.265C2.59163 42.0907 4.64848 45.176 7.81603 48.3024L10.5311 50.9352L9.29697 52.3338C8.63877 53.0743 7.52807 54.6786 6.82875 55.9127C2.71504 63.1529 2.71504 71.298 6.74647 79.3197C9.00901 83.8037 13.9455 89.316 18.2648 92.1133L19.2521 92.7715L16.9485 95.322C15.7143 96.7207 14.0277 99.1066 13.2873 100.629C11.9709 103.22 11.8886 103.632 11.9297 107.499C11.9297 110.954 12.0943 112.024 12.9993 114.163C14.2745 117.125 16.0846 119.922 18.5528 122.555L20.3628 124.488L18.6762 126.874C16.3725 130.165 15.6321 132.921 15.92 137.076C16.8662 150.775 28.9605 160.565 48.9119 163.856C50.9688 164.185 53.7249 164.473 55.1236 164.473C58.1266 164.473 59.4019 163.486 59.4019 161.141C59.4019 158.714 58.1677 157.933 53.6015 157.439C42.1654 156.164 33.1564 152.544 27.8909 147.114C25.3404 144.481 24.312 142.753 23.4481 139.832C22.214 135.636 22.9133 131.893 25.3815 129.589L26.3277 128.725L29.7832 130.494C40.2731 135.924 51.7915 138.68 63.9269 138.68C71.4139 138.68 75.1573 137.981 79.5179 135.801C87.1282 131.934 88.28 122.349 81.8215 116.384C75.5687 110.625 61.8289 109.062 46.0735 112.312C40.7668 113.381 33.2799 115.973 29.413 118.03C25.7518 120.004 25.3815 119.881 22.5842 116.466C19.8692 113.134 18.8819 110.831 18.8819 107.704C18.8819 104.249 19.7458 102.48 23.0779 99.1478L25.6695 96.5973L27.2327 97.2555C39.2447 102.521 51.7915 105.236 64.2972 105.236C84.5366 105.236 94.9031 97.5434 89.5964 86.4364C87.7864 82.693 83.7961 79.8956 77.9135 78.2502C73.7587 77.0572 60.1012 77.1395 53.6427 78.3736C44.6337 80.1013 34.226 83.6391 28.1789 87.0123L25.5872 88.4521L22.7899 86.5598C11.3127 78.7027 7.52807 66.8963 13.6986 58.2576C16.3314 54.5141 15.7143 54.6786 19.9515 56.6944C28.2611 60.5201 37.4758 63.2763 47.2664 64.7572C54.2186 65.8268 70.3443 65.8679 75.651 64.7983C86.7991 62.5769 93.5044 58.7512 96.3018 53.0743C97.865 49.9067 97.9472 44.8469 96.5075 41.6793C94.0392 36.2904 87.8687 32.5881 78.6128 30.9014C73.0182 29.9142 62.0758 29.9964 54.5477 31.1483C40.8491 33.2051 27.932 37.8125 19.1287 43.6951L15.7143 45.9576L13.9866 44.5589C7.48694 39.2523 5.01872 30.8603 8.10399 24.772C12.9993 15.1048 33.9792 8.31721 62.6517 7.0831C66.1895 6.91855 69.3982 6.63059 69.8095 6.42491C70.7968 5.93126 71.6607 3.83328 71.4139 2.55803C71.0436 0.501177 69.6038 -0.0747409 64.9965 0.00753316C62.734 0.0486702 60.0189 0.130944 58.9905 0.213218ZM79.1065 38.1827C85.0302 39.3757 89.761 42.3787 90.5014 45.4228C90.954 47.1506 90.378 49.6599 89.2262 51.182C85.853 55.5837 77.461 58.1753 65.0788 58.6278C51.1745 59.1214 36.1183 56.4064 25.0113 51.3465L22.1729 50.0713L23.2013 49.2486C25.2581 47.6853 34.1849 43.5305 39.039 41.9262C46.4026 39.5402 54.6711 37.9359 63.5156 37.1954C67.0122 36.9074 75.5687 37.4422 79.1065 38.1827ZM77.5021 85.408C80.8754 86.5187 83.0968 88.2876 83.7138 90.4679C84.1663 91.9076 84.1252 92.2367 83.4259 93.224C82.3563 94.705 78.7774 96.4327 75.2396 97.2143C71.1259 98.1193 61.7467 98.4484 56.3166 97.8725C50.3517 97.2143 43.1527 95.6923 38.0106 93.9234C35.7069 93.1829 33.6912 92.4424 33.5678 92.319C33.033 91.7431 42.618 88.1642 49.1176 86.5598C56.2343 84.7909 60.5948 84.2973 68.0406 84.4207C73.5941 84.5441 75.3219 84.7087 77.5021 85.408ZM68.5343 118.194C74.17 119.181 77.6256 121.033 78.7363 123.748C81.9861 131.646 64.3383 134.443 45.1684 129.054C41.3838 128.026 33.8146 125.064 33.1564 124.365C32.7862 123.995 33.6912 123.501 37.3113 122.102C47.3076 118.194 59.731 116.631 68.5343 118.194Z" fill="currentColor"/></svg>
           </button>
@@ -8839,161 +9346,170 @@
 
       <!-- ── ABOUT ME SECTION ─────────────────────────────── -->
       <section class="am-section" id="aboutSection">
-        <div class="am-inner">
 
-          <!-- LEFT: Apple-style pill accordion -->
-          <div class="am-controls" id="amControls">
-            <div class="am-intro-el" id="amIntroEl"></div>
-            <ul class="am-control-group">
-
-              <li class="am-control-item" data-am-tab="design-dna" data-index="0">
-                <div class="am-item-bg-wrap"><span class="am-item-bg"></span></div>
-                <button class="am-item-btn">
-                  <span class="am-item-label">My design DNA</span>
-                  <span class="am-item-icon"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="9.25" stroke="rgb(29,29,31)" stroke-width="1.5"/><line class="bar-h" x1="5.5" y1="10" x2="14.5" y2="10" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/><line class="bar-v" x1="10" y1="5.5" x2="10" y2="14.5" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/></svg></span>
-                </button>
-                <div class="am-item-mask"><div class="am-item-content"><div class="am-item-inner">
-                  <div class="am-item-inner-title">My design DNA</div>
-                  <p class="am-item-inner-body">This is the shape of how I work. Breadth is what I build, depth is how I think.</p>
-                </div></div></div>
-              </li>
-
-              <li class="am-control-item" data-am-tab="about" data-index="1">
-                <div class="am-item-bg-wrap"><span class="am-item-bg"></span></div>
-                <button class="am-item-btn">
-                  <span class="am-item-label">A little about me</span>
-                  <span class="am-item-icon"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="9.25" stroke="rgb(29,29,31)" stroke-width="1.5"/><line class="bar-h" x1="5.5" y1="10" x2="14.5" y2="10" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/><line class="bar-v" x1="10" y1="5.5" x2="10" y2="14.5" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/></svg></span>
-                </button>
-                <div class="am-item-mask"><div class="am-item-content"><div class="am-item-inner">
-                  <div class="am-item-inner-title">A little about me</div>
-                  <p class="am-item-inner-body">I grew up between two worlds — drawn to systems, but fascinated by people. I'd spend hours debugging something just to understand it, then redraw the whole thing because the layout bothered me. That tension never resolved. I've stopped trying. Outside work I'm hiking with bad phone signal, obsessing over a typeface nobody else notices, or losing track of time in a chess opening.</p>
-                </div></div></div>
-              </li>
-
-              <li class="am-control-item" data-am-tab="principles" data-index="2">
-                <div class="am-item-bg-wrap"><span class="am-item-bg"></span></div>
-                <button class="am-item-btn">
-                  <span class="am-item-label">My Operating principles</span>
-                  <span class="am-item-icon"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="9.25" stroke="rgb(29,29,31)" stroke-width="1.5"/><line class="bar-h" x1="5.5" y1="10" x2="14.5" y2="10" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/><line class="bar-v" x1="10" y1="5.5" x2="10" y2="14.5" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/></svg></span>
-                </button>
-                <div class="am-item-mask"><div class="am-item-content"><div class="am-item-inner">
-                  <div class="am-item-inner-title">My Operating principles</div>
-                  <p class="am-item-inner-body">Design is every decision you make before you open Figma. I believe clarity is a form of respect, that speed of trust matters more than speed of delivery, and that the best solutions always look inevitable in hindsight. I'd rather change my mind and ship the better thing than be right and ship the wrong one.</p>
-                </div></div></div>
-              </li>
-
-              <li class="am-control-item" data-am-tab="next-role" data-index="3">
-                <div class="am-item-bg-wrap"><span class="am-item-bg"></span></div>
-                <button class="am-item-btn">
-                  <span class="am-item-label">What I am looking for in my next role</span>
-                  <span class="am-item-icon"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="9.25" stroke="rgb(29,29,31)" stroke-width="1.5"/><line class="bar-h" x1="5.5" y1="10" x2="14.5" y2="10" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/><line class="bar-v" x1="10" y1="5.5" x2="10" y2="14.5" stroke="rgb(29,29,31)" stroke-width="1.5" stroke-linecap="round"/></svg></span>
-                </button>
-                <div class="am-item-mask"><div class="am-item-content"><div class="am-item-inner">
-                  <div class="am-item-inner-title">What I am looking for in my next role</div>
-                  <p class="am-item-inner-body">A team that ships fast but thinks deeply. A product with a real problem at its core — one I can feel, not just measure. Room to own both the craft and the strategy. And engineers who ask why, not just what. The best things I've built came from that kind of trust in the room.</p>
-                </div></div></div>
-              </li>
-
-            </ul>
+        <!-- Tab navigation -->
+        <div class="abt-nav">
+          <div class="abt-nav-pill">
+            <button class="abt-tab is-active" data-pane="dna">
+              <span class="abt-tab-dot" style="background:#86DE5C"></span>My Design DNA
+            </button>
+            <button class="abt-tab" data-pane="outside">
+              <span class="abt-tab-dot" style="background:#FBB45A"></span>Me Outside Work
+            </button>
+            <button class="abt-tab" data-pane="looking">
+              <span class="abt-tab-dot" style="background:#6BB2F7"></span>What I&rsquo;m Looking For
+            </button>
+            <button class="abt-tab" data-pane="whyme">
+              <span class="abt-tab-dot" style="background:#B486F2"></span>Why Me
+            </button>
           </div>
+        </div>
 
-          <!-- RIGHT: Dynamic content panel -->
-          <div class="am-panel">
-            <div class="am-panel-pane is-active" data-am-pane="about">
-              <p class="am-pane-eyebrow">Outside work</p>
-              <p class="am-pane-pull">&ldquo;Drawn to systems, fascinated by people.&rdquo;</p>
-              <p class="am-pane-body">I grew up between two worlds. I'd spend hours debugging code just to understand how it worked, then redraw the whole thing on paper because the layout bothered me. That tension never left — and I've stopped trying to resolve it.</p>
-              <p class="am-pane-body">Outside work I'm likely hiking somewhere with bad phone signal, obsessing over a typeface nobody else notices, or deep in a chess opening that absolutely doesn't need another hour of my time.</p>
-              <div class="am-pane-divider"></div>
-              <p class="am-pane-eyebrow" style="margin-bottom:12px;">Things I can't stop thinking about</p>
-              <div class="am-pane-tags">
-                <span class="am-pane-tag">Hiking</span>
-                <span class="am-pane-tag">Coffee ritual</span>
-                <span class="am-pane-tag">Mechanical keyboards</span>
-                <span class="am-pane-tag">Cinema</span>
-                <span class="am-pane-tag">Chess</span>
-                <span class="am-pane-tag">Type design</span>
-                <span class="am-pane-tag">Building things</span>
-                <span class="am-pane-tag">Long walks</span>
+        <!-- Pane content -->
+        <div class="abt-panes">
+
+          <!-- ── DNA pane ── -->
+          <div class="abt-pane is-active" id="abt-dna">
+            <div class="dna2">
+              <div class="dna2-sig">
+                <img src="photo.jpg" alt="Bhanu">
+                <span class="dna2-sig-txt">
+                  <span class="dna2-sig-name">Bhanu Kowshik</span>
+                  <span class="dna2-sig-role">In my own words</span>
+                </span>
+              </div>
+              <div class="dna2-t">
+                <div class="dna2-axis"><span class="dna2-axis-label">Breadth &mdash; what I build</span><span class="dna2-axis-line"></span></div>
+                <div class="dna2-bar">
+                  <button class="dna2-tile" style="--c1:#86DE5C;--c2:#2FA24E;--lc:#43C167;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Customer.svg')">
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Customer Discovery</span>
+                    <span class="dna2-q" hidden>I don't trust what people <em>say</em> they want &mdash; I watch what they actually do. Most early calls are just listening.</span>
+                  </button>
+                  <button class="dna2-tile" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Strategy.svg')">
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Product Strategy</span>
+                    <span class="dna2-q" hidden>Beautiful work that ships the wrong thing is still wrong. I sweat <em>what</em> we build before <em>how</em> it looks.</span>
+                  </button>
+                  <button class="dna2-tile" style="--c1:#B486F2;--c2:#7C3AED;--lc:#9D6BF0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Experience%20Design.svg')">
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Experience Design</span>
+                    <span class="dna2-q" hidden>Home base. Flows, states, the tiny moments &mdash; the craft that makes a product feel <em>obvious</em>.</span>
+                  </button>
+                  <button class="dna2-tile" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Build.svg')">
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Product Builder</span>
+                    <span class="dna2-q" hidden>I don't hand off and walk away. I sit with engineers until it's <em>real and shipped</em>.</span>
+                  </button>
+                  <button class="dna2-tile" style="--c1:#6FE0A0;--c2:#1FA55E;--lc:#34BE72;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg')">
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Engineering Collab</span>
+                    <span class="dna2-q" hidden>I speak enough engineering to know what's cheap, what's pricey, and when &ldquo;it's complicated&rdquo; means <em>no</em>.</span>
+                  </button>
+                </div>
+                <div class="dna2-lower">
+                  <div class="dna2-panel" id="dnaPanel">
+                    <div class="dna2-cardhead"><span class="dna2-ic"></span><span class="dna2-name dna2-fade"></span></div>
+                    <span class="dna2-qmark">&ldquo;</span>
+                    <p class="dna2-quote dna2-fade"></p>
+                  </div>
+                  <div class="dna2-stemwrap">
+                    <div class="dna2-axis depth"><span class="dna2-axis-label">Depth &mdash; how I think</span></div>
+                    <div class="dna2-stem">
+                      <button class="dna2-tile" style="--c1:#5FD9B4;--c2:#149E78;--lc:#1FC096;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg')">
+                        <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Research</span>
+                        <span class="dna2-q" hidden>I'd rather <em>kill my idea in a 20-minute interview</em> than defend it for six months in production.</span>
+                      </button>
+                      <button class="dna2-tile" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/principles.svg')">
+                        <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">First Principles</span>
+                        <span class="dna2-q" hidden>I break problems down to what's <em>actually true</em>, then build back up. Best practices are someone else's constraints.</span>
+                      </button>
+                      <button class="dna2-tile" style="--c1:#CD7CEE;--c2:#B0379E;--lc:#CB5AD0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg')">
+                        <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Systems Thinking</span>
+                        <span class="dna2-q" hidden>I design the <em>system</em>, not the screen. One component should answer ten questions you haven't asked yet.</span>
+                      </button>
+                      <button class="dna2-tile" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')">
+                        <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Builder Mindset</span>
+                        <span class="dna2-q" hidden><em>Momentum over polish.</em> A rough thing in real hands beats a perfect thing in Figma.</span>
+                      </button>
+                      <button class="dna2-tile" style="--c1:#5FE0CE;--c2:#12A38E;--lc:#1FC0A8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg')">
+                        <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Measured Impact</span>
+                        <span class="dna2-q" hidden>If I can't tie it to a <em>number that moved</em>, it was decoration. I design for outcomes.</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+          </div><!-- /abt-pane dna -->
 
-            <div class="am-panel-pane" data-am-pane="principles">
-              <p class="am-pane-eyebrow">How I work</p>
-              <p class="am-pane-pull">&ldquo;The best design decisions don't look like decisions at all.&rdquo;</p>
-              <ul class="am-pane-list">
-                <li class="am-pane-item">
-                  <span class="am-pane-num">01</span>
-                  <div>
-                    <div class="am-pane-item-text">Start with the problem, not the solution</div>
-                    <div class="am-pane-item-sub">Most bad design is a good answer to the wrong question. I spend more time on the brief than most people spend on the design.</div>
-                  </div>
-                </li>
-                <li class="am-pane-item">
-                  <span class="am-pane-num">02</span>
-                  <div>
-                    <div class="am-pane-item-text">Clarity is a form of respect</div>
-                    <div class="am-pane-item-sub">If a user has to think too hard, I haven't done my job. Simplicity isn't a style choice — it's the work.</div>
-                  </div>
-                </li>
-                <li class="am-pane-item">
-                  <span class="am-pane-num">03</span>
-                  <div>
-                    <div class="am-pane-item-text">Speed of trust &gt; speed of delivery</div>
-                    <div class="am-pane-item-sub">Ship fast, but never at the cost of the team's confidence in the work. A decision people don't believe in gets undone twice.</div>
-                  </div>
-                </li>
-                <li class="am-pane-item">
-                  <span class="am-pane-num">04</span>
-                  <div>
-                    <div class="am-pane-item-text">Make the invisible visible</div>
-                    <div class="am-pane-item-sub">Great UX is the absence of friction. My job is to show the team what users will never be able to articulate themselves.</div>
-                  </div>
-                </li>
-                <li class="am-pane-item">
-                  <span class="am-pane-num">05</span>
-                  <div>
-                    <div class="am-pane-item-text">Opinions, held loosely</div>
-                    <div class="am-pane-item-sub">Strong point of view. Weak attachment to being right. I'd rather change my mind and ship the better thing.</div>
-                  </div>
-                </li>
-              </ul>
+          <!-- ── Me Outside Work pane ── -->
+          <div class="abt-pane" id="abt-outside">
+            <div class="oh-hero">
+              <img class="oh-hero-photo" src="photo.jpg" alt="Bhanu Kowshik">
+              <div class="oh-hero-text">
+                <p class="oh-greeting">The human behind the work</p>
+                <h3 class="oh-name">Hi, I&rsquo;m Bhanu&nbsp;:)</h3>
+                <p class="oh-bio">I don&rsquo;t stop creating &mdash; I just change the medium. When I&rsquo;m not in Figma, I&rsquo;m experimenting with a new API, building a side project nobody asked for, or out with friends bowling and finding the city&rsquo;s best coffee. <strong>Creativity, for me, is a lifestyle &mdash; not a job title.</strong></p>
+              </div>
             </div>
+            <div class="oh-marquee-wrap">
+              <div class="oh-marquee-track">
+                <span class="oh-marquee-item">Kayaking</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Building side projects</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Bowling</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Chess</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Coffee ritual</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Cinema</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Mechanical keyboards</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Experimenting with tools</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Hiking</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Type design</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Kayaking</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Building side projects</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Bowling</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Chess</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Coffee ritual</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Cinema</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Mechanical keyboards</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Experimenting with tools</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Hiking</span><span class="oh-marquee-dot">&middot;</span>
+                <span class="oh-marquee-item">Type design</span><span class="oh-marquee-dot">&middot;</span>
+              </div>
+            </div>
+          </div><!-- /abt-pane outside -->
 
-            <div class="am-panel-pane" data-am-pane="next-role">
+          <!-- ── What I'm Looking For pane ── -->
+          <div class="abt-pane" id="abt-looking">
+            <div class="abt-std-pane">
               <p class="am-pane-eyebrow">What I&rsquo;m looking for</p>
-              <p class="am-pane-pull">&ldquo;I want to build something I'd be embarrassed not to work on.&rdquo;</p>
+              <p class="am-pane-pull">&ldquo;I want to build something I&rsquo;d be embarrassed not to work on.&rdquo;</p>
               <ul class="am-pane-list">
                 <li class="am-pane-item">
-                  <span class="am-pane-num">—</span>
+                  <span class="am-pane-num">&mdash;</span>
                   <div>
                     <div class="am-pane-item-text">A team that ships fast but thinks deeply</div>
                     <div class="am-pane-item-sub">Velocity without intention is just noise. I want both in the same room.</div>
                   </div>
                 </li>
                 <li class="am-pane-item">
-                  <span class="am-pane-num">—</span>
+                  <span class="am-pane-num">&mdash;</span>
                   <div>
                     <div class="am-pane-item-text">A real problem at the core</div>
                     <div class="am-pane-item-sub">I want to feel the impact of the work, not just see it in a dashboard. Users over metrics.</div>
                   </div>
                 </li>
                 <li class="am-pane-item">
-                  <span class="am-pane-num">—</span>
+                  <span class="am-pane-num">&mdash;</span>
                   <div>
                     <div class="am-pane-item-text">Ownership of craft and strategy</div>
                     <div class="am-pane-item-sub">I do my best work when I can shape the problem and the solution. Not just the pixels.</div>
                   </div>
                 </li>
                 <li class="am-pane-item">
-                  <span class="am-pane-num">—</span>
+                  <span class="am-pane-num">&mdash;</span>
                   <div>
                     <div class="am-pane-item-text">Engineers who ask why, not just what</div>
                     <div class="am-pane-item-sub">The best products I've shipped came from engineers who cared about the experience as much as the implementation.</div>
                   </div>
                 </li>
                 <li class="am-pane-item">
-                  <span class="am-pane-num">—</span>
+                  <span class="am-pane-num">&mdash;</span>
                   <div>
                     <div class="am-pane-item-text">Space to do something new</div>
                     <div class="am-pane-item-sub">I'm not looking to maintain. I want to build something that didn't exist before I walked in.</div>
@@ -9001,80 +9517,61 @@
                 </li>
               </ul>
             </div>
-            <div class="am-panel-pane" data-am-pane="design-dna">
+          </div><!-- /abt-pane looking -->
 
-              <div class="dna-t-grid">
-
-                <!-- ROW 1: breadth bar -->
-                <div class="dna-cell dna-b1" style="--c1:#86DE5C;--c2:#2FA24E;--lc:#43C167;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Customer.svg')">
-                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Customer Discovery</span></div>
-                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Customer Discovery</span></div>
-                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Customer Discovery</span></div>
-                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Customer Discovery</span></div>
+          <!-- ── Why Me pane ── -->
+          <div class="abt-pane" id="abt-whyme">
+            <div class="abt-std-pane">
+              <p class="am-pane-eyebrow">The case for me</p>
+              <p class="am-pane-pull">&ldquo;Great design doesn&rsquo;t just look good. It performs.&rdquo;</p>
+              <div class="whyme-stats">
+                <div class="whyme-stat">
+                  <span class="whyme-num">$600k</span>
+                  <span class="whyme-label">raised as sole designer</span>
                 </div>
-                <div class="dna-cell dna-b2" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Strategy.svg')">
-                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Product Strategy</span></div>
-                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Product Strategy</span></div>
-                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Product Strategy</span></div>
-                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Product Strategy</span></div>
+                <div class="whyme-stat">
+                  <span class="whyme-num">$500k</span>
+                  <span class="whyme-label">ARR as sole designer</span>
                 </div>
-                <div class="dna-cell dna-b3" style="--c1:#B486F2;--c2:#7C3AED;--lc:#9D6BF0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Experience%20Design.svg')">
-                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Experience Design</span></div>
-                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Experience Design</span></div>
-                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Experience Design</span></div>
-                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Experience Design</span></div>
+                <div class="whyme-stat">
+                  <span class="whyme-num">0&rarr;1</span>
+                  <span class="whyme-label">multiple products shipped</span>
                 </div>
-                <div class="dna-cell dna-b4" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Build.svg')">
-                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Product Builder</span></div>
-                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Product Builder</span></div>
-                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Product Builder</span></div>
-                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Product Builder</span></div>
-                </div>
-                <div class="dna-cell dna-b5" style="--c1:#6FE0A0;--c2:#1FA55E;--lc:#34BE72;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg')">
-                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Engineering Collab</span></div>
-                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Engineering Collab</span></div>
-                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Engineering Collab</span></div>
-                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Engineering Collab</span></div>
-                </div>
-
-                <!-- COLUMN 3: depth stem -->
-                <div class="dna-cell dna-d1" style="--c1:#5FD9B4;--c2:#149E78;--lc:#1FC096;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg')">
-                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Research</span></div>
-                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Research</span></div>
-                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Research</span></div>
-                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Research</span></div>
-                </div>
-                <div class="dna-cell dna-d2" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/principles.svg')">
-                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">First Principles</span></div>
-                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">First Principles</span></div>
-                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">First Principles</span></div>
-                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">First Principles</span></div>
-                </div>
-                <div class="dna-cell dna-d3" style="--c1:#CD7CEE;--c2:#B0379E;--lc:#CB5AD0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg')">
-                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Systems Thinking</span></div>
-                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Systems Thinking</span></div>
-                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Systems Thinking</span></div>
-                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Systems Thinking</span></div>
-                </div>
-                <div class="dna-cell dna-d4" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')">
-                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Builder Mindset</span></div>
-                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Builder Mindset</span></div>
-                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Builder Mindset</span></div>
-                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Builder Mindset</span></div>
-                </div>
-                <div class="dna-cell dna-d5" style="--c1:#5FE0CE;--c2:#12A38E;--lc:#1FC0A8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg')">
-                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Measured Impact</span></div>
-                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Measured Impact</span></div>
-                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Measured Impact</span></div>
-                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Measured Impact</span></div>
-                </div>
-
               </div>
+              <ul class="am-pane-list" style="margin-top:28px;">
+                <li class="am-pane-item">
+                  <span class="am-pane-num">&mdash;</span>
+                  <div>
+                    <div class="am-pane-item-text">I own the full stack of design</div>
+                    <div class="am-pane-item-sub">Research, strategy, interaction, visual, and shipping alongside engineers. No hand-offs. No gaps.</div>
+                  </div>
+                </li>
+                <li class="am-pane-item">
+                  <span class="am-pane-num">&mdash;</span>
+                  <div>
+                    <div class="am-pane-item-text">I've been the only designer in the room</div>
+                    <div class="am-pane-item-sub">And the company raised real money and hit real ARR. Design wasn't decoration &mdash; it was the product.</div>
+                  </div>
+                </li>
+                <li class="am-pane-item">
+                  <span class="am-pane-num">&mdash;</span>
+                  <div>
+                    <div class="am-pane-item-text">AI-native from day one</div>
+                    <div class="am-pane-item-sub">I build with AI, design for AI, and think about what AI makes newly possible. Not as a trend &mdash; as a mindset.</div>
+                  </div>
+                </li>
+                <li class="am-pane-item">
+                  <span class="am-pane-num">&mdash;</span>
+                  <div>
+                    <div class="am-pane-item-text">I move fast without breaking trust</div>
+                    <div class="am-pane-item-sub">Speed of trust matters more than speed of delivery. I've done both at the same time.</div>
+                  </div>
+                </li>
+              </ul>
             </div>
+          </div><!-- /abt-pane whyme -->
 
-          </div>
-
-        </div>
+        </div><!-- /abt-panes -->
       </section>
 
       <!-- ── TESTIMONIALS MARQUEE GRID ─────────────────────── -->
@@ -9229,8 +9726,73 @@
 
     <!-- ── grain frame: bars span the full height, content sits on top ── -->
     <div class="footer-grain" aria-hidden="true">
+      <svg class="footer-grain-svg" viewBox="0 0 1481 535" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Bar fill gradients: transparent at top, lime at bottom -->
+          <linearGradient id="fgBar4" x1="0" y1="152" x2="0" y2="535" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#E6F28D" stop-opacity="0"/>
+            <stop offset="35%" stop-color="#E6F28D" stop-opacity="0.20"/>
+            <stop offset="100%" stop-color="#E6F28D" stop-opacity="0.62"/>
+          </linearGradient>
+          <linearGradient id="fgBar3" x1="0" y1="221" x2="0" y2="535" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#E6F28D" stop-opacity="0"/>
+            <stop offset="35%" stop-color="#E6F28D" stop-opacity="0.16"/>
+            <stop offset="100%" stop-color="#E6F28D" stop-opacity="0.52"/>
+          </linearGradient>
+          <linearGradient id="fgBar2" x1="0" y1="284" x2="0" y2="535" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#E6F28D" stop-opacity="0"/>
+            <stop offset="30%" stop-color="#E6F28D" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="#E6F28D" stop-opacity="0.40"/>
+          </linearGradient>
+          <linearGradient id="fgBar1" x1="0" y1="355" x2="0" y2="535" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#E6F28D" stop-opacity="0"/>
+            <stop offset="25%" stop-color="#E6F28D" stop-opacity="0.08"/>
+            <stop offset="100%" stop-color="#E6F28D" stop-opacity="0.28"/>
+          </linearGradient>
+          <!-- Grain filter — high-contrast lime particles, clipped to bar alpha only -->
+          <filter id="fgGrain" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.88 0.88" numOctaves="3" seed="7" stitchTiles="stitch" result="noise"/>
+            <feColorMatrix type="matrix"
+              values="0 0 0 0 0.90
+                      0 0 0 0 0.95
+                      0 0 0 0 0.55
+                      0 0 0 9 -3.5"
+              in="noise" result="particles"/>
+            <feComposite in="particles" in2="SourceGraphic" operator="in"/>
+          </filter>
+          <!-- Dotted line gradients -->
+          <linearGradient id="fgDot1" x1="635" y1="0" x2="635" y2="535" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="white" stop-opacity="0"/>
+            <stop offset="100%" stop-color="white" stop-opacity="0.50"/>
+          </linearGradient>
+          <linearGradient id="fgDot2" x1="424" y1="155" x2="424" y2="535" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="white" stop-opacity="0"/>
+            <stop offset="100%" stop-color="white" stop-opacity="0.50"/>
+          </linearGradient>
+          <linearGradient id="fgDot3" x1="213" y1="238" x2="213" y2="535" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="white" stop-opacity="0"/>
+            <stop offset="100%" stop-color="white" stop-opacity="0.50"/>
+          </linearGradient>
+        </defs>
+        <g class="fg-blocks" filter="url(#fgGrain)">
+          <rect x="0" y="355" width="213" height="180" fill="url(#fgBar1)"/>
+          <rect x="212" y="284" width="213" height="251" fill="url(#fgBar2)"/>
+          <rect x="423" y="221" width="213" height="314" fill="url(#fgBar3)"/>
+          <rect x="634" y="152" width="214" height="383" fill="url(#fgBar4)"/>
+          <rect x="846" y="221" width="213" height="314" fill="url(#fgBar3)"/>
+          <rect x="1057" y="284" width="213" height="251" fill="url(#fgBar2)"/>
+          <rect x="1268" y="355" width="213" height="180" fill="url(#fgBar1)"/>
+        </g>
+        <g class="fg-dots">
+          <line x1="213" y1="238" x2="213" y2="541" stroke="url(#fgDot3)" stroke-width="2" stroke-dasharray="2 10"/>
+          <line x1="424" y1="155" x2="424" y2="541" stroke="url(#fgDot2)" stroke-width="2" stroke-dasharray="2 10"/>
+          <line x1="635" y1="0" x2="635" y2="541" stroke="url(#fgDot1)" stroke-width="2" stroke-dasharray="2 10"/>
+          <line x1="847" y1="0" x2="847" y2="541" stroke="url(#fgDot1)" stroke-width="2" stroke-dasharray="2 10"/>
+          <line x1="1058" y1="155" x2="1058" y2="541" stroke="url(#fgDot2)" stroke-width="2" stroke-dasharray="2 10"/>
+          <line x1="1270" y1="238" x2="1270" y2="541" stroke="url(#fgDot3)" stroke-width="2" stroke-dasharray="2 10"/>
+        </g>
+      </svg>
       <div class="footer-grain-glow"></div>
-      <div class="footer-grain-bars" id="footerBars"></div>
       <div class="footer-grain-noise"></div>
       <div class="footer-grain-scrim"></div>
     </div>
@@ -9247,7 +9809,7 @@
           </span>
 
           <h2 class="footer-cta">
-            <span class="fc-line">Building something cool?</span>
+            <span class="fc-line">Building something&nbsp;cool?</span>
             <span class="fc-line fc-line--em">I’m just a mail away.</span>
           </h2>
 
@@ -9267,8 +9829,8 @@
               <a class="footer-soc" href="https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal" target="_blank" rel="noopener" aria-label="Product Hunt">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="1.8"/><path d="M9 7h4.2a2.8 2.8 0 0 1 0 5.6H9V7zm0 5.6V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </a>
-              <a class="footer-soc" href="mailto:kowshikbhanu1000@gmail.com" aria-label="Email">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+              <a class="footer-soc" href="https://github.com/bhanukowshik-cpu" target="_blank" rel="noopener" aria-label="GitHub">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5 0-.3 0-1 0-1.8-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2 0 1.6 0 2.9 0 3.3 0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
               </a>
             </div>
           </div>
@@ -9277,23 +9839,15 @@
         <div class="footer-note" id="footerNote">
           <span class="fn-eyebrow">A small note for you</span>
           <div class="fn-paper">
-            <p class="fn-letter">Out of all the things you could've done today, you spent a little of it right here — with my work. That genuinely means a lot. If something made you feel something, leave a little love just below.</p>
+            <p class="fn-letter">Out of all the things you could've done today, you spent a little of it right here, with my work. That genuinely means a lot. And if it stuck with you, you know what the heart's for.</p>
           </div>
           <button class="footer-love" id="footerLove" type="button" aria-pressed="false" aria-label="Leave some love">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.9-10-9.3C.2 8.3 1.7 4.7 5 4.1 7 3.7 9 4.6 12 7.5c3-2.9 5-3.8 7-3.4 3.3.6 4.8 4.2 3 7.6C19.5 16.1 12 21 12 21z"/></svg>
           </button>
-          <div class="footer-love-count">
-            <span class="flc-num" id="loveCount">2,700</span>
-            <span class="flc-label">people left their love so far</span>
-          </div>
         </div>
 
       </div>
 
-      <div class="footer-bottombar">
-        <span class="footer-copyright">© 2026 Bhanu Kowshik</span>
-        <span class="footer-madewith">Made with a lot of Chai</span>
-      </div>
 
     </div>
 
@@ -10704,22 +11258,7 @@
     tickClock();
     setInterval(tickClock, 15000);
 
-    /* build the grainy gradient skyline — taller & brighter toward centre */
-    const barsHost = document.getElementById('footerBars');
-    if (barsHost) {
-      const N = 13;
-      for (let i = 0; i < N; i++) {
-        const t = N > 1 ? i / (N - 1) : 0.5;        // 0..1 across the row
-        const centre = 1 - Math.abs(t - 0.5) * 2;   // 0 at edges, 1 at centre
-        const rnd = Math.abs(Math.sin((i + 1) * 12.9898) * 43758.5453) % 1;
-        const h = Math.min(100, 52 + centre * 40 + rnd * 16);
-        const bar = document.createElement('span');
-        bar.className = 'fg-bar';
-        bar.style.height = h.toFixed(1) + '%';
-        bar.style.opacity = (0.12 + centre * 0.55).toFixed(2);
-        barsHost.appendChild(bar);
-      }
-    }
+
   })();
 
   /* ── STICKY STACK + HERO FRAME ─────────────────────────────── */
@@ -11347,12 +11886,12 @@
     }
 
     /* Clone-based height measurement — no transition interference */
-    function measureH(item) {
+    function measureH(item, w) {
       var inner = item.querySelector('.am-item-inner');
       var clone = inner.cloneNode(true);
       clone.style.cssText =
         'position:fixed;top:-9999px;left:0;' +
-        'width:' + getExpandedW() + 'px;' +
+        'width:' + (w || getExpandedW()) + 'px;' +
         'opacity:0;visibility:hidden;transform:none;transition:none;' +
         'padding:24px 22px;box-sizing:border-box';
       document.body.appendChild(clone);
@@ -11365,24 +11904,15 @@
     var collapsedW = new Map();
     items.forEach(function (item) { collapsedW.set(item, item.offsetWidth); });
 
-    /* ── Expand ── */
+    /* ── Expand — pill hugs its label when closed, grows wide+tall to reveal content ── */
     function expand(item) {
       var cw = collapsedW.get(item) || item.offsetWidth;
       var ew, eh;
       if (item.dataset.amTab === 'design-dna') {
-        /* DNA opens the 20% column — size the captioned pill to fit it (not the
-           current/normal column, which is still wide at this point in the click) */
+        /* DNA opens the 20% column — size to that future width (column is still wide here) */
         var innerEl = item.closest('.am-inner');
         ew = Math.max(180, Math.floor((innerEl ? innerEl.offsetWidth : 1100) * 0.20) - 14);
-        var inner = item.querySelector('.am-item-inner');
-        var clone = inner.cloneNode(true);
-        clone.style.cssText =
-          'position:fixed;top:-9999px;left:0;width:' + ew + 'px;' +
-          'opacity:0;visibility:hidden;transform:none;transition:none;' +
-          'padding:24px 22px;box-sizing:border-box';
-        document.body.appendChild(clone);
-        eh = clone.offsetHeight;
-        document.body.removeChild(clone);
+        eh = measureH(item, ew);
       } else {
         ew = getExpandedW();
         eh = measureH(item);
@@ -11394,20 +11924,18 @@
       item.offsetHeight;
 
       item.style.transition =
-        'width 333ms cubic-bezier(0.4,0,0.2,1),' +
-        'height 333ms cubic-bezier(0.4,0,0.2,1)';
+        'width 360ms cubic-bezier(0.4,0,0.2,1), height 360ms cubic-bezier(0.4,0,0.2,1)';
       item.style.width  = ew + 'px';
       item.style.height = eh + 'px';
       item.classList.add('expanded');
     }
 
-    /* ── Collapse ── */
+    /* ── Collapse — back to hugging the label ── */
     function collapse(item, cb) {
       var cw = collapsedW.get(item) || 200;
       item.classList.remove('expanded');
       item.style.transition =
-        'width 333ms cubic-bezier(0.4,0,0.2,1),' +
-        'height 333ms cubic-bezier(0.4,0,0.2,1)';
+        'width 360ms cubic-bezier(0.4,0,0.2,1), height 360ms cubic-bezier(0.4,0,0.2,1)';
       item.style.width  = cw + 'px';
       item.style.height = '56px';
       setTimeout(function () {
@@ -11417,7 +11945,7 @@
         item.offsetHeight;
         item.style.transition = '';
         if (cb) cb();
-      }, 350);
+      }, 360);
     }
 
     /* ── Switch right panel pane ── */
@@ -11463,6 +11991,56 @@
         }
       });
     });
+
+    /* ── Design-DNA: the T — moving across a tile drives the quote panel ── */
+    (function () {
+      var dna = document.querySelector('.dna2');
+      if (!dna) return;
+      var panel = dna.querySelector('#dnaPanel');
+      var pName = panel && panel.querySelector('.dna2-name');
+      var pQuote = panel && panel.querySelector('.dna2-quote');
+      var tiles = Array.from(dna.querySelectorAll('.dna2-tile'));
+      if (!panel || !tiles.length) return;
+
+      var swapT;
+      function select(tile) {
+        if (tile.classList.contains('is-sel')) return;
+        tiles.forEach(function (t) { t.classList.remove('is-sel'); });
+        tile.classList.add('is-sel');
+        var q = tile.querySelector('.dna2-q');
+        var name = tile.querySelector('.dna2-tile-nm').textContent;
+        var quote = q ? q.innerHTML : '';
+        // carry the skill's accent + icon onto the panel
+        panel.style.setProperty('--c1', tile.style.getPropertyValue('--c1'));
+        panel.style.setProperty('--c2', tile.style.getPropertyValue('--c2'));
+        panel.style.setProperty('--lc', tile.style.getPropertyValue('--lc'));
+        panel.style.setProperty('--icon', tile.style.getPropertyValue('--icon'));
+        // soft cross-fade the text
+        panel.classList.add('is-swapping');
+        clearTimeout(swapT);
+        swapT = setTimeout(function () {
+          pName.textContent = name;
+          pQuote.innerHTML = quote;
+          panel.classList.remove('is-swapping');
+        }, 170);
+      }
+
+      tiles.forEach(function (tile) {
+        tile.addEventListener('pointerenter', function () { select(tile); });
+        tile.addEventListener('click', function () { select(tile); });
+        tile.addEventListener('focus', function () { select(tile); });
+      });
+
+      // seed with the first breadth tile, no fade
+      var first = tiles[0];
+      first.classList.add('is-sel');
+      panel.style.setProperty('--c1', first.style.getPropertyValue('--c1'));
+      panel.style.setProperty('--c2', first.style.getPropertyValue('--c2'));
+      panel.style.setProperty('--lc', first.style.getPropertyValue('--lc'));
+      panel.style.setProperty('--icon', first.style.getPropertyValue('--icon'));
+      pName.textContent = first.querySelector('.dna2-tile-nm').textContent;
+      pQuote.innerHTML = first.querySelector('.dna2-q').innerHTML;
+    })();
 
     /* ── Entrance animation (IntersectionObserver) ── */
     function runEntrance() {
@@ -13661,11 +14239,21 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var spiralRoot = document.getElementById('spiral-root');
     var spiralBtn  = document.getElementById('s2SpiralBtn');
     var listBtn    = document.getElementById('s2ListBtn');
+    var thumb      = document.querySelector('.s2-vt-thumb');
     if (!spiralRoot || !spiralBtn || !listBtn) return;
+
+    // Slide the highlight thumb onto whichever button is active.
+    function positionThumb(view) {
+      if (!thumb) return;
+      var active = view === 'spiral' ? spiralBtn : listBtn;
+      thumb.style.width = active.offsetWidth + 'px';
+      thumb.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+    }
 
     function setView(view) {
       spiralBtn.classList.toggle('s2-vt-active', view === 'spiral');
       listBtn.classList.toggle('s2-vt-active',   view === 'list');
+      positionThumb(view);
       spiralRoot.dispatchEvent(new CustomEvent('s2:setView', { detail: { view: view } }));
       var isList = view === 'list';
       ['s2ProjectBar', 's2ProjectTabs', 's2FrontLabel'].forEach(function (id) {
@@ -13676,6 +14264,28 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
     spiralBtn.addEventListener('click', function () { setView('spiral'); });
     listBtn.addEventListener('click',   function () { setView('list');   });
+
+    // Place the thumb under the initially-active button (spiral) without animating
+    // the very first paint, and keep it aligned on resize.
+    function initThumb() {
+      if (!thumb) return;
+      var prev = thumb.style.transition;
+      thumb.style.transition = 'none';
+      positionThumb(spiralBtn.classList.contains('s2-vt-active') ? 'spiral' : 'list');
+      void thumb.offsetWidth;            // flush so the next change animates
+      thumb.style.transition = prev || '';
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initThumb);
+    } else {
+      initThumb();
+    }
+    window.addEventListener('resize', function () {
+      var prev = thumb && thumb.style.transition;
+      if (thumb) thumb.style.transition = 'none';
+      positionThumb(listBtn.classList.contains('s2-vt-active') ? 'list' : 'spiral');
+      if (thumb) { void thumb.offsetWidth; thumb.style.transition = prev || ''; }
+    });
   })();
 
   /* ── Section 2: Project panels + bottom tab strip ────────────────────── */
@@ -13932,7 +14542,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260628-revert" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
@@ -14247,33 +14857,18 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   </script>
 
   <script>
-  /* ── footer love note: reveal, heart micro-interaction, live counter ── */
+  /* ── footer love note: reveal + heart micro-interaction ── */
   (function(){
-    var note   = document.getElementById('footerNote');
-    var love   = document.getElementById('footerLove');
-    var countEl= document.getElementById('loveCount');
-    if (!countEl) return;
+    var note = document.getElementById('footerNote');
+    var love = document.getElementById('footerLove');
     var HEART = '<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.9-10-9.3C.2 8.3 1.7 4.7 5 4.1 7 3.7 9 4.6 12 7.5c3-2.9 5-3.8 7-3.4 3.3.6 4.8 4.2 3 7.6C19.5 16.1 12 21 12 21z"/></svg>';
-    var BASE = 2700, liked = false;
+    var liked = false;
     try { liked = localStorage.getItem('bk-loved') === '1'; } catch(e){}
-    var current = BASE + (liked ? 1 : 0);
-    function render(n){ countEl.textContent = n.toLocaleString('en-US'); }
-    render(current);
-
-    var counted = false;
-    function countUp(){
-      if (counted) return; counted = true;
-      var start = Math.max(0, current - 26), t0 = null, dur = 1400;
-      function step(ts){ if(!t0) t0=ts; var p=Math.min(1,(ts-t0)/dur); var e=1-Math.pow(1-p,3); render(Math.round(start+(current-start)*e)); if(p<1) requestAnimationFrame(step); }
-      requestAnimationFrame(step);
-    }
 
     if (note && 'IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ note.classList.add('in'); countUp(); io.disconnect(); } }); }, { threshold: 0.3 });
+      var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ note.classList.add('in'); io.disconnect(); } }); }, { threshold: 0.3 });
       io.observe(note);
-    } else if (note) { note.classList.add('in'); countUp(); }
-
-    setInterval(function(){ current += 1; render(current); }, 600000);
+    } else if (note) { note.classList.add('in'); }
 
     function burst(btn){
       for (var i=0;i<9;i++){
@@ -14293,7 +14888,10 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (!lToast || !lToastMsg) return;
       clearTimeout(lToastTimer);
       lToastMsg.textContent = msg;
-      lToast.style.bottom = '40px';
+      var dock = document.getElementById('cbWrap') || document.getElementById('cb');
+      var tBottom = 128;
+      if (dock) { var dr = dock.getBoundingClientRect(); if (dr.height > 4) tBottom = Math.max(124, Math.round(window.innerHeight - dr.top + 26)); }
+      lToast.style.bottom = tBottom + 'px';
       lToast.classList.add('toast-show');
       lToastTimer = setTimeout(function(){ lToast.classList.remove('toast-show'); }, 2800);
     }
@@ -14306,16 +14904,31 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
           love.classList.add('loved','pop'); love.setAttribute('aria-pressed','true');
           setTimeout(function(){ love.classList.remove('pop'); }, 650);
           try { localStorage.setItem('bk-loved','1'); } catch(e){}
-          current += 1; render(current);
           burst(love);
           loveToast('Thank you \u2014 you made my day');
         } else {
           love.classList.remove('loved'); love.setAttribute('aria-pressed','false');
           try { localStorage.removeItem('bk-loved'); } catch(e){}
-          current -= 1; render(current);
         }
       });
     }
+  })();
+
+  /* ── About section: horizontal tab switching ───────────────── */
+  (function () {
+    var tabs  = Array.from(document.querySelectorAll('.abt-tab'));
+    var panes = Array.from(document.querySelectorAll('.abt-pane'));
+    if (!tabs.length) return;
+    tabs.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = this.dataset.pane;
+        tabs.forEach(function (b) { b.classList.remove('is-active'); });
+        panes.forEach(function (p) { p.classList.remove('is-active'); });
+        this.classList.add('is-active');
+        var pane = document.getElementById('abt-' + target);
+        if (pane) pane.classList.add('is-active');
+      });
+    });
   })();
   </script>
 </body>
