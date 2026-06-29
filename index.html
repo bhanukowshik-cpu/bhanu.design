@@ -3853,13 +3853,14 @@
     /* ─── ABOUT ME TAB PANEL ────────────────────────────────── */
     /* Full-viewport snap section — exactly one screen, same as .tm-section / .s2-section-wrap */
     .am-section {
-      padding: 28px 40px;
+      padding: 44px 40px 24px;
       scroll-snap-align: start;
       height: calc(100vh - 80px);
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      /* Top-anchored: the nav + breadth bar hold a fixed position; only the lower content changes height */
+      justify-content: flex-start;
       /* Same ruled grid as the testimonials section — bright in the centre, fading to dark at the edges */
       background-color: #111111;
       background-image:
@@ -4079,9 +4080,9 @@
     .oh2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 56px;
+      gap: 28px;
       align-items: center;
-      padding: 32px 0 8px;
+      padding: 24px 0 8px;
     }
     /* Left: deck */
     .oh2-left {
@@ -4118,10 +4119,10 @@
       user-select: none;
       -webkit-user-drag: none;
     }
-    /* Stack positions — JS assigns these */
-    .oh2-card.is-back  { transform: rotate(-7deg) translate(-10px, 8px) scale(0.91); z-index: 1; }
-    .oh2-card.is-mid   { transform: rotate(5deg)  translate(8px, 4px)  scale(0.96); z-index: 2; }
-    .oh2-card.is-front { transform: rotate(-2deg) translate(0, 0)      scale(1);    z-index: 3; cursor: grab; }
+    /* Stack positions — peek offset ensures back cards always show */
+    .oh2-card.is-back  { transform: rotate(-9deg) translate(-28px, 18px) scale(0.88); z-index: 1; }
+    .oh2-card.is-mid   { transform: rotate(6deg)  translate(22px, 12px)  scale(0.93); z-index: 2; }
+    .oh2-card.is-front { transform: rotate(-2deg) translate(0, 0)        scale(1);    z-index: 3; cursor: grab; }
     .oh2-card.is-dragging {
       transition: none;
       cursor: grabbing;
@@ -4162,11 +4163,11 @@
     }
     .oh2-body {
       font-family: var(--font-heading);
-      font-size: 15px;
+      font-size: 17px;
       font-weight: 500;
-      line-height: 1.8;
-      color: rgba(29,29,31,0.62);
-      max-width: 42ch;
+      line-height: 1.75;
+      color: rgba(29,29,31,0.68);
+      max-width: 38ch;
       margin: 0 0 28px;
     }
     .oh2-body strong { color: rgba(29,29,31,0.9); font-weight: 700; }
@@ -4396,6 +4397,19 @@
     [data-theme="dark"] .am-pane-item-sub   { color: rgba(240,237,232,0.4); }
 
     /* ── About section: horizontal tab layout ─────────────────── */
+    /* Section title */
+    .abt-header { text-align: center; margin-bottom: 18px; }
+    .abt-title {
+      font-family: var(--font-heading); font-weight: 700;
+      font-size: 26px; letter-spacing: -0.02em; line-height: 1;
+      color: #fff; margin: 0;
+    }
+    .abt-title-sub {
+      display: block; margin-top: 8px;
+      font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: rgba(255,255,255,0.36);
+    }
     .abt-nav { display: flex; justify-content: center; margin-bottom: 36px; }
     /* Tab strip — exact testimonial .tm-tabs glass treatment */
     .abt-nav-pill {
@@ -4416,16 +4430,36 @@
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor; mask-composite: exclude;
     }
+    /* Sliding highlight — glides between tabs (JS sets --x / --w) */
+    .abt-nav-thumb {
+      position: absolute; top: 4px; left: 0; z-index: 0;
+      height: calc(100% - 8px);
+      width: var(--w, 0px);
+      transform: translateX(var(--x, 0px));
+      border-radius: 999px;
+      background: linear-gradient(0deg,
+        rgba(255,255,255,0)    0%,
+        rgba(255,255,255,0.18) 2.45%,
+        rgba(255,255,255,0)    126.14%
+      );
+      box-shadow:
+         1.1px  2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+        -1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+         2.0px  3.0px 2.0px  0.0px rgba(0,0,0,0.1) inset;
+      transition: transform 0.42s cubic-bezier(0.34,1.2,0.4,1), width 0.42s cubic-bezier(0.34,1.2,0.4,1);
+      pointer-events: none;
+    }
+    .abt-nav-thumb.no-anim { transition: none; }
     .abt-tab {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 9px;
+      font-family: var(--font-mono); font-size: 15px; font-weight: 600;
       letter-spacing: 0.02em;
-      padding: 9px 18px;
+      padding: 10px 22px;
       border-radius: 999px;
       border: none; background: transparent;
       color: rgba(255,255,255,0.55);
       cursor: pointer; white-space: nowrap;
-      position: relative; overflow: visible;
+      position: relative; z-index: 2; overflow: visible;
       transition: color 0.25s ease;
     }
     /* Bottom glow halo — same as .tm-tab::after */
@@ -4443,18 +4477,8 @@
       transition: opacity 0.25s;
     }
     .abt-tab:hover { color: rgba(255,255,255,0.8); }
-    .abt-tab.is-active {
-      color: #fff;
-      background: linear-gradient(0deg,
-        rgba(255,255,255,0)    0%,
-        rgba(255,255,255,0.18) 2.45%,
-        rgba(255,255,255,0)    126.14%
-      );
-      box-shadow:
-         1.1px  2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
-        -1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
-         2.0px  3.0px 2.0px  0.0px rgba(0,0,0,0.1) inset;
-    }
+    /* Highlight now lives on the sliding .abt-nav-thumb, not the tab itself */
+    .abt-tab.is-active { color: #fff; }
     .abt-tab.is-active::after { opacity: 1; }
     .abt-tab.is-active .abt-tab-dot { opacity: 1; }
     /* Pane visibility */
@@ -4498,51 +4522,25 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 72px 40px;
-      gap: 16px;
-    }
-    .abt-wip-icon {
-      font-size: 36px;
-      line-height: 1;
-      margin-bottom: 4px;
-      filter: grayscale(0.2);
-    }
-    .abt-wip-label {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #FBB45A;
-      background: rgba(251,180,90,0.12);
-      border: 1px solid rgba(251,180,90,0.25);
-      border-radius: 100px;
-      padding: 5px 14px;
-    }
-    .abt-wip-title {
-      font-family: var(--font-heading);
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      color: rgba(29,29,31,0.85);
-      margin: 0;
+      padding: 40px 40px 36px;
+      gap: 10px;
     }
     .abt-wip-sub {
       font-family: var(--font-mono);
-      font-size: 12px;
-      line-height: 1.8;
-      color: rgba(29,29,31,0.45);
-      max-width: 36ch;
+      font-size: 16.5px;
+      line-height: 1.9;
+      color: rgba(29,29,31,0.42);
+      max-width: 38ch;
       margin: 0;
     }
-    [data-theme="dark"] .abt-wip-title { color: rgba(240,237,232,0.88); }
-    [data-theme="dark"] .abt-wip-sub   { color: rgba(240,237,232,0.38); }
+    [data-theme="dark"] .abt-wip-sub { color: rgba(240,237,232,0.35); }
     .wip-canvas {
       display: block;
       width: 100%;
-      max-width: 560px;
-      height: 200px;
+      max-width: 600px;
+      height: 220px;
       flex-shrink: 0;
+      cursor: none;
     }
 
     /* ── Off-hours polaroid grid ───────────────────────────────── */
@@ -4938,7 +4936,7 @@
     .dna2-sig-role { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
 
     /* The T: breadth bar on top, then quote panel (left) + depth stem (right column) */
-    .dna2-t { display: flex; flex-direction: column; gap: 12px; }
+    .dna2-t { display: flex; flex-direction: column; gap: 10px; }
     /* Axis labels — Caveat, flanked by arrows that expand outward from the centre */
     .dna2-axis { display: flex; align-items: center; gap: 12px; }
     .dna2-axis.breadth { justify-content: center; }
@@ -4957,15 +4955,15 @@
     .dna2-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     /* Lower band shares the bar's 5-col rhythm: quote sits bottom-left, stem drops from centre (col 3), depth axis runs down col 4 */
     .dna2-lower { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; align-items: stretch; }
-    .dna2-stem { grid-column: 3 / 4; grid-row: 1; align-self: start; display: flex; flex-direction: column; gap: 10px; }
+    .dna2-stem { grid-column: 3 / 4; grid-row: 1; align-self: start; display: flex; flex-direction: column; gap: 8px; }
     .dna2-axis.depth { grid-column: 4 / 5; grid-row: 1; align-self: stretch; flex-direction: column; justify-content: center; gap: 10px; }
     .dna2-axis.depth .dna2-axis-label { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
 
     /* Tile — calm dark glass, accent only on hover/select */
     /* Every block — breadth and depth — is the SAME size for a groomed T */
     .dna2-tile {
-      position: relative; min-height: 82px; background: #141418; border-radius: 13px;
-      padding: 11px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+      position: relative; min-height: 76px; background: #141418; border-radius: 13px;
+      padding: 10px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;
       cursor: pointer; overflow: hidden; text-align: center;
       border: 1px solid rgba(255,255,255,0.07);
       transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s ease, background 0.3s ease;
@@ -9497,6 +9495,11 @@
       <!-- ── ABOUT ME SECTION ─────────────────────────────── -->
       <section class="am-section" id="aboutSection">
 
+        <!-- Section title -->
+        <div class="abt-header">
+          <h2 class="abt-title">About Me<span class="abt-title-sub">Get to know me</span></h2>
+        </div>
+
         <!-- Tab navigation -->
         <div class="abt-nav">
           <div class="abt-nav-pill">
@@ -9594,13 +9597,13 @@
               <div class="oh2-left">
                 <div class="oh2-deck" id="ohDeck">
                   <div class="oh2-card is-back">
-                    <img src="About%20Me%20section%20Images/About%20me%20section%203.jpeg" alt="Kayaking in Austin">
+                    <img src="About%20Me%20section%20Images/About%20me%20section%201.JPG" alt="At the cat café">
                   </div>
                   <div class="oh2-card is-mid">
                     <img src="About%20Me%20section%20Images/About%20me%20section%202.jpeg" alt="By the waterfront">
                   </div>
                   <div class="oh2-card is-front">
-                    <img src="About%20Me%20section%20Images/About%20me%20section%201.JPG" alt="At the cat café">
+                    <img src="About%20Me%20section%20Images/About%20me%20section%203.jpeg" alt="Kayaking in Austin">
                   </div>
                 </div>
                 <p class="oh2-hint">↖ drag to reveal next</p>
@@ -15007,17 +15010,42 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     }
   })();
 
-  /* ── About section: horizontal tab switching ───────────────── */
+  /* ── About section: horizontal tab switching + sliding highlight ─── */
   (function () {
     var tabs  = Array.from(document.querySelectorAll('.abt-tab'));
     var panes = Array.from(document.querySelectorAll('.abt-pane'));
     if (!tabs.length) return;
+
+    /* Sliding "thumb" that glides between tabs */
+    var pill  = document.querySelector('.abt-nav-pill');
+    var thumb = null;
+    if (pill) {
+      thumb = document.createElement('span');
+      thumb.className = 'abt-nav-thumb no-anim';
+      pill.insertBefore(thumb, pill.firstChild);
+    }
+    function moveThumb(tab, animate) {
+      if (!thumb || !tab) return;
+      if (!animate) thumb.classList.add('no-anim');
+      thumb.style.setProperty('--x', tab.offsetLeft + 'px');
+      thumb.style.setProperty('--w', tab.offsetWidth + 'px');
+      if (!animate) { thumb.offsetWidth; thumb.classList.remove('no-anim'); }
+    }
+    function activeTab() { return tabs.find(function (t) { return t.classList.contains('is-active'); }) || tabs[0]; }
+
+    /* Seed the thumb under the active tab (no animation), once fonts settle so widths are final */
+    function seed() { moveThumb(activeTab(), false); }
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(seed); }
+    requestAnimationFrame(seed);
+    window.addEventListener('resize', function () { moveThumb(activeTab(), false); });
+
     tabs.forEach(function (btn) {
       btn.addEventListener('click', function () {
         var target = this.dataset.pane;
         tabs.forEach(function (b) { b.classList.remove('is-active'); });
         panes.forEach(function (p) { p.classList.remove('is-active'); });
         this.classList.add('is-active');
+        moveThumb(this, true);
         var pane = document.getElementById('abt-' + target);
         if (pane) pane.classList.add('is-active');
         // boot WIP canvas on first reveal (wait for fonts so text samples correctly)
@@ -15033,121 +15061,237 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     });
   })();
 
-  /* ── WIP particle canvas ───────────────────────────────────── */
+  /* ── WIP glitch canvas ──────────────────────────────────────── */
   (function () {
     function initWipCanvas(canvas) {
       var dpr = window.devicePixelRatio || 1;
-      var W   = canvas.offsetWidth  || 560;
-      var H   = canvas.offsetHeight || 200;
+      var W   = canvas.offsetWidth  || 600;
+      var H   = canvas.offsetHeight || 300;
       canvas.width  = W * dpr;
       canvas.height = H * dpr;
       var ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
 
-      // ── render text to offscreen canvas and sample pixel targets ──
-      var off = document.createElement('canvas');
-      off.width = W; off.height = H;
-      var octx = off.getContext('2d');
-      var fSize = Math.max(28, Math.min(56, Math.floor(W / 7)));
-      octx.fillStyle = '#fff';
-      octx.font = '800 ' + fSize + 'px Montserrat, Arial Black, sans-serif';
-      octx.textAlign = 'center';
-      octx.textBaseline = 'middle';
-      // two lines so letters are big and clear
-      octx.fillText('Work In', W / 2, H * 0.36);
-      octx.fillText('Progress', W / 2, H * 0.72);
+      var TARGET = 'WORK IN PROGRESS';
+      var GLITCH_CHARS = '!@#$%^&*<>?/\\|[]{}~`01';
+      var isDark = function () {
+        return document.documentElement.getAttribute('data-theme') === 'dark';
+      };
 
-      var imgData = octx.getImageData(0, 0, W, H).data;
-      var targets = [];
-      var step = 7; // bigger step = fewer, more spaced-out dots
-      for (var y = 0; y < H; y += step) {
-        for (var x = 0; x < W; x += step) {
-          if (imgData[(y * W + x) * 4 + 3] > 100) {
-            targets.push({ x: x + (Math.random() - 0.5) * 2,
-                           y: y + (Math.random() - 0.5) * 2 });
-          }
-        }
-      }
-      // shuffle so convergence order is random
-      for (var s = targets.length - 1; s > 0; s--) {
-        var j = Math.floor(Math.random() * (s + 1));
-        var tmp = targets[s]; targets[s] = targets[j]; targets[j] = tmp;
-      }
-
-      // ── particles: start scattered across entire canvas ──────────
-      var particles = targets.map(function (t) {
+      /* ── per-character state ───────────────────────────────── */
+      var chars = TARGET.split('').map(function (ch, i) {
         return {
-          tx: t.x, ty: t.y,
-          x:  Math.random() * W,
-          y:  Math.random() * H,
-          vx: 0, vy: 0,
-          r:   1.2 + Math.random() * 1.0,
-          phase: Math.random() * Math.PI * 2,
-          freq:  0.4 + Math.random() * 0.7
+          target: ch,
+          display: ' ',
+          locked: false,
+          lockDelay: 600 + i * 110 + Math.random() * 200,  /* stagger lock-in */
+          scrambleUntil: 0
         };
       });
 
-      var startTs = null;
-      var CONVERGE = 1800; // ms for scatter→text
-      var raf;
+      /* ── scanline tears ────────────────────────────────────── */
+      var tears = [];
+      function spawnTear() {
+        tears.push({
+          y:      Math.random() * H,
+          height: 1 + Math.random() * 5,
+          offset: (Math.random() - 0.5) * 60,
+          life:   0,
+          maxLife: 60 + Math.random() * 80
+        });
+      }
+
+      /* ── chromatic aberration offset ───────────────────────── */
+      var caOffset = 0, caTarget = 0;
+
+      var startTs = null, raf;
+      var REVEAL_DONE = false;
+
+      /* schedule glitch bursts after reveal */
+      var nextGlitch = 0;
+
+      function scheduleGlitch(now) {
+        /* burst every 2.5–5 s */
+        nextGlitch = now + 4000 + Math.random() * 4000;
+      }
+
+      function triggerGlitch(now) {
+        /* un-lock some chars so they scramble again */
+        var count = 2 + Math.floor(Math.random() * 5);
+        for (var k = 0; k < count; k++) {
+          var idx = Math.floor(Math.random() * chars.length);
+          if (chars[idx].target !== ' ') {
+            chars[idx].locked  = false;
+            chars[idx].scrambleUntil = now + 500 + Math.random() * 600;
+          }
+        }
+        caTarget  = (Math.random() - 0.5) * 8;
+        for (var t = 0; t < 3; t++) spawnTear();
+        scheduleGlitch(now);
+      }
+
+      var _frame = 0;
+      function rndChar() {
+        return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+      }
+      function shouldScramble() {
+        return _frame % 5 === 0;
+      }
 
       function draw(ts) {
         raf = requestAnimationFrame(draw);
         if (!startTs) startTs = ts;
+        _frame++;
         var elapsed = ts - startTs;
+        var dark    = isDark();
 
-        // converge progress 0→1 with ease-out cubic
-        var p01 = Math.min(elapsed / CONVERGE, 1);
-        var ease = 1 - Math.pow(1 - p01, 3);
+        /* colour palette */
+        var accent  = dark ? '#6BB2F7' : '#E68A28';
+        var accentR = dark ? '107,178,247' : '230,138,40';
+        var textC   = dark ? 'rgba(215,238,255,0.95)' : 'rgba(255,240,200,0.97)';
+        var dimC    = dark ? 'rgba(107,178,247,0.35)'  : 'rgba(230,138,40,0.35)';
+        var bgScan  = dark ? 'rgba(107,178,247,0.06)'  : 'rgba(230,138,40,0.06)';
 
-        var dark = document.documentElement.getAttribute('data-theme') === 'dark';
-        ctx.clearRect(0, 0, W, H);
-        var t = ts * 0.001;
-
-        for (var i = 0; i < particles.length; i++) {
-          var p = particles[i];
-
-          // stronger spring ramps in as particles converge
-          var spring = 0.025 + ease * 0.06;
-          var drag   = 0.78  + ease * 0.07;
-          var dx = p.tx - p.x, dy = p.ty - p.y;
-          p.vx = p.vx * drag + dx * spring;
-          p.vy = p.vy * drag + dy * spring;
-
-          // gentle float only after mostly settled
-          var wobble = ease * ease;
-          p.x += p.vx + Math.sin(t * p.freq       + p.phase) * wobble * 0.6;
-          p.y += p.vy + Math.cos(t * p.freq * 1.3 + p.phase) * wobble * 0.5;
-
-          var pulse = 0.5 + 0.5 * Math.sin(t * p.freq * 2 + p.phase);
-          var alpha = ease * (0.55 + 0.45 * pulse);
-          var rad   = p.r + 0.4 * pulse;
-
-          // tight glow halo — only 2.5× radius so dots stay distinct
-          var glowR = rad * 2.5;
-          var grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR);
-          if (dark) {
-            grd.addColorStop(0,   'rgba(107,178,247,' + (alpha * 0.7) + ')');
-            grd.addColorStop(0.5, 'rgba(107,178,247,' + (alpha * 0.2) + ')');
-            grd.addColorStop(1,   'rgba(107,178,247,0)');
-          } else {
-            grd.addColorStop(0,   'rgba(251,140,50,' + (alpha * 0.65) + ')');
-            grd.addColorStop(0.5, 'rgba(251,140,50,' + (alpha * 0.18) + ')');
-            grd.addColorStop(1,   'rgba(251,140,50,0)');
-          }
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, glowR, 0, Math.PI * 2);
-          ctx.fillStyle = grd;
-          ctx.fill();
-
-          // bright core dot
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
-          ctx.fillStyle = dark
-            ? 'rgba(210,235,255,' + (0.7 + 0.3 * pulse) + ')'
-            : 'rgba(255,200,110,' + (0.7 + 0.3 * pulse) + ')';
-          ctx.fill();
+        /* chromatic aberration easing */
+        caOffset += (caTarget - caOffset) * 0.12;
+        if (Math.abs(caOffset - caTarget) < 0.2) {
+          caOffset = caTarget;
+          if (caTarget !== 0) caTarget = 0;
         }
+
+        ctx.clearRect(0, 0, W, H);
+
+        /* ── scanline background grid ─────────────────────────── */
+        ctx.save();
+        for (var ly = 0; ly < H; ly += 4) {
+          ctx.fillStyle = bgScan;
+          ctx.fillRect(0, ly, W, 1);
+        }
+        ctx.restore();
+
+        /* ── update char reveal ───────────────────────────────── */
+        var allLocked = true;
+        for (var i = 0; i < chars.length; i++) {
+          var c = chars[i];
+          if (c.target === ' ') { c.display = ' '; continue; }
+          if (!c.locked) {
+            allLocked = false;
+            if (elapsed >= c.lockDelay || (REVEAL_DONE && ts >= c.scrambleUntil)) {
+              c.display = c.target;
+              c.locked  = true;
+            } else {
+              if (shouldScramble()) c.display = rndChar();
+            }
+          }
+        }
+        if (allLocked && !REVEAL_DONE) {
+          REVEAL_DONE = true;
+          scheduleGlitch(ts);
+        }
+
+        /* trigger periodic glitch burst */
+        if (REVEAL_DONE && ts >= nextGlitch) triggerGlitch(ts);
+
+        /* re-scramble unlocked chars */
+        if (REVEAL_DONE) {
+          for (var i = 0; i < chars.length; i++) {
+            var c = chars[i];
+            if (!c.locked && c.target !== ' ' && shouldScramble()) c.display = rndChar();
+          }
+        }
+
+        /* ── render main text (3 passes for glow) ─────────────── */
+        var fSize = Math.min(68, Math.floor(W / 6));
+        var line1 = chars.slice(0, 7);    /* WORK IN */
+        var line2 = chars.slice(8);       /* PROGRESS */
+
+        function drawLine(glyphs, cx, cy, pass) {
+          var str = glyphs.map(function (c) { return c.display; }).join('');
+          ctx.font = '800 ' + fSize + 'px "JetBrains Mono", "Courier New", monospace';
+          ctx.textAlign    = 'center';
+          ctx.textBaseline = 'middle';
+
+          if (pass === 0) {
+            /* outer bloom */
+            ctx.shadowColor = accent;
+            ctx.shadowBlur  = 28;
+            ctx.fillStyle   = 'rgba(' + accentR + ',0.3)';
+            ctx.fillText(str, cx, cy);
+          } else if (pass === 1) {
+            /* chromatic R shift */
+            ctx.shadowBlur = 0;
+            ctx.fillStyle  = 'rgba(255,80,80,0.25)';
+            ctx.fillText(str, cx + caOffset, cy - 1);
+            /* chromatic B shift */
+            ctx.fillStyle  = 'rgba(80,140,255,0.25)';
+            ctx.fillText(str, cx - caOffset, cy + 1);
+          } else {
+            /* crisp core */
+            ctx.shadowColor = accent;
+            ctx.shadowBlur  = 6;
+            /* locked chars: bright / unlocked: dim */
+            glyphs.forEach(function (c, gi) {
+              var before = glyphs.slice(0, gi).map(function(x){return x.display;}).join('');
+              var charX  = cx - ctx.measureText(glyphs.map(function(x){return x.display;}).join('')).width / 2
+                           + ctx.measureText(before).width
+                           + ctx.measureText(c.display).width / 2;
+              ctx.fillStyle = c.locked ? textC : dimC;
+              ctx.fillText(c.display, charX, cy);
+            });
+          }
+        }
+
+        var lineH = fSize * 1.35;
+        var y1 = H / 2 - lineH / 2;
+        var y2 = H / 2 + lineH / 2;
+
+        ctx.save();
+        /* pass 0: bloom */
+        drawLine(line1, W / 2, y1, 0);
+        drawLine(line2, W / 2, y2, 0);
+        /* pass 1: chromatic */
+        drawLine(line1, W / 2, y1, 1);
+        drawLine(line2, W / 2, y2, 1);
+        /* pass 2: crisp */
+        drawLine(line1, W / 2, y1, 2);
+        drawLine(line2, W / 2, y2, 2);
+        ctx.restore();
+
+        /* ── cursor blink after last char ─────────────────────── */
+        if (REVEAL_DONE) {
+          var blink = Math.floor(ts / 530) % 2 === 0;
+          if (blink) {
+            ctx.save();
+            ctx.font      = '800 ' + fSize + 'px "JetBrains Mono", monospace';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            var lastLineW = ctx.measureText('PROGRESS').width;
+            var cursorX   = W / 2 + lastLineW / 2 + 4;
+            ctx.shadowColor = accent;
+            ctx.shadowBlur  = 10;
+            ctx.fillStyle   = accent;
+            ctx.fillRect(cursorX, y2 - fSize * 0.45, fSize * 0.08, fSize * 0.9);
+            ctx.restore();
+          }
+        }
+
+        /* ── scanline tear artifacts ───────────────────────────── */
+        ctx.save();
+        tears = tears.filter(function (tr) {
+          tr.life++;
+          var progress = tr.life / tr.maxLife;
+          var alpha    = Math.sin(progress * Math.PI) * 0.4;
+          if (alpha <= 0) return false;
+          /* grab a strip and shift it */
+          try {
+            var imgData = ctx.getImageData(0, tr.y, W, tr.height);
+            ctx.putImageData(imgData, tr.offset, tr.y);
+            ctx.fillStyle = 'rgba(' + accentR + ',' + alpha * 0.3 + ')';
+            ctx.fillRect(0, tr.y, W, tr.height);
+          } catch (e) {}
+          return tr.life < tr.maxLife;
+        });
+        ctx.restore();
       }
 
       raf = requestAnimationFrame(draw);
@@ -15156,6 +15300,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         if (!canvas.closest('.abt-pane').classList.contains('is-active')) {
           cancelAnimationFrame(raf);
           canvas._wipBooted = false;
+          REVEAL_DONE = false;
         }
       });
     }
@@ -15192,25 +15337,31 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
     render();
 
-    var drag = { active: false, card: null, sx: 0, sy: 0 };
+    var drag = { active: false, card: null, sx: 0, sy: 0, moved: false };
 
     function getFront() { return cards[order[order.length - 1]]; }
 
-    deck.addEventListener('mousedown',  onStart);
-    deck.addEventListener('touchstart', onStart, { passive: false });
+    /* Attach directly to the front card so there's no target ambiguity */
+    function bindFront() {
+      var fc = getFront();
+      fc.addEventListener('mousedown',  onStart);
+      fc.addEventListener('touchstart', onStart, { passive: false });
+    }
+    bindFront();
 
     function onStart(e) {
-      var fc = getFront();
-      if (e.target.closest('.oh2-card') !== fc) return;
-      if (e.cancelable) e.preventDefault();
+      if (drag.active) return;
+      e.preventDefault();
       var pt = e.touches ? e.touches[0] : e;
+      var fc = getFront();
       drag.active = true;
+      drag.moved  = false;
       drag.card   = fc;
       drag.sx     = pt.clientX;
       drag.sy     = pt.clientY;
-      fc.classList.add('is-dragging');
-      fc.classList.remove('is-front');
-      document.addEventListener('mousemove',  onMove);
+      fc.style.transition = 'none';
+      fc.style.zIndex = '10';
+      document.addEventListener('mousemove',  onMove, { passive: false });
       document.addEventListener('mouseup',    onEnd);
       document.addEventListener('touchmove',  onMove, { passive: false });
       document.addEventListener('touchend',   onEnd);
@@ -15218,11 +15369,14 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
     function onMove(e) {
       if (!drag.active) return;
-      if (e.cancelable) e.preventDefault();
+      e.preventDefault();
       var pt = e.touches ? e.touches[0] : e;
       var dx = pt.clientX - drag.sx;
       var dy = pt.clientY - drag.sy;
-      drag.card.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + (dx * 0.035) + 'deg) scale(1.04)';
+      drag.moved = true;
+      drag.dx = dx; drag.dy = dy;
+      drag.card.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + (dx * 0.03) + 'deg) scale(1.05)';
+      drag.card.style.boxShadow = '0 28px 80px rgba(0,0,0,0.32)';
     }
 
     function onEnd(e) {
@@ -15239,34 +15393,38 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       var dist = Math.sqrt(dx * dx + dy * dy);
       var c = drag.card;
 
-      if (dist > 72) {
-        /* Fly off in drag direction, then go to back */
-        var angle  = Math.atan2(dy, dx);
-        var flyX   = Math.cos(angle) * 700;
-        var flyY   = Math.sin(angle) * 700;
-        c.style.transition = 'transform 0.42s cubic-bezier(0.4,0,0.8,0.6), opacity 0.32s ease';
-        c.style.transform  = 'translate(' + flyX + 'px,' + flyY + 'px) rotate(' + (dx * 0.08) + 'deg) scale(0.88)';
+      if (drag.moved && dist > 72) {
+        /* Fly off in drag direction */
+        var angle = Math.atan2(dy, dx);
+        var flyX  = Math.cos(angle) * 700;
+        var flyY  = Math.sin(angle) * 700;
+        c.style.transition = 'transform 0.4s cubic-bezier(0.4,0,0.8,0.6), opacity 0.3s ease, box-shadow 0.3s ease';
+        c.style.transform  = 'translate(' + flyX + 'px,' + flyY + 'px) rotate(' + (dx * 0.08) + 'deg) scale(0.85)';
         c.style.opacity    = '0';
-        c.classList.remove('is-dragging');
+        c.style.boxShadow  = '';
 
         setTimeout(function () {
-          /* Silently move card to back of order */
+          /* Move to back of order silently */
           var frontIdx = order.pop();
           order.unshift(frontIdx);
-          /* Reset card silently (no transition) */
           c.style.transition = 'none';
           c.style.transform  = '';
-          c.style.opacity    = '';
+          c.style.opacity    = '1';
+          c.style.zIndex     = '';
           c.offsetHeight;
-          /* Re-render with spring animation */
           render();
-        }, 430);
+          /* Re-bind drag to new front card */
+          setTimeout(function() { bindFront(); }, 20);
+        }, 420);
       } else {
-        /* Not dragged far enough — snap back */
-        c.classList.remove('is-dragging');
-        c.style.transform = '';
+        /* Snap back */
+        c.style.transition = '';
+        c.style.transform  = '';
+        c.style.boxShadow  = '';
+        c.style.zIndex     = '';
         render();
       }
+      drag.card = null;
     }
   })();
   </script>
