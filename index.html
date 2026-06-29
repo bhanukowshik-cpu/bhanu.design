@@ -2638,7 +2638,28 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 15vh 56px 34px;
+      padding: clamp(40px, 6vh, 72px) 56px clamp(96px, 13vh, 140px);
+    }
+    .footer-spread {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 72px;
+      flex-wrap: wrap;
+    }
+    .footer-col-left {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 28px;
+      max-width: 560px;
+    }
+    .footer-contact {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
     }
     .footer-row {
       display: flex;
@@ -2725,24 +2746,20 @@
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 6px;
       font-family: var(--font-heading);
     }
-    .fc-hook {
-      font-size: clamp(40px, 5.4vw, 78px);
-      font-weight: 800;
-      line-height: 0.96;
-      letter-spacing: -0.035em;
+    .fc-line {
+      font-size: clamp(34px, 4.6vw, 64px);
+      font-weight: 600;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
       color: var(--color-white);
     }
-    .fc-answer {
-      font-family: var(--font-heading);
-      font-size: clamp(20px, 2.4vw, 34px);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: transparent;
-      -webkit-text-stroke: 1.4px rgba(255,255,255,0.78);
-      text-stroke: 1.4px rgba(255,255,255,0.78);
+    .fc-line--em {
+      font-style: italic;
+      font-weight: 500;
+      color: rgba(255,255,255,0.5);
     }
 
     .footer-cta-sub {
@@ -2789,9 +2806,16 @@
       border-color: var(--primary);
       transform: translateY(-2px);
     }
-    .footer-copyright {
-      margin-top: 0;
-      padding-top: 44px;
+    .footer-bottombar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .footer-copyright,
+    .footer-madewith {
       font-family: var(--font-mono);
       font-size: 12px;
       letter-spacing: 0.02em;
@@ -2806,38 +2830,72 @@
       align-items: center;
       justify-content: center;
       width: 100%;
-      padding: 28px 0;
+      padding: 4px 0;
     }
     .footer-note {
       display: flex;
       flex-direction: column;
       align-items: center;
-      max-width: 560px;
+      max-width: 600px;
+      flex: 0 1 auto;
       opacity: 0;
       transform: translateY(64px);
       transition: opacity 1.1s cubic-bezier(0.2,0.7,0.2,1),
                   transform 1.1s cubic-bezier(0.2,0.7,0.2,1);
     }
     .footer-note.in { opacity: 1; transform: translateY(0); }
+    .fn-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.42);
+      margin-bottom: 14px;
+    }
+    .fn-paper {
+      --rl: clamp(38px, 3.4vw, 48px);
+      position: relative;
+      width: clamp(380px, 46vw, 620px);
+      max-width: 100%;
+      padding: calc(var(--rl) * 0.58) 40px calc(var(--rl) * 0.58) 64px;
+      background-color: #e9e4d8;
+      background-image:
+        repeating-linear-gradient(to bottom,
+          transparent 0,
+          transparent calc(var(--rl) * 0.69),
+          rgba(46,42,34,0.12) calc(var(--rl) * 0.69),
+          rgba(46,42,34,0.12) calc(var(--rl) * 0.69 + 1px),
+          transparent calc(var(--rl) * 0.69 + 1px),
+          transparent var(--rl)),
+        linear-gradient(90deg,
+          transparent 0 48px,
+          rgba(158,112,98,0.28) 48px 49px,
+          transparent 49px);
+      background-origin: content-box, border-box;
+      background-clip: content-box, border-box;
+      background-repeat: repeat, no-repeat;
+      border-radius: 4px;
+      border: 1px solid rgba(120,108,86,0.18);
+      transform: rotate(-0.6deg);
+    }
     .fn-letter {
       margin: 0;
-      max-width: 520px;
       font-family: 'Caveat', cursive;
       font-weight: 600;
-      font-size: clamp(22px, 2.3vw, 29px);
-      line-height: 44px;
-      color: rgba(255,255,255,0.82);
+      font-size: calc(var(--rl) * 0.66);
+      line-height: var(--rl);
+      color: #2f3540;
       text-align: left;
-      background-image: repeating-linear-gradient(
-        to bottom,
-        transparent 0,
-        transparent 43px,
-        rgba(255,255,255,0.10) 43px,
-        rgba(255,255,255,0.10) 44px);
+    }
+    @media (max-width: 767px) {
+      .fn-paper { width: 88vw; --rl: 34px; padding-left: 54px; }
+      .footer-note { max-width: 100%; }
+      .fn-eyebrow { margin-bottom: 14px; }
     }
     .footer-love {
       position: relative;
-      margin-top: 30px;
+      margin-top: 20px;
       width: 60px; height: 60px;
       display: inline-flex; align-items: center; justify-content: center;
       background: none; border: none; padding: 0;
@@ -2867,14 +2925,37 @@
     }
     .fl-particle svg { width: 100%; height: 100%; fill: currentColor; }
     .footer-love-count {
-      margin-top: 20px;
+      position: relative;
+      isolation: isolate;
+      margin-top: 14px;
       display: inline-flex; align-items: baseline; gap: 8px;
-      padding: 10px 18px; border-radius: 100px;
-      background: rgba(255,255,255,0.05);
-      -webkit-backdrop-filter: blur(14px) saturate(140%);
-      backdrop-filter: blur(14px) saturate(140%);
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+      padding: 11px 22px; border-radius: 999px;
+      color: #fff;
+      background:
+        linear-gradient(0deg,
+          rgba(255,255,255,0)    0%,
+          rgba(255,255,255,0.18) 2.45%,
+          rgba(255,255,255,0)    126.14%),
+        rgba(23,23,23,0.55);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      backdrop-filter: blur(20px) saturate(160%);
+      box-shadow:
+         1.1px  2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+        -1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+         2.0px  3.0px 2.0px  0.0px rgba(0,0,0,0.1) inset;
+    }
+    .footer-love-count::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(180deg, rgba(100,100,100,0.5) 9.46%, rgba(180,180,180,0.5) 92.23%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
     }
     .flc-num { font-family: var(--font-mono); font-weight: 700; font-size: 15px; color: #fff; }
     .flc-label { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.02em; color: rgba(255,255,255,0.5); }
@@ -2992,17 +3073,21 @@
     }
 
     /* ── Footer responsive overrides (must come AFTER base footer CSS) ── */
+    @media (max-width: 1023px) {
+      .footer-spread        { flex-direction: column; align-items: stretch; gap: 50px; }
+      .footer-col-left      { max-width: 100%; }
+    }
     @media (max-width: 767px) {
       .site-footer          { min-height: 100vh; min-height: 100svh; }
-      .footer-content       { padding: 11vh 22px 26px; }
-      .footer-row           { flex-direction: column; align-items: flex-start; gap: 36px; }
+      .footer-content       { padding: 9vh 22px clamp(96px, 16vh, 150px); }
       .footer-status        { font-size: 10px; padding: 7px 13px; gap: 7px; }
-      .fc-hook              { font-size: clamp(34px, 10vw, 52px); }
-      .footer-right         { width: 100%; }
+      .fc-line              { font-size: clamp(30px, 9vw, 46px); }
+      .footer-contact       { width: 100%; }
       .footer-mail-glass    { width: 100%; box-sizing: border-box; }
       .footer-mail-text     { white-space: normal; overflow-wrap: anywhere; }
       .footer-copy-btn      { width: 24px; height: 24px; flex-shrink: 0; }
-      .footer-copyright     { padding-top: 32px; }
+      .fn-paper             { width: 100%; }
+      .footer-bottombar     { flex-direction: column; align-items: flex-start; gap: 6px; }
     }
 
     /* modern pill toast */
@@ -3984,11 +4069,10 @@
       min-height: 560px;
       position: relative;
       overflow: hidden;
-      transition: min-height 0.4s cubic-bezier(0.16,1,0.3,1);
     }
     /* Design DNA pane floats free — no container chrome (Apple-style) */
     .am-panel:has([data-am-pane="design-dna"].is-active) {
-      min-height: 720px;
+      min-height: 800px;
       border-color: transparent;
       overflow: visible;
     }
@@ -4005,29 +4089,23 @@
       padding-block: 10px; white-space: normal;
     }
     .am-inner:has([data-am-pane="design-dna"].is-active) .am-item-label { white-space: normal; }
-    /* DNA content column: caption at top, T-shape centered */
+    /* DNA content column: T-shape centered both axes */
     .am-panel-pane[data-am-pane="design-dna"] {
       padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
     }
     .am-panel-pane[data-am-pane="design-dna"] .dna-t-grid { margin: auto 0; }
-    .dna-caption { text-align: center; padding-top: 6px; }
-    .dna-caption-title {
-      font-family: var(--font-heading);
-      font-size: 22px; font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--secondary);
+    /* DNA pill sub-copy — white & readable on the dark glass */
+    .am-control-item[data-am-tab="design-dna"] .am-item-inner-body {
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: rgba(29,29,31,0.7);
     }
-    .dna-caption-sub {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: rgba(29,29,31,0.5);
-      margin-top: 6px;
-    }
-    [data-theme="dark"] .dna-caption-title { color: rgba(240,237,232,0.9); }
-    [data-theme="dark"] .dna-caption-sub   { color: rgba(240,237,232,0.45); }
+    [data-theme="dark"] .am-control-item[data-am-tab="design-dna"] .am-item-inner-title { color: #fff; }
+    [data-theme="dark"] .am-control-item[data-am-tab="design-dna"] .am-item-inner-body  { color: rgba(255,255,255,0.82); }
     /* Default (off-screen below) + enter animation — Apple: 600ms / 250ms delay */
     .am-panel-pane {
       position: absolute;
@@ -4170,73 +4248,49 @@
     /* ─── DESIGN DNA T-SHAPE ────────────────────────────────── */
     .dna-t-grid {
       display: grid;
-      grid-template-columns: repeat(5, 140px);
-      grid-template-rows: repeat(6, 90px);
-      gap: 10px;
+      grid-template-columns: repeat(5, 158px);
+      grid-template-rows: repeat(6, 114px);
+      gap: 12px;
       margin-top: 0;
     }
+    /* Each block is a 3D cube — head-on & flat at rest, one full X-spin on hover */
     .dna-cell {
       position: relative;
+      transform-style: preserve-3d;
+      transform: perspective(950px) rotateX(0deg);
+      transition: transform 1s cubic-bezier(0.45,0.05,0.25,1);
+      cursor: pointer;
+    }
+    .dna-cell:hover { transform: perspective(950px) rotateX(360deg); }
+    /* Cube faces — content on all four sides, borderless glass */
+    .dna-face {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 158px; height: 114px;
+      margin: -57px 0 0 -79px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 8px 6px;
       border-radius: 16px;
-      background: rgba(255,255,255,0.55);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
       background:
         linear-gradient(155deg,
-          color-mix(in srgb, var(--c1) 22%, rgba(255,255,255,0.72)) 0%,
-          color-mix(in srgb, var(--c2) 12%, rgba(255,255,255,0.5))  100%);
-      border: 1px solid rgba(255,255,255,0.8);
-      border-color: color-mix(in srgb, var(--c1) 40%, rgba(255,255,255,0.6));
-      backdrop-filter: blur(16px) saturate(1.5);
-      -webkit-backdrop-filter: blur(16px) saturate(1.5);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+          color-mix(in srgb, var(--c1) 16%, #ffffff) 0%,
+          color-mix(in srgb, var(--c2) 9%,  #f3f3f3) 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.92),
-        0 6px 18px color-mix(in srgb, var(--c2) 16%, transparent),
-        0 2px 6px rgba(0,0,0,0.05);
-      cursor: default;
-      overflow: visible;
-      transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        inset 0 1px 0 rgba(255,255,255,0.9),
+        0 8px 22px color-mix(in srgb, var(--c2) 14%, transparent),
+        0 2px 6px rgba(0,0,0,0.06);
     }
-    /* Per-color glow rising from the bottom-left on hover */
-    .dna-cell::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background: radial-gradient(ellipse at 0% 120%,
-        color-mix(in srgb, var(--c2) 42%, transparent) 0%,
-        color-mix(in srgb, var(--c1) 22%, transparent) 38%,
-        transparent 72%);
-      opacity: 0;
-      transition: opacity 0.35s ease;
-      pointer-events: none;
+    .dna-f1 { transform: translateZ(57px); }
+    .dna-f2 { transform: rotateX(90deg)  translateZ(57px); }
+    .dna-f3 { transform: rotateX(180deg) translateZ(57px); }
+    .dna-f4 { transform: rotateX(270deg) translateZ(57px); }
+    @media (prefers-reduced-motion: reduce) {
+      .dna-cell, .dna-cell:hover { transition: none; transform: perspective(950px) rotateX(0deg); }
     }
-    /* Noise grain overlay */
-    .dna-cell::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 13px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
-      opacity: 0;
-      mix-blend-mode: overlay;
-      transition: opacity 0.35s ease;
-      pointer-events: none;
-    }
-    .dna-cell:hover {
-      border-color: color-mix(in srgb, var(--c1) 58%, transparent);
-      transform: translateY(-2px);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.98),
-        0 12px 28px color-mix(in srgb, var(--c2) 26%, transparent),
-        0 4px 10px rgba(0,0,0,0.06);
-    }
-    .dna-cell:hover::before { opacity: 1; }
-    .dna-cell:hover::after  { opacity: 1; }
     /* Grid placement */
     .dna-b1 { grid-column: 1; grid-row: 1; }
     .dna-b2 { grid-column: 2; grid-row: 1; }
@@ -4266,24 +4320,23 @@
     }
     /* Icon — black SVG recolored via mask + per-skill gradient */
     .dna-icon {
-      width: 38px; height: 38px;
+      width: 48px; height: 48px;
       display: block;
       flex-shrink: 0;
       background: linear-gradient(150deg, var(--c1,#9a9a9a), var(--c2,#5f5f5f));
-      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-      -webkit-mask-position: center;  mask-position: center;
-      -webkit-mask-size: contain;     mask-size: contain;
+      -webkit-mask: var(--icon) center / contain no-repeat;
+      mask: var(--icon) center / contain no-repeat;
     }
     /* Label — colored to match the icon */
     .dna-label {
       font-family: var(--font-heading);
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 600;
       letter-spacing: -0.01em;
       color: var(--lc, rgba(29,29,31,0.6));
       text-align: center;
       line-height: 1.25;
-      margin-top: 9px;
+      margin-top: 12px;
     }
     /* Tooltip callout */
     .dna-tip {
@@ -4326,27 +4379,15 @@
     .dna-b4 .dna-tip::after, .dna-b5 .dna-tip::after { left: auto; right: 12%; }
     .dna-b1:hover .dna-tip, .dna-b2:hover .dna-tip { transform: translateX(0) translateY(0); }
     .dna-b4:hover .dna-tip, .dna-b5:hover .dna-tip { transform: translateX(0) translateY(0); }
-    /* Dark mode */
-    [data-theme="dark"] .dna-cell {
-      background: rgba(255,255,255,0.06);
+    /* Dark mode — borderless dark glass cube faces */
+    [data-theme="dark"] .dna-face {
       background:
         linear-gradient(155deg,
-          color-mix(in srgb, var(--c1) 16%, rgba(255,255,255,0.04)) 0%,
-          color-mix(in srgb, var(--c2) 7%,  rgba(255,255,255,0.02)) 60%,
-          rgba(255,255,255,0.015) 100%);
-      border-color: color-mix(in srgb, var(--c1) 26%, transparent);
+          color-mix(in srgb, var(--c1) 20%, #1b1b1b) 0%,
+          color-mix(in srgb, var(--c2) 10%, #151515) 100%);
       box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--c1) 42%, transparent),
-        inset 0 0 18px color-mix(in srgb, var(--c2) 7%, transparent),
-        0 6px 22px rgba(0,0,0,0.32);
-    }
-    [data-theme="dark"] .dna-cell:hover {
-      border-color: color-mix(in srgb, var(--c1) 60%, transparent);
-      box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--c1) 70%, transparent),
-        inset 0 0 24px color-mix(in srgb, var(--c2) 16%, transparent),
-        0 14px 32px color-mix(in srgb, var(--c2) 30%, transparent),
-        0 6px 18px rgba(0,0,0,0.42);
+        inset 0 1px 0 color-mix(in srgb, var(--c1) 45%, transparent),
+        0 10px 30px rgba(0,0,0,0.5);
     }
     [data-theme="dark"] .dna-depth-line::before { background: rgba(240,237,232,0.1); }
     [data-theme="dark"] .dna-tip {
@@ -8386,6 +8427,7 @@
         <span class="nav-indicator" id="navIndicator"></span>
         <a class="nav-work" href="#s2Section">WORK</a>
         <a class="nav-work" href="#aboutSection">ABOUT</a>
+        <a class="nav-work" href="#testimonialsSection">TESTIMONIALS</a>
         <a class="nav-work" href="./resume.pdf" target="_blank" rel="noopener">RESUME</a>
         <a class="nav-work" href="#contactSection">CONTACT</a>
       </div>
@@ -8415,6 +8457,7 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="#s2Section">Work</a>
     <a href="#aboutSection">About</a>
+    <a href="#testimonialsSection">Testimonials</a>
     <a href="./resume.pdf" target="_blank" rel="noopener">Resume</a>
     <a href="#contactSection">Contact</a>
   </div>
@@ -8963,57 +9006,67 @@
               <div class="dna-t-grid">
 
                 <!-- ROW 1: breadth bar -->
-                <div class="dna-cell dna-b1" style="--c1:#86DE5C;--c2:#2FA24E;--lc:#43C167">
-                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Customer.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Customer.svg')"></span>
-                  <span class="dna-label">Customer Discovery</span>
-                  <div class="dna-tip">Finding what users actually need, not what they say they want.</div>
+                <div class="dna-cell dna-b1" style="--c1:#86DE5C;--c2:#2FA24E;--lc:#43C167;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Customer.svg')">
+                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Customer Discovery</span></div>
+                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Customer Discovery</span></div>
+                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Customer Discovery</span></div>
+                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Customer Discovery</span></div>
                 </div>
-                <div class="dna-cell dna-b2" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8">
-                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Strategy.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Strategy.svg')"></span>
-                  <span class="dna-label">Product Strategy</span>
-                  <div class="dna-tip">Connecting design decisions to business outcomes that matter.</div>
+                <div class="dna-cell dna-b2" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Strategy.svg')">
+                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Product Strategy</span></div>
+                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Product Strategy</span></div>
+                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Product Strategy</span></div>
+                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Product Strategy</span></div>
                 </div>
-                <div class="dna-cell dna-b3" style="--c1:#B486F2;--c2:#7C3AED;--lc:#9D6BF0">
-                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Experience%20Design.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Experience%20Design.svg')"></span>
-                  <span class="dna-label">Experience Design</span>
-                  <div class="dna-tip">My core craft. Where depth lives.</div>
+                <div class="dna-cell dna-b3" style="--c1:#B486F2;--c2:#7C3AED;--lc:#9D6BF0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Experience%20Design.svg')">
+                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Experience Design</span></div>
+                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Experience Design</span></div>
+                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Experience Design</span></div>
+                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Experience Design</span></div>
                 </div>
-                <div class="dna-cell dna-b4" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E">
-                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Build.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Build.svg')"></span>
-                  <span class="dna-label">Product Builder</span>
-                  <div class="dna-tip">Moving from 0→1 with engineering teams. Shipping is a design decision.</div>
+                <div class="dna-cell dna-b4" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Build.svg')">
+                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Product Builder</span></div>
+                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Product Builder</span></div>
+                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Product Builder</span></div>
+                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Product Builder</span></div>
                 </div>
-                <div class="dna-cell dna-b5" style="--c1:#6FE0A0;--c2:#1FA55E;--lc:#34BE72">
-                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg')"></span>
-                  <span class="dna-label">Engineering Collab</span>
-                  <div class="dna-tip">Working with engineers as partners, not handoff recipients.</div>
+                <div class="dna-cell dna-b5" style="--c1:#6FE0A0;--c2:#1FA55E;--lc:#34BE72;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg')">
+                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Engineering Collab</span></div>
+                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Engineering Collab</span></div>
+                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Engineering Collab</span></div>
+                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Engineering Collab</span></div>
                 </div>
 
                 <!-- COLUMN 3: depth stem -->
-                <div class="dna-cell dna-d1" style="--c1:#5FD9B4;--c2:#149E78;--lc:#1FC096">
-                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg')"></span>
-                  <span class="dna-label">Research</span>
-                  <div class="dna-tip">Synthesizing signals into clear design direction.</div>
+                <div class="dna-cell dna-d1" style="--c1:#5FD9B4;--c2:#149E78;--lc:#1FC096;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg')">
+                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Research</span></div>
+                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Research</span></div>
+                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Research</span></div>
+                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Research</span></div>
                 </div>
-                <div class="dna-cell dna-d2" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8">
-                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/principles.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/principles.svg')"></span>
-                  <span class="dna-label">First Principles</span>
-                  <div class="dna-tip">Breaking complex problems down to their fundamental truths.</div>
+                <div class="dna-cell dna-d2" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/principles.svg')">
+                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">First Principles</span></div>
+                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">First Principles</span></div>
+                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">First Principles</span></div>
+                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">First Principles</span></div>
                 </div>
-                <div class="dna-cell dna-d3" style="--c1:#CD7CEE;--c2:#B0379E;--lc:#CB5AD0">
-                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg')"></span>
-                  <span class="dna-label">Systems Thinking</span>
-                  <div class="dna-tip">Designing for scale, not just the screen in front of you.</div>
+                <div class="dna-cell dna-d3" style="--c1:#CD7CEE;--c2:#B0379E;--lc:#CB5AD0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg')">
+                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Systems Thinking</span></div>
+                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Systems Thinking</span></div>
+                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Systems Thinking</span></div>
+                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Systems Thinking</span></div>
                 </div>
-                <div class="dna-cell dna-d4" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E">
-                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')"></span>
-                  <span class="dna-label">Builder Mindset</span>
-                  <div class="dna-tip">Bias toward momentum. Iteration over perfection.</div>
+                <div class="dna-cell dna-d4" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')">
+                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Builder Mindset</span></div>
+                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Builder Mindset</span></div>
+                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Builder Mindset</span></div>
+                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Builder Mindset</span></div>
                 </div>
-                <div class="dna-cell dna-d5" style="--c1:#5FE0CE;--c2:#12A38E;--lc:#1FC0A8">
-                  <span class="dna-icon" style="-webkit-mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg');mask-image:url('T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg')"></span>
-                  <span class="dna-label">Measured Impact</span>
-                  <div class="dna-tip">Tying design to metrics that actually change the trajectory.</div>
+                <div class="dna-cell dna-d5" style="--c1:#5FE0CE;--c2:#12A38E;--lc:#1FC0A8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg')">
+                  <div class="dna-face dna-f1"><span class="dna-icon"></span><span class="dna-label">Measured Impact</span></div>
+                  <div class="dna-face dna-f2"><span class="dna-icon"></span><span class="dna-label">Measured Impact</span></div>
+                  <div class="dna-face dna-f3"><span class="dna-icon"></span><span class="dna-label">Measured Impact</span></div>
+                  <div class="dna-face dna-f4"><span class="dna-icon"></span><span class="dna-label">Measured Impact</span></div>
                 </div>
 
               </div>
@@ -9184,48 +9237,48 @@
 
     <!-- ── content: headline (left) + glass mail (right) ── -->
     <div class="footer-content">
-      <div class="footer-row">
 
-        <div class="footer-left">
+      <div class="footer-spread">
+
+        <div class="footer-col-left">
           <span class="footer-status">
             <span class="ph-dot"></span>
             <span class="footer-status-text">Open to the right team</span>
           </span>
 
           <h2 class="footer-cta">
-            <span class="fc-hook">Building something cool?</span>
-            <span class="fc-answer">I’m just a mail away.</span>
+            <span class="fc-line">Building something cool?</span>
+            <span class="fc-line fc-line--em">I’m just a mail away.</span>
           </h2>
-        </div>
 
-        <div class="footer-right">
-          <span class="footer-right-label">Shoot me a mail at</span>
-          <div class="footer-mail-glass">
-            <a class="footer-mail-text" href="mailto:kowshikbhanu1000@gmail.com">kowshikbhanu1000@gmail.com</a>
-            <button class="footer-copy-btn" data-copy="kowshikbhanu1000@gmail.com" data-toast="mail" aria-label="Copy email">
-          <svg class="icon-clipboard" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <svg class="icon-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9bd309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="4 12 9 17 20 7"/></svg>
-        </button>
+          <div class="footer-contact">
+            <span class="footer-right-label">Shoot me a mail at</span>
+            <div class="footer-mail-glass">
+              <a class="footer-mail-text" href="mailto:kowshikbhanu1000@gmail.com">kowshikbhanu1000@gmail.com</a>
+              <button class="footer-copy-btn" data-copy="kowshikbhanu1000@gmail.com" data-toast="mail" aria-label="Copy email">
+                <svg class="icon-clipboard" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <svg class="icon-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9bd309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="4 12 9 17 20 7"/></svg>
+              </button>
+            </div>
+            <div class="footer-socials">
+              <a class="footer-soc" href="https://www.linkedin.com/in/bhanukowshik/" target="_blank" rel="noopener" aria-label="LinkedIn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.11 1 2.5 1s2.48 1.12 2.48 2.5zM.2 8h4.6v13H.2V8zm7.4 0h4.41v1.78h.06c.61-1.16 2.1-2.38 4.32-2.38 4.62 0 5.47 3.04 5.47 7V21h-4.6v-6.6c0-1.57-.03-3.6-2.2-3.6-2.2 0-2.54 1.72-2.54 3.49V21h-4.6V8z"/></svg>
+              </a>
+              <a class="footer-soc" href="https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal" target="_blank" rel="noopener" aria-label="Product Hunt">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="1.8"/><path d="M9 7h4.2a2.8 2.8 0 0 1 0 5.6H9V7zm0 5.6V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+              <a class="footer-soc" href="mailto:kowshikbhanu1000@gmail.com" aria-label="Email">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+              </a>
+            </div>
           </div>
-
-          <div class="footer-socials">
-                  <a class="footer-soc" href="https://www.linkedin.com/in/bhanukowshik/" target="_blank" rel="noopener" aria-label="LinkedIn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.11 1 2.5 1s2.48 1.12 2.48 2.5zM.2 8h4.6v13H.2V8zm7.4 0h4.41v1.78h.06c.61-1.16 2.1-2.38 4.32-2.38 4.62 0 5.47 3.04 5.47 7V21h-4.6v-6.6c0-1.57-.03-3.6-2.2-3.6-2.2 0-2.54 1.72-2.54 3.49V21h-4.6V8z"/></svg>
-                  </a>
-                  <a class="footer-soc" href="https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal" target="_blank" rel="noopener" aria-label="Product Hunt">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="1.8"/><path d="M9 7h4.2a2.8 2.8 0 0 1 0 5.6H9V7zm0 5.6V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </a>
-                  <a class="footer-soc" href="mailto:kowshikbhanu1000@gmail.com" aria-label="Email">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-                  </a>
-                </div>
         </div>
 
-      </div>
-
-      <div class="footer-note-wrap">
         <div class="footer-note" id="footerNote">
-          <p class="fn-letter">Out of all the things you could've done today, you spent a little of it right here — with my work. That genuinely means a lot. If something made you feel something, leave a little love just below.</p>
+          <span class="fn-eyebrow">A small note for you</span>
+          <div class="fn-paper">
+            <p class="fn-letter">Out of all the things you could've done today, you spent a little of it right here — with my work. That genuinely means a lot. If something made you feel something, leave a little love just below.</p>
+          </div>
           <button class="footer-love" id="footerLove" type="button" aria-pressed="false" aria-label="Leave some love">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.9-10-9.3C.2 8.3 1.7 4.7 5 4.1 7 3.7 9 4.6 12 7.5c3-2.9 5-3.8 7-3.4 3.3.6 4.8 4.2 3 7.6C19.5 16.1 12 21 12 21z"/></svg>
           </button>
@@ -9234,9 +9287,14 @@
             <span class="flc-label">people left their love so far</span>
           </div>
         </div>
+
       </div>
 
-      <span class="footer-copyright">© 2026 Bhanu Kowshik · Made with a lot of Chai</span>
+      <div class="footer-bottombar">
+        <span class="footer-copyright">© 2026 Bhanu Kowshik</span>
+        <span class="footer-madewith">Made with a lot of Chai</span>
+      </div>
+
     </div>
 
   </footer>
@@ -11312,9 +11370,19 @@
       var cw = collapsedW.get(item) || item.offsetWidth;
       var ew, eh;
       if (item.dataset.amTab === 'design-dna') {
-        /* Caption lives in the content column now — the pill just toggles, no resize */
-        ew = cw;
-        eh = 56;
+        /* DNA opens the 20% column — size the captioned pill to fit it (not the
+           current/normal column, which is still wide at this point in the click) */
+        var innerEl = item.closest('.am-inner');
+        ew = Math.max(180, Math.floor((innerEl ? innerEl.offsetWidth : 1100) * 0.20) - 14);
+        var inner = item.querySelector('.am-item-inner');
+        var clone = inner.cloneNode(true);
+        clone.style.cssText =
+          'position:fixed;top:-9999px;left:0;width:' + ew + 'px;' +
+          'opacity:0;visibility:hidden;transform:none;transition:none;' +
+          'padding:24px 22px;box-sizing:border-box';
+        document.body.appendChild(clone);
+        eh = clone.offsetHeight;
+        document.body.removeChild(clone);
       } else {
         ew = getExpandedW();
         eh = measureH(item);
@@ -13616,6 +13684,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       {
         tab: 'EverTutor',
         title: 'EverTutor AI System',
+
         metrics: [
           { val: '2000+', lbl: 'Daily Active Users' },
           { val: '−96%',  lbl: 'Workflow time'       },
@@ -13628,6 +13697,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       {
         tab: 'ET Live',
         title: 'EverTutor Live',
+
         metrics: [
           { val: '85%', lbl: 'Session Completion' },
           { val: '2×',  lbl: 'Faster Mastery'     },
@@ -13640,6 +13710,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       {
         tab: 'ET Studio',
         title: 'EverTutor Studio',
+
         metrics: [
           { val: '104→4hrs', lbl: 'Per Lesson' },
           { val: '12',       lbl: 'Schools'    },
@@ -13652,6 +13723,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       {
         tab: 'ET Analytics',
         title: 'EverTutor Analytics',
+
         metrics: [
           { val: 'Live',    lbl: 'In Production' },
           { val: 'Dog-ear', lbl: 'System'        },
@@ -13664,6 +13736,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       {
         tab: 'Stressie',
         title: 'Stressie',
+
         metrics: [
           { val: '17.4%', lbl: 'Engagement Rate'    },
           { val: '$600k', lbl: 'Funding'             },
@@ -13676,6 +13749,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       {
         tab: 'Dearly',
         title: 'Dearly',
+
         metrics: [
           { val: '140',  lbl: 'Letters Written' },
           { val: '35★',  lbl: '5-Star Ratings'  },
@@ -13833,7 +13907,9 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     }
 
     /* Listen for spiral frontmost card changes */
-    window.addEventListener('s2:frontCard', function (e) { updatePanels(e.detail.idx); });
+    window.addEventListener('s2:frontCard', function (e) {
+      updatePanels(e.detail.idx);
+    });
 
     /* Shoot up tab strip when section scrolls into view */
     var tabsShown = false;
@@ -14210,15 +14286,34 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       }
     }
 
+    var lToast = document.getElementById('copyToast');
+    var lToastMsg = document.getElementById('copyToastMsg');
+    var lToastTimer;
+    function loveToast(msg){
+      if (!lToast || !lToastMsg) return;
+      clearTimeout(lToastTimer);
+      lToastMsg.textContent = msg;
+      lToast.style.bottom = '40px';
+      lToast.classList.add('toast-show');
+      lToastTimer = setTimeout(function(){ lToast.classList.remove('toast-show'); }, 2800);
+    }
+
     if (love) {
       if (liked) { love.classList.add('loved'); love.setAttribute('aria-pressed','true'); }
       love.addEventListener('click', function(){
-        if (love.classList.contains('loved')) return;
-        love.classList.add('loved','pop'); love.setAttribute('aria-pressed','true');
-        setTimeout(function(){ love.classList.remove('pop'); }, 650);
-        try { localStorage.setItem('bk-loved','1'); } catch(e){}
-        current += 1; render(current);
-        burst(love);
+        var willLove = !love.classList.contains('loved');
+        if (willLove) {
+          love.classList.add('loved','pop'); love.setAttribute('aria-pressed','true');
+          setTimeout(function(){ love.classList.remove('pop'); }, 650);
+          try { localStorage.setItem('bk-loved','1'); } catch(e){}
+          current += 1; render(current);
+          burst(love);
+          loveToast('Thank you \u2014 you made my day');
+        } else {
+          love.classList.remove('loved'); love.setAttribute('aria-pressed','false');
+          try { localStorage.removeItem('bk-loved'); } catch(e){}
+          current -= 1; render(current);
+        }
       });
     }
   })();
