@@ -4074,14 +4074,39 @@
       align-items: stretch;
       min-height: 420px;
     }
-    .oh-hero-photo {
+    /* Stacked photo cards */
+    .oh-stack {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+      padding: 32px;
+    }
+    .oh-card {
+      position: absolute;
+      width: 82%;
+      background: #fff;
+      border-radius: 10px;
+      padding: 9px 9px 44px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.1);
+      cursor: default;
+      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease;
+    }
+    .oh-card img {
       width: 100%;
-      height: 100%;
+      height: 240px;
       object-fit: cover;
       object-position: center top;
+      border-radius: 4px;
       display: block;
-      border-radius: 12px 0 0 12px;
     }
+    .oh-card--3 { transform: rotate(-7deg) translate(-18px, 10px); z-index: 1; }
+    .oh-card--2 { transform: rotate(5deg)  translate(14px, -6px);  z-index: 2; }
+    .oh-card--1 { transform: rotate(-2deg) translate(0px, -2px);   z-index: 3; }
+    .oh-stack:hover .oh-card--3 { transform: rotate(-14deg) translate(-60px, 14px); box-shadow: 0 8px 28px rgba(0,0,0,0.16); }
+    .oh-stack:hover .oh-card--2 { transform: rotate(12deg)  translate(54px, -10px); box-shadow: 0 8px 28px rgba(0,0,0,0.16); }
+    .oh-stack:hover .oh-card--1 { transform: rotate(-1deg)  translate(0px, -8px);  box-shadow: 0 18px 56px rgba(0,0,0,0.26); }
     .oh-hero-text {
       display: flex;
       flex-direction: column;
@@ -9520,7 +9545,17 @@
           <!-- ── Me Outside Work pane ── -->
           <div class="abt-pane" id="abt-outside">
             <div class="oh-hero">
-              <img class="oh-hero-photo" src="photo.jpg" alt="Bhanu Kowshik">
+              <div class="oh-stack">
+                <div class="oh-card oh-card--3">
+                  <img src="About%20Me%20section%20Images/About%20me%20section%203.jpeg" alt="Kayaking in Austin">
+                </div>
+                <div class="oh-card oh-card--2">
+                  <img src="About%20Me%20section%20Images/About%20me%20section%202.jpeg" alt="By the waterfront">
+                </div>
+                <div class="oh-card oh-card--1">
+                  <img src="About%20Me%20section%20Images/About%20me%20section%201.JPG" alt="At the cat café">
+                </div>
+              </div>
               <div class="oh-hero-text">
                 <p class="oh-greeting">The human behind the work</p>
                 <h3 class="oh-name">Designer by title.<br>Builder by instinct.</h3>
