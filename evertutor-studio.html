@@ -1415,6 +1415,7 @@
     [data-theme="dark"] body {
       background-image: radial-gradient(circle, rgba(255,255,255,0.10) 0.8px, transparent 0.8px);
     }
+    [data-theme="dark"] .nav-home img { filter: invert(1); }
     [data-theme="dark"] .nav {
       background: rgba(26,26,26,0.92);
       box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.06);
@@ -2531,31 +2532,6 @@
      NAV AUTO-HIDE — hides on scroll-down, reappears on any scroll-up
   ═══════════════════════════════════════════════════════════ */
   const nav = document.querySelector('.nav');
-  let lastY = window.scrollY;
-  let upwardAccum = 0; // accumulated upward scroll distance
-
-  window.addEventListener('scroll', () => {
-    const currentY = window.scrollY;
-    const delta    = currentY - lastY;
-
-    // Ignore tiny jitter (< 4px)
-    if (Math.abs(delta) < 4) { lastY = currentY; return; }
-
-    if (delta > 0 && currentY > 60) {
-      // Scrolling down past the hero → hide & reset upward accumulator
-      nav.classList.add('nav-hidden');
-      upwardAccum = 0;
-    } else if (delta < 0) {
-      // Accumulate upward scroll; only reveal after 50% of viewport scrolled up
-      upwardAccum += Math.abs(delta);
-      if (upwardAccum >= window.innerHeight * 0.5) {
-        nav.classList.remove('nav-hidden');
-        upwardAccum = 0;
-      }
-    }
-
-    lastY = currentY;
-  }, { passive: true });
 
   /* ═══════════════════════════════════════════════════════════
      NAV SCROLL SPY

@@ -846,6 +846,7 @@
     [data-theme="dark"] body {
       background-image: radial-gradient(circle, rgba(255,255,255,0.10) 0.8px, transparent 0.8px);
     }
+    [data-theme="dark"] .nav-home img { filter: invert(1); }
     [data-theme="dark"] .nav {
       background: rgba(26,26,26,0.92);
       box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.06);
@@ -1738,17 +1739,6 @@
 
     /* ── NAV AUTO-HIDE ───────────────────────────────────────── */
     const nav = document.getElementById('mainNav');
-    let lastY = window.scrollY, upAcc = 0;
-    window.addEventListener('scroll', () => {
-      const cy = window.scrollY, delta = cy - lastY;
-      if (Math.abs(delta) < 4) { lastY = cy; return; }
-      if (delta > 0 && cy > 60) { nav.classList.add('nav-hidden'); upAcc = 0; }
-      else if (delta < 0) {
-        upAcc += Math.abs(delta);
-        if (upAcc >= window.innerHeight * 0.5) { nav.classList.remove('nav-hidden'); upAcc = 0; }
-      }
-      lastY = cy;
-    }, { passive: true });
 
     /* ── SMOOTH SCROLL ───────────────────────────────────────── */
     function easeOutExpo(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
