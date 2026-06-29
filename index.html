@@ -3851,10 +3851,12 @@
     }
 
     /* ─── ABOUT ME TAB PANEL ────────────────────────────────── */
+    /* Full-viewport snap section — exactly one screen, same as .tm-section / .s2-section-wrap */
     .am-section {
-      padding: 80px 40px 72px;
+      padding: 28px 40px;
       scroll-snap-align: start;
-      min-height: 100dvh;
+      height: calc(100vh - 80px);
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -4326,37 +4328,65 @@
 
     /* ── About section: horizontal tab layout ─────────────────── */
     .abt-nav { display: flex; justify-content: center; margin-bottom: 36px; }
+    /* Tab strip — exact testimonial .tm-tabs glass treatment */
     .abt-nav-pill {
-      display: inline-flex; gap: 4px;
-      background: rgba(29,29,31,0.05);
-      border: 1px solid rgba(29,29,31,0.1);
-      border-radius: 100px;
-      padding: 5px;
+      display: inline-flex; gap: 2px;
+      background: rgba(23,23,23,0.88);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-radius: 999px;
+      padding: 4px;
+      position: relative;
+      isolation: isolate;
+    }
+    .abt-nav-pill::before {
+      content: ""; position: absolute; inset: 0; z-index: -1;
+      border-radius: inherit; padding: 1px;
+      background: linear-gradient(180deg, rgba(100,100,100,0.5) 9.46%, rgba(180,180,180,0.5) 92.23%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
     }
     .abt-tab {
-      display: inline-flex; align-items: center; gap: 7px;
-      font-family: var(--font-mono);
-      font-size: 11px; font-weight: 600;
-      letter-spacing: 0.04em;
-      padding: 9px 20px;
-      border-radius: 100px;
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 9px 18px;
+      border-radius: 999px;
       border: none; background: transparent;
-      color: rgba(29,29,31,0.42);
-      cursor: pointer;
-      transition: background 0.18s ease, color 0.18s ease;
-      white-space: nowrap;
+      color: rgba(255,255,255,0.55);
+      cursor: pointer; white-space: nowrap;
+      position: relative; overflow: visible;
+      transition: color 0.25s ease;
+    }
+    /* Bottom glow halo — same as .tm-tab::after */
+    .abt-tab::after {
+      content: ""; position: absolute; bottom: -5px; left: 50%;
+      transform: translateX(-50%);
+      width: 70%; height: 10px; border-radius: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, transparent 70%);
+      filter: blur(4px); pointer-events: none; opacity: 0;
+      transition: opacity 250ms cubic-bezier(0.4,0,0.2,1);
     }
     .abt-tab-dot {
       width: 7px; height: 7px; border-radius: 50%;
-      flex-shrink: 0; opacity: 0.45;
-      transition: opacity 0.18s;
+      flex-shrink: 0; opacity: 0.5;
+      transition: opacity 0.25s;
     }
-    .abt-tab:hover { color: rgba(29,29,31,0.72); background: rgba(29,29,31,0.04); }
+    .abt-tab:hover { color: rgba(255,255,255,0.8); }
     .abt-tab.is-active {
-      background: #E6F28D;
-      color: rgba(29,29,31,0.88);
-      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(0deg,
+        rgba(255,255,255,0)    0%,
+        rgba(255,255,255,0.18) 2.45%,
+        rgba(255,255,255,0)    126.14%
+      );
+      box-shadow:
+         1.1px  2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+        -1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+         2.0px  3.0px 2.0px  0.0px rgba(0,0,0,0.1) inset;
     }
+    .abt-tab.is-active::after { opacity: 1; }
     .abt-tab.is-active .abt-tab-dot { opacity: 1; }
     /* Pane visibility */
     .abt-pane { display: none; }
@@ -4389,14 +4419,7 @@
       letter-spacing: 0.09em; text-transform: uppercase;
       color: rgba(29,29,31,0.38);
     }
-    /* Dark mode */
-    [data-theme="dark"] .abt-nav-pill {
-      background: rgba(240,237,232,0.05);
-      border-color: rgba(240,237,232,0.1);
-    }
-    [data-theme="dark"] .abt-tab { color: rgba(240,237,232,0.38); }
-    [data-theme="dark"] .abt-tab:hover { color: rgba(240,237,232,0.7); background: rgba(240,237,232,0.05); }
-    [data-theme="dark"] .abt-tab.is-active { background: #E6F28D; color: rgba(29,29,31,0.88); }
+    /* Dark mode — tabs use the theme-independent glass treatment above */
     [data-theme="dark"] .whyme-num  { color: rgba(240,237,232,0.92); }
     [data-theme="dark"] .whyme-label { color: rgba(240,237,232,0.35); }
     /* ── Under-construction pane ───────────────────────────────── */
@@ -4445,6 +4468,13 @@
     }
     [data-theme="dark"] .abt-wip-title { color: rgba(240,237,232,0.88); }
     [data-theme="dark"] .abt-wip-sub   { color: rgba(240,237,232,0.38); }
+    .wip-canvas {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      height: 180px;
+      flex-shrink: 0;
+    }
 
     /* ── Off-hours polaroid grid ───────────────────────────────── */
     .oh-polaroids {
@@ -4839,7 +4869,7 @@
     .dna2-sig-role { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
 
     /* The T: breadth bar on top, then quote panel (left) + depth stem (right column) */
-    .dna2-t { display: flex; flex-direction: column; gap: 16px; }
+    .dna2-t { display: flex; flex-direction: column; gap: 12px; }
     /* Axis labels — Caveat, flanked by arrows that expand outward from the centre */
     .dna2-axis { display: flex; align-items: center; gap: 12px; }
     .dna2-axis.breadth { justify-content: center; }
@@ -4855,18 +4885,18 @@
     .dna2-arm.down  { background: linear-gradient(180deg, transparent, rgba(255,255,255,0.34)); }
     .dna2-arm.up::before   { content: ""; position: absolute; top: 0;    left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-bottom: 7px solid rgba(255,255,255,0.5); border-top: 0; }
     .dna2-arm.down::after  { content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-top: 7px solid rgba(255,255,255,0.5); border-bottom: 0; }
-    .dna2-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .dna2-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     /* Lower band shares the bar's 5-col rhythm: quote sits bottom-left, stem drops from centre (col 3), depth axis runs down col 4 */
     .dna2-lower { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; align-items: stretch; }
-    .dna2-stem { grid-column: 3 / 4; grid-row: 1; align-self: start; display: flex; flex-direction: column; gap: 12px; }
+    .dna2-stem { grid-column: 3 / 4; grid-row: 1; align-self: start; display: flex; flex-direction: column; gap: 10px; }
     .dna2-axis.depth { grid-column: 4 / 5; grid-row: 1; align-self: stretch; flex-direction: column; justify-content: center; gap: 10px; }
     .dna2-axis.depth .dna2-axis-label { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
 
     /* Tile — calm dark glass, accent only on hover/select */
     /* Every block — breadth and depth — is the SAME size for a groomed T */
     .dna2-tile {
-      position: relative; min-height: 96px; background: #141418; border-radius: 13px;
-      padding: 12px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px;
+      position: relative; min-height: 82px; background: #141418; border-radius: 13px;
+      padding: 11px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
       cursor: pointer; overflow: hidden; text-align: center;
       border: 1px solid rgba(255,255,255,0.07);
       transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s ease, background 0.3s ease;
@@ -9493,7 +9523,7 @@
               <img class="oh-hero-photo" src="photo.jpg" alt="Bhanu Kowshik">
               <div class="oh-hero-text">
                 <p class="oh-greeting">The human behind the work</p>
-                <h3 class="oh-name">Hi, I&rsquo;m Bhanu&nbsp;:)</h3>
+                <h3 class="oh-name">Designer by title.<br>Builder by instinct.</h3>
                 <p class="oh-bio">I don&rsquo;t stop creating &mdash; I just change the medium. When I&rsquo;m not in Figma, I&rsquo;m experimenting with a new API, building a side project nobody asked for, or out with friends bowling and finding the city&rsquo;s best coffee. <strong>Creativity, for me, is a lifestyle &mdash; not a job title.</strong></p>
               </div>
             </div>
@@ -9526,9 +9556,7 @@
           <!-- ── What I'm Looking For pane ── -->
           <div class="abt-pane" id="abt-looking">
             <div class="abt-wip">
-              <div class="abt-wip-icon">🚧</div>
-              <span class="abt-wip-label">In progress</span>
-              <h3 class="abt-wip-title">Something thoughtful is being built here</h3>
+              <canvas class="wip-canvas" data-wip-id="looking"></canvas>
               <p class="abt-wip-sub">This section is still taking shape. Check back soon — it'll be worth the wait.</p>
             </div>
           </div><!-- /abt-pane looking -->
@@ -9536,9 +9564,7 @@
           <!-- ── Why Me pane ── -->
           <div class="abt-pane" id="abt-whyme">
             <div class="abt-wip">
-              <div class="abt-wip-icon">🚧</div>
-              <span class="abt-wip-label">In progress</span>
-              <h3 class="abt-wip-title">The case for me — being crafted carefully</h3>
+              <canvas class="wip-canvas" data-wip-id="whyme"></canvas>
               <p class="abt-wip-sub">Numbers, stories, and proof points are being curated. This one matters too much to rush.</p>
             </div>
           </div><!-- /abt-pane whyme -->
@@ -14899,8 +14925,121 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         this.classList.add('is-active');
         var pane = document.getElementById('abt-' + target);
         if (pane) pane.classList.add('is-active');
+        // boot WIP canvas on first reveal
+        var canvas = pane && pane.querySelector('.wip-canvas');
+        if (canvas && !canvas._wipBooted) { canvas._wipBooted = true; initWipCanvas(canvas); }
       });
     });
+  })();
+
+  /* ── WIP particle canvas ───────────────────────────────────── */
+  (function () {
+    function initWipCanvas(canvas) {
+      var dpr    = window.devicePixelRatio || 1;
+      var W      = canvas.offsetWidth  || 560;
+      var H      = canvas.offsetHeight || 180;
+      canvas.width  = W * dpr;
+      canvas.height = H * dpr;
+      var ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      // ── sample text pixels ──────────────────────────────────
+      var off = document.createElement('canvas');
+      off.width = W; off.height = H;
+      var octx = off.getContext('2d');
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      var fSize = Math.min(48, Math.floor(W / 9));
+      octx.clearRect(0, 0, W, H);
+      octx.fillStyle = '#fff';
+      octx.font = '800 ' + fSize + 'px Montserrat, Arial Black, sans-serif';
+      octx.textAlign = 'center';
+      octx.textBaseline = 'middle';
+      octx.fillText('Work In Progress', W / 2, H / 2);
+
+      var imgData = octx.getImageData(0, 0, W, H).data;
+      var targets = [];
+      var step = 4;
+      for (var y = 0; y < H; y += step) {
+        for (var x = 0; x < W; x += step) {
+          if (imgData[(y * W + x) * 4 + 3] > 120) {
+            targets.push({ x: x, y: y });
+          }
+        }
+      }
+
+      // ── build particles ──────────────────────────────────────
+      var COUNT = Math.min(targets.length, 500);
+      var particles = [];
+      for (var i = 0; i < COUNT; i++) {
+        var t = targets[Math.floor(Math.random() * targets.length)];
+        particles.push({
+          tx: t.x + (Math.random() - 0.5) * step,
+          ty: t.y + (Math.random() - 0.5) * step,
+          x:  Math.random() * W,
+          y:  Math.random() * H,
+          vx: 0, vy: 0,
+          r:  0.8 + Math.random() * 1.6,
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.018 + Math.random() * 0.014
+        });
+      }
+
+      var raf;
+      function draw(ts) {
+        raf = requestAnimationFrame(draw);
+        dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        ctx.clearRect(0, 0, W, H);
+        var t = ts * 0.001;
+
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+          // drift toward target with springy ease
+          var dx = p.tx - p.x, dy = p.ty - p.y;
+          p.vx = p.vx * 0.85 + dx * 0.04;
+          p.vy = p.vy * 0.85 + dy * 0.04;
+          // subtle orbit wobble
+          p.x += p.vx + Math.sin(t * p.speed * 6 + p.phase) * 0.35;
+          p.y += p.vy + Math.cos(t * p.speed * 5 + p.phase) * 0.35;
+
+          var alpha = 0.55 + 0.45 * Math.sin(t * p.speed * 8 + p.phase);
+          var r = p.r + 0.5 * Math.sin(t * p.speed * 4 + p.phase);
+
+          // glow halo
+          var grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 4);
+          if (dark) {
+            grd.addColorStop(0, 'rgba(107,178,247,' + (alpha * 0.9) + ')');
+            grd.addColorStop(1, 'rgba(107,178,247,0)');
+          } else {
+            grd.addColorStop(0, 'rgba(251,180,90,' + (alpha * 0.85) + ')');
+            grd.addColorStop(1, 'rgba(251,180,90,0)');
+          }
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, r * 4, 0, Math.PI * 2);
+          ctx.fillStyle = grd;
+          ctx.fill();
+
+          // core dot
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+          ctx.fillStyle = dark
+            ? 'rgba(180,220,255,' + alpha + ')'
+            : 'rgba(255,200,100,' + alpha + ')';
+          ctx.fill();
+        }
+      }
+
+      raf = requestAnimationFrame(draw);
+
+      // stop when tab hidden to save CPU
+      canvas.closest('.abt-pane').addEventListener('transitionend', function () {
+        if (!canvas.closest('.abt-pane').classList.contains('is-active')) {
+          cancelAnimationFrame(raf);
+          canvas._wipBooted = false;
+        }
+      });
+    }
+
+    window.initWipCanvas = initWipCanvas;
   })();
   </script>
 </body>
