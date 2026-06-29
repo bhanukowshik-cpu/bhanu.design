@@ -47,7 +47,7 @@
       --bg:           #1A1A1A;
       --primary:      #789F04;
       --accent:       #789F04;
-      --white:        #0C0C0C;
+      --white:        #1A1A1A;
       --color-white:  #F5F5F7;
       --secondary:    #F0EDE8;
       --grey:         #999999;
@@ -103,7 +103,7 @@
       overflow: clip;
       display: flex;
       flex-direction: column;
-      gap: 27px;
+      gap: 100px;
       padding-top: 0;       /* hero gets its own top padding via .hero padding-top */
       padding-bottom: 50px;
     }
@@ -2499,7 +2499,7 @@
       .nav-work            { font-size: 12px; }
       .top-nav             { padding: 8px 24px; }
       .page                { padding: 74px 10% 70px; }
-      .card                { gap: 24px; padding-bottom: 36px; border-radius: 20px; }
+      .card                { gap: 100px; padding-bottom: 36px; border-radius: 20px; }
       .hero                { padding: 30px 32px 0; }
       .hero-screen::after  { left: -32px; right: -32px; }
       .hero-screen         { min-height: calc(100svh - 104px); }  /* page 74 + hero 30 */
@@ -2537,7 +2537,7 @@
       .hero-transform-graphic { display: none; }
       .top-nav              { padding: 8px 16px; height: 50px; }
       .page                 { padding: 60px 5% 56px; }
-      .card                 { gap: 20px; padding-bottom: 28px; border-radius: 16px; }
+      .card                 { gap: 100px; padding-bottom: 28px; border-radius: 16px; }
       .hero                 { padding: 22px 20px 0; gap: 16px; }
       .hero-screen::after   { left: -20px; right: -20px; }
       .hero-screen          { min-height: calc(100svh - 82px); }  /* page 60 + hero 22 */
@@ -3853,10 +3853,10 @@
     /* ─── ABOUT ME TAB PANEL ────────────────────────────────── */
     /* Full-viewport snap section — exactly one screen, same as .tm-section / .s2-section-wrap */
     .am-section {
-      padding: 44px 40px 24px;
+      padding: 84px 40px 40px;
       scroll-snap-align: start;
-      height: calc(100vh - 80px);
-      overflow: hidden;
+      /* At least one screen (snaps like tm-section), but grows rather than clipping if content is taller */
+      min-height: calc(100vh - 80px);
       display: flex;
       flex-direction: column;
       /* Top-anchored: the nav + breadth bar hold a fixed position; only the lower content changes height */
@@ -4119,16 +4119,23 @@
       user-select: none;
       -webkit-user-drag: none;
     }
-    /* Stack positions — peek offset ensures back cards always show */
-    .oh2-card.is-back  { transform: rotate(-9deg) translate(-28px, 18px) scale(0.88); z-index: 1; }
-    .oh2-card.is-mid   { transform: rotate(6deg)  translate(22px, 12px)  scale(0.93); z-index: 2; }
-    .oh2-card.is-front { transform: rotate(-2deg) translate(0, 0)        scale(1);    z-index: 3; cursor: grab; }
-    .oh2-card.is-dragging {
-      transition: none;
-      cursor: grabbing;
-      z-index: 10;
-      box-shadow: 0 28px 80px rgba(0,0,0,0.32);
+    /* JS sets transforms/z-index directly via applySlot */
+    .oh2-card { cursor: grab; }
+    .oh2-dragging { cursor: grabbing !important; transition: none !important; }
+    /* Caveat handwritten label inside each polaroid */
+    .oh2-label {
+      display: block;
+      font-family: 'Caveat', cursive;
+      font-size: 18px;
+      font-weight: 600;
+      color: rgba(29,29,31,0.72);
+      text-align: center;
+      padding: 8px 4px 0;
+      line-height: 1.2;
+      user-select: none;
+      pointer-events: none;
     }
+    [data-theme="dark"] .oh2-label { color: rgba(29,29,31,0.65); }
     .oh2-hint {
       font-family: var(--font-mono);
       font-size: 10px;
@@ -4927,7 +4934,7 @@
     /* Per-skill icon/label colors are set inline via --c1/--c2/--lc on each cell */
 
     /* ═══ DESIGN DNA — the T, in testimonials glass language ═══ */
-    .dna2 { width: 100%; max-width: 920px; margin: 0 auto; }
+    .dna2 { width: 100%; max-width: 760px; margin: 0 auto; }
     /* Signature — the one photo that says "these are my words" */
     .dna2-sig { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
     .dna2-sig img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
@@ -4952,7 +4959,7 @@
     .dna2-arm.down  { background: linear-gradient(180deg, transparent, rgba(255,255,255,0.34)); }
     .dna2-arm.up::before   { content: ""; position: absolute; top: 0;    left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-bottom: 7px solid rgba(255,255,255,0.5); border-top: 0; }
     .dna2-arm.down::after  { content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-top: 7px solid rgba(255,255,255,0.5); border-bottom: 0; }
-    .dna2-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .dna2-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
     /* Lower band shares the bar's 5-col rhythm: quote sits bottom-left, stem drops from centre (col 3), depth axis runs down col 4 */
     .dna2-lower { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; align-items: stretch; }
     .dna2-stem { grid-column: 3 / 4; grid-row: 1; align-self: start; display: flex; flex-direction: column; gap: 8px; }
@@ -4962,8 +4969,8 @@
     /* Tile — calm dark glass, accent only on hover/select */
     /* Every block — breadth and depth — is the SAME size for a groomed T */
     .dna2-tile {
-      position: relative; min-height: 76px; background: #141418; border-radius: 13px;
-      padding: 10px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;
+      position: relative; min-height: 100px; background: #141418; border-radius: 14px;
+      padding: 12px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
       cursor: pointer; overflow: hidden; text-align: center;
       border: 1px solid rgba(255,255,255,0.07);
       transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s ease, background 0.3s ease;
@@ -8898,6 +8905,12 @@
     }
 
 
+    /* ── DEBUG: section borders ── */
+    .card > *,
+    .hero, .s2-section-wrap, .ws-section, .am-section, .tm-section,
+    .about-section, .section-divider, .more-work-section, .footer-wrap {
+      outline: 2px solid red !important;
+    }
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
@@ -9516,13 +9529,6 @@
           <!-- ── DNA pane ── -->
           <div class="abt-pane is-active" id="abt-dna">
             <div class="dna2">
-              <div class="dna2-sig">
-                <img src="photo.jpg" alt="Bhanu">
-                <span class="dna2-sig-txt">
-                  <span class="dna2-sig-name">Bhanu Kowshik</span>
-                  <span class="dna2-sig-role">In my own words</span>
-                </span>
-              </div>
               <div class="dna2-t">
                 <div class="dna2-axis breadth"><span class="dna2-arm left"></span><span class="dna2-axis-label">Breadth &mdash; what I build</span><span class="dna2-arm right"></span></div>
                 <div class="dna2-bar">
@@ -9561,11 +9567,11 @@
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Systems Thinking</span>
                         <span class="dna2-q" hidden>I design the <em>system</em>, not the screen. One component should answer ten questions you haven't asked yet.</span>
                       </button>
-                      <button class="dna2-tile" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')">
+                      <button class="dna2-tile" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg')">
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Builder Mindset</span>
                         <span class="dna2-q" hidden><em>Momentum over polish.</em> A rough thing in real hands beats a perfect thing in Figma.</span>
                       </button>
-                      <button class="dna2-tile" style="--c1:#5FE0CE;--c2:#12A38E;--lc:#1FC0A8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg')">
+                      <button class="dna2-tile" style="--c1:#5FE0CE;--c2:#12A38E;--lc:#1FC0A8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')">
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Measured Impact</span>
                         <span class="dna2-q" hidden>If I can't tie it to a <em>number that moved</em>, it was decoration. I design for outcomes.</span>
                       </button>
@@ -9588,17 +9594,20 @@
               <!-- Draggable card deck -->
               <div class="oh2-left">
                 <div class="oh2-deck" id="ohDeck">
-                  <div class="oh2-card is-back">
+                  <div class="oh2-card" id="ohc-0">
                     <img src="About%20Me%20section%20Images/About%20me%20section%201.JPG" alt="At the cat café">
+                    <span class="oh2-label">making new friends 🐱</span>
                   </div>
-                  <div class="oh2-card is-mid">
+                  <div class="oh2-card" id="ohc-1">
                     <img src="About%20Me%20section%20Images/About%20me%20section%202.jpeg" alt="By the waterfront">
+                    <span class="oh2-label">Key West, sunset o'clock ☀️</span>
                   </div>
-                  <div class="oh2-card is-front">
+                  <div class="oh2-card" id="ohc-2">
                     <img src="About%20Me%20section%20Images/About%20me%20section%203.jpeg" alt="Kayaking in Austin">
+                    <span class="oh2-label">Ladybird Lake, Austin 🛶</span>
                   </div>
                 </div>
-                <p class="oh2-hint">↖ drag to reveal next</p>
+                <p class="oh2-hint">drag to flip</p>
               </div>
 
               <!-- Text -->
@@ -15300,123 +15309,158 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     window.initWipCanvas = initWipCanvas;
   })();
 
-  /* ── Me Outside Work: draggable card deck ─────────────────── */
+  /* ── Me Outside Work: photo card deck (testimonials physics) ── */
   (function () {
     var deck = document.getElementById('ohDeck');
     if (!deck) return;
 
-    var cards = Array.from(deck.querySelectorAll('.oh2-card'));
-    /* order[0]=back, order[1]=mid, order[2]=front */
-    var order = [0, 1, 2];
+    // Logical order: index 0 = front, 1 = mid, 2 = back
+    var cardEls = [
+      document.getElementById('ohc-2'), // kayaking — front
+      document.getElementById('ohc-1'), // waterfront — mid
+      document.getElementById('ohc-0'), // cat café — back
+    ];
+    if (!cardEls[0]) return;
 
-    function render(skipTransition) {
-      order.forEach(function (cardIdx, stackPos) {
-        var c = cards[cardIdx];
-        if (skipTransition) {
-          c.style.transition = 'none';
-          c.offsetHeight;
-        }
-        c.classList.remove('is-back', 'is-mid', 'is-front');
-        if      (stackPos === 0) c.classList.add('is-back');
-        else if (stackPos === 1) c.classList.add('is-mid');
-        else                     c.classList.add('is-front');
-        if (skipTransition) {
-          c.offsetHeight;
-          c.style.transition = '';
-        }
-      });
+    // Slot positions matching testimonials SLOTS style
+    var SLOTS = [
+      { tx:   0, ty:  0,  rot:  -2, sc: 1,    op: 1 }, // front
+      { tx:  22, ty: 12,  rot:   6, sc: 0.94, op: 1 }, // mid
+      { tx: -26, ty: 18,  rot:  -9, sc: 0.88, op: 1 }, // back
+    ];
+
+    function buildT(tx, ty, rot, sc) {
+      return 'translateX('+tx+'px) translateY('+ty+'px) rotate('+rot+'deg) scale('+sc+')';
     }
 
-    render();
-
-    var drag = { active: false, card: null, sx: 0, sy: 0, moved: false };
-
-    function getFront() { return cards[order[order.length - 1]]; }
-
-    /* Attach directly to the front card so there's no target ambiguity */
-    function bindFront() {
-      var fc = getFront();
-      fc.addEventListener('mousedown',  onStart);
-      fc.addEventListener('touchstart', onStart, { passive: false });
-    }
-    bindFront();
-
-    function onStart(e) {
-      if (drag.active) return;
-      e.preventDefault();
-      var pt = e.touches ? e.touches[0] : e;
-      var fc = getFront();
-      drag.active = true;
-      drag.moved  = false;
-      drag.card   = fc;
-      drag.sx     = pt.clientX;
-      drag.sy     = pt.clientY;
-      fc.style.transition = 'none';
-      fc.style.zIndex = '10';
-      document.addEventListener('mousemove',  onMove, { passive: false });
-      document.addEventListener('mouseup',    onEnd);
-      document.addEventListener('touchmove',  onMove, { passive: false });
-      document.addEventListener('touchend',   onEnd);
-    }
-
-    function onMove(e) {
-      if (!drag.active) return;
-      e.preventDefault();
-      var pt = e.touches ? e.touches[0] : e;
-      var dx = pt.clientX - drag.sx;
-      var dy = pt.clientY - drag.sy;
-      drag.moved = true;
-      drag.dx = dx; drag.dy = dy;
-      drag.card.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + (dx * 0.03) + 'deg) scale(1.05)';
-      drag.card.style.boxShadow = '0 28px 80px rgba(0,0,0,0.32)';
-    }
-
-    function onEnd(e) {
-      if (!drag.active) return;
-      drag.active = false;
-      document.removeEventListener('mousemove',  onMove);
-      document.removeEventListener('mouseup',    onEnd);
-      document.removeEventListener('touchmove',  onMove);
-      document.removeEventListener('touchend',   onEnd);
-
-      var pt = e.changedTouches ? e.changedTouches[0] : e;
-      var dx = pt.clientX - drag.sx;
-      var dy = pt.clientY - drag.sy;
-      var dist = Math.sqrt(dx * dx + dy * dy);
-      var c = drag.card;
-
-      if (drag.moved && dist > 72) {
-        /* Fly off in drag direction */
-        var angle = Math.atan2(dy, dx);
-        var flyX  = Math.cos(angle) * 700;
-        var flyY  = Math.sin(angle) * 700;
-        c.style.transition = 'transform 0.4s cubic-bezier(0.4,0,0.8,0.6), opacity 0.3s ease, box-shadow 0.3s ease';
-        c.style.transform  = 'translate(' + flyX + 'px,' + flyY + 'px) rotate(' + (dx * 0.08) + 'deg) scale(0.85)';
-        c.style.opacity    = '0';
-        c.style.boxShadow  = '';
-
-        setTimeout(function () {
-          /* Move to back of order silently */
-          var frontIdx = order.pop();
-          order.unshift(frontIdx);
-          c.style.transition = 'none';
-          c.style.transform  = '';
-          c.style.opacity    = '1';
-          c.style.zIndex     = '';
-          c.offsetHeight;
-          render();
-          /* Re-bind drag to new front card */
-          setTimeout(function() { bindFront(); }, 20);
-        }, 420);
+    function applySlot(card, slotIdx, animate) {
+      var s = SLOTS[slotIdx];
+      if (animate) {
+        card.classList.remove('oh2-dragging');
+        card.style.transition = 'transform 0.55s cubic-bezier(0.34,1.4,0.64,1), box-shadow 0.4s ease';
       } else {
-        /* Snap back */
-        c.style.transition = '';
-        c.style.transform  = '';
-        c.style.boxShadow  = '';
-        c.style.zIndex     = '';
-        render();
+        card.style.transition = 'none';
       }
-      drag.card = null;
+      card.style.transform     = buildT(s.tx, s.ty, s.rot, s.sc);
+      card.style.zIndex        = String(3 - slotIdx);
+      card.style.pointerEvents = slotIdx === 0 ? 'auto' : 'none';
+    }
+
+    cardEls.forEach(function(c, i) { applySlot(c, i, false); });
+
+    var dragging = null;
+    var startX = 0, startY = 0;
+    var curX = 0, curY = 0, curRot = 0;
+    var lastT = 0, lastX = 0, lastY = 0;
+    var velX = 0, velY = 0;
+
+    deck.addEventListener('pointerdown', function(e) {
+      if (e.button !== 0 && e.pointerType === 'mouse') return;
+      if (e.target.closest('.oh2-card') !== cardEls[0]) return;
+      dragging = cardEls[0];
+      startX = e.clientX; startY = e.clientY;
+      lastX  = e.clientX; lastY  = e.clientY; lastT = e.timeStamp;
+      velX = velY = 0;
+      dragging.classList.add('oh2-dragging');
+      dragging.style.transition = 'none';
+      dragging.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener('pointermove', function(e) {
+      if (!dragging) return;
+      var dx = e.clientX - startX;
+      var dy = e.clientY - startY;
+      var dt = e.timeStamp - lastT;
+      if (dt > 0) { velX = (e.clientX - lastX) / dt; velY = (e.clientY - lastY) / dt; }
+      lastX = e.clientX; lastY = e.clientY; lastT = e.timeStamp;
+      curX   = SLOTS[0].tx + dx;
+      curY   = SLOTS[0].ty + dy;
+      curRot = SLOTS[0].rot + dx * 0.04;
+      dragging.style.transform = buildT(curX, curY, curRot, 1.04);
+      e.preventDefault();
+    }, { passive: false });
+
+    function onPointerUp(e) {
+      if (!dragging) return;
+      var card = dragging;
+      dragging = null;
+      card.classList.remove('oh2-dragging');
+
+      var dx = e.clientX - startX;
+      var dy = e.clientY - startY;
+      if (e.timeStamp - lastT > 80) { velX = 0; velY = 0; }
+
+      var speed        = Math.max(Math.abs(velX), Math.abs(velY));
+      var displacement = Math.max(Math.abs(dx), Math.abs(dy));
+      var threshold    = window.matchMedia('(pointer: coarse)').matches ? 70 : 100;
+
+      if (displacement > threshold || (speed > 0.5 && displacement > 30)) {
+        swipeOut(card, dx);
+      } else {
+        springBack(card);
+      }
+    }
+    window.addEventListener('pointerup',     onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+
+    function springBack(card) {
+      var s = SLOTS[0];
+      var x = curX, y = curY, rot = curRot;
+      var vx = velX * 16, vy = velY * 16, vr = 0;
+      var K = 260, B = 34, rafId, prev = performance.now();
+      card.style.transition = 'none';
+      function step(now) {
+        var dt = Math.min((now - prev) / 1000, 0.05); prev = now;
+        vx += (-K*(x-s.tx) - B*vx) * dt;
+        vy += (-K*(y-s.ty) - B*vy) * dt;
+        vr += (-K*(rot-s.rot) - B*vr) * dt;
+        x += vx*dt; y += vy*dt; rot += vr*dt;
+        card.style.transform = buildT(x, y, rot, 1);
+        if (Math.abs(vx)<0.4 && Math.abs(x-s.tx)<0.4 && Math.abs(vy)<0.4 && Math.abs(y-s.ty)<0.4) {
+          cancelAnimationFrame(rafId);
+          applySlot(card, 0, false);
+        } else { rafId = requestAnimationFrame(step); }
+      }
+      rafId = requestAnimationFrame(step);
+    }
+
+    function swipeOut(card, dx) {
+      // Cycle: front goes to back
+      cardEls.push(cardEls.shift());
+
+      card.classList.remove('oh2-dragging');
+      card.style.transition    = 'none';
+      card.style.zIndex        = '1';
+      card.style.pointerEvents = 'none';
+      void card.offsetHeight;
+
+      // Spring swiped card to back slot using physics
+      var target = SLOTS[2];
+      var x = curX, y = curY, r = curRot;
+      var _vx = velX * 10, _vy = velY * 10, _vr = 0;
+      var K = 380, B = 42, rafId, prev = performance.now();
+
+      // Animate remaining cards into new slots
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          cardEls.forEach(function(c, i) { if (i !== 2) applySlot(c, i, true); });
+        });
+      });
+
+      function step(now) {
+        var dt = Math.min((now - prev) / 1000, 0.05); prev = now;
+        _vx += (-K*(x-target.tx) - B*_vx) * dt;
+        _vy += (-K*(y-target.ty) - B*_vy) * dt;
+        _vr += (-K*(r-target.rot) - B*_vr) * dt;
+        x += _vx*dt; y += _vy*dt; r += _vr*dt;
+        card.style.transform = buildT(x, y, r, 1);
+        if (Math.abs(_vx)<0.5 && Math.abs(x-target.tx)<0.5 && Math.abs(_vy)<0.5 && Math.abs(y-target.ty)<0.5) {
+          cancelAnimationFrame(rafId);
+          applySlot(card, 2, false);
+        } else { rafId = requestAnimationFrame(step); }
+      }
+      rafId = requestAnimationFrame(step);
     }
   })();
   </script>
