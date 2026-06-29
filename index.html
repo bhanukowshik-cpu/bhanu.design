@@ -4072,7 +4072,7 @@
       display: grid;
       grid-template-columns: 44% 1fr;
       align-items: stretch;
-      min-height: 420px;
+      min-height: 460px;
     }
     /* Stacked photo cards */
     .oh-stack {
@@ -4095,9 +4095,9 @@
     }
     .oh-card img {
       width: 100%;
-      height: 240px;
+      height: 280px;
       object-fit: cover;
-      object-position: center top;
+      object-position: center 35%;
       border-radius: 4px;
       display: block;
     }
@@ -4497,7 +4497,7 @@
       display: block;
       width: 100%;
       max-width: 560px;
-      height: 180px;
+      height: 200px;
       flex-shrink: 0;
     }
 
@@ -14970,102 +14970,120 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   /* ── WIP particle canvas ───────────────────────────────────── */
   (function () {
     function initWipCanvas(canvas) {
-      var dpr    = window.devicePixelRatio || 1;
-      var W      = canvas.offsetWidth  || 560;
-      var H      = canvas.offsetHeight || 180;
+      var dpr = window.devicePixelRatio || 1;
+      var W   = canvas.offsetWidth  || 560;
+      var H   = canvas.offsetHeight || 200;
       canvas.width  = W * dpr;
       canvas.height = H * dpr;
       var ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
 
-      // ── sample text pixels ──────────────────────────────────
+      // ── render text to offscreen canvas and sample pixel targets ──
       var off = document.createElement('canvas');
       off.width = W; off.height = H;
       var octx = off.getContext('2d');
-      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
-      var fSize = Math.min(48, Math.floor(W / 9));
-      octx.clearRect(0, 0, W, H);
+      var fSize = Math.max(28, Math.min(56, Math.floor(W / 7)));
       octx.fillStyle = '#fff';
       octx.font = '800 ' + fSize + 'px Montserrat, Arial Black, sans-serif';
       octx.textAlign = 'center';
       octx.textBaseline = 'middle';
-      octx.fillText('Work In Progress', W / 2, H / 2);
+      // two lines so letters are big and clear
+      octx.fillText('Work In', W / 2, H * 0.36);
+      octx.fillText('Progress', W / 2, H * 0.72);
 
       var imgData = octx.getImageData(0, 0, W, H).data;
       var targets = [];
       var step = 4;
       for (var y = 0; y < H; y += step) {
         for (var x = 0; x < W; x += step) {
-          if (imgData[(y * W + x) * 4 + 3] > 120) {
-            targets.push({ x: x, y: y });
+          if (imgData[(y * W + x) * 4 + 3] > 100) {
+            targets.push({ x: x + Math.random() * step * 0.5,
+                           y: y + Math.random() * step * 0.5 });
           }
         }
       }
+      // shuffle
+      for (var s = targets.length - 1; s > 0; s--) {
+        var j = Math.floor(Math.random() * (s + 1));
+        var tmp = targets[s]; targets[s] = targets[j]; targets[j] = tmp;
+      }
+      targets = targets.slice(0, Math.min(targets.length, 700));
 
-      // ── build particles ──────────────────────────────────────
-      var COUNT = Math.min(targets.length, 500);
-      var particles = [];
-      for (var i = 0; i < COUNT; i++) {
-        var t = targets[Math.floor(Math.random() * targets.length)];
-        particles.push({
-          tx: t.x + (Math.random() - 0.5) * step,
-          ty: t.y + (Math.random() - 0.5) * step,
-          x:  Math.random() * W,
+      // ── particles: start scattered across entire canvas ──────────
+      var particles = targets.map(function (t) {
+        return {
+          tx: t.x, ty: t.y,          // final text position
+          x:  Math.random() * W,      // scattered start
           y:  Math.random() * H,
           vx: 0, vy: 0,
-          r:  0.8 + Math.random() * 1.6,
+          r:   0.9 + Math.random() * 1.5,
           phase: Math.random() * Math.PI * 2,
-          speed: 0.018 + Math.random() * 0.014
-        });
-      }
+          freq:  0.5 + Math.random() * 0.9
+        };
+      });
 
+      var startTs = null;
+      var CONVERGE = 1600; // ms for scatter→text
       var raf;
+
       function draw(ts) {
         raf = requestAnimationFrame(draw);
-        dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (!startTs) startTs = ts;
+        var elapsed = ts - startTs;
+
+        // converge progress 0→1 with ease-out cubic
+        var p01 = Math.min(elapsed / CONVERGE, 1);
+        var ease = 1 - Math.pow(1 - p01, 3);
+
+        var dark = document.documentElement.getAttribute('data-theme') === 'dark';
         ctx.clearRect(0, 0, W, H);
         var t = ts * 0.001;
 
         for (var i = 0; i < particles.length; i++) {
           var p = particles[i];
-          // drift toward target with springy ease
-          var dx = p.tx - p.x, dy = p.ty - p.y;
-          p.vx = p.vx * 0.85 + dx * 0.04;
-          p.vy = p.vy * 0.85 + dy * 0.04;
-          // subtle orbit wobble
-          p.x += p.vx + Math.sin(t * p.speed * 6 + p.phase) * 0.35;
-          p.y += p.vy + Math.cos(t * p.speed * 5 + p.phase) * 0.35;
 
-          var alpha = 0.55 + 0.45 * Math.sin(t * p.speed * 8 + p.phase);
-          var r = p.r + 0.5 * Math.sin(t * p.speed * 4 + p.phase);
+          // spring strength ramps up as ease increases
+          var spring = 0.02 + ease * 0.055;
+          var drag   = 0.80 + ease * 0.05;
+          var dx = p.tx - p.x, dy = p.ty - p.y;
+          p.vx = p.vx * drag + dx * spring;
+          p.vy = p.vy * drag + dy * spring;
+
+          // once converged, add gentle float wobble
+          var wobble = ease * ease;
+          p.x += p.vx + Math.sin(t * p.freq       + p.phase) * wobble * 0.5;
+          p.y += p.vy + Math.cos(t * p.freq * 1.2 + p.phase) * wobble * 0.4;
+
+          // brightness pulses after settling
+          var alpha = 0.45 + 0.55 * (ease * (0.5 + 0.5 * Math.sin(t * p.freq * 2 + p.phase)));
+          var rad   = p.r  + 0.5  * Math.sin(t * p.freq + p.phase);
 
           // glow halo
-          var grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 4);
+          var grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad * 5);
           if (dark) {
-            grd.addColorStop(0, 'rgba(107,178,247,' + (alpha * 0.9) + ')');
+            grd.addColorStop(0, 'rgba(107,178,247,' + (alpha * 0.85) + ')');
             grd.addColorStop(1, 'rgba(107,178,247,0)');
           } else {
-            grd.addColorStop(0, 'rgba(251,180,90,' + (alpha * 0.85) + ')');
-            grd.addColorStop(1, 'rgba(251,180,90,0)');
+            grd.addColorStop(0, 'rgba(251,140,50,' + (alpha * 0.75) + ')');
+            grd.addColorStop(1, 'rgba(251,140,50,0)');
           }
           ctx.beginPath();
-          ctx.arc(p.x, p.y, r * 4, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, rad * 5, 0, Math.PI * 2);
           ctx.fillStyle = grd;
           ctx.fill();
 
           // core dot
           ctx.beginPath();
-          ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
           ctx.fillStyle = dark
-            ? 'rgba(180,220,255,' + alpha + ')'
-            : 'rgba(255,200,100,' + alpha + ')';
+            ? 'rgba(200,230,255,' + (0.6 + 0.4 * alpha) + ')'
+            : 'rgba(255,185,80,'  + (0.6 + 0.4 * alpha) + ')';
           ctx.fill();
         }
       }
 
       raf = requestAnimationFrame(draw);
 
-      // stop when tab hidden to save CPU
       canvas.closest('.abt-pane').addEventListener('transitionend', function () {
         if (!canvas.closest('.abt-pane').classList.contains('is-active')) {
           cancelAnimationFrame(raf);
