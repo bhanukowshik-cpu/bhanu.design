@@ -9360,68 +9360,52 @@
       .abt-tab { font-size: 13px; padding: 9px 16px; }
     }
 
-    /* ── DNA T-chart: stack vertically so nothing overflows on iPad ── */
+    /* ── DNA T-chart: scale-down row layout for iPad (keeps desktop structure) ── */
     @media (max-width: 1023px) {
-      /* ① Outer flex: aside on top, T-chart below */
-      .dna2 {
-        flex-direction: column !important;
-        flex-wrap: nowrap !important;
-        gap: 32px !important;
-        align-items: stretch !important;
-        max-width: 100% !important;
-      }
-      /* ② Aside: full-width block */
+      /* Tighten the gap so aside + T-chart both fit */
+      .dna2 { gap: 20px !important; overflow: hidden; }
+      /* Aside: shrink from 360px to 160px */
       .dna2-aside {
-        width: 100% !important;
-        flex: 0 0 auto !important;
-        min-width: 0 !important;
-        flex-direction: column;
-        gap: 14px;
+        width: 160px !important;
+        flex-shrink: 0 !important;
+        justify-content: flex-start !important;
+        padding-top: 4px;
       }
-      .dna2-heading { font-size: 26px; margin-bottom: 10px; }
-      .dna2-intro   { font-size: 14px; margin-bottom: 12px; }
-      /* ③ Legend: de-absolute so it doesn't overlap */
-      .dna2-legend {
-        position: static !important;
-        right: auto !important;
-        bottom: auto !important;
-        align-self: flex-start;
-        margin-top: 0;
-      }
-      /* ④ T-section: full width */
-      .dna2-t {
-        flex: 0 0 auto !important;
-        width: 100% !important;
-        min-width: 0 !important;
-      }
-      /* ⑤ Breadth bar: 3 cols (tiles wrap to 2 rows — fine) */
-      .dna2-bar { grid-template-columns: repeat(3, 1fr) !important; gap: 12px !important; }
-      /* ⑥ Lower section: panel left (cols 1-2), stem right (col 3) */
-      .dna2-lower {
-        display: grid !important;
+      .dna2-heading { font-size: 20px !important; line-height: 1.2 !important; margin-bottom: 8px !important; }
+      .dna2-intro   { font-size: 12px !important; margin-bottom: 12px !important; line-height: 1.5 !important; }
+      .dna2-eyebrow { font-size: 9px !important; margin-bottom: 12px !important; }
+      .dna2-cta     { font-size: 11px !important; padding: 8px 14px !important; }
+      /* Legend: hide at tablet — no room */
+      .dna2-legend  { display: none !important; }
+      /* T-chart: take remaining space, clip any overflow */
+      .dna2-t { min-width: 0 !important; overflow: hidden; }
+      /* Breadth bar: 3 cols instead of 5 */
+      .dna2-bar {
         grid-template-columns: repeat(3, 1fr) !important;
-        gap: 12px !important;
+        gap: 10px !important;
+      }
+      /* Lower: panel (cols 1-2) + stem (col 3) — matches bar columns */
+      .dna2-lower {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 10px !important;
         align-items: start !important;
       }
-      /* Panel spans the left 2 columns, row 1 */
-      .dna2-panel {
-        grid-column: 1 / 3 !important;
-        grid-row: 1 !important;
-        align-self: start;
-      }
-      /* Stem occupies column 3, and spans enough rows for all 5 tiles */
-      .dna2-stem {
+      .dna2-panel { grid-column: 1 / 3 !important; grid-row: 1 !important; }
+      .dna2-stem  {
         grid-column: 3 !important;
         grid-row: 1 / span 3 !important;
         display: flex !important;
         flex-direction: column !important;
-        gap: 10px !important;
+        gap: 8px !important;
       }
-      /* Depth axis: hide on tablet — too complex to re-orient cleanly */
+      /* Depth axis: hide — vertical text doesn't fit at this width */
       .dna2-axis.depth { display: none !important; }
-      .dna2-tile    { min-height: 80px !important; }
-      .dna2-tile-nm { font-size: 12px !important; }
-      .dna2-tile-ic { width: 32px !important; height: 32px !important; }
+      /* Scale tiles down */
+      .dna2-tile    { min-height: 72px !important; padding: 8px 6px !important; }
+      .dna2-tile-nm { font-size: 10px !important; }
+      .dna2-tile-ic { width: 28px !important; height: 28px !important; }
+      /* Breadth axis label */
+      .dna2-axis.breadth .dna2-axis-label { font-size: 11px !important; }
     }
 
     /* ── Beyond the Pixels (oh2): tighten headline/gap at wide tablet ── */
