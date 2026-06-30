@@ -5953,14 +5953,14 @@
        hidden on .cb-fab2) so only the top arc shows through, like light rising
        from the floor of the glass. */
     .cb-fab2-glow {
-      position: absolute; left: 50%; top: 55%;
+      position: absolute; left: 50%; top: 68%;
       width: 200%; aspect-ratio: 1 / 1;
       transform: translateX(-50%);
       border-radius: 50%;
       background: radial-gradient(circle,
-        #ff9d42 0%, #ff6b35 35%, #ff6b35 55%, rgba(255,107,53,0) 78%);
+        #ffe27a 0%, #ff9d5c 16%, #ff6b8b 32%, #c06bff 48%, #5e7dff 64%, #1a1a2e 84%, #0b0b0d 100%);
       filter: blur(10px);
-      opacity: 0.65;
+      opacity: 0.9;
       z-index: 0;
       pointer-events: none;
     }
@@ -5970,7 +5970,7 @@
       width: 100% !important;
       height: 100% !important;
       pointer-events: none;
-      opacity: 0.62;   /* lets the blurred real backdrop (from the frame's backdrop-filter) show through the star */
+      opacity: 0.8;   /* lets the blurred real backdrop (from the frame's backdrop-filter) show through the star */
     }
     @media (prefers-reduced-motion: reduce) {
       .cb-fab2 { transition: opacity 0.3s ease; transform: none; }
@@ -9720,6 +9720,29 @@
     html:not([data-theme="dark"]) .s2-bar-rule { background: rgba(37,37,37,0.12); }
     html:not([data-theme="dark"]) .s2-bar-cta { color: var(--secondary); border-color: rgba(37,37,37,0.20); }
     html:not([data-theme="dark"]) .s2-bar-cta:hover { background: rgba(37,37,37,0.06); border-color: rgba(37,37,37,0.35); }
+    html:not([data-theme="dark"]) .s2-bar-tag {
+      color: rgba(37,37,37,0.65);
+      background: rgba(37,37,37,0.06);
+      border-color: rgba(37,37,37,0.12);
+    }
+    html:not([data-theme="dark"]) .s2-bar-tag-shipped {
+      color: #6F7E15;
+      background: rgba(111,126,21,0.08);
+      border-color: rgba(111,126,21,0.25);
+    }
+    html:not([data-theme="dark"]) .s2-bar-metric-val { color: #6F7E15; }
+    html:not([data-theme="dark"]) .s2-bar-metric-lbl { color: rgba(37,37,37,0.50); }
+    html:not([data-theme="dark"]) .s2-side-nav-btn {
+      background: rgba(37,37,37,0.07);
+      color: rgba(37,37,37,0.65);
+      box-shadow: rgba(37,37,37,0.10) 0 1px 6px inset;
+    }
+    html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
+      background: rgba(37,37,37,0.12);
+      color: var(--secondary);
+    }
+    html:not([data-theme="dark"]) .tag-text { color: rgba(37,37,37,0.70); }
+    html:not([data-theme="dark"]) .tags-bar-overlay { background: rgba(37,37,37,0.05); }
 
     /* DNA tile labels */
     html:not([data-theme="dark"]) .dna2-tile-nm { color: rgba(37,37,37,0.65); }
@@ -14919,34 +14942,35 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       const fabCam = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
       fabCam.position.set(0, 0, 5);
 
-      // Lights — dialed way down so the glass reads as transparent, not a blown-out white silhouette
-      const fk = new THREE.DirectionalLight(0xffffff, 1.6); fk.position.set(1,2,3);   fabScene.add(fk);
-      const ff = new THREE.DirectionalLight(0xeaf0ff, 0.9); ff.position.set(-3,-1,2);  fabScene.add(ff);
-      const fr = new THREE.DirectionalLight(0xf2f6ff, 1.0); fr.position.set(-2,3,-2);  fabScene.add(fr);
-      fabScene.add(new THREE.AmbientLight(0xffffff, 0.12));
-      const fo1 = new THREE.PointLight(0xffffff, 3.5, 8); fabScene.add(fo1);
-      const fo2 = new THREE.PointLight(0xeaf2ff, 2.5, 8); fabScene.add(fo2);
+      // Lights — brighter still, warmed slightly to support the yellow glass tint
+      const fk = new THREE.DirectionalLight(0xfffdf2, 3.2); fk.position.set(1,2,3);   fabScene.add(fk);
+      const ff = new THREE.DirectionalLight(0xf5f3ea, 2.0); ff.position.set(-3,-1,2);  fabScene.add(ff);
+      const fr = new THREE.DirectionalLight(0xfaf6e8, 2.2); fr.position.set(-2,3,-2);  fabScene.add(fr);
+      fabScene.add(new THREE.AmbientLight(0xfffdf0, 0.32));
+      const fo1 = new THREE.PointLight(0xfffdf0, 6.5, 8); fabScene.add(fo1);
+      const fo2 = new THREE.PointLight(0xf5f0d8, 5.0, 8); fabScene.add(fo2);
 
-      // Clear, colorless, properly transmissive glass — low light so the backdrop shows through
+      // Light, transmissive glass with just a hint of yellow in the base color
       const fabGlass = new MeshTransmissionMaterial({
         samples: 8,
         transmissionSampler: false,
         transmission: 1.0,
-        thickness: 0.6,
+        thickness: 0.4,
         roughness: 0.02,
         chromaticAberration: 0,
         anisotropicBlur: 0.04,
-        distortion: 0.35,
-        distortionScale: 0.5,
+        distortion: 0.3,
+        distortionScale: 0.45,
         temporalDistortion: 0.15,
       });
+      fabGlass.color = new THREE.Color(0xfff6d8);   // a pint of yellow
       fabGlass.ior = 1.45;
-      fabGlass.attenuationColor = new THREE.Color(0xffffff);
-      fabGlass.attenuationDistance = 2.0;
-      fabGlass.envMapIntensity = 1.0;
+      fabGlass.attenuationColor = new THREE.Color(0xfffbe8);
+      fabGlass.attenuationDistance = 4.0;
+      fabGlass.envMapIntensity = 2.0;
       fabGlass.clearcoat = 1.0;
       fabGlass.clearcoatRoughness = 0.05;
-      fabGlass.specularIntensity = 0.6;
+      fabGlass.specularIntensity = 1.0;
 
       // Offscreen neutral grayscale backdrop the glass refracts (transmission needs something to sample)
       const fabBufScene = new THREE.Scene();
@@ -15662,7 +15686,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260630-band50" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260630-staticface" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
