@@ -5251,7 +5251,6 @@
     .sn-cta:hover { opacity: 1; }
     .sn-cta-arrow { display: inline-block; transition: transform 0.2s ease; }
     .sn-cta:hover .sn-cta-arrow { transform: translateX(3px); }
-    [data-theme="dark"] .sn-cta { color: #F0EDE8; }
 
     /* ─── old hero-frame rule removed — see .hero-frame above ── */
 
@@ -9054,6 +9053,35 @@
     /* ─── PHONE-FIRST RESPONSIVE OVERRIDES ─────────────────────
        Covers gaps in existing breakpoints for 320–767px screens.  */
 
+    /* ── Section 2 project bar — stack on phone ── */
+    @media (max-width: 767px) {
+      /* Bar: pin left/right so nav buttons don't overlap */
+      .s2-project-bar,
+      .s2-project-bar.s2-bar-in {
+        left: 12px;
+        right: 72px;
+        width: auto;
+        transform: translateY(0) !important;
+        padding: 20px 20px;
+        border-radius: 16px;
+      }
+      /* Nav buttons: smaller + clear of bar */
+      .s2-side-nav { right: 12px; gap: 8px; }
+      .s2-side-nav-btn { width: 48px; height: 48px; }
+
+      .s2-bar-top-row {
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      .s2-bar-tags { max-width: 100%; justify-content: flex-start; }
+      .s2-bar-title { white-space: normal !important; font-size: 20px; }
+      .s2-bar-desc  { font-size: 13px; }
+      .s2-bar-metrics { flex-wrap: wrap; gap: 20px; }
+      .s2-bar-metric-val { font-size: 20px; }
+      .s2-bar-bottom-row { flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+    }
+
     @media (max-width: 767px) {
       /* Hero facts — tighter padding, 2×2 grid of items */
       .hero-facts {
@@ -9143,20 +9171,66 @@
 
     /* ── DNA T-chart: stack vertically so nothing overflows on iPad ── */
     @media (max-width: 1023px) {
-      .dna2 { flex-direction: column; gap: 32px; align-items: stretch; }
-      .dna2-aside { width: 100%; max-width: 100%; flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+      /* ① Outer flex: aside on top, T-chart below */
+      .dna2 {
+        flex-direction: column !important;
+        flex-wrap: nowrap !important;
+        gap: 32px !important;
+        align-items: stretch !important;
+        max-width: 100% !important;
+      }
+      /* ② Aside: full-width block */
+      .dna2-aside {
+        width: 100% !important;
+        flex: 0 0 auto !important;
+        min-width: 0 !important;
+        flex-direction: column;
+        gap: 14px;
+      }
       .dna2-heading { font-size: 26px; margin-bottom: 10px; }
       .dna2-intro   { font-size: 14px; margin-bottom: 12px; }
-      .dna2-legend  { position: static; right: auto; bottom: auto; flex-shrink: 0; align-self: flex-start; margin-top: 4px; }
-      .dna2-bar     { grid-template-columns: repeat(3, 1fr); gap: 12px; }
-      .dna2-lower   { grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start; }
-      .dna2-stem    { grid-column: 3 / 4; grid-row: 1 / 3; }
-      .dna2-axis.depth { grid-column: auto; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; }
-      .dna2-axis.depth .dna2-axis-label { writing-mode: horizontal-tb; font-size: 18px; }
-      .dna2-panel   { grid-column: 1 / 3; grid-row: auto; }
-      .dna2-tile    { min-height: 88px; }
-      .dna2-tile-nm { font-size: 12px; }
-      .dna2-tile-ic { width: 32px; height: 32px; }
+      /* ③ Legend: de-absolute so it doesn't overlap */
+      .dna2-legend {
+        position: static !important;
+        right: auto !important;
+        bottom: auto !important;
+        align-self: flex-start;
+        margin-top: 0;
+      }
+      /* ④ T-section: full width */
+      .dna2-t {
+        flex: 0 0 auto !important;
+        width: 100% !important;
+        min-width: 0 !important;
+      }
+      /* ⑤ Breadth bar: 3 cols (tiles wrap to 2 rows — fine) */
+      .dna2-bar { grid-template-columns: repeat(3, 1fr) !important; gap: 12px !important; }
+      /* ⑥ Lower section: panel left (cols 1-2), stem right (col 3) */
+      .dna2-lower {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 12px !important;
+        align-items: start !important;
+      }
+      /* Panel spans the left 2 columns, row 1 */
+      .dna2-panel {
+        grid-column: 1 / 3 !important;
+        grid-row: 1 !important;
+        align-self: start;
+      }
+      /* Stem occupies column 3, and spans enough rows for all 5 tiles */
+      .dna2-stem {
+        grid-column: 3 !important;
+        grid-row: 1 / span 3 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+      /* Depth axis: hide on tablet — too complex to re-orient cleanly */
+      .dna2-axis.depth { display: none !important; }
+      .dna2-tile    { min-height: 80px !important; }
+      .dna2-tile-nm { font-size: 12px !important; }
+      .dna2-tile-ic { width: 32px !important; height: 32px !important; }
     }
 
     /* ── Beyond the Pixels (oh2): tighten headline/gap at wide tablet ── */
@@ -9435,8 +9509,8 @@
 
         <!-- scattered polaroid cluster, left of center -->
         <div class="hero-photos hero-photos-left" aria-hidden="true">
-          <div class="polaroid p1"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Won $50K out of 100s of startups</span></div></div>
-          <div class="polaroid p2"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitched myself as the product</span></div></div>
+          <div class="polaroid p1"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">$50K pitch win</span></div></div>
+          <div class="polaroid p2"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">I was the product</span></div></div>
         </div>
 
         <div class="hero-screen-left">
@@ -9466,15 +9540,15 @@
         <!-- mobile polaroid carousel — hidden on desktop, slow right→left scroll on tablet/mobile -->
         <div class="hero-carousel" aria-hidden="true">
           <div class="hero-carousel-track">
-            <div class="hero-carousel-wrap" style="--r:-5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Won $50K out of 100s of startups</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:4deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitched myself as the product</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:-3deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">First product. First booth. Texas.</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:3deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed how 1:1 AI tutoring feels</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">$50K pitch win</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:4deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">I was the product</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-3deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">First booth. Texas.</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:3deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed the AI UX</span></div></div>
             <!-- duplicate set for seamless infinite loop -->
-            <div class="hero-carousel-wrap" style="--r:-5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Won $50K out of 100s of startups</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:4deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitched myself as the product</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:-3deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">First product. First booth. Texas.</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:3deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed how 1:1 AI tutoring feels</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">$50K pitch win</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:4deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">I was the product</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-3deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">First booth. Texas.</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:3deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed the AI UX</span></div></div>
           </div>
         </div>
 
@@ -9482,8 +9556,8 @@
 
         <!-- scattered polaroid cluster, right of center -->
         <div class="hero-photos" aria-hidden="true">
-          <div class="polaroid p3"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">First product. First booth. Texas.</span></div></div>
-          <div class="polaroid p4"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed how 1:1 AI tutoring feels</span></div></div>
+          <div class="polaroid p3"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">First booth. Texas.</span></div></div>
+          <div class="polaroid p4"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed the AI UX</span></div></div>
         </div>
 
 
