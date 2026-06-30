@@ -401,6 +401,7 @@
       border-radius: 4px;
       box-shadow: none;
     }
+    [data-theme="dark"] .pc { background: #353535; }
     .pc img {
       display: block;
       width: 100%;
@@ -1050,12 +1051,11 @@
       min-height: 0;
       width: 100%;
     }
+    /* tm-section is center-justified — wrap must NOT be flex:1 or it over-stretches */
     .tm-section > .cinematic-wrap {
       display: flex;
       flex-direction: column;
       align-items: center;
-      flex: 1;
-      min-height: 0;
       width: 100%;
     }
 
@@ -5251,6 +5251,7 @@
     .sn-cta:hover { opacity: 1; }
     .sn-cta-arrow { display: inline-block; transition: transform 0.2s ease; }
     .sn-cta:hover .sn-cta-arrow { transform: translateX(3px); }
+    [data-theme="dark"] .sn-cta { color: #F0EDE8; }
 
     /* ─── old hero-frame rule removed — see .hero-frame above ── */
 
@@ -5572,7 +5573,7 @@
     [data-theme="dark"] .hv-connect       { color: #FB9393; }
     [data-theme="dark"] .hv-scale         { color: #0F8EDD; }
     [data-theme="dark"] .hv-scale::before { border-color: #0F8EDD; }
-    [data-theme="dark"] .hv-h             { border-color: #0F8EDD; }
+    [data-theme="dark"] .hv-h             { border-color: #0F8EDD; background: #2C2C2C; }
     /* hero text on dark background — crisp near-white per Figma */
     [data-theme="dark"] .hero-heading { color: #F5F5F7; }
     [data-theme="dark"] .greeting     { color: #F5F5F7; }
@@ -6303,7 +6304,7 @@
       transition: background 0.25s ease, filter 0.25s ease, opacity 0.3s ease, top 0.35s cubic-bezier(0.34,1.2,0.64,1);
     }
     .cb-send.vis::after { opacity: 1; }
-    .cb-send.vis { color: #252525; } /* dark label + ↵ icon on the lime fill */
+    .cb-send.vis { color: #252525; } /* always dark text — lime fill is light in both themes */
     /* hover: the discs rise to flood ~80% of the pill and sharpen */
     .cb-send:hover::before,
     .cb-send:hover::after { top: 20%; filter: blur(6px); }
@@ -9468,12 +9469,12 @@
             <div class="hero-carousel-wrap" style="--r:-5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Won $50K out of 100s of startups</span></div></div>
             <div class="hero-carousel-wrap" style="--r:4deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitched myself as the product</span></div></div>
             <div class="hero-carousel-wrap" style="--r:-3deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">First product. First booth. Texas.</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:3deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Launched 1:1 AI tutoring to the world</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:3deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed how 1:1 AI tutoring feels</span></div></div>
             <!-- duplicate set for seamless infinite loop -->
             <div class="hero-carousel-wrap" style="--r:-5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Won $50K out of 100s of startups</span></div></div>
             <div class="hero-carousel-wrap" style="--r:4deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitched myself as the product</span></div></div>
             <div class="hero-carousel-wrap" style="--r:-3deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">First product. First booth. Texas.</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:3deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Launched 1:1 AI tutoring to the world</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:3deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed how 1:1 AI tutoring feels</span></div></div>
           </div>
         </div>
 
@@ -9482,7 +9483,7 @@
         <!-- scattered polaroid cluster, right of center -->
         <div class="hero-photos" aria-hidden="true">
           <div class="polaroid p3"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">First product. First booth. Texas.</span></div></div>
-          <div class="polaroid p4"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Launched 1:1 AI tutoring to the world</span></div></div>
+          <div class="polaroid p4"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed how 1:1 AI tutoring feels</span></div></div>
         </div>
 
 
@@ -15671,10 +15672,10 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     setInterval(flipNext, 5000);
   })();
 
-  /* ── Cinematic camera-dolly scroll transitions ──────────────────────────
-     Applies scroll-scrubbed scale + translate to inner content wrappers.
-     Sections keep their full-area backgrounds; only the content moves.
-     Result: a weighted, premium depth feel as you move between sections.
+  /* ── Cinematic section entrances ────────────────────────────────────────
+     One-shot animations triggered as each section scrolls into view.
+     NO scrub — scrub fights scroll-snap and causes jitter. Instead,
+     power3.out easing gives the weighted "settling into place" feel.
   ──────────────────────────────────────────────────────────────────────── */
   (function initCinematicScroll() {
     window.addEventListener('load', function () {
@@ -15683,85 +15684,53 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
       gsap.registerPlugin(ScrollTrigger);
 
-      /* scrub: 1.2 adds ~1.2s of weighted lag — gives that "expensive" feel
-         where the content settles slightly behind the scroll gesture.       */
-      var SCRUB = 1.2;
+      var DUR  = 1.0;
+      var EASE = 'power3.out';
 
       /* ── About Me ──────────────────────────────────────────────────────── */
-      var aboutSection = document.getElementById('aboutSection');
-      var aboutWrap    = aboutSection && aboutSection.querySelector('.cinematic-wrap');
-      if (aboutSection && aboutWrap) {
-
-        // Entrance: arrives from slightly below and slightly zoomed-in
+      var aboutWrap = document.querySelector('#aboutSection .cinematic-wrap');
+      if (aboutWrap) {
         gsap.fromTo(aboutWrap,
-          { y: 70, scale: 1.04, opacity: 0 },
-          { y: 0,  scale: 1,    opacity: 1, ease: 'none',
+          { y: 60, scale: 1.04, opacity: 0 },
+          { y: 0,  scale: 1,    opacity: 1,
+            duration: DUR, ease: EASE,
             scrollTrigger: {
-              trigger: aboutSection,
-              start: 'top 90%',   // section enters bottom of viewport
-              end:   'top 10%',   // section top reaches near-top
-              scrub: SCRUB,
+              trigger: '#aboutSection',
+              start: 'top 82%',
+              toggleActions: 'play none none none',
             }
           }
         );
-
-        // Exit: content recedes upward as section scrolls off the top
-        gsap.to(aboutWrap, {
-          y: -55, scale: 0.97, opacity: 0.85, ease: 'none',
-          scrollTrigger: {
-            trigger: aboutSection,
-            start: 'top -5%',    // section top just above viewport
-            end:   'bottom 15%', // section almost gone
-            scrub: SCRUB,
-          }
-        });
       }
 
       /* ── Testimonials ──────────────────────────────────────────────────── */
-      var tmSection = document.getElementById('testimonialsSection');
-      var tmWrap    = tmSection && tmSection.querySelector('.cinematic-wrap');
-      if (tmSection && tmWrap) {
-
-        // Entrance: y + scale only — individual element opacity handled by
-        // the existing .tm-visible CSS animation to avoid double-opacity
+      /* opacity stays untouched — .tm-visible CSS animation owns that */
+      var tmWrap = document.querySelector('#testimonialsSection .cinematic-wrap');
+      if (tmWrap) {
         gsap.fromTo(tmWrap,
-          { y: 70, scale: 1.04 },
-          { y: 0,  scale: 1,   ease: 'none',
+          { y: 60, scale: 1.04 },
+          { y: 0,  scale: 1,
+            duration: DUR, ease: EASE,
             scrollTrigger: {
-              trigger: tmSection,
-              start: 'top 90%',
-              end:   'top 10%',
-              scrub: SCRUB,
+              trigger: '#testimonialsSection',
+              start: 'top 82%',
+              toggleActions: 'play none none none',
             }
           }
         );
-
-        // Exit: fade + recede
-        gsap.to(tmWrap, {
-          y: -55, scale: 0.97, opacity: 0.85, ease: 'none',
-          scrollTrigger: {
-            trigger: tmSection,
-            start: 'top -5%',
-            end:   'bottom 15%',
-            scrub: SCRUB,
-          }
-        });
       }
 
       /* ── Footer ────────────────────────────────────────────────────────── */
-      var footer        = document.getElementById('contactSection');
-      var footerContent = footer && footer.querySelector('.footer-content');
-      if (footer && footerContent) {
-
-        // Entrance: y + scale only — footer-note has its own opacity transition
+      var footerContent = document.querySelector('#contactSection .footer-content');
+      if (footerContent) {
         gsap.fromTo(footerContent,
-          { y: 70, scale: 1.04 },
-          { y: 0,  scale: 1,   ease: 'none',
+          { y: 60, scale: 1.04 },
+          { y: 0,  scale: 1,
+            duration: DUR, ease: EASE,
             scrollTrigger: {
-              trigger: footer,
-              start: 'top 90%',
-              end:   'top 10%',
-              scrub: SCRUB,
+              trigger: '#contactSection',
+              start: 'top 82%',
+              toggleActions: 'play none none none',
             }
           }
         );
