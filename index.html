@@ -401,8 +401,8 @@
       border-radius: 4px;
       box-shadow: none;
     }
-    [data-theme="dark"] .pc { background: #353535; }
-    [data-theme="dark"] .pc-cap { color: #C8C8C8; }
+    [data-theme="dark"] .pc { background: #f5f5f5; box-shadow: 0 2px 12px rgba(0,0,0,0.45); }
+    [data-theme="dark"] .pc-cap { color: #1a1a1a; }
     .pc img {
       display: block;
       width: 100%;
@@ -429,7 +429,7 @@
     }
     .hero-carousel-track {
       display: flex;
-      gap: 22px;
+      gap: 0;
       width: max-content;
       animation: hero-carousel-scroll 38s linear infinite;
       will-change: transform;
@@ -437,9 +437,14 @@
     .hero-carousel-wrap {
       flex-shrink: 0;
       transform: rotate(var(--r, 0deg));
+      margin-right: 22px;
     }
     .hero-carousel-wrap .pc {
       width: 120px;
+    }
+    .hero-carousel-wrap .pc-cap {
+      font-size: 13px;
+      white-space: normal;
     }
     @keyframes hero-carousel-scroll {
       from { transform: translateX(0); }
@@ -615,10 +620,10 @@
     .tool-cluster { white-space: nowrap; margin-left: 0.22em; }
     .tool-ic {
       display: inline-block;
-      width: 55.78px;
-      height: 55.78px;
+      width: 1.45em;
+      height: 1.45em;
       vertical-align: middle;
-      margin-left: 6px;
+      margin-left: 0.18em;
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
@@ -985,6 +990,16 @@
     }
     .hero.hero-revealed .word-inner { transform: translateY(0); }
     .hero.hero-revealed .hero-heading { opacity: 1 !important; animation: none !important; }
+    /* Character-level reveal for hero heading — fade + rise, staggered per char */
+    .chr {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.36s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--ci, 0) * 9ms),
+                  transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--ci, 0) * 9ms);
+    }
+    .hero.hero-revealed .chr { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) { .chr { opacity: 1 !important; transform: none !important; transition: none !important; } }
 
     /* Line-clip: full line rises from a hidden trough */
     .hero-lw { overflow: hidden; display: block; }
@@ -1042,56 +1057,40 @@
       transform: translateY(0);
     }
 
-    /* ── Cinematic scroll wrappers ─────────────────────────────────────────
-       Sit INSIDE section containers so the section background always fills
-       its full area. Only the content inside transforms — no card bleed.
-
-       Initial state: content is invisible and pushed down + slightly zoomed.
-       .cw-visible (added by IntersectionObserver) triggers the transition.
-
-       cubic-bezier(0.16, 1, 0.3, 1) is an expo-out curve: very fast start,
-       extreme deceleration into the final position. This is what gives it
-       the "heavy, expensive, settling" feel rather than a bounce or spring.
-    ─────────────────────────────────────────────────────────────────────── */
+    /* ── Structural wrappers (layout only, no animation) ─────────────────── */
     .am-section > .cinematic-wrap {
       display: flex;
       flex-direction: column;
       flex: 1;
       min-height: 0;
       width: 100%;
-      opacity: 0;
-      transform: translateY(80px) scale(1.05);
-      transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
-                  transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    /* tm-section: center-justified — no flex:1 or it over-stretches.
-       Children already have their own opacity via .tm-visible, so
-       we only transition transform here to avoid double-hiding.         */
     .tm-section > .cinematic-wrap {
       display: flex;
       flex-direction: column;
       align-items: center;
       width: 100%;
-      transform: translateY(80px) scale(1.05);
-      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    /* Footer content: transform only, footer-note has its own opacity reveal */
-    .footer-content {
-      transform: translateY(80px) scale(1.05);
-      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* ── Scroll reveal: fade up from bottom ────────────────────────────────
+       .sr-item starts hidden and offset downward.
+       When the parent section hits 15% viewport visibility, JS adds
+       .sr-visible to all .sr-item children with staggered --sd delays.
+       Easing: expo-out (0.16,1,0.3,1) — fast out of starting position,
+       then very slow final approach, like something with real weight.
+    ─────────────────────────────────────────────────────────────────────── */
+    .sr-item {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--sd, 0ms),
+                  transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--sd, 0ms);
     }
-    /* Visible state — class added by IntersectionObserver */
-    .cinematic-wrap.cw-visible,
-    .footer-content.cw-visible {
+    .sr-item.sr-visible {
       opacity: 1;
       transform: none;
     }
     @media (prefers-reduced-motion: reduce) {
-      .cinematic-wrap, .footer-content {
-        opacity: 1 !important;
-        transform: none !important;
-        transition: none !important;
-      }
+      .sr-item { opacity: 1 !important; transform: none !important; transition: none !important; }
     }
 
 
@@ -2536,7 +2535,7 @@
       .hero-screen::after  { left: -32px; right: -32px; }
       .hero-screen         { min-height: calc(100svh - 104px); }  /* page 74 + hero 30 */
       .hero-content        { gap: 30px; }
-      .hero-heading { font-size: 26px; line-height: 36px; }
+      .hero-heading { font-size: 22px; line-height: 32px; }
       .hero-screen  { grid-template-columns: 1fr; } /* text fills full width — no photo column */
       .hero-screen-left { max-width: 100%; }
       .hero-facts   { max-width: 100%; }
@@ -5913,14 +5912,16 @@
       padding: 0;
       border: none;
       cursor: pointer;
-      perspective: 300px;
       overflow: hidden;
-      background: rgba(255,255,255,0.12);
-      backdrop-filter: blur(14px) saturate(160%);
-      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      isolation: isolate;
+      background-image:
+        linear-gradient(0deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+        radial-gradient(34.57% 51.92% at 49.87% 95.19%, rgba(247,247,252,0.08) 33.17%, rgba(247,247,252,0) 100%);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       box-shadow:
-        inset 1.5px 2px 3px rgba(255,255,255,0.90),
-        inset 0 0 0 1px rgba(255,255,255,0.28),
+        inset 0 0 0 1px rgba(255,255,255,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.22),
         0 12px 40px rgba(0,0,0,0.28);
       /* hidden default: parked off-screen to the right, faded */
       opacity: 0;
@@ -5940,34 +5941,33 @@
       transform: translateX(150px) scale(0.9);
       pointer-events: none;
     }
-    .cb-fab2 svg {
+    /* Rainbow aurora — same signature as the chat panel's cp-wheel-glow, rising from
+       the floor of the button and clipped by the rounded frame. Sits behind the icon. */
+    .cb-fab2-glow {
+      position: absolute; left: 50%; bottom: -46px;
+      width: 110px; height: 110px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: conic-gradient(from 0deg,
+        #ff4757, #ff6b35, #ffd32a, #2ed573, #1e90ff, #a29bfe, #fd79a8, #ff4757);
+      filter: blur(16px) saturate(130%);
+      opacity: 0.55;
+      animation: ask-wheel-spin 14s linear infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .cb-fab2-star {
+      position: relative;
+      z-index: 1;
       width: 30px;
       height: 30px;
-      color: #ffffff;
-      flex-shrink: 0;
-      animation: cb-fab-spin 8s linear infinite;
-    }
-    .cb-fab2::before {   /* rotating rainbow glow behind the spark */
-      content: '';
-      position: absolute;
-      z-index: -1;
-      left: 50%; top: 50%;
-      width: 220%; aspect-ratio: 1 / 1;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      filter: blur(10px);
-      background: conic-gradient(
-        from 0deg,
-        #ff4757, #ff6b35, #ffd32a, #2ed573, #1e90ff, #a29bfe, #fd79a8, #ff4757
-      );
-      opacity: 0.65;
-      animation: ask-wheel-spin 6s linear infinite;
-      will-change: transform;
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.35));
+      pointer-events: none;
     }
     @media (prefers-reduced-motion: reduce) {
       .cb-fab2 { transition: opacity 0.3s ease; transform: none; }
       .cb-fab2.fab-in { transform: none; }
-      .cb-fab2 svg, .cb-fab2::before { animation: none !important; }
+      .cb-fab2-glow { animation: none; }
     }
 
     /* ── Bar EXIT (reverse entrance) ───────────────────────────
@@ -9118,7 +9118,11 @@
       .s2-section-wrap { min-height: auto; height: auto; padding-bottom: 32px; }
 
       /* Spiral canvas zone: fixed height */
-      .s2-cards-zone { height: 340px; position: relative; }
+      .s2-cards-zone { height: 340px; position: relative; order: 1; }
+
+      /* "Featured Work" title + toggle: above the spiral, not below */
+      .s2-fw-header { order: 0; }
+      .s2-work-container { order: 2; }
 
       /* Show the accordion */
       .s2-mobile-accordion {
@@ -9426,35 +9430,48 @@
       .dna2-axis.depth { display: none !important; }
     }
 
-    /* ── DNA T-shape: phone override (must come AFTER the 1023px tablet block above) ── */
+    /* ── DNA + tab nav: phone override (must come AFTER the 1023px tablet block above) ── */
     @media (max-width: 767px) {
-      /* Stack aside above T-chart */
-      .dna2 { flex-direction: column !important; gap: 20px !important; overflow: visible !important; }
-      .dna2-aside { width: 100% !important; }
-      .dna2-intro { display: none !important; }
+      /* About Me title */
+      .abt-title { font-size: 14px !important; }
+
+      /* Tab nav: same glass-pill + sliding-thumb as desktop/testimonials, just smaller — stays in normal flow, section-specific (not fixed to viewport) */
+      .abt-tab { font-size: 12px !important; padding: 8px 14px !important; }
+
+      /* ── DNA aside: compact, left-aligned ── */
+      .dna2 { flex-direction: column !important; gap: 16px !important; overflow: visible !important; align-items: flex-start !important; }
+      .dna2-aside { width: 100% !important; max-width: 100% !important; align-items: flex-start !important; text-align: left !important; }
+      .dna2-heading { font-size: 20px !important; text-align: left !important; margin-bottom: 6px !important; }
+      .dna2-intro { display: block !important; font-size: 12px !important; text-align: left !important; line-height: 1.6 !important; margin-bottom: 10px !important; }
+      .dna2-cta { align-self: flex-start !important; width: auto !important; font-size: 11px !important; padding: 8px 14px !important; }
       .dna2-legend { display: none !important; }
-      .dna2-heading { font-size: 22px !important; }
-      /* T-chart: full-width, keep 5-col compact grid */
+
+      /* ── T-chart: 5-col breadth bar, stem in center col, panel full-width below ── */
       .dna2-t { width: 100% !important; min-width: 0 !important; flex: none !important; }
       .dna2-bar { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 5px !important; }
+
+      /* Lower: 5-col grid. Row 1 = stem (col 3) + depth axis (cols 4-5). Row 2 = full-width panel */
       .dna2-lower { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 5px !important; align-items: start !important; }
-      /* Stem stays in center col (col 3) */
-      .dna2-stem { grid-column: 3 / 4 !important; grid-row: 1 !important; display: flex !important; flex-direction: column !important; gap: 5px !important; }
-      /* Quote panel spans cols 1-2 */
-      .dna2-panel { grid-column: 1 / 3 !important; grid-row: 1 !important; align-self: start !important; }
-      /* Hide depth axis */
-      .dna2-axis.depth { display: none !important; }
-      /* Compact tiles: icon only */
-      .dna2-tile { min-height: 52px !important; padding: 6px 4px !important; gap: 4px !important; border-radius: 10px !important; }
-      .dna2-tile-ic { width: 22px !important; height: 22px !important; }
-      .dna2-tile-nm { display: none !important; }
-      /* Axis */
-      .dna2-axis-label { font-size: 11px !important; }
-      .dna2-arm.left, .dna2-arm.right { max-width: 40px !important; }
-      /* Panel text compact */
-      .dna2-quote { font-size: 12px !important; line-height: 1.5 !important; }
-      .dna2-name { font-size: 12px !important; }
-      .dna2-qmark { font-size: 28px !important; }
+      /* Stem: center column, row 1 — forms the vertical bar of the T */
+      .dna2-stem { display: flex !important; flex-direction: column !important; gap: 5px !important; grid-column: 3 / 4 !important; grid-row: 1 !important; }
+      /* Depth axis: cols 4-5, row 1 */
+      .dna2-axis.depth { display: flex !important; grid-column: 4 / 6 !important; grid-row: 1 !important; flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; padding-top: 4px !important; }
+      .dna2-axis.depth .dna2-axis-label { writing-mode: vertical-rl !important; font-size: 9px !important; white-space: nowrap !important; }
+      .dna2-arm.up, .dna2-arm.down { min-height: 20px !important; }
+      /* Panel: spans ALL 5 cols in row 2 — full width below the T */
+      .dna2-panel { display: flex !important; grid-column: 1 / 6 !important; grid-row: 2 !important; align-self: stretch !important; padding: 12px 14px !important; }
+
+      /* Compact tiles — bigger, legible name under a smaller icon */
+      .dna2-tile { min-height: 78px !important; padding: 8px 4px !important; gap: 4px !important; border-radius: 10px !important; }
+      .dna2-tile-ic { width: 18px !important; height: 18px !important; }
+      .dna2-tile-nm { display: block !important; font-size: 9.5px !important; line-height: 1.25 !important; }
+      /* Breadth axis */
+      .dna2-axis-label { font-size: 10px !important; }
+      .dna2-arm.left, .dna2-arm.right { max-width: 30px !important; }
+      /* Panel text */
+      .dna2-quote { font-size: 11px !important; line-height: 1.5 !important; }
+      .dna2-name  { font-size: 12px !important; }
+      .dna2-qmark { font-size: 24px !important; }
     }
 
     /* ── Beyond the Pixels (oh2): tighten headline/gap at wide tablet ── */
@@ -10297,12 +10314,12 @@
         <div class="cinematic-wrap">
 
         <!-- Section title -->
-        <div class="abt-header">
+        <div class="abt-header sr-item" style="--sd:0ms">
           <h2 class="abt-title">About Me</h2>
         </div>
 
         <!-- Tab navigation -->
-        <div class="abt-nav">
+        <div class="abt-nav sr-item" style="--sd:80ms">
           <div class="abt-nav-pill">
             <button class="abt-tab is-active" data-pane="dna">My Design DNA</button>
             <button class="abt-tab" data-pane="outside">Beyond the Pixels</button>
@@ -10312,7 +10329,7 @@
         </div>
 
         <!-- Pane content -->
-        <div class="abt-panes">
+        <div class="abt-panes sr-item" style="--sd:180ms">
 
           <!-- ── DNA pane ── -->
           <div class="abt-pane is-active" id="abt-dna">
@@ -10461,7 +10478,6 @@
       <!-- ── TESTIMONIALS MARQUEE GRID ─────────────────────── -->
 
       <section class="tm-section" id="testimonialsSection">
-        <div class="cinematic-wrap">
 
         <div class="tm-header">
           <h2 class="tm-headline">From people who know my work</h2>
@@ -10601,7 +10617,6 @@
           </div>
 
         </div><!-- /tm-stack-scene -->
-        </div><!-- /cinematic-wrap -->
 
       </section><!-- /testimonials -->
 
@@ -10688,7 +10703,7 @@
 
       <div class="footer-spread">
 
-        <div class="footer-col-left">
+        <div class="footer-col-left sr-item" style="--sd:0ms">
           <span class="footer-status">
             <span class="ph-dot"></span>
             <span class="footer-status-text">Open to the right team</span>
@@ -10821,11 +10836,37 @@
         return el;
       }
 
-      // Split heading into per-word clips
+      // Split heading into per-character fades
       const heading = document.querySelector('.hero-heading');
       if (heading) {
+        let ci = 0;
+        function wrapCharNode(node) {
+          if (node.nodeType === 3) {
+            const frag = document.createDocumentFragment();
+            for (const ch of node.textContent) {
+              if (/\s/.test(ch)) {
+                // plain whitespace text node — nothing to animate, and wrapping
+                // it in an inline-block span causes browsers to collapse it
+                frag.appendChild(document.createTextNode(ch));
+                continue;
+              }
+              const s = document.createElement('span');
+              s.className = 'chr';
+              s.style.setProperty('--ci', ci++);
+              s.textContent = ch;
+              frag.appendChild(s);
+            }
+            return frag;
+          }
+          if (node.nodeName === 'BR') return node.cloneNode(true);
+          const el = node.cloneNode(true);
+          el.classList.add('chr');
+          el.style.setProperty('--ci', ci);
+          ci += Math.max(el.textContent.length || 1, 4);
+          return el;
+        }
         const frag = document.createDocumentFragment();
-        [...heading.childNodes].forEach(n => frag.appendChild(wrapNode(n)));
+        [...heading.childNodes].forEach(n => frag.appendChild(wrapCharNode(n)));
         heading.innerHTML = '';
         heading.appendChild(frag);
       }
@@ -13205,10 +13246,20 @@
   <!-- ── AI CHAT FAB — standalone; shows on the middle sections (Projects,
        About, Testimonials). Shoots in from the right as the bar drops away. -->
   <button class="cb-fab2" id="cbFab" aria-label="Open AI chat">
-    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 1l2.09 8.91L23 12l-8.91 2.09L12 23l-2.09-8.91L1 12l8.91-2.09z"/>
+    <span class="cb-fab2-glow" aria-hidden="true"></span>
+    <svg class="cb-fab2-star" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="fabStarGrad" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="55%" stop-color="#eef2f7"/>
+          <stop offset="100%" stop-color="#c9d4e3"/>
+        </linearGradient>
+      </defs>
+      <path fill="url(#fabStarGrad)" transform="translate(257.125,11.9375)" d="M0 0 C3.44110066 1.27171111 4.00011393 1.95018912 5.875 5.0625 C7.00593865 7.99477707 7.8878251 10.98979601 8.7734375 14.00390625 C9.04466431 14.90296188 9.31589111 15.80201752 9.59533691 16.72831726 C10.18111788 18.67402549 10.76311058 20.62087738 11.34173584 22.56872559 C12.25902828 25.65537981 13.18701608 28.73864096 14.11767578 31.82128906 C16.95832156 41.24487135 19.7661342 50.67793438 22.54476929 60.11997986 C23.67156439 63.9431758 24.806968 67.76379049 25.94317627 71.584198 C26.72481581 74.2273388 27.49234558 76.87429013 28.25927734 79.52172852 C35.39980233 103.78477622 46.69874795 125.86508883 61.875 146.0625 C62.57882812 147.01253906 63.28265625 147.96257812 64.0078125 148.94140625 C74.62714947 162.57996648 87.60902623 175.30220977 101.875 185.0625 C102.51759766 185.5064209 103.16019531 185.9503418 103.82226562 186.40771484 C125.42127928 201.19967391 148.91517055 210.60454857 173.93460083 218.02151489 C176.89535856 218.89957298 179.8520984 219.79024481 182.80834961 220.68334961 C191.60537065 223.33420011 200.413486 225.94275759 209.24662781 228.47077942 C212.67466229 229.45210878 216.09983545 230.44324847 219.525177 231.43392944 C221.88500261 232.1099608 224.2495606 232.76699182 226.61499023 233.4230957 C228.04694614 233.83463624 229.47868182 234.24694412 230.91015625 234.66015625 C232.1412915 235.00570557 233.37242676 235.35125488 234.64086914 235.70727539 C238.33313594 237.25447649 240.31883802 239.0070528 242.875 242.0625 C243.4375 244.625 243.4375 244.625 242.875 247.0625 C239.87496819 250.74122379 237.12688949 251.92646932 232.61962891 253.24145508 C231.69152657 253.51807228 231.69152657 253.51807228 230.74467468 253.80027771 C228.70033861 254.40637334 226.65118495 254.9940859 224.6015625 255.58203125 C223.15747401 256.00675236 221.71374391 256.43269369 220.27035522 256.85978699 C216.45814847 257.98459645 212.64170502 259.09427238 208.82403564 260.20037842 C205.02364253 261.30355737 201.22663579 262.41823543 197.4296875 263.53320312 C196.69016814 263.75035508 195.95064878 263.96750704 195.18871975 264.19123936 C193.70710399 264.62639212 192.22551576 265.06163861 190.74395561 265.49698067 C189.27469697 265.92848426 187.80531245 266.35955946 186.33580208 266.790205 C177.28251104 269.44332765 168.2462896 272.13765231 159.25390625 274.9921875 C157.9887468 275.39260002 157.9887468 275.39260002 156.69802856 275.80110168 C117.59176829 288.37098897 83.06554829 312.77200177 58.875 346.0625 C58.45653809 346.63661621 58.03807617 347.21073242 57.60693359 347.80224609 C52.23917841 355.26851501 47.59364619 363.08626712 43.25 371.1875 C42.83105469 371.95457275 42.41210938 372.72164551 41.98046875 373.51196289 C32.19233605 392.27317802 26.70025118 412.96041686 20.80944824 433.18151855 C19.77163242 436.73738721 18.72419227 440.29041715 17.67773438 443.84375 C17.06459845 445.92841932 16.45169863 448.01315792 15.83886337 450.09791565 C15.44040857 451.45314638 15.04176187 452.80832071 14.64291763 454.16343689 C12.82922116 460.32785847 11.0185328 466.49156867 9.32177734 472.68945312 C9.0995903 473.48792664 8.87740326 474.28640015 8.64848328 475.10906982 C8.09939085 477.0930144 7.56484667 479.08097122 7.03198242 481.06933594 C5.77965441 484.3091632 4.5929115 485.92697501 1.875 488.0625 C-1.125 488.625 -1.125 488.625 -4.125 488.0625 C-7.25201892 484.75460819 -8.8158161 481.78649623 -10.08862305 477.44726562 C-10.41964523 476.34000122 -10.75066742 475.23273682 -11.09172058 474.09191895 C-11.43656998 472.89627319 -11.78141937 471.70062744 -12.13671875 470.46875 C-12.70676375 468.5469276 -13.2768099 466.62510554 -13.84691334 464.70330048 C-14.64474418 462.00286203 -15.43181632 459.2993314 -16.21917725 456.5958252 C-17.1827649 453.29359712 -18.1567106 449.99443773 -19.13085938 446.6953125 C-19.32195219 446.04800391 -19.51304501 445.40069532 -19.70992851 444.73377132 C-20.09627653 443.42523901 -20.48269962 442.11672885 -20.86919785 440.80824089 C-21.45030145 438.84008297 -22.03046454 436.87164926 -22.61062622 434.9032135 C-25.33288084 425.67763355 -28.10900752 416.46971167 -30.94140625 407.27734375 C-31.4778199 405.52284912 -31.4778199 405.52284912 -32.02507019 403.73291016 C-39.61730155 379.24380373 -51.37897142 356.56518251 -68.125 337.0625 C-68.85976562 336.20011719 -69.59453125 335.33773438 -70.3515625 334.44921875 C-72.55827424 331.93356736 -74.82296205 329.49118729 -77.125 327.0625 C-77.58036133 326.57458984 -78.03572266 326.08667969 -78.50488281 325.58398438 C-115.29920915 286.37251251 -165.00574592 273.3075689 -214.89453125 258.63671875 C-215.98295822 258.31469482 -217.07138519 257.9926709 -218.1927948 257.66088867 C-222.69168011 256.33492243 -227.18560202 255.02387889 -231.73193359 253.86962891 C-233.60292725 253.38695557 -233.60292725 253.38695557 -235.51171875 252.89453125 C-236.52838623 252.65065674 -237.54505371 252.40678223 -238.5925293 252.15551758 C-241.86126277 250.74472805 -243.22377217 249.03775972 -245.125 246.0625 C-245.125 242.9375 -245.125 242.9375 -244.125 240.0625 C-241.06574564 237.23257993 -237.95855852 236.20134693 -233.99658203 235.04467773 C-232.75232452 234.6767662 -231.50806702 234.30885468 -230.22610474 233.92979431 C-229.56109074 233.73748671 -228.89607674 233.5451791 -228.2109108 233.34704399 C-226.09135651 232.73410539 -223.97499361 232.11106271 -221.85910034 231.48561096 C-218.08820712 230.37279985 -214.3147278 229.26905953 -210.54034424 228.16815186 C-192.45504083 222.89220738 -174.38604443 217.60342809 -156.5078125 211.65625 C-154.68130661 211.05090675 -154.68130661 211.05090675 -152.81790161 210.43333435 C-128.16027861 202.13026166 -106.44381713 188.71180465 -87.33203125 171.08203125 C-85.41017848 169.32345093 -83.44852511 167.65430225 -81.4375 166 C-77.57408951 162.69106046 -74.36420937 158.97526897 -71.125 155.0625 C-70.48087158 154.30283936 -70.48087158 154.30283936 -69.82373047 153.52783203 C-50.1451327 130.26639097 -37.67991472 103.46965343 -28.85864258 74.49008179 C-28.0405624 71.80294179 -27.21321147 69.11877526 -26.38476562 66.43481445 C-23.34657217 56.55446985 -20.41236759 46.64831371 -17.56640625 36.7109375 C-16.98394519 34.69030799 -16.40134596 32.6697183 -15.81860352 30.64916992 C-14.70235581 26.77681888 -13.60872235 22.89899187 -12.52709961 19.0168457 C-12.01882205 17.24408656 -11.50982629 15.47153312 -11 13.69921875 C-10.67407616 12.49421219 -10.67407616 12.49421219 -10.34156799 11.26486206 C-8.71938295 5.72055467 -6.54490908 0.13089818 0 0 Z"/>
     </svg>
   </button>
+
+  <!-- FAB glass star is rendered in the loader module script above -->
 
   <!-- ── CHAT PANEL ─────────────────────────────────────────── -->
   <div class="cp" id="cp" aria-hidden="true">
@@ -14859,6 +14910,133 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       window.addEventListener('glassloaderhidden', () => setTimeout(releaseGPU, 1100));
       setTimeout(releaseGPU, 8000);   // hard fallback, well past the loader's own cap
     }
+
+    // ── FAB glass star ── runs in the same module, shares Three.js instance ──
+    (function initFabStar() {
+      const fabCanvas = document.getElementById('fabStarCanvas');
+      if (!fabCanvas || document.body.classList.contains('no-webgl')) return;
+
+      const SZ  = 72;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      fabCanvas.width  = SZ * dpr;
+      fabCanvas.height = SZ * dpr;
+
+      const fabRenderer = new THREE.WebGLRenderer({ canvas: fabCanvas, antialias: true, alpha: true });
+      fabRenderer.setPixelRatio(dpr);
+      fabRenderer.setSize(SZ, SZ, false);
+      fabRenderer.setClearColor(0x000000, 0);
+      fabRenderer.outputColorSpace = THREE.SRGBColorSpace;
+      fabRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+      fabRenderer.toneMappingExposure = 1.0;
+
+      const fabScene = new THREE.Scene();
+      const fabPmrem = new THREE.PMREMGenerator(fabRenderer);
+      fabScene.environment = fabPmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+      const fabCam = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+      fabCam.position.set(0, 0, 5);
+
+      // Lights — same recipe as the loader star, scaled down for the small canvas
+      const fk = new THREE.DirectionalLight(0xffffff, 5.0); fk.position.set(1,2,3);   fabScene.add(fk);
+      const ff = new THREE.DirectionalLight(0xeaf0ff, 3.5); ff.position.set(-3,-1,2);  fabScene.add(ff);
+      const fr = new THREE.DirectionalLight(0xfff4e0, 4.0); fr.position.set(-2,3,-2);  fabScene.add(fr);
+      fabScene.add(new THREE.AmbientLight(0xffffff, 0.3));
+      const fo1 = new THREE.PointLight(0xe6f28d, 12, 8); fabScene.add(fo1);
+      const fo2 = new THREE.PointLight(0x88aaff, 8, 8); fabScene.add(fo2);
+
+      // Same refractive glass as the loader star — rainbow dispersion lives INSIDE the glass
+      const fabGlass = new MeshTransmissionMaterial({
+        samples: 8,
+        transmissionSampler: false,
+        thickness: 0.9,
+        roughness: 0.0,
+        chromaticAberration: 0.22,
+        anisotropicBlur: 0.05,
+        distortion: 0.55,
+        distortionScale: 0.7,
+        temporalDistortion: 0.25,
+      });
+      fabGlass.ior = 1.48;
+      fabGlass.attenuationColor = new THREE.Color(0xd0eaff);
+      fabGlass.attenuationDistance = 1.2;
+      fabGlass.envMapIntensity = 4.5;
+      fabGlass.clearcoat = 1.0;
+      fabGlass.clearcoatRoughness = 0.0;
+      fabGlass.specularIntensity = 1.5;
+
+      // Offscreen colorful backdrop the glass refracts (transmission needs something to sample)
+      const fabBufScene = new THREE.Scene();
+      const fabTexCanvas = document.createElement('canvas');
+      fabTexCanvas.width = 128; fabTexCanvas.height = 128;
+      const fabTexCtx = fabTexCanvas.getContext('2d');
+      fabTexCtx.fillStyle = '#0b0b0d';
+      fabTexCtx.fillRect(0, 0, 128, 128);
+      const fabRainbow = fabTexCtx.createConicGradient(0, 64, 64);
+      fabRainbow.addColorStop(0.0, '#ff4757');
+      fabRainbow.addColorStop(0.16, '#ff6b35');
+      fabRainbow.addColorStop(0.33, '#ffd32a');
+      fabRainbow.addColorStop(0.5, '#2ed573');
+      fabRainbow.addColorStop(0.66, '#1e90ff');
+      fabRainbow.addColorStop(0.83, '#a29bfe');
+      fabRainbow.addColorStop(1.0, '#ff4757');
+      fabTexCtx.fillStyle = fabRainbow;
+      fabTexCtx.globalAlpha = 0.85;
+      fabTexCtx.fillRect(0, 0, 128, 128);
+      fabTexCtx.globalAlpha = 1;
+      const fabTexture = new THREE.CanvasTexture(fabTexCanvas);
+      fabTexture.colorSpace = THREE.SRGBColorSpace;
+      const fabBackdrop = new THREE.Mesh(
+        new THREE.PlaneGeometry(4, 4),
+        new THREE.MeshBasicMaterial({ map: fabTexture })
+      );
+      fabBackdrop.position.z = -1.2;
+      fabBufScene.add(fabBackdrop);
+
+      const fabFbo = new THREE.WebGLRenderTarget(SZ * dpr, SZ * dpr, {
+        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter
+      });
+
+      // Build star geometry (same SVG path as loader)
+      const STAR_D = 'M0 0 C3.44110066 1.27171111 4.00011393 1.95018912 5.875 5.0625 C7.00593865 7.99477707 7.8878251 10.98979601 8.7734375 14.00390625 C9.04466431 14.90296188 9.31589111 15.80201752 9.59533691 16.72831726 C10.18111788 18.67402549 10.76311058 20.62087738 11.34173584 22.56872559 C12.25902828 25.65537981 13.18701608 28.73864096 14.11767578 31.82128906 C16.95832156 41.24487135 19.7661342 50.67793438 22.54476929 60.11997986 C23.67156439 63.9431758 24.806968 67.76379049 25.94317627 71.584198 C26.72481581 74.2273388 27.49234558 76.87429013 28.25927734 79.52172852 C35.39980233 103.78477622 46.69874795 125.86508883 61.875 146.0625 C62.57882812 147.01253906 63.28265625 147.96257812 64.0078125 148.94140625 C74.62714947 162.57996648 87.60902623 175.30220977 101.875 185.0625 C102.51759766 185.5064209 103.16019531 185.9503418 103.82226562 186.40771484 C125.42127928 201.19967391 148.91517055 210.60454857 173.93460083 218.02151489 C176.89535856 218.89957298 179.8520984 219.79024481 182.80834961 220.68334961 C191.60537065 223.33420011 200.413486 225.94275759 209.24662781 228.47077942 C212.67466229 229.45210878 216.09983545 230.44324847 219.525177 231.43392944 C221.88500261 232.1099608 224.2495606 232.76699182 226.61499023 233.4230957 C228.04694614 233.83463624 229.47868182 234.24694412 230.91015625 234.66015625 C232.1412915 235.00570557 233.37242676 235.35125488 234.64086914 235.70727539 C238.33313594 237.25447649 240.31883802 239.0070528 242.875 242.0625 C243.4375 244.625 243.4375 244.625 242.875 247.0625 C239.87496819 250.74122379 237.12688949 251.92646932 232.61962891 253.24145508 C231.69152657 253.51807228 231.69152657 253.51807228 230.74467468 253.80027771 C228.70033861 254.40637334 226.65118495 254.9940859 224.6015625 255.58203125 C223.15747401 256.00675236 221.71374391 256.43269369 220.27035522 256.85978699 C216.45814847 257.98459645 212.64170502 259.09427238 208.82403564 260.20037842 C205.02364253 261.30355737 201.22663579 262.41823543 197.4296875 263.53320312 C196.69016814 263.75035508 195.95064878 263.96750704 195.18871975 264.19123936 C193.70710399 264.62639212 192.22551576 265.06163861 190.74395561 265.49698067 C189.27469697 265.92848426 187.80531245 266.35955946 186.33580208 266.790205 C177.28251104 269.44332765 168.2462896 272.13765231 159.25390625 274.9921875 C157.9887468 275.39260002 157.9887468 275.39260002 156.69802856 275.80110168 C117.59176829 288.37098897 83.06554829 312.77200177 58.875 346.0625 C58.45653809 346.63661621 58.03807617 347.21073242 57.60693359 347.80224609 C52.23917841 355.26851501 47.59364619 363.08626712 43.25 371.1875 C42.83105469 371.95457275 42.41210938 372.72164551 41.98046875 373.51196289 C32.19233605 392.27317802 26.70025118 412.96041686 20.80944824 433.18151855 C19.77163242 436.73738721 18.72419227 440.29041715 17.67773438 443.84375 C17.06459845 445.92841932 16.45169863 448.01315792 15.83886337 450.09791565 C15.44040857 451.45314638 15.04176187 452.80832071 14.64291763 454.16343689 C12.82922116 460.32785847 11.0185328 466.49156867 9.32177734 472.68945312 C9.0995903 473.48792664 8.87740326 474.28640015 8.64848328 475.10906982 C8.09939085 477.0930144 7.56484667 479.08097122 7.03198242 481.06933594 C5.77965441 484.3091632 4.5929115 485.92697501 1.875 488.0625 C-1.125 488.625 -1.125 488.625 -4.125 488.0625 C-7.25201892 484.75460819 -8.8158161 481.78649623 -10.08862305 477.44726562 C-10.41964523 476.34000122 -10.75066742 475.23273682 -11.09172058 474.09191895 C-11.43656998 472.89627319 -11.78141937 471.70062744 -12.13671875 470.46875 C-12.70676375 468.5469276 -13.2768099 466.62510554 -13.84691334 464.70330048 C-14.64474418 462.00286203 -15.43181632 459.2993314 -16.21917725 456.5958252 C-17.1827649 453.29359712 -18.1567106 449.99443773 -19.13085938 446.6953125 C-19.32195219 446.04800391 -19.51304501 445.40069532 -19.70992851 444.73377132 C-20.09627653 443.42523901 -20.48269962 442.11672885 -20.86919785 440.80824089 C-21.45030145 438.84008297 -22.03046454 436.87164926 -22.61062622 434.9032135 C-25.33288084 425.67763355 -28.10900752 416.46971167 -30.94140625 407.27734375 C-31.4778199 405.52284912 -31.4778199 405.52284912 -32.02507019 403.73291016 C-39.61730155 379.24380373 -51.37897142 356.56518251 -68.125 337.0625 C-68.85976562 336.20011719 -69.59453125 335.33773438 -70.3515625 334.44921875 C-72.55827424 331.93356736 -74.82296205 329.49118729 -77.125 327.0625 C-77.58036133 326.57458984 -78.03572266 326.08667969 -78.50488281 325.58398438 C-115.29920915 286.37251251 -165.00574592 273.3075689 -214.89453125 258.63671875 C-215.98295822 258.31469482 -217.07138519 257.9926709 -218.1927948 257.66088867 C-222.69168011 256.33492243 -227.18560202 255.02387889 -231.73193359 253.86962891 C-233.60292725 253.38695557 -233.60292725 253.38695557 -235.51171875 252.89453125 C-236.52838623 252.65065674 -237.54505371 252.40678223 -238.5925293 252.15551758 C-241.86126277 250.74472805 -243.22377217 249.03775972 -245.125 246.0625 C-245.125 242.9375 -245.125 242.9375 -244.125 240.0625 C-241.06574564 237.23257993 -237.95855852 236.20134693 -233.99658203 235.04467773 C-232.75232452 234.6767662 -231.50806702 234.30885468 -230.22610474 233.92979431 C-229.56109074 233.73748671 -228.89607674 233.5451791 -228.2109108 233.34704399 C-226.09135651 232.73410539 -223.97499361 232.11106271 -221.85910034 231.48561096 C-218.08820712 230.37279985 -214.3147278 229.26905953 -210.54034424 228.16815186 C-192.45504083 222.89220738 -174.38604443 217.60342809 -156.5078125 211.65625 C-154.68130661 211.05090675 -154.68130661 211.05090675 -152.81790161 210.43333435 C-128.16027861 202.13026166 -106.44381713 188.71180465 -87.33203125 171.08203125 C-85.41017848 169.32345093 -83.44852511 167.65430225 -81.4375 166 C-77.57408951 162.69106046 -74.36420937 158.97526897 -71.125 155.0625 C-70.48087158 154.30283936 -70.48087158 154.30283936 -69.82373047 153.52783203 C-50.1451327 130.26639097 -37.67991472 103.46965343 -28.85864258 74.49008179 C-28.0405624 71.80294179 -27.21321147 69.11877526 -26.38476562 66.43481445 C-23.34657217 56.55446985 -20.41236759 46.64831371 -17.56640625 36.7109375 C-16.98394519 34.69030799 -16.40134596 32.6697183 -15.81860352 30.64916992 C-14.70235581 26.77681888 -13.60872235 22.89899187 -12.52709961 19.0168457 C-12.01882205 17.24408656 -11.50982629 15.47153312 -11 13.69921875 C-10.67407616 12.49421219 -10.67407616 12.49421219 -10.34156799 11.26486206 C-8.71938295 5.72055467 -6.54490908 0.13089818 0 0 Z';
+
+      const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><path d="${STAR_D}" transform="translate(257.125,11.9375)"/></svg>`;
+      const svgLdr = new SVGLoader();
+      const svgDat = svgLdr.parse(svgStr);
+
+      const FS = 1.10 / 244, FD = 0.12 / FS, FB = 0.04 / FS;
+      let fGeo = null;
+      for (const p of svgDat.paths) {
+        for (const sh of SVGLoader.createShapes(p)) {
+          const g = new THREE.ExtrudeGeometry(sh, { depth: FD, bevelEnabled: true, bevelThickness: FB, bevelSize: FB * 0.7, bevelSegments: 5 });
+          g.translate(-257, -244, -FD / 2);
+          g.scale(FS, -FS, FS);
+          fGeo = fGeo ? mergeGeometries([fGeo, g]) : g;
+        }
+      }
+      if (!fGeo) { fabRenderer.dispose(); return; }
+      fGeo.computeVertexNormals();
+
+      const fabStar = new THREE.Mesh(fGeo, fabGlass);
+      fabScene.add(fabStar);
+
+      (function fabTick() {
+        const t = performance.now() / 1000;
+        fabStar.rotation.y += 0.013;
+        const b = 1 + 0.025 * Math.sin(t * 0.7);
+        fabStar.scale.set(b, b, b);
+        fo1.position.set(3 * Math.cos(t * 0.7),  1.5 * Math.sin(t * 0.5),  2.5);
+        fo2.position.set(-3 * Math.cos(t * 0.55), -1.5 * Math.sin(t * 0.65), 2.0);
+        fabGlass.time = t;
+
+        fabRenderer.setRenderTarget(fabFbo);
+        fabRenderer.render(fabBufScene, fabCam);
+        fabGlass.buffer = fabFbo.texture;
+
+        fabRenderer.setRenderTarget(null);
+        fabRenderer.render(fabScene, fabCam);
+        requestAnimationFrame(fabTick);
+      })();
+    })();
   </script>
 
   <script>
@@ -15329,18 +15507,33 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       }, delay);
     }
 
-    /* Update bar when frontmost card changes */
+    /* Update bar when frontmost card changes.
+       The bar only does its slide-out/slide-in choreography the very first
+       time it appears. After that it stays visible permanently and just
+       swaps its text — so fast scrolling never leaves it blank. */
+    var barEverShown = false;
+
     function updatePanels(idx) {
       var card = S2_DATA[idx];
       currentIdx = idx;
 
       tabBtns.forEach(function (b, i) { b.classList.toggle('s2-tab-active', i === idx); });
 
-      /* Slide bar out — removing class resets CSS animations for next entry */
-      if (projectBar) projectBar.classList.remove('s2-bar-in');
+      if (!barEverShown) {
+        /* First reveal only: slide bar out then back in with the fade-up animation */
+        if (projectBar) projectBar.classList.remove('s2-bar-in');
+        clearTimeout(updateTimer);
+        updateTimer = setTimeout(function () { populateBar(card, true); }, 160);
+        return;
+      }
 
+      /* Subsequent changes: swap content immediately, bar stays visible */
       clearTimeout(updateTimer);
-      updateTimer = setTimeout(function () {
+      populateBar(card, false);
+    }
+
+    function populateBar(card, animate) {
+        barEverShown = true;
         /* Populate bar content */
         if (barTitle) barTitle.textContent = card.title;
 
@@ -15374,8 +15567,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
           barCta.style.display = card.href === '#' ? 'none' : '';
         }
 
-        /* Force reflow so animations restart, then slide bar in */
-        if (projectBar) {
+        /* First reveal only: force reflow so the fade-up keyframes restart, then slide bar in */
+        if (animate && projectBar) {
           void projectBar.offsetWidth;
           projectBar.classList.add('s2-bar-in');
         }
@@ -15387,7 +15580,6 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
             countUpMetric(el, el.dataset.val, 180 + i * 90);
           });
         }
-      }, 160);
     }
 
     /* Listen for spiral frontmost card changes */
@@ -16251,34 +16443,61 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     setInterval(flipNext, 5000);
   })();
 
-  /* ── Cinematic section entrances ────────────────────────────────────────
-     Pure CSS transitions triggered by IntersectionObserver.
-     Avoids GSAP timing issues and scroll-snap conflicts entirely.
-     The easing (expo-out curve) is set in CSS — fast initial movement
-     that decelerates dramatically, giving the "heavy, premium" settle.
+  /* ── Scroll reveal: fade up from bottom ────────────────────────────────
+     One IntersectionObserver per section at 15% threshold.
+     When a section enters view, all its .sr-item children get .sr-visible
+     added — CSS transitions handle the rest with staggered --sd delays.
   ──────────────────────────────────────────────────────────────────────── */
-  (function initCinematicScroll() {
-    var targets = [
-      document.querySelector('#aboutSection .cinematic-wrap'),
-      document.querySelector('#testimonialsSection .cinematic-wrap'),
-      document.querySelector('#contactSection .footer-content'),
-    ].filter(Boolean);
-
-    if (!targets.length || !('IntersectionObserver' in window)) {
-      targets.forEach(function(el) { el.classList.add('cw-visible'); });
+  (function initScrollReveal() {
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll('.sr-item').forEach(function(el) {
+        el.classList.add('sr-visible');
+      });
       return;
     }
 
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('cw-visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12 });
+    var sections = [
+      document.getElementById('aboutSection'),
+      document.getElementById('contactSection'),
+    ].filter(Boolean);
 
-    targets.forEach(function(el) { observer.observe(el); });
+    sections.forEach(function(section) {
+      var items = section.querySelectorAll('.sr-item');
+      if (!items.length) return;
+
+      var obs = new IntersectionObserver(function(entries) {
+        if (entries[0].isIntersecting) {
+          items.forEach(function(el) { el.classList.add('sr-visible'); });
+          obs.disconnect();
+        }
+      }, { threshold: 0.15 });
+
+      obs.observe(section);
+    });
+  })();
+
+  /* ── Subtle scroll lag ──────────────────────────────────────────────────
+     The .page wrapper (mesh + card) very slightly lags behind the native
+     scroll position, giving the scroll a weighted, high-end feel.
+     Only 12% of the instantaneous lag is applied so the effect is almost
+     imperceptible — you feel it more than you see it.
+  ──────────────────────────────────────────────────────────────────────── */
+  (function initScrollLag() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var page = document.querySelector('.page');
+    if (!page) return;
+
+    var current = 0;
+    var target  = 0;
+
+    function tick() {
+      target  = window.scrollY;
+      current += (target - current) * 0.1;
+      var lag  = target - current;
+      page.style.transform = lag > 0.5 ? 'translateY(' + (-lag * 0.12) + 'px)' : '';
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   })();
 
   </script>
