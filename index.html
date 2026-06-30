@@ -429,7 +429,7 @@
     }
     .hero-carousel-track {
       display: flex;
-      gap: 22px;
+      gap: 0;
       width: max-content;
       animation: hero-carousel-scroll 38s linear infinite;
       will-change: transform;
@@ -437,9 +437,14 @@
     .hero-carousel-wrap {
       flex-shrink: 0;
       transform: rotate(var(--r, 0deg));
+      margin-right: 22px;
     }
     .hero-carousel-wrap .pc {
       width: 120px;
+    }
+    .hero-carousel-wrap .pc-cap {
+      font-size: 13px;
+      white-space: normal;
     }
     @keyframes hero-carousel-scroll {
       from { transform: translateX(0); }
@@ -615,10 +620,10 @@
     .tool-cluster { white-space: nowrap; margin-left: 0.22em; }
     .tool-ic {
       display: inline-block;
-      width: 55.78px;
-      height: 55.78px;
+      width: 1.45em;
+      height: 1.45em;
       vertical-align: middle;
-      margin-left: 6px;
+      margin-left: 0.18em;
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
@@ -2536,7 +2541,7 @@
       .hero-screen::after  { left: -32px; right: -32px; }
       .hero-screen         { min-height: calc(100svh - 104px); }  /* page 74 + hero 30 */
       .hero-content        { gap: 30px; }
-      .hero-heading { font-size: 26px; line-height: 36px; }
+      .hero-heading { font-size: 22px; line-height: 32px; }
       .hero-screen  { grid-template-columns: 1fr; } /* text fills full width — no photo column */
       .hero-screen-left { max-width: 100%; }
       .hero-facts   { max-width: 100%; }
@@ -13205,9 +13210,8 @@
   <!-- ── AI CHAT FAB — standalone; shows on the middle sections (Projects,
        About, Testimonials). Shoots in from the right as the bar drops away. -->
   <button class="cb-fab2" id="cbFab" aria-label="Open AI chat">
-    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 1l2.09 8.91L23 12l-8.91 2.09L12 23l-2.09-8.91L1 12l8.91-2.09z"/>
-    </svg>
+    <span class="cb-fab2-glow" aria-hidden="true"></span>
+    <canvas id="fabStarCanvas"></canvas>
   </button>
 
   <!-- ── CHAT PANEL ─────────────────────────────────────────── -->
