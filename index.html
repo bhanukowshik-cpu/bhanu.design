@@ -402,6 +402,7 @@
       box-shadow: none;
     }
     [data-theme="dark"] .pc { background: #353535; }
+    [data-theme="dark"] .pc-cap { color: #C8C8C8; }
     .pc img {
       display: block;
       width: 100%;
@@ -749,6 +750,7 @@
       line-height: 1;
       letter-spacing: 0.2px;
     }
+    [data-theme="dark"] .hf-projects-text { color: var(--secondary); }
     .hf-projects-arrow {
       margin-top: 3px;
       margin-left: 10px;
@@ -1041,8 +1043,15 @@
     }
 
     /* ── Cinematic scroll wrappers ─────────────────────────────────────────
-       Sit INSIDE section containers. GSAP transforms apply here so the
-       section's own background always fills its bounds — no card bleed.
+       Sit INSIDE section containers so the section background always fills
+       its full area. Only the content inside transforms — no card bleed.
+
+       Initial state: content is invisible and pushed down + slightly zoomed.
+       .cw-visible (added by IntersectionObserver) triggers the transition.
+
+       cubic-bezier(0.16, 1, 0.3, 1) is an expo-out curve: very fast start,
+       extreme deceleration into the final position. This is what gives it
+       the "heavy, expensive, settling" feel rather than a bounce or spring.
     ─────────────────────────────────────────────────────────────────────── */
     .am-section > .cinematic-wrap {
       display: flex;
@@ -1050,13 +1059,39 @@
       flex: 1;
       min-height: 0;
       width: 100%;
+      opacity: 0;
+      transform: translateY(80px) scale(1.05);
+      transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    /* tm-section is center-justified — wrap must NOT be flex:1 or it over-stretches */
+    /* tm-section: center-justified — no flex:1 or it over-stretches.
+       Children already have their own opacity via .tm-visible, so
+       we only transition transform here to avoid double-hiding.         */
     .tm-section > .cinematic-wrap {
       display: flex;
       flex-direction: column;
       align-items: center;
       width: 100%;
+      transform: translateY(80px) scale(1.05);
+      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    /* Footer content: transform only, footer-note has its own opacity reveal */
+    .footer-content {
+      transform: translateY(80px) scale(1.05);
+      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    /* Visible state — class added by IntersectionObserver */
+    .cinematic-wrap.cw-visible,
+    .footer-content.cw-visible {
+      opacity: 1;
+      transform: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cinematic-wrap, .footer-content {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
     }
 
 
