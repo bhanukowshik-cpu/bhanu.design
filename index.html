@@ -2681,22 +2681,23 @@
       max-width: 1240px;
       margin: 0 auto;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      gap: 56px;
-      flex-wrap: wrap;
+      justify-content: center;
+      gap: 48px;
     }
     .footer-col-left {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
       gap: 28px;
-      max-width: 548px;
+      max-width: 640px;
+      text-align: center;
     }
     .footer-contact {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
       gap: 16px;
     }
     .footer-row {
@@ -15782,69 +15783,33 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   })();
 
   /* ── Cinematic section entrances ────────────────────────────────────────
-     One-shot animations triggered as each section scrolls into view.
-     NO scrub — scrub fights scroll-snap and causes jitter. Instead,
-     power3.out easing gives the weighted "settling into place" feel.
+     Pure CSS transitions triggered by IntersectionObserver.
+     Avoids GSAP timing issues and scroll-snap conflicts entirely.
+     The easing (expo-out curve) is set in CSS — fast initial movement
+     that decelerates dramatically, giving the "heavy, premium" settle.
   ──────────────────────────────────────────────────────────────────────── */
   (function initCinematicScroll() {
-    window.addEventListener('load', function () {
-      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var targets = [
+      document.querySelector('#aboutSection .cinematic-wrap'),
+      document.querySelector('#testimonialsSection .cinematic-wrap'),
+      document.querySelector('#contactSection .footer-content'),
+    ].filter(Boolean);
 
-      gsap.registerPlugin(ScrollTrigger);
+    if (!targets.length || !('IntersectionObserver' in window)) {
+      targets.forEach(function(el) { el.classList.add('cw-visible'); });
+      return;
+    }
 
-      var DUR  = 1.0;
-      var EASE = 'power3.out';
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('cw-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
 
-      /* ── About Me ──────────────────────────────────────────────────────── */
-      var aboutWrap = document.querySelector('#aboutSection .cinematic-wrap');
-      if (aboutWrap) {
-        gsap.fromTo(aboutWrap,
-          { y: 60, scale: 1.04, opacity: 0 },
-          { y: 0,  scale: 1,    opacity: 1,
-            duration: DUR, ease: EASE,
-            scrollTrigger: {
-              trigger: '#aboutSection',
-              start: 'top 82%',
-              toggleActions: 'play none none none',
-            }
-          }
-        );
-      }
-
-      /* ── Testimonials ──────────────────────────────────────────────────── */
-      /* opacity stays untouched — .tm-visible CSS animation owns that */
-      var tmWrap = document.querySelector('#testimonialsSection .cinematic-wrap');
-      if (tmWrap) {
-        gsap.fromTo(tmWrap,
-          { y: 60, scale: 1.04 },
-          { y: 0,  scale: 1,
-            duration: DUR, ease: EASE,
-            scrollTrigger: {
-              trigger: '#testimonialsSection',
-              start: 'top 82%',
-              toggleActions: 'play none none none',
-            }
-          }
-        );
-      }
-
-      /* ── Footer ────────────────────────────────────────────────────────── */
-      var footerContent = document.querySelector('#contactSection .footer-content');
-      if (footerContent) {
-        gsap.fromTo(footerContent,
-          { y: 60, scale: 1.04 },
-          { y: 0,  scale: 1,
-            duration: DUR, ease: EASE,
-            scrollTrigger: {
-              trigger: '#contactSection',
-              start: 'top 82%',
-              toggleActions: 'play none none none',
-            }
-          }
-        );
-      }
-    });
+    targets.forEach(function(el) { observer.observe(el); });
   })();
 
   </script>
