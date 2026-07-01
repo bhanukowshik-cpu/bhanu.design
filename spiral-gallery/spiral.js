@@ -458,47 +458,38 @@ void main() {
         listBlobCtx    = lc.getContext('2d');
 
         var info = document.createElement('div');
-        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:20px 24px 22px;gap:0;';
+        // overflow:hidden ensures nothing bleeds past the card boundary
+        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:18px 22px 18px;gap:0;overflow:hidden;';
 
-        // Eyebrow: "01 — Featured Work"
+        // Eyebrow
         var eyebrow = document.createElement('span');
         eyebrow.textContent = '01  —  Featured Work';
-        eyebrow.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.28);letter-spacing:0.12em;text-transform:uppercase;display:block;margin-bottom:12px;';
+        eyebrow.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.28);letter-spacing:0.12em;text-transform:uppercase;display:block;margin-bottom:10px;flex-shrink:0;';
         info.appendChild(eyebrow);
 
-        // Title — strip numeric prefix (e.g. "1). ") for cleaner display
+        // Title — strip full numeric prefix "1). " correctly
         var title = document.createElement('h3');
-        title.textContent = card.title.replace(/^\d+[\)\.]\s*/, '');
-        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(22px,1.9vw,28px);font-weight:800;color:#fff;margin:0 0 10px;line-height:1.15;letter-spacing:-0.5px;';
+        title.textContent = card.title.replace(/^[\d]+[\)\.]+\s*/, '');
+        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(20px,1.8vw,26px);font-weight:800;color:#fff;margin:0 0 8px;line-height:1.2;letter-spacing:-0.4px;flex-shrink:0;';
         info.appendChild(title);
 
-        // Description — readable at 14px with generous line-height
+        // Description
         var desc = document.createElement('p');
         desc.textContent = card.desc;
-        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:14px;line-height:1.75;color:rgba(255,255,255,0.52);margin:0 0 16px;';
+        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:13.5px;line-height:1.7;color:rgba(255,255,255,0.5);margin:0 0 12px;flex-shrink:0;';
         info.appendChild(desc);
 
         if (card.iconTags && card.iconTags.length) {
           var ir0 = buildIconRow(card.iconTags);
-          ir0.style.marginBottom = '16px';
+          ir0.style.cssText += ';margin-bottom:12px;flex-shrink:0;';
           info.appendChild(ir0);
         }
 
-        // Top 3 metrics — single row, values large + lime
-        info.appendChild(buildMetrics(card.metrics.slice(0, 3), 3));
-
-        // Scroll hint at bottom — standalone row, well-separated
-        var hintRow = document.createElement('div');
-        hintRow.style.cssText = 'margin-top:auto;padding-top:18px;display:flex;align-items:center;gap:10px;';
-        var hintCircle = document.createElement('div');
-        hintCircle.style.cssText = 'width:32px;height:32px;border-radius:999px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;animation:s2GridPulse 1.8s ease-in-out infinite;flex-shrink:0;';
-        hintCircle.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-        var hintText = document.createElement('span');
-        hintText.textContent = 'Scroll to explore';
-        hintText.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.25);letter-spacing:0.06em;';
-        hintRow.appendChild(hintCircle);
-        hintRow.appendChild(hintText);
-        info.appendChild(hintRow);
+        // Top 3 metrics — single row, lime values
+        var mw0 = document.createElement('div');
+        mw0.style.cssText = 'flex-shrink:0;';
+        mw0.appendChild(buildMetrics(card.metrics.slice(0, 3), 3));
+        info.appendChild(mw0);
         cardEl.appendChild(info);
 
       } else {
@@ -632,7 +623,7 @@ void main() {
       var projectW = Math.max(240, Math.floor(avail / 2.5));
       var heroW    = Math.max(220, Math.round(projectW * 0.78));
       // Height: leave room for track top-padding (80px) + controls bar (72px) + breathing (32px)
-      var cardH    = Math.min(520, Math.max(340, el.clientHeight - 184));
+      var cardH    = Math.min(520, Math.max(380, el.clientHeight - 184));
       gridCardEls.forEach(function (c, i) {
         c.style.width  = (i === 0 ? heroW : projectW) + 'px';
         c.style.height = cardH + 'px';
