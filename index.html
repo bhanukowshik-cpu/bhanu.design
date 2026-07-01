@@ -375,12 +375,28 @@
       transition: opacity 0.55s cubic-bezier(0.16,1,0.3,1) 0.07s,
                   transform 0.75s cubic-bezier(0.16,1,0.3,1) 0.07s;
     }
+    /* hero load entrance: the wrapper itself snaps visible immediately —
+       each .polaroid inside handles its own staggered pop-in (below) so
+       the photos arrive one after another instead of as one block. */
+    .hero.hero-revealed .hero-photos {
+      opacity: 1;
+      transform: translateX(0);
+      transition: none;
+    }
     .polaroid {
       position: absolute;
       width: clamp(145px, 11vw, 188px);
-      opacity: 1;
-      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), filter 0.35s ease;
+      opacity: 0;
+      scale: 0.84;
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), filter 0.35s ease,
+                  opacity 0.36s cubic-bezier(0.16,1,0.3,1) var(--pd, 0ms),
+                  scale 0.36s cubic-bezier(0.16,1,0.3,1) var(--pd, 0ms);
     }
+    .hero.hero-revealed .polaroid { opacity: 1; scale: 1; }
+    .polaroid.p1 { --pd: 1280ms; }
+    .polaroid.p2 { --pd: 1330ms; }
+    .polaroid.p3 { --pd: 1380ms; }
+    .polaroid.p4 { --pd: 1430ms; }
     .polaroid:hover {
       transform: scale(1.09) rotate(0deg) !important;
       z-index: 10 !important;
@@ -1001,12 +1017,20 @@
       will-change: transform;
     }
     .hero.hero-revealed .hero-li { transform: translateY(0); }
-    .hero.hero-revealed #greeting,
-    .hero.hero-revealed .hero-subtext,
-    .hero.hero-revealed .hero-ctas { opacity: 1 !important; animation: none !important; }
+    .hero.hero-revealed #greeting { opacity: 1 !important; animation: none !important; }
     /* hero-facts pill: JS wraps .hfact items in a block .hero-li — override to flex so row layout works */
     .hero-facts .hero-lw { display: flex; }
     .hero-facts .hero-li { display: flex; flex-direction: row; gap: 48px; align-items: flex-start; }
+
+    /* CTA pops in once the heading cascade is mostly settled */
+    .hero.hero-revealed .hero-ctas {
+      animation: hero-frame-up 0.28s cubic-bezier(0.16, 1, 0.3, 1) var(--cta-delay, 880ms) both;
+    }
+    /* Facts pill: the box itself slides up first, content (hfact rows) fades in
+       a beat later via the existing .hero-li clip — see --ld set in JS. */
+    .hero.hero-revealed .hero-facts {
+      animation: hero-frame-up 0.32s cubic-bezier(0.16, 1, 0.3, 1) var(--hfb-delay, 980ms) both;
+    }
 
     /* Hero frame: float up after words land */
     .hero.hero-revealed .hero-frame {
@@ -5176,36 +5200,6 @@
     .dna2-fade { transition: opacity 0.18s ease; }
     .dna2-panel.is-swapping .dna2-fade { opacity: 0; }
 
-    /* Mobile — keep T shape, stack aside above, compact tiles */
-    @media (max-width: 767px) {
-      /* Stack aside above the T-chart */
-      .dna2 { flex-direction: column !important; gap: 20px !important; overflow: visible !important; }
-      .dna2-aside { width: 100% !important; flex-direction: column; align-items: flex-start; }
-      .dna2-intro { display: none !important; }
-      .dna2-legend { display: none !important; }
-      .dna2-heading { font-size: 22px !important; margin-bottom: 6px !important; }
-      /* T-chart: full width, 5-col compact grid */
-      .dna2-t { width: 100% !important; min-width: 0 !important; }
-      .dna2-bar { grid-template-columns: repeat(5, 1fr) !important; gap: 6px !important; }
-      .dna2-lower { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 6px !important; align-items: start !important; }
-      /* Stem stays in center column (col 3) */
-      .dna2-stem { grid-column: 3 / 4 !important; grid-row: 1 !important; display: flex !important; flex-direction: column !important; gap: 6px !important; }
-      /* Panel spans cols 1-2 */
-      .dna2-panel { grid-column: 1 / 3 !important; grid-row: 1 !important; align-self: start !important; }
-      /* Depth axis: hide — not enough room */
-      .dna2-axis.depth { display: none !important; }
-      /* Compact tiles: icon only, name hidden */
-      .dna2-tile { min-height: 56px !important; padding: 8px 4px !important; gap: 4px !important; border-radius: 10px !important; }
-      .dna2-tile-ic { width: 24px !important; height: 24px !important; }
-      .dna2-tile-nm { display: none !important; }
-      /* Axis labels */
-      .dna2-axis-label { font-size: 13px !important; }
-      .dna2-arm.left, .dna2-arm.right { max-width: 60px !important; }
-      /* Quote panel compact */
-      .dna2-quote { font-size: 12px !important; line-height: 1.5 !important; }
-      .dna2-name { font-size: 13px !important; }
-    }
-
     /* ─── STICKY STACK ──────────────────────────────────────── */
     .sticky-stack {
       position: relative;
@@ -5916,19 +5910,15 @@
       align-items: center;
       justify-content: center;
       padding: 0;
-      cursor: pointer;
-      overflow: hidden;
-      isolation: isolate;
-      /* lighter than .glass-pill — let real page content show through the blur */
-      background-image:
-        linear-gradient(0deg, rgba(0,0,0,0.22), rgba(0,0,0,0.22)),
-        radial-gradient(34.57% 51.92% at 49.87% 95.19%, rgba(247,247,252,0.10) 33.17%, rgba(247,247,252,0) 100%);
-      backdrop-filter: blur(10px) saturate(160%);
-      -webkit-backdrop-filter: blur(10px) saturate(160%);
       border: none;
+      cursor: pointer;
+      perspective: 300px;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
       box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.10),
-        inset 0 1px 0 rgba(255,255,255,0.22),
+        inset 1.5px 2px 3px rgba(255,255,255,0.90),
+        inset 0 0 0 1px rgba(255,255,255,0.28),
         0 12px 40px rgba(0,0,0,0.28);
       /* hidden default: parked off-screen to the right, faded */
       opacity: 0;
@@ -5948,34 +5938,17 @@
       transform: translateX(150px) scale(0.9);
       pointer-events: none;
     }
-    /* Warm amber glow — same recipe as the "Ask me anything" CTA's bottom disc:
-       a circle centered low, clipped by the button's own rounded frame (overflow:
-       hidden on .cb-fab2) so only the top arc shows through, like light rising
-       from the floor of the glass. */
-    .cb-fab2-glow {
-      position: absolute; left: 50%; top: 92%;
-      width: 150%; aspect-ratio: 1 / 1;
-      transform: translateX(-50%);
-      border-radius: 50%;
-      background: radial-gradient(circle,
-        #ffe27a 0%, #ff9d5c 18%, #ff6b8b 36%, #c06bff 54%, #5e7dff 72%, #0b0b0d 100%);
-      filter: blur(8px);
-      opacity: 0.95;
-      z-index: 0;
-      pointer-events: none;
-    }
-    .cb-fab2 canvas {
-      position: relative;
-      z-index: 1;
-      width: 100% !important;
-      height: 100% !important;
-      pointer-events: none;
-      opacity: 0.7;   /* lets the blurred real backdrop (from the frame's backdrop-filter) show through the star */
+    .cb-fab2 svg {
+      width: 30px;
+      height: 30px;
+      color: #ffffff;
+      flex-shrink: 0;
+      animation: cb-fab-spin 8s linear infinite;
     }
     @media (prefers-reduced-motion: reduce) {
       .cb-fab2 { transition: opacity 0.3s ease; transform: none; }
       .cb-fab2.fab-in { transform: none; }
-      .cb-fab2-glow { animation: none; }
+      .cb-fab2 svg { animation: none !important; }
     }
 
     /* ── Bar EXIT (reverse entrance) ───────────────────────────
@@ -9126,7 +9099,11 @@
       .s2-section-wrap { min-height: auto; height: auto; padding-bottom: 32px; }
 
       /* Spiral canvas zone: fixed height */
-      .s2-cards-zone { height: 340px; position: relative; }
+      .s2-cards-zone { height: 340px; position: relative; order: 1; }
+
+      /* "Featured Work" title + toggle: above the spiral, not below */
+      .s2-fw-header { order: 0; }
+      .s2-work-container { order: 2; }
 
       /* Show the accordion */
       .s2-mobile-accordion {
@@ -9436,33 +9413,42 @@
 
     /* ── DNA T-shape: phone override (must come AFTER the 1023px tablet block above) ── */
     @media (max-width: 767px) {
-      /* Stack aside above T-chart */
-      .dna2 { flex-direction: column !important; gap: 20px !important; overflow: visible !important; }
-      .dna2-aside { width: 100% !important; }
-      .dna2-intro { display: none !important; }
+      /* About Me title */
+      .abt-title { font-size: 14px !important; }
+      /* Tab nav: same glass-pill + sliding-thumb as desktop/testimonials, just smaller */
+      .abt-tab { font-size: 12px !important; padding: 8px 14px !important; }
+
+      /* Aside: content-width only, not stretched full bar width */
+      .dna2 { flex-direction: column !important; gap: 16px !important; overflow: visible !important; align-items: flex-start !important; }
+      .dna2-aside { width: auto !important; max-width: 100% !important; align-items: flex-start !important; text-align: left !important; }
+      .dna2-heading { font-size: 20px !important; text-align: left !important; margin-bottom: 6px !important; }
+      .dna2-intro { display: block !important; font-size: 12px !important; text-align: left !important; line-height: 1.6 !important; margin-bottom: 10px !important; }
+      .dna2-cta { align-self: flex-start !important; width: auto !important; font-size: 11px !important; padding: 8px 14px !important; }
       .dna2-legend { display: none !important; }
-      .dna2-heading { font-size: 22px !important; }
-      /* T-chart: full-width, keep 5-col compact grid */
+
+      /* T-chart: full-width, 5-col compact grid */
       .dna2-t { width: 100% !important; min-width: 0 !important; flex: none !important; }
       .dna2-bar { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 5px !important; }
-      .dna2-lower { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 5px !important; align-items: start !important; }
-      /* Stem stays in center col (col 3) */
+
+      /* Lower: row 1 = stem (col 3) + depth axis (cols 4-5). Row 2 = full-width panel — no dead columns */
+      .dna2-lower { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; column-gap: 5px !important; row-gap: 14px !important; align-items: start !important; }
       .dna2-stem { grid-column: 3 / 4 !important; grid-row: 1 !important; display: flex !important; flex-direction: column !important; gap: 5px !important; }
-      /* Quote panel spans cols 1-2 */
-      .dna2-panel { grid-column: 1 / 3 !important; grid-row: 1 !important; align-self: start !important; }
-      /* Hide depth axis */
-      .dna2-axis.depth { display: none !important; }
-      /* Compact tiles: icon only */
-      .dna2-tile { min-height: 52px !important; padding: 6px 4px !important; gap: 4px !important; border-radius: 10px !important; }
-      .dna2-tile-ic { width: 22px !important; height: 22px !important; }
-      .dna2-tile-nm { display: none !important; }
-      /* Axis */
-      .dna2-axis-label { font-size: 11px !important; }
-      .dna2-arm.left, .dna2-arm.right { max-width: 40px !important; }
-      /* Panel text compact */
-      .dna2-quote { font-size: 12px !important; line-height: 1.5 !important; }
-      .dna2-name { font-size: 12px !important; }
-      .dna2-qmark { font-size: 28px !important; }
+      .dna2-axis.depth { display: flex !important; grid-column: 4 / 6 !important; grid-row: 1 !important; flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; padding-top: 4px !important; }
+      .dna2-axis.depth .dna2-axis-label { writing-mode: vertical-rl !important; font-size: 9px !important; white-space: nowrap !important; }
+      .dna2-arm.up, .dna2-arm.down { min-height: 20px !important; }
+      .dna2-panel { display: flex !important; grid-column: 1 / 6 !important; grid-row: 2 !important; align-self: stretch !important; padding: 12px 14px !important; }
+
+      /* Tiles: icon + legible name */
+      .dna2-tile { min-height: 78px !important; padding: 8px 4px !important; gap: 4px !important; border-radius: 10px !important; }
+      .dna2-tile-ic { width: 18px !important; height: 18px !important; }
+      .dna2-tile-nm { display: block !important; font-size: 9.5px !important; line-height: 1.25 !important; }
+      /* Breadth axis */
+      .dna2-axis-label { font-size: 10px !important; }
+      .dna2-arm.left, .dna2-arm.right { max-width: 30px !important; }
+      /* Panel text */
+      .dna2-quote { font-size: 11px !important; line-height: 1.5 !important; }
+      .dna2-name  { font-size: 12px !important; }
+      .dna2-qmark { font-size: 24px !important; }
     }
 
     /* ── Beyond the Pixels (oh2): tighten headline/gap at wide tablet ── */
@@ -10119,7 +10105,7 @@
               <div class="ws-et-metric-row">
                 <div class="ws-et-metric">
                   <span class="ws-et-val" data-count="2000" data-suffix="+">2000+</span>
-                  <span class="ws-et-lbl">Daily Active Users</span>
+                  <span class="ws-et-lbl">Active Learners</span>
                 </div>
                 <div class="ws-et-mdivider"></div>
                 <div class="ws-et-metric">
@@ -10128,7 +10114,7 @@
                 </div>
               </div>
               <div class="ws-et-metric">
-                <span class="ws-et-val" data-count="300" data-prefix="0→$" data-suffix="k ARR">0→$300k ARR</span>
+                <span class="ws-et-val" data-count="500" data-prefix="0→$" data-suffix="k+ ARR">0→$500k+ ARR</span>
                 <span class="ws-et-lbl">as Sole Product Designer</span>
               </div>
             </div>
@@ -10222,7 +10208,7 @@
                   <line x1="160.70" y1="51.87" x2="160.47" y2="48.87" />
                 </g>
               </svg>
-              <img class="ws-orb-img" src="Parallax cards/EverTutor Glimpse/Tutor Blob Dark Mode.png" alt="EverTutor AI System" loading="lazy" />
+              <img class="ws-orb-img" src="Parallax cards/EverTutor Glimpse/Dark mode finalized.png" alt="EverTutor AI System" loading="lazy" />
             </div>
           </div>
 
@@ -10854,7 +10840,7 @@
        - Heading: each word wrapped in overflow:hidden clip + translateY inner
        - Greeting / subtext: whole line wrapped in a single clip trough     */
     (function setupHeroClipReveal() {
-      const WORD_GAP = 44; // ms stagger between words
+      const WORD_GAP = 20; // ms stagger between words
       const delayRef = { d: 0 }; // shared mutable counter
 
       function makeWordClip(content, d) {
@@ -10917,14 +10903,23 @@
         greeting.appendChild(lw);
       }
 
-      // Line-clip the subtext — fires after last heading word
+      // CTA pops in right as the heading cascade settles
+      const ctas = document.querySelector('.hero-ctas');
+      if (ctas) ctas.style.setProperty('--cta-delay', '880ms');
+
+      // Facts pill: box slides up first (--hfb-delay), then its content
+      // (--ld below) fades in a beat later, inside the already-settled box.
+      const facts = document.querySelector('.hero-facts');
+      if (facts) facts.style.setProperty('--hfb-delay', '980ms');
+
+      // Line-clip the subtext — content fires shortly after the box lands
       const subtext = document.querySelector('.hero-subtext');
       if (subtext) {
         const lw = document.createElement('span');
         lw.className = 'hero-lw';
         const li = document.createElement('span');
         li.className = 'hero-li';
-        li.style.setProperty('--ld', '1480ms');
+        li.style.setProperty('--ld', '1180ms');
         while (subtext.firstChild) li.appendChild(subtext.firstChild);
         lw.appendChild(li);
         subtext.appendChild(lw);
@@ -10942,49 +10937,68 @@
       track.innerHTML = set.repeat(6); // 6 = two identical halves of 3 sets each
     })();
 
-    // ── Hero entrance — fires immediately, no loader to wait for ────────
+    // ── Hero entrance — waits for the glass loader to lift so the whole
+    //    text → CTA → facts → photos cascade is actually seen, not played
+    //    out hidden behind the loader overlay. Fires immediately if the
+    //    loader is already gone (e.g. reduced motion skipped it). ────────
     (function triggerHeroReveal() {
       const nav  = document.getElementById('topNav');
       const hero = document.querySelector('.hero');
       const card = document.querySelector('.card');
       if (card) card.classList.add('page-ready');
-      // Double rAF ensures transitions are registered before values change
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        if (nav)  nav.classList.add('hero-revealed');
-        if (hero) hero.classList.add('hero-revealed');
-        // Lock nav opacity after its slide-in animation finishes so
-        // .scrolled class toggling never causes a flicker
-        setTimeout(() => { if (nav) nav.style.opacity = '1'; }, 700);
-        // Section divider fires with subtext + hero-frame (all at once after words→SVG)
-        setTimeout(() => {
-          const sd = document.getElementById('sdFrame');
-          if (sd) sd.classList.add('sd-revealed');
-        }, 1480);
-      }));
+
+      function reveal() {
+        // Double rAF ensures transitions are registered before values change
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          if (nav)  nav.classList.add('hero-revealed');
+          if (hero) hero.classList.add('hero-revealed');
+          // Lock nav opacity after its slide-in animation finishes so
+          // .scrolled class toggling never causes a flicker
+          setTimeout(() => { if (nav) nav.style.opacity = '1'; }, 700);
+          // Section divider fires with subtext + hero-frame (all at once after words→SVG)
+          setTimeout(() => {
+            const sd = document.getElementById('sdFrame');
+            if (sd) sd.classList.add('sd-revealed');
+          }, 1480);
+        }));
+      }
+
+      if (document.documentElement.classList.contains('glass-loading')) {
+        window.addEventListener('glassloaderhidden', reveal, { once: true });
+      } else {
+        reveal();
+      }
     })();
 
-    // ── Stats bar count-up — fires after stats reveal at 1480ms ─
+    // ── Stats bar count-up — fires with the facts pill content ─
     (function initStatCountUp() {
-      setTimeout(function() {
-        document.querySelectorAll('.hfact-v').forEach(function(el) {
-          var text = el.textContent.trim();
-          var match = text.match(/^(\d+)/);
-          if (!match) return;
-          var target = parseInt(match[1], 10);
-          var suffix = text.slice(match[0].length);
-          var duration = 1000;
-          var start = null;
-          function tick(ts) {
-            if (!start) start = ts;
-            var elapsed = ts - start;
-            var progress = Math.min(elapsed / duration, 1);
-            var eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-            el.textContent = Math.round(eased * target) + suffix;
-            if (progress < 1) requestAnimationFrame(tick);
-          }
-          requestAnimationFrame(tick);
-        });
-      }, 1600);
+      function run() {
+        setTimeout(function() {
+          document.querySelectorAll('.hfact-v').forEach(function(el) {
+            var text = el.textContent.trim();
+            var match = text.match(/^(\d+)/);
+            if (!match) return;
+            var target = parseInt(match[1], 10);
+            var suffix = text.slice(match[0].length);
+            var duration = 600;
+            var start = null;
+            function tick(ts) {
+              if (!start) start = ts;
+              var elapsed = ts - start;
+              var progress = Math.min(elapsed / duration, 1);
+              var eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+              el.textContent = Math.round(eased * target) + suffix;
+              if (progress < 1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+          });
+        }, 1200);
+      }
+      if (document.documentElement.classList.contains('glass-loading')) {
+        window.addEventListener('glassloaderhidden', run, { once: true });
+      } else {
+        run();
+      }
     })();
 
     // ── Hero heading → photo slide-in interaction ────────────────
@@ -11042,7 +11056,7 @@
       greetingTextEl.textContent = phrase.slice(0, charIdx);
 
       if (charIdx < phrase.length) {
-        setTimeout(tick, 75);
+        setTimeout(tick, 42);
       } else {
         // Fully typed — show wave, play once, freeze on last frame, hide cursor
         lottieWaveEl.classList.add('playing');
@@ -11055,7 +11069,13 @@
     }
 
     greetingTextEl.textContent = '';
-    setTimeout(tick, 800);
+    // Gated on the loader lifting (same as triggerHeroReveal) — otherwise the
+    // typewriter finishes invisibly behind the loader and reveals pre-typed.
+    if (document.documentElement.classList.contains('glass-loading')) {
+      window.addEventListener('glassloaderhidden', () => setTimeout(tick, 120), { once: true });
+    } else {
+      setTimeout(tick, 120);
+    }
 
     /* nav wave — plays once on load */
     const navWaveEl = document.getElementById('navWave');
@@ -12193,7 +12213,7 @@
         impact: [
           { headline: '2× expected academic growth',             sub: "Validated Bloom's 2 Sigma hypothesis in production" },
           { headline: 'Reduced lesson creation 100 hrs → 4 hrs', sub: 'Through a unified authoring system' },
-          { headline: 'Scaled to 2,000+ daily active students',  sub: 'Within the first year of launch' },
+          { headline: 'Scaled to 2,000+ active learners',  sub: 'Within the first year of launch' },
         ],
       },
       'sn-mid': {
@@ -13275,8 +13295,9 @@
   <!-- ── AI CHAT FAB — standalone; shows on the middle sections (Projects,
        About, Testimonials). Shoots in from the right as the bar drops away. -->
   <button class="cb-fab2" id="cbFab" aria-label="Open AI chat">
-    <span class="cb-fab2-glow" aria-hidden="true"></span>
-    <canvas id="fabStarCanvas"></canvas>
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 1l2.09 8.91L23 12l-8.91 2.09L12 23l-2.09-8.91L1 12l8.91-2.09z"/>
+    </svg>
   </button>
 
   <!-- ── CHAT PANEL ─────────────────────────────────────────── -->
@@ -14273,7 +14294,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     function onLoaderDone() {
       if (loaderDone) return; loaderDone = true;
       renderedMode = null;
-      syncBarMode(480);   // initial beat after the loader lifts
+      syncBarMode(1350);  // last beat of the hero cascade — after text/CTA/facts/photos
     }
     if (document.documentElement.classList.contains('glass-loading')) {
       window.addEventListener('glassloaderhidden', onLoaderDone, { once: true });
@@ -14928,127 +14949,6 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       window.addEventListener('glassloaderhidden', () => setTimeout(releaseGPU, 1100));
       setTimeout(releaseGPU, 8000);   // hard fallback, well past the loader's own cap
     }
-    // ── FAB glass star ── runs in the same module, shares Three.js instance ──
-    (function initFabStar() {
-      const fabCanvas = document.getElementById('fabStarCanvas');
-      if (!fabCanvas || document.body.classList.contains('no-webgl')) return;
-
-      const SZ  = 72;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      fabCanvas.width  = SZ * dpr;
-      fabCanvas.height = SZ * dpr;
-
-      const fabRenderer = new THREE.WebGLRenderer({ canvas: fabCanvas, antialias: true, alpha: true });
-      fabRenderer.setPixelRatio(dpr);
-      fabRenderer.setSize(SZ, SZ, false);
-      fabRenderer.setClearColor(0x000000, 0);
-      fabRenderer.outputColorSpace = THREE.SRGBColorSpace;
-      fabRenderer.toneMapping = THREE.ACESFilmicToneMapping;
-      fabRenderer.toneMappingExposure = 1.0;
-
-      const fabScene = new THREE.Scene();
-      const fabPmrem = new THREE.PMREMGenerator(fabRenderer);
-      fabScene.environment = fabPmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-
-      const fabCam = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-      fabCam.position.set(0, 0, 5);
-
-      // Lights — toned back down to mid-level; bright enough to be clear, not blown out
-      const fk = new THREE.DirectionalLight(0xfffdf2, 2.0); fk.position.set(1,2,3);   fabScene.add(fk);
-      const ff = new THREE.DirectionalLight(0xf5f3ea, 1.2); ff.position.set(-3,-1,2);  fabScene.add(ff);
-      const fr = new THREE.DirectionalLight(0xfaf6e8, 1.3); fr.position.set(-2,3,-2);  fabScene.add(fr);
-      fabScene.add(new THREE.AmbientLight(0xfffdf0, 0.18));
-      const fo1 = new THREE.PointLight(0xfffdf0, 4.0, 8); fabScene.add(fo1);
-      const fo2 = new THREE.PointLight(0xf5f0d8, 3.0, 8); fabScene.add(fo2);
-
-      // Light, transmissive glass with just a hint of yellow in the base color
-      const fabGlass = new MeshTransmissionMaterial({
-        samples: 8,
-        transmissionSampler: false,
-        transmission: 1.0,
-        thickness: 0.5,
-        roughness: 0.02,
-        chromaticAberration: 0,
-        anisotropicBlur: 0.04,
-        distortion: 0.3,
-        distortionScale: 0.45,
-        temporalDistortion: 0.15,
-      });
-      fabGlass.color = new THREE.Color(0xfff6d8);   // a pint of yellow
-      fabGlass.ior = 1.45;
-      fabGlass.attenuationColor = new THREE.Color(0xfff3d0);
-      fabGlass.attenuationDistance = 2.4;
-      fabGlass.envMapIntensity = 1.2;
-      fabGlass.clearcoat = 1.0;
-      fabGlass.clearcoatRoughness = 0.05;
-      fabGlass.specularIntensity = 0.7;
-
-      // Offscreen neutral grayscale backdrop the glass refracts (transmission needs something to sample)
-      const fabBufScene = new THREE.Scene();
-      const fabTexCanvas = document.createElement('canvas');
-      fabTexCanvas.width = 128; fabTexCanvas.height = 128;
-      const fabTexCtx = fabTexCanvas.getContext('2d');
-      fabTexCtx.fillStyle = '#0b0b0d';
-      fabTexCtx.fillRect(0, 0, 128, 128);
-      const fabGlow = fabTexCtx.createRadialGradient(64, 50, 0, 64, 50, 80);
-      fabGlow.addColorStop(0.0, 'rgba(255,255,255,0.35)');
-      fabGlow.addColorStop(1.0, 'rgba(255,255,255,0)');
-      fabTexCtx.fillStyle = fabGlow;
-      fabTexCtx.fillRect(0, 0, 128, 128);
-      const fabTexture = new THREE.CanvasTexture(fabTexCanvas);
-      fabTexture.colorSpace = THREE.SRGBColorSpace;
-      const fabBackdrop = new THREE.Mesh(
-        new THREE.PlaneGeometry(4, 4),
-        new THREE.MeshBasicMaterial({ map: fabTexture })
-      );
-      fabBackdrop.position.z = -1.2;
-      fabBufScene.add(fabBackdrop);
-
-      const fabFbo = new THREE.WebGLRenderTarget(SZ * dpr, SZ * dpr, {
-        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter
-      });
-
-      // Build star geometry (same SVG path as loader)
-      const STAR_D = 'M0 0 C3.44110066 1.27171111 4.00011393 1.95018912 5.875 5.0625 C7.00593865 7.99477707 7.8878251 10.98979601 8.7734375 14.00390625 C9.04466431 14.90296188 9.31589111 15.80201752 9.59533691 16.72831726 C10.18111788 18.67402549 10.76311058 20.62087738 11.34173584 22.56872559 C12.25902828 25.65537981 13.18701608 28.73864096 14.11767578 31.82128906 C16.95832156 41.24487135 19.7661342 50.67793438 22.54476929 60.11997986 C23.67156439 63.9431758 24.806968 67.76379049 25.94317627 71.584198 C26.72481581 74.2273388 27.49234558 76.87429013 28.25927734 79.52172852 C35.39980233 103.78477622 46.69874795 125.86508883 61.875 146.0625 C62.57882812 147.01253906 63.28265625 147.96257812 64.0078125 148.94140625 C74.62714947 162.57996648 87.60902623 175.30220977 101.875 185.0625 C102.51759766 185.5064209 103.16019531 185.9503418 103.82226562 186.40771484 C125.42127928 201.19967391 148.91517055 210.60454857 173.93460083 218.02151489 C176.89535856 218.89957298 179.8520984 219.79024481 182.80834961 220.68334961 C191.60537065 223.33420011 200.413486 225.94275759 209.24662781 228.47077942 C212.67466229 229.45210878 216.09983545 230.44324847 219.525177 231.43392944 C221.88500261 232.1099608 224.2495606 232.76699182 226.61499023 233.4230957 C228.04694614 233.83463624 229.47868182 234.24694412 230.91015625 234.66015625 C232.1412915 235.00570557 233.37242676 235.35125488 234.64086914 235.70727539 C238.33313594 237.25447649 240.31883802 239.0070528 242.875 242.0625 C243.4375 244.625 243.4375 244.625 242.875 247.0625 C239.87496819 250.74122379 237.12688949 251.92646932 232.61962891 253.24145508 C231.69152657 253.51807228 231.69152657 253.51807228 230.74467468 253.80027771 C228.70033861 254.40637334 226.65118495 254.9940859 224.6015625 255.58203125 C223.15747401 256.00675236 221.71374391 256.43269369 220.27035522 256.85978699 C216.45814847 257.98459645 212.64170502 259.09427238 208.82403564 260.20037842 C205.02364253 261.30355737 201.22663579 262.41823543 197.4296875 263.53320312 C196.69016814 263.75035508 195.95064878 263.96750704 195.18871975 264.19123936 C193.70710399 264.62639212 192.22551576 265.06163861 190.74395561 265.49698067 C189.27469697 265.92848426 187.80531245 266.35955946 186.33580208 266.790205 C177.28251104 269.44332765 168.2462896 272.13765231 159.25390625 274.9921875 C157.9887468 275.39260002 157.9887468 275.39260002 156.69802856 275.80110168 C117.59176829 288.37098897 83.06554829 312.77200177 58.875 346.0625 C58.45653809 346.63661621 58.03807617 347.21073242 57.60693359 347.80224609 C52.23917841 355.26851501 47.59364619 363.08626712 43.25 371.1875 C42.83105469 371.95457275 42.41210938 372.72164551 41.98046875 373.51196289 C32.19233605 392.27317802 26.70025118 412.96041686 20.80944824 433.18151855 C19.77163242 436.73738721 18.72419227 440.29041715 17.67773438 443.84375 C17.06459845 445.92841932 16.45169863 448.01315792 15.83886337 450.09791565 C15.44040857 451.45314638 15.04176187 452.80832071 14.64291763 454.16343689 C12.82922116 460.32785847 11.0185328 466.49156867 9.32177734 472.68945312 C9.0995903 473.48792664 8.87740326 474.28640015 8.64848328 475.10906982 C8.09939085 477.0930144 7.56484667 479.08097122 7.03198242 481.06933594 C5.77965441 484.3091632 4.5929115 485.92697501 1.875 488.0625 C-1.125 488.625 -1.125 488.625 -4.125 488.0625 C-7.25201892 484.75460819 -8.8158161 481.78649623 -10.08862305 477.44726562 C-10.41964523 476.34000122 -10.75066742 475.23273682 -11.09172058 474.09191895 C-11.43656998 472.89627319 -11.78141937 471.70062744 -12.13671875 470.46875 C-12.70676375 468.5469276 -13.2768099 466.62510554 -13.84691334 464.70330048 C-14.64474418 462.00286203 -15.43181632 459.2993314 -16.21917725 456.5958252 C-17.1827649 453.29359712 -18.1567106 449.99443773 -19.13085938 446.6953125 C-19.32195219 446.04800391 -19.51304501 445.40069532 -19.70992851 444.73377132 C-20.09627653 443.42523901 -20.48269962 442.11672885 -20.86919785 440.80824089 C-21.45030145 438.84008297 -22.03046454 436.87164926 -22.61062622 434.9032135 C-25.33288084 425.67763355 -28.10900752 416.46971167 -30.94140625 407.27734375 C-31.4778199 405.52284912 -31.4778199 405.52284912 -32.02507019 403.73291016 C-39.61730155 379.24380373 -51.37897142 356.56518251 -68.125 337.0625 C-68.85976562 336.20011719 -69.59453125 335.33773438 -70.3515625 334.44921875 C-72.55827424 331.93356736 -74.82296205 329.49118729 -77.125 327.0625 C-77.58036133 326.57458984 -78.03572266 326.08667969 -78.50488281 325.58398438 C-115.29920915 286.37251251 -165.00574592 273.3075689 -214.89453125 258.63671875 C-215.98295822 258.31469482 -217.07138519 257.9926709 -218.1927948 257.66088867 C-222.69168011 256.33492243 -227.18560202 255.02387889 -231.73193359 253.86962891 C-233.60292725 253.38695557 -233.60292725 253.38695557 -235.51171875 252.89453125 C-236.52838623 252.65065674 -237.54505371 252.40678223 -238.5925293 252.15551758 C-241.86126277 250.74472805 -243.22377217 249.03775972 -245.125 246.0625 C-245.125 242.9375 -245.125 242.9375 -244.125 240.0625 C-241.06574564 237.23257993 -237.95855852 236.20134693 -233.99658203 235.04467773 C-232.75232452 234.6767662 -231.50806702 234.30885468 -230.22610474 233.92979431 C-229.56109074 233.73748671 -228.89607674 233.5451791 -228.2109108 233.34704399 C-226.09135651 232.73410539 -223.97499361 232.11106271 -221.85910034 231.48561096 C-218.08820712 230.37279985 -214.3147278 229.26905953 -210.54034424 228.16815186 C-192.45504083 222.89220738 -174.38604443 217.60342809 -156.5078125 211.65625 C-154.68130661 211.05090675 -154.68130661 211.05090675 -152.81790161 210.43333435 C-128.16027861 202.13026166 -106.44381713 188.71180465 -87.33203125 171.08203125 C-85.41017848 169.32345093 -83.44852511 167.65430225 -81.4375 166 C-77.57408951 162.69106046 -74.36420937 158.97526897 -71.125 155.0625 C-70.48087158 154.30283936 -70.48087158 154.30283936 -69.82373047 153.52783203 C-50.1451327 130.26639097 -37.67991472 103.46965343 -28.85864258 74.49008179 C-28.0405624 71.80294179 -27.21321147 69.11877526 -26.38476562 66.43481445 C-23.34657217 56.55446985 -20.41236759 46.64831371 -17.56640625 36.7109375 C-16.98394519 34.69030799 -16.40134596 32.6697183 -15.81860352 30.64916992 C-14.70235581 26.77681888 -13.60872235 22.89899187 -12.52709961 19.0168457 C-12.01882205 17.24408656 -11.50982629 15.47153312 -11 13.69921875 C-10.67407616 12.49421219 -10.67407616 12.49421219 -10.34156799 11.26486206 C-8.71938295 5.72055467 -6.54490908 0.13089818 0 0 Z';
-
-      const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><path d="${STAR_D}" transform="translate(257.125,11.9375)"/></svg>`;
-      const svgLdr = new SVGLoader();
-      const svgDat = svgLdr.parse(svgStr);
-
-      const FS = 1.10 / 244, FD = 0.12 / FS, FB = 0.04 / FS;
-      let fGeo = null;
-      for (const p of svgDat.paths) {
-        for (const sh of SVGLoader.createShapes(p)) {
-          const g = new THREE.ExtrudeGeometry(sh, { depth: FD, bevelEnabled: true, bevelThickness: FB, bevelSize: FB * 0.7, bevelSegments: 5 });
-          g.translate(-257, -244, -FD / 2);
-          g.scale(FS, -FS, FS);
-          fGeo = fGeo ? mergeGeometries([fGeo, g]) : g;
-        }
-      }
-      if (!fGeo) { fabRenderer.dispose(); return; }
-      fGeo.computeVertexNormals();
-
-      const fabStar = new THREE.Mesh(fGeo, fabGlass);
-      fabScene.add(fabStar);
-
-      (function fabTick() {
-        const t = performance.now() / 1000;
-        fabStar.rotation.y += 0.013;
-        const b = 1 + 0.025 * Math.sin(t * 0.7);
-        fabStar.scale.set(b, b, b);
-        fo1.position.set(3 * Math.cos(t * 0.7),  1.5 * Math.sin(t * 0.5),  2.5);
-        fo2.position.set(-3 * Math.cos(t * 0.55), -1.5 * Math.sin(t * 0.65), 2.0);
-        fabGlass.time = t;
-
-        fabRenderer.setRenderTarget(fabFbo);
-        fabRenderer.render(fabBufScene, fabCam);
-        fabGlass.buffer = fabFbo.texture;
-
-        fabRenderer.setRenderTarget(null);
-        fabRenderer.render(fabScene, fabCam);
-        requestAnimationFrame(fabTick);
-      })();
-    })();
   </script>
 
   <script>
@@ -15360,9 +15260,9 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         title: 'EverTutor AI System',
 
         metrics: [
-          { val: '2000+', lbl: 'Daily Active Users' },
+          { val: '2000+', lbl: 'Active Learners' },
           { val: '−96%',  lbl: 'Workflow time'       },
-          { val: '$300k ARR', lbl: 'Sole Designer'   }
+          { val: '$500k+ ARR', lbl: 'Sole Designer'   }
         ],
         tags: ['Shipped', 'Voice AI Tutor', 'EdTech', 'B2C · Mobile'],
         desc: "World's first multimodal 1:1 voice AI tutor. 3 tools as one system, enabling a billion minds.",
@@ -15585,6 +15485,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       updatePanels(e.detail.idx);
     });
 
+
     /* Shoot up tab strip when section scrolls into view */
     var tabsShown = false;
     var cardsZone = document.getElementById('s2CardsZone');
@@ -15697,7 +15598,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260630-staticface" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260630-morning" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */

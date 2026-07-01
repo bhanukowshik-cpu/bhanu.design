@@ -19,12 +19,12 @@
 
     // ── Cards ─────────────────────────────────────────────────────────────
     var CARDS = [
-      { label: 'EverTutor',    img: '/images/blob.png',      video: null                        },
-      { label: 'ET Live',      img: '/images/thumb-1.jpg',   video: '/images/et-live.mp4'       },
-      { label: 'ET Studio',    img: '/images/thumb-2.jpg',   video: '/images/et-studio.mp4'     },
-      { label: 'ET Analytics', img: '/images/thumb-3.jpg',   video: '/images/et-analytics.mp4'  },
-      { label: 'Stressie',     img: '/images/thumb-5.jpg',   video: '/images/stressie.mp4'      },
-      { label: 'Dearly',       img: '/images/thumb-4.jpg',   video: '/images/dearly.mp4'        },
+      { label: 'EverTutor',    img: '/images/blob.png',              video: null                       },
+      { label: 'ET Live',      img: '/images/card-et-live.png',      video: '/images/et-live.mp4'      },
+      { label: 'ET Studio',    img: '/images/card-et-studio.png',    video: '/images/et-studio.mp4'    },
+      { label: 'ET Analytics', img: '/images/card-et-analytics.png', video: '/images/et-analytics.mp4' },
+      { label: 'Stressie',     img: '/images/card-stressie.png',     video: '/images/stressie.mp4', portrait: true },
+      { label: 'Dearly',       img: '/images/card-dearly.png',       video: '/images/dearly.mp4'       },
     ];
     var allCards = CARDS.concat(CARDS);
 
@@ -143,6 +143,7 @@ uniform float uVideoReveal;
 uniform float uFogOpacity;
 uniform float uAuroraStrength;
 uniform float uTime;
+uniform float uIsPortrait;
 
 varying vec2 vUv;
 
@@ -163,26 +164,28 @@ void main() {
 
   vec2 zoomedUv = (uv - 0.5) / uZoom + 0.5;
 
-  // ── Video sub-panel: physically slides up from below the card ────────────
-  // Panel is 92% of the card with 4% margin on every side when fully revealed.
-  // Constraint: panelSY + 2*panelMY = 1.0, panelSX + 2*panelMX = 1.0
-  float panelMX  = 0.04;
-  float panelMY  = 0.04;
-  float panelSX  = 0.92;
+  // ── Video sub-panel: slides DOWN from above the card into place ──────────
+  // Landscape videos fill a 92% panel; the portrait (phone) video shows FULLY
+  // inside a narrow, tall 9:16 column centred on the card — nothing cropped.
+  float portrait = step(0.5, uIsPortrait);
   float panelSY  = 0.92;
+  float panelMY  = 0.04;
+  float panelSX  = mix(0.92, 0.29, portrait);   // 9:16 phone width inside a 16:9 card
+  float panelMX  = (1.0 - panelSX) * 0.5;
 
-  // uVideoReveal=0 → panel fully below card (panelTop=0, panelBot=-panelSY)
-  // uVideoReveal=1 → panel in final inset position (panelBot=panelMY, panelTop=1-panelMY)
-  float panelBot = -panelSY + uVideoReveal * (panelMY + panelSY);
-  float panelTop =             uVideoReveal * (1.0 - panelMY);
+  // uVideoReveal=0 → panel fully above the card; =1 → final inset position.
+  // Leading edge is the BOTTOM, descending from the top toward centre.
+  float panelBot = 1.0 - uVideoReveal * (1.0 - panelMY);
+  float panelTop = panelBot + panelSY;
 
-  // Soft panel edges (anti-aliased)
-  float fe       = 0.005;
-  float inX      = smoothstep(panelMX - fe, panelMX + fe, vUv.x) *
-                   smoothstep(1.0 - panelMX + fe, 1.0 - panelMX - fe, vUv.x);
-  float inY      = smoothstep(panelBot - fe, panelBot + fe, vUv.y) *
-                   smoothstep(panelTop  + fe, panelTop  - fe, vUv.y);
-  float inPanel  = inX * inY * step(0.001, uVideoReveal);
+  // Rounded-corner panel mask (anti-aliased rounded rectangle)
+  float fe       = 0.004;
+  float pr       = mix(0.045, 0.03, portrait);     // corner radius (tighter for the phone)
+  vec2  pCenter  = vec2(0.5, (panelBot + panelTop) * 0.5);
+  vec2  pHalf    = vec2(panelSX, panelSY) * 0.5;
+  vec2  pq       = abs(vUv - pCenter) - pHalf + pr;
+  float pSdf     = min(max(pq.x, pq.y), 0.0) + length(max(pq, 0.0)) - pr;
+  float inPanel  = (1.0 - smoothstep(-fe, fe, pSdf)) * step(0.001, uVideoReveal);
 
   // Remap card UV → video texture UV (1:1 since both are 16:9)
   float vidU     = (vUv.x - panelMX) / panelSX;
@@ -193,8 +196,10 @@ void main() {
   vec4 vidSample = texture2D(uVideoTexture, vidUV);
   vec4 blended   = mix(imgSample, vidSample, inPanel);
 
-  // Glowing scan-line at the leading (top) edge of the panel as it slides up
-  float edgeDist = abs(vUv.y - panelTop);
+  // Glowing scan-line at the leading (bottom) edge as the panel slides down
+  float inX      = smoothstep(panelMX - fe, panelMX + fe, vUv.x) *
+                   smoothstep(1.0 - panelMX + fe, 1.0 - panelMX - fe, vUv.x);
+  float edgeDist = abs(vUv.y - panelBot);
   float edge     = 1.0 - smoothstep(0.0, 0.022, edgeDist);
   float edgeVis  = edge * inX * step(0.01, uVideoReveal) * step(uVideoReveal, 0.99);
   blended.rgb   += vec3(0.9, 0.95, 0.55) * edgeVis * 0.8;
@@ -292,6 +297,7 @@ void main() {
         uFogOpacity:      { value: 1 },
         uAuroraStrength:  { value: 0 },
         uTime:            { value: 0 },
+        uIsPortrait:      { value: allCards[i].portrait ? 1.0 : 0.0 },
       };
       uniforms.push(u);
       hiddenProgress.push(1);
@@ -322,8 +328,9 @@ void main() {
       var dup = ci + CARDS.length;
 
       if (card.video) {
-        // Video cards: put video directly on the card face.
-        // Plane is 16:9, videos are 16:9 → cover-fit ratio = 1:1, nothing cut off.
+        // Video cards: STATIC thumbnail on the card face; the video lives in the
+        // reveal panel (uVideoTexture) and only slides in / plays when this card
+        // is the active (front) one — see the ticker + front-card logic below.
         var vid = document.createElement('video');
         vid.src = card.video; vid.loop = true; vid.muted = true;
         vid.playsInline = true; vid.preload = 'auto';
@@ -331,12 +338,21 @@ void main() {
         var vtex = new THREE.VideoTexture(vid);
         vtex.minFilter = THREE.LinearFilter;
         vtex.magFilter = THREE.LinearFilter;
-        uniforms[ci].uTexture.value        = vtex;
-        uniforms[ci].uImageSizes.value.set(1920, 1080);
-        uniforms[dup].uTexture.value       = vtex;
-        uniforms[dup].uImageSizes.value.set(1920, 1080);
         uniforms[ci].uVideoTexture.value   = vtex;
         uniforms[dup].uVideoTexture.value  = vtex;
+
+        // Load the static thumbnail as the card face so every card always shows
+        // an image (never a blank/black frame before the video plays).
+        loader.load(card.img, function (tex) {
+          tex.minFilter = THREE.LinearFilter;
+          tex.magFilter = THREE.LinearFilter;
+          var w = (tex.image && (tex.image.naturalWidth  || tex.image.width))  || 1280;
+          var h = (tex.image && (tex.image.naturalHeight || tex.image.height)) || 720;
+          uniforms[ci].uTexture.value  = tex;
+          uniforms[dup].uTexture.value = tex;
+          uniforms[ci].uImageSizes.value.set(w, h);
+          uniforms[dup].uImageSizes.value.set(w, h);
+        });
       } else {
         // EverTutor (no video): animated canvas — white bg + blob-light + waveform
         videoEls.push(null);
@@ -703,6 +719,10 @@ void main() {
         );
         meshes[i].rotation.y = -angle + Math.PI / 2;
 
+        // Video reveals ONLY on the active (front, B≈2) card — every other card
+        // keeps showing its static thumbnail.
+        videoRevealTarget[i] = (allCards[i].video && Math.abs(B - 2) < 0.5) ? 1 : 0;
+
         // Animate video panel slide per card (~0.5s glide)
         var vrEase = 1 - Math.pow(1 - 0.04, deltaTime * 0.15);
         videoRevealProgress[i] = lerp(videoRevealProgress[i], videoRevealTarget[i], vrEase);
@@ -736,6 +756,13 @@ void main() {
         var fcIdx = fcFront % CARDS.length;
         if (fcIdx !== lastFrontCardIdx) {
           lastFrontCardIdx = fcIdx;
+          // Play only the active card's video; pause every other one so videos
+          // never play in the background on inactive cards.
+          videoEls.forEach(function (v, ci) {
+            if (!v) return;
+            if (ci === fcIdx) { try { v.currentTime = 0; v.play().catch(function () {}); } catch (e) {} }
+            else              { try { v.pause(); } catch (e) {} }
+          });
           window.dispatchEvent(new CustomEvent('s2:frontCard', { detail: { idx: fcIdx } }));
         }
       }
@@ -761,10 +788,8 @@ void main() {
       if (entries[0].isIntersecting && !entryTriggered) {
         entryTriggered = true;
         spiralEntryObs.disconnect();
-        // User has scrolled here — autoplay policy is satisfied; start all videos
-        CARDS.forEach(function (card, ci) {
-          if (videoEls[ci]) { videoEls[ci].play().catch(function () {}); }
-        });
+        // Videos play only on the active card now (handled in the front-card
+        // detection above), so we no longer start them all on entry.
         setTimeout(function () {
           snapTarget        = null;
           targetWheelDeltaY = ENTRY_SPEED;
