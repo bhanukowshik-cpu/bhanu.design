@@ -601,13 +601,27 @@
 
     /* ─── MOBILE FACTS CAROUSEL — one fact cross-fades every 4s ── */
     .hfc-panel { display: none; }  /* hidden by default; mobile shows it */
+    .hfc-dots  { display: none; }  /* hidden by default; mobile shows it */
     .hfc-slide { opacity: 0; }     /* all slides start invisible */
     @keyframes hfc-fade {
-      0%    { opacity: 0; transform: translateY(5px); }
-      6%    { opacity: 1; transform: translateY(0);   }
-      19%   { opacity: 1; transform: translateY(0);   }
-      25%   { opacity: 0; transform: translateY(-5px);}
-      100%  { opacity: 0; transform: translateY(5px); }
+      0%    { opacity: 0; transform: translate3d(18px, 0, 0); }
+      6%    { opacity: 1; transform: translate3d(0, 0, 0);    }
+      19%   { opacity: 1; transform: translate3d(0, 0, 0);    }
+      25%   { opacity: 0; transform: translate3d(-18px, 0, 0);}
+      100%  { opacity: 0; transform: translate3d(18px, 0, 0); }
+    }
+    @-webkit-keyframes hfc-fade {
+      0%    { opacity: 0; -webkit-transform: translate3d(18px, 0, 0); }
+      6%    { opacity: 1; -webkit-transform: translate3d(0, 0, 0);    }
+      19%   { opacity: 1; -webkit-transform: translate3d(0, 0, 0);    }
+      25%   { opacity: 0; -webkit-transform: translate3d(-18px, 0, 0);}
+      100%  { opacity: 0; -webkit-transform: translate3d(18px, 0, 0); }
+    }
+    @keyframes hfc-dot-pulse {
+      0%    { width: 18px; background: rgba(255,255,255,0.85); }
+      22%   { width: 18px; background: rgba(255,255,255,0.85); }
+      25%   { width: 6px;  background: rgba(255,255,255,0.22); }
+      100%  { width: 6px;  background: rgba(255,255,255,0.22); }
     }
 
     /* ─── GREETING / TYPING LINE ─────────────────────────────── */
@@ -2757,54 +2771,79 @@
         height: auto;
       }
       .hero-screen-left     { flex: 1; align-self: stretch; gap: 24px; justify-content: center; }
+      /* Mobile facts pill — matches desktop .hero-facts exactly */
       .hero-ticker {
         flex-shrink: 0;
         background: rgba(255,252,248,0.80);
         border: 1px solid rgba(37,37,37,0.12);
         border-radius: 20px;
-        padding: 0;
+        padding: 20px 28px 24px;
         overflow: hidden;
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
+        position: relative;
       }
-      .hero-ticker::before, .hero-ticker::after { display: block; }
-      .hero-ticker-track    { display: flex; }
-      .hfc-panel            { display: none; }
+      .hero-ticker::before, .hero-ticker::after { display: none; }
+      .hero-ticker-track    { display: none; }
+      .hfc-panel {
+        display: block;
+        position: relative;
+        height: 46px;
+        overflow: hidden;
+      }
       .hfc-slide {
         position: absolute;
-        inset: 0;
+        left: 0; right: 0; top: 0; height: 46px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
         animation: hfc-fade 16s ease-in-out infinite;
         -webkit-animation: hfc-fade 16s ease-in-out infinite;
         animation-delay: calc(var(--i) * 4s);
         -webkit-animation-delay: calc(var(--i) * 4s);
       }
+      /* Match desktop .hfact-k / .hfact-v exactly */
       .hfc-k {
-        font-size: 10px;
+        font-size: 13px;
         font-weight: 500;
-        letter-spacing: 0.13em;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: rgba(37,37,37,0.45);
+        color: #525252;
         font-family: var(--font-mono);
       }
       .hfc-v {
-        font-size: 17px;
+        font-size: 19px;
         font-weight: 500;
         font-family: var(--font-mono);
         color: var(--secondary);
-        margin-top: 2px;
+        margin-top: 4px;
       }
+      /* Dot indicators */
+      .hfc-dots {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 14px;
+      }
+      .hfc-dot {
+        height: 6px;
+        width: 6px;
+        border-radius: 3px;
+        background: rgba(37,37,37,0.18);
+        animation: hfc-dot-pulse 16s linear infinite;
+        animation-delay: calc(var(--i) * 4s);
+      }
+      /* Dark mode — match desktop .hero-facts dark exactly */
       [data-theme="dark"] .hero-ticker {
         background: linear-gradient(180deg, #262626 0%, #0D0D0D 100%);
-        border: 1px solid rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.08);
       }
-      [data-theme="dark"] .hero-ticker::before { background: linear-gradient(to right, #1c1c1c, transparent); }
-      [data-theme="dark"] .hero-ticker::after  { background: linear-gradient(to left,  #1c1c1c, transparent); }
-      [data-theme="dark"] .hfc-k { color: rgba(255,255,255,0.40); }
-      [data-theme="dark"] .hfc-v { color: rgba(255,255,255,0.90); }
+      [data-theme="dark"] .hfc-k { color: rgba(255,255,255,0.45); }
+      [data-theme="dark"] .hfc-v { color: #F5F5F7; }
+      [data-theme="dark"] .hfc-dot { background: rgba(255,255,255,0.22); }
       .hero-content         { gap: 20px; }
       .greeting             { font-size: 16px; }
       .hero-heading { font-size: 24px; line-height: 34px; }
@@ -6169,90 +6208,6 @@
       .cb-fab2 svg { animation: none !important; }
     }
 
-    /* ── Mobile ask bottom-sheet overlay ────────────────────── */
-    .mob-ask-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 3000;
-    }
-    .mob-ask-overlay.mob-ask-open { display: block; }
-    .mob-ask-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    .mob-ask-overlay.mob-ask-open .mob-ask-backdrop { opacity: 1; }
-    .mob-ask-sheet {
-      position: absolute;
-      left: 0; right: 0; bottom: 0;
-      background: rgba(30,30,34,0.92);
-      backdrop-filter: blur(20px) saturate(160%);
-      -webkit-backdrop-filter: blur(20px) saturate(160%);
-      border-radius: 24px 24px 0 0;
-      border-top: 1px solid rgba(255,255,255,0.10);
-      padding: 12px 20px 32px;
-      transform: translateY(100%);
-      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
-      box-shadow: 0 -8px 40px rgba(0,0,0,0.4);
-    }
-    .mob-ask-overlay.mob-ask-open .mob-ask-sheet { transform: translateY(0); }
-    .mob-ask-handle {
-      width: 36px; height: 4px;
-      border-radius: 2px;
-      background: rgba(255,255,255,0.25);
-      margin: 0 auto 20px;
-    }
-    .mob-ask-label {
-      color: rgba(255,255,255,0.5);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin: 0 0 12px;
-    }
-    .mob-ask-input-row {
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
-    }
-    .mob-ask-input {
-      flex: 1;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 14px;
-      color: #fff;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 15px;
-      line-height: 1.5;
-      padding: 12px 16px;
-      resize: none;
-      outline: none;
-      field-sizing: content;
-      max-height: 140px;
-      overflow-y: auto;
-    }
-    .mob-ask-input::placeholder { color: rgba(255,255,255,0.3); }
-    .mob-ask-input:focus { border-color: rgba(230,242,141,0.5); }
-    .mob-ask-send {
-      flex-shrink: 0;
-      width: 46px; height: 46px;
-      border-radius: 50%;
-      border: none;
-      background: #E6F28D;
-      color: #1a1a1a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.15s ease, background 0.15s ease;
-    }
-    .mob-ask-send:active { transform: scale(0.92); background: #d4e070; }
-
     /* ── Bar EXIT (reverse entrance) ───────────────────────────
        collapse: bar → circle (row slides back out to the right, width shrinks);
        drop: the circle falls + fades down to the bottom (reverse of the shoot). */
@@ -7214,19 +7169,34 @@
     .cp-textarea::placeholder { color: rgba(255,255,255,0.4); }
     .cp-pill .cb-send:disabled { opacity: 0.45; pointer-events: none; }
 
-    /* hide on small screens */
+    /* Mobile: .cp becomes a full-screen transparent glass overlay sliding up from bottom */
     @media (max-width: 900px) {
-      .cp { display: none; }
       body.chat-open .page { padding-right: 24px; }
+      .cp {
+        top: 0; right: 0; bottom: 0; left: 0;
+        width: 100%;
+        border-radius: 0;
+        background: rgba(10, 9, 12, 0.82);
+        backdrop-filter: blur(28px) saturate(180%);
+        -webkit-backdrop-filter: blur(28px) saturate(180%);
+        border: none;
+        transform: translateY(100%);
+        transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
+        z-index: 2000;
+      }
+      body.chat-open .cp { transform: translateY(0); }
+      .cp-header { padding-top: max(18px, env(safe-area-inset-top)); border-radius: 0; }
+      .cp-input-row { padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+      .cp-close { width: 36px; height: 36px; border-radius: 10px; }
     }
     @media (max-width: 540px) {
       .cb { --cb-bar-w: calc(100vw - 32px); }
       .cb.bar-revealed { width: var(--cb-bar-w); }
-      .cb.expanded     { width: calc(100vw - 32px); }
-      /* Shrink hint chips so they don't overflow the narrower bar */
+      /* Taller expanded bar to fit 3-row chip layout at narrow widths */
+      .cb.expanded { width: calc(100vw - 32px); height: 260px; }
+      /* Shrink hint chips so they wrap cleanly within the narrower bar */
       .cb-hint { font-size: 12px !important; padding: 5px 9px !important; }
-      .cb-hints { overflow-x: auto; flex-wrap: nowrap !important; padding-bottom: 4px; scrollbar-width: none; }
-      .cb-hints::-webkit-scrollbar { display: none; }
+      .cb-hints { gap: 8px 5px !important; padding: 8px 14px 8px !important; }
     }
 
     /* ─── GLASS LOADING SCREEN (Figma artboard + liquid glass cursor) ─── */
@@ -10502,6 +10472,12 @@
             <div class="hfc-slide" style="--i:1"><span class="hfc-k">Designing Since</span><span class="hfc-v">5 + Years</span></div>
             <div class="hfc-slide" style="--i:2"><span class="hfc-k">Proven Work In</span><span class="hfc-v">0 to 1, B2B &amp; B2C</span></div>
             <div class="hfc-slide" style="--i:3"><span class="hfc-k">Based In</span><span class="hfc-v">San Francisco</span></div>
+          </div>
+          <div class="hfc-dots" aria-hidden="true">
+            <span class="hfc-dot" style="--i:0"></span>
+            <span class="hfc-dot" style="--i:1"></span>
+            <span class="hfc-dot" style="--i:2"></span>
+            <span class="hfc-dot" style="--i:3"></span>
           </div>
           <!-- Desktop/tablet: scrolling marquee -->
           <div class="hero-ticker-track">
@@ -14078,11 +14054,6 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     document.querySelectorAll('.cb-hint').forEach(function (hint) {
       hint.addEventListener('mousedown', function (e) {
         e.preventDefault();
-        if (window.innerWidth <= 767) {
-          /* On mobile: open the overlay pre-filled with the hint text */
-          if (window._openMobSheet) window._openMobSheet(hint.textContent.trim());
-          return;
-        }
         cbInput.value = hint.textContent;
         cbInput.dispatchEvent(new Event('input', { bubbles: true }));
         cbInput.focus();
@@ -14103,12 +14074,6 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     }
 
     function cbDoSend() {
-      /* On mobile, route through the bottom-sheet overlay */
-      if (window.innerWidth <= 767) {
-        var prefill = cbInput.value.trim();
-        if (window._openMobSheet) window._openMobSheet(prefill || '');
-        return;
-      }
       var text = cbInput.value.trim();
       if (!text) { cbToast('Enter a question to ask first'); return; }
       if (isLoading) return;
@@ -14134,6 +14099,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     function closeChat() {
       document.body.classList.remove('chat-open');
       cpEl.setAttribute('aria-hidden', 'true');
+      /* Reset any keyboard-driven inline size so CSS transition takes over */
+      cpEl.style.height = ''; cpEl.style.top = '';
       // restore whichever zone the user is now in: bar shoots back up (Hero/
       // Contact) or the FAB shoots back in (middle sections)
       if (window._syncBarMode) window._syncBarMode();
@@ -14834,61 +14801,25 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
     window.addEventListener('scroll', function () { syncBarMode(0); }, { passive: true });
 
-    /* Open chat from the FAB: bottom sheet on mobile, inline expand on desktop.
-       Overlay HTML is appended after this script block; look up elements lazily. */
+    /* FAB opens the chat overlay */
+    if (cbFab) cbFab.addEventListener('click', function () { if (window._openChat) window._openChat(); });
+
+    /* Keyboard-aware on mobile: shrink .cp to the visual viewport height when
+       the on-screen keyboard pushes the viewport up */
     (function () {
-      var _overlay, _backdrop, _input, _sendBtn, _wired = false;
-
-      function getEls() {
-        if (!_overlay) _overlay  = document.getElementById('mob-ask-overlay');
-        if (!_backdrop) _backdrop = document.getElementById('mobAskBackdrop');
-        if (!_input)   _input    = document.getElementById('mobAskInput');
-        if (!_sendBtn) _sendBtn  = document.getElementById('mobAskSend');
-      }
-
-      function openSheet(prefill) {
-        getEls();
-        if (!_overlay) return;
-        if (prefill && _input) _input.value = prefill;
-        _overlay.setAttribute('aria-hidden', 'false');
-        _overlay.classList.add('mob-ask-open');
-        setTimeout(function () { if (_input) _input.focus(); }, 420);
-        /* Wire backdrop / send / input once on first open */
-        if (!_wired) {
-          _wired = true;
-          if (_backdrop) _backdrop.addEventListener('click', closeSheet);
-          if (_sendBtn)  _sendBtn.addEventListener('click', submitSheet);
-          if (_input)    _input.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitSheet(); }
-          });
+      function onVVChange() {
+        if (!cpEl) return;
+        if (!document.body.classList.contains('chat-open') || window.innerWidth > 900) {
+          cpEl.style.height = ''; cpEl.style.top = ''; return;
         }
+        var vv = window.visualViewport;
+        cpEl.style.top    = vv.offsetTop + 'px';
+        cpEl.style.height = vv.height    + 'px';
       }
-      function closeSheet() {
-        if (!_overlay) return;
-        _overlay.classList.remove('mob-ask-open');
-        _overlay.setAttribute('aria-hidden', 'true');
-        if (_input) _input.value = '';
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', onVVChange);
+        window.visualViewport.addEventListener('scroll', onVVChange);
       }
-      function submitSheet() {
-        var text = _input ? _input.value.trim() : '';
-        closeSheet();
-        if (window._openChat) window._openChat(text || undefined);
-      }
-
-      /* Expose so cbSend and hint chips can trigger the sheet on mobile */
-      window._openMobSheet = openSheet;
-
-      if (cbFab) cbFab.addEventListener('click', function () {
-        if (window.innerWidth <= 767) {
-          openSheet();
-        } else {
-          if (window._openChat) window._openChat();
-        }
-      });
-
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && _overlay && _overlay.classList.contains('mob-ask-open')) closeSheet();
-      });
     })();
 
     /* First run: the shoot must be SEEN, not hidden behind the glass loader
@@ -17081,20 +17012,6 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
   </script>
 
-  <!-- Mobile ask overlay (bottom sheet) -->
-  <div id="mob-ask-overlay" class="mob-ask-overlay" aria-hidden="true">
-    <div class="mob-ask-backdrop" id="mobAskBackdrop"></div>
-    <div class="mob-ask-sheet" role="dialog" aria-label="Ask me anything">
-      <div class="mob-ask-handle"></div>
-      <p class="mob-ask-label">Ask me anything</p>
-      <div class="mob-ask-input-row">
-        <textarea id="mobAskInput" class="mob-ask-input" rows="1" placeholder="Type your question…" maxlength="500"></textarea>
-        <button id="mobAskSend" class="mob-ask-send" aria-label="Send">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
-      </div>
-    </div>
-  </div>
 
 </body>
 </html>
