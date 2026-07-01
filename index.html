@@ -165,23 +165,23 @@
       content: '';
       position: absolute;
       left: -40px; right: -40px; bottom: 0;
-      height: 160px;
+      height: 44%;
       background:
-        radial-gradient(ellipse 70% 140px at 50% 100%, rgba(230,242,141,0.20) 0%, rgba(230,242,141,0.06) 65%, transparent 100%);
+        radial-gradient(ellipse 72% 68% at 50% 100%, rgba(230,242,141,0.34) 0%, rgba(230,242,141,0.11) 50%, transparent 78%),
+        radial-gradient(ellipse 115% 42% at 50% 110%, rgba(230,242,141,0.13) 0%, transparent 58%);
       pointer-events: none;
       z-index: -1;
     }
     .hero-screen::before {
       content: '';
       position: absolute;
-      left: -40px; right: -40px; bottom: 0;
-      height: 160px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.70' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 120px 120px;
-      opacity: 0.60;
+      left: -40px; right: -40px; top: 0; bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      opacity: 0.16;
       mix-blend-mode: soft-light;
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, #000 100%);
-      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, #000 100%);
+      -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.20) 50%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0.70) 100%);
+      mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.20) 50%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0.70) 100%);
       pointer-events: none;
       z-index: -1;
     }
@@ -426,12 +426,12 @@
        the column's bottom edge (not a top % guess) so it can't overflow
        past the column regardless of caption length. */
     .polaroid.p1 { left: 0%; top: 0%;  z-index: 1; transform: rotate(-5deg); }
-    .polaroid.p2 { left: 8%; top: auto; bottom: 0%; z-index: 2; transform: rotate(4deg);  }
+    .polaroid.p2 { left: 8%; top: auto; bottom: 14%; z-index: 2; transform: rotate(4deg);  }
     .polaroid.p3 { left: 0%; top: 0%;  z-index: 3; transform: rotate(-3deg); }
-    .polaroid.p4 { display: block; left: 8%; top: auto; bottom: 0%; z-index: 4; transform: rotate(4deg); }
+    .polaroid.p4 { display: block; left: 8%; top: auto; bottom: 14%; z-index: 4; transform: rotate(4deg); }
     /* left-column overrides — anchor to right (inner) edge so photos lean toward center */
     .hero-photos-left .polaroid.p1 { left: auto; right: 0%; top: 0%;  transform: rotate(-4deg); }
-    .hero-photos-left .polaroid.p2 { left: auto; right: 8%; top: auto; bottom: 0%; transform: rotate(5deg); }
+    .hero-photos-left .polaroid.p2 { left: auto; right: 8%; top: auto; bottom: 14%; transform: rotate(5deg); }
     .pc {
       display: block;
       background: #F2F2F2;
@@ -6419,7 +6419,7 @@
       font-size: 11px;
       font-weight: 600;
       color: rgba(255,255,255,0.38);
-      margin-bottom: 12px;
+      padding-bottom: 12px; /* padding (not margin) so it's counted in scrollHeight measurement */
       letter-spacing: 0.09em;
       text-transform: uppercase;
     }
@@ -14015,6 +14015,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var cbInput = document.getElementById('cbInput');
     var cbSend  = document.getElementById('cbSend');
     var cbMic   = document.getElementById('cbMic');
+    var cbHints = document.getElementById('cbHints');
     var cpEl    = document.getElementById('cp');
     var cpMsgs  = document.getElementById('cpMsgs');
     var cpClose = document.getElementById('cpClose');
@@ -14082,7 +14083,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (window.innerWidth > 540) return; // desktop uses CSS height
       var hintsH = cbHints ? cbHints.scrollHeight : 0;
       var maxH = Math.floor(window.innerHeight * 0.8);
-      cbEl.style.height = Math.min(hintsH + 63 + 4, maxH) + 'px'; // hints + row + 4px, capped at 80vh
+      cbEl.style.height = Math.min(hintsH + 63 + 16, maxH) + 'px'; // hints + row + 16px buffer, capped at 80vh
     }
     cbInput.addEventListener('focus', function () {
       cbSetExpandedHeight();
@@ -14097,15 +14098,21 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     });
     cbSend.addEventListener('click', cbDoSend);
 
-    /* prompt hints — mousedown (not click) so the input never blurs and
-       the expanded state holds while the hint fills the field */
+    /* prompt hints — touchstart on mobile (prevents the later synthesized mousedown/click
+       from double-firing); mousedown on desktop so the input never blurs mid-tap */
     document.querySelectorAll('.cb-hint').forEach(function (hint) {
-      hint.addEventListener('mousedown', function (e) {
+      var hintFired = false;
+      function fillHint(e) {
+        if (hintFired) return;
+        hintFired = true;
+        setTimeout(function () { hintFired = false; }, 400);
         e.preventDefault();
-        cbInput.value = hint.textContent;
+        cbInput.value = hint.textContent.trim();
         cbInput.dispatchEvent(new Event('input', { bubbles: true }));
         cbInput.focus();
-      });
+      }
+      hint.addEventListener('touchstart', fillHint, { passive: false });
+      hint.addEventListener('mousedown',  fillHint);
     });
 
     /* empty-input toast — reuses the footer #copyToast component */
@@ -17026,10 +17033,24 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var running = false;
     var SPEED   = 20; /* px / second */
 
-    function measure() { halfW = track.scrollWidth / 2; }
+    function measure() {
+      /* Use the screen position of the first set-B item relative to the track's
+         own left edge — this cancels any current translate so halfW is always
+         the natural pixel offset of the duplicate set, not a scrollWidth ÷ 2 guess. */
+      var items = track.querySelectorAll('.hero-carousel-wrap');
+      var half  = Math.floor(items.length / 2);
+      if (half > 0 && items[half]) {
+        var tl = track.getBoundingClientRect().left;
+        var il = items[half].getBoundingClientRect().left;
+        halfW  = il - tl; /* offset cancels the common transform */
+      }
+      if (halfW <= 0) halfW = track.scrollWidth / 2; /* layout-not-ready fallback */
+    }
 
     function tick(t) {
       if (!running) return;
+      /* re-measure on first few frames in case layout wasn't ready at start() */
+      if (halfW <= 0 && track.scrollWidth > 0) measure();
       if (lastT) {
         var dt = Math.min((t - lastT) / 1000, 0.05); /* cap at 50ms so tab-switch doesn't jump */
         pos += SPEED * dt;
