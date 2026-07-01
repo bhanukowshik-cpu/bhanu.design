@@ -2756,24 +2756,20 @@
         min-height: calc(100svh - 164px); /* viewport - page-pad(60) - hero-pad-top(22) - chat-bar(82) */
         height: auto;
       }
-      .hero-screen-left     { flex: 1; align-self: stretch; gap: 24px; }
+      .hero-screen-left     { flex: 1; align-self: stretch; gap: 24px; justify-content: center; }
       .hero-ticker {
         flex-shrink: 0;
         background: rgba(255,252,248,0.80);
         border: 1px solid rgba(37,37,37,0.12);
         border-radius: 20px;
-        padding: 20px 24px;
-        overflow: visible;
+        padding: 0;
+        overflow: hidden;
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
       }
-      .hero-ticker::before, .hero-ticker::after { display: none; }
-      .hero-ticker-track    { display: none; }
-      .hfc-panel {
-        display: block;
-        position: relative;
-        height: 52px;
-      }
+      .hero-ticker::before, .hero-ticker::after { display: block; }
+      .hero-ticker-track    { display: flex; }
+      .hfc-panel            { display: none; }
       .hfc-slide {
         position: absolute;
         inset: 0;
@@ -2803,8 +2799,10 @@
       }
       [data-theme="dark"] .hero-ticker {
         background: linear-gradient(180deg, #262626 0%, #0D0D0D 100%);
-        border: none;
+        border: 1px solid rgba(255,255,255,0.10);
       }
+      [data-theme="dark"] .hero-ticker::before { background: linear-gradient(to right, #1c1c1c, transparent); }
+      [data-theme="dark"] .hero-ticker::after  { background: linear-gradient(to left,  #1c1c1c, transparent); }
       [data-theme="dark"] .hfc-k { color: rgba(255,255,255,0.40); }
       [data-theme="dark"] .hfc-v { color: rgba(255,255,255,0.90); }
       .hero-content         { gap: 20px; }
@@ -7225,6 +7223,10 @@
       .cb { --cb-bar-w: calc(100vw - 32px); }
       .cb.bar-revealed { width: var(--cb-bar-w); }
       .cb.expanded     { width: calc(100vw - 32px); }
+      /* Shrink hint chips so they don't overflow the narrower bar */
+      .cb-hint { font-size: 12px !important; padding: 5px 9px !important; }
+      .cb-hints { overflow-x: auto; flex-wrap: nowrap !important; padding-bottom: 4px; scrollbar-width: none; }
+      .cb-hints::-webkit-scrollbar { display: none; }
     }
 
     /* ─── GLASS LOADING SCREEN (Figma artboard + liquid glass cursor) ─── */
@@ -14076,6 +14078,11 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     document.querySelectorAll('.cb-hint').forEach(function (hint) {
       hint.addEventListener('mousedown', function (e) {
         e.preventDefault();
+        if (window.innerWidth <= 767) {
+          /* On mobile: open the overlay pre-filled with the hint text */
+          if (window._openMobSheet) window._openMobSheet(hint.textContent.trim());
+          return;
+        }
         cbInput.value = hint.textContent;
         cbInput.dispatchEvent(new Event('input', { bubbles: true }));
         cbInput.focus();
@@ -14096,6 +14103,12 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     }
 
     function cbDoSend() {
+      /* On mobile, route through the bottom-sheet overlay */
+      if (window.innerWidth <= 767) {
+        var prefill = cbInput.value.trim();
+        if (window._openMobSheet) window._openMobSheet(prefill || '');
+        return;
+      }
       var text = cbInput.value.trim();
       if (!text) { cbToast('Enter a question to ask first'); return; }
       if (isLoading) return;
@@ -14833,9 +14846,10 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         if (!_sendBtn) _sendBtn  = document.getElementById('mobAskSend');
       }
 
-      function openSheet() {
+      function openSheet(prefill) {
         getEls();
         if (!_overlay) return;
+        if (prefill && _input) _input.value = prefill;
         _overlay.setAttribute('aria-hidden', 'false');
         _overlay.classList.add('mob-ask-open');
         setTimeout(function () { if (_input) _input.focus(); }, 420);
@@ -14860,6 +14874,9 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         closeSheet();
         if (window._openChat) window._openChat(text || undefined);
       }
+
+      /* Expose so cbSend and hint chips can trigger the sheet on mobile */
+      window._openMobSheet = openSheet;
 
       if (cbFab) cbFab.addEventListener('click', function () {
         if (window.innerWidth <= 767) {
@@ -16228,7 +16245,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260701-169frame" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260701-center" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
