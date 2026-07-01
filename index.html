@@ -44,7 +44,7 @@
     }
 
     [data-theme="dark"] {
-      --bg:           #0C0C0C;
+      --bg:           #171717;
       --primary:      #789F04;
       --accent:       #789F04;
       --white:        #1A1A1A;
@@ -58,7 +58,7 @@
       --dot-color:    rgba(255, 255, 255, 0.10);
       --nav-bg:       rgba(37, 37, 37, 0.94);
       --nav-bg-sc:    rgba(37, 37, 37, 0.72);
-      /* Grain texture — off in dark mode so bg stays true #0C0C0C */
+      /* Grain texture — off in dark mode so bg stays true #171717 */
       --noise-opacity: 0;
       --noise-blend:   screen;
     }
@@ -150,22 +150,37 @@
     .hero-screen {
       position: relative;
       display: grid;
-      grid-template-columns: 0.6fr 3fr 0.6fr;   /* photo-left / center text / photo-right */
+      grid-template-columns: 0.9fr 2.6fr 0.9fr;   /* photo-left / center text / photo-right — balanced: photos closer in, center still wide for content */
       min-height: calc(100svh - 134px);
       padding-bottom: 16px;
     }
-    /* Bottom-centre bloom gradient clipped to section 1.
+    /* Bottom-centre bloom gradient clipped to section 1 — a true circle
+       (center pushed below the box so only its top arc shows), grainy like
+       the footer's noise treatment but without the grid pattern.
        The glow is lifted off the very bottom edge and fades to transparent before
        the seam, so the space between Section 1 and Section 2 shows its true dark
-       (#0C0C0C) colour instead of a green tint. */
+       (#0D0D0D) colour instead of a green tint. */
     .hero-screen::after {
       content: '';
       position: absolute;
       left: -40px; right: -40px; bottom: 0;
       height: 240px;
       background:
-        radial-gradient(ellipse 65% 78% at 50% 78%, rgba(230,242,141,0.20) 0%, transparent 72%),
-        linear-gradient(to top, transparent 0%, transparent 18%, rgba(230,242,141,0.06) 38%, transparent 70%);
+        radial-gradient(circle 320px at 50% 380px, rgba(230,242,141,0.22) 0%, rgba(230,242,141,0.09) 45%, transparent 75%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero-screen::before {
+      content: '';
+      position: absolute;
+      left: -40px; right: -40px; bottom: 0;
+      height: 240px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+      opacity: 0.45;
+      mix-blend-mode: soft-light;
+      -webkit-mask-image: radial-gradient(circle 320px at 50% 380px, #000 0%, #000 45%, transparent 75%);
+      mask-image: radial-gradient(circle 320px at 50% 380px, #000 0%, #000 45%, transparent 75%);
       pointer-events: none;
       z-index: 0;
     }
@@ -212,16 +227,16 @@
       flex-wrap: wrap;
       align-items: flex-start;
       align-self: center;
-      gap: 28px 64px;
+      gap: 20px 28px;
       max-width: 100%;
       border-radius: 20px;
-      padding: 22px 40px;
+      padding: 20px 28px;
       background: rgba(255,252,248,0.80);
       border: 1px solid rgba(37,37,37,0.12);
       position: relative;
     }
     [data-theme="dark"] .hero-facts {
-      background: linear-gradient(180deg, #262626 0%, #0C0C0C 100%);
+      background: linear-gradient(180deg, #262626 0%, #0D0D0D 100%);
       border: none;
     }
     [data-theme="dark"] .hero-facts::before {
@@ -334,7 +349,7 @@
     .hfact-k {
       display: block;
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 500;
       letter-spacing: 0.14em;
       text-transform: uppercase;
@@ -344,81 +359,88 @@
     .hfact-v {
       display: block;
       font-family: var(--font-mono);
-      font-size: 16px;
+      font-size: 19px;
       font-weight: 500;
       color: var(--secondary);
+      white-space: nowrap;
     }
 
-    /* ─── HERO PHOTOS — 20% grid column, photos positioned inside it ─── */
+    /* ─── HERO PHOTOS — grid column, photos positioned inside it ─── */
     .hero-photos {
       position: relative;               /* polaroids are absolute within this column */
       pointer-events: none;
       z-index: 2;
-      opacity: 0;
+      opacity: 1;
       overflow: visible;                /* allow rotate to bleed slightly */
-      transition: opacity 0.5s cubic-bezier(0.32,0,0.67,0),
-                  transform 0.5s cubic-bezier(0.32,0,0.67,0);
+      /* constrain height so top/bottom photos aren't pinned to the full section height */
+      height: clamp(560px, 76vh, 720px);
+      align-self: center;
+      transition: opacity 0.45s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.65s cubic-bezier(0.16,1,0.3,1);
     }
-    /* default: sit off-screen; opacity 0 keeps them invisible regardless of clip */
-    .hero-photos:not(.hero-photos-left) { transform: translateX(60px); }
-    .hero-photos-left                   { transform: translateX(-60px); }
-    /* slide + fade in when heading is hovered */
-    .hero-screen.heading-hovered .hero-photos-left {
-      opacity: 1;
-      transform: translateX(0);
-      transition: opacity 0.55s cubic-bezier(0.16,1,0.3,1),
-                  transform 0.75s cubic-bezier(0.16,1,0.3,1);
+    /* default: visible, in place — the photos are the hero, shown on load */
+    .hero-photos:not(.hero-photos-left) { transform: translateX(0); }
+    .hero-photos-left                   { transform: translateX(0); }
+    /* cursor leaves the section entirely → slide out and fade */
+    .hero-screen.photos-away .hero-photos-left {
+      opacity: 0;
+      transform: translateX(-60px);
+      transition: opacity 0.4s cubic-bezier(0.32,0,0.67,0),
+                  transform 0.4s cubic-bezier(0.32,0,0.67,0);
     }
-    .hero-screen.heading-hovered .hero-photos:not(.hero-photos-left) {
-      opacity: 1;
-      transform: translateX(0);
-      transition: opacity 0.55s cubic-bezier(0.16,1,0.3,1) 0.07s,
-                  transform 0.75s cubic-bezier(0.16,1,0.3,1) 0.07s;
+    .hero-screen.photos-away .hero-photos:not(.hero-photos-left) {
+      opacity: 0;
+      transform: translateX(60px);
+      transition: opacity 0.4s cubic-bezier(0.32,0,0.67,0),
+                  transform 0.4s cubic-bezier(0.32,0,0.67,0);
     }
-    /* hero load entrance: the wrapper itself snaps visible immediately —
-       each .polaroid inside handles its own staggered pop-in (below) so
-       the photos arrive one after another instead of as one block. */
-    .hero.hero-revealed .hero-photos {
-      opacity: 1;
-      transform: translateX(0);
-      transition: none;
-    }
+    /* Photos are visible by default (the hero of this section) and only
+       slide out once the cursor leaves the hero entirely — see
+       .photos-away above. Each polaroid pops in/out with a light stagger. */
     .polaroid {
       position: absolute;
-      width: clamp(145px, 11vw, 188px);
-      opacity: 0;
-      scale: 0.84;
+      /* sized relative to its own grid column (.hero-photos), not the
+         viewport — vw sizing let the photo outgrow narrower columns and
+         bleed into the heading text next to it. */
+      width: min(230px, 84%);
+      opacity: 1;
+      scale: 1;
       transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), filter 0.35s ease,
-                  opacity 0.36s cubic-bezier(0.16,1,0.3,1) var(--pd, 0ms),
-                  scale 0.36s cubic-bezier(0.16,1,0.3,1) var(--pd, 0ms);
+                  opacity 0.32s cubic-bezier(0.16,1,0.3,1) var(--pd, 0ms),
+                  scale 0.32s cubic-bezier(0.16,1,0.3,1) var(--pd, 0ms);
     }
-    .hero.hero-revealed .polaroid { opacity: 1; scale: 1; }
-    .polaroid.p1 { --pd: 1280ms; }
-    .polaroid.p2 { --pd: 1330ms; }
-    .polaroid.p3 { --pd: 1380ms; }
-    .polaroid.p4 { --pd: 1430ms; }
+    .hero-screen.photos-away .polaroid { opacity: 0; scale: 0.84; }
+    .polaroid.p1 { --pd: 0ms; }
+    .polaroid.p2 { --pd: 60ms; }
+    .polaroid.p3 { --pd: 120ms; }
+    .polaroid.p4 { --pd: 180ms; }
     .polaroid:hover {
-      transform: scale(1.09) rotate(0deg) !important;
+      transform: scale(1.06) rotate(0deg) !important;
       z-index: 10 !important;
       filter: drop-shadow(0 18px 36px rgba(0,0,0,0.38));
     }
-    /* right-column 2-photo */
-    .polaroid.p1 { left: 5%;  top: 3%;  z-index: 1; transform: rotate(-5deg); }
-    .polaroid.p2 { left: 30%; top: 38%; z-index: 2; transform: rotate(4deg);  }
-    .polaroid.p3 { left: 5%;  top: 8%;  z-index: 3; transform: rotate(-3deg); }
-    .polaroid.p4 { display: block; left: 15%; top: 55%; z-index: 4; transform: rotate(4deg); }
-    /* left-column overrides */
-    .hero-photos-left .polaroid.p1 { left: 10%; top: 10%; transform: rotate(-4deg); }
-    .hero-photos-left .polaroid.p2 { left: 5%;  top: 55%; transform: rotate(5deg);  }
+    /* right-column 2-photo — kept tight to the column's outer edge so the
+       grid column never has to give up width to the photo, which is what
+       was pushing photos into the heading text. Bottom photo anchors to
+       the column's bottom edge (not a top % guess) so it can't overflow
+       past the column regardless of caption length. */
+    .polaroid.p1 { left: 0%; top: 0%;  z-index: 1; transform: rotate(-5deg); }
+    .polaroid.p2 { left: 8%; top: auto; bottom: 0%; z-index: 2; transform: rotate(4deg);  }
+    .polaroid.p3 { left: 0%; top: 0%;  z-index: 3; transform: rotate(-3deg); }
+    .polaroid.p4 { display: block; left: 8%; top: auto; bottom: 0%; z-index: 4; transform: rotate(4deg); }
+    /* left-column overrides — anchor to right (inner) edge so photos lean toward center */
+    .hero-photos-left .polaroid.p1 { left: auto; right: 0%; top: 0%;  transform: rotate(-4deg); }
+    .hero-photos-left .polaroid.p2 { left: auto; right: 8%; top: auto; bottom: 0%; transform: rotate(5deg); }
     .pc {
       display: block;
-      background: #f2f2f2;
+      background: #FFFFFF;
       padding: 6px 6px 14px;
       border-radius: 4px;
       box-shadow: none;
     }
-    [data-theme="dark"] .pc { background: #353535; }
-    [data-theme="dark"] .pc-cap { color: #C8C8C8; }
+    /* Always a classic white polaroid frame — same in dark mode too */
+    [data-theme="dark"] .pc { background: #FFFFFF; }
+    [data-theme="dark"] .pc-cap { color: #252525; }
     .pc img {
       display: block;
       width: 100%;
@@ -436,7 +458,8 @@
       line-height: 1.2;
       text-align: center;
       color: #252525;
-      white-space: nowrap;
+      white-space: normal;
+      overflow-wrap: break-word;
       letter-spacing: 0.01em;
     }
     /* ── MOBILE POLAROID CAROUSEL ─────────────────────────────── */
@@ -453,7 +476,7 @@
     .hero-carousel-wrap {
       flex-shrink: 0;
       transform: rotate(var(--r, 0deg));
-      margin-right: 22px;
+      margin-right: 30px;
     }
     .hero-carousel-wrap .pc {
       width: 120px;
@@ -521,6 +544,7 @@
       line-height: 48px;
       letter-spacing: -0.5px;
       color: var(--secondary);
+      text-wrap: balance;   /* even line lengths instead of a ragged wrap */
     }
     @media (min-width: 1600px) {
       .hero-heading { font-size: 40px; line-height: 60px; }
@@ -1020,7 +1044,7 @@
     .hero.hero-revealed #greeting { opacity: 1 !important; animation: none !important; }
     /* hero-facts pill: JS wraps .hfact items in a block .hero-li — override to flex so row layout works */
     .hero-facts .hero-lw { display: flex; }
-    .hero-facts .hero-li { display: flex; flex-direction: row; gap: 48px; align-items: flex-start; }
+    .hero-facts .hero-li { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 20px 28px; align-items: flex-start; }
 
     /* CTA pops in once the heading cascade is mostly settled */
     .hero.hero-revealed .hero-ctas {
@@ -1312,7 +1336,7 @@
       background: #ffffff;
     }
     [data-theme="dark"] .ov-frame {
-      background: #1a1a1a;
+      background: #0D0D0D;
       border-radius: 10px 10px 0 0;
       overflow: hidden;
     }
@@ -2687,7 +2711,7 @@
       position: relative;
       min-height: 100vh;
       min-height: 100svh;
-      background: #121B08;
+      background: #0D0D0D;
       display: flex;
       flex-direction: column;
       padding: 0;
@@ -3926,9 +3950,9 @@
       /* Header+nav fixed top; pane content centers in remaining space */
       justify-content: flex-start;
       /* Same ruled grid as the testimonials section — bright in the centre, fading to dark at the edges */
-      background-color: #111111;
+      background-color: #0D0D0D;
       background-image:
-        radial-gradient(65% 60% at 50% 50%, transparent 0%, transparent 45%, rgba(17,17,17,0.6) 72%, rgba(17,17,17,0.96) 90%),
+        radial-gradient(65% 60% at 50% 50%, transparent 0%, transparent 45%, rgba(13,13,13,0.6) 72%, rgba(13,13,13,0.96) 90%),
         linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
       background-size: 100% 100%, 52px 52px, 52px 52px;
@@ -4794,8 +4818,8 @@
     .dna-cell:hover .dna-face {
       background:
         linear-gradient(155deg,
-          color-mix(in srgb, var(--c1) 22%, #1b1b1b) 0%,
-          color-mix(in srgb, var(--c2) 11%, #141414) 100%);
+          color-mix(in srgb, var(--c1) 22%, #0D0D0D) 0%,
+          color-mix(in srgb, var(--c2) 11%, #0D0D0D) 100%);
       box-shadow:
         inset 0 1px 0 color-mix(in srgb, var(--c1) 55%, transparent),
         inset 0 0 28px color-mix(in srgb, var(--c2) 16%, transparent),
@@ -5695,7 +5719,7 @@
     /* ── Dark card — flat, no drop shadow ───────────────────── */
     [data-theme="dark"] .card {
       box-shadow: none;
-      background: #0C0C0C;
+      background: #0D0D0D;
     }
 
     /* ── Glassy scrolled nav in dark mode (#5) ──────────────── */
@@ -5780,13 +5804,10 @@
       max-width: calc(100vw - 24px);
       margin-inline: auto;
       z-index: 1200;
-      transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), max-width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-      overflow: hidden;
-      border-radius: 999px;
+      transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), max-width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .cb-wrap:hover,
     .cb-wrap:focus-within { transform: translateY(-2px); }
-    .cb-wrap:has(.cb.expanded) { border-radius: 28px; }
     body.chat-open .cb-wrap {
       opacity: 0;
       pointer-events: none;
@@ -6083,6 +6104,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
+      overflow: hidden; /* clips the wide .cb-row during circle/intro state; border-radius handles corner shape */
       height: 63px;
       width: 52px; /* intro: photo-only; JS adds .bar-revealed */
       --cb-bar-w: min(614px, calc(100vw - 48px)); /* resting bar width — shared by .bar-revealed and the entrance circle's hidden row */
@@ -6094,16 +6116,19 @@
         height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
         border-radius 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .cb.bar-revealed { width: var(--cb-bar-w); }
-    /* expand: springy overshoot for tactile feel */
+    /* border-radius: 32px = 63px height / 2 — explicit so the expand transition
+       starts from the real visual value, not 999px (which clamps to 31.5px and
+       causes corners to get rounder then snap as the clamping limit rises
+       during the height animation). */
+    .cb.bar-revealed { width: var(--cb-bar-w); border-radius: 32px; }
     .cb.expanded {
       width: min(792px, calc(100vw - 48px));
-      height: 252px;
+      height: 220px;
       border-radius: 28px;
       transition:
         width  0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
         height 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
-        border-radius 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border-radius 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     /* bottom control row — fixed height, pinned by the column flex-end so
@@ -6141,12 +6166,13 @@
     .cb-hints-title {
       display: block;
       width: 100%;
-      font-family: var(--font-heading);
-      font-size: 15px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.45);
-      margin-bottom: 10px;
-      letter-spacing: 0.01em;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.38);
+      margin-bottom: 12px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
     }
     .cb-hint {
       display: inline-flex;
@@ -6295,7 +6321,7 @@
       #cbSend:not(.vis) { min-width: 180px; }
       .cb { height: 72px; --cb-bar-w: min(820px, calc(100vw - 48px)); }
       .cb.cb-circle { width: 72px; } /* = height → perfect circle */
-      .cb.bar-revealed { width: var(--cb-bar-w); }
+      .cb.bar-revealed { width: var(--cb-bar-w); border-radius: 36px; } /* 72px height / 2 */
       .cb.expanded { width: min(960px, calc(100vw - 48px)); }
       .cb-row { height: 72px; padding: 0 14px; gap: 12px; }
       .cb-input { font-size: 16px; }
@@ -6485,6 +6511,11 @@
       0%   { box-shadow: 0 0 0 0 rgba(230,242,141,0.45); }
       70%  { box-shadow: 0 0 0 6px rgba(230,242,141,0); }
       100% { box-shadow: 0 0 0 0 rgba(230,242,141,0); }
+    }
+    /* desktop: match mic button height to the .cb-send CTA (44px) */
+    @media (min-width: 1024px) {
+      .cb-mic:not(.recording) { width: 44px; height: 44px; }
+      .cb-mic svg { width: 19px; height: 19px; }
     }
 
     /* ── Chat panel ── */
@@ -7161,7 +7192,7 @@
       top: 0;
       height: 100vh;
       overflow: hidden;
-      background: #0C0C0C;
+      background: #0D0D0D;
       display: flex;
       align-items: center;
       justify-content: flex-start;
@@ -7185,7 +7216,7 @@
       justify-content: center;
       padding-top: calc((100vh - 742px) * 0.1);
       padding-bottom: calc((100vh - 742px) * 0.1);
-      background: #0C0C0C;
+      background: #0D0D0D;
       overflow: hidden;
     }
 
@@ -7394,7 +7425,7 @@
 
     .work-blob-pill {
       position: absolute;
-      background: #0C0C0C;
+      background: #0D0D0D;
       color: rgba(255,255,255,0.88);
       font-family: var(--font-mono);
       font-size: 12px;
@@ -7505,7 +7536,7 @@
       font-size: 100px;
       font-weight: 700;
       line-height: 1;
-      background: linear-gradient(to bottom, #FFFCF8 0%, #0C0C0C 100%);
+      background: linear-gradient(to bottom, #FFFCF8 0%, #0D0D0D 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -7647,7 +7678,7 @@
       100% { background-position: 350% 50%, 250% 50%; }
     }
     .ws-section {
-      background: #0C0C0C;
+      background: #0D0D0D;
       position: relative;
       overflow: hidden;
       width: 100%;
@@ -7893,13 +7924,20 @@
       align-items: flex-start;
       gap: 28px;
       margin-bottom: 22px;
+      /* Hard fixed height (not a floor) — matches the tags column's max-height
+         cap so the frame is pixel-identical across every card at every viewport
+         width, whether a given card's content fills it or leaves it half-empty. */
+      height: 108px;
     }
     .s2-bar-title-col {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      flex: 1;
-      min-width: 0;
+      /* flex-basis:auto (not 0%) so this column carries real weight in the
+         shrink calculation — with a 0% basis it was getting squeezed to 0
+         width whenever the tags column's content asked for more room. */
+      flex: 1 1 auto;
+      min-width: 220px;
     }
 
     .s2-bar-title {
@@ -7923,9 +7961,43 @@
       color: rgba(255,252,248,0.55);
       margin: 0;
       opacity: 0;
+      /* Always exactly 2 lines regardless of copy length or viewport width —
+         this is what keeps every card's frame the same height. */
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      min-height: 3.4em;
     }
     .s2-bar-in .s2-bar-desc { animation: s2FadeUp 0.38s 0.12s ease forwards; }
 
+    .s2-bar-tags-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      flex-shrink: 1;
+      max-width: 460px;
+      /* Hard ceiling covering up to 3 wrapped rows — narrow viewports can force
+         a long tag list to wrap that far. Never clip a tag/icon row; the row
+         height below is set to match so the frame still stays fixed everywhere. */
+      max-height: 108px;
+      overflow: hidden;
+    }
+    /* When a card has icon-description rows (card.iconTags), the pill row and
+       the icon rows flatten into ONE wrapping group so total height always
+       matches a plain card's tag block — never taller, never a separate frame size. */
+    .s2-bar-tags-col--merged {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 9px 10px;
+    }
+    .s2-bar-tags-col--merged > .s2-bar-tags,
+    .s2-bar-tags-col--merged > .s2-bar-icon-tags {
+      display: contents;
+    }
     .s2-bar-tags {
       display: flex;
       flex-direction: row;
@@ -7933,33 +8005,87 @@
       justify-content: flex-end;
       align-items: flex-start;
       gap: 5px;
-      flex-shrink: 0;
-      max-width: 320px;
       opacity: 0;
     }
     .s2-bar-in .s2-bar-tags { animation: s2FadeUp 0.35s 0.09s ease forwards; }
     .s2-bar-tag {
       font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.04em;
+      font-size: 14px;
+      letter-spacing: 0.03em;
       color: rgba(255,252,248,0.55);
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 6px;
-      padding: 4px 10px;
+      padding: 5px 11px;
       white-space: nowrap;
     }
     .s2-bar-tag-shipped {
-      color: #E6F28D;
-      background: rgba(230,242,141,0.08);
-      border-color: rgba(230,242,141,0.25);
+      /* Deliberately no accent color — Shipped reads as a normal, plain tag everywhere */
     }
 
-    /* Hairline divider */
+    /* Icon-description rows — richer alternative to plain tag pills, used when
+       a card has extra right-side space (card.iconTags in S2_DATA) */
+    .s2-bar-icon-tags {
+      display: none;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 9px 10px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .s2-bar-icon-tag {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .s2-bar-tags-col--merged .s2-bar-tag,
+    .s2-bar-tags-col--merged .s2-bar-icon-tag {
+      opacity: 0;
+      transform: translateX(8px);
+    }
+    .s2-bar-in .s2-bar-tags-col--merged .s2-bar-tag,
+    .s2-bar-in .s2-bar-tags-col--merged .s2-bar-icon-tag {
+      animation: s2IconTagIn 0.45s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+    .s2-bar-tags-col--merged .s2-bar-tag             { animation-delay: 0.12s; }
+    .s2-bar-tags-col--merged .s2-bar-icon-tag:nth-child(1) { animation-delay: 0.18s; }
+    .s2-bar-tags-col--merged .s2-bar-icon-tag:nth-child(2) { animation-delay: 0.24s; }
+    .s2-bar-tags-col--merged .s2-bar-icon-tag:nth-child(3) { animation-delay: 0.30s; }
+    @keyframes s2IconTagIn { to { opacity: 1; transform: translateX(0); } }
+    .s2-bar-icon-tag-ic {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, rgba(230,242,141,0.18), rgba(230,242,141,0.04));
+      border: 1px solid rgba(230,242,141,0.22);
+      box-shadow: 0 2px 10px rgba(230,242,141,0.08);
+      transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+    }
+    .s2-bar-icon-tag:hover .s2-bar-icon-tag-ic {
+      border-color: rgba(230,242,141,0.48);
+      background: linear-gradient(145deg, rgba(230,242,141,0.26), rgba(230,242,141,0.06));
+      transform: translateY(-1px) scale(1.05);
+    }
+    .s2-bar-icon-tag-ic img { width: 14px; height: 14px; object-fit: contain; }
+    .s2-bar-icon-tag-ic .s2-icon-light { display: none; }
+    .s2-bar-icon-tag-ic .s2-icon-dark  { display: block; }
+    .s2-bar-icon-tag-lbl {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      letter-spacing: 0.01em;
+      color: rgba(255,252,248,0.78);
+      white-space: nowrap;
+    }
+
+    /* Spacer (was a visible hairline divider — kept invisible for spacing only) */
     .s2-bar-rule {
       width: 100%;
       height: 1px;
-      background: rgba(255,255,255,0.07);
+      background: transparent;
       margin-bottom: 22px;
     }
 
@@ -7985,10 +8111,11 @@
     }
     .s2-bar-metric-lbl {
       font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 0.08em;
+      font-size: 13px;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
       color: rgba(255,252,248,0.65);
+      white-space: nowrap;
     }
     /* Frosted glass CTA */
     .s2-bar-cta {
@@ -8150,6 +8277,14 @@
         rgb(140,180,190)       -2.00px  2.39px 24px   -2.60px inset;
     }
 
+    /* ── Left/right nav for grid view (mirrors up/down spiral nav) ── */
+    .s2-grid-nav-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      z-index: 16;
+    }
+    .s2-grid-nav-prev { left: 24px; }
+    .s2-grid-nav-next { right: 24px; }
+
     /* Full glimpse wrapper */
     .s2-glimpse-full { position: relative; }
 
@@ -8162,7 +8297,7 @@
       align-items: center;
       gap: 16px;
       padding: 18px 48px;
-      background: #0C0C0C;
+      background: #0D0D0D;
       border-bottom: 1px solid rgba(255,252,248,0.07);
     }
     .s2-cs-blob {
@@ -8194,7 +8329,7 @@
     .s2-cards-zone {
       position: absolute;
       inset: 0;
-      background: #0C0C0C;
+      background: #0D0D0D;
     }
 
     /* Video + content row */
@@ -8202,7 +8337,7 @@
       display: flex;
       align-items: stretch;
       gap: 0;
-      background: #0C0C0C;
+      background: #0D0D0D;
       padding: 60px 48px 80px;
     }
     .s2-video-left {
@@ -8394,7 +8529,7 @@
       position: relative;
       aspect-ratio: 16/9;
       overflow: hidden;
-      background: #111;
+      background: #0D0D0D;
     }
     .ws-sub-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
     .ws-sub-info { padding: 12px 14px 14px; }
@@ -8757,9 +8892,9 @@
       align-items: center; justify-content: center;
       padding: 60px 0;
       scroll-snap-align: start;
-      background-color: #111111;
+      background-color: #0D0D0D;
       background-image:
-        radial-gradient(65% 60% at 50% 46%, transparent 0%, transparent 45%, rgba(17,17,17,0.6) 72%, rgba(17,17,17,0.96) 90%),
+        radial-gradient(65% 60% at 50% 46%, transparent 0%, transparent 45%, rgba(13,13,13,0.6) 72%, rgba(13,13,13,0.96) 90%),
         linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
       background-size: 100% 100%, 52px 52px, 52px 52px;
@@ -9064,7 +9199,7 @@
         rgb(140,180,190)       -2.00px  2.39px 24px   -2.60px inset;
     }
     /* Dark mode */
-    [data-theme="dark"] .tm-section        { background-color: #111111; }
+    [data-theme="dark"] .tm-section        { background-color: #0D0D0D; }
     [data-theme="dark"] .tm-eyebrow-tag    { color: rgba(255,255,255,0.45); border-color: rgba(255,255,255,0.15); opacity: 1; }
     [data-theme="dark"] .tm-headline       { color: #fff; }
     [data-theme="dark"] .tm-dot            { background: rgba(255,255,255,0.2); }
@@ -9101,6 +9236,7 @@
     @media (max-width: 767px) {
       /* Kill the floating project bar + ↑↓ nav on mobile */
       .s2-side-nav   { display: none !important; }
+      .s2-grid-nav-btn { display: none !important; }
       .s2-project-bar { display: none !important; }
 
       /* Section height: let the accordion push it taller */
@@ -9204,11 +9340,6 @@
         padding: 5px 10px;
         border-radius: 100px;
         border: 1px solid rgba(255,255,255,0.15);
-      }
-      .s2-acc-tag.s2-tag-shipped {
-        background: rgba(230,242,141,0.12);
-        border-color: rgba(230,242,141,0.30);
-        color: #E6F28D;
       }
 
       /* Metrics row */
@@ -9515,7 +9646,7 @@
 
     /* ═══════════════════════════════════════════════════════════
        LIGHT MODE OVERRIDES — "dark island" sections
-       All sections below used hardcoded #0C0C0C / #111 / #252525
+       All sections below used hardcoded #0D0D0D / #111 / #252525
        backgrounds with no light-mode variant. These rules give
        them proper light-mode appearance when the toggle is off.
        ══════════════════════════════════════════════════════════ */
@@ -9711,7 +9842,6 @@
       -webkit-background-clip: text;
       background-clip: text;
     }
-    html:not([data-theme="dark"]) .s2-bar-rule { background: rgba(37,37,37,0.12); }
     html:not([data-theme="dark"]) .s2-bar-cta { color: var(--secondary); border-color: rgba(37,37,37,0.20); }
     html:not([data-theme="dark"]) .s2-bar-cta:hover { background: rgba(37,37,37,0.06); border-color: rgba(37,37,37,0.35); }
     html:not([data-theme="dark"]) .s2-bar-tag {
@@ -9719,11 +9849,14 @@
       background: rgba(37,37,37,0.06);
       border-color: rgba(37,37,37,0.12);
     }
-    html:not([data-theme="dark"]) .s2-bar-tag-shipped {
-      color: #6F7E15;
-      background: rgba(111,126,21,0.08);
-      border-color: rgba(111,126,21,0.25);
+    html:not([data-theme="dark"]) .s2-bar-icon-tag-ic {
+      background: linear-gradient(145deg, rgba(111,126,21,0.12), rgba(111,126,21,0.03));
+      border-color: rgba(111,126,21,0.20);
+      box-shadow: none;
     }
+    html:not([data-theme="dark"]) .s2-bar-icon-tag-ic .s2-icon-light { display: block; }
+    html:not([data-theme="dark"]) .s2-bar-icon-tag-ic .s2-icon-dark  { display: none; }
+    html:not([data-theme="dark"]) .s2-bar-icon-tag-lbl { color: rgba(37,37,37,0.72); }
     html:not([data-theme="dark"]) .s2-bar-metric-val { color: #6F7E15; }
     html:not([data-theme="dark"]) .s2-bar-metric-lbl { color: rgba(37,37,37,0.50); }
     html:not([data-theme="dark"]) .s2-side-nav-btn {
@@ -9985,8 +10118,8 @@
 
         <!-- scattered polaroid cluster, left of center -->
         <div class="hero-photos hero-photos-left" aria-hidden="true">
-          <div class="polaroid p1"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">$50K pitch win</span></div></div>
-          <div class="polaroid p2"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">I was the product</span></div></div>
+          <div class="polaroid p1"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Winning $50K as Sole Designer</span></div></div>
+          <div class="polaroid p2"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitching in front of 250+</span></div></div>
         </div>
 
         <div class="hero-screen-left">
@@ -10016,15 +10149,15 @@
         <!-- mobile polaroid carousel — hidden on desktop, slow right→left scroll on tablet/mobile -->
         <div class="hero-carousel" aria-hidden="true">
           <div class="hero-carousel-track">
-            <div class="hero-carousel-wrap" style="--r:-5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">$50K pitch win</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:4deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">I was the product</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:-3deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">First booth. Texas.</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:3deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed the AI UX</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-2.5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Winning $50K as Sole Designer</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:2deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitching in front of 250+</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-1.5deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">My First Product Showcase</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:1.5deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">48 hours 0 sleep grind</span></div></div>
             <!-- duplicate set for seamless infinite loop -->
-            <div class="hero-carousel-wrap" style="--r:-5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">$50K pitch win</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:4deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">I was the product</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:-3deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">First booth. Texas.</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:3deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed the AI UX</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-2.5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Winning $50K as Sole Designer</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:2deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitching in front of 250+</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-1.5deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">My First Product Showcase</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:1.5deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">48 hours 0 sleep grind</span></div></div>
           </div>
         </div>
 
@@ -10032,8 +10165,8 @@
 
         <!-- scattered polaroid cluster, right of center -->
         <div class="hero-photos" aria-hidden="true">
-          <div class="polaroid p3"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">First booth. Texas.</span></div></div>
-          <div class="polaroid p4"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">Designed the AI UX</span></div></div>
+          <div class="polaroid p3"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">My First Product Showcase</span></div></div>
+          <div class="polaroid p4"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">48 hours 0 sleep grind</span></div></div>
         </div>
 
 
@@ -10061,6 +10194,14 @@
         </button>
       </div>
 
+      <!-- ── Left / Right grid-view nav — hidden until grid view is active ── -->
+      <button class="s2-side-nav-btn s2-grid-nav-btn s2-grid-nav-prev" id="s2GridPrev" aria-label="Previous project" style="display:none;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="s2-side-nav-btn s2-grid-nav-btn s2-grid-nav-next" id="s2GridNext" aria-label="Next project" style="display:none;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
       <!-- ── Featured Work heading ── -->
       <div class="s2-fw-header" id="s2FwHeader">
         <div class="s2-fwh-row">
@@ -10069,7 +10210,7 @@
         <div class="s2-view-toggle">
           <span class="s2-vt-thumb" aria-hidden="true"></span>
           <button class="s2-vt-btn s2-vt-btn-text s2-vt-active" id="s2SpiralBtn" aria-label="Spiral view">spiral</button>
-          <button class="s2-vt-btn s2-vt-btn-text" id="s2ListBtn" aria-label="Grid view">list</button>
+          <button class="s2-vt-btn s2-vt-btn-text" id="s2ListBtn" aria-label="Grid view">grid</button>
         </div>
       </div>
 
@@ -10083,7 +10224,10 @@
             <h3 class="s2-bar-title" id="s2BarTitle"></h3>
             <p class="s2-bar-desc" id="s2BarDesc"></p>
           </div>
-          <div class="s2-bar-tags" id="s2BarTags"></div>
+          <div class="s2-bar-tags-col" id="s2BarTagsCol">
+            <div class="s2-bar-tags" id="s2BarTags"></div>
+            <div class="s2-bar-icon-tags" id="s2BarIconTags"></div>
+          </div>
         </div>
         <div class="s2-bar-rule"></div>
         <div class="s2-bar-bottom-row">
@@ -11005,13 +11149,25 @@
       }
     })();
 
-    // ── Hero heading → photo slide-in interaction ────────────────
+    // ── Hero content → photo slide-out interaction ──────────────────
+    // Polaroids are visible by default (the hero of this section). They
+    // only slide out once the cursor leaves the hero entirely, and slide
+    // back in as soon as it re-enters any hero content.
     (function initHeadingPhotoReveal() {
-      const heading = document.querySelector('.hero-heading');
-      const screen  = document.querySelector('.hero-screen');
-      if (!heading || !screen) return;
-      heading.addEventListener('mouseenter', () => screen.classList.add('heading-hovered'));
-      heading.addEventListener('mouseleave', () => screen.classList.remove('heading-hovered'));
+      const hero   = document.querySelector('.hero');
+      const screen = document.querySelector('.hero-screen');
+      if (!hero || !screen) return;
+      hero.addEventListener('mouseenter', () => screen.classList.remove('photos-away'));
+      hero.addEventListener('mouseleave', () => screen.classList.add('photos-away'));
+      // On the very first cursor movement after load, sync the visible/hidden state
+      // without waiting for a mouseenter/mouseleave event to fire.
+      document.addEventListener('mousemove', function syncInitialCursorPosition(e) {
+        document.removeEventListener('mousemove', syncInitialCursorPosition);
+        const r = hero.getBoundingClientRect();
+        const inside = e.clientX >= r.left && e.clientX <= r.right &&
+                       e.clientY >= r.top  && e.clientY <= r.bottom;
+        if (!inside) screen.classList.add('photos-away');
+      });
     })();
 
 
@@ -15261,28 +15417,33 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var S2_DATA = [
       {
         tab: 'EverTutor',
-        title: 'EverTutor AI System',
+        title: '1). EverTutor AI System',
 
         metrics: [
-          { val: '2000+', lbl: 'Active Learners' },
-          { val: '−96%',  lbl: 'Workflow time'       },
-          { val: '$500k+ ARR', lbl: 'Sole Designer'   }
+          { val: '2000+', lbl: 'Daily Active Users' },
+          { val: '3 Tools',  lbl: 'Working as One System' },
+          { val: '$500k+', lbl: 'As Sole Designer'   }
         ],
-        tags: ['Shipped', 'Voice AI Tutor', 'EdTech', 'B2C · Mobile'],
-        desc: "World's first multimodal 1:1 voice AI tutor. 3 tools as one system, enabling a billion minds.",
-        href: 'evertutor-live.html'
+        tags: ['Shipped'],
+        iconTags: [
+          { icon: 'profile', label: 'Sole Product Designer' },
+          { icon: 'thunder', label: '0 to 1' },
+          { icon: 'mic',     label: 'Voice AI' }
+        ],
+        desc: "World's first multi modal voice 1st AI tutor powered by 3 tools working as one system.",
+        href: '#'
       },
       {
         tab: 'ET Live',
-        title: 'EverTutor Live',
+        title: '1.1 EverTutor Live',
 
         metrics: [
-          { val: '85%', lbl: 'Session Completion' },
-          { val: '2×',  lbl: 'Faster Mastery'     },
-          { val: '$250→$5/hr', lbl: '1:1 Tutor Cost'   }
+          { val: '$250→$5/hr', lbl: '1:1 Tutor Cost'   },
+          { val: '2×',  lbl: 'Proven Mastery'     },
+          { val: '85%', lbl: 'Session Completion' }
         ],
-        tags: ['Shipped', 'Adaptive AI Tutoring', 'Real-time', 'B2C · Mobile'],
-        desc: 'Voice-first AI tutor. Students master topics in 30 min vs 60 in a classroom. Taken from prototype to PMF.',
+        tags: ['Shipped', 'B2C', 'Multi Model Interaction', 'Designing for Voice'],
+        desc: 'Scaled one-to-one learning support by shaping a voice-native AI experience, from an early concept to product-market fit.',
         href: 'evertutor-live.html'
       },
       {
@@ -15338,13 +15499,26 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         href: '#'
       }
     ];
+    // Single source of truth for grid-view card content (spiral.js reads this
+    // to avoid duplicating title/desc/metrics/href data).
+    window.S2_PROJECT_DATA = S2_DATA;
+
+    /* Icon set for card.iconTags rows — reused from the EverTutor Glimpse icon pass */
+    var S2_ICON_BASE = 'Parallax cards/EverTutor Glimpse/Portfolio icons SVG/';
+    var S2_ICON_MAP = {
+      profile: { light: S2_ICON_BASE + 'Profile.svg',        dark: S2_ICON_BASE + 'Profile dark theme.svg' },
+      thunder: { light: S2_ICON_BASE + 'Thunder.svg',        dark: S2_ICON_BASE + 'Thunder Dark Theme.svg' },
+      mic:     { light: S2_ICON_BASE + 'Mic.svg',            dark: S2_ICON_BASE + 'Mic dark theme.svg'     }
+    };
 
     var spiralRoot  = document.getElementById('spiral-root');
     var tabsList    = document.getElementById('s2TabsList');
     var projectTabs = document.getElementById('s2ProjectTabs');
     var projectBar  = document.getElementById('s2ProjectBar');
     var barTitle    = document.getElementById('s2BarTitle');
+    var barTagsCol  = document.getElementById('s2BarTagsCol');
     var barTags     = document.getElementById('s2BarTags');
+    var barIconTags = document.getElementById('s2BarIconTags');
     var barDesc     = document.getElementById('s2BarDesc');
     var barMetrics  = document.getElementById('s2BarMetrics');
     var barCta      = document.getElementById('s2BarCta');
@@ -15374,30 +15548,23 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var currentIdx = 0;
     var updateTimer = null;
 
-    /* Up / Down nav */
+    /* Up / Down nav — use s2:stepCard so the spiral always moves exactly ±1
+       position from wherever it is now, never the long way around the loop. */
     var navUp = document.getElementById('s2NavUp');
     var navDn = document.getElementById('s2NavDown');
     if (navUp) navUp.addEventListener('click', function () {
-      spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', {
-        detail: { idx: (currentIdx - 1 + S2_DATA.length) % S2_DATA.length }
-      }));
+      spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: -1 } }));
     });
     if (navDn) navDn.addEventListener('click', function () {
-      spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', {
-        detail: { idx: (currentIdx + 1) % S2_DATA.length }
-      }));
+      spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: 1 } }));
     });
     var sideNavPrev = document.getElementById('s2SideNavPrev');
     var sideNavNext = document.getElementById('s2SideNavNext');
     if (sideNavPrev) sideNavPrev.addEventListener('click', function () {
-      spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', {
-        detail: { idx: (currentIdx - 1 + S2_DATA.length) % S2_DATA.length }
-      }));
+      spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: -1 } }));
     });
     if (sideNavNext) sideNavNext.addEventListener('click', function () {
-      spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', {
-        detail: { idx: (currentIdx + 1) % S2_DATA.length }
-      }));
+      spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: 1 } }));
     });
 
     /* Count a metric value from 0 up to its number, preserving prefix/suffix */
@@ -15438,14 +15605,39 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
         /* Populate bar content */
         if (barTitle) barTitle.textContent = card.title;
 
+        if (barTagsCol) {
+          barTagsCol.classList.toggle('s2-bar-tags-col--merged', !!(card.iconTags && card.iconTags.length));
+        }
+
         if (barTags) {
           barTags.innerHTML = '';
           card.tags.forEach(function (t) {
             var s = document.createElement('span');
-            s.className = t === 'Shipped' ? 's2-bar-tag s2-bar-tag-shipped' : 's2-bar-tag';
+            s.className = 's2-bar-tag';
             s.textContent = t;
             barTags.appendChild(s);
           });
+        }
+
+        if (barIconTags) {
+          barIconTags.innerHTML = '';
+          if (card.iconTags && card.iconTags.length) {
+            barIconTags.style.display = 'flex';
+            card.iconTags.forEach(function (it) {
+              var icons = S2_ICON_MAP[it.icon] || {};
+              var row = document.createElement('div');
+              row.className = 's2-bar-icon-tag';
+              row.innerHTML =
+                '<span class="s2-bar-icon-tag-ic">' +
+                  '<img class="s2-icon-light" src="' + (icons.light || '') + '" alt="" aria-hidden="true">' +
+                  '<img class="s2-icon-dark" src="' + (icons.dark || '') + '" alt="" aria-hidden="true">' +
+                '</span>' +
+                '<span class="s2-bar-icon-tag-lbl">' + it.label + '</span>';
+              barIconTags.appendChild(row);
+            });
+          } else {
+            barIconTags.style.display = 'none';
+          }
         }
 
         if (barDesc) barDesc.textContent = card.desc;
@@ -15518,8 +15710,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
           /* Tags HTML */
           var tagsHtml = card.tags.map(function (t) {
-            var cls = t === 'Shipped' ? 's2-acc-tag s2-tag-shipped' : 's2-acc-tag';
-            return '<span class="' + cls + '">' + t + '</span>';
+            return '<span class="s2-acc-tag">' + t + '</span>';
           }).join('');
 
           /* Metrics HTML */
@@ -15602,7 +15793,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260630-noglow" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260630-helixhover" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
