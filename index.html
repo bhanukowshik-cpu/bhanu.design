@@ -7212,10 +7212,18 @@
       .cp-close { width: 36px; height: 36px; border-radius: 10px; }
     }
     @media (max-width: 540px) {
-      .cb { --cb-bar-w: calc(100vw - 32px); }
+      .cb { --cb-bar-w: calc(100vw - 32px); max-height: 63px;
+            transition: width 0.4s cubic-bezier(0.22,1,0.36,1),
+                        max-height 0.4s cubic-bezier(0.22,1,0.36,1),
+                        border-radius 0.4s cubic-bezier(0.22,1,0.36,1); }
       .cb.bar-revealed { width: var(--cb-bar-w); }
-      /* height is set by JS cbSetExpandedHeight() to fit hints content at any width */
-      .cb.expanded { width: calc(100vw - 32px); }
+      /* max-height drives the expand animation; height stays auto so the bar
+         grows to exactly fit content — no JS measurement needed */
+      .cb.expanded { width: calc(100vw - 32px); height: auto !important;
+                     max-height: 640px !important;
+                     transition: width 0.45s cubic-bezier(0.34,1.4,0.64,1),
+                                 max-height 0.45s cubic-bezier(0.34,1.4,0.64,1),
+                                 border-radius 0.4s cubic-bezier(0.22,1,0.36,1); }
       /* Shrink hint chips so they wrap cleanly within the narrower bar */
       .cb-hint { font-size: 12px !important; padding: 5px 9px !important; max-width: 100%; overflow: hidden; }
       .cb-hint span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
@@ -14079,17 +14087,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     cpMsgs.addEventListener('scroll', updateMoreCue, { passive: true });
 
     /* ── Chat bar ── */
-    function cbSetExpandedHeight() {
-      if (window.innerWidth > 540) return; // desktop uses CSS height
-      var hintsH = cbHints ? cbHints.scrollHeight : 0;
-      var maxH = Math.floor(window.innerHeight * 0.8);
-      cbEl.style.height = Math.min(hintsH + 63 + 16, maxH) + 'px'; // hints + row + 16px buffer, capped at 80vh
-    }
-    cbInput.addEventListener('focus', function () {
-      cbSetExpandedHeight();
-      cbEl.classList.add('expanded');
-    });
-    cbInput.addEventListener('blur',  function () { if (!cbInput.value) { cbEl.classList.remove('expanded'); cbEl.style.height = ''; } });
+    cbInput.addEventListener('focus', function () { cbEl.classList.add('expanded'); });
+    cbInput.addEventListener('blur',  function () { if (!cbInput.value) cbEl.classList.remove('expanded'); });
     cbInput.addEventListener('input', function () {
       cbSend.classList.toggle('vis', cbInput.value.trim().length > 0);
     });
