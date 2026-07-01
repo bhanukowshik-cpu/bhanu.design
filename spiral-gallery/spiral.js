@@ -444,53 +444,65 @@ void main() {
       cardEl.className = 's2-grid-card';
 
       if (ci === 0) {
-        // HERO: transparent bg, blob floats, content below
-        cardEl.style.cssText = 'flex:0 0 auto;display:flex;flex-direction:column;border-radius:24px;overflow:hidden;background:transparent;cursor:default;';
+        // HERO: row layout — rich content left, blob accent right
+        cardEl.style.cssText = 'flex:0 0 auto;display:flex;flex-direction:row;border-radius:24px;overflow:hidden;background:rgba(10,12,15,0.75);cursor:pointer;border:1px solid rgba(255,255,255,0.09);';
 
-        var blobArea = document.createElement('div');
-        blobArea.style.cssText = 'flex:0 0 34%;position:relative;display:flex;align-items:center;justify-content:center;';
-        var lc = document.createElement('canvas');
-        lc.width = 800; lc.height = 450;
-        lc.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;';
-        blobArea.appendChild(lc);
-        cardEl.appendChild(blobArea);
-        listBlobCanvas = lc;
-        listBlobCtx    = lc.getContext('2d');
-
+        // LEFT: info panel
         var info = document.createElement('div');
-        // overflow:hidden ensures nothing bleeds past the card boundary
-        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:18px 22px 18px;gap:0;overflow:hidden;';
+        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:28px 20px 28px 28px;gap:0;overflow:hidden;min-width:0;';
 
         // Eyebrow
         var eyebrow = document.createElement('span');
         eyebrow.textContent = '01  —  Featured Work';
-        eyebrow.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.28);letter-spacing:0.12em;text-transform:uppercase;display:block;margin-bottom:10px;flex-shrink:0;';
+        eyebrow.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:10.5px;font-weight:500;color:rgba(255,255,255,0.28);letter-spacing:0.12em;text-transform:uppercase;display:block;margin-bottom:12px;flex-shrink:0;';
         info.appendChild(eyebrow);
 
-        // Title — strip full numeric prefix "1). " correctly
+        // Title — strip full numeric prefix "1). "
         var title = document.createElement('h3');
         title.textContent = card.title.replace(/^[\d]+[\)\.]+\s*/, '');
-        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(20px,1.8vw,26px);font-weight:800;color:#fff;margin:0 0 8px;line-height:1.2;letter-spacing:-0.4px;flex-shrink:0;';
+        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(18px,1.6vw,24px);font-weight:800;color:#fff;margin:0 0 10px;line-height:1.2;letter-spacing:-0.4px;flex-shrink:0;';
         info.appendChild(title);
 
-        // Description
+        // Description — clamped to 3 lines
         var desc = document.createElement('p');
         desc.textContent = card.desc;
-        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:13.5px;line-height:1.7;color:rgba(255,255,255,0.5);margin:0 0 12px;flex-shrink:0;';
+        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:15px;line-height:1.65;color:rgba(255,255,255,0.55);margin:0 0 16px;flex-shrink:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;';
         info.appendChild(desc);
 
         if (card.iconTags && card.iconTags.length) {
           var ir0 = buildIconRow(card.iconTags);
-          ir0.style.cssText += ';margin-bottom:12px;flex-shrink:0;';
+          ir0.style.cssText += ';margin-bottom:16px;flex-shrink:0;';
           info.appendChild(ir0);
         }
 
-        // Top 3 metrics — single row, lime values
+        // Metrics
         var mw0 = document.createElement('div');
-        mw0.style.cssText = 'flex-shrink:0;';
+        mw0.style.cssText = 'flex-shrink:0;margin-bottom:20px;';
         mw0.appendChild(buildMetrics(card.metrics.slice(0, 3), 3));
         info.appendChild(mw0);
+
+        // CTA
+        if (card.href && card.href !== '#') {
+          var heroCta = document.createElement('a');
+          heroCta.href = card.href;
+          heroCta.textContent = 'View Case Study →';
+          heroCta.style.cssText = 'display:inline-flex;align-items:center;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;color:#0f1115;background:#E6F28D;border-radius:999px;padding:8px 18px;text-decoration:none;letter-spacing:0.02em;flex-shrink:0;align-self:flex-start;margin-top:16px;';
+          info.appendChild(heroCta);
+        }
+
         cardEl.appendChild(info);
+
+        // RIGHT: blob accent panel — canvas centered & oversized to fill panel
+        var blobArea = document.createElement('div');
+        blobArea.style.cssText = 'flex:0 0 40%;position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,0.06);';
+        var lc = document.createElement('canvas');
+        lc.width = 800; lc.height = 450;
+        // Maintain 16:9 aspect ratio, scale up 3× so blob fills the panel width; centered by transform
+        lc.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300%;aspect-ratio:800/450;display:block;';
+        blobArea.appendChild(lc);
+        listBlobCanvas = lc;
+        listBlobCtx    = lc.getContext('2d');
+        cardEl.appendChild(blobArea);
 
       } else {
         // PROJECT CARD: dark bg, inset rounded video, clean info
@@ -498,7 +510,7 @@ void main() {
 
         // Media: inset container + video/thumbnail
         var mediaOuter = document.createElement('div');
-        mediaOuter.style.cssText = 'flex:0 0 50%;padding:10px 10px 0;box-sizing:border-box;';
+        mediaOuter.style.cssText = 'flex:0 0 40%;padding:10px 10px 0;box-sizing:border-box;';
         var bgImg = card.img ? 'url(' + card.img + ')' : 'none';
         var mediaInner = document.createElement('div');
         mediaInner.style.cssText = 'width:100%;height:100%;border-radius:14px;overflow:hidden;background-color:#0a0c0f;background-image:' + bgImg + ';background-size:cover;background-position:center;position:relative;';
@@ -551,7 +563,7 @@ void main() {
 
         if (card.href && card.href !== '#') {
           var ctaWrap = document.createElement('div');
-          ctaWrap.style.cssText = 'margin-top:auto;padding-top:14px;';
+          ctaWrap.style.cssText = 'margin-top:14px;';
           var cta = document.createElement('a');
           cta.href = card.href;
           cta.textContent = 'View Case Study →';
@@ -619,9 +631,9 @@ void main() {
     function sizeGridCards() {
       var leftPad = 80, rightPad = 60, gap = 20;
       var avail = el.clientWidth - leftPad - rightPad;
-      // Show 2.5 project cards after hero — hero slightly narrower to hint at next card
-      var projectW = Math.max(240, Math.floor(avail / 2.5));
-      var heroW    = Math.max(220, Math.round(projectW * 0.78));
+      // Hero is the featured card — widest card; row layout needs room for content + blob
+      var heroW    = Math.max(380, Math.floor(avail * 0.46));
+      var projectW = Math.max(200, Math.floor(avail * 0.27));
       // Height: leave room for track top-padding (80px) + controls bar (72px) + breathing (32px)
       var cardH    = Math.min(520, Math.max(380, el.clientHeight - 184));
       gridCardEls.forEach(function (c, i) {
@@ -668,6 +680,12 @@ void main() {
     }
     prevBtn.addEventListener('click', function() { scrollGridToCard(gridCurrentIdx - 1); });
     nextBtn.addEventListener('click', function() { scrollGridToCard(gridCurrentIdx + 1); });
+
+    // Glass nav buttons (same style as spiral up/down) for grid view
+    var gridNavPrev = document.getElementById('s2GridPrev');
+    var gridNavNext = document.getElementById('s2GridNext');
+    if (gridNavPrev) gridNavPrev.addEventListener('click', function() { scrollGridToCard(gridCurrentIdx - 1); });
+    if (gridNavNext) gridNavNext.addEventListener('click', function() { scrollGridToCard(gridCurrentIdx + 1); });
 
     // ── Wheel: vertical → horizontal (lets page scroll at the ends) ───
     el.addEventListener('wheel', function(e) {
@@ -722,6 +740,8 @@ void main() {
         renderer.domElement.style.opacity = '1';
         if (frontLabelWrap) frontLabelWrap.style.visibility = '';
         if (sideNavWrap) sideNavWrap.style.display = '';
+        if (gridNavPrev) gridNavPrev.style.display = 'none';
+        if (gridNavNext) gridNavNext.style.display = 'none';
         allCards.forEach(function (_, i) {
           setTimeout(function () { hiddenTarget[i] = 0; }, (i % 4) * 50);
         });
@@ -732,6 +752,8 @@ void main() {
         renderer.domElement.style.opacity = '0';
         if (frontLabelWrap) frontLabelWrap.style.visibility = 'hidden';
         if (sideNavWrap) sideNavWrap.style.display = 'none';
+        if (gridNavPrev) gridNavPrev.style.display = '';
+        if (gridNavNext) gridNavNext.style.display = '';
         el.style.height = '100%';
         setTimeout(function () {
           listOverlay.style.display = 'flex';
