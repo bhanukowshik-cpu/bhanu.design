@@ -6575,7 +6575,7 @@
     @media (min-width: 1024px) {
       .cb-send { font-size: 15px; height: 44px; padding: 0 28px; }
       #cbSend:not(.vis) { min-width: 180px; }
-      .cb { height: 72px; --cb-bar-w: min(820px, calc(100vw - 48px)); }
+      .cb { height: 72px; max-height: 72px; --cb-bar-w: min(820px, calc(100vw - 48px)); }
       .cb.cb-circle { width: 72px; } /* = height → perfect circle */
       .cb.bar-revealed { width: var(--cb-bar-w); border-radius: 36px; } /* 72px height / 2 */
       .cb.expanded { width: min(960px, calc(100vw - 48px)); }
@@ -14084,7 +14084,16 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     }
     function cbCollapse() {
       if (cbInput.value) return;
-      cbEl.classList.remove('expanded');
+      var currentH = Math.round(cbEl.getBoundingClientRect().height);
+      var baseH = window.innerWidth >= 1024 ? 72 : 63;
+      /* pin the current rendered height, then animate max-height down to baseH */
+      cbEl.style.maxHeight = currentH + 'px';
+      void cbEl.offsetHeight; /* commit start value before next assignment */
+      cbEl.style.maxHeight = baseH + 'px';
+      setTimeout(function () {
+        cbEl.classList.remove('expanded');
+        cbEl.style.maxHeight = '';
+      }, 450);
     }
     /* touchstart fires before iOS's blur/focus churn so the bar is already
        expanded when the keyboard opens */
@@ -16260,7 +16269,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260701-gridv10" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260701-gridv11" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
