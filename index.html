@@ -151,8 +151,8 @@
       position: relative;
       display: grid;
       grid-template-columns: 0.9fr 2.6fr 0.9fr;   /* photo-left / center text / photo-right — balanced: photos closer in, center still wide for content */
-      min-height: calc(100svh - 134px);
-      padding-bottom: 16px;
+      height: calc(100svh - 134px);
+      grid-template-rows: 1fr auto;
     }
     /* Bottom-centre bloom gradient clipped to section 1 — a true circle
        (center pushed below the box so only its top arc shows), grainy like
@@ -164,9 +164,9 @@
       content: '';
       position: absolute;
       left: -40px; right: -40px; bottom: 0;
-      height: 240px;
+      height: 160px;
       background:
-        radial-gradient(circle 320px at 50% 380px, rgba(230,242,141,0.22) 0%, rgba(230,242,141,0.09) 45%, transparent 75%);
+        radial-gradient(ellipse 70% 140px at 50% 100%, rgba(230,242,141,0.20) 0%, rgba(230,242,141,0.06) 65%, transparent 100%);
       pointer-events: none;
       z-index: 0;
     }
@@ -174,13 +174,13 @@
       content: '';
       position: absolute;
       left: -40px; right: -40px; bottom: 0;
-      height: 240px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 160px 160px;
-      opacity: 0.45;
+      height: 160px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.70' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 120px 120px;
+      opacity: 0.60;
       mix-blend-mode: soft-light;
-      -webkit-mask-image: radial-gradient(circle 320px at 50% 380px, #000 0%, #000 45%, transparent 75%);
-      mask-image: radial-gradient(circle 320px at 50% 380px, #000 0%, #000 45%, transparent 75%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, #000 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, #000 100%);
       pointer-events: none;
       z-index: 0;
     }
@@ -222,7 +222,7 @@
 
     /* ─── HERO FACTS — bordered glass panel (matches Figma) ──── */
     .hero-facts {
-      display: flex;
+      display: flex;               /* visible on desktop/tablet; ticker replaces it on mobile */
       flex-direction: row;
       flex-wrap: wrap;
       align-items: flex-start;
@@ -465,13 +465,18 @@
     /* ── MOBILE POLAROID CAROUSEL ─────────────────────────────── */
     .hero-carousel {
       display: none; /* desktop: hidden */
+      /* isolation: prevent parent mask/overflow from resetting child animation layer */
+      isolation: isolate;
     }
     .hero-carousel-track {
       display: flex;
       gap: 0;
       width: max-content;
+      /* translate3d forces GPU layer so iOS mask-image parent can't interrupt it */
       animation: hero-carousel-scroll 38s linear infinite;
-      will-change: transform;
+      -webkit-animation: hero-carousel-scroll 38s linear infinite;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
     .hero-carousel-wrap {
       flex-shrink: 0;
@@ -486,12 +491,123 @@
       white-space: normal;
     }
     @keyframes hero-carousel-scroll {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
+      from { transform: translate3d(0, 0, 0); }
+      to   { transform: translate3d(-50%, 0, 0); }
+    }
+    @-webkit-keyframes hero-carousel-scroll {
+      from { -webkit-transform: translate3d(0, 0, 0); }
+      to   { -webkit-transform: translate3d(-50%, 0, 0); }
     }
     @keyframes pfloat {
       0%, 100% { transform: translateY(0);    }
       50%      { transform: translateY(-9px); }
+    }
+
+    /* ─── HERO TICKER — full-width right-to-left meta strip (mobile only) ─── */
+    .hero-ticker {
+      display: none;               /* hidden by default; mobile query enables it */
+      grid-column: 1 / -1;
+      overflow: hidden;
+      border-top: 1px solid rgba(37,37,37,0.10);
+      background: rgba(255,252,248,0.50);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      isolation: isolate;
+      position: relative;
+    }
+    [data-theme="dark"] .hero-ticker {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+    }
+    .hero-ticker::before,
+    .hero-ticker::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 80px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .hero-ticker::before {
+      left: 0;
+      background: linear-gradient(to right, var(--bg, #FFFCF8), transparent);
+    }
+    .hero-ticker::after {
+      right: 0;
+      background: linear-gradient(to left, var(--bg, #FFFCF8), transparent);
+    }
+    [data-theme="dark"] .hero-ticker::before {
+      background: linear-gradient(to right, #0D0D0D, transparent);
+    }
+    [data-theme="dark"] .hero-ticker::after {
+      background: linear-gradient(to left, #0D0D0D, transparent);
+    }
+    .hero-ticker-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      padding: 14px 0;
+      animation: hero-ticker-scroll 28s linear infinite;
+      -webkit-animation: hero-ticker-scroll 28s linear infinite;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .htick-item {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 0 36px;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+    }
+    .htick-k {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #888;
+    }
+    .htick-slash {
+      color: rgba(37,37,37,0.25);
+      font-size: 13px;
+    }
+    [data-theme="dark"] .htick-slash { color: rgba(255,255,255,0.20); }
+    .htick-v {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--secondary);
+    }
+    .htick-dot {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(37,37,37,0.20);
+      margin: 0 16px;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .htick-dot  { background: rgba(255,255,255,0.18); }
+    [data-theme="dark"] .htick-k    { color: rgba(255,255,255,0.40); }
+    [data-theme="dark"] .htick-v    { color: rgba(255,255,255,0.90); }
+    @keyframes hero-ticker-scroll {
+      from { transform: translate3d(0, 0, 0); }
+      to   { transform: translate3d(-50%, 0, 0); }
+    }
+    @-webkit-keyframes hero-ticker-scroll {
+      from { -webkit-transform: translate3d(0, 0, 0); }
+      to   { -webkit-transform: translate3d(-50%, 0, 0); }
+    }
+
+    /* ─── MOBILE FACTS CAROUSEL — one fact cross-fades every 4s ── */
+    .hfc-panel { display: none; }  /* hidden by default; mobile shows it */
+    .hfc-slide { opacity: 0; }     /* all slides start invisible */
+    @keyframes hfc-fade {
+      0%    { opacity: 0; transform: translateY(5px); }
+      6%    { opacity: 1; transform: translateY(0);   }
+      19%   { opacity: 1; transform: translateY(0);   }
+      25%   { opacity: 0; transform: translateY(-5px);}
+      100%  { opacity: 0; transform: translateY(5px); }
     }
 
     /* ─── GREETING / TYPING LINE ─────────────────────────────── */
@@ -2587,17 +2703,22 @@
       .card                { gap: 60px; padding-bottom: 36px; border-radius: 20px; }
       .hero                { padding: 30px 32px 0; }
       .hero-screen::after  { left: -32px; right: -32px; }
+      .hero-screen::before { left: -32px; right: -32px; }
       .hero-screen         { min-height: calc(100svh - 104px); }  /* page 74 + hero 30 */
       .hero-content        { gap: 30px; }
       .hero-heading { font-size: 22px; line-height: 32px; }
       .hero-screen  { grid-template-columns: 1fr; } /* text fills full width — no photo column */
       .hero-screen-left { max-width: 100%; }
       .hero-facts   { max-width: 100%; }
+      .hero-facts .hero-li { flex-wrap: wrap; }   /* allow facts to wrap on tablet */
+      .hero-facts { display: flex; }           /* restore facts pill on tablet */
+      .hero-ticker { display: none; }           /* hide ticker on tablet/mobile */
       .hero-photos, .hero-photos-left { display: none; }
       .hero-carousel {
         display: block;
         overflow: hidden;
         padding: 28px 0 10px;
+        isolation: isolate;          /* own stacking context — mask can't kill child GPU layer */
         -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
         mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
       }
@@ -2620,16 +2741,75 @@
     /* ── Mobile: up to 767px ─────────────────────────────────── */
     @media (max-width: 767px) {
       .hero-transform-graphic { display: none; }
+      .hero-ticker          { display: block; }   /* scrolling marquee replaces facts on mobile */
+      .hero-facts           { display: none; }    /* facts pill hidden on mobile */
       .top-nav              { padding: 8px 16px; height: 50px; }
       .page                 { padding: 60px 5% 56px; }
       .card                 { gap: 60px; padding-bottom: 28px; border-radius: 16px; }
       .hero                 { padding: 22px 20px 0; gap: 16px; }
       .hero-screen::after   { left: -20px; right: -20px; }
-      .hero-screen          { min-height: calc(100svh - 82px); }  /* page 60 + hero 22 */
+      .hero-screen::before  { left: -20px; right: -20px; }
+      /* switch to flexbox column so content stacks naturally and ticker pins to bottom */
+      .hero-screen {
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100svh - 164px); /* viewport - page-pad(60) - hero-pad-top(22) - chat-bar(82) */
+        height: auto;
+      }
+      .hero-screen-left     { flex: 1; align-self: stretch; gap: 24px; }
+      .hero-ticker {
+        flex-shrink: 0;
+        background: rgba(255,252,248,0.80);
+        border: 1px solid rgba(37,37,37,0.12);
+        border-radius: 20px;
+        padding: 20px 24px;
+        overflow: visible;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      .hero-ticker::before, .hero-ticker::after { display: none; }
+      .hero-ticker-track    { display: none; }
+      .hfc-panel {
+        display: block;
+        position: relative;
+        height: 52px;
+      }
+      .hfc-slide {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        animation: hfc-fade 16s ease-in-out infinite;
+        -webkit-animation: hfc-fade 16s ease-in-out infinite;
+        animation-delay: calc(var(--i) * 4s);
+        -webkit-animation-delay: calc(var(--i) * 4s);
+      }
+      .hfc-k {
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        color: rgba(37,37,37,0.45);
+        font-family: var(--font-mono);
+      }
+      .hfc-v {
+        font-size: 17px;
+        font-weight: 500;
+        font-family: var(--font-mono);
+        color: var(--secondary);
+        margin-top: 2px;
+      }
+      [data-theme="dark"] .hero-ticker {
+        background: linear-gradient(180deg, #262626 0%, #0D0D0D 100%);
+        border: none;
+      }
+      [data-theme="dark"] .hfc-k { color: rgba(255,255,255,0.40); }
+      [data-theme="dark"] .hfc-v { color: rgba(255,255,255,0.90); }
       .hero-content         { gap: 20px; }
       .greeting             { font-size: 16px; }
       .hero-heading { font-size: 24px; line-height: 34px; }
-      .hero-screen  { flex-direction: column; gap: 26px; }
       .hero-photos, .hero-photos-left { display: none; }
       .hero-subtext         { font-size: 13px; line-height: 24px; }
       .current-badge        { font-size: 13px; padding: 12px 16px; display: flex; align-self: stretch; width: 100%; box-sizing: border-box; white-space: normal; }
@@ -5934,6 +6114,7 @@
       border: none;
       cursor: pointer;
       perspective: 300px;
+      overflow: hidden;
       background: rgba(255,255,255,0.12);
       backdrop-filter: blur(14px) saturate(160%);
       -webkit-backdrop-filter: blur(14px) saturate(160%);
@@ -5948,6 +6129,26 @@
       transition:
         opacity   0.4s ease,
         transform 0.55s cubic-bezier(0.34, 1.45, 0.64, 1);
+    }
+    /* same spinning rainbow wheel as the Ask me anything CTA */
+    .cb-fab2::before {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      left: 50%; top: 50%;
+      width: 220%; aspect-ratio: 1 / 1;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      filter: blur(10px);
+      background: conic-gradient(
+        from 0deg,
+        #ff4757, #ff6b35, #ffd32a, #2ed573, #1e90ff, #a29bfe, #fd79a8, #ff4757
+      );
+      opacity: 0.65;
+      animation: ask-wheel-spin 6s linear infinite;
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
     .cb-fab2.fab-in {
       opacity: 1;
@@ -7755,7 +7956,7 @@
 
     /* ── Section 2 redesign — Featured Work ─────────────────── */
     .s2-fw-header {
-      padding: 20px 48px 10px;
+      padding: 20px 40px 10px;
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -7882,7 +8083,7 @@
       position: absolute;
       bottom: 28px;
       left: 50%;
-      width: min(1250px, calc(100% - 64px));
+      width: min(1250px, calc(100% - 80px));
       z-index: 10;
       display: flex;
       flex-direction: column;
@@ -7923,11 +8124,7 @@
       justify-content: space-between;
       align-items: flex-start;
       gap: 28px;
-      margin-bottom: 22px;
-      /* Hard fixed height (not a floor) — matches the tags column's max-height
-         cap so the frame is pixel-identical across every card at every viewport
-         width, whether a given card's content fills it or leaves it half-empty. */
-      height: 108px;
+      margin-bottom: 12px;
     }
     .s2-bar-title-col {
       display: flex;
@@ -7952,6 +8149,24 @@
     }
     .s2-bar-in .s2-bar-title {
       animation: s2FadeUp 0.45s 0.05s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+    .s2-bar-title-badge {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #E6F28D;
+      background: rgba(230, 242, 141, 0.08);
+      border: 1px solid rgba(230, 242, 141, 0.35);
+      border-radius: 6px;
+      padding: 3px 10px;
+      vertical-align: middle;
+      margin-left: 14px;
+      position: relative;
+      top: -2px;
     }
 
     .s2-bar-desc {
@@ -8086,7 +8301,7 @@
       width: 100%;
       height: 1px;
       background: transparent;
-      margin-bottom: 22px;
+      margin-bottom: 12px;
     }
 
     /* Bottom row: metrics left, CTA right */
@@ -9417,18 +9632,28 @@
     }
 
     @media (max-width: 767px) {
-      /* Hero facts — tighter padding, 2×2 grid of items */
+      /* Hero facts — tighter padding, 2×2 grid of items, smaller type */
       .hero-facts {
-        padding: 16px 18px;
-        gap: 14px 28px;
+        padding: 14px 16px;
+        gap: 12px 20px;
         border-radius: 14px;
+        margin: 0 auto;            /* center the pill horizontally */
+        width: fit-content;        /* shrink-wrap so it doesn't stretch full width */
+        max-width: 90%;
+        text-align: center;
       }
       .hero-facts .hero-li {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 14px 16px;
+        gap: 12px 20px;
       }
-      .hero-facts .hero-li .hfact { min-width: 0; overflow: hidden; }
+      /* allow text to wrap inside each 2-col grid cell */
+      .hero-facts .hero-li .hfact { min-width: 0; overflow: hidden; text-align: center; }
+      .hero-facts .hero-li .hfact-k,
+      .hero-facts .hero-li .hfact-v { white-space: normal; overflow-wrap: break-word; }
+      /* smaller type for mobile — 19px values are too large on a 375px screen */
+      .hero-facts .hero-li .hfact-k { font-size: 10px; letter-spacing: 0.12em; }
+      .hero-facts .hero-li .hfact-v { font-size: 14px; }
 
       /* CTA buttons — smaller so both fit side-by-side on 375px */
       .hero-cta {
@@ -9554,8 +9779,16 @@
     @media (max-width: 767px) {
       /* About Me title */
       .abt-title { font-size: 14px !important; }
-      /* Tab nav: same glass-pill + sliding-thumb as desktop/testimonials, just smaller */
+      /* Tab nav: same glass-pill + sliding-thumb, just smaller + 2-row thumb fix */
       .abt-tab { font-size: 12px !important; padding: 8px 14px !important; }
+      /* Clip the thumb inside pill bounds on 2-row layout; position it per-row */
+      .abt-nav-pill { overflow: clip; }
+      .abt-nav-thumb {
+        top: calc(var(--y, 0px) + 3px) !important;
+        height: calc(var(--rh, 34px) - 6px) !important;
+        transition: transform 0.38s cubic-bezier(0.34, 1.2, 0.4, 1), width 0.38s cubic-bezier(0.34, 1.2, 0.4, 1), top 0.25s ease !important;
+      }
+      .abt-nav-thumb.no-anim { transition: none !important; }
 
       /* Aside: content-width only, not stretched full bar width */
       .dna2 { flex-direction: column !important; gap: 16px !important; overflow: visible !important; align-items: flex-start !important; }
@@ -10146,18 +10379,27 @@
           <div class="hfact"><span class="hfact-k">Based in</span><span class="hfact-v">San Francisco</span></div>
         </div>
 
-        <!-- mobile polaroid carousel — hidden on desktop, slow right→left scroll on tablet/mobile -->
+        <!-- mobile polaroid carousel — 8-image strip (4 photos × 2 rotations) + duplicate for seamless loop -->
         <div class="hero-carousel" aria-hidden="true">
           <div class="hero-carousel-track">
+            <!-- set A: 8 items -->
             <div class="hero-carousel-wrap" style="--r:-2.5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Winning $50K as Sole Designer</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:1.5deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">My First Product Showcase</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-1.5deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitching in front of 250+</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:2.5deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">48 hours 0 sleep grind</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-1deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Winning $50K as Sole Designer</span></div></div>
             <div class="hero-carousel-wrap" style="--r:2deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitching in front of 250+</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:-1.5deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">My First Product Showcase</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:1.5deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">48 hours 0 sleep grind</span></div></div>
-            <!-- duplicate set for seamless infinite loop -->
+            <div class="hero-carousel-wrap" style="--r:-2deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">My First Product Showcase</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:1deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">48 hours 0 sleep grind</span></div></div>
+            <!-- set B: exact duplicate for seamless JS reset at halfW -->
             <div class="hero-carousel-wrap" style="--r:-2.5deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Winning $50K as Sole Designer</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:1.5deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">My First Product Showcase</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-1.5deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitching in front of 250+</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:2.5deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">48 hours 0 sleep grind</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-1deg"><div class="pc"><img src="photos/pic-pitch-win.jpg" alt="" loading="lazy"><span class="pc-cap">Winning $50K as Sole Designer</span></div></div>
             <div class="hero-carousel-wrap" style="--r:2deg"><div class="pc"><img src="photos/pic-pitch-self.jpg" alt="" loading="lazy"><span class="pc-cap">Pitching in front of 250+</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:-1.5deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">My First Product Showcase</span></div></div>
-            <div class="hero-carousel-wrap" style="--r:1.5deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">48 hours 0 sleep grind</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:-2deg"><div class="pc"><img src="photos/pic-conference.jpg" alt="" loading="lazy"><span class="pc-cap">My First Product Showcase</span></div></div>
+            <div class="hero-carousel-wrap" style="--r:1deg"><div class="pc"><img src="photos/pic-future.jpg" alt="" loading="lazy"><span class="pc-cap">48 hours 0 sleep grind</span></div></div>
           </div>
         </div>
 
@@ -10170,6 +10412,37 @@
         </div>
 
 
+
+        <!-- Desktop meta ticker / mobile cycling facts pill -->
+        <div class="hero-ticker" aria-hidden="true">
+          <!-- Mobile: one fact at a time, cycles with cross-fade -->
+          <div class="hfc-panel">
+            <div class="hfc-slide" style="--i:0"><span class="hfc-k">Role</span><span class="hfc-v">Product Designer</span></div>
+            <div class="hfc-slide" style="--i:1"><span class="hfc-k">Designing Since</span><span class="hfc-v">5 + Years</span></div>
+            <div class="hfc-slide" style="--i:2"><span class="hfc-k">Proven Work In</span><span class="hfc-v">0 to 1, B2B &amp; B2C</span></div>
+            <div class="hfc-slide" style="--i:3"><span class="hfc-k">Based In</span><span class="hfc-v">San Francisco</span></div>
+          </div>
+          <!-- Desktop/tablet: scrolling marquee -->
+          <div class="hero-ticker-track">
+            <span class="htick-item"><span class="htick-k">Role</span><span class="htick-slash"> / </span><span class="htick-v">Product Designer</span></span>
+            <span class="htick-dot"></span>
+            <span class="htick-item"><span class="htick-k">Designing Since</span><span class="htick-slash"> / </span><span class="htick-v">5 + Years</span></span>
+            <span class="htick-dot"></span>
+            <span class="htick-item"><span class="htick-k">Proven Work In</span><span class="htick-slash"> / </span><span class="htick-v">0 to 1, B2B &amp; B2C</span></span>
+            <span class="htick-dot"></span>
+            <span class="htick-item"><span class="htick-k">Based In</span><span class="htick-slash"> / </span><span class="htick-v">San Francisco</span></span>
+            <span class="htick-dot"></span>
+            <!-- duplicate set for seamless loop -->
+            <span class="htick-item"><span class="htick-k">Role</span><span class="htick-slash"> / </span><span class="htick-v">Product Designer</span></span>
+            <span class="htick-dot"></span>
+            <span class="htick-item"><span class="htick-k">Designing Since</span><span class="htick-slash"> / </span><span class="htick-v">5 + Years</span></span>
+            <span class="htick-dot"></span>
+            <span class="htick-item"><span class="htick-k">Proven Work In</span><span class="htick-slash"> / </span><span class="htick-v">0 to 1, B2B &amp; B2C</span></span>
+            <span class="htick-dot"></span>
+            <span class="htick-item"><span class="htick-k">Based In</span><span class="htick-slash"> / </span><span class="htick-v">San Francisco</span></span>
+            <span class="htick-dot"></span>
+          </div>
+        </div>
         </div><!-- /hero-screen -->
 
 
@@ -11149,25 +11422,49 @@
       }
     })();
 
-    // ── Hero content → photo slide-out interaction ──────────────────
-    // Polaroids are visible by default (the hero of this section). They
-    // only slide out once the cursor leaves the hero entirely, and slide
-    // back in as soon as it re-enters any hero content.
+    // ── Hero photos — entry animation + content-hover control ───────
+    // Flow: photos slide IN on load → stay visible for 3 s (intro phase,
+    // mouseleave is locked so nothing can hide them early) → after 3 s,
+    // if cursor isn't on the center content (text / CTA / facts) they slide
+    // out. From then on mouseenter / mouseleave on the content zone drives
+    // visibility indefinitely.
     (function initHeadingPhotoReveal() {
-      const hero   = document.querySelector('.hero');
-      const screen = document.querySelector('.hero-screen');
-      if (!hero || !screen) return;
-      hero.addEventListener('mouseenter', () => screen.classList.remove('photos-away'));
-      hero.addEventListener('mouseleave', () => screen.classList.add('photos-away'));
-      // On the very first cursor movement after load, sync the visible/hidden state
-      // without waiting for a mouseenter/mouseleave event to fire.
-      document.addEventListener('mousemove', function syncInitialCursorPosition(e) {
-        document.removeEventListener('mousemove', syncInitialCursorPosition);
-        const r = hero.getBoundingClientRect();
-        const inside = e.clientX >= r.left && e.clientX <= r.right &&
-                       e.clientY >= r.top  && e.clientY <= r.bottom;
-        if (!inside) screen.classList.add('photos-away');
+      const screen  = document.querySelector('.hero-screen');
+      const content = document.querySelector('.hero-screen-left'); // heading + CTA + facts
+      if (!screen || !content) return;
+
+      let introPhase = true; // locked during the 3-s reveal window
+      let cursorX = -1, cursorY = -1;
+      document.addEventListener('mousemove', (e) => { cursorX = e.clientX; cursorY = e.clientY; });
+
+      content.addEventListener('mouseenter', () => screen.classList.remove('photos-away'));
+      content.addEventListener('mouseleave', () => {
+        if (!introPhase) screen.classList.add('photos-away');
       });
+
+      function isOnContent() {
+        if (cursorX < 0) return false;
+        const r = content.getBoundingClientRect();
+        return cursorX >= r.left && cursorX <= r.right &&
+               cursorY >= r.top  && cursorY <= r.bottom;
+      }
+
+      function runPhotoReveal() {
+        screen.classList.add('photos-away');            // start hidden
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          screen.classList.remove('photos-away');       // animate in
+          setTimeout(() => {
+            introPhase = false;                         // unlock mouseleave
+            if (!isOnContent()) screen.classList.add('photos-away');
+          }, 3000);
+        }));
+      }
+
+      if (document.documentElement.classList.contains('glass-loading')) {
+        window.addEventListener('glassloaderhidden', runPhotoReveal, { once: true });
+      } else {
+        runPhotoReveal();
+      }
     })();
 
 
@@ -15418,11 +15715,13 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       {
         tab: 'EverTutor',
         title: '1). EverTutor AI System',
+        badge: '(Next 3 Projects)',
 
         metrics: [
           { val: '2000+', lbl: 'Daily Active Users' },
           { val: '3 Tools',  lbl: 'Working as One System' },
-          { val: '$500k+', lbl: 'As Sole Designer'   }
+          { val: '$500k+', lbl: 'As Sole Designer'   },
+          { val: '-96%',  lbl: 'Content Creation Time Cut' }
         ],
         tags: ['Shipped'],
         iconTags: [
@@ -15508,8 +15807,9 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var S2_ICON_MAP = {
       profile: { light: S2_ICON_BASE + 'Profile.svg',        dark: S2_ICON_BASE + 'Profile dark theme.svg' },
       thunder: { light: S2_ICON_BASE + 'Thunder.svg',        dark: S2_ICON_BASE + 'Thunder Dark Theme.svg' },
-      mic:     { light: S2_ICON_BASE + 'Mic.svg',            dark: S2_ICON_BASE + 'Mic dark theme.svg'     }
+      mic:     { light: S2_ICON_BASE + 'Mic dark theme.svg',  dark: S2_ICON_BASE + 'Mic dark theme.svg'     }
     };
+    window.S2_ICON_MAP = S2_ICON_MAP;
 
     var spiralRoot  = document.getElementById('spiral-root');
     var tabsList    = document.getElementById('s2TabsList');
@@ -15603,7 +15903,13 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       clearTimeout(updateTimer);
       updateTimer = setTimeout(function () {
         /* Populate bar content */
-        if (barTitle) barTitle.textContent = card.title;
+        if (barTitle) {
+          if (card.badge) {
+            barTitle.innerHTML = card.title + '<span class="s2-bar-title-badge">' + card.badge + '</span>';
+          } else {
+            barTitle.textContent = card.title;
+          }
+        }
 
         if (barTagsCol) {
           barTagsCol.classList.toggle('s2-bar-tags-col--merged', !!(card.iconTags && card.iconTags.length));
@@ -15793,7 +16099,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260630-helixhover" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260701-icontags" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
@@ -16184,6 +16490,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       if (!animate) thumb.classList.add('no-anim');
       thumb.style.setProperty('--x', tab.offsetLeft + 'px');
       thumb.style.setProperty('--w', tab.offsetWidth + 'px');
+      thumb.style.setProperty('--y', tab.offsetTop + 'px');
+      thumb.style.setProperty('--rh', tab.offsetHeight + 'px');
       if (!animate) { thumb.offsetWidth; thumb.classList.remove('no-anim'); }
     }
     function activeTab() { return tabs.find(function (t) { return t.classList.contains('is-active'); }) || tabs[0]; }
@@ -16565,6 +16873,64 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     }, { threshold: 0.12 });
 
     targets.forEach(function(el) { observer.observe(el); });
+  })();
+
+  /* ─── Hero carousel — JS RAF marquee (seamless, no CSS-animation snap) ─── */
+  (function initCarouselMarquee() {
+    var carousel = document.querySelector('.hero-carousel');
+    var track    = document.querySelector('.hero-carousel-track');
+    if (!carousel || !track) return;
+
+    /* disable CSS animation — JS drives it instead */
+    track.style.animation       = 'none';
+    track.style.webkitAnimation = 'none';
+    track.style.transform       = 'translate3d(0,0,0)';
+
+    var pos     = 0;
+    var halfW   = 0;
+    var lastT   = 0;
+    var running = false;
+    var SPEED   = 20; /* px / second */
+
+    function measure() { halfW = track.scrollWidth / 2; }
+
+    function tick(t) {
+      if (!running) return;
+      if (lastT) {
+        var dt = Math.min((t - lastT) / 1000, 0.05); /* cap at 50ms so tab-switch doesn't jump */
+        pos += SPEED * dt;
+        if (halfW > 0 && pos >= halfW) pos -= halfW;
+        var tx = 'translate3d(' + (-pos) + 'px,0,0)';
+        track.style.transform       = tx;
+        track.style.webkitTransform = tx;
+      }
+      lastT = t;
+      requestAnimationFrame(tick);
+    }
+
+    function start() {
+      if (running) return;
+      running = true;
+      measure();
+      lastT = 0;
+      requestAnimationFrame(tick);
+    }
+
+    function onResize() {
+      var visible = window.getComputedStyle(carousel).display !== 'none';
+      if (visible && !running) { start(); }
+      else if (visible) { measure(); } /* re-measure on resize in case layout changed */
+    }
+
+    window.addEventListener('resize', onResize);
+    /* start after all images have loaded so scrollWidth is accurate */
+    if (document.readyState === 'complete') {
+      onResize();
+    } else {
+      window.addEventListener('load', onResize);
+      /* fallback: also try at 500ms in case load fires late */
+      setTimeout(onResize, 500);
+    }
   })();
 
   </script>
