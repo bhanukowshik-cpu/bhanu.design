@@ -379,7 +379,7 @@ void main() {
     // ── Nav buttons ───────────────────────────────────────────────────────
     // ── Grid overlay — single row, horizontal scroll, full-bleed media ───
     var listOverlay = document.createElement('div');
-    listOverlay.style.cssText = 'position:absolute;inset:0;z-index:15;overflow:hidden;padding:104px 40px 0;box-sizing:border-box;display:none;opacity:0;transition:opacity 0.3s;';
+    listOverlay.style.cssText = 'position:absolute;inset:0;z-index:15;overflow:hidden;padding:104px 0 0 80px;box-sizing:border-box;display:none;opacity:0;transition:opacity 0.3s;';
 
     var lvTrack = document.createElement('div');
     lvTrack.className = 's2-grid-track';
@@ -420,7 +420,7 @@ void main() {
 
         // Info section
         var info = document.createElement('div');
-        info.style.cssText = 'flex:1;min-height:0;display:flex;flex-direction:column;padding:14px 20px 16px;gap:8px;overflow:hidden;';
+        info.style.cssText = 'flex:1;min-height:0;display:flex;flex-direction:column;padding:14px 20px 16px;gap:8px;';
 
         var name = document.createElement('h3');
         name.textContent = card.title;
@@ -563,7 +563,7 @@ void main() {
           var cta = document.createElement('a');
           cta.href = card.href;
           cta.textContent = 'View Case Study →';
-          cta.style.cssText = 'display:block;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:500;letter-spacing:0.02em;border-radius:999px;padding:8px 16px;color:#fff;text-decoration:none;background:linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 2.45%, rgba(255,255,255,0) 126.14%);box-shadow:1.1px 2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,-1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset;transition:background 0.2s;';
+          cta.style.cssText = 'display:block;font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:600;letter-spacing:0.02em;border-radius:999px;padding:12px 26px;color:#fff;text-decoration:none;background:linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 2.45%, rgba(255,255,255,0) 126.14%);box-shadow:1.1px 2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,-1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset;transition:background 0.2s;';
           cta.addEventListener('mouseenter', function() { cta.style.background = 'rgba(255,255,255,0.14)'; });
           cta.addEventListener('mouseleave', function() { cta.style.background = 'linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 2.45%, rgba(255,255,255,0) 126.14%)'; });
           ctaPill.appendChild(cta);
@@ -586,9 +586,9 @@ void main() {
 
     // Fit exactly ~2.5 cards in the viewport, recomputed on resize.
     function sizeGridCards() {
-      var gap = 24, sidePad = 80, visible = 3;
+      var gap = 24, sidePad = 80, visible = 1.75;
       var avail = el.clientWidth - sidePad;
-      var cardW = Math.max(200, (avail - gap * (visible - 1)) / visible);
+      var cardW = Math.max(200, (avail - gap * 0.75) / visible);
       var cardH = Math.min(560, Math.max(380, el.clientHeight - 150));
       gridCardEls.forEach(function (c) { c.style.width = cardW + 'px'; c.style.height = cardH + 'px'; });
     }
@@ -922,12 +922,12 @@ void main() {
 
       // Redraw EverTutor blob waveform canvas every frame
       if (blobAnimTex) {
-        drawBlobWave(blobAnimCtx, time, blobAnimImg);
+        drawBlobWave(blobAnimCtx, time, blobAnimImg, false);
         blobAnimTex.needsUpdate = true;
       }
       // Mirror blob animation to list-view card 01
       if (listBlobCtx) {
-        drawBlobWave(listBlobCtx, time, blobAnimImg);
+        drawBlobWave(listBlobCtx, time, blobAnimImg, true);
       }
 
       renderer.render(scene, camera);
