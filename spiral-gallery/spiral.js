@@ -26,7 +26,13 @@
       { label: 'Stressie',     img: '/images/card-stressie.png',     video: '/images/stressie.mp4', portrait: true },
       { label: 'Dearly',       img: '/images/card-dearly.png',       video: '/images/dearly.mp4'       },
     ];
-    var allCards = CARDS.concat(CARDS);
+    // 3 copies instead of 2 — fills more of the frame and pushes the modulo
+    // wrap-around point (where a mesh's position resets) much farther from
+    // the visible front region, so the reset happens somewhere already faded
+    // out rather than in view.
+    var LOOP_COPIES = 3;
+    var allCards = [];
+    for (var lc = 0; lc < LOOP_COPIES; lc++) allCards = allCards.concat(CARDS);
 
     // ── List view card data — single source of truth: matches S2_DATA in index.html
     var LIST_CARDS = [
@@ -111,6 +117,7 @@ varying vec3 vWorldPosition;
 #define PI 3.14159265359
 
 uniform float uScrollSpeed;
+uniform float uVideoReveal;
 
 void main() {
   vec3 worldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
@@ -196,14 +203,6 @@ void main() {
   vec4 vidSample = texture2D(uVideoTexture, vidUV);
   vec4 blended   = mix(imgSample, vidSample, inPanel);
 
-  // Glowing scan-line at the leading (bottom) edge as the panel slides down
-  float inX      = smoothstep(panelMX - fe, panelMX + fe, vUv.x) *
-                   smoothstep(1.0 - panelMX + fe, 1.0 - panelMX - fe, vUv.x);
-  float edgeDist = abs(vUv.y - panelBot);
-  float edge     = 1.0 - smoothstep(0.0, 0.022, edgeDist);
-  float edgeVis  = edge * inX * step(0.01, uVideoReveal) * step(uVideoReveal, 0.99);
-  blended.rgb   += vec3(0.9, 0.95, 0.55) * edgeVis * 0.8;
-
   vec4 color;
   if (gl_FrontFacing) {
     color = blended;
@@ -261,15 +260,27 @@ void main() {
     el.appendChild(renderer.domElement);
 
     var scene  = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
-    camera.position.set(0, 0, 7);
+    // Camera FOV/distance matched to the reference implementation's proven
+    // values — 45deg below 900px width, 35deg at desktop widths, z=8.
+    var CAMERA_Z = 8;
+    function fovForWidth(w) { return w < 900 ? 45 : 35; }
+    var camera = new THREE.PerspectiveCamera(fovForWidth(W), W / H, 0.1, 100);
+    camera.position.set(0, 0, CAMERA_Z);
 
-    // ── Spiral constants ──────────────────────────────────────────────────
-    var VERTICAL_GAP = 0.4;
-    var ANGLE_GAP    = Math.PI / 4;
-    var BASE_RADIUS  = 2.3;
+    // ── Spiral constants — matched to the reference implementation's proven
+    //    values (verticalGap 0.5, angleGap 0.85, baseRadius 2), scaled up
+    //    modestly by CARD_SCALE per the earlier size-bump request. ────────
+    var CARD_SCALE   = 1.15;
+    var VERTICAL_GAP = 0.5 * CARD_SCALE;
+    var ANGLE_GAP    = 0.85;
+    var BASE_RADIUS  = 2 * CARD_SCALE;
     var totalCount   = allCards.length;
     var centerIndex  = Math.floor(totalCount / 2);
+    // B's two wrap edges (where a mesh's position resets as scrollOffset
+    // advances) — used below to fade cards out before they reach either edge.
+    var B_MIN        = -centerIndex;
+    var B_MAX        = totalCount - 1 - centerIndex;
+    var EDGE_FADE_MARGIN = 2.5;
 
     var uniforms       = [];
     var hiddenProgress = [];
@@ -283,13 +294,13 @@ void main() {
     var videoRevealTarget   = [];
 
     allCards.forEach(function (_, i) {
-      var geo = new THREE.PlaneGeometry(16/9, 1.0, 8, 8);
+      var geo = new THREE.PlaneGeometry(16/9 * CARD_SCALE, 1.0 * CARD_SCALE, 8, 8);
       var u = {
         uTexture:        { value: new THREE.Texture() },
         uVideoTexture:   { value: new THREE.Texture() },
         uColorStrength:  { value: 0 },
         uZoom:           { value: 1 },
-        uPlaneSizes:     { value: new THREE.Vector2(16/9, 1.0) },
+        uPlaneSizes:     { value: new THREE.Vector2(16/9 * CARD_SCALE, 1.0 * CARD_SCALE) },
         uImageSizes:     { value: new THREE.Vector2(1280, 720) },
         uRevealProgress: { value: 0 },
         uVideoReveal:    { value: 0 },
@@ -325,7 +336,9 @@ void main() {
     var blobAnimImg    = null;
 
     CARDS.forEach(function (card, ci) {
-      var dup = ci + CARDS.length;
+      // Every copy of this card (one per LOOP_COPIES) shares the same texture.
+      var copyIdxs = [];
+      for (var lc2 = 0; lc2 < LOOP_COPIES; lc2++) copyIdxs.push(ci + lc2 * CARDS.length);
 
       if (card.video) {
         // Video cards: STATIC thumbnail on the card face; the video lives in the
@@ -338,8 +351,7 @@ void main() {
         var vtex = new THREE.VideoTexture(vid);
         vtex.minFilter = THREE.LinearFilter;
         vtex.magFilter = THREE.LinearFilter;
-        uniforms[ci].uVideoTexture.value   = vtex;
-        uniforms[dup].uVideoTexture.value  = vtex;
+        copyIdxs.forEach(function (idx) { uniforms[idx].uVideoTexture.value = vtex; });
 
         // Load the static thumbnail as the card face so every card always shows
         // an image (never a blank/black frame before the video plays).
@@ -348,10 +360,10 @@ void main() {
           tex.magFilter = THREE.LinearFilter;
           var w = (tex.image && (tex.image.naturalWidth  || tex.image.width))  || 1280;
           var h = (tex.image && (tex.image.naturalHeight || tex.image.height)) || 720;
-          uniforms[ci].uTexture.value  = tex;
-          uniforms[dup].uTexture.value = tex;
-          uniforms[ci].uImageSizes.value.set(w, h);
-          uniforms[dup].uImageSizes.value.set(w, h);
+          copyIdxs.forEach(function (idx) {
+            uniforms[idx].uTexture.value = tex;
+            uniforms[idx].uImageSizes.value.set(w, h);
+          });
         });
       } else {
         // EverTutor (no video): animated canvas — white bg + blob-light + waveform
@@ -368,10 +380,10 @@ void main() {
         blobAnimTex           = new THREE.CanvasTexture(blobAnimCanvas);
         blobAnimTex.minFilter = THREE.LinearFilter;
         blobAnimTex.magFilter = THREE.LinearFilter;
-        uniforms[ci].uTexture.value        = blobAnimTex;
-        uniforms[ci].uImageSizes.value.set(800, 450);
-        uniforms[dup].uTexture.value       = blobAnimTex;
-        uniforms[dup].uImageSizes.value.set(800, 450);
+        copyIdxs.forEach(function (idx) {
+          uniforms[idx].uTexture.value = blobAnimTex;
+          uniforms[idx].uImageSizes.value.set(800, 450);
+        });
       }
     });
 
@@ -379,7 +391,7 @@ void main() {
     var wheelDeltaY       = 0;
     var targetWheelDeltaY = 0;
     var wheelDirection    = 1;
-    var scrollOffset      = 4;  // positions EverTutor (index 0) at the visually-forward B=2 slot
+    var scrollOffset      = totalCount - (centerIndex + 2);  // positions EverTutor (index 0) at the visually-forward B=2 slot
     var entryTriggered    = false;
     var ENTRY_SPEED       = 0.6;    // initial spin speed on section enter (one full card cycle)
     var SLOW_DRIFT        = 0.0005; // gentle continuous forward drift after entry settles
@@ -553,7 +565,7 @@ void main() {
         allCards.forEach(function (_, i) {
           setTimeout(function () { hiddenTarget[i] = 0; }, (i % 4) * 50);
         });
-        gsap.to(camera.position, { z: 7, duration: 1, ease: 'power2.inOut' });
+        gsap.to(camera.position, { z: CAMERA_Z, duration: 1, ease: 'power2.inOut' });
       } else {
         allCards.forEach(function (_, i) { hiddenTarget[i] = 1; });
         renderer.domElement.style.transition = 'opacity 0.3s';
@@ -576,11 +588,23 @@ void main() {
     });
 
     // ── Initial reveal ────────────────────────────────────────────────────
-    setTimeout(function () {
-      allCards.forEach(function (_, i) {
-        setTimeout(function () { hiddenTarget[i] = 0; }, (i % 4) * 50);
-      });
-    }, 600);
+    // Gated on the glass loader lifting (same pattern used for the hero
+    // entrance) — otherwise this fires on a flat timer from script-parse
+    // time, finishes revealing while still hidden behind the loader (which
+    // holds the screen ~2.8s+), and the fly-in animation is never actually
+    // seen.
+    function revealCards() {
+      setTimeout(function () {
+        allCards.forEach(function (_, i) {
+          setTimeout(function () { hiddenTarget[i] = 0; }, (i % 4) * 50);
+        });
+      }, 600);
+    }
+    if (document.documentElement.classList.contains('glass-loading')) {
+      window.addEventListener('glassloaderhidden', revealCards, { once: true });
+    } else {
+      revealCards();
+    }
 
     // ── Front card tracking + snap-to-card ───────────────────────────────
     var lastFrontCardIdx = -1;
@@ -680,9 +704,14 @@ void main() {
       wheelDeltaY       += (targetWheelDeltaY - wheelDeltaY) * 0.1;
       scrollOffset      += wheelDeltaY;
       targetWheelDeltaY *= 0.9;
-      // Once entry animation has fired, floor the speed so the helix
-      // never fully stops — it keeps a very slow continuous forward rotation.
-      if (entryTriggered && snapTarget === null && targetWheelDeltaY < SLOW_DRIFT) {
+      // Once entry animation has fired, floor the speed so the helix never
+      // fully stops — it keeps a very slow continuous forward rotation once
+      // scroll input has actually decayed to near-zero. Must check magnitude,
+      // not the raw signed value: checking targetWheelDeltaY < SLOW_DRIFT
+      // directly was also true for any negative (upward-scroll) value,
+      // snapping it back to positive every frame and fighting upward scroll
+      // input almost immediately — that was the "scrolling up feels harder" bug.
+      if (entryTriggered && snapTarget === null && Math.abs(targetWheelDeltaY) < SLOW_DRIFT) {
         targetWheelDeltaY = SLOW_DRIFT;
       }
 
@@ -707,8 +736,8 @@ void main() {
         N = ((N % totalCount) + totalCount) % totalCount;
         var B = N - centerIndex;
 
-        var flyDir = hiddenTarget[i] > 0 ? 1.5 : -1.5;
-        var y      = B * VERTICAL_GAP - 0.8 - hiddenProgress[i] * flyDir;
+        var flyDir = (hiddenTarget[i] > 0 ? 1.5 : -1.5) * CARD_SCALE;
+        var y      = B * VERTICAL_GAP - 0.8 * CARD_SCALE - hiddenProgress[i] * flyDir;
         var radius = BASE_RADIUS * (1 - hiddenProgress[i] / 2);
         var angle  = B * ANGLE_GAP;
 
@@ -730,12 +759,22 @@ void main() {
 
         uniforms[i].uScrollSpeed.value    = wheelDeltaY;
         uniforms[i].uColorStrength.value  = 0; // darkening removed
-        uniforms[i].uZoom.value           = 1 + 0.05 * hoverProgress[i];
-        uniforms[i].uRevealProgress.value = (1 - hoverProgress[i] * 0.05) * (1 - hiddenProgress[i]);
 
         // Depth fog: darken cards further from the front slot (B=2)
         var distFromFront = Math.abs(B - 2);
         uniforms[i].uFogOpacity.value = Math.max(0.15, 1.0 - distFromFront * 0.25);
+
+        // Edge fade: each mesh's B wraps (modulo) as scrollOffset advances —
+        // that wrap is an instant jump from B_MIN to B_MAX (or vice versa).
+        // Fade alpha to 0 near EITHER edge (signed distance, not distance-
+        // from-front — those aren't the same thing and using distFromFront
+        // here would incorrectly fade out cards mid-spiral on one side).
+        var edgeFadeLow  = Math.max(0, Math.min(1, (B - B_MIN) / EDGE_FADE_MARGIN));
+        var edgeFadeHigh = Math.max(0, Math.min(1, (B_MAX - B) / EDGE_FADE_MARGIN));
+        var edgeFade     = edgeFadeLow * edgeFadeHigh;
+
+        uniforms[i].uZoom.value           = 1 + 0.05 * hoverProgress[i];
+        uniforms[i].uRevealProgress.value = (1 - hoverProgress[i] * 0.05) * (1 - hiddenProgress[i]) * edgeFade;
 
         // Bottom aurora: only on EverTutor cards, fades in as card approaches front
         var isEverTutor = (i % CARDS.length === 0);
@@ -803,6 +842,7 @@ void main() {
       var w = el.clientWidth;
       var h = el.clientHeight;
       camera.aspect = w / h;
+      camera.fov    = fovForWidth(window.innerWidth);
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
     });

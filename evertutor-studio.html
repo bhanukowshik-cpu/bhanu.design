@@ -218,7 +218,7 @@
       letter-spacing: -0.8px;
       color: var(--secondary);
     }
-    /* Italic part — "100+ hours to 4." */
+    /* Italic part — "104 hours to 4." */
     .cs-heading em {
       font-style: italic;
       font-weight: 600;
@@ -255,6 +255,68 @@
     @keyframes fade-in {
       from { opacity: 0; }
       to   { opacity: 1; }
+    }
+
+    /* ─── FULL-BLEED HERO VISUAL ─────────────────────────────── */
+    .cs-hero-visual {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      overflow: hidden;
+      background: #0a2a14;
+    }
+    .chv-bg-pan {
+      position: absolute;
+      inset: -4%;
+      background:
+        radial-gradient(ellipse 140% 120% at 50% bottom,
+          #20f567 0%, #00d050 10%, #00a838 22%,
+          #005c1e 38%, #002410 55%, transparent 73%),
+        linear-gradient(to top, #001a08 0%, #000603 40%, #000000 65%),
+        #000000;
+      animation: chv-pan 22s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+    @keyframes chv-pan {
+      0%   { transform: scale(1.04) translate(0, 0); }
+      100% { transform: scale(1.1) translate(0, -1.5%); }
+    }
+    .chv-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.45) 100%);
+      pointer-events: none;
+    }
+    .chv-video-frame {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 62%;
+      max-width: 720px;
+      border-radius: 17px;
+      overflow: hidden;
+      box-shadow: 0px 20px 60px rgba(0,0,0,0.35);
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.82);
+      transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+    }
+    .chv-video-frame.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .chv-video-frame video {
+      width: 100%;
+      height: auto;
+      display: block;
+      pointer-events: none;
+    }
+    @media (max-width: 1023px) {
+      .cs-hero-visual { height: 380px; }
+      .chv-video-frame { width: 76%; }
+    }
+    @media (max-width: 767px) {
+      .cs-hero-visual { height: 260px; }
+      .chv-video-frame { width: 88%; border-radius: 12px; }
     }
 
     /* ─── CAROUSEL SECTION ───────────────────────────────────── */
@@ -909,6 +971,82 @@
       color: rgba(147,147,147,0.6);
     }
 
+    /* ─── OLD vs NEW WORKFLOW COMPARISON ─────────────────────── */
+    .tools-compare {
+      display: flex;
+      align-items: stretch;
+      gap: 20px;
+    }
+    .tc-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid #efefef;
+      border-radius: 14px;
+      padding: 20px;
+      background: #FAFAFA;
+      min-width: 0;
+    }
+    .tc-new { background: rgba(230,242,141,0.18); border-color: rgba(230,242,141,0.6); }
+    .tc-panel-label {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 13px;
+      color: #515151;
+    }
+    .tc-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .tc-tool {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: #fff;
+      border: 1px solid #efefef;
+      color: var(--secondary);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .tc-tool.visible { opacity: 1; transform: translateY(0); }
+    .tc-tool-studio { background: #E6F28D; border-color: #E6F28D; font-weight: 600; }
+    .tc-tool-plus { font-family: var(--font-mono); color: #999; font-size: 13px; }
+    .tc-counter-row {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 34px;
+      color: var(--secondary);
+      line-height: 1;
+    }
+    .tc-tilde { opacity: 0.6; font-weight: 500; }
+    .tc-unit { font-size: 18px; font-weight: 600; color: #515151; }
+    .tc-sub {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 20px;
+      color: #515151;
+    }
+    .tc-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #999;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .tc-panel { background: #222222; border-color: #3A3A3A; }
+    [data-theme="dark"] .tc-new { background: rgba(230,242,141,0.06); border-color: rgba(230,242,141,0.25); }
+    [data-theme="dark"] .tc-tool { background: #1A1A1A; border-color: #3A3A3A; color: #F0EDE8; }
+    [data-theme="dark"] .tc-tool-studio { background: #E6F28D; border-color: #E6F28D; color: #252525; }
+    [data-theme="dark"] .tc-panel-label,
+    [data-theme="dark"] .tc-sub,
+    [data-theme="dark"] .tc-unit { color: #999999; }
+    @media (max-width: 767px) {
+      .tools-compare { flex-direction: column; }
+      .tc-arrow { transform: rotate(90deg); padding: 4px 0; }
+      .tc-counter-row { font-size: 26px; }
+    }
+
     @media (max-width: 900px) {
       /* Impact: image stays LEFT, just smaller at tablet/narrow sizes */
       .imp-image-frame { width: 72px; height: 90px; }
@@ -1430,11 +1568,13 @@
     [data-theme="dark"] .imp-card,
     [data-theme="dark"] .ug-card,
     [data-theme="dark"] .oc-card { background: #1A1A1A; border-color: #3A3A3A; box-shadow: none; }
-    /* ── sweep highlights — keep text dark so lime bg stays readable ── */
+    /* ── sweep highlights — keep text dark so lime/pink bg stays readable ── */
     [data-theme="dark"] .tr-highlight,
     [data-theme="dark"] .imp-hl,
     [data-theme="dark"] .cd-hl,
-    [data-theme="dark"] .oc-metric-value { color: #252525; }
+    [data-theme="dark"] .oc-metric-value,
+    [data-theme="dark"] .ug-tag-pain,
+    [data-theme="dark"] .ug-tag-gain { color: #252525; }
     /* ── team & role section ── */
     [data-theme="dark"] .tr-image-frame { background: #2C2C2C; }
     [data-theme="dark"] .tr-bullet { background: #F0EDE8; }
@@ -1611,17 +1751,28 @@
 
       <section id="overview">
 
+        <!-- ── Full-bleed hero visual: card graphic backdrop + video ── -->
+        <div class="cs-hero-visual" id="csHeroVisual">
+          <div class="chv-bg-pan"></div>
+          <div class="chv-scrim"></div>
+          <div class="chv-video-frame" id="chvVideoFrame">
+            <video autoplay muted loop playsinline preload="auto">
+              <source src="Projects videos/ET Studio Case study.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+
         <!-- ── Frame 1: Hero Section and Designation Frame ── -->
         <div class="cs-hero">
           <div class="designation-row" id="desigRow">
             <span class="desig-pill">Lead Product Designer</span>
             <span class="desig-pill">Lead Curriculum Designer</span>
-            <span class="desig-pill"><span class="status-dot"></span>2025 - Present</span>
+            <span class="desig-pill"><span class="status-dot"></span>2025 - Mid 2026</span>
           </div>
 
           <!-- Word-by-word animated heading -->
           <div class="cs-heading" id="csHeading">
-            Architected a system that reduced lesson creation from <em>100+ hours to 4 hours</em>
+            Built the content creation tool that cut lesson production from <em>104 hours to 4</em>
           </div>
 
           <!-- Subtitle (Montserrat Bold 25px per Figma) -->
@@ -1664,7 +1815,7 @@
                   <span class="tr-highlight" id="trHighlight">Lead Product &amp; Curriculum Designer (Me)</span>
                   <img class="tr-avatar" src="photo.jpg" alt="Bhanu" />
                 </div>
-                <p class="tr-mixed-mono">Defined the core system architecture and end-to-end product experience, and validated it by creating real lessons used in production.</p>
+                <p class="tr-mixed-mono">Defined the core system architecture and end-to-end product experience, and validated it by creating real lessons used in production. Designed the full V0 system solo, overnight, in ~6 hours—then spent the rest of the runway to developer handoff incorporating feedback and documenting flows.</p>
               </div>
             </div>
 
@@ -1704,7 +1855,32 @@
                 </div>
                 <div class="imp-header-text">
                   <p class="imp-label">IMPACT</p>
-                  <p class="imp-desc">Reduced lesson creation from ~100+ hours to 4, enabling rapid content production and giving educators direct control over how the AI Tutor teaches.</p>
+                  <p class="imp-desc">Reduced lesson creation from 104 hours to 4, enabling rapid content production and giving educators direct control over how the AI Tutor teaches.</p>
+                </div>
+              </div>
+
+              <!-- Old workflow vs new workflow comparison -->
+              <div class="tools-compare tr-anim" id="toolsCompare">
+                <div class="tc-panel tc-old">
+                  <p class="tc-panel-label">Old workflow — 3 disconnected tools</p>
+                  <div class="tc-tools">
+                    <span class="tc-tool">Slides.com</span>
+                    <span class="tc-tool-plus">+</span>
+                    <span class="tc-tool">Mermaid</span>
+                    <span class="tc-tool-plus">+</span>
+                    <span class="tc-tool">Canva</span>
+                  </div>
+                  <p class="tc-counter-row"><span class="tc-counter" data-target="104">0</span><span class="tc-unit"> hrs</span></p>
+                  <p class="tc-sub">per lesson—switching tools, rebuilding by hand, no shared source of truth</p>
+                </div>
+                <div class="tc-arrow">→</div>
+                <div class="tc-panel tc-new">
+                  <p class="tc-panel-label">New workflow — one unified tool</p>
+                  <div class="tc-tools">
+                    <span class="tc-tool tc-tool-studio">Studio</span>
+                  </div>
+                  <p class="tc-counter-row"><span class="tc-counter" data-target="4">0</span><span class="tc-unit"> hrs</span></p>
+                  <p class="tc-sub">create, structure &amp; publish a lesson in one place</p>
                 </div>
               </div>
 
@@ -1718,15 +1894,15 @@
                       <span class="imp-hl">96% faster</span>
                       <span class="imp-title-plain">lesson creation</span>
                     </div>
-                    <p class="imp-body">Reduced creation time from ~100 hours to ~4 hours by replacing fragmented tools with a single, structured system.</p>
+                    <p class="imp-body">Reduced creation time from 104 hours to 4 hours by replacing fragmented tools with a single, structured system.</p>
                   </div>
                   <div class="imp-metric">
                     <p class="imp-num">02</p>
                     <div class="imp-title">
-                      <span class="imp-hl">95% faster</span>
-                      <span class="imp-title-plain">onboarding</span>
+                      <span class="imp-hl">&lt;2 hours</span>
+                      <span class="imp-title-plain">to onboard</span>
                     </div>
-                    <p class="imp-body">Content designers ramped in ~2 hours vs 40–50 hours, enabled by familiar, low-friction interactions.</p>
+                    <p class="imp-body">Content designers ramped in under 2 hours vs 40–50 hours, enabled by familiar, low-friction interactions.</p>
                     <p class="imp-footnote">Calculated first creation to publish time</p>
                   </div>
                   <div class="imp-metric">
@@ -1855,11 +2031,13 @@
               </div>
             </div>
 
+            <div class="cd-blockquote tr-anim">"My first instinct was to design for full lesson complexity—every branching path, every edge case a teacher might want. With a 12-hour runway to developer handoff and 104 hours per lesson to fix, that scope was unbuildable. I cut it back to a structured, step-by-step flow system instead—less flexible on paper, but the only version that could actually ship and scale."</div>
+
             <div class="tr-item tr-anim">
               <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
               <div class="tr-item-content">
                 <p class="tr-mixed">Extreme production time vs need for scale</p>
-                <p class="tr-item-desc">Creating a single lesson took ~110 hours end-to-end—making it impossible to scale. To support real classrooms, this needed to be reduced to &lt;5 hours per lesson—without compromising pedagogy.</p>
+                <p class="tr-item-desc">Creating a single lesson took 104 hours end-to-end—making it impossible to scale. To support real classrooms, this needed to be reduced to &lt;5 hours per lesson—without compromising pedagogy.</p>
                 <p class="cd-insight">→ <span class="cd-hl">Design for speed</span> without breaking instructional quality</p>
               </div>
             </div>
@@ -1868,7 +2046,7 @@
               <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
               <div class="tr-item-content">
                 <p class="tr-mixed">Aggressive timeline driven by real demand</p>
-                <p class="tr-item-desc">Early prototypes generated strong interest from schools, creating immediate demand to support real curriculum. For V0, we had ~12 hours from initial collaborative sketching to developer handoff.</p>
+                <p class="tr-item-desc">Early prototypes generated strong interest from schools, creating immediate demand to support real curriculum. For V0, we had ~12 hours from my initial sketching to developer handoff.</p>
                 <p class="cd-insight">→ <span class="cd-hl">Focus on what must work,</span> not everything that could</p>
               </div>
             </div>
@@ -1917,7 +2095,7 @@
               </div>
               <div class="tr-top-text">
                 <p class="tr-label">Design Approach</p>
-                <p class="tr-desc">Given these constraints, the goal was to design a system that could scale lesson creation from ~110 hrs → &lt;5 hrs, without compromising pedagogy or increasing complexity.</p>
+                <p class="tr-desc">Given these constraints, the goal was to design a system that could scale lesson creation from 104 hrs → &lt;5 hrs, without compromising pedagogy or increasing complexity.</p>
               </div>
             </div>
 
@@ -1995,13 +2173,13 @@
             <div class="oc-grid tr-anim">
               <div class="oc-metric">
                 <p class="oc-metric-label">Lesson creation time</p>
-                <span class="oc-metric-value">~110 hrs → ~4 hrs</span>
+                <span class="oc-metric-value">104 hrs → 4 hrs</span>
                 <p class="oc-metric-body">Most of the time previously spent building lessons was eliminated—shifting effort from manual creation to refining instruction.</p>
               </div>
               <div class="oc-metric">
                 <p class="oc-metric-label">Content production at scale</p>
-                <span class="oc-metric-value">~700 lessons in ~3,128 hours</span>
-                <p class="oc-metric-body">What was previously infeasible became repeatable—validating the system&apos;s ability to scale content creation in real conditions.</p>
+                <span class="oc-metric-value">~700 lessons, ~4.5 hrs avg</span>
+                <p class="oc-metric-body">~3,128 hours across ~700 lessons—what was previously infeasible became repeatable, validating the system&apos;s ability to scale content creation in real conditions.</p>
               </div>
               <div class="oc-metric">
                 <p class="oc-metric-label">Control over pedagogy</p>
@@ -2012,6 +2190,11 @@
                 <p class="oc-metric-label">System flexibility</p>
                 <span class="oc-metric-value">Subject-agnostic by design</span>
                 <p class="oc-metric-body">Validated across pilots in English and Physics—proving the system can scale beyond math without redesigning workflows.</p>
+              </div>
+              <div class="oc-metric">
+                <p class="oc-metric-label">Time to onboard</p>
+                <span class="oc-metric-value">&lt;2 hours</span>
+                <p class="oc-metric-body">New content designers went from first login to publishing a lesson in under 2 hours, vs. 40–50 hours on the old fragmented tools.</p>
               </div>
             </div>
 
@@ -2234,15 +2417,17 @@
   const csHeading  = document.getElementById('csHeading');
   const csSubtitle = document.getElementById('csSubtitle');
   const desigRow   = document.getElementById('desigRow');
+  const heroVisual = document.getElementById('chvVideoFrame');
   const carouselSec = document.getElementById('csCarouselSection');
 
   splitWords(csHeading);
   const allWords = csHeading.querySelectorAll('.word');
 
-  // Stagger: pills → words → subtitle → carousel
-  setTimeout(() => desigRow.classList.add('visible'), 80);
-  allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 260 + i * 52));
-  const afterWords = 260 + allWords.length * 52 + 60;
+  // Stagger: hero visual → pills → words → subtitle → carousel
+  setTimeout(() => heroVisual.classList.add('visible'), 80);
+  setTimeout(() => desigRow.classList.add('visible'), 420);
+  allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 600 + i * 52));
+  const afterWords = 600 + allWords.length * 52 + 60;
   setTimeout(() => csSubtitle.classList.add('visible'),  afterWords);
   setTimeout(() => carouselSec.classList.add('visible'), afterWords + 280);
 
@@ -2424,6 +2609,21 @@
   /* Initial render */
   render(false);
 
+  /* Counts a .tc-counter element up from 0 to its data-target over ~900ms */
+  function animateCounter(el) {
+    const target = parseFloat(el.dataset.target);
+    const dur = 900;
+    const start = performance.now();
+    function step(now) {
+      const p = Math.min(1, (now - start) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased);
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(step);
+  }
+
   /* ═══════════════════════════════════════════════════════════
      SECTION ENTRANCE ANIMATIONS (staggered fade + rise)
   ═══════════════════════════════════════════════════════════ */
@@ -2464,6 +2664,17 @@
       el.querySelectorAll('.oc-metric-value').forEach((v, i) => {
         setTimeout(() => v.classList.add('revealed'), 300 + i * 150);
       });
+
+      // Old-vs-new tools comparison: stagger chips in, then count up both numbers
+      const toolsCompareEl = el.classList.contains('tools-compare') ? el : el.querySelector('.tools-compare');
+      if (toolsCompareEl) {
+        const tools = toolsCompareEl.querySelectorAll('.tc-tool');
+        tools.forEach((t, i) => setTimeout(() => t.classList.add('visible'), 150 + i * 160));
+        const afterTools = 150 + tools.length * 160 + 150;
+        toolsCompareEl.querySelectorAll('.tc-counter').forEach(counter => {
+          setTimeout(() => animateCounter(counter), afterTools);
+        });
+      }
 
       childObs.unobserve(el);
     });
