@@ -6226,10 +6226,15 @@
     /* ── Bar EXIT (reverse entrance) ───────────────────────────
        collapse: bar → circle (row slides back out to the right, width shrinks);
        drop: the circle falls + fades down to the bottom (reverse of the shoot). */
+    @keyframes cb-radius-morph-out {
+      0%   { border-radius: 32px; }   /* pill */
+      20%  { border-radius: 12px; }   /* corners flatten → squarish */
+      80%  { border-radius: 32px; }   /* rounding back up */
+      100% { border-radius: 50%; }    /* full circle */
+    }
     .cb.cb-collapsing {
-      transition:
-        width         0.5s cubic-bezier(0.5, 0, 0.75, 0),
-        border-radius 0.5s cubic-bezier(0.5, 0, 0.75, 0);
+      animation: cb-radius-morph-out 0.5s ease both;
+      transition: width 0.5s cubic-bezier(0.5, 0, 0.75, 0);
     }
     @keyframes cb-drop {
       from { opacity: 1; transform: translateY(0) scale(1); }
