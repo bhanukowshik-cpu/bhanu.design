@@ -164,14 +164,14 @@
     .page {
       display: flex;
       justify-content: center;
-      padding: 94px 40px 90px;
+      padding: 94px 10% 90px;
     }
 
     /* ─── CARD — same as portfolio ───────────────────────────── */
     .card {
       background: var(--white);
       width: 100%;
-      max-width: 1200px;
+      max-width: 1920px;
       border-radius: 30px;
       box-shadow: 0 0 20px rgba(0,0,0,0.05);
       overflow: hidden;
@@ -218,7 +218,7 @@
       letter-spacing: -0.8px;
       color: var(--secondary);
     }
-    /* Italic part — "100+ hours to 4." */
+    /* Italic part — "104 hours to 4." */
     .cs-heading em {
       font-style: italic;
       font-weight: 600;
@@ -255,6 +255,68 @@
     @keyframes fade-in {
       from { opacity: 0; }
       to   { opacity: 1; }
+    }
+
+    /* ─── FULL-BLEED HERO VISUAL ─────────────────────────────── */
+    .cs-hero-visual {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      overflow: hidden;
+      background: #0a2a14;
+    }
+    .chv-bg-pan {
+      position: absolute;
+      inset: -4%;
+      background:
+        radial-gradient(ellipse 140% 120% at 50% bottom,
+          #20f567 0%, #00d050 10%, #00a838 22%,
+          #005c1e 38%, #002410 55%, transparent 73%),
+        linear-gradient(to top, #001a08 0%, #000603 40%, #000000 65%),
+        #000000;
+      animation: chv-pan 22s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+    @keyframes chv-pan {
+      0%   { transform: scale(1.04) translate(0, 0); }
+      100% { transform: scale(1.1) translate(0, -1.5%); }
+    }
+    .chv-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.45) 100%);
+      pointer-events: none;
+    }
+    .chv-video-frame {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 62%;
+      max-width: 720px;
+      border-radius: 17px;
+      overflow: hidden;
+      box-shadow: 0px 20px 60px rgba(0,0,0,0.35);
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.82);
+      transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+    }
+    .chv-video-frame.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .chv-video-frame video {
+      width: 100%;
+      height: auto;
+      display: block;
+      pointer-events: none;
+    }
+    @media (max-width: 1023px) {
+      .cs-hero-visual { height: 380px; }
+      .chv-video-frame { width: 76%; }
+    }
+    @media (max-width: 767px) {
+      .cs-hero-visual { height: 260px; }
+      .chv-video-frame { width: 88%; border-radius: 12px; }
     }
 
     /* ─── CAROUSEL SECTION ───────────────────────────────────── */
@@ -661,13 +723,11 @@
     .mobile-menu a.active { font-weight: 700; }
 
 
-    @media (min-width: 1600px) { .card { max-width: 1400px; } }
-    @media (min-width: 1440px) { .card { max-width: 1300px; } }
 
     /* ── Tablet: 768px – 1023px ──────────────────────────────── */
     @media (max-width: 1023px) {
       .nav                  { padding: 8px 24px; }
-      .page                 { padding: 74px 20px 60px; }
+      .page                 { padding: 74px 10% 70px; }
       .cs-hero              { padding: 28px 24px 36px; gap: 16px; }
       .cs-heading           { font-size: 26px; }
       .cs-subtitle          { font-size: 20px; line-height: 40px; }
@@ -701,7 +761,7 @@
       .nav-sections { display: none; }
       .nav-hamburger { display: flex; }
 
-      .page                 { padding: 60px 10px 50px; }
+      .page                 { padding: 60px 5% 56px; }
       .card                 { border-radius: 16px; }
 
       /* Hero */
@@ -909,6 +969,82 @@
       font-size: 12px;
       line-height: 25px;
       color: rgba(147,147,147,0.6);
+    }
+
+    /* ─── OLD vs NEW WORKFLOW COMPARISON ─────────────────────── */
+    .tools-compare {
+      display: flex;
+      align-items: stretch;
+      gap: 20px;
+    }
+    .tc-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid #efefef;
+      border-radius: 14px;
+      padding: 20px;
+      background: #FAFAFA;
+      min-width: 0;
+    }
+    .tc-new { background: rgba(230,242,141,0.18); border-color: rgba(230,242,141,0.6); }
+    .tc-panel-label {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 13px;
+      color: #515151;
+    }
+    .tc-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .tc-tool {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: #fff;
+      border: 1px solid #efefef;
+      color: var(--secondary);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .tc-tool.visible { opacity: 1; transform: translateY(0); }
+    .tc-tool-studio { background: #E6F28D; border-color: #E6F28D; font-weight: 600; }
+    .tc-tool-plus { font-family: var(--font-mono); color: #999; font-size: 13px; }
+    .tc-counter-row {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 34px;
+      color: var(--secondary);
+      line-height: 1;
+    }
+    .tc-tilde { opacity: 0.6; font-weight: 500; }
+    .tc-unit { font-size: 18px; font-weight: 600; color: #515151; }
+    .tc-sub {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 20px;
+      color: #515151;
+    }
+    .tc-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #999;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .tc-panel { background: #222222; border-color: #3A3A3A; }
+    [data-theme="dark"] .tc-new { background: rgba(230,242,141,0.06); border-color: rgba(230,242,141,0.25); }
+    [data-theme="dark"] .tc-tool { background: #1A1A1A; border-color: #3A3A3A; color: #F0EDE8; }
+    [data-theme="dark"] .tc-tool-studio { background: #E6F28D; border-color: #E6F28D; color: #252525; }
+    [data-theme="dark"] .tc-panel-label,
+    [data-theme="dark"] .tc-sub,
+    [data-theme="dark"] .tc-unit { color: #999999; }
+    @media (max-width: 767px) {
+      .tools-compare { flex-direction: column; }
+      .tc-arrow { transform: rotate(90deg); padding: 4px 0; }
+      .tc-counter-row { font-size: 26px; }
     }
 
     @media (max-width: 900px) {
@@ -1404,6 +1540,147 @@
       .other-projects-grid { grid-template-columns: 1fr; }
       .op-card-img { height: 200px; }
     }
+    /* ─── DARK MODE TOKENS ───────────────────────────────────── */
+    [data-theme="dark"] {
+      --secondary:  #F0EDE8;
+      --bg:         #1A1A1A;
+      --white:      #0C0C0C;
+      --grey:       #999999;
+      --border:     #3A3A3A;
+    }
+    [data-theme="dark"] body {
+      background-image: radial-gradient(circle, rgba(255,255,255,0.15) 0.8px, transparent 0.8px);
+    }
+    [data-theme="dark"] .nav-home img { filter: invert(1); }
+    [data-theme="dark"] .nav {
+      background: rgba(26,26,26,0.92);
+      box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.06);
+    }
+    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #2C2C2C; }
+    [data-theme="dark"] .desig-pill { background: rgba(44,44,44,0.95); }
+    [data-theme="dark"] #dragLabel { background: #F0EDE8; color: #252525; }
+    /* ── carousel ── */
+    [data-theme="dark"] .fan-card { background: #1E1E1E; }
+    [data-theme="dark"] .fan-card img { background: #1E1E1E; }
+    [data-theme="dark"] .carousel-caption { color: #999999; }
+    /* ── all main card containers ── */
+    [data-theme="dark"] .tr-card,
+    [data-theme="dark"] .imp-card,
+    [data-theme="dark"] .ug-card,
+    [data-theme="dark"] .oc-card { background: #1A1A1A; border-color: #3A3A3A; box-shadow: none; }
+    /* ── sweep highlights — keep text dark so lime/pink bg stays readable ── */
+    [data-theme="dark"] .tr-highlight,
+    [data-theme="dark"] .imp-hl,
+    [data-theme="dark"] .cd-hl,
+    [data-theme="dark"] .oc-metric-value,
+    [data-theme="dark"] .ug-tag-pain,
+    [data-theme="dark"] .ug-tag-gain { color: #252525; }
+    /* ── team & role section ── */
+    [data-theme="dark"] .tr-image-frame { background: #2C2C2C; }
+    [data-theme="dark"] .tr-bullet { background: #F0EDE8; }
+    [data-theme="dark"] .tr-items-connected::before { background: rgba(240,237,232,0.14); }
+    [data-theme="dark"] .tr-label,
+    [data-theme="dark"] .tr-item-desc,
+    [data-theme="dark"] .tr-mixed,
+    [data-theme="dark"] .tr-mixed-mono { color: #999999; }
+    [data-theme="dark"] .tr-next .tr-next-text { color: #999999; }
+    /* ── impact section ── */
+    [data-theme="dark"] .imp-image-frame { background: #2C2C2C; }
+    [data-theme="dark"] .imp-label,
+    [data-theme="dark"] .imp-num,
+    [data-theme="dark"] .imp-body,
+    [data-theme="dark"] .imp-footnote { color: #999999; }
+    /* ── users & goals section ── */
+    [data-theme="dark"] .ug-image-frame { background: #2C2C2C; }
+    [data-theme="dark"] .ug-label,
+    [data-theme="dark"] .ug-role-label,
+    [data-theme="dark"] .ug-body { color: #999999; }
+    /* ── constraints & design section ── */
+    [data-theme="dark"] .cd-image-frame { background: #2C2C2C; }
+    [data-theme="dark"] .cd-blockquote { background: #252525; color: #999999; }
+    [data-theme="dark"] .cd-insight { color: #999999; }
+    /* ── outcomes section ── */
+    [data-theme="dark"] .oc-image-frame { background: #2C2C2C; }
+    [data-theme="dark"] .oc-label,
+    [data-theme="dark"] .oc-metric-label,
+    [data-theme="dark"] .oc-metric-body,
+    [data-theme="dark"] .oc-section-title,
+    [data-theme="dark"] .oc-author-role,
+    [data-theme="dark"] .oc-quote { color: #999999; }
+    [data-theme="dark"] .oc-testimonial { background: #222222; border-color: #3A3A3A; }
+    /* ── section labels shared ── */
+    [data-theme="dark"] .section-label { color: #999999; }
+    [data-theme="dark"] .other-projects { border-top-color: rgba(240,237,232,0.08); }
+    [data-theme="dark"] .other-projects-label { color: #666; }
+    /* ── other projects cards ── */
+    [data-theme="dark"] .op-card { background: #1E1E1E; border-color: rgba(240,237,232,0.1); }
+    [data-theme="dark"] .op-card-img { background: #2C2C2C; }
+    [data-theme="dark"] .op-card-tag { background: #2C2C2C; color: #888; }
+    [data-theme="dark"] .op-card-title { color: #F0EDE8; }
+    [data-theme="dark"] .op-card-desc { color: #999999; }
+    [data-theme="dark"] .op-card-cta { background: #F0EDE8; color: #252525; }
+    /* ─── THEME TOGGLE BUTTON ────────────────────────────────── */
+    .theme-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer !important; flex-shrink: 0; border-radius: 100px; transition: transform 0.15s ease; }
+    .theme-toggle:active { transform: scale(0.93); }
+    .tt-track { position: relative; width: 58px; height: 30px; border-radius: 100px; background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border: 1.5px solid rgba(255,255,255,0.40); flex-shrink: 0; overflow: hidden; transition: background 0.5s ease, border-color 0.4s ease; }
+    .tt-track::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 50%; border-radius: 100px 100px 50% 50%; background: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 100%); pointer-events: none; z-index: 10; }
+    .tt-hill-back { position: absolute; bottom: 0; left: -5%; width: 75%; height: 13px; background: #72B87A; border-radius: 50% 60% 0 0; z-index: 1; transition: background 0.5s ease; }
+    .tt-hill-front { position: absolute; bottom: 0; right: -8%; width: 62%; height: 11px; background: #5DA066; border-radius: 60% 50% 0 0; z-index: 2; transition: background 0.5s ease; }
+    .tt-star { position: absolute; background: rgba(255,255,255,0.90); border-radius: 50%; opacity: 0; transition: opacity 0.4s ease; z-index: 1; }
+    .tt-star-1 { width: 2.5px; height: 2.5px; top: 5px; left: 8px; }
+    .tt-star-2 { width: 2px; height: 2px; top: 11px; left: 18px; }
+    .tt-star-3 { width: 2px; height: 2px; top: 6px; left: 27px; }
+    .tt-star-4 { width: 1.5px; height: 1.5px; top: 13px; left: 11px; }
+    [data-theme="dark"] .tt-star { opacity: 1; }
+    @keyframes tt-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.12; } }
+    [data-theme="dark"] .tt-star-1 { animation: tt-twinkle 2.1s ease-in-out infinite; }
+    [data-theme="dark"] .tt-star-2 { animation: tt-twinkle 1.7s ease-in-out 0.8s infinite; }
+    [data-theme="dark"] .tt-star-3 { animation: tt-twinkle 2.5s ease-in-out 1.5s infinite; }
+    [data-theme="dark"] .tt-star-4 { animation: tt-twinkle 1.9s ease-in-out 0.4s infinite; }
+    .tt-shoot { position: absolute; top: 3px; left: 4px; width: 9px; height: 1px; background: linear-gradient(to right, transparent, #FFE87A); border-radius: 1px; opacity: 0; transform: rotate(35deg); z-index: 2; pointer-events: none; }
+    @keyframes tt-shooting-star { 0% { opacity: 0; transform: translate(0,0) rotate(35deg); } 3% { opacity: 0.85; } 15% { opacity: 0; transform: translate(20px,8px) rotate(35deg); } 100% { opacity: 0; transform: translate(20px,8px) rotate(35deg); } }
+    [data-theme="dark"] .tt-shoot { animation: tt-shooting-star 5s ease-in 2s infinite; }
+    .tt-cloud { position: absolute; right: 9px; top: 6px; width: 15px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 10px; opacity: 1; transition: opacity 0.4s ease; z-index: 1; }
+    .tt-cloud::before { content: ''; position: absolute; width: 9px; height: 9px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -5px; left: 2px; }
+    .tt-cloud::after { content: ''; position: absolute; width: 7px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -4px; left: 7px; }
+    [data-theme="dark"] .tt-cloud { opacity: 0; }
+    @keyframes tt-cloud-drift { from { transform: translateX(30px); } to { transform: translateX(-85px); } }
+    [data-theme="light"] .tt-cloud { animation: tt-cloud-drift 26s linear 0s infinite backwards; }
+    .tt-cloud-b { position: absolute; right: 3px; top: 11px; width: 9px; height: 4px; background: rgba(255,255,255,0.95); border-radius: 8px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
+    .tt-cloud-b::before { content: ''; position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 1px; }
+    .tt-cloud-b::after { content: ''; position: absolute; width: 5px; height: 5px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 4px; }
+    [data-theme="dark"] .tt-cloud-b { opacity: 0; }
+    [data-theme="light"] .tt-cloud-b { opacity: 0.65; animation: tt-cloud-drift 18s linear 4s infinite backwards; }
+    .tt-cloud-c { position: absolute; right: 18px; top: 4px; width: 11px; height: 5px; background: rgba(255,255,255,0.95); border-radius: 8px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
+    .tt-cloud-c::before { content: ''; position: absolute; width: 7px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -4px; left: 1px; }
+    .tt-cloud-c::after { content: ''; position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 5px; }
+    [data-theme="dark"] .tt-cloud-c { opacity: 0; }
+    [data-theme="light"] .tt-cloud-c { opacity: 0.45; animation: tt-cloud-drift 22s linear 10s infinite backwards; }
+    .tt-thumb { position: absolute; top: 50%; left: 3px; width: 22px; height: 22px; border-radius: 50%; z-index: 3; transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); box-shadow: 0 2px 4px rgba(0,0,0,0.28); }
+    .tt-thumb::before, .tt-thumb::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.75); opacity: 0; transition: opacity 0.4s ease; }
+    .tt-thumb::before { width: 7px; height: 7px; top: 4px; left: 5px; }
+    .tt-thumb::after  { width: 5px; height: 5px; top: 13px; left: 14px; }
+    [data-theme="dark"] .tt-thumb::before, [data-theme="dark"] .tt-thumb::after { opacity: 1; }
+    [data-theme="light"] .tt-track { background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border-color: rgba(255,255,255,0.40); }
+    [data-theme="light"] .tt-hill-back { background: #72B87A; }
+    [data-theme="light"] .tt-hill-front { background: #5DA066; }
+    [data-theme="light"] .tt-thumb { transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); }
+    [data-theme="light"] .tt-star { opacity: 0; }
+    [data-theme="light"] .tt-cloud { opacity: 1; }
+    [data-theme="light"] .tt-thumb::before, [data-theme="light"] .tt-thumb::after { opacity: 0; }
+    [data-theme="dark"] .tt-track { background: linear-gradient(180deg, #0B1829 0%, #152238 100%); border-color: rgba(255,255,255,0.10); }
+    [data-theme="dark"] .tt-track::after { background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%); }
+    [data-theme="dark"] .tt-hill-back { background: #1D3D25; }
+    [data-theme="dark"] .tt-hill-front { background: #152C1A; }
+    [data-theme="dark"] .tt-thumb { transform: translateX(28px) translateY(-50%); background: #EEF0F5; }
+    [data-theme="dark"] .tt-star { opacity: 1; }
+    [data-theme="dark"] .tt-cloud { opacity: 0; }
+    /* ─── SMOOTH THEME TRANSITION ────────────────────────────── */
+    html.color-transitioning * { transition-property: background, background-color, color, border-color, opacity !important; transition-duration: 0.5s !important; transition-timing-function: ease !important; }
+    html.color-transitioning .tt-track { transition: background 0.5s ease, border-color 0.4s ease !important; }
+    html.color-transitioning .tt-hill-back, html.color-transitioning .tt-hill-front { transition: background 0.5s ease !important; }
+    html.color-transitioning .tt-star, html.color-transitioning .tt-cloud { transition: opacity 0.4s ease !important; }
+    html.color-transitioning .tt-thumb { transition: transform 0.44s cubic-bezier(0.34,1.56,0.64,1), background 0.5s ease !important; }
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
@@ -1436,6 +1713,21 @@
       <a href="#design"      class="nav-btn"         data-section="design">Design Approach</a>
       <a href="#outcomes"    class="nav-btn"         data-section="outcomes">OUTCOMES</a>
     </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+      <span class="tt-track">
+        <span class="tt-star tt-star-1"></span>
+        <span class="tt-star tt-star-2"></span>
+        <span class="tt-star tt-star-3"></span>
+        <span class="tt-star tt-star-4"></span>
+        <span class="tt-shoot"></span>
+        <span class="tt-cloud"></span>
+        <span class="tt-cloud-b"></span>
+        <span class="tt-cloud-c"></span>
+        <span class="tt-hill-back"></span>
+        <span class="tt-hill-front"></span>
+        <span class="tt-thumb"></span>
+      </span>
+    </button>
     <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -1459,17 +1751,28 @@
 
       <section id="overview">
 
+        <!-- ── Full-bleed hero visual: card graphic backdrop + video ── -->
+        <div class="cs-hero-visual" id="csHeroVisual">
+          <div class="chv-bg-pan"></div>
+          <div class="chv-scrim"></div>
+          <div class="chv-video-frame" id="chvVideoFrame">
+            <video autoplay muted loop playsinline preload="auto">
+              <source src="Projects videos/ET Studio Case study.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+
         <!-- ── Frame 1: Hero Section and Designation Frame ── -->
         <div class="cs-hero">
           <div class="designation-row" id="desigRow">
             <span class="desig-pill">Lead Product Designer</span>
             <span class="desig-pill">Lead Curriculum Designer</span>
-            <span class="desig-pill"><span class="status-dot"></span>2025 - Present</span>
+            <span class="desig-pill"><span class="status-dot"></span>2025 - Mid 2026</span>
           </div>
 
           <!-- Word-by-word animated heading -->
           <div class="cs-heading" id="csHeading">
-            Architected a system that reduced lesson creation from <em>100+ hours to 4 hours</em>
+            Built the content creation tool that cut lesson production from <em>104 hours to 4</em>
           </div>
 
           <!-- Subtitle (Montserrat Bold 25px per Figma) -->
@@ -1512,7 +1815,7 @@
                   <span class="tr-highlight" id="trHighlight">Lead Product &amp; Curriculum Designer (Me)</span>
                   <img class="tr-avatar" src="photo.jpg" alt="Bhanu" />
                 </div>
-                <p class="tr-mixed-mono">Defined the core system architecture and end-to-end product experience, and validated it by creating real lessons used in production.</p>
+                <p class="tr-mixed-mono">Defined the core system architecture and end-to-end product experience, and validated it by creating real lessons used in production. Designed the full V0 system solo, overnight, in ~6 hours—then spent the rest of the runway to developer handoff incorporating feedback and documenting flows.</p>
               </div>
             </div>
 
@@ -1552,7 +1855,32 @@
                 </div>
                 <div class="imp-header-text">
                   <p class="imp-label">IMPACT</p>
-                  <p class="imp-desc">Reduced lesson creation from ~100+ hours to 4, enabling rapid content production and giving educators direct control over how the AI Tutor teaches.</p>
+                  <p class="imp-desc">Reduced lesson creation from 104 hours to 4, enabling rapid content production and giving educators direct control over how the AI Tutor teaches.</p>
+                </div>
+              </div>
+
+              <!-- Old workflow vs new workflow comparison -->
+              <div class="tools-compare tr-anim" id="toolsCompare">
+                <div class="tc-panel tc-old">
+                  <p class="tc-panel-label">Old workflow — 3 disconnected tools</p>
+                  <div class="tc-tools">
+                    <span class="tc-tool">Slides.com</span>
+                    <span class="tc-tool-plus">+</span>
+                    <span class="tc-tool">Mermaid</span>
+                    <span class="tc-tool-plus">+</span>
+                    <span class="tc-tool">Canva</span>
+                  </div>
+                  <p class="tc-counter-row"><span class="tc-counter" data-target="104">0</span><span class="tc-unit"> hrs</span></p>
+                  <p class="tc-sub">per lesson—switching tools, rebuilding by hand, no shared source of truth</p>
+                </div>
+                <div class="tc-arrow">→</div>
+                <div class="tc-panel tc-new">
+                  <p class="tc-panel-label">New workflow — one unified tool</p>
+                  <div class="tc-tools">
+                    <span class="tc-tool tc-tool-studio">Studio</span>
+                  </div>
+                  <p class="tc-counter-row"><span class="tc-counter" data-target="4">0</span><span class="tc-unit"> hrs</span></p>
+                  <p class="tc-sub">create, structure &amp; publish a lesson in one place</p>
                 </div>
               </div>
 
@@ -1566,15 +1894,15 @@
                       <span class="imp-hl">96% faster</span>
                       <span class="imp-title-plain">lesson creation</span>
                     </div>
-                    <p class="imp-body">Reduced creation time from ~100 hours to ~4 hours by replacing fragmented tools with a single, structured system.</p>
+                    <p class="imp-body">Reduced creation time from 104 hours to 4 hours by replacing fragmented tools with a single, structured system.</p>
                   </div>
                   <div class="imp-metric">
                     <p class="imp-num">02</p>
                     <div class="imp-title">
-                      <span class="imp-hl">95% faster</span>
-                      <span class="imp-title-plain">onboarding</span>
+                      <span class="imp-hl">&lt;2 hours</span>
+                      <span class="imp-title-plain">to onboard</span>
                     </div>
-                    <p class="imp-body">Content designers ramped in ~2 hours vs 40–50 hours, enabled by familiar, low-friction interactions.</p>
+                    <p class="imp-body">Content designers ramped in under 2 hours vs 40–50 hours, enabled by familiar, low-friction interactions.</p>
                     <p class="imp-footnote">Calculated first creation to publish time</p>
                   </div>
                   <div class="imp-metric">
@@ -1703,11 +2031,13 @@
               </div>
             </div>
 
+            <div class="cd-blockquote tr-anim">"My first instinct was to design for full lesson complexity—every branching path, every edge case a teacher might want. With a 12-hour runway to developer handoff and 104 hours per lesson to fix, that scope was unbuildable. I cut it back to a structured, step-by-step flow system instead—less flexible on paper, but the only version that could actually ship and scale."</div>
+
             <div class="tr-item tr-anim">
               <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
               <div class="tr-item-content">
                 <p class="tr-mixed">Extreme production time vs need for scale</p>
-                <p class="tr-item-desc">Creating a single lesson took ~110 hours end-to-end—making it impossible to scale. To support real classrooms, this needed to be reduced to &lt;5 hours per lesson—without compromising pedagogy.</p>
+                <p class="tr-item-desc">Creating a single lesson took 104 hours end-to-end—making it impossible to scale. To support real classrooms, this needed to be reduced to &lt;5 hours per lesson—without compromising pedagogy.</p>
                 <p class="cd-insight">→ <span class="cd-hl">Design for speed</span> without breaking instructional quality</p>
               </div>
             </div>
@@ -1716,7 +2046,7 @@
               <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
               <div class="tr-item-content">
                 <p class="tr-mixed">Aggressive timeline driven by real demand</p>
-                <p class="tr-item-desc">Early prototypes generated strong interest from schools, creating immediate demand to support real curriculum. For V0, we had ~12 hours from initial collaborative sketching to developer handoff.</p>
+                <p class="tr-item-desc">Early prototypes generated strong interest from schools, creating immediate demand to support real curriculum. For V0, we had ~12 hours from my initial sketching to developer handoff.</p>
                 <p class="cd-insight">→ <span class="cd-hl">Focus on what must work,</span> not everything that could</p>
               </div>
             </div>
@@ -1765,7 +2095,7 @@
               </div>
               <div class="tr-top-text">
                 <p class="tr-label">Design Approach</p>
-                <p class="tr-desc">Given these constraints, the goal was to design a system that could scale lesson creation from ~110 hrs → &lt;5 hrs, without compromising pedagogy or increasing complexity.</p>
+                <p class="tr-desc">Given these constraints, the goal was to design a system that could scale lesson creation from 104 hrs → &lt;5 hrs, without compromising pedagogy or increasing complexity.</p>
               </div>
             </div>
 
@@ -1843,13 +2173,13 @@
             <div class="oc-grid tr-anim">
               <div class="oc-metric">
                 <p class="oc-metric-label">Lesson creation time</p>
-                <span class="oc-metric-value">~110 hrs → ~4 hrs</span>
+                <span class="oc-metric-value">104 hrs → 4 hrs</span>
                 <p class="oc-metric-body">Most of the time previously spent building lessons was eliminated—shifting effort from manual creation to refining instruction.</p>
               </div>
               <div class="oc-metric">
                 <p class="oc-metric-label">Content production at scale</p>
-                <span class="oc-metric-value">~700 lessons in ~3,128 hours</span>
-                <p class="oc-metric-body">What was previously infeasible became repeatable—validating the system&apos;s ability to scale content creation in real conditions.</p>
+                <span class="oc-metric-value">~700 lessons, ~4.5 hrs avg</span>
+                <p class="oc-metric-body">~3,128 hours across ~700 lessons—what was previously infeasible became repeatable, validating the system&apos;s ability to scale content creation in real conditions.</p>
               </div>
               <div class="oc-metric">
                 <p class="oc-metric-label">Control over pedagogy</p>
@@ -1860,6 +2190,11 @@
                 <p class="oc-metric-label">System flexibility</p>
                 <span class="oc-metric-value">Subject-agnostic by design</span>
                 <p class="oc-metric-body">Validated across pilots in English and Physics—proving the system can scale beyond math without redesigning workflows.</p>
+              </div>
+              <div class="oc-metric">
+                <p class="oc-metric-label">Time to onboard</p>
+                <span class="oc-metric-value">&lt;2 hours</span>
+                <p class="oc-metric-body">New content designers went from first login to publishing a lesson in under 2 hours, vs. 40–50 hours on the old fragmented tools.</p>
               </div>
             </div>
 
@@ -2082,15 +2417,17 @@
   const csHeading  = document.getElementById('csHeading');
   const csSubtitle = document.getElementById('csSubtitle');
   const desigRow   = document.getElementById('desigRow');
+  const heroVisual = document.getElementById('chvVideoFrame');
   const carouselSec = document.getElementById('csCarouselSection');
 
   splitWords(csHeading);
   const allWords = csHeading.querySelectorAll('.word');
 
-  // Stagger: pills → words → subtitle → carousel
-  setTimeout(() => desigRow.classList.add('visible'), 80);
-  allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 260 + i * 52));
-  const afterWords = 260 + allWords.length * 52 + 60;
+  // Stagger: hero visual → pills → words → subtitle → carousel
+  setTimeout(() => heroVisual.classList.add('visible'), 80);
+  setTimeout(() => desigRow.classList.add('visible'), 420);
+  allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 600 + i * 52));
+  const afterWords = 600 + allWords.length * 52 + 60;
   setTimeout(() => csSubtitle.classList.add('visible'),  afterWords);
   setTimeout(() => carouselSec.classList.add('visible'), afterWords + 280);
 
@@ -2272,6 +2609,21 @@
   /* Initial render */
   render(false);
 
+  /* Counts a .tc-counter element up from 0 to its data-target over ~900ms */
+  function animateCounter(el) {
+    const target = parseFloat(el.dataset.target);
+    const dur = 900;
+    const start = performance.now();
+    function step(now) {
+      const p = Math.min(1, (now - start) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased);
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(step);
+  }
+
   /* ═══════════════════════════════════════════════════════════
      SECTION ENTRANCE ANIMATIONS (staggered fade + rise)
   ═══════════════════════════════════════════════════════════ */
@@ -2312,6 +2664,17 @@
       el.querySelectorAll('.oc-metric-value').forEach((v, i) => {
         setTimeout(() => v.classList.add('revealed'), 300 + i * 150);
       });
+
+      // Old-vs-new tools comparison: stagger chips in, then count up both numbers
+      const toolsCompareEl = el.classList.contains('tools-compare') ? el : el.querySelector('.tools-compare');
+      if (toolsCompareEl) {
+        const tools = toolsCompareEl.querySelectorAll('.tc-tool');
+        tools.forEach((t, i) => setTimeout(() => t.classList.add('visible'), 150 + i * 160));
+        const afterTools = 150 + tools.length * 160 + 150;
+        toolsCompareEl.querySelectorAll('.tc-counter').forEach(counter => {
+          setTimeout(() => animateCounter(counter), afterTools);
+        });
+      }
 
       childObs.unobserve(el);
     });
@@ -2378,31 +2741,6 @@
      NAV AUTO-HIDE — hides on scroll-down, reappears on any scroll-up
   ═══════════════════════════════════════════════════════════ */
   const nav = document.querySelector('.nav');
-  let lastY = window.scrollY;
-  let upwardAccum = 0; // accumulated upward scroll distance
-
-  window.addEventListener('scroll', () => {
-    const currentY = window.scrollY;
-    const delta    = currentY - lastY;
-
-    // Ignore tiny jitter (< 4px)
-    if (Math.abs(delta) < 4) { lastY = currentY; return; }
-
-    if (delta > 0 && currentY > 60) {
-      // Scrolling down past the hero → hide & reset upward accumulator
-      nav.classList.add('nav-hidden');
-      upwardAccum = 0;
-    } else if (delta < 0) {
-      // Accumulate upward scroll; only reveal after 50% of viewport scrolled up
-      upwardAccum += Math.abs(delta);
-      if (upwardAccum >= window.innerHeight * 0.5) {
-        nav.classList.remove('nav-hidden');
-        upwardAccum = 0;
-      }
-    }
-
-    lastY = currentY;
-  }, { passive: true });
 
   /* ═══════════════════════════════════════════════════════════
      NAV SCROLL SPY
@@ -2499,6 +2837,74 @@
     });
   }, { threshold: 0.4 });
   document.querySelectorAll('section[id]').forEach(s => spyObs.observe(s));
+  </script>
+
+  <script>
+  /* ── Dark / Light mode toggle ──────────────────────────────── */
+  (function() {
+    var root = document.documentElement;
+    var btn  = document.getElementById('themeToggle');
+    var KEY  = 'portfolio-theme';
+
+    function animateToggleScene(toDark) {
+      var track     = document.querySelector('.tt-track');
+      var thumb     = document.querySelector('.tt-thumb');
+      var hillBack  = document.querySelector('.tt-hill-back');
+      var hillFront = document.querySelector('.tt-hill-front');
+      var stars     = document.querySelectorAll('.tt-star');
+      var cloud     = document.querySelector('.tt-cloud');
+      var cloudB    = document.querySelector('.tt-cloud-b');
+      var cloudC    = document.querySelector('.tt-cloud-c');
+      if (!track) return;
+      [track, thumb, hillBack, hillFront, cloud, cloudB, cloudC].forEach(function(el) {
+        if (el) el.getAnimations().forEach(function(a) { a.cancel(); });
+      });
+      stars.forEach(function(el) { el.getAnimations().forEach(function(a) { a.cancel(); }); });
+      var ease   = { easing: 'ease', fill: 'none' };
+      var spring = { easing: 'cubic-bezier(0.34,1.56,0.64,1)', fill: 'none' };
+      track.animate([{ background: toDark ? 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' : 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' }, { background: toDark ? 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' : 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' }], { duration: 500, easing: ease.easing, fill: ease.fill });
+      track.animate([{ borderColor: toDark ? 'rgba(255,255,255,0.40)' : 'rgba(255,255,255,0.10)' }, { borderColor: toDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.40)' }], { duration: 400, easing: ease.easing, fill: ease.fill });
+      thumb.animate([{ transform: toDark ? 'translateX(0) translateY(-50%)' : 'translateX(28px) translateY(-50%)' }, { transform: toDark ? 'translateX(28px) translateY(-50%)' : 'translateX(0) translateY(-50%)' }], { duration: 440, easing: spring.easing, fill: spring.fill });
+      thumb.animate([{ background: toDark ? 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' : '#EEF0F5' }, { background: toDark ? '#EEF0F5' : 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' }], { duration: 500, easing: ease.easing, fill: ease.fill });
+      hillBack.animate([{ background: toDark ? '#72B87A' : '#1D3D25' }, { background: toDark ? '#1D3D25' : '#72B87A' }], { duration: 500, easing: ease.easing, fill: ease.fill });
+      hillFront.animate([{ background: toDark ? '#5DA066' : '#152C1A' }, { background: toDark ? '#152C1A' : '#5DA066' }], { duration: 500, easing: ease.easing, fill: ease.fill });
+      stars.forEach(function(s) { s.animate([{ opacity: toDark ? 0 : 1 }, { opacity: toDark ? 1 : 0 }], { duration: 400, easing: ease.easing, fill: ease.fill }); });
+      cloud.animate([{ opacity: toDark ? 1 : 0 }, { opacity: toDark ? 0 : 1 }], { duration: 400, easing: ease.easing, fill: ease.fill });
+      if (cloudB) cloudB.animate([{ opacity: toDark ? 0.65 : 0 }, { opacity: toDark ? 0 : 0.65 }], { duration: 400, easing: ease.easing, fill: ease.fill });
+      if (cloudC) cloudC.animate([{ opacity: toDark ? 0.45 : 0 }, { opacity: toDark ? 0 : 0.45 }], { duration: 400, easing: ease.easing, fill: ease.fill });
+    }
+
+    function apply(theme, animate) {
+      if (animate) {
+        var toDark = theme === 'dark';
+        animateToggleScene(toDark);
+        root.classList.add('color-transitioning');
+        void root.offsetHeight;
+        root.setAttribute('data-theme', theme);
+        try { localStorage.setItem(KEY, theme); } catch(e) {}
+        setTimeout(function() { root.classList.remove('color-transitioning'); }, 600);
+      } else {
+        root.setAttribute('data-theme', theme);
+        try { localStorage.setItem(KEY, theme); } catch(e) {}
+      }
+    }
+
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch(e) {}
+    if (saved === 'dark' || saved === 'light') {
+      apply(saved, false);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      apply('dark', false);
+    } else {
+      apply('light', false);
+    }
+
+    if (btn) {
+      btn.addEventListener('click', function() {
+        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
+      });
+    }
+  })();
   </script>
 
 

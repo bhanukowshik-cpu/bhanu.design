@@ -1,6 +1,15 @@
 import { useRef, useEffect } from 'react'
 import LiquidGlass from './components/LiquidGlass/LiquidGlass'
+import GlassButton from './components/GlassButton/GlassButton'
 import poppyUrl from './assets/dejan-zakic-68AnV6eU2aw-unsplash.jpg'
+import SpiralGallery from './components/SpiralGallery/SpiralGallery'
+
+const SPIRAL_CARDS = [
+  { title: 'ET Studio', sub: 'AI Content System', desc: 'Redesigned the end-to-end content creation workflow — reducing production time from 104 hours to 4 hours per lesson.', color: '#7F77DD', image: '/images/et-studio.jpg' },
+  { title: 'ET Live', sub: 'Adaptive Tutoring', desc: '85% session completion rate and 2x faster mastery. Real-time AI tutor with adaptive feedback built from scratch.', color: '#1D9E75', image: '/images/et-live.jpg' },
+  { title: 'ET Analytics', sub: 'Learning Intelligence', desc: 'Platform-wide analytics for 2,000+ DAU — surfacing mastery signals and content performance in real time.', color: '#D85A30', image: '/images/et-analytics.jpg' },
+  { title: 'Dearly', sub: 'Digital Letters', desc: 'A handwritten-style letter app for heartfelt notes. Launched on Product Hunt with custom SVG glyph rendering.', color: '#D4537E', image: '/images/dearly.jpg' },
+]
 
 function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: number, h: number) {
   const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight)
@@ -45,15 +54,11 @@ export default function App() {
   }, [])
 
   return (
+    <>
+    <SpiralGallery cards={SPIRAL_CARDS} />
     <div
       ref={containerRef}
-      style={{
-        width:    '100vw',
-        height:   '100vh',
-        position: 'relative',
-        overflow: 'hidden',
-        cursor:   'none',
-      }}
+      style={{ display: 'none', width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden', cursor: 'none' }}
     >
       <canvas
         ref={sceneCanvasRef}
@@ -70,6 +75,16 @@ export default function App() {
         containerRef={containerRef}
         sceneCanvasRef={sceneCanvasRef}
       />
+
+      <div style={{
+        position: 'absolute',
+        bottom: 40,
+        left: '50%',
+        transform: 'translateX(-50%)',
+      }}>
+        <GlassButton label="Get started" />
+      </div>
     </div>
+    </>
   )
 }

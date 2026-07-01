@@ -22,6 +22,8 @@
       --border:       #EFEFEF;
       --orange:       #BF6212;
       --orange-light: #FFF7E9;
+      --orange-badge: #8C4A0D;
+      --orange-rgb:   191,98,18;
       --font-display: 'Playfair Display', serif;
       --font-heading: 'Poppins', sans-serif;
       --font-mono:    'JetBrains Mono', monospace;
@@ -180,12 +182,12 @@
     /* ─── PAGE + CARD ────────────────────────────────────────── */
     .page {
       display: flex; justify-content: center;
-      padding: 94px 40px 90px;
+      padding: 94px 10% 90px;
     }
     .card {
       background: var(--white);
       width: 100%;
-      max-width: 1200px;
+      max-width: 1920px;
       border-radius: 30px;
       box-shadow: 0 0 20px rgba(0,0,0,0.05);
       overflow: hidden;
@@ -293,7 +295,7 @@
     .citation-icon-btn {
       display: inline-flex; align-items: center; justify-content: center;
       width: 32px; height: 32px; flex-shrink: 0;
-      background: var(--orange); border-radius: 8px;
+      background: var(--orange-badge); border-radius: 8px;
     }
     .citation-arrow {
       color: var(--orange); font-size: 13px; font-weight: 700;
@@ -400,7 +402,7 @@
     }
     .section-badge {
       display: flex; align-items: center; gap: 10px;
-      background: var(--orange);
+      background: var(--orange-badge);
       padding: 14px 24px; border-radius: 14px;
       white-space: nowrap; flex-shrink: 0;
     }
@@ -428,7 +430,7 @@
 
     /* ─── THANK YOU BAR ──────────────────────────────────────── */
     .cs-thankyou {
-      background: var(--orange);
+      background: var(--orange-badge);
       width: 100%;
       padding: 12px 40px;
       display: flex;
@@ -440,7 +442,7 @@
       font-weight: 500;
       font-size: 15px;
       letter-spacing: 0.08em;
-      color: var(--bg);
+      color: #FFFCF8;
     }
 
     /* ─── KEYFRAMES ──────────────────────────────────────────── */
@@ -467,12 +469,10 @@
     }
 
 
-    @media (min-width: 1600px) { .card { max-width: 1400px; } }
-    @media (min-width: 1440px) { .card { max-width: 1300px; } }
 
     /* ── Tablet ── */
     @media (max-width: 1024px) {
-      .page              { padding: 74px 20px 60px; }
+      .page              { padding: 74px 10% 70px; }
       .nav               { padding: 8px 24px; }
       .nav-sections      { display: none; }
       .nav-hamburger     { display: flex; }
@@ -492,6 +492,7 @@
 
     /* ── Mobile ── */
     @media (max-width: 767px) {
+      .page              { padding: 60px 5% 56px; }
       .cs-hero           { padding: 22px 18px 28px; gap: 16px; }
       .cs-heading        { font-size: 30px; line-height: 48px; }
       .cs-subtitle       { font-size: 15px; }
@@ -678,6 +679,16 @@
       display: flex; flex-direction: column; gap: 12px;
     }
 
+    /* Results section — subtle highlight to mark it as the payoff */
+    #results .pf-card {
+      border: 1px solid rgba(191,98,18,0.22);
+      box-shadow: 0 20px 50px -28px rgba(191,98,18,0.45);
+    }
+    [data-theme="dark"] #results .pf-card {
+      border-color: rgba(255,138,61,0.25);
+      box-shadow: 0 20px 50px -28px rgba(255,138,61,0.4);
+    }
+
     .pf-card-title {
       font-family: var(--font-heading);
       font-style: normal; font-weight: 500;
@@ -686,7 +697,7 @@
 
     .pf-card-body {
       font-family: var(--font-heading);
-      font-weight: 400; font-size: var(--fs-base); line-height: 1.7;
+      font-weight: 400; font-size: 16px; line-height: 1.7;
       color: var(--secondary);
     }
     .pf-card-body strong { font-weight: 700; }
@@ -724,14 +735,14 @@
 
     .pf-stat-name {
       font-family: var(--font-heading); font-weight: 600;
-      font-size: var(--fs-base); color: var(--secondary);
+      font-size: 16px; color: var(--secondary);
     }
 
     /* Bullet list */
     .pf-bullets { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
     .pf-bullets li {
       font-family: var(--font-heading);
-      font-weight: 400; font-size: var(--fs-base); line-height: 1.6;
+      font-weight: 400; font-size: 16px; line-height: 1.6;
       color: var(--secondary);
       padding-left: 16px; position: relative;
     }
@@ -740,7 +751,7 @@
 
     .pf-footnote {
       font-family: var(--font-display); font-style: italic; font-weight: 400;
-      font-size: var(--fs-sm); color: rgba(191,98,18,0.65); margin-top: 4px;
+      font-size: var(--fs-sm); color: rgba(var(--orange-rgb), 0.85); margin-top: 4px;
     }
 
     /* ── Responsive ── */
@@ -893,10 +904,15 @@
     .exp-phone {
       flex: 1;
       min-width: 0;
-      border-radius: 30px;
-      overflow: hidden;
+      display: flex; flex-direction: column; gap: 10px;
     }
+    .exp-phone-img { border-radius: 30px; overflow: hidden; }
     .exp-phone img { width: 100%; display: block; }
+    .exp-phone-caption {
+      font-family: var(--font-heading); font-weight: 500;
+      font-size: 13px; line-height: 1.4; text-align: center;
+      color: rgba(255,250,240,0.55);
+    }
 
     /* Mobile: 3-up top row, 2-up centered bottom row */
     @media (max-width: 767px) {
@@ -907,12 +923,13 @@
       }
       .exp-phone {
         flex: 0 0 calc(33.333% - 8px);
-        border-radius: 22px;
       }
+      .exp-phone-img { border-radius: 22px; }
+      .exp-phone-caption { font-size: 12px; }
     }
     @media (max-width: 480px) {
       .exp-phones { gap: 10px; }
-      .exp-phone { border-radius: 18px; }
+      .exp-phone-img { border-radius: 18px; }
     }
 
     /* ─── ONBOARDING SUB-SECTION ────────────────────────── */
@@ -923,7 +940,9 @@
     .ob-wrap.triggered { opacity: 1; transform: translateY(0); transition: none; }
 
     .ob-card {
-      background: var(--orange-light);
+      background:
+        radial-gradient(ellipse at 74% 24%, rgba(190,100,20,0.42) 0%, rgba(140,68,14,0.18) 36%, transparent 60%),
+        #1A0F06;
       border-radius: 20px;
       padding: 28px 32px 32px;
       display: flex; flex-direction: column; gap: 24px;
@@ -939,9 +958,9 @@
     .ob-desc {
       font-family: var(--font-heading);
       font-weight: 400; font-size: var(--fs-base);
-      line-height: 1.75; color: var(--secondary);
+      line-height: 1.75; color: rgba(255,250,240,0.72);
     }
-    .ob-desc strong { font-weight: 700; }
+    .ob-desc strong { font-weight: 700; color: #FFFCF8; }
 
     @media (max-width: 1024px) {
       .ob-wrap { padding-left: 28px; padding-right: 28px; }
@@ -990,6 +1009,14 @@
     .test-avatar {
       width: 44px; height: 44px;
       border-radius: 50%; object-fit: cover;
+    }
+    .test-avatar-initial {
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(191,98,18,0.12);
+      border: 1px solid rgba(191,98,18,0.25);
+      color: var(--orange);
+      font-family: var(--font-heading); font-weight: 700; font-size: 13px;
+      flex-shrink: 0;
     }
 
     @media (max-width: 1024px) {
@@ -1042,11 +1069,19 @@
       overflow: hidden;
       flex: 1;
       min-width: 0;
+      position: relative;
     }
     .cw-img:first-child { flex: 1.8; }
     .cw-img img {
       width: 100%; height: 100%;
       object-fit: cover; display: block;
+    }
+    .cw-caption {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      padding: 28px 16px 14px;
+      background: linear-gradient(to top, rgba(0,0,0,0.65), transparent);
+      font-family: var(--font-heading); font-weight: 500;
+      font-size: 13px; color: rgba(255,250,240,0.92);
     }
 
     @media (max-width: 1024px) {
@@ -1141,6 +1176,120 @@
       .other-projects-grid { grid-template-columns: 1fr; }
       .op-card-img { height: 200px; }
     }
+    /* ─── DARK MODE TOKENS ───────────────────────────────────── */
+    [data-theme="dark"] {
+      --secondary:    #F0EDE8;
+      --bg:           #1A1A1A;
+      --white:        #0C0C0C;
+      --grey:         #999999;
+      --border:       #3A3A3A;
+      --orange:       #FF8A3D;
+      --orange-light: #2A1A08;
+      --orange-rgb:   255,138,61;
+    }
+    [data-theme="dark"] body {
+      background-image: radial-gradient(circle, rgba(255,255,255,0.15) 0.8px, transparent 0.8px);
+    }
+    [data-theme="dark"] .nav-home img { filter: invert(1); }
+    [data-theme="dark"] .nav {
+      background: rgba(26,26,26,0.92);
+      box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.06);
+    }
+    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #2C2C2C; }
+    [data-theme="dark"] .mobile-menu { box-shadow: -8px 0 32px rgba(0,0,0,0.40); }
+    [data-theme="dark"] .hero-pill { border-color: rgba(191,98,18,0.45); }
+    [data-theme="dark"] .hero-pill:hover { background: rgba(191,98,18,0.12); }
+    [data-theme="dark"] .hero-date { color: #9C8B70; }
+    [data-theme="dark"] .cs-subtitle { color: rgba(240,237,232,0.65); }
+    [data-theme="dark"] .summary-label { color: #9C8B70; }
+    [data-theme="dark"] .summary-desc { color: #9C8B70; }
+    [data-theme="dark"] .section-line { background: rgba(240,237,232,0.12); }
+    /* ── overview section ── */
+    [data-theme="dark"] .skill-tag {
+      background: rgba(255,138,61,0.08);
+      border-color: rgba(255,138,61,0.35);
+      border-radius: 999px;
+    }
+    [data-theme="dark"] .timeline-val { color: #9C8B70; }
+    [data-theme="dark"] .team-role { color: #9C8B70; }
+    [data-theme="dark"] .team-name.nda-badge { color: #9C8B70; }
+    [data-theme="dark"] .team-divider { background: rgba(240,237,232,0.08); }
+    /* ── pilot findings section ── */
+    [data-theme="dark"] .pf-stat-chip {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(240,237,232,0.12);
+      box-shadow: none;
+    }
+    [data-theme="dark"] .pf-arc-track { stroke: rgba(240,237,232,0.14); }
+    /* ── other projects ── */
+    [data-theme="dark"] .op-card { background: #1E1E1E; border-color: rgba(240,237,232,0.1); }
+    [data-theme="dark"] .op-card-img { background: #2C2C2C; }
+    [data-theme="dark"] .op-card-tag { background: #2C2C2C; color: #A0A0A0; }
+    [data-theme="dark"] .op-card-title { color: #F0EDE8; }
+    [data-theme="dark"] .op-card-desc { color: #999999; }
+    [data-theme="dark"] .op-card-cta { background: #F0EDE8; color: #252525; }
+    /* ─── THEME TOGGLE BUTTON ────────────────────────────────── */
+    .theme-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer !important; flex-shrink: 0; border-radius: 100px; transition: transform 0.15s ease; }
+    .theme-toggle:active { transform: scale(0.93); }
+    .tt-track { position: relative; width: 58px; height: 30px; border-radius: 100px; background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border: 1.5px solid rgba(255,255,255,0.40); flex-shrink: 0; overflow: hidden; transition: background 0.5s ease, border-color 0.4s ease; }
+    .tt-track::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 50%; border-radius: 100px 100px 50% 50%; background: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 100%); pointer-events: none; z-index: 10; }
+    .tt-hill-back { position: absolute; bottom: 0; left: -5%; width: 75%; height: 13px; background: #72B87A; border-radius: 50% 60% 0 0; z-index: 1; transition: background 0.5s ease; }
+    .tt-hill-front { position: absolute; bottom: 0; right: -8%; width: 62%; height: 11px; background: #5DA066; border-radius: 60% 50% 0 0; z-index: 2; transition: background 0.5s ease; }
+    .tt-star { position: absolute; background: rgba(255,255,255,0.90); border-radius: 50%; opacity: 0; transition: opacity 0.4s ease; z-index: 1; }
+    .tt-star-1 { width: 2.5px; height: 2.5px; top: 5px; left: 8px; }
+    .tt-star-2 { width: 2px; height: 2px; top: 11px; left: 18px; }
+    .tt-star-3 { width: 2px; height: 2px; top: 6px; left: 27px; }
+    .tt-star-4 { width: 1.5px; height: 1.5px; top: 13px; left: 11px; }
+    [data-theme="dark"] .tt-star { opacity: 1; }
+    @keyframes tt-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.12; } }
+    [data-theme="dark"] .tt-star-1 { animation: tt-twinkle 2.1s ease-in-out infinite; }
+    [data-theme="dark"] .tt-star-2 { animation: tt-twinkle 1.7s ease-in-out 0.8s infinite; }
+    [data-theme="dark"] .tt-star-3 { animation: tt-twinkle 2.5s ease-in-out 1.5s infinite; }
+    [data-theme="dark"] .tt-star-4 { animation: tt-twinkle 1.9s ease-in-out 0.4s infinite; }
+    .tt-shoot { position: absolute; top: 3px; left: 4px; width: 9px; height: 1px; background: linear-gradient(to right, transparent, #FFE87A); border-radius: 1px; opacity: 0; transform: rotate(35deg); z-index: 2; pointer-events: none; }
+    @keyframes tt-shooting-star { 0% { opacity: 0; transform: translate(0,0) rotate(35deg); } 3% { opacity: 0.85; } 15% { opacity: 0; transform: translate(20px,8px) rotate(35deg); } 100% { opacity: 0; transform: translate(20px,8px) rotate(35deg); } }
+    [data-theme="dark"] .tt-shoot { animation: tt-shooting-star 5s ease-in 2s infinite; }
+    .tt-cloud { position: absolute; right: 9px; top: 6px; width: 15px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 10px; opacity: 1; transition: opacity 0.4s ease; z-index: 1; }
+    .tt-cloud::before { content: ''; position: absolute; width: 9px; height: 9px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -5px; left: 2px; }
+    .tt-cloud::after { content: ''; position: absolute; width: 7px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -4px; left: 7px; }
+    [data-theme="dark"] .tt-cloud { opacity: 0; }
+    @keyframes tt-cloud-drift { from { transform: translateX(30px); } to { transform: translateX(-85px); } }
+    [data-theme="light"] .tt-cloud { animation: tt-cloud-drift 26s linear 0s infinite backwards; }
+    .tt-cloud-b { position: absolute; right: 3px; top: 11px; width: 9px; height: 4px; background: rgba(255,255,255,0.95); border-radius: 8px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
+    .tt-cloud-b::before { content: ''; position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 1px; }
+    .tt-cloud-b::after { content: ''; position: absolute; width: 5px; height: 5px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 4px; }
+    [data-theme="dark"] .tt-cloud-b { opacity: 0; }
+    [data-theme="light"] .tt-cloud-b { opacity: 0.65; animation: tt-cloud-drift 18s linear 4s infinite backwards; }
+    .tt-cloud-c { position: absolute; right: 18px; top: 4px; width: 11px; height: 5px; background: rgba(255,255,255,0.95); border-radius: 8px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
+    .tt-cloud-c::before { content: ''; position: absolute; width: 7px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -4px; left: 1px; }
+    .tt-cloud-c::after { content: ''; position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 5px; }
+    [data-theme="dark"] .tt-cloud-c { opacity: 0; }
+    [data-theme="light"] .tt-cloud-c { opacity: 0.45; animation: tt-cloud-drift 22s linear 10s infinite backwards; }
+    .tt-thumb { position: absolute; top: 50%; left: 3px; width: 22px; height: 22px; border-radius: 50%; z-index: 3; transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); box-shadow: 0 2px 4px rgba(0,0,0,0.28); }
+    .tt-thumb::before, .tt-thumb::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.75); opacity: 0; transition: opacity 0.4s ease; }
+    .tt-thumb::before { width: 7px; height: 7px; top: 4px; left: 5px; }
+    .tt-thumb::after  { width: 5px; height: 5px; top: 13px; left: 14px; }
+    [data-theme="dark"] .tt-thumb::before, [data-theme="dark"] .tt-thumb::after { opacity: 1; }
+    [data-theme="light"] .tt-track { background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border-color: rgba(255,255,255,0.40); }
+    [data-theme="light"] .tt-hill-back { background: #72B87A; }
+    [data-theme="light"] .tt-hill-front { background: #5DA066; }
+    [data-theme="light"] .tt-thumb { transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); }
+    [data-theme="light"] .tt-star { opacity: 0; }
+    [data-theme="light"] .tt-cloud { opacity: 1; }
+    [data-theme="light"] .tt-thumb::before, [data-theme="light"] .tt-thumb::after { opacity: 0; }
+    [data-theme="dark"] .tt-track { background: linear-gradient(180deg, #0B1829 0%, #152238 100%); border-color: rgba(255,255,255,0.10); }
+    [data-theme="dark"] .tt-track::after { background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%); }
+    [data-theme="dark"] .tt-hill-back { background: #1D3D25; }
+    [data-theme="dark"] .tt-hill-front { background: #152C1A; }
+    [data-theme="dark"] .tt-thumb { transform: translateX(28px) translateY(-50%); background: #EEF0F5; }
+    [data-theme="dark"] .tt-star { opacity: 1; }
+    [data-theme="dark"] .tt-cloud { opacity: 0; }
+    /* ─── SMOOTH THEME TRANSITION ────────────────────────────── */
+    html.color-transitioning * { transition-property: background, background-color, color, border-color, opacity !important; transition-duration: 0.5s !important; transition-timing-function: ease !important; }
+    html.color-transitioning .tt-track { transition: background 0.5s ease, border-color 0.4s ease !important; }
+    html.color-transitioning .tt-hill-back, html.color-transitioning .tt-hill-front { transition: background 0.5s ease !important; }
+    html.color-transitioning .tt-star, html.color-transitioning .tt-cloud { transition: opacity 0.4s ease !important; }
+    html.color-transitioning .tt-thumb { transition: transform 0.44s cubic-bezier(0.34,1.56,0.64,1), background 0.5s ease !important; }
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
@@ -1165,13 +1314,29 @@
     <div class="nav-sections">
       <a href="#summary"        class="nav-btn active" data-section="summary">Summary</a>
       <a href="#overview"       class="nav-btn"        data-section="overview">Overview</a>
-      <a href="#pilot-findings" class="nav-btn"        data-section="pilot-findings">V1 Pilot Findings</a>
-      <a href="#strategy"       class="nav-btn"        data-section="strategy">My Strategy</a>
+      <a href="#pilot-findings" class="nav-btn"        data-section="pilot-findings">Findings</a>
+      <a href="#strategy"       class="nav-btn"        data-section="strategy">Strategy</a>
       <a href="#experiences"    class="nav-btn"        data-section="experiences">Approach</a>
-      <a href="#users-loved"    class="nav-btn"        data-section="users-loved">Users Liked</a>
+      <a href="#results"        class="nav-btn"        data-section="results">Results</a>
+      <a href="#users-loved"    class="nav-btn"        data-section="users-loved">Loved</a>
       <a href="#frustrations"   class="nav-btn"        data-section="frustrations">Frustrations</a>
-      <a href="#current-work"   class="nav-btn"        data-section="current-work">Current Work</a>
+      <a href="#current-work"   class="nav-btn"        data-section="current-work">Outcome</a>
     </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+      <span class="tt-track">
+        <span class="tt-star tt-star-1"></span>
+        <span class="tt-star tt-star-2"></span>
+        <span class="tt-star tt-star-3"></span>
+        <span class="tt-star tt-star-4"></span>
+        <span class="tt-shoot"></span>
+        <span class="tt-cloud"></span>
+        <span class="tt-cloud-b"></span>
+        <span class="tt-cloud-c"></span>
+        <span class="tt-hill-back"></span>
+        <span class="tt-hill-front"></span>
+        <span class="tt-thumb"></span>
+      </span>
+    </button>
     <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -1185,9 +1350,10 @@
     <a href="#pilot-findings">V1 Pilot Findings</a>
     <a href="#strategy">My Strategy</a>
     <a href="#experiences">Approach</a>
+    <a href="#results">Results</a>
     <a href="#users-loved">Users Liked</a>
     <a href="#frustrations">Frustrations</a>
-    <a href="#current-work">Current Work</a>
+    <a href="#current-work">Where It Landed</a>
   </div>
 
   <!-- ── PAGE ───────────────────────────────────────────────── -->
@@ -1203,8 +1369,10 @@
           <div class="hero-top-row" id="heroTopRow">
             <div class="hero-pills">
               <span class="hero-pill">Founding Product Designer</span>
-              <span class="hero-pill">June 2024 – Dec 2024</span>
+              <span class="hero-pill">June 2024 – Sept 2024</span>
               <span class="hero-pill">Health and Wellness</span>
+              <span class="hero-pill">B2B</span>
+              <span class="hero-pill">B2C</span>
             </div>
             <a href="https://www.stressieapp.com" class="hero-link-plain" target="_blank" rel="noopener">
               www.StressieApp.com
@@ -1253,9 +1421,8 @@
               <div class="hero-badges-wrap">
                 <div class="hero-badges">
                   <div class="hero-badge">Incubating at <strong>Harvard Innovation Labs</strong></div>
-                  <div class="hero-badge"><strong>Currently piloting</strong> at InKind &amp; Amazon</div>
-                  <div class="hero-badge"><strong>Users say</strong> they feel de-stressed after using the app</div>
-                  <div class="hero-badge"><strong>Companies say</strong> the data insights are highly actionable</div>
+                  <div class="hero-badge"><strong>Piloting</strong> with Amazon's hardware team</div>
+                  <div class="hero-badge"><strong>Piloting</strong> with InKind, a multi-location restaurant group</div>
                 </div>
               </div>
             </div>
@@ -1500,11 +1667,6 @@
                 </div>
               </div>
 
-              <div class="pf-card">
-                <span class="pf-card-title">Engagement Rate</span>
-                <p class="pf-card-body">The <strong>average engagement rate for this pilot was 17.4%</strong>, compared to an industry average of ~2.0%.</p>
-              </div>
-
             </div><!-- /pf-col left -->
 
             <!-- Right column -->
@@ -1563,62 +1725,17 @@
         <div class="cs-section-wrap tr-anim" style="padding-top:0;animation-delay:0.1s">
           <div class="st-grid">
 
-            <!-- ── Left: Conversation ── -->
+            <!-- ── Left: Key Decisions ── -->
             <div class="st-col">
               <div class="st-card">
-                <span class="st-card-title">Our conversation went like this</span>
-
-                <div class="conv-list">
-
-                  <div class="conv-item">
-                    <img class="conv-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/Our%20conversation%20went%20this/Lupita.png" alt="Lupita" />
-                    <div class="conv-bubble">
-                      <span class="conv-name">Lupita Almuhana, Product Owner &amp; Founder</span>
-                      <p class="conv-text">Looks like users feel the UI is very immature and not very intuitive — any idea what we can do?</p>
-                    </div>
-                  </div>
-
-                  <div class="conv-divider"></div>
-
-                  <div class="conv-item">
-                    <img class="conv-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/Our%20conversation%20went%20this/NDA%20Ristricted.png" alt="NDA Restricted" />
-                    <div class="conv-bubble">
-                      <span class="conv-name">Identity Protected, Tech Lead / AI Engineer</span>
-                      <p class="conv-text">Why don't we just fix the bugs, change some colors — I'm not sure what's so confusing about the graphs?</p>
-                    </div>
-                  </div>
-
-                  <div class="conv-divider"></div>
-
-                  <div class="conv-item">
-                    <img class="conv-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/Our%20conversation%20went%20this/Me%20Founding%20Designer.png" alt="Me" />
-                    <div class="conv-bubble">
-                      <span class="conv-name">Me, Founding Product Designer</span>
-                      <p class="conv-text">There's a lot to improve. The reason users found it unintuitive is that <strong>the app was text-heavy, lacked clear visual hierarchy, and had poor information architecture.</strong></p>
-                    </div>
-                  </div>
-
-                  <div class="conv-divider"></div>
-
-                  <div class="conv-item">
-                    <img class="conv-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/Our%20conversation%20went%20this/Lupita%20Thinking.png" alt="Lupita" />
-                    <div class="conv-bubble">
-                      <span class="conv-name">Lupita Almuhana, Product Owner &amp; Founder</span>
-                      <p class="conv-text">Ok, then what can we do?</p>
-                    </div>
-                  </div>
-
-                  <div class="conv-divider"></div>
-
-                  <div class="conv-item">
-                    <img class="conv-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/Our%20conversation%20went%20this/Me%20Founding.png" alt="Me" />
-                    <div class="conv-bubble">
-                      <span class="conv-name">Me, Founding Product Designer</span>
-                      <p class="conv-text">Yes, I got a plan for it, hear me out....</p>
-                    </div>
-                  </div>
-
-                </div>
+                <span class="st-card-title">Key Decisions</span>
+                <ul class="pf-bullets">
+                  <li><strong>Committed to a full redesign, not patch fixes</strong> — color, hierarchy, and signifiers were inconsistent enough that surface-level changes wouldn't fix the "immature" feeling users reported.</li>
+                  <li><strong>Rebuilt around visual hierarchy and a calmer palette</strong> — replaced the cluttered, text-heavy layout with clearer IA and a warm, muted cream palette so the app itself felt less stressful to use.</li>
+                  <li><strong>Owned QA personally to kill the crashes</strong> — stress-tested and load-tested the app myself ahead of re-pilot, since reliability is non-negotiable for a tool people reach for under stress.</li>
+                  <li><strong>Shipped notifications as a new retention lever</strong> — introduced as a net-new feature (not a V1 carryover) specifically to bring users back, and got it working reliably this time.</li>
+                  <li><strong>Validated with a focus group before shipping</strong> — tested the redesign with a small group prior to re-pilot launch.</li>
+                </ul>
               </div><!-- /st-card -->
             </div><!-- /st-col left -->
 
@@ -1680,19 +1797,24 @@
               <div class="exp-phones-wrap">
                 <div class="exp-phones">
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%201.png" alt="Stressie experience screen 1" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%201.png" alt="Stressie experience screen 1" /></div>
+                    <span class="exp-phone-caption">Personalize your journey</span>
                   </div>
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%202.png" alt="Stressie experience screen 2" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%202.png" alt="Stressie experience screen 2" /></div>
+                    <span class="exp-phone-caption">Explore what lights you up</span>
                   </div>
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%203.png" alt="Stressie experience screen 3" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%203.png" alt="Stressie experience screen 3" /></div>
+                    <span class="exp-phone-caption">Choose your top 3</span>
                   </div>
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%204.png" alt="Stressie experience screen 4" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%204.png" alt="Stressie experience screen 4" /></div>
+                    <span class="exp-phone-caption">Tell us what you love</span>
                   </div>
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%205.png" alt="Stressie experience screen 5" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%205.png" alt="Stressie experience screen 5" /></div>
+                    <span class="exp-phone-caption">Earn coping points</span>
                   </div>
                 </div>
               </div>
@@ -1713,19 +1835,24 @@
               <div class="exp-phones-wrap">
                 <div class="exp-phones">
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%201.png" alt="Onboarding screen 1" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%201.png" alt="Onboarding screen 1" /></div>
+                    <span class="exp-phone-caption">Understanding how you manage stress</span>
                   </div>
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%202.png" alt="Onboarding screen 2" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%202.png" alt="Onboarding screen 2" /></div>
+                    <span class="exp-phone-caption">Reflecting on recent responses</span>
                   </div>
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%203.png" alt="Onboarding screen 3" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%203.png" alt="Onboarding screen 3" /></div>
+                    <span class="exp-phone-caption">Rating how you've coped</span>
                   </div>
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%204.png" alt="Onboarding screen 4" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%204.png" alt="Onboarding screen 4" /></div>
+                    <span class="exp-phone-caption">A short breathing break</span>
                   </div>
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%205.png" alt="Onboarding screen 5" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%205.png" alt="Onboarding screen 5" /></div>
+                    <span class="exp-phone-caption">Your coping style result</span>
                   </div>
                 </div>
               </div>
@@ -1747,19 +1874,24 @@
               <div class="exp-phones-wrap">
                 <div class="exp-phones">
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%201.png" alt="Core experience screen 1" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%201.png" alt="Core experience screen 1" /></div>
+                    <span class="exp-phone-caption">Daily check-in</span>
                   </div>
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%202.png" alt="Core experience screen 2" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%202.png" alt="Core experience screen 2" /></div>
+                    <span class="exp-phone-caption">How's everything going?</span>
                   </div>
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%203.png" alt="Core experience screen 3" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%203.png" alt="Core experience screen 3" /></div>
+                    <span class="exp-phone-caption">A strategy tailored to you</span>
                   </div>
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%204.png" alt="Core experience screen 4" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%204.png" alt="Core experience screen 4" /></div>
+                    <span class="exp-phone-caption">Curated coping activities</span>
                   </div>
                   <div class="exp-phone">
-                    <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%205.png" alt="Core experience screen 5" />
+                    <div class="exp-phone-img"><img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20experience%202/On-Boarding%20Mockup%205.png" alt="Core experience screen 5" /></div>
+                    <span class="exp-phone-caption">Guided breathing reset</span>
                   </div>
                 </div>
               </div>
@@ -1769,61 +1901,45 @@
 
       </section>
 
-      <!-- ══ 05 · WHAT USERS LOVED ═════════════════════════ -->
-      <section id="users-loved" data-has-content="true">
+      <!-- ══ 05 · RESULTS ═══════════════════════════════════ -->
+      <section id="results" data-has-content="true">
 
         <div class="section-header tr-anim">
           <div class="section-badge">
             <span class="section-num">05.</span>
-            <span class="section-title-text">What Users Loved About the New Experience</span>
+            <span class="section-title-text">Results After the Redesign</span>
           </div>
           <div class="section-line"></div>
         </div>
 
-        <!-- Intro -->
-        <div class="cs-section-wrap tr-anim" style="padding-bottom:32px;animation-delay:0.06s">
-          <p class="test-intro-text">
-            <span class="st-orange-italic">With Stressie's pilots at Amazon and InKind</span>,
-            we gathered early feedback and data on the revised experience. Here's what they loved most.
-          </p>
-        </div>
+        <div class="cs-section-wrap tr-anim" style="padding-top:0;animation-delay:0.08s">
+          <div class="pf-grid">
 
-        <!-- 5 Testimonial cards — 3+2 grid -->
-        <div class="cs-section-wrap tr-anim" style="padding-top:0;animation-delay:0.1s">
-          <div class="test-grid">
+            <div class="pf-col">
+              <div class="pf-card">
+                <span class="pf-card-title">Retention</span>
+                <p class="pf-card-body">Retention climbed from the <strong>~2% industry baseline</strong> for health &amp; wellness apps to <strong>17.4%</strong> after the redesign — driven by cleaner information architecture and a calmer visual language.</p>
+              </div>
+              <div class="pf-card">
+                <span class="pf-card-title">Completion</span>
+                <p class="pf-card-body">Meaningfully <strong>more users completed the full stress-check journey</strong> end-to-end — from flagging they were stressed to reaching a resolution — once the IA overhaul removed friction from the flow.</p>
+              </div>
+            </div><!-- /pf-col left -->
 
-            <!-- Card 1 -->
-            <div class="test-card">
-              <p class="test-quote">" I love the app's interface. Even before exploring its features, <strong>the overall vibe instantly makes me feel calmer</strong> and less stressed. "</p>
-              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Testrimonials%20Section/User%20face%201.png" alt="User" />
-            </div>
+            <div class="pf-col">
+              <div class="pf-card">
+                <span class="pf-card-title">Reliability</span>
+                <p class="pf-card-body">I led stress- and load-testing ahead of re-pilot, and the <strong>crashes reported in V1 were no longer an issue</strong> — non-negotiable for a tool people reach for under stress.</p>
+              </div>
+              <div class="pf-card">
+                <span class="pf-card-title">What InKind Told Us</span>
+                <p class="pf-card-body">Per InKind's pilot feedback, staff <strong>reported earning more in tips</strong>, <strong>clocking in and out more consistently</strong>, and <strong>lower turnover</strong> — while managers gained visibility into team stress they could act on.</p>
+                <p class="pf-footnote">*Self-reported via pilot feedback, not measured analytics</p>
+              </div>
+            </div><!-- /pf-col right -->
 
-            <!-- Card 2 -->
-            <div class="test-card">
-              <p class="test-quote">" The interventions are simple yet effective— <strong>I don't need anything extra</strong>, just my chair and a little space. "</p>
-              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Testrimonials%20Section/User%20face%202.png" alt="User" />
-            </div>
-
-            <!-- Card 3 -->
-            <div class="test-card">
-              <p class="test-quote">" <strong>The Quick Resets are a game-changer!</strong> They're perfect for moments of high stress, and I especially love the box breathing exercise. "</p>
-              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Testrimonials%20Section/User%20face%203.png" alt="User" />
-            </div>
-
-            <!-- Card 4 (wider) -->
-            <div class="test-card">
-              <p class="test-quote">" What surprised me most was how <strong>the app actually learns my patterns</strong> — it checks in at exactly the right moment and the advice never feels generic. "</p>
-              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Testrimonials%20Section/User%20face%204.png" alt="User" />
-            </div>
-
-            <!-- Card 5 (wider) -->
-            <div class="test-card">
-              <p class="test-quote">" <strong>I went from feeling constantly overwhelmed to managing my day in short, intentional moments.</strong> The daily check-ins are now part of my routine. "</p>
-              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Testrimonials%20Section/User%20face%205.png" alt="User" />
-            </div>
-
-          </div>
-        </div>
+          </div><!-- /pf-grid -->
+        </div><!-- /cs-section-wrap -->
 
       </section>
 
@@ -1841,8 +1957,8 @@
         <!-- Intro -->
         <div class="cs-section-wrap tr-anim" style="padding-bottom:32px;animation-delay:0.06s">
           <p class="test-intro-text">
-            <span class="st-orange-italic">As part of the same pilot</span>,
-            we also asked users about any frustrations they had with the app. Here's what they shared.
+            <span class="st-orange-italic">With Stressie's pilots at Amazon and InKind</span>,
+            we asked users about any frustrations they had with the redesigned app. Here's what they shared.
           </p>
         </div>
 
@@ -1853,19 +1969,19 @@
             <!-- Card 1 -->
             <div class="test-card">
               <p class="test-quote">" <strong>There's no option to pause the stress assessment</strong>, and I'm unsure if my progress saves when I exit. This is frustrating. "</p>
-              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Frustration%20Points/User%201.png" alt="User" />
+              <span class="test-avatar test-avatar-initial">P1</span>
             </div>
 
             <!-- Card 2 -->
             <div class="test-card">
               <p class="test-quote">" <strong>I didn't find the coping points compelling as an incentive</strong> to complete the onboarding. I don't know their value. "</p>
-              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Frustration%20Points/User%202.png" alt="User" />
+              <span class="test-avatar test-avatar-initial">P2</span>
             </div>
 
             <!-- Card 3 -->
             <div class="test-card">
               <p class="test-quote">" Answering the questions feels mentally exhausting. I haven't built trust with the app yet, so <strong>sharing personal feelings this early is uncomfortable.</strong> "</p>
-              <img class="test-avatar" src="Stressie%20Case%20Study%20Updated%20Materials/Frustration%20Points/User%203.png" alt="User" />
+              <span class="test-avatar test-avatar-initial">P3</span>
             </div>
 
           </div>
@@ -1873,13 +1989,71 @@
 
       </section>
 
-      <!-- ══ 07 · CURRENT WORK ══════════════════════════════ -->
-      <section id="current-work" data-has-content="true">
+      <!-- ══ 07 · WHAT USERS LOVED ═════════════════════════ -->
+      <section id="users-loved" data-has-content="true">
 
         <div class="section-header tr-anim">
           <div class="section-badge">
             <span class="section-num">07.</span>
-            <span class="section-title-text">What I'm Currently Working On</span>
+            <span class="section-title-text">What Users Loved About the New Experience</span>
+          </div>
+          <div class="section-line"></div>
+        </div>
+
+        <!-- Intro -->
+        <div class="cs-section-wrap tr-anim" style="padding-bottom:32px;animation-delay:0.06s">
+          <p class="test-intro-text">
+            <span class="st-orange-italic">As part of the same pilot</span>,
+            we also gathered what they loved most about the redesigned experience.
+          </p>
+        </div>
+
+        <!-- 5 Testimonial cards — 3+2 grid -->
+        <div class="cs-section-wrap tr-anim" style="padding-top:0;animation-delay:0.1s">
+          <div class="test-grid">
+
+            <!-- Card 1 -->
+            <div class="test-card">
+              <p class="test-quote">" I love the app's interface. Even before exploring its features, <strong>the overall vibe instantly makes me feel calmer</strong> and less stressed. "</p>
+              <span class="test-avatar test-avatar-initial">P4</span>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="test-card">
+              <p class="test-quote">" The interventions are simple yet effective— <strong>I don't need anything extra</strong>, just my chair and a little space. "</p>
+              <span class="test-avatar test-avatar-initial">P5</span>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="test-card">
+              <p class="test-quote">" <strong>The Quick Resets are a game-changer!</strong> They're perfect for moments of high stress, and I especially love the box breathing exercise. "</p>
+              <span class="test-avatar test-avatar-initial">P6</span>
+            </div>
+
+            <!-- Card 4 (wider) -->
+            <div class="test-card">
+              <p class="test-quote">" What surprised me most was how <strong>the app actually learns my patterns</strong> — it checks in at exactly the right moment and the advice never feels generic. "</p>
+              <span class="test-avatar test-avatar-initial">P7</span>
+            </div>
+
+            <!-- Card 5 (wider) -->
+            <div class="test-card">
+              <p class="test-quote">" <strong>I went from feeling constantly overwhelmed to managing my day in short, intentional moments.</strong> The daily check-ins are now part of my routine. "</p>
+              <span class="test-avatar test-avatar-initial">P8</span>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══ 08 · CURRENT WORK ══════════════════════════════ -->
+      <section id="current-work" data-has-content="true">
+
+        <div class="section-header tr-anim">
+          <div class="section-badge">
+            <span class="section-num">08.</span>
+            <span class="section-title-text">Where It Landed</span>
           </div>
           <div class="section-line"></div>
         </div>
@@ -1887,7 +2061,7 @@
         <!-- Intro -->
         <div class="cs-section-wrap tr-anim" style="padding-bottom:36px;animation-delay:0.06s">
           <p class="cw-intro">
-            <span class="cw-orange">We're wrapping up the pilot and gathering screen-level data using tools like Mixpanel and PostHog</span>. I'm analyzing potential friction points and incorporating early feedback to continuously refine the experience.
+            <span class="cw-orange">The pilot results helped Stressie secure ~$600K in funding</span>. By the time I moved on from the team, we were wrapping up the pilot and gathering screen-level data using tools like Mixpanel and PostHog to guide the next phase.
           </p>
         </div>
 
@@ -1896,15 +2070,19 @@
           <div class="cw-images">
             <div class="cw-img">
               <img src="Stressie%20Case%20Study%20Updated%20Materials/What%20I%20am%20working%20on/What%20I%20am%20working%20on%201.png" alt="Stressie business card" />
+              <span class="cw-caption">Stressie business card</span>
             </div>
             <div class="cw-img">
               <img src="Stressie%20Case%20Study%20Updated%20Materials/What%20I%20am%20working%20on/What%20I%20am%20working%20on%202.png" alt="Bhanu sharing vision" />
+              <span class="cw-caption">Sharing the vision behind Stressie</span>
             </div>
             <div class="cw-img">
               <img src="Stressie%20Case%20Study%20Updated%20Materials/What%20I%20am%20working%20on/What%20I%20am%20working%20on%203.png" alt="The team" />
+              <span class="cw-caption">The team</span>
             </div>
             <div class="cw-img">
               <img src="Stressie%20Case%20Study%20Updated%20Materials/What%20I%20am%20working%20on/What%20I%20am%20working%20on%204.png" alt="Stressie booth" />
+              <span class="cw-caption">Pilot booth setup</span>
             </div>
           </div>
         </div>
@@ -2166,17 +2344,6 @@
   /* ═══════════════════════════════════════════════════════════
      NAV AUTO-HIDE
   ═══════════════════════════════════════════════════════════ */
-  let lastY = window.scrollY;
-  window.addEventListener('scroll', () => {
-    const currentY = window.scrollY, delta = currentY - lastY;
-    if (Math.abs(delta) < 4) { lastY = currentY; return; }
-    if (delta > 0 && currentY > 80) {
-      nav.classList.add('nav-hidden');
-    } else if (delta < 0) {
-      nav.classList.remove('nav-hidden');
-    }
-    lastY = currentY;
-  }, { passive: true });
 
   /* ═══════════════════════════════════════════════════════════
      NAV SCROLL SPY
@@ -2267,6 +2434,74 @@
   }, { threshold: 0.08 });
 
   animGroups.forEach((_, parentEl) => elObs.observe(parentEl));
+  </script>
+
+  <script>
+  /* ── Dark / Light mode toggle ──────────────────────────────── */
+  (function() {
+    var root = document.documentElement;
+    var btn  = document.getElementById('themeToggle');
+    var KEY  = 'portfolio-theme';
+
+    function animateToggleScene(toDark) {
+      var track     = document.querySelector('.tt-track');
+      var thumb     = document.querySelector('.tt-thumb');
+      var hillBack  = document.querySelector('.tt-hill-back');
+      var hillFront = document.querySelector('.tt-hill-front');
+      var stars     = document.querySelectorAll('.tt-star');
+      var cloud     = document.querySelector('.tt-cloud');
+      var cloudB    = document.querySelector('.tt-cloud-b');
+      var cloudC    = document.querySelector('.tt-cloud-c');
+      if (!track) return;
+      [track, thumb, hillBack, hillFront, cloud, cloudB, cloudC].forEach(function(el) {
+        if (el) el.getAnimations().forEach(function(a) { a.cancel(); });
+      });
+      stars.forEach(function(el) { el.getAnimations().forEach(function(a) { a.cancel(); }); });
+      var ease   = { easing: 'ease', fill: 'none' };
+      var spring = { easing: 'cubic-bezier(0.34,1.56,0.64,1)', fill: 'none' };
+      track.animate([{ background: toDark ? 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' : 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' }, { background: toDark ? 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' : 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' }], { duration: 500, easing: ease.easing, fill: ease.fill });
+      track.animate([{ borderColor: toDark ? 'rgba(255,255,255,0.40)' : 'rgba(255,255,255,0.10)' }, { borderColor: toDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.40)' }], { duration: 400, easing: ease.easing, fill: ease.fill });
+      thumb.animate([{ transform: toDark ? 'translateX(0) translateY(-50%)' : 'translateX(28px) translateY(-50%)' }, { transform: toDark ? 'translateX(28px) translateY(-50%)' : 'translateX(0) translateY(-50%)' }], { duration: 440, easing: spring.easing, fill: spring.fill });
+      thumb.animate([{ background: toDark ? 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' : '#EEF0F5' }, { background: toDark ? '#EEF0F5' : 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' }], { duration: 500, easing: ease.easing, fill: ease.fill });
+      hillBack.animate([{ background: toDark ? '#72B87A' : '#1D3D25' }, { background: toDark ? '#1D3D25' : '#72B87A' }], { duration: 500, easing: ease.easing, fill: ease.fill });
+      hillFront.animate([{ background: toDark ? '#5DA066' : '#152C1A' }, { background: toDark ? '#152C1A' : '#5DA066' }], { duration: 500, easing: ease.easing, fill: ease.fill });
+      stars.forEach(function(s) { s.animate([{ opacity: toDark ? 0 : 1 }, { opacity: toDark ? 1 : 0 }], { duration: 400, easing: ease.easing, fill: ease.fill }); });
+      cloud.animate([{ opacity: toDark ? 1 : 0 }, { opacity: toDark ? 0 : 1 }], { duration: 400, easing: ease.easing, fill: ease.fill });
+      if (cloudB) cloudB.animate([{ opacity: toDark ? 0.65 : 0 }, { opacity: toDark ? 0 : 0.65 }], { duration: 400, easing: ease.easing, fill: ease.fill });
+      if (cloudC) cloudC.animate([{ opacity: toDark ? 0.45 : 0 }, { opacity: toDark ? 0 : 0.45 }], { duration: 400, easing: ease.easing, fill: ease.fill });
+    }
+
+    function apply(theme, animate) {
+      if (animate) {
+        var toDark = theme === 'dark';
+        animateToggleScene(toDark);
+        root.classList.add('color-transitioning');
+        void root.offsetHeight;
+        root.setAttribute('data-theme', theme);
+        try { localStorage.setItem(KEY, theme); } catch(e) {}
+        setTimeout(function() { root.classList.remove('color-transitioning'); }, 600);
+      } else {
+        root.setAttribute('data-theme', theme);
+        try { localStorage.setItem(KEY, theme); } catch(e) {}
+      }
+    }
+
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch(e) {}
+    if (saved === 'dark' || saved === 'light') {
+      apply(saved, false);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      apply('dark', false);
+    } else {
+      apply('light', false);
+    }
+
+    if (btn) {
+      btn.addEventListener('click', function() {
+        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
+      });
+    }
+  })();
   </script>
 
 
