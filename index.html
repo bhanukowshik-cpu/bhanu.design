@@ -619,33 +619,28 @@
     }
     /* ─── MOBILE FACTS STRIP — hidden by default; mobile enables ─ */
     .hero-facts-strip { display: none; }
-    .hero-facts-strip-track { display: flex; gap: 12px; will-change: transform; }
-    .hfs-card {
+    .hero-facts-strip-track { display: flex; align-items: center; will-change: transform; }
+    .hfs-item {
       flex-shrink: 0;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 4px;
-      width: 58vw; max-width: 220px; min-width: 160px;
-      padding: 16px 18px 18px;
-      border-radius: 16px;
-      background: rgba(255,252,248,0.85);
-      border: 1px solid rgba(37,37,37,0.12);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      padding: 12px 18px;
+    }
+    .hfs-sep {
+      flex-shrink: 0;
+      width: 1px; height: 24px;
+      background: rgba(37,37,37,0.12);
     }
     .hfs-k {
-      font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
+      font-size: 10px; font-weight: 500; letter-spacing: 0.14em;
       text-transform: uppercase; color: rgba(37,37,37,0.50);
       font-family: var(--font-mono);
     }
     .hfs-v {
-      font-size: 17px; font-weight: 600;
+      font-size: 14px; font-weight: 600;
       font-family: var(--font-mono); color: var(--secondary);
-      margin-top: 3px;
+      margin-top: 2px;
     }
-    [data-theme="dark"] .hfs-card {
-      background: linear-gradient(180deg, #262626 0%, #0D0D0D 100%);
-      border-color: rgba(255,255,255,0.08);
-    }
+    [data-theme="dark"] .hfs-sep { background: rgba(255,255,255,0.10); }
     [data-theme="dark"] .hfs-k { color: rgba(255,255,255,0.45); }
     [data-theme="dark"] .hfs-v { color: #F5F5F7; }
 
@@ -2781,9 +2776,18 @@
     @media (max-width: 767px) {
       .hero-transform-graphic { display: none; }
       .hero-ticker          { display: none; }    /* replaced by hero-facts-strip on mobile */
-      .hero-facts-strip     { display: block; overflow: hidden; align-self: stretch;
-        -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 15%);
-        mask-image: linear-gradient(to right, transparent 0%, #000 15%); }
+      .hero-facts-strip {
+        display: block; align-self: stretch; overflow: hidden;
+        background: rgba(255,252,248,0.6);
+        border: 1px solid rgba(37,37,37,0.10);
+        border-radius: 20px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+      [data-theme="dark"] .hero-facts-strip {
+        background: linear-gradient(180deg, #262626 0%, #0D0D0D 100%);
+        border-color: rgba(255,255,255,0.08);
+      }
       .hero-facts           { display: none; }    /* facts pill hidden on mobile */
       .top-nav              { padding: 8px 16px; height: 50px; }
       .page                 { padding: 60px 5% 56px; }
@@ -6471,10 +6475,16 @@
       opacity: 0;
       transform: translateX(44px);
     }
+    /* border-radius morphs in two phases: circle → squarish → pill
+       Width transitions separately so the corner change is visible before the bar expands */
+    @keyframes cb-radius-morph {
+      0%   { border-radius: 32px; }   /* circle (50% ≈ 32px at 63px) */
+      18%  { border-radius: 12px; }   /* corners flatten first */
+      100% { border-radius: 32px; }   /* settle at pill */
+    }
     .cb.cb-opening {
-      transition:
-        width         0.62s cubic-bezier(0.34, 1.45, 0.64, 1),
-        border-radius 0.62s cubic-bezier(0.34, 1.45, 0.64, 1);
+      animation: cb-radius-morph 0.72s ease both;
+      transition: width 0.62s cubic-bezier(0.34, 1.45, 0.64, 1);
     }
 
     /* CTA label crossfade — "Ask me anything" (empty) ↔ "Ask" (has text) */
@@ -10438,14 +10448,22 @@
         <!-- mobile-only peek-ahead facts strip (between CTA and photo carousel) -->
         <div class="hero-facts-strip" aria-hidden="true">
           <div class="hero-facts-strip-track">
-            <div class="hfs-card"><span class="hfs-k">Role</span><span class="hfs-v">Product Designer</span></div>
-            <div class="hfs-card"><span class="hfs-k">Designing Since</span><span class="hfs-v">5 + Years</span></div>
-            <div class="hfs-card"><span class="hfs-k">Proven Work In</span><span class="hfs-v">0 to 1, B2B &amp; B2C</span></div>
-            <div class="hfs-card"><span class="hfs-k">Based In</span><span class="hfs-v">San Francisco</span></div>
-            <div class="hfs-card"><span class="hfs-k">Role</span><span class="hfs-v">Product Designer</span></div>
-            <div class="hfs-card"><span class="hfs-k">Designing Since</span><span class="hfs-v">5 + Years</span></div>
-            <div class="hfs-card"><span class="hfs-k">Proven Work In</span><span class="hfs-v">0 to 1, B2B &amp; B2C</span></div>
-            <div class="hfs-card"><span class="hfs-k">Based In</span><span class="hfs-v">San Francisco</span></div>
+            <div class="hfs-item"><span class="hfs-k">Role</span><span class="hfs-v">Product Designer</span></div>
+            <span class="hfs-sep"></span>
+            <div class="hfs-item"><span class="hfs-k">Designing Since</span><span class="hfs-v">5 + Years</span></div>
+            <span class="hfs-sep"></span>
+            <div class="hfs-item"><span class="hfs-k">Proven Work In</span><span class="hfs-v">0 to 1, B2B &amp; B2C</span></div>
+            <span class="hfs-sep"></span>
+            <div class="hfs-item"><span class="hfs-k">Based In</span><span class="hfs-v">San Francisco</span></div>
+            <span class="hfs-sep"></span>
+            <div class="hfs-item"><span class="hfs-k">Role</span><span class="hfs-v">Product Designer</span></div>
+            <span class="hfs-sep"></span>
+            <div class="hfs-item"><span class="hfs-k">Designing Since</span><span class="hfs-v">5 + Years</span></div>
+            <span class="hfs-sep"></span>
+            <div class="hfs-item"><span class="hfs-k">Proven Work In</span><span class="hfs-v">0 to 1, B2B &amp; B2C</span></div>
+            <span class="hfs-sep"></span>
+            <div class="hfs-item"><span class="hfs-k">Based In</span><span class="hfs-v">San Francisco</span></div>
+            <span class="hfs-sep"></span>
           </div>
         </div>
 
@@ -14062,7 +14080,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     function cbSetExpandedHeight() {
       if (window.innerWidth > 540) return; // desktop uses CSS height
       var hintsH = cbHints ? cbHints.scrollHeight : 0;
-      cbEl.style.height = (hintsH + 63 + 4) + 'px'; // hints + row + 4px breathing room
+      var maxH = Math.floor(window.innerHeight * 0.8);
+      cbEl.style.height = Math.min(hintsH + 63 + 4, maxH) + 'px'; // hints + row + 4px, capped at 80vh
     }
     cbInput.addEventListener('focus', function () {
       cbSetExpandedHeight();
@@ -16204,7 +16223,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260701-gridv2" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260701-gridv3" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
