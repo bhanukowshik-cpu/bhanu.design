@@ -373,7 +373,7 @@
       opacity: 1;
       overflow: visible;                /* allow rotate to bleed slightly */
       /* constrain height so top/bottom photos aren't pinned to the full section height */
-      height: clamp(560px, 76vh, 720px);
+      height: clamp(480px, 58vh, 620px);
       align-self: center;
       transition: opacity 0.45s cubic-bezier(0.16,1,0.3,1),
                   transform 0.65s cubic-bezier(0.16,1,0.3,1);
@@ -1160,7 +1160,7 @@
     .hero.hero-revealed #greeting { opacity: 1 !important; animation: none !important; }
     /* hero-facts pill: JS wraps .hfact items in a block .hero-li — override to flex so row layout works */
     .hero-facts .hero-lw { display: flex; }
-    .hero-facts .hero-li { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 20px 28px; align-items: flex-start; }
+    .hero-facts .hero-li { display: flex; flex-direction: row; flex-wrap: wrap; gap: 20px 28px; align-items: flex-start; justify-content: center; }
 
     /* CTA pops in once the heading cascade is mostly settled */
     .hero.hero-revealed .hero-ctas {
@@ -6091,8 +6091,7 @@
       -webkit-backdrop-filter: blur(14px) saturate(160%) !important;
       box-shadow:
         inset 1.5px 2px 3px rgba(255,255,255,0.90),
-        inset 0 0 0 1px rgba(255,255,255,0.28),
-        0 12px 40px rgba(0,0,0,0.28) !important;
+        inset 0 0 0 1px rgba(255,255,255,0.28) !important;
       overflow: hidden;
     }
 
@@ -6120,8 +6119,7 @@
       -webkit-backdrop-filter: blur(14px) saturate(160%);
       box-shadow:
         inset 1.5px 2px 3px rgba(255,255,255,0.90),
-        inset 0 0 0 1px rgba(255,255,255,0.28),
-        0 12px 40px rgba(0,0,0,0.28);
+        inset 0 0 0 1px rgba(255,255,255,0.28);
       /* hidden default: parked off-screen to the right, faded */
       opacity: 0;
       transform: translateX(150px) scale(0.9);
@@ -6173,6 +6171,90 @@
       .cb-fab2 svg { animation: none !important; }
     }
 
+    /* ── Mobile ask bottom-sheet overlay ────────────────────── */
+    .mob-ask-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+    }
+    .mob-ask-overlay.mob-ask-open { display: block; }
+    .mob-ask-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .mob-ask-overlay.mob-ask-open .mob-ask-backdrop { opacity: 1; }
+    .mob-ask-sheet {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      background: rgba(30,30,34,0.92);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-radius: 24px 24px 0 0;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      padding: 12px 20px 32px;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.4);
+    }
+    .mob-ask-overlay.mob-ask-open .mob-ask-sheet { transform: translateY(0); }
+    .mob-ask-handle {
+      width: 36px; height: 4px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.25);
+      margin: 0 auto 20px;
+    }
+    .mob-ask-label {
+      color: rgba(255,255,255,0.5);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 0 0 12px;
+    }
+    .mob-ask-input-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .mob-ask-input {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      padding: 12px 16px;
+      resize: none;
+      outline: none;
+      field-sizing: content;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+    .mob-ask-input::placeholder { color: rgba(255,255,255,0.3); }
+    .mob-ask-input:focus { border-color: rgba(230,242,141,0.5); }
+    .mob-ask-send {
+      flex-shrink: 0;
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      border: none;
+      background: #E6F28D;
+      color: #1a1a1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+    .mob-ask-send:active { transform: scale(0.92); background: #d4e070; }
+
     /* ── Bar EXIT (reverse entrance) ───────────────────────────
        collapse: bar → circle (row slides back out to the right, width shrinks);
        drop: the circle falls + fades down to the bottom (reverse of the shoot). */
@@ -6205,8 +6287,7 @@
       border: none;
       box-shadow:
         inset 0 0 0 1px rgba(255,255,255,0.10),
-        inset 0 1px 0 rgba(255,255,255,0.22),
-        0 12px 40px rgba(0,0,0,0.28);
+        inset 0 1px 0 rgba(255,255,255,0.22);
       transition: background 0.2s ease, box-shadow 0.2s ease;
     }
     [data-theme="light"] .glass-pill {
@@ -6215,8 +6296,7 @@
         radial-gradient(34.57% 51.92% at 49.87% 95.19%, rgba(247,247,252,0.08) 33.17%, rgba(247,247,252,0) 100%);
       box-shadow:
         inset 0 0 0 1px rgba(255,255,255,0.10),
-        inset 0 1px 0 rgba(255,255,255,0.22),
-        0 12px 40px rgba(0,0,0,0.28);
+        inset 0 1px 0 rgba(255,255,255,0.22);
     }
     .glass-pill::before { display: none; }
     .glass-pill::after {
@@ -6236,8 +6316,7 @@
         radial-gradient(34.57% 51.92% at 49.87% 95.19%, rgba(247,247,252,0.12) 33.17%, rgba(247,247,252,0) 100%);
       box-shadow:
         inset 0 0 0 1px rgba(255,255,255,0.16),
-        inset 0 1px 0 rgba(255,255,255,0.30),
-        0 12px 40px rgba(0,0,0,0.32);
+        inset 0 1px 0 rgba(255,255,255,0.30);
     }
 
     /* ── Rainbow arc behind pill ── */
@@ -14742,8 +14821,58 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
 
     window.addEventListener('scroll', function () { syncBarMode(0); }, { passive: true });
 
-    /* Open chat from the FAB. */
-    if (cbFab) cbFab.addEventListener('click', function () { if (window._openChat) window._openChat(); });
+    /* Open chat from the FAB: bottom sheet on mobile, inline expand on desktop.
+       Overlay HTML is appended after this script block; look up elements lazily. */
+    (function () {
+      var _overlay, _backdrop, _input, _sendBtn, _wired = false;
+
+      function getEls() {
+        if (!_overlay) _overlay  = document.getElementById('mob-ask-overlay');
+        if (!_backdrop) _backdrop = document.getElementById('mobAskBackdrop');
+        if (!_input)   _input    = document.getElementById('mobAskInput');
+        if (!_sendBtn) _sendBtn  = document.getElementById('mobAskSend');
+      }
+
+      function openSheet() {
+        getEls();
+        if (!_overlay) return;
+        _overlay.setAttribute('aria-hidden', 'false');
+        _overlay.classList.add('mob-ask-open');
+        setTimeout(function () { if (_input) _input.focus(); }, 420);
+        /* Wire backdrop / send / input once on first open */
+        if (!_wired) {
+          _wired = true;
+          if (_backdrop) _backdrop.addEventListener('click', closeSheet);
+          if (_sendBtn)  _sendBtn.addEventListener('click', submitSheet);
+          if (_input)    _input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitSheet(); }
+          });
+        }
+      }
+      function closeSheet() {
+        if (!_overlay) return;
+        _overlay.classList.remove('mob-ask-open');
+        _overlay.setAttribute('aria-hidden', 'true');
+        if (_input) _input.value = '';
+      }
+      function submitSheet() {
+        var text = _input ? _input.value.trim() : '';
+        closeSheet();
+        if (window._openChat) window._openChat(text || undefined);
+      }
+
+      if (cbFab) cbFab.addEventListener('click', function () {
+        if (window.innerWidth <= 767) {
+          openSheet();
+        } else {
+          if (window._openChat) window._openChat();
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && _overlay && _overlay.classList.contains('mob-ask-open')) closeSheet();
+      });
+    })();
 
     /* First run: the shoot must be SEEN, not hidden behind the glass loader
        (which holds the screen ≥ 2.8s). Wait for the loader to lift, then render
@@ -16099,7 +16228,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260701-icontags" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260701-169frame" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
@@ -16934,6 +17063,22 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   })();
 
   </script>
+
+  <!-- Mobile ask overlay (bottom sheet) -->
+  <div id="mob-ask-overlay" class="mob-ask-overlay" aria-hidden="true">
+    <div class="mob-ask-backdrop" id="mobAskBackdrop"></div>
+    <div class="mob-ask-sheet" role="dialog" aria-label="Ask me anything">
+      <div class="mob-ask-handle"></div>
+      <p class="mob-ask-label">Ask me anything</p>
+      <div class="mob-ask-input-row">
+        <textarea id="mobAskInput" class="mob-ask-input" rows="1" placeholder="Type your question…" maxlength="500"></textarea>
+        <button id="mobAskSend" class="mob-ask-send" aria-label="Send">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
 </html>
