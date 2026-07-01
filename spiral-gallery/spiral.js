@@ -415,7 +415,7 @@ void main() {
         img.style.cssText = 'width:13px;height:13px;object-fit:contain;flex-shrink:0;';
         var lbl = document.createElement('span');
         lbl.textContent = it.label;
-        lbl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:500;color:rgba(255,255,255,0.75);white-space:nowrap;';
+        lbl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:12.5px;font-weight:500;color:rgba(255,255,255,0.72);white-space:nowrap;';
         pill.appendChild(img); pill.appendChild(lbl); row.appendChild(pill);
       });
       return row;
@@ -429,10 +429,10 @@ void main() {
         var cell = document.createElement('div');
         var val = document.createElement('span');
         val.textContent = m.val;
-        val.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:clamp(17px,1.4vw,22px);font-weight:700;color:#E6F28D;display:block;letter-spacing:-0.3px;line-height:1.1;';
+        val.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:clamp(18px,1.5vw,24px);font-weight:700;color:#E6F28D;display:block;letter-spacing:-0.3px;line-height:1.1;';
         var lbl = document.createElement('span');
         lbl.textContent = m.lbl;
-        lbl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:10px;font-weight:600;color:rgba(255,255,255,0.38);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-top:4px;line-height:1.35;';
+        lbl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,0.38);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-top:5px;line-height:1.4;';
         cell.appendChild(val); cell.appendChild(lbl); grid.appendChild(cell);
       });
       return grid;
@@ -458,34 +458,47 @@ void main() {
         listBlobCtx    = lc.getContext('2d');
 
         var info = document.createElement('div');
-        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:14px 20px 16px;gap:7px;';
+        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:20px 24px 22px;gap:0;';
 
-        // Row: eyebrow number + pulsing arrow (right-aligned)
-        var topRow = document.createElement('div');
-        topRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;';
+        // Eyebrow: "01 — Featured Work"
         var eyebrow = document.createElement('span');
-        eyebrow.textContent = '01';
-        eyebrow.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:600;color:rgba(255,255,255,0.25);letter-spacing:0.14em;';
-        var hintCircle = document.createElement('div');
-        hintCircle.style.cssText = 'width:30px;height:30px;border-radius:999px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.28);display:flex;align-items:center;justify-content:center;animation:s2GridPulse 1.8s ease-in-out infinite;flex-shrink:0;';
-        hintCircle.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-        topRow.appendChild(eyebrow);
-        topRow.appendChild(hintCircle);
-        info.appendChild(topRow);
+        eyebrow.textContent = '01  —  Featured Work';
+        eyebrow.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.28);letter-spacing:0.12em;text-transform:uppercase;display:block;margin-bottom:12px;';
+        info.appendChild(eyebrow);
 
+        // Title — strip numeric prefix (e.g. "1). ") for cleaner display
         var title = document.createElement('h3');
-        title.textContent = card.title;
-        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(17px,1.5vw,21px);font-weight:800;color:#fff;margin:0;line-height:1.2;letter-spacing:-0.3px;';
+        title.textContent = card.title.replace(/^\d+[\)\.]\s*/, '');
+        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(22px,1.9vw,28px);font-weight:800;color:#fff;margin:0 0 10px;line-height:1.15;letter-spacing:-0.5px;';
+        info.appendChild(title);
 
+        // Description — readable at 14px with generous line-height
         var desc = document.createElement('p');
         desc.textContent = card.desc;
-        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:12.5px;line-height:1.6;color:rgba(255,255,255,0.45);margin:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
-
-        info.appendChild(title);
+        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:14px;line-height:1.75;color:rgba(255,255,255,0.52);margin:0 0 16px;';
         info.appendChild(desc);
-        if (card.iconTags && card.iconTags.length) info.appendChild(buildIconRow(card.iconTags));
-        // Only top 3 metrics in a single row to avoid overflow
+
+        if (card.iconTags && card.iconTags.length) {
+          var ir0 = buildIconRow(card.iconTags);
+          ir0.style.marginBottom = '16px';
+          info.appendChild(ir0);
+        }
+
+        // Top 3 metrics — single row, values large + lime
         info.appendChild(buildMetrics(card.metrics.slice(0, 3), 3));
+
+        // Scroll hint at bottom — standalone row, well-separated
+        var hintRow = document.createElement('div');
+        hintRow.style.cssText = 'margin-top:auto;padding-top:18px;display:flex;align-items:center;gap:10px;';
+        var hintCircle = document.createElement('div');
+        hintCircle.style.cssText = 'width:32px;height:32px;border-radius:999px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;animation:s2GridPulse 1.8s ease-in-out infinite;flex-shrink:0;';
+        hintCircle.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+        var hintText = document.createElement('span');
+        hintText.textContent = 'Scroll to explore';
+        hintText.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.25);letter-spacing:0.06em;';
+        hintRow.appendChild(hintCircle);
+        hintRow.appendChild(hintText);
+        info.appendChild(hintRow);
         cardEl.appendChild(info);
 
       } else {
@@ -512,48 +525,48 @@ void main() {
 
         // Info section
         var info = document.createElement('div');
-        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:14px 16px 16px;gap:0;';
+        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:18px 20px 20px;gap:0;';
 
-        // Number + title on same line
-        var titleRow = document.createElement('div');
-        titleRow.style.cssText = 'display:flex;align-items:baseline;gap:10px;margin-bottom:6px;';
-        var numLbl = document.createElement('span');
+        // Card number eyebrow
         var n2 = ci < 9 ? '0' + (ci + 1) : '' + (ci + 1);
+        var numLbl = document.createElement('span');
         numLbl.textContent = n2;
-        numLbl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:600;color:rgba(255,255,255,0.22);letter-spacing:0.1em;flex-shrink:0;padding-top:1px;';
+        numLbl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.25);letter-spacing:0.14em;display:block;margin-bottom:8px;';
+        info.appendChild(numLbl);
+
+        // Title
         var title = document.createElement('h3');
         title.textContent = card.title;
-        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(15px,1.35vw,18px);font-weight:800;color:#fff;margin:0;line-height:1.25;letter-spacing:-0.2px;';
-        titleRow.appendChild(numLbl);
-        titleRow.appendChild(title);
-        info.appendChild(titleRow);
+        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(17px,1.5vw,20px);font-weight:800;color:#fff;margin:0 0 8px;line-height:1.2;letter-spacing:-0.3px;';
+        info.appendChild(title);
 
+        // Description
         var desc = document.createElement('p');
         desc.textContent = card.desc;
-        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:12px;line-height:1.6;color:rgba(255,255,255,0.42);margin:0 0 8px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
+        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:13px;line-height:1.7;color:rgba(255,255,255,0.5);margin:0 0 12px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
         info.appendChild(desc);
 
         if (card.iconTags && card.iconTags.length) {
           var ir = buildIconRow(card.iconTags);
-          ir.style.marginBottom = '10px';
+          ir.style.marginBottom = '12px';
           info.appendChild(ir);
         }
 
-        // Metrics inline — values + subtle labels below
+        // Metrics with top separator
         var metWrap = document.createElement('div');
-        metWrap.style.cssText = 'padding-top:8px;border-top:1px solid rgba(255,255,255,0.07);';
+        metWrap.style.cssText = 'padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);';
         metWrap.appendChild(buildMetrics(card.metrics));
         info.appendChild(metWrap);
 
         if (card.href && card.href !== '#') {
           var ctaWrap = document.createElement('div');
-          ctaWrap.style.cssText = 'margin-top:auto;padding-top:10px;';
+          ctaWrap.style.cssText = 'margin-top:auto;padding-top:14px;';
           var cta = document.createElement('a');
           cta.href = card.href;
           cta.textContent = 'View Case Study →';
-          cta.style.cssText = 'display:inline-block;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;letter-spacing:0.03em;border-radius:999px;padding:9px 20px;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.04);transition:background 0.18s,border-color 0.18s;';
-          cta.addEventListener('mouseenter', function() { cta.style.background='rgba(255,255,255,0.1)'; cta.style.borderColor='rgba(255,255,255,0.35)'; });
-          cta.addEventListener('mouseleave', function() { cta.style.background='rgba(255,255,255,0.04)'; cta.style.borderColor='rgba(255,255,255,0.16)'; });
+          cta.style.cssText = 'display:inline-block;font-family:"JetBrains Mono",monospace;font-size:12.5px;font-weight:600;letter-spacing:0.03em;border-radius:999px;padding:11px 22px;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);transition:background 0.18s,border-color 0.18s;';
+          cta.addEventListener('mouseenter', function() { cta.style.background='rgba(255,255,255,0.11)'; cta.style.borderColor='rgba(255,255,255,0.38)'; });
+          cta.addEventListener('mouseleave', function() { cta.style.background='rgba(255,255,255,0.05)'; cta.style.borderColor='rgba(255,255,255,0.18)'; });
           ctaWrap.appendChild(cta);
           info.appendChild(ctaWrap);
         }

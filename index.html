@@ -6355,14 +6355,15 @@
       justify-content: flex-end;
       overflow: hidden; /* clips the wide .cb-row during circle/intro state; border-radius handles corner shape */
       height: 63px;
+      max-height: 63px;
       width: 52px; /* intro: photo-only; JS adds .bar-revealed */
       --cb-bar-w: min(614px, calc(100vw - 48px)); /* resting bar width — shared by .bar-revealed and the entrance circle's hidden row */
       cursor: text;
       /* collapse (this is the destination state when .expanded is removed):
          pure deceleration, no overshoot — springs feel wrong in reverse */
       transition:
-        width  0.4s cubic-bezier(0.22, 1, 0.36, 1),
-        height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        width      0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
         border-radius 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
     /* border-radius: 32px = 63px height / 2 — explicit so the expand transition
@@ -6372,11 +6373,12 @@
     .cb.bar-revealed { width: var(--cb-bar-w); border-radius: 32px; }
     .cb.expanded {
       width: min(792px, calc(100vw - 48px));
-      height: 220px;
+      height: auto;
+      max-height: min(600px, 80vh);
       border-radius: 28px;
       transition:
-        width  0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
-        height 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+        width      0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+        max-height 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
         border-radius 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
@@ -14080,14 +14082,10 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     /* ── Chat bar ── */
     function cbExpand() {
       cbEl.classList.add('expanded');
-      var hintsH = cbHints ? cbHints.scrollHeight : 0;
-      var maxH   = Math.floor(window.innerHeight * 0.8);
-      cbEl.style.height = Math.min(hintsH + 63 + 24, maxH) + 'px';
     }
     function cbCollapse() {
       if (cbInput.value) return;
       cbEl.classList.remove('expanded');
-      cbEl.style.height = '';
     }
     /* touchstart fires before iOS's blur/focus churn so the bar is already
        expanded when the keyboard opens */
@@ -16263,7 +16261,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260701-gridv7" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260701-gridv8" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
