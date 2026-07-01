@@ -7212,18 +7212,9 @@
       .cp-close { width: 36px; height: 36px; border-radius: 10px; }
     }
     @media (max-width: 540px) {
-      .cb { --cb-bar-w: calc(100vw - 32px); max-height: 63px;
-            transition: width 0.4s cubic-bezier(0.22,1,0.36,1),
-                        max-height 0.4s cubic-bezier(0.22,1,0.36,1),
-                        border-radius 0.4s cubic-bezier(0.22,1,0.36,1); }
+      .cb { --cb-bar-w: calc(100vw - 32px); }
       .cb.bar-revealed { width: var(--cb-bar-w); }
-      /* max-height drives the expand animation; height stays auto so the bar
-         grows to exactly fit content — no JS measurement needed */
-      .cb.expanded { width: calc(100vw - 32px); height: auto !important;
-                     max-height: 640px !important;
-                     transition: width 0.45s cubic-bezier(0.34,1.4,0.64,1),
-                                 max-height 0.45s cubic-bezier(0.34,1.4,0.64,1),
-                                 border-radius 0.4s cubic-bezier(0.22,1,0.36,1); }
+      .cb.expanded { width: calc(100vw - 32px); }
       /* Shrink hint chips so they wrap cleanly within the narrower bar */
       .cb-hint { font-size: 12px !important; padding: 5px 9px !important; max-width: 100%; overflow: hidden; }
       .cb-hint span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
@@ -14087,8 +14078,30 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     cpMsgs.addEventListener('scroll', updateMoreCue, { passive: true });
 
     /* ── Chat bar ── */
-    cbInput.addEventListener('focus', function () { cbEl.classList.add('expanded'); });
-    cbInput.addEventListener('blur',  function () { if (!cbInput.value) cbEl.classList.remove('expanded'); });
+    function cbExpand() {
+      cbEl.classList.add('expanded');
+      if (window.innerWidth <= 540) {
+        var hintsH = cbHints ? cbHints.scrollHeight : 0;
+        var maxH   = Math.floor(window.innerHeight * 0.8);
+        cbEl.style.height = Math.min(hintsH + 63 + 24, maxH) + 'px';
+      }
+    }
+    function cbCollapse() {
+      if (cbInput.value) return;
+      cbEl.classList.remove('expanded');
+      cbEl.style.height = '';
+    }
+    /* touchstart fires before iOS's blur/focus churn so the bar is already
+       expanded when the keyboard opens */
+    cbInput.addEventListener('touchstart', cbExpand, { passive: true });
+    cbInput.addEventListener('focus', cbExpand);
+    /* delay blur so transient iOS keyboard-open blur/refocus doesn't collapse */
+    var cbBlurTimer;
+    cbInput.addEventListener('blur', function () {
+      clearTimeout(cbBlurTimer);
+      cbBlurTimer = setTimeout(cbCollapse, 200);
+    });
+    cbInput.addEventListener('focus', function () { clearTimeout(cbBlurTimer); });
     cbInput.addEventListener('input', function () {
       cbSend.classList.toggle('vis', cbInput.value.trim().length > 0);
     });
@@ -15908,6 +15921,10 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
           { val: '0',       lbl: 'Extra Clicks'  }
         ],
         tags: ['Shipped', 'Data Visualization', 'Real-time', 'B2B Dashboard'],
+        iconTags: [
+          { icon: 'profile', label: 'Sole Product Designer' },
+          { icon: 'thunder', label: '0 to 1' }
+        ],
         desc: 'Real-time student insights. The dog-ear system: complexity on demand, clean by default.',
         href: '#'
       },
@@ -15921,6 +15938,10 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
           { val: 'Amazon', lbl: '& InKind Live'      }
         ],
         tags: ['Shipped', 'Wellness App', 'Harvard-incubated', 'B2B SaaS'],
+        iconTags: [
+          { icon: 'profile', label: 'Founding Designer' },
+          { icon: 'thunder', label: '0 to 1' }
+        ],
         desc: 'Harvard-incubated workplace stress app. Full redesign: engagement hit 17.4% vs ~2% industry average.',
         href: 'stressie-studio.html'
       },
@@ -15934,6 +15955,11 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
           { val: '48hrs', lbl: 'Built In'        }
         ],
         tags: ['Shipped', 'Animated Messages', 'Voice', 'Consumer App'],
+        iconTags: [
+          { icon: 'profile', label: 'Sole Product Designer' },
+          { icon: 'thunder', label: '0 to 1' },
+          { icon: 'mic',     label: 'Voice' }
+        ],
         desc: 'Animated handwriting with your real voice and photos, sent as a unique link. Built in 48 hours.',
         href: '#'
       }
@@ -16239,7 +16265,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260701-gridv6" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260701-gridv7" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */

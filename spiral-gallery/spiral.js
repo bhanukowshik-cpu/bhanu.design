@@ -448,7 +448,7 @@ void main() {
         cardEl.style.cssText = 'flex:0 0 auto;display:flex;flex-direction:column;border-radius:24px;overflow:hidden;background:transparent;cursor:default;';
 
         var blobArea = document.createElement('div');
-        blobArea.style.cssText = 'flex:0 0 40%;position:relative;display:flex;align-items:center;justify-content:center;';
+        blobArea.style.cssText = 'flex:0 0 34%;position:relative;display:flex;align-items:center;justify-content:center;';
         var lc = document.createElement('canvas');
         lc.width = 800; lc.height = 450;
         lc.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;';
@@ -484,7 +484,8 @@ void main() {
         info.appendChild(title);
         info.appendChild(desc);
         if (card.iconTags && card.iconTags.length) info.appendChild(buildIconRow(card.iconTags));
-        info.appendChild(buildMetrics(card.metrics, 2));
+        // Only top 3 metrics in a single row to avoid overflow
+        info.appendChild(buildMetrics(card.metrics.slice(0, 3), 3));
         cardEl.appendChild(info);
 
       } else {
@@ -614,9 +615,9 @@ void main() {
     function sizeGridCards() {
       var leftPad = 80, rightPad = 60, gap = 20;
       var avail = el.clientWidth - leftPad - rightPad;
-      // Target: 2 full project cards visible side-by-side with a ~120px peek of a third
-      var projectW = Math.max(280, Math.floor((avail - gap) / 2.15));
-      var heroW    = Math.max(260, Math.round(projectW * 0.78));
+      // Show 2.5 project cards after hero — hero slightly narrower to hint at next card
+      var projectW = Math.max(240, Math.floor(avail / 2.5));
+      var heroW    = Math.max(220, Math.round(projectW * 0.78));
       // Height: leave room for track top-padding (80px) + controls bar (72px) + breathing (32px)
       var cardH    = Math.min(520, Math.max(340, el.clientHeight - 184));
       gridCardEls.forEach(function (c, i) {
