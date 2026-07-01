@@ -617,12 +617,37 @@
       25%   { opacity: 0; -webkit-transform: translate3d(-18px, 0, 0);}
       100%  { opacity: 0; -webkit-transform: translate3d(18px, 0, 0); }
     }
-    @keyframes hfc-dot-pulse {
-      0%    { width: 18px; background: rgba(255,255,255,0.85); }
-      22%   { width: 18px; background: rgba(255,255,255,0.85); }
-      25%   { width: 6px;  background: rgba(255,255,255,0.22); }
-      100%  { width: 6px;  background: rgba(255,255,255,0.22); }
+    /* ─── MOBILE FACTS STRIP — hidden by default; mobile enables ─ */
+    .hero-facts-strip { display: none; }
+    .hero-facts-strip-track { display: flex; gap: 12px; will-change: transform; }
+    .hfs-card {
+      flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px;
+      width: 58vw; max-width: 220px; min-width: 160px;
+      padding: 16px 18px 18px;
+      border-radius: 16px;
+      background: rgba(255,252,248,0.85);
+      border: 1px solid rgba(37,37,37,0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
+    .hfs-k {
+      font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(37,37,37,0.50);
+      font-family: var(--font-mono);
+    }
+    .hfs-v {
+      font-size: 17px; font-weight: 600;
+      font-family: var(--font-mono); color: var(--secondary);
+      margin-top: 3px;
+    }
+    [data-theme="dark"] .hfs-card {
+      background: linear-gradient(180deg, #262626 0%, #0D0D0D 100%);
+      border-color: rgba(255,255,255,0.08);
+    }
+    [data-theme="dark"] .hfs-k { color: rgba(255,255,255,0.45); }
+    [data-theme="dark"] .hfs-v { color: #F5F5F7; }
 
     /* ─── GREETING / TYPING LINE ─────────────────────────────── */
     .greeting {
@@ -2755,7 +2780,10 @@
     /* ── Mobile: up to 767px ─────────────────────────────────── */
     @media (max-width: 767px) {
       .hero-transform-graphic { display: none; }
-      .hero-ticker          { display: block; }   /* scrolling marquee replaces facts on mobile */
+      .hero-ticker          { display: none; }    /* replaced by hero-facts-strip on mobile */
+      .hero-facts-strip     { display: block; overflow: hidden; align-self: stretch;
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 15%);
+        mask-image: linear-gradient(to right, transparent 0%, #000 15%); }
       .hero-facts           { display: none; }    /* facts pill hidden on mobile */
       .top-nav              { padding: 8px 16px; height: 50px; }
       .page                 { padding: 60px 5% 56px; }
@@ -2820,22 +2848,6 @@
         color: var(--secondary);
         margin-top: 4px;
       }
-      /* Dot indicators */
-      .hfc-dots {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        margin-top: 14px;
-      }
-      .hfc-dot {
-        height: 6px;
-        width: 6px;
-        border-radius: 3px;
-        background: rgba(37,37,37,0.18);
-        animation: hfc-dot-pulse 16s linear infinite;
-        animation-delay: calc(var(--i) * 4s);
-      }
       /* Dark mode — match desktop .hero-facts dark exactly */
       [data-theme="dark"] .hero-ticker {
         background: linear-gradient(180deg, #262626 0%, #0D0D0D 100%);
@@ -2843,7 +2855,6 @@
       }
       [data-theme="dark"] .hfc-k { color: rgba(255,255,255,0.45); }
       [data-theme="dark"] .hfc-v { color: #F5F5F7; }
-      [data-theme="dark"] .hfc-dot { background: rgba(255,255,255,0.22); }
       .hero-content         { gap: 20px; }
       .greeting             { font-size: 16px; }
       .hero-heading { font-size: 24px; line-height: 34px; }
@@ -7192,10 +7203,11 @@
     @media (max-width: 540px) {
       .cb { --cb-bar-w: calc(100vw - 32px); }
       .cb.bar-revealed { width: var(--cb-bar-w); }
-      /* Taller expanded bar to fit 3-row chip layout at narrow widths */
-      .cb.expanded { width: calc(100vw - 32px); height: 260px; }
+      /* height is set by JS cbSetExpandedHeight() to fit hints content at any width */
+      .cb.expanded { width: calc(100vw - 32px); }
       /* Shrink hint chips so they wrap cleanly within the narrower bar */
-      .cb-hint { font-size: 12px !important; padding: 5px 9px !important; }
+      .cb-hint { font-size: 12px !important; padding: 5px 9px !important; max-width: 100%; overflow: hidden; }
+      .cb-hint span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
       .cb-hints { gap: 8px 5px !important; padding: 8px 14px 8px !important; }
     }
 
@@ -10423,6 +10435,20 @@
           <a class="hero-cta hero-cta-primary" href="#s2Section">View Work</a>
         </div>
 
+        <!-- mobile-only peek-ahead facts strip (between CTA and photo carousel) -->
+        <div class="hero-facts-strip" aria-hidden="true">
+          <div class="hero-facts-strip-track">
+            <div class="hfs-card"><span class="hfs-k">Role</span><span class="hfs-v">Product Designer</span></div>
+            <div class="hfs-card"><span class="hfs-k">Designing Since</span><span class="hfs-v">5 + Years</span></div>
+            <div class="hfs-card"><span class="hfs-k">Proven Work In</span><span class="hfs-v">0 to 1, B2B &amp; B2C</span></div>
+            <div class="hfs-card"><span class="hfs-k">Based In</span><span class="hfs-v">San Francisco</span></div>
+            <div class="hfs-card"><span class="hfs-k">Role</span><span class="hfs-v">Product Designer</span></div>
+            <div class="hfs-card"><span class="hfs-k">Designing Since</span><span class="hfs-v">5 + Years</span></div>
+            <div class="hfs-card"><span class="hfs-k">Proven Work In</span><span class="hfs-v">0 to 1, B2B &amp; B2C</span></div>
+            <div class="hfs-card"><span class="hfs-k">Based In</span><span class="hfs-v">San Francisco</span></div>
+          </div>
+        </div>
+
         <div class="hero-subtext hero-facts reveal">
           <div class="hfact"><span class="hfact-k">Role</span><span class="hfact-v">Product Designer</span></div>
           <div class="hfact"><span class="hfact-k">Designing since</span><span class="hfact-v">5 + Years</span></div>
@@ -10472,12 +10498,6 @@
             <div class="hfc-slide" style="--i:1"><span class="hfc-k">Designing Since</span><span class="hfc-v">5 + Years</span></div>
             <div class="hfc-slide" style="--i:2"><span class="hfc-k">Proven Work In</span><span class="hfc-v">0 to 1, B2B &amp; B2C</span></div>
             <div class="hfc-slide" style="--i:3"><span class="hfc-k">Based In</span><span class="hfc-v">San Francisco</span></div>
-          </div>
-          <div class="hfc-dots" aria-hidden="true">
-            <span class="hfc-dot" style="--i:0"></span>
-            <span class="hfc-dot" style="--i:1"></span>
-            <span class="hfc-dot" style="--i:2"></span>
-            <span class="hfc-dot" style="--i:3"></span>
           </div>
           <!-- Desktop/tablet: scrolling marquee -->
           <div class="hero-ticker-track">
@@ -13783,11 +13803,11 @@
       </button>
       <div class="cb-hints" id="cbHints">
         <span class="cb-hints-title">Try asking</span>
-        <button class="cb-hint" type="button">Why you over someone with 8+ years at Google?</button>
-        <button class="cb-hint" type="button">What metrics did you move?</button>
-        <button class="cb-hint" type="button">Why should we hire you?</button>
-        <button class="cb-hint" type="button">What did you choose not to build?</button>
-        <button class="cb-hint" type="button">What are you actually bad at?</button>
+        <button class="cb-hint" type="button"><span>Why you over someone with 8+ years at Google?</span></button>
+        <button class="cb-hint" type="button"><span>What metrics did you move?</span></button>
+        <button class="cb-hint" type="button"><span>Why should we hire you?</span></button>
+        <button class="cb-hint" type="button"><span>What did you choose not to build?</span></button>
+        <button class="cb-hint" type="button"><span>What are you actually bad at?</span></button>
       </div>
       <div class="cb-row">
         <img class="cb-photo" src="photo.jpg" alt="Bhanu" />
@@ -14039,8 +14059,16 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     cpMsgs.addEventListener('scroll', updateMoreCue, { passive: true });
 
     /* ── Chat bar ── */
-    cbInput.addEventListener('focus', function () { cbEl.classList.add('expanded'); });
-    cbInput.addEventListener('blur',  function () { if (!cbInput.value) cbEl.classList.remove('expanded'); });
+    function cbSetExpandedHeight() {
+      if (window.innerWidth > 540) return; // desktop uses CSS height
+      var hintsH = cbHints ? cbHints.scrollHeight : 0;
+      cbEl.style.height = (hintsH + 63 + 4) + 'px'; // hints + row + 4px breathing room
+    }
+    cbInput.addEventListener('focus', function () {
+      cbSetExpandedHeight();
+      cbEl.classList.add('expanded');
+    });
+    cbInput.addEventListener('blur',  function () { if (!cbInput.value) { cbEl.classList.remove('expanded'); cbEl.style.height = ''; } });
     cbInput.addEventListener('input', function () {
       cbSend.classList.toggle('vis', cbInput.value.trim().length > 0);
     });
@@ -16176,7 +16204,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260701-center" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260701-gridv2" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
@@ -17006,6 +17034,61 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     } else {
       window.addEventListener('load', onResize);
       /* fallback: also try at 500ms in case load fires late */
+      setTimeout(onResize, 500);
+    }
+  })();
+
+  /* ── Facts strip marquee (mobile peek-ahead carousel) ────────── */
+  (function initFactsStrip() {
+    var strip = document.querySelector('.hero-facts-strip');
+    var track = document.querySelector('.hero-facts-strip-track');
+    if (!strip || !track) return;
+
+    track.style.animation       = 'none';
+    track.style.webkitAnimation = 'none';
+    track.style.transform       = 'translate3d(0,0,0)';
+
+    var pos     = 0;
+    var halfW   = 0;
+    var lastT   = 0;
+    var running = false;
+    var SPEED   = 22; /* px / second — slightly faster than photo carousel */
+
+    function measure() { halfW = track.scrollWidth / 2; }
+
+    function tick(t) {
+      if (!running) return;
+      if (lastT) {
+        var dt = Math.min((t - lastT) / 1000, 0.05);
+        pos += SPEED * dt;
+        if (halfW > 0 && pos >= halfW) pos -= halfW;
+        var tx = 'translate3d(' + (-pos) + 'px,0,0)';
+        track.style.transform       = tx;
+        track.style.webkitTransform = tx;
+      }
+      lastT = t;
+      requestAnimationFrame(tick);
+    }
+
+    function start() {
+      if (running) return;
+      running = true;
+      measure();
+      lastT = 0;
+      requestAnimationFrame(tick);
+    }
+
+    function onResize() {
+      var visible = window.getComputedStyle(strip).display !== 'none';
+      if (visible && !running) { start(); }
+      else if (visible) { measure(); }
+    }
+
+    window.addEventListener('resize', onResize);
+    if (document.readyState === 'complete') {
+      onResize();
+    } else {
+      window.addEventListener('load', onResize);
       setTimeout(onResize, 500);
     }
   })();
