@@ -384,7 +384,7 @@ void main() {
     // Scrollable card track (flex row)
     var lvTrack = document.createElement('div');
     lvTrack.className = 's2-grid-track';
-    lvTrack.style.cssText = 'flex:1;display:flex;align-items:center;gap:24px;overflow-x:auto;overflow-y:hidden;padding:104px 60px 0 80px;box-sizing:border-box;-webkit-overflow-scrolling:touch;';
+    lvTrack.style.cssText = 'flex:1;display:flex;align-items:center;gap:20px;overflow-x:auto;overflow-y:hidden;padding:80px 60px 0 80px;box-sizing:border-box;-webkit-overflow-scrolling:touch;';
 
     // CSS injected into head (scrollbar hide + animations)
     var gridStyleTag = document.createElement('style');
@@ -448,7 +448,7 @@ void main() {
         cardEl.style.cssText = 'flex:0 0 auto;display:flex;flex-direction:column;border-radius:24px;overflow:hidden;background:transparent;cursor:default;';
 
         var blobArea = document.createElement('div');
-        blobArea.style.cssText = 'flex:0 0 48%;position:relative;display:flex;align-items:center;justify-content:center;';
+        blobArea.style.cssText = 'flex:0 0 40%;position:relative;display:flex;align-items:center;justify-content:center;';
         var lc = document.createElement('canvas');
         lc.width = 800; lc.height = 450;
         lc.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;';
@@ -458,50 +458,42 @@ void main() {
         listBlobCtx    = lc.getContext('2d');
 
         var info = document.createElement('div');
-        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:16px 22px 20px;gap:10px;';
+        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:14px 20px 16px;gap:7px;';
 
+        // Row: eyebrow number + pulsing arrow (right-aligned)
+        var topRow = document.createElement('div');
+        topRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;';
         var eyebrow = document.createElement('span');
-        eyebrow.textContent = '01 — EverTutor AI System';
-        eyebrow.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;';
+        eyebrow.textContent = '01';
+        eyebrow.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:600;color:rgba(255,255,255,0.25);letter-spacing:0.14em;';
+        var hintCircle = document.createElement('div');
+        hintCircle.style.cssText = 'width:30px;height:30px;border-radius:999px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.28);display:flex;align-items:center;justify-content:center;animation:s2GridPulse 1.8s ease-in-out infinite;flex-shrink:0;';
+        hintCircle.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+        topRow.appendChild(eyebrow);
+        topRow.appendChild(hintCircle);
+        info.appendChild(topRow);
 
         var title = document.createElement('h3');
         title.textContent = card.title;
-        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(20px,1.8vw,28px);font-weight:800;color:#fff;margin:0;line-height:1.2;letter-spacing:-0.4px;';
+        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(17px,1.5vw,21px);font-weight:800;color:#fff;margin:0;line-height:1.2;letter-spacing:-0.3px;';
 
         var desc = document.createElement('p');
         desc.textContent = card.desc;
-        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:13px;line-height:1.65;color:rgba(255,255,255,0.48);margin:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
+        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:12.5px;line-height:1.6;color:rgba(255,255,255,0.45);margin:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
 
-        info.appendChild(eyebrow);
         info.appendChild(title);
         info.appendChild(desc);
         if (card.iconTags && card.iconTags.length) info.appendChild(buildIconRow(card.iconTags));
         info.appendChild(buildMetrics(card.metrics, 2));
-
-        // Pulsing scroll-right arrow
-        var hintWrap = document.createElement('div');
-        hintWrap.style.cssText = 'margin-top:auto;padding-top:10px;display:flex;align-items:center;gap:10px;';
-        var hintCircle = document.createElement('div');
-        hintCircle.style.cssText = 'width:36px;height:36px;border-radius:999px;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;animation:s2GridPulse 1.8s ease-in-out infinite;flex-shrink:0;';
-        hintCircle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-        hintWrap.appendChild(hintCircle);
-        info.appendChild(hintWrap);
         cardEl.appendChild(info);
 
       } else {
         // PROJECT CARD: dark bg, inset rounded video, clean info
-        cardEl.style.cssText = 'flex:0 0 auto;display:flex;flex-direction:column;border-radius:24px;overflow:hidden;background:#0f1115;cursor:pointer;position:relative;';
-
-        // Card index badge top-right
-        var badge = document.createElement('span');
-        var n = ci < 9 ? '0' + (ci + 1) : '' + (ci + 1);
-        badge.textContent = n;
-        badge.style.cssText = 'position:absolute;top:20px;right:20px;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;color:rgba(255,255,255,0.28);letter-spacing:0.08em;z-index:2;';
-        cardEl.appendChild(badge);
+        cardEl.style.cssText = 'flex:0 0 auto;display:flex;flex-direction:column;border-radius:24px;overflow:hidden;background:#0f1115;cursor:pointer;';
 
         // Media: inset container + video/thumbnail
         var mediaOuter = document.createElement('div');
-        mediaOuter.style.cssText = 'flex:0 0 57%;padding:12px 12px 0;box-sizing:border-box;';
+        mediaOuter.style.cssText = 'flex:0 0 50%;padding:10px 10px 0;box-sizing:border-box;';
         var bgImg = card.img ? 'url(' + card.img + ')' : 'none';
         var mediaInner = document.createElement('div');
         mediaInner.style.cssText = 'width:100%;height:100%;border-radius:14px;overflow:hidden;background-color:#0a0c0f;background-image:' + bgImg + ';background-size:cover;background-position:center;position:relative;';
@@ -519,34 +511,48 @@ void main() {
 
         // Info section
         var info = document.createElement('div');
-        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:16px 20px 20px;gap:8px;';
+        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:14px 16px 16px;gap:0;';
 
+        // Number + title on same line
+        var titleRow = document.createElement('div');
+        titleRow.style.cssText = 'display:flex;align-items:baseline;gap:10px;margin-bottom:6px;';
+        var numLbl = document.createElement('span');
+        var n2 = ci < 9 ? '0' + (ci + 1) : '' + (ci + 1);
+        numLbl.textContent = n2;
+        numLbl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:600;color:rgba(255,255,255,0.22);letter-spacing:0.1em;flex-shrink:0;padding-top:1px;';
         var title = document.createElement('h3');
         title.textContent = card.title;
-        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(17px,1.5vw,22px);font-weight:800;color:#fff;margin:0;line-height:1.25;letter-spacing:-0.3px;';
+        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(15px,1.35vw,18px);font-weight:800;color:#fff;margin:0;line-height:1.25;letter-spacing:-0.2px;';
+        titleRow.appendChild(numLbl);
+        titleRow.appendChild(title);
+        info.appendChild(titleRow);
 
         var desc = document.createElement('p');
         desc.textContent = card.desc;
-        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:12px;line-height:1.65;color:rgba(255,255,255,0.45);margin:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
-
-        info.appendChild(title);
+        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:12px;line-height:1.6;color:rgba(255,255,255,0.42);margin:0 0 8px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
         info.appendChild(desc);
-        if (card.iconTags && card.iconTags.length) info.appendChild(buildIconRow(card.iconTags));
 
-        var sep = document.createElement('div');
-        sep.style.cssText = 'height:1px;background:rgba(255,255,255,0.07);flex-shrink:0;margin:2px 0;';
-        info.appendChild(sep);
-        info.appendChild(buildMetrics(card.metrics));
+        if (card.iconTags && card.iconTags.length) {
+          var ir = buildIconRow(card.iconTags);
+          ir.style.marginBottom = '10px';
+          info.appendChild(ir);
+        }
+
+        // Metrics inline — values + subtle labels below
+        var metWrap = document.createElement('div');
+        metWrap.style.cssText = 'padding-top:8px;border-top:1px solid rgba(255,255,255,0.07);';
+        metWrap.appendChild(buildMetrics(card.metrics));
+        info.appendChild(metWrap);
 
         if (card.href && card.href !== '#') {
           var ctaWrap = document.createElement('div');
-          ctaWrap.style.cssText = 'margin-top:auto;padding-top:4px;';
+          ctaWrap.style.cssText = 'margin-top:auto;padding-top:10px;';
           var cta = document.createElement('a');
           cta.href = card.href;
           cta.textContent = 'View Case Study →';
-          cta.style.cssText = 'display:inline-block;font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:600;letter-spacing:0.03em;border-radius:999px;padding:10px 22px;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.04);transition:background 0.2s,border-color 0.2s;';
-          cta.addEventListener('mouseenter', function() { cta.style.background='rgba(255,255,255,0.1)'; cta.style.borderColor='rgba(255,255,255,0.38)'; });
-          cta.addEventListener('mouseleave', function() { cta.style.background='rgba(255,255,255,0.04)'; cta.style.borderColor='rgba(255,255,255,0.18)'; });
+          cta.style.cssText = 'display:inline-block;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;letter-spacing:0.03em;border-radius:999px;padding:9px 20px;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.04);transition:background 0.18s,border-color 0.18s;';
+          cta.addEventListener('mouseenter', function() { cta.style.background='rgba(255,255,255,0.1)'; cta.style.borderColor='rgba(255,255,255,0.35)'; });
+          cta.addEventListener('mouseleave', function() { cta.style.background='rgba(255,255,255,0.04)'; cta.style.borderColor='rgba(255,255,255,0.16)'; });
           ctaWrap.appendChild(cta);
           info.appendChild(ctaWrap);
         }
@@ -606,12 +612,13 @@ void main() {
 
     // ── Card sizing ───────────────────────────────────────────────────
     function sizeGridCards() {
-      var leftPad = 80, rightPad = 60, gap = 24;
+      var leftPad = 80, rightPad = 60, gap = 20;
       var avail = el.clientWidth - leftPad - rightPad;
-      // Hero shows ~55% of available, project cards ~62% (shows ~1.6 cards)
-      var heroW    = Math.max(280, Math.round(avail * 0.55));
-      var projectW = Math.max(280, Math.round(avail * 0.62));
-      var cardH    = Math.min(600, Math.max(440, el.clientHeight - 120));
+      // Target: 2 full project cards visible side-by-side with a ~120px peek of a third
+      var projectW = Math.max(280, Math.floor((avail - gap) / 2.15));
+      var heroW    = Math.max(260, Math.round(projectW * 0.78));
+      // Height: leave room for track top-padding (80px) + controls bar (72px) + breathing (32px)
+      var cardH    = Math.min(520, Math.max(340, el.clientHeight - 184));
       gridCardEls.forEach(function (c, i) {
         c.style.width  = (i === 0 ? heroW : projectW) + 'px';
         c.style.height = cardH + 'px';
