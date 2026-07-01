@@ -11547,13 +11547,17 @@
 
       function runPhotoReveal() {
         screen.classList.add('photos-away');            // start hidden
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          screen.classList.remove('photos-away');       // animate in
-          setTimeout(() => {
-            introPhase = false;                         // unlock mouseleave
-            if (!isOnContent()) screen.classList.add('photos-away');
-          }, 3000);
-        }));
+        // Wait for the hero content cascade to finish (text → CTA → facts ~1540ms),
+        // then slide photos in with the same animation as the cursor-hover reveal.
+        setTimeout(() => {
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            screen.classList.remove('photos-away');     // animate in
+            setTimeout(() => {
+              introPhase = false;                       // unlock mouseleave
+              if (!isOnContent()) screen.classList.add('photos-away');
+            }, 3000);
+          }));
+        }, 1600);
       }
 
       if (document.documentElement.classList.contains('glass-loading')) {
@@ -16269,7 +16273,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260701-gridv11" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260701-gridv13" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
