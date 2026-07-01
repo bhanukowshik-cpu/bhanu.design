@@ -48,10 +48,12 @@
         video:    c.video,
         poster:   POSTERS[i] || null,
         portrait: !!c.portrait,
-        title:    d.title   || c.label,
-        desc:     d.desc    || '',
-        metrics:  d.metrics || [],
-        href:     d.href    || '#'
+        title:    d.title    || c.label,
+        desc:     d.desc     || '',
+        metrics:  d.metrics  || [],
+        iconTags: d.iconTags || [],
+        tags:     d.tags     || [],
+        href:     d.href     || '#'
       };
     });
 
@@ -377,18 +379,19 @@ void main() {
     // ── Nav buttons ───────────────────────────────────────────────────────
     // ── Grid overlay — single row, horizontal scroll, full-bleed media ───
     var listOverlay = document.createElement('div');
-    listOverlay.style.cssText = 'position:absolute;inset:0;z-index:15;overflow:hidden;padding:104px 0 0;box-sizing:border-box;display:none;opacity:0;transition:opacity 0.3s;';
+    listOverlay.style.cssText = 'position:absolute;inset:0;z-index:15;overflow:hidden;padding:104px 40px 0;box-sizing:border-box;display:none;opacity:0;transition:opacity 0.3s;';
 
     var lvTrack = document.createElement('div');
     lvTrack.className = 's2-grid-track';
-    lvTrack.style.cssText = 'display:flex;gap:24px;height:100%;padding:0 40px 32px;box-sizing:border-box;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;cursor:grab;';
+    lvTrack.style.cssText = 'display:flex;align-items:center;gap:24px;height:100%;padding:0 0 32px;box-sizing:border-box;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;cursor:grab;';
 
     // Hide the native scrollbar + define the swipe-hint animation (can't
     // reach index.html's <style> block from here, so inject a small one).
     var gridStyleTag = document.createElement('style');
     gridStyleTag.textContent =
       '.s2-grid-track::-webkit-scrollbar{display:none}' +
-      '@keyframes s2SwipeHint{0%,100%{transform:translateY(-50%) translateX(0);opacity:.9}50%{transform:translateY(-50%) translateX(-10px);opacity:.4}}';
+      '@keyframes s2SwipeHint{0%,100%{transform:translateY(-50%) translateX(0);opacity:.9}50%{transform:translateY(-50%) translateX(-10px);opacity:.4}}' +
+      '@keyframes s2ScrollArrow{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(7px);opacity:0.45}}';
     document.head.appendChild(gridStyleTag);
 
     // Live blob canvas for grid card 01 (driven in the GSAP ticker)
@@ -399,104 +402,180 @@ void main() {
     GRID_CARDS.forEach(function (card, ci) {
       var cardEl = document.createElement('div');
       cardEl.className = 's2-grid-card';
-      cardEl.style.cssText = 'position:relative;flex:0 0 auto;height:100%;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:#14161a;cursor:pointer;scroll-snap-align:start;';
 
-      // ── Section 1 (60%) — 16:9 video/canvas shown IN FULL (never cropped),
-      // sitting over a softly blurred copy of the same artwork so the letterbox
-      // never shows raw black bars.
-      var videoRow = document.createElement('div');
-      videoRow.style.cssText = 'position:relative;flex:0 0 60%;overflow:hidden;background:#000;';
+      if (ci === 0) {
+        // ── Hero slot: transparent, blob canvas + content, no media frame ─
+        cardEl.style.cssText = 'position:relative;flex:0 0 auto;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:transparent;cursor:default;scroll-snap-align:start;';
 
-      var bgFill = document.createElement('img');
-      bgFill.src = card.img;
-      bgFill.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(28px) brightness(0.55) saturate(120%);transform:scale(1.2);';
-      videoRow.appendChild(bgFill);
-
-      var mediaWrap = document.createElement('div');
-      mediaWrap.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;';
-
-      if (card.video) {
-        var vid = document.createElement('video');
-        vid.src = card.video;
-        if (card.poster) vid.poster = card.poster;
-        vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true;
-        vid.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;';
-        mediaWrap.appendChild(vid);
-      } else {
-        // EverTutor AI System — live blob waveform, same animation as spiral card
+        // Blob canvas fills top ~52% of the card
+        var blobArea = document.createElement('div');
+        blobArea.style.cssText = 'flex:0 0 45%;position:relative;display:flex;align-items:center;justify-content:center;';
         var lc = document.createElement('canvas');
         lc.width = 800; lc.height = 450;
         lc.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;';
-        mediaWrap.appendChild(lc);
+        blobArea.appendChild(lc);
+        cardEl.appendChild(blobArea);
         listBlobCanvas = lc;
         listBlobCtx    = lc.getContext('2d');
+
+        // Info section
+        var info = document.createElement('div');
+        info.style.cssText = 'flex:1;min-height:0;display:flex;flex-direction:column;padding:14px 20px 16px;gap:8px;overflow:hidden;';
+
+        var name = document.createElement('h3');
+        name.textContent = card.title;
+        name.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:20px;font-weight:700;color:#fff;margin:0;line-height:1.25;letter-spacing:-0.3px;';
+
+        var descEl = document.createElement('p');
+        descEl.textContent = card.desc;
+        descEl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:14px;line-height:1.6;color:rgba(255,255,255,0.58);margin:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
+
+        info.appendChild(name);
+        info.appendChild(descEl);
+
+        // Icon meta-tags
+        if (card.iconTags && card.iconTags.length) {
+          var iconMap0 = window.S2_ICON_MAP || {};
+          var iconRow0 = document.createElement('div');
+          iconRow0.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
+          card.iconTags.forEach(function (it) {
+            var icons = iconMap0[it.icon] || {};
+            var tagEl = document.createElement('div');
+            tagEl.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:4px 10px 4px 7px;';
+            var ic = document.createElement('img');
+            ic.src = icons.dark || '';
+            ic.style.cssText = 'width:13px;height:13px;object-fit:contain;flex-shrink:0;';
+            var itLbl = document.createElement('span');
+            itLbl.textContent = it.label;
+            itLbl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:500;color:rgba(255,255,255,0.8);white-space:nowrap;';
+            tagEl.appendChild(ic); tagEl.appendChild(itLbl); iconRow0.appendChild(tagEl);
+          });
+          info.appendChild(iconRow0);
+        }
+
+        // Metrics grid
+        var heroMetCols = 2;
+        var heroChips = document.createElement('div');
+        heroChips.style.cssText = 'display:grid;grid-template-columns:repeat(' + heroMetCols + ',1fr);gap:8px;';
+        card.metrics.forEach(function (m) {
+          var cell = document.createElement('div');
+          cell.style.cssText = 'min-width:0;';
+          var val = document.createElement('span');
+          val.textContent = m.val;
+          val.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:clamp(16px,1.4vw,22px);font-weight:700;color:#E6F28D;display:block;letter-spacing:-0.3px;line-height:1.1;';
+          var mLbl = document.createElement('span');
+          mLbl.textContent = m.lbl;
+          mLbl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-top:3px;line-height:1.3;';
+          cell.appendChild(val); cell.appendChild(mLbl); heroChips.appendChild(cell);
+        });
+        info.appendChild(heroChips);
+
+        // Animated scroll-right hint
+        var scrollHint = document.createElement('div');
+        scrollHint.style.cssText = 'margin-top:auto;padding-top:14px;display:flex;align-items:center;transition:opacity 0.4s;';
+        var scrollArr = document.createElement('div');
+        scrollArr.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.55);animation:s2ScrollArrow 1.4s ease-in-out infinite;flex-shrink:0;';
+        scrollArr.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+        scrollHint.appendChild(scrollArr);
+        info.appendChild(scrollHint);
+        swipeHintEl = scrollHint;
+
+        cardEl.appendChild(info);
+
+      } else {
+        // ── Standard card: dark bg, 16:9 media, info ─────────────────────
+        cardEl.style.cssText = 'position:relative;flex:0 0 auto;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:#14161a;cursor:pointer;scroll-snap-align:start;';
+
+        var videoRow = document.createElement('div');
+        var bgImg = card.img ? 'url(' + card.img + ')' : 'none';
+        videoRow.style.cssText = 'position:relative;flex:0 0 58%;overflow:hidden;background-color:#060606;background-image:' + bgImg + ';background-size:cover;background-position:center;margin:10px 10px 0;border-radius:14px;';
+
+        var mediaWrap = document.createElement('div');
+        mediaWrap.style.cssText = 'position:absolute;inset:0;padding:15px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;';
+
+        if (card.video) {
+          var vid = document.createElement('video');
+          vid.src = card.video;
+          if (card.poster) vid.poster = card.poster;
+          vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true;
+          vid.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;';
+          mediaWrap.appendChild(vid);
+        }
+        videoRow.appendChild(mediaWrap);
+        cardEl.appendChild(videoRow);
+
+        // Info section
+        var info = document.createElement('div');
+        info.style.cssText = 'flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-between;padding:20px 22px;gap:12px;';
+
+        var name = document.createElement('h3');
+        name.textContent = card.title;
+        name.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:20px;font-weight:700;color:#fff;margin:0;line-height:1.25;letter-spacing:-0.3px;';
+
+        var descEl = document.createElement('p');
+        descEl.textContent = card.desc;
+        descEl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:14px;line-height:1.6;color:rgba(255,255,255,0.58);margin:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
+
+        var cols = card.metrics.length > 3 ? card.metrics.length : 3;
+        var chipsRow = document.createElement('div');
+        chipsRow.style.cssText = 'display:grid;grid-template-columns:repeat(' + cols + ',1fr);gap:8px;';
+
+        card.metrics.forEach(function (m) {
+          var cell = document.createElement('div');
+          cell.style.cssText = 'min-width:0;';
+          var val = document.createElement('span');
+          val.textContent = m.val;
+          val.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:clamp(16px,1.4vw,22px);font-weight:700;color:#E6F28D;display:block;letter-spacing:-0.3px;line-height:1.1;';
+          var mLbl = document.createElement('span');
+          mLbl.textContent = m.lbl;
+          mLbl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-top:3px;line-height:1.3;';
+          cell.appendChild(val); cell.appendChild(mLbl); chipsRow.appendChild(cell);
+        });
+
+        info.appendChild(name);
+        info.appendChild(descEl);
+
+        // Icon meta-tags
+        if (card.iconTags && card.iconTags.length) {
+          var iconMap = window.S2_ICON_MAP || {};
+          var iconRow = document.createElement('div');
+          iconRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
+          card.iconTags.forEach(function (it) {
+            var icons = iconMap[it.icon] || {};
+            var tag = document.createElement('div');
+            tag.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:4px 10px 4px 7px;';
+            var ic = document.createElement('img');
+            ic.src = icons.dark || '';
+            ic.style.cssText = 'width:13px;height:13px;object-fit:contain;flex-shrink:0;';
+            var lbl = document.createElement('span');
+            lbl.textContent = it.label;
+            lbl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:500;color:rgba(255,255,255,0.8);white-space:nowrap;';
+            tag.appendChild(ic); tag.appendChild(lbl); iconRow.appendChild(tag);
+          });
+          info.appendChild(iconRow);
+        }
+
+        info.appendChild(chipsRow);
+
+        if (card.href && card.href !== '#') {
+          var ctaPill = document.createElement('div');
+          ctaPill.style.cssText = 'align-self:flex-start;margin-top:4px;background:rgba(23,23,23,0.88);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border-radius:999px;padding:4px;';
+          var cta = document.createElement('a');
+          cta.href = card.href;
+          cta.textContent = 'View Case Study →';
+          cta.style.cssText = 'display:block;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:500;letter-spacing:0.02em;border-radius:999px;padding:8px 16px;color:#fff;text-decoration:none;background:linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 2.45%, rgba(255,255,255,0) 126.14%);box-shadow:1.1px 2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,-1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset;transition:background 0.2s;';
+          cta.addEventListener('mouseenter', function() { cta.style.background = 'rgba(255,255,255,0.14)'; });
+          cta.addEventListener('mouseleave', function() { cta.style.background = 'linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 2.45%, rgba(255,255,255,0) 126.14%)'; });
+          ctaPill.appendChild(cta);
+          info.appendChild(ctaPill);
+        }
+
+        cardEl.appendChild(info);
+
+        cardEl.addEventListener('click', function () {
+          if (card.href && card.href !== '#') window.location.href = card.href;
+        });
       }
-      videoRow.appendChild(mediaWrap);
-      cardEl.appendChild(videoRow);
-
-      // First card: animated hint pointing the swipe/scroll direction
-      if (ci === 0) {
-        swipeHintEl = document.createElement('div');
-        swipeHintEl.style.cssText = 'position:absolute;top:50%;left:16px;transform:translateY(-50%);width:40px;height:40px;border-radius:999px;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:2;animation:s2SwipeHint 1.6s ease-in-out infinite;';
-        swipeHintEl.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
-        videoRow.appendChild(swipeHintEl);
-      }
-
-      // ── Section 2 (remaining 40%) — title, description, metrics, CTA ────
-      var info = document.createElement('div');
-      info.style.cssText = 'flex:1;min-height:0;display:flex;flex-direction:column;padding:20px 22px;gap:8px;';
-
-      var name = document.createElement('h3');
-      name.textContent = card.title;
-      name.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:18px;font-weight:700;color:#fff;margin:0;line-height:1.25;letter-spacing:-0.2px;';
-
-      var desc = document.createElement('p');
-      desc.textContent = card.desc;
-      desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:12.5px;line-height:1.55;color:rgba(255,255,255,0.58);margin:0;flex:1;min-height:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
-
-      var chipsRow = document.createElement('div');
-      chipsRow.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:6px;';
-
-      card.metrics.forEach(function (m) {
-        var cell = document.createElement('div');
-        cell.style.cssText = 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:9px;padding:8px 10px;min-width:0;';
-        var val = document.createElement('span');
-        val.textContent = m.val;
-        val.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:700;color:#E6F28D;display:block;letter-spacing:-0.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-        var lbl = document.createElement('span');
-        lbl.textContent = m.lbl;
-        lbl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:8.5px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-        cell.appendChild(val);
-        cell.appendChild(lbl);
-        chipsRow.appendChild(cell);
-      });
-
-      info.appendChild(name);
-      info.appendChild(desc);
-      info.appendChild(chipsRow);
-
-      // CTA — same glass-pill styling as the spiral/grid view toggle. Cards
-      // with no case study yet (href '#') simply get no CTA, matching how
-      // the spiral treats them — no "in progress" placeholder text.
-      if (card.href && card.href !== '#') {
-        var ctaPill = document.createElement('div');
-        ctaPill.style.cssText = 'align-self:flex-start;margin-top:4px;background:rgba(23,23,23,0.88);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border-radius:999px;padding:4px;';
-        var cta = document.createElement('a');
-        cta.href = card.href;
-        cta.textContent = 'View Case Study →';
-        cta.style.cssText = 'display:block;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:500;letter-spacing:0.02em;border-radius:999px;padding:8px 16px;color:#fff;text-decoration:none;background:linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 2.45%, rgba(255,255,255,0) 126.14%);box-shadow:1.1px 2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,-1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset;transition:background 0.2s;';
-        cta.addEventListener('mouseenter', function() { cta.style.background = 'rgba(255,255,255,0.14)'; });
-        cta.addEventListener('mouseleave', function() { cta.style.background = 'linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 2.45%, rgba(255,255,255,0) 126.14%)'; });
-        ctaPill.appendChild(cta);
-        info.appendChild(ctaPill);
-      }
-
-      cardEl.appendChild(info);
-
-      // Click anywhere on the card navigates — suppressed if mid-drag (see below)
-      cardEl.addEventListener('click', function () {
-        if (card.href && card.href !== '#') window.location.href = card.href;
-      });
 
       lvTrack.appendChild(cardEl);
       gridCardEls.push(cardEl);
@@ -507,10 +586,11 @@ void main() {
 
     // Fit exactly ~2.5 cards in the viewport, recomputed on resize.
     function sizeGridCards() {
-      var gap = 24, sidePad = 80, visible = 2.5;
+      var gap = 24, sidePad = 80, visible = 3;
       var avail = el.clientWidth - sidePad;
-      var cardW = Math.max(220, (avail - gap) / visible);
-      gridCardEls.forEach(function (c) { c.style.width = cardW + 'px'; });
+      var cardW = Math.max(200, (avail - gap * (visible - 1)) / visible);
+      var cardH = Math.min(560, Math.max(380, el.clientHeight - 150));
+      gridCardEls.forEach(function (c) { c.style.width = cardW + 'px'; c.style.height = cardH + 'px'; });
     }
     sizeGridCards();
     window.addEventListener('resize', sizeGridCards);
@@ -652,15 +732,14 @@ void main() {
     function lerp(a, b, t) { return a + (b - a) * t; }
 
     // ── Blob waveform canvas draw ─────────────────────────────────────────
-    function drawBlobWave(ctx, t, img) {
+    function drawBlobWave(ctx, t, img, transparent) {
       var W = 800, H = 450, cx = W / 2, cy = H / 2;
       var NUM = 40;
 
       var BR = 122; // fixed blob radius
 
       // 1. Dark background
-      ctx.fillStyle = '#060606';
-      ctx.fillRect(0, 0, W, H);
+      if (transparent) { ctx.clearRect(0, 0, W, H); } else { ctx.fillStyle = '#060606'; ctx.fillRect(0, 0, W, H); }
 
       // 2. Ring halo — starts near blob edge, fades outward
       var halo = ctx.createRadialGradient(cx, cy, BR * 0.75, cx, cy, BR * 2.1);
@@ -685,7 +764,7 @@ void main() {
         ctx.fillStyle = '#0D0D0D'; ctx.fill();
       }
 
-      // 4. Bidirectional tick bars — expand from midpoint both inward + outward
+      // 5. Bidirectional tick bars — expand from midpoint both inward + outward
       var MID_OFFSET = 30; // gap from blob edge to bar centre
       ctx.lineCap = 'round';
       for (var k = 0; k < NUM; k++) {
@@ -707,7 +786,7 @@ void main() {
         var gr = k % 2 === 0 ? '74,222,128' : '134,239,172';
 
         // Crisp core
-        ctx.lineWidth   = 3;
+        ctx.lineWidth   = 5;
         ctx.strokeStyle = 'rgba(' + gr + ',' + alph.toFixed(2) + ')';
         ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
       }

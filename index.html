@@ -149,6 +149,7 @@
        134px = page padding-top (94) + hero padding-top (40). */
     .hero-screen {
       position: relative;
+      isolation: isolate;
       display: grid;
       grid-template-columns: 0.9fr 2.6fr 0.9fr;   /* photo-left / center text / photo-right — balanced: photos closer in, center still wide for content */
       height: calc(100svh - 134px);
@@ -168,7 +169,7 @@
       background:
         radial-gradient(ellipse 70% 140px at 50% 100%, rgba(230,242,141,0.20) 0%, rgba(230,242,141,0.06) 65%, transparent 100%);
       pointer-events: none;
-      z-index: 0;
+      z-index: -1;
     }
     .hero-screen::before {
       content: '';
@@ -182,7 +183,7 @@
       -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, #000 100%);
       mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, #000 100%);
       pointer-events: none;
-      z-index: 0;
+      z-index: -1;
     }
     /* ─── SCROLL PROGRESS BAR — top of page ───────────────── */
     .scroll-progress {
@@ -433,13 +434,13 @@
     .hero-photos-left .polaroid.p2 { left: auto; right: 8%; top: auto; bottom: 0%; transform: rotate(5deg); }
     .pc {
       display: block;
-      background: #FFFFFF;
+      background: #F2F2F2;
       padding: 6px 6px 14px;
       border-radius: 4px;
       box-shadow: none;
     }
-    /* Always a classic white polaroid frame — same in dark mode too */
-    [data-theme="dark"] .pc { background: #FFFFFF; }
+    /* Slightly off-white polaroid — same in dark mode so it still pops */
+    [data-theme="dark"] .pc { background: #F2F2F2; }
     [data-theme="dark"] .pc-cap { color: #252525; }
     .pc img {
       display: block;
