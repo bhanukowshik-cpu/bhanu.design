@@ -15,9 +15,9 @@ function webglAvailable(): boolean {
 }
 
 /**
- * Entry point. Camera at z=5 / fov 40 puts the unit sphere at ~55% of
- * viewport height on desktop (brief: 45–60%); OrbScene handles narrow-
- * viewport fitting.
+ * Entry point. Medium focal length (fov 35 ≈ 65mm), object centered,
+ * pulled back for negative space — the sphere sits at ~49% of viewport
+ * height. OrbScene handles narrow-viewport fitting.
  */
 export function VoiceOrb() {
   const hasWebGL = useMemo(webglAvailable, []);
@@ -26,7 +26,7 @@ export function VoiceOrb() {
   return (
     <Canvas
       dpr={[1, 2]}
-      camera={{ position: [0, 0, 5], fov: 40 }}
+      camera={{ position: [0, 0, 6.4], fov: 35 }}
       gl={{ antialias: true, alpha: true }}
       style={{ position: 'absolute', inset: 0 }}
     >

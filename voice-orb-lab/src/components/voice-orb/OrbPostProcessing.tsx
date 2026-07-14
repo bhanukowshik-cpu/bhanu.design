@@ -1,16 +1,17 @@
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, BrightnessContrast } from '@react-three/postprocessing';
 import { useControls } from 'leva';
 
 /**
- * Restrained post: bloom clips to highlights only (high threshold) and the
- * vignette stays whisper-soft. The orb must hold up with bloom disabled.
+ * Phase 1A post: subtle bloom + a touch of contrast. Tone mapping is
+ * ACES Filmic via the default renderer config. Nothing else — no CA,
+ * no grain, no flares, no vignette. The material must carry the frame.
  */
 export function OrbPostProcessing() {
   const ctl = useControls('Post', {
     bloomEnabled:   true,
-    bloomStrength:  { value: 0.55, min: 0, max: 2,   step: 0.01 },
-    bloomThreshold: { value: 0.72, min: 0, max: 1,   step: 0.01 },
-    vignette:       { value: 0.16, min: 0, max: 0.5, step: 0.01 },
+    bloomStrength:  { value: 0.35, min: 0, max: 2, step: 0.01 },
+    bloomThreshold: { value: 0.8,  min: 0, max: 1, step: 0.01 },
+    contrast:       { value: 0.04, min: -0.2, max: 0.2, step: 0.005 },
   });
 
   return (
@@ -19,13 +20,13 @@ export function OrbPostProcessing() {
         <Bloom
           intensity={ctl.bloomStrength}
           luminanceThreshold={ctl.bloomThreshold}
-          luminanceSmoothing={0.25}
+          luminanceSmoothing={0.3}
           mipmapBlur
         />
       ) : (
         <></>
       )}
-      <Vignette eskil={false} offset={0.28} darkness={ctl.vignette} />
+      <BrightnessContrast brightness={0} contrast={ctl.contrast} />
     </EffectComposer>
   );
 }
