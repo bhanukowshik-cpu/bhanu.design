@@ -80,6 +80,14 @@
   <div class="grid" id="grid"></div>
   <p class="err" id="err">Couldn’t load Three.js from the CDN — check your connection and reload.</p>
 
+<script>
+  /* module scripts can't load over file:// — catch the mistake loudly */
+  if (location.protocol === 'file:') {
+    var e = document.getElementById('err');
+    e.textContent = 'This page must be served over http — open http://localhost:8080/voice-orb/variations.html (with the portfolio server running) instead of the file directly.';
+    e.style.display = 'block';
+  }
+</script>
 <script type="module">
   import { VARIANTS, createVariant } from './variants.js?v=1';
 
