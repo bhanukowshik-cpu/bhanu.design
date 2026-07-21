@@ -9937,8 +9937,17 @@
         border-radius: 18px;
         gap: 4px;
         padding: 6px;
+        overflow: clip;
       }
       .abt-tab { font-size: var(--fs-sm); padding: 9px 16px; }
+      /* Pill can wrap to 2 rows from here down — position the sliding thumb
+         per-row (JS sets --y/--rh) instead of letting it span the full pill */
+      .abt-nav-thumb {
+        top: calc(var(--y, 0px) + 3px) !important;
+        height: calc(var(--rh, 34px) - 6px) !important;
+        transition: transform 0.38s cubic-bezier(0.34, 1.2, 0.4, 1), width 0.38s cubic-bezier(0.34, 1.2, 0.4, 1), top 0.25s ease !important;
+      }
+      .abt-nav-thumb.no-anim { transition: none !important; }
     }
 
     /* ── DNA tablet: content on top (centered), T below (breadth only), tabs at bottom ── */
@@ -10034,6 +10043,13 @@
       .dna2-quote { font-size: var(--fs-label) !important; line-height: 1.5 !important; }
       .dna2-name  { font-size: var(--fs-sm) !important; }
       .dna2-qmark { font-size: 24px !important; }
+    }
+
+    /* ── DNA breadth bar: below 480px five 1fr columns squeeze to ~58px and
+       long single words ("Engineering") spill past their tiles — let the
+       grid wrap to 3+2 instead, breakpoint-free ── */
+    @media (max-width: 480px) {
+      .dna2-bar { grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)) !important; }
     }
 
     /* ── Beyond the Pixels (oh2): tighten headline/gap at wide tablet ── */
