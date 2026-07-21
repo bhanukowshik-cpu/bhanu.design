@@ -1725,7 +1725,7 @@
     }
     .mobile-menu-backdrop.open { opacity: 1; pointer-events: auto; }
     .mobile-menu a {
-      font-family: var(--font-mono); font-weight: 500; font-size: var(--fs-sm);
+      font-family: var(--font-mono); font-weight: 500; font-size: var(--fs-body);
       text-transform: uppercase; color: var(--secondary); text-decoration: none;
       padding: 14px 0; border-bottom: 1px solid var(--border); width: 100%;
       letter-spacing: 0.06em;
@@ -10092,6 +10092,24 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
+       TOUCH ERGONOMICS — 44px minimum targets on coarse pointers
+       Visuals stay the same; hit areas grow via padding/negative
+       margin or min-height so fingers never miss. (WCAG 2.5.8)
+       ══════════════════════════════════════════════════════════ */
+    @media (pointer: coarse) {
+      .nav-hamburger  { width: 44px; height: 44px; padding: 10px; }
+      /* padding + negative margin = bigger hit box, zero layout shift */
+      .theme-toggle   { padding: 7px; margin: -7px; }
+      .hero-cta       { min-height: 44px; }
+      .s2-vt-btn      { min-height: 42px; }
+      .abt-tab        { padding-top: 12px !important; padding-bottom: 12px !important; }
+      .dna2-cta       { padding-top: 11px !important; padding-bottom: 11px !important; }
+      .footer-copy-btn { width: 36px; height: 36px; }
+      .footer-copy-btn::before { content: ''; position: absolute; inset: -6px; border-radius: 12px; }
+      .s2-acc-chevron { width: 24px; height: 24px; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
        LIGHT MODE OVERRIDES — "dark island" sections
        All sections below used hardcoded #0D0D0D / #111 / #252525
        backgrounds with no light-mode variant. These rules give
@@ -11670,11 +11688,14 @@
 
       let introPhase = true; // locked during the 3-s reveal window
       let cursorX = -1, cursorY = -1;
+      // Touch-primary devices have no cursor: keep photos visible instead of
+      // hover-hiding them (isOnContent() is always false without mousemove).
+      const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
       document.addEventListener('mousemove', (e) => { cursorX = e.clientX; cursorY = e.clientY; });
 
       content.addEventListener('mouseenter', () => screen.classList.remove('photos-away'));
       content.addEventListener('mouseleave', () => {
-        if (!introPhase) screen.classList.add('photos-away');
+        if (!introPhase && canHover) screen.classList.add('photos-away');
       });
 
       function isOnContent() {
@@ -11693,7 +11714,7 @@
             screen.classList.remove('photos-away');     // animate in
             setTimeout(() => {
               introPhase = false;                       // unlock mouseleave
-              if (!isOnContent()) screen.classList.add('photos-away');
+              if (canHover && !isOnContent()) screen.classList.add('photos-away');
             }, 3000);
           }));
         }, 1600);
