@@ -9649,8 +9649,12 @@
     @media (max-width: 767px) {
       .tm-header { padding: 0 20px; margin-bottom: 36px; }
       .tm-stack-scene { width: calc(100% - 24px); }
-      .tm-stack  { height: 312px; }
-      .tm-sc     { height: 200px; }
+      /* Cards grow with their quote instead of clipping it: the front card
+         sits in flow (margin-top replaces its translateY) so the stack takes
+         its real height; back cards stay absolute and peek above as before */
+      .tm-stack  { height: auto; min-height: 312px; }
+      .tm-sc     { height: auto; min-height: 200px; }
+      .tm-sc[data-pos="0"] { position: relative; transform: translateY(0) scale(1); margin-top: 66px; }
       .tm-body   { padding: 16px 18px 14px; }
       .tm-quote  { font-size: var(--fs-label); }
       .tm-qmark  { font-size: 28px; }
@@ -9900,8 +9904,8 @@
       /* Marquee photos — smaller on phone */
       .av2-marquee-photo { width: 200px; height: 210px; }
 
-      /* Testimonials — legible quote text (was 10.5px, too small) */
-      .tm-quote { font-size: var(--fs-sm) !important; line-height: 1.65 !important; }
+      /* Testimonials — legible quote text (cards auto-grow, so body-size type fits) */
+      .tm-quote { font-size: var(--fs-body) !important; line-height: 1.65 !important; }
       .tm-text-col { padding: 16px 16px 14px !important; }
 
       /* Footer — tighter horizontal padding on phone */
@@ -9917,9 +9921,9 @@
       .av2-headline { font-size: 22px; }
       .av2-philosophy { font-size: var(--fs-sm); }
 
-      .tm-stack { height: 280px; }
-      .tm-sc    { height: 190px; }
-      .tm-name  { font-size: var(--fs-label); }
+      .tm-stack { height: auto; min-height: 280px; }
+      .tm-sc    { min-height: 190px; }
+      .tm-name  { font-size: var(--fs-sm); }
 
       .top-nav { height: 46px; padding: 6px 14px; }
     }
@@ -10287,8 +10291,22 @@
     html:not([data-theme="dark"]) .tm-sc[data-color="pink"] { background: var(--surface); }
 
     html:not([data-theme="dark"]) .tm-quote { color: var(--secondary); }
-    html:not([data-theme="dark"]) .tm-author-name { color: var(--secondary); }
-    html:not([data-theme="dark"]) .tm-author-title { color: rgba(37,37,37,0.55); }
+    html:not([data-theme="dark"]) .tm-name { color: var(--secondary); }
+    html:not([data-theme="dark"]) .tm-role { color: rgba(37,37,37,0.55); }
+    /* Per-card accent colors: the pastel dark-mode tints wash out on white —
+       swap for their darker cousins so highlighted phrases stay readable */
+    html:not([data-theme="dark"]) .tm-sc[data-color="purple"] .tm-qmark,
+    html:not([data-theme="dark"]) .tm-sc[data-color="purple"] .tm-quote em { color: #7C3AED; }
+    html:not([data-theme="dark"]) .tm-sc[data-color="purple"] .tm-role { color: rgba(109,40,217,0.80); }
+    html:not([data-theme="dark"]) .tm-sc[data-color="peach"] .tm-qmark,
+    html:not([data-theme="dark"]) .tm-sc[data-color="peach"] .tm-quote em { color: #C2570F; }
+    html:not([data-theme="dark"]) .tm-sc[data-color="peach"] .tm-role { color: rgba(194,87,15,0.85); }
+    html:not([data-theme="dark"]) .tm-sc[data-color="green"] .tm-qmark,
+    html:not([data-theme="dark"]) .tm-sc[data-color="green"] .tm-quote em { color: #047857; }
+    html:not([data-theme="dark"]) .tm-sc[data-color="green"] .tm-role { color: rgba(4,120,87,0.85); }
+    html:not([data-theme="dark"]) .tm-sc[data-color="blue"] .tm-qmark,
+    html:not([data-theme="dark"]) .tm-sc[data-color="blue"] .tm-quote em { color: #1D4ED8; }
+    html:not([data-theme="dark"]) .tm-sc[data-color="blue"] .tm-role { color: rgba(29,78,216,0.80); }
     html:not([data-theme="dark"]) .tm-sc .tm-fh { background: var(--surface-alt); }
 
     /* Stack shadows: dark cards behind active one */
@@ -11257,7 +11275,7 @@
                 </div>
                 <div class="tm-art-col">
                   <div class="tm-art-frame">
-                    <img src="Testrimonial%20Icons/Lupita%20Stressie.svg?v=2" class="tm-art-img" alt="Lupita">
+                    <img src="Testrimonial%20Icons/Lupita%20Stressie.svg?v=2" class="tm-art-img" alt="Lupita" onerror="this.style.display='none'">
                   </div>
                 </div>
               </div>
@@ -11284,7 +11302,7 @@
                 </div>
                 <div class="tm-art-col">
                   <div class="tm-art-frame">
-                    <img src="Testrimonial%20Icons/Subash%20EverTutor.svg?v=2" class="tm-art-img" alt="Subash">
+                    <img src="Testrimonial%20Icons/Subash%20EverTutor.svg?v=2" class="tm-art-img" alt="Subash" onerror="this.style.display='none'">
                   </div>
                 </div>
               </div>
@@ -11311,7 +11329,7 @@
                 </div>
                 <div class="tm-art-col">
                   <div class="tm-art-frame">
-                    <img src="Testrimonial%20Icons/Shaini%20Designer.svg?v=2" class="tm-art-img" alt="Shaini">
+                    <img src="Testrimonial%20Icons/Shaini%20Designer.svg?v=2" class="tm-art-img" alt="Shaini" onerror="this.style.display='none'">
                   </div>
                 </div>
               </div>
@@ -11338,7 +11356,7 @@
                 </div>
                 <div class="tm-art-col">
                   <div class="tm-art-frame">
-                    <img src="Testrimonial%20Icons/Anushree%20Designer.svg?v=2" class="tm-art-img" alt="AnuShree">
+                    <img src="Testrimonial%20Icons/Anushree%20Designer.svg?v=2" class="tm-art-img" alt="AnuShree" onerror="this.style.display='none'">
                   </div>
                 </div>
               </div>
