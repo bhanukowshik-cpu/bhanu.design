@@ -9655,7 +9655,10 @@
          its real height; back cards stay absolute and peek above as before */
       .tm-stack  { height: auto; min-height: 312px; }
       .tm-sc     { height: auto; min-height: 200px; }
-      .tm-sc[data-pos="0"] { position: relative; transform: translateY(0) scale(1); margin-top: 66px; }
+      .tm-sc[data-pos="0"] { position: relative; transform: translateY(0) scale(1); margin-top: 66px; max-height: none; overflow: visible; }
+      /* Back cards only peek above the front card — cap them so a long
+         quote can't poke out below the deck */
+      .tm-sc:not([data-pos="0"]) { max-height: calc(100% - 44px); overflow: hidden; }
       .tm-body   { padding: 16px 18px 14px; }
       .tm-quote  { font-size: var(--fs-label); }
       .tm-qmark  { font-size: 28px; }
@@ -10099,8 +10102,9 @@
       .hf-impact-list { gap: 20px; }
     }
 
-    /* ── Testimonials: readable card heights on 768-900px ── */
-    @media (max-width: 900px) {
+    /* ── Testimonials: readable card heights on 768-900px only —
+       phones (≤767px) use the auto-growing stack instead ── */
+    @media (min-width: 768px) and (max-width: 900px) {
       .tm-stack    { height: 460px; }
       .tm-sc       { height: 360px; }
       .tm-art-col  { width: 180px; }
