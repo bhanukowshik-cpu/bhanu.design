@@ -376,32 +376,34 @@ void main() {
       mouse.set(-9999, -9999);
     });
 
-    // ── Nav buttons ───────────────────────────────────────────────────────
-    // ── Grid overlay — horizontal gallery with bottom controls ──────────
+    // ── List overlay — editorial title list ───────────────────────────
     var listOverlay = document.createElement('div');
     listOverlay.style.cssText = 'position:absolute;inset:0;z-index:15;display:none;opacity:0;transition:opacity 0.3s;flex-direction:column;overflow:hidden;';
 
-    // Scrollable card track (flex row)
-    var lvTrack = document.createElement('div');
-    lvTrack.className = 's2-grid-track';
-    lvTrack.style.cssText = 'flex:1;display:flex;align-items:center;gap:20px;overflow-x:auto;overflow-y:hidden;padding:80px 60px 0 80px;box-sizing:border-box;-webkit-overflow-scrolling:touch;';
-
-    // CSS injected into head (scrollbar hide + animations)
     var gridStyleTag = document.createElement('style');
     gridStyleTag.textContent =
-      '.s2-grid-track{scrollbar-width:none;-ms-overflow-style:none}' +
-      '.s2-grid-track::-webkit-scrollbar{display:none}' +
-      '@keyframes s2GridPulse{0%,100%{transform:translateX(0) scale(1);opacity:1}50%{transform:translateX(6px) scale(0.9);opacity:0.5}}';
+      '.s2-list-wrap{display:flex;flex-direction:column;justify-content:center;}' +
+      '.s2-list-row{display:flex;align-items:baseline;gap:20px;cursor:pointer;padding:10px 0;transition:color 0.28s;}' +
+      '.s2-list-row-title{font-family:"Montserrat",sans-serif;font-weight:800;letter-spacing:-0.03em;line-height:1.1;color:rgba(255,255,255,0.55);transition:color 0.28s,transform 0.32s cubic-bezier(0.16,1,0.3,1);}' +
+      '.s2-list-row-num{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:500;color:rgba(255,255,255,0.18);letter-spacing:0.08em;transition:color 0.28s;flex-shrink:0;align-self:center;}' +
+      '.s2-list-row-arrow{font-family:"JetBrains Mono",monospace;font-size:14px;color:rgba(255,255,255,0);transition:color 0.28s,transform 0.28s;flex-shrink:0;align-self:center;}' +
+      '.s2-list-wrap:hover .s2-list-row-title{color:rgba(255,255,255,0.13);}' +
+      '.s2-list-wrap:hover .s2-list-row-num{color:rgba(255,255,255,0.07);}' +
+      '.s2-list-row:hover .s2-list-row-title{color:#fff !important;transform:translateX(6px);}' +
+      '.s2-list-row:hover .s2-list-row-num{color:rgba(255,255,255,0.3) !important;}' +
+      '.s2-list-row:hover .s2-list-row-arrow{color:rgba(255,255,255,0.5);transform:translateX(4px);}';
     document.head.appendChild(gridStyleTag);
 
-    var listBlobCanvas = null, listBlobCtx  = null;
-    var gridCardEls    = [];
+    var listBlobCanvas = null, listBlobCtx = null;
+    var gridCardEls    = []; // compat
     var gridCurrentIdx = 0;
     var gridVisible    = false;
-    var gridPrevBtn    = null; // external btns (legacy refs, kept null for compat)
+    var gridPrevBtn    = null;
     var gridNextBtn    = null;
+    var gridNavPrev    = null;
+    var gridNavNext    = null;
 
-    // ── Shared builders ───────────────────────────────────────────────
+    // ── Shared builder (kept for compat) ──────────────────────────────
     function buildIconRow(iconTags) {
       var iconMap = window.S2_ICON_MAP || {};
       var row = document.createElement('div');
@@ -421,310 +423,83 @@ void main() {
       return row;
     }
 
-    function buildMetrics(metrics, cols) {
-      var ncols = cols || (metrics.length > 3 ? metrics.length : metrics.length);
-      var grid = document.createElement('div');
-      grid.style.cssText = 'display:grid;grid-template-columns:repeat(' + ncols + ',1fr);gap:12px 16px;';
-      metrics.forEach(function (m) {
-        var cell = document.createElement('div');
-        var val = document.createElement('span');
-        val.textContent = m.val;
-        val.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:clamp(18px,1.5vw,24px);font-weight:700;color:#E6F28D;display:block;letter-spacing:-0.3px;line-height:1.1;';
-        var lbl = document.createElement('span');
-        lbl.textContent = m.lbl;
-        lbl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,0.38);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-top:5px;line-height:1.4;';
-        cell.appendChild(val); cell.appendChild(lbl); grid.appendChild(cell);
-      });
-      return grid;
-    }
+    // ── Floating video preview (top-right, follows hovered row) ───────
+    var previewBox = document.createElement('div');
+    previewBox.style.cssText = 'position:absolute;right:72px;width:300px;border-radius:18px;overflow:hidden;opacity:0;transition:opacity 0.25s,transform 0.3s cubic-bezier(0.16,1,0.3,1);transform:translateY(12px) scale(0.95);pointer-events:none;box-shadow:0 40px 100px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.08);z-index:20;aspect-ratio:16/9;';
+    var previewBg = document.createElement('div');
+    previewBg.style.cssText = 'position:absolute;inset:0;background-size:cover;background-position:center;';
+    var previewVid = document.createElement('video');
+    previewVid.autoplay = true; previewVid.muted = true; previewVid.loop = true; previewVid.playsInline = true;
+    previewVid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;';
+    previewBox.appendChild(previewBg);
+    previewBox.appendChild(previewVid);
+    listOverlay.appendChild(previewBox);
 
-    // ── Card creation ─────────────────────────────────────────────────
+    // ── Header label ──────────────────────────────────────────────────
+    var listHeader = document.createElement('div');
+    listHeader.style.cssText = 'flex-shrink:0;padding:40px 10vw 0;display:flex;align-items:center;justify-content:space-between;';
+    var listLabel = document.createElement('span');
+    listLabel.textContent = 'FEATURED WORK';
+    listLabel.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.22);letter-spacing:0.22em;';
+    var listCountEl = document.createElement('span');
+    listCountEl.textContent = GRID_CARDS.length + ' PROJECTS';
+    listCountEl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.13);letter-spacing:0.14em;';
+    listHeader.appendChild(listLabel);
+    listHeader.appendChild(listCountEl);
+    listOverlay.appendChild(listHeader);
+
+    // ── Rows ──────────────────────────────────────────────────────────
+    var rowsContainer = document.createElement('div');
+    rowsContainer.className = 's2-list-wrap';
+    rowsContainer.style.cssText += ';flex:1;padding:0 10vw;';
+
+    function runCountAnimations() {} // no-op (no per-row metrics in this design)
+
     GRID_CARDS.forEach(function (card, ci) {
-      var cardEl = document.createElement('div');
-      cardEl.className = 's2-grid-card';
+      var row = document.createElement('div');
+      row.className = 's2-list-row';
 
-      if (ci === 0) {
-        // HERO: row layout — rich content left, blob accent right
-        cardEl.style.cssText = 'flex:0 0 auto;display:flex;flex-direction:row;border-radius:24px;overflow:hidden;background:rgba(10,12,15,0.75);cursor:pointer;border:1px solid rgba(255,255,255,0.09);';
+      var numEl = document.createElement('span');
+      numEl.className = 's2-list-row-num';
+      numEl.textContent = (ci < 9 ? '0' : '') + (ci + 1);
+      row.appendChild(numEl);
 
-        // LEFT: info panel
-        var info = document.createElement('div');
-        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:28px 20px 28px 28px;gap:0;overflow:hidden;min-width:0;';
+      var titleEl = document.createElement('span');
+      titleEl.className = 's2-list-row-title';
+      titleEl.style.fontSize = 'clamp(28px,3.8vw,58px)';
+      titleEl.textContent = card.title.replace(/^\d+([.)]\d*)*\s*/, ''); // strips "1). " and "1.1 " style prefixes
+      row.appendChild(titleEl);
 
-        // Eyebrow
-        var eyebrow = document.createElement('span');
-        eyebrow.textContent = '01  —  Featured Work';
-        eyebrow.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:10.5px;font-weight:500;color:rgba(255,255,255,0.28);letter-spacing:0.12em;text-transform:uppercase;display:block;margin-bottom:12px;flex-shrink:0;';
-        info.appendChild(eyebrow);
+      var arrowEl = document.createElement('span');
+      arrowEl.className = 's2-list-row-arrow';
+      arrowEl.textContent = '→';
+      row.appendChild(arrowEl);
 
-        // Title — strip full numeric prefix "1). "
-        var title = document.createElement('h3');
-        title.textContent = card.title.replace(/^[\d]+[\)\.]+\s*/, '');
-        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(18px,1.6vw,24px);font-weight:800;color:#fff;margin:0 0 10px;line-height:1.2;letter-spacing:-0.4px;flex-shrink:0;';
-        info.appendChild(title);
+      // Hover: show video preview centered on row
+      row.addEventListener('mouseenter', function () {
+        if (card.video) { previewVid.src = card.video; previewVid.play().catch(function(){}); }
+        if (card.img) previewBg.style.backgroundImage = 'url(' + card.img + ')';
+        else previewBg.style.backgroundImage = 'none';
+        var rowRect = row.getBoundingClientRect();
+        var overlayRect = listOverlay.getBoundingClientRect();
+        var topPos = rowRect.top - overlayRect.top + rowRect.height / 2 - 84;
+        previewBox.style.top = Math.max(20, Math.min(overlayRect.height - 200, topPos)) + 'px';
+        previewBox.style.opacity = '1';
+        previewBox.style.transform = 'translateY(0) scale(1)';
+      });
+      row.addEventListener('mouseleave', function () {
+        previewBox.style.opacity = '0';
+        previewBox.style.transform = 'translateY(12px) scale(0.95)';
+      });
+      row.addEventListener('click', function () {
+        if (card.href && card.href !== '#') window.location.href = card.href;
+      });
 
-        // Description — clamped to 3 lines
-        var desc = document.createElement('p');
-        desc.textContent = card.desc;
-        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:15px;line-height:1.65;color:rgba(255,255,255,0.55);margin:0 0 16px;flex-shrink:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;';
-        info.appendChild(desc);
-
-        if (card.iconTags && card.iconTags.length) {
-          var ir0 = buildIconRow(card.iconTags);
-          ir0.style.cssText += ';margin-bottom:16px;flex-shrink:0;';
-          info.appendChild(ir0);
-        }
-
-        // Metrics
-        var mw0 = document.createElement('div');
-        mw0.style.cssText = 'flex-shrink:0;margin-bottom:20px;';
-        mw0.appendChild(buildMetrics(card.metrics.slice(0, 3), 3));
-        info.appendChild(mw0);
-
-        // CTA
-        if (card.href && card.href !== '#') {
-          var heroCta = document.createElement('a');
-          heroCta.href = card.href;
-          heroCta.textContent = 'View Case Study →';
-          heroCta.style.cssText = 'display:inline-flex;align-items:center;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;color:#0f1115;background:#E6F28D;border-radius:999px;padding:8px 18px;text-decoration:none;letter-spacing:0.02em;flex-shrink:0;align-self:flex-start;margin-top:16px;';
-          info.appendChild(heroCta);
-        }
-
-        cardEl.appendChild(info);
-
-        // RIGHT: blob accent panel — canvas centered & oversized to fill panel
-        var blobArea = document.createElement('div');
-        blobArea.style.cssText = 'flex:0 0 40%;position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,0.06);';
-        var lc = document.createElement('canvas');
-        lc.width = 800; lc.height = 450;
-        // Maintain 16:9 aspect ratio, scale up 3× so blob fills the panel width; centered by transform
-        lc.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300%;aspect-ratio:800/450;display:block;';
-        blobArea.appendChild(lc);
-        listBlobCanvas = lc;
-        listBlobCtx    = lc.getContext('2d');
-        cardEl.appendChild(blobArea);
-
-      } else {
-        // PROJECT CARD: dark bg, inset rounded video, clean info
-        cardEl.style.cssText = 'flex:0 0 auto;display:flex;flex-direction:column;border-radius:24px;overflow:hidden;background:#0f1115;cursor:pointer;';
-
-        // Media: inset container + video/thumbnail
-        var mediaOuter = document.createElement('div');
-        mediaOuter.style.cssText = 'flex:0 0 40%;padding:10px 10px 0;box-sizing:border-box;';
-        var bgImg = card.img ? 'url(' + card.img + ')' : 'none';
-        var mediaInner = document.createElement('div');
-        mediaInner.style.cssText = 'width:100%;height:100%;border-radius:14px;overflow:hidden;background-color:#0a0c0f;background-image:' + bgImg + ';background-size:cover;background-position:center;position:relative;';
-
-        if (card.video) {
-          var vid = document.createElement('video');
-          vid.src = card.video;
-          if (card.poster) vid.poster = card.poster;
-          vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true;
-          vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;';
-          mediaInner.appendChild(vid);
-        }
-        mediaOuter.appendChild(mediaInner);
-        cardEl.appendChild(mediaOuter);
-
-        // Info section
-        var info = document.createElement('div');
-        info.style.cssText = 'flex:1;display:flex;flex-direction:column;padding:18px 20px 20px;gap:0;';
-
-        // Card number eyebrow
-        var n2 = ci < 9 ? '0' + (ci + 1) : '' + (ci + 1);
-        var numLbl = document.createElement('span');
-        numLbl.textContent = n2;
-        numLbl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.25);letter-spacing:0.14em;display:block;margin-bottom:8px;';
-        info.appendChild(numLbl);
-
-        // Title
-        var title = document.createElement('h3');
-        title.textContent = card.title;
-        title.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:clamp(17px,1.5vw,20px);font-weight:800;color:#fff;margin:0 0 8px;line-height:1.2;letter-spacing:-0.3px;';
-        info.appendChild(title);
-
-        // Description
-        var desc = document.createElement('p');
-        desc.textContent = card.desc;
-        desc.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:13px;line-height:1.7;color:rgba(255,255,255,0.5);margin:0 0 12px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
-        info.appendChild(desc);
-
-        if (card.iconTags && card.iconTags.length) {
-          var ir = buildIconRow(card.iconTags);
-          ir.style.marginBottom = '12px';
-          info.appendChild(ir);
-        }
-
-        // Metrics with top separator
-        var metWrap = document.createElement('div');
-        metWrap.style.cssText = 'padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);';
-        metWrap.appendChild(buildMetrics(card.metrics));
-        info.appendChild(metWrap);
-
-        if (card.href && card.href !== '#') {
-          var ctaWrap = document.createElement('div');
-          ctaWrap.style.cssText = 'margin-top:14px;';
-          var cta = document.createElement('a');
-          cta.href = card.href;
-          cta.textContent = 'View Case Study →';
-          cta.style.cssText = 'display:inline-block;font-family:"JetBrains Mono",monospace;font-size:12.5px;font-weight:600;letter-spacing:0.03em;border-radius:999px;padding:11px 22px;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);transition:background 0.18s,border-color 0.18s;';
-          cta.addEventListener('mouseenter', function() { cta.style.background='rgba(255,255,255,0.11)'; cta.style.borderColor='rgba(255,255,255,0.38)'; });
-          cta.addEventListener('mouseleave', function() { cta.style.background='rgba(255,255,255,0.05)'; cta.style.borderColor='rgba(255,255,255,0.18)'; });
-          ctaWrap.appendChild(cta);
-          info.appendChild(ctaWrap);
-        }
-
-        cardEl.appendChild(info);
-        cardEl.addEventListener('click', function () {
-          if (card.href && card.href !== '#') window.location.href = card.href;
-        });
-      }
-
-      lvTrack.appendChild(cardEl);
-      gridCardEls.push(cardEl);
+      rowsContainer.appendChild(row);
     });
 
-    // ── Bottom controls bar: [←][→]  [progress scrubber]  [n/N] ─────
-    var controlsBar = document.createElement('div');
-    controlsBar.style.cssText = 'flex-shrink:0;height:72px;display:flex;align-items:center;gap:14px;padding:0 40px 0 80px;box-sizing:border-box;border-top:1px solid rgba(255,255,255,0.06);';
-
-    function makeNavBtn(isLeft) {
-      var btn = document.createElement('button');
-      btn.style.cssText = 'flex-shrink:0;width:40px;height:40px;border-radius:999px;border:1.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.18s,border-color 0.18s;';
-      btn.innerHTML = isLeft
-        ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>'
-        : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-      btn.addEventListener('mouseenter', function() { btn.style.background='rgba(255,255,255,0.12)'; btn.style.borderColor='rgba(255,255,255,0.38)'; });
-      btn.addEventListener('mouseleave', function() { btn.style.background='rgba(255,255,255,0.05)'; btn.style.borderColor='rgba(255,255,255,0.18)'; });
-      return btn;
-    }
-
-    var prevBtn = makeNavBtn(true);
-    var nextBtn = makeNavBtn(false);
-
-    var progressOuter = document.createElement('div');
-    progressOuter.style.cssText = 'flex:1;height:36px;display:flex;align-items:center;cursor:pointer;position:relative;';
-    var progressTrack = document.createElement('div');
-    progressTrack.style.cssText = 'position:absolute;left:0;right:0;height:3px;background:rgba(255,255,255,0.1);border-radius:999px;';
-    var progressFill = document.createElement('div');
-    progressFill.style.cssText = 'height:100%;width:0%;background:rgba(255,255,255,0.5);border-radius:999px;position:relative;transition:width 0.08s;';
-    var progressThumb = document.createElement('div');
-    progressThumb.style.cssText = 'position:absolute;right:-7px;top:50%;transform:translateY(-50%);width:14px;height:14px;border-radius:999px;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,0.15);cursor:grab;pointer-events:none;';
-    progressFill.appendChild(progressThumb);
-    progressTrack.appendChild(progressFill);
-    progressOuter.appendChild(progressTrack);
-
-    var cardCounter = document.createElement('span');
-    cardCounter.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:500;color:rgba(255,255,255,0.28);white-space:nowrap;flex-shrink:0;min-width:36px;text-align:right;';
-    cardCounter.textContent = '1/' + GRID_CARDS.length;
-
-    controlsBar.appendChild(prevBtn);
-    controlsBar.appendChild(nextBtn);
-    controlsBar.appendChild(progressOuter);
-    controlsBar.appendChild(cardCounter);
-
-    listOverlay.appendChild(lvTrack);
-    listOverlay.appendChild(controlsBar);
+    listOverlay.appendChild(rowsContainer);
     el.appendChild(listOverlay);
-
-    // ── Card sizing ───────────────────────────────────────────────────
-    function sizeGridCards() {
-      var leftPad = 80, rightPad = 60, gap = 20;
-      var avail = el.clientWidth - leftPad - rightPad;
-      // Hero is the featured card — widest card; row layout needs room for content + blob
-      var heroW    = Math.max(380, Math.floor(avail * 0.46));
-      var projectW = Math.max(200, Math.floor(avail * 0.27));
-      // Height: leave room for track top-padding (80px) + controls bar (72px) + breathing (32px)
-      var cardH    = Math.min(520, Math.max(380, el.clientHeight - 184));
-      gridCardEls.forEach(function (c, i) {
-        c.style.width  = (i === 0 ? heroW : projectW) + 'px';
-        c.style.height = cardH + 'px';
-      });
-    }
-    sizeGridCards();
-    window.addEventListener('resize', sizeGridCards);
-
-    // ── Progress sync ─────────────────────────────────────────────────
-    function syncGridProgress() {
-      var maxSL = lvTrack.scrollWidth - lvTrack.clientWidth;
-      var pct = maxSL > 0 ? Math.min(1, lvTrack.scrollLeft / maxSL) : 0;
-      progressFill.style.width = (pct * 100) + '%';
-      // nearest card
-      var nearest = 0, minD = Infinity;
-      gridCardEls.forEach(function (c, i) {
-        var d = Math.abs(c.offsetLeft - 80 - lvTrack.scrollLeft);
-        if (d < minD) { minD = d; nearest = i; }
-      });
-      gridCurrentIdx = nearest;
-      cardCounter.textContent = (nearest + 1) + '/' + GRID_CARDS.length;
-    }
-    lvTrack.addEventListener('scroll', syncGridProgress, { passive: true });
-
-    // ── Scrubber drag ─────────────────────────────────────────────────
-    var scrubbing = false;
-    progressOuter.addEventListener('mousedown', function(e) { scrubbing = true; doScrub(e); e.preventDefault(); });
-    window.addEventListener('mousemove', function(e) { if (scrubbing) doScrub(e); });
-    window.addEventListener('mouseup', function() { scrubbing = false; });
-    function doScrub(e) {
-      var r = progressTrack.getBoundingClientRect();
-      var p = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-      lvTrack.scrollLeft = p * (lvTrack.scrollWidth - lvTrack.clientWidth);
-    }
-
-    // ── Arrow navigation ──────────────────────────────────────────────
-    function scrollGridToCard(idx) {
-      idx = Math.max(0, Math.min(gridCardEls.length - 1, idx));
-      var target = gridCardEls[idx];
-      if (!target) return;
-      lvTrack.scrollTo({ left: Math.max(0, target.offsetLeft - 80), behavior: 'smooth' });
-    }
-    prevBtn.addEventListener('click', function() { scrollGridToCard(gridCurrentIdx - 1); });
-    nextBtn.addEventListener('click', function() { scrollGridToCard(gridCurrentIdx + 1); });
-
-    // Glass nav buttons (same style as spiral up/down) for grid view
-    var gridNavPrev = document.getElementById('s2GridPrev');
-    var gridNavNext = document.getElementById('s2GridNext');
-    if (gridNavPrev) gridNavPrev.addEventListener('click', function() { scrollGridToCard(gridCurrentIdx - 1); });
-    if (gridNavNext) gridNavNext.addEventListener('click', function() { scrollGridToCard(gridCurrentIdx + 1); });
-
-    // ── Wheel: vertical → horizontal (lets page scroll at the ends) ───
-    el.addEventListener('wheel', function(e) {
-      if (!gridVisible) return;
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) * 0.6) return; // native horizontal
-      var maxSL = lvTrack.scrollWidth - lvTrack.clientWidth;
-      var atEnd   = lvTrack.scrollLeft >= maxSL - 2;
-      var atStart = lvTrack.scrollLeft <= 2;
-      if ((e.deltaY > 0 && atEnd) || (e.deltaY < 0 && atStart)) return;
-      e.preventDefault();
-      lvTrack.scrollLeft += e.deltaY * 1.1;
-    }, { passive: false });
-
-    // ── Mouse drag ────────────────────────────────────────────────────
-    var gridDrag = null;
-    lvTrack.addEventListener('pointerdown', function(e) {
-      if (e.pointerType === 'touch') return;
-      gridDrag = { startX: e.clientX, startScroll: lvTrack.scrollLeft, moved: false };
-      lvTrack.setPointerCapture(e.pointerId);
-      lvTrack.style.cursor = 'grabbing';
-      e.preventDefault();
-    });
-    lvTrack.addEventListener('pointermove', function(e) {
-      if (!gridDrag) return;
-      var dx = e.clientX - gridDrag.startX;
-      if (Math.abs(dx) > 4) gridDrag.moved = true;
-      lvTrack.scrollLeft = gridDrag.startScroll - dx;
-    });
-    function endGridDrag() {
-      if (!gridDrag) return;
-      lvTrack.style.cursor = '';
-      if (gridDrag.moved) {
-        var sup = function(ev) { ev.stopPropagation(); ev.preventDefault(); };
-        lvTrack.addEventListener('click', sup, { capture: true, once: true });
-      }
-      gridDrag = null;
-    }
-    lvTrack.addEventListener('pointerup', endGridDrag);
-    lvTrack.addEventListener('pointerleave', endGridDrag);
 
     // ── View toggle (driven by DOM buttons in s2-fw-header) ──────────────
     var frontLabelWrap = document.getElementById('s2FrontLabel');
@@ -757,9 +532,9 @@ void main() {
         el.style.height = '100%';
         setTimeout(function () {
           listOverlay.style.display = 'flex';
-          sizeGridCards();
           requestAnimationFrame(function () {
             listOverlay.style.opacity = '1';
+            runCountAnimations();
             gridVisible = true;
           });
         }, 300);
@@ -767,22 +542,30 @@ void main() {
     });
 
     // ── Initial reveal ────────────────────────────────────────────────────
-    // Gated on the glass loader lifting (same pattern used for the hero
-    // entrance) — otherwise this fires on a flat timer from script-parse
-    // time, finishes revealing while still hidden behind the loader (which
-    // holds the screen ~2.8s+), and the fly-in animation is never actually
-    // seen.
-    function revealCards() {
+    // Cards fly in only once BOTH conditions are met:
+    //   1. The glass loader has lifted
+    //   2. Section 2 has scrolled into view
+    // This gives the same staggered fly-in as toggling back to spiral —
+    // cards aren't revealed on page load if the section is off-screen.
+    var _loaderReady  = !document.documentElement.classList.contains('glass-loading');
+    var _sectionReady = false;
+    var _revealed     = false;
+
+    function tryRevealCards() {
+      if (_revealed || !_loaderReady || !_sectionReady) return;
+      _revealed = true;
       setTimeout(function () {
         allCards.forEach(function (_, i) {
           setTimeout(function () { hiddenTarget[i] = 0; }, (i % 4) * 50);
         });
-      }, 600);
+      }, 200);
     }
-    if (document.documentElement.classList.contains('glass-loading')) {
-      window.addEventListener('glassloaderhidden', revealCards, { once: true });
-    } else {
-      revealCards();
+
+    if (!_loaderReady) {
+      window.addEventListener('glassloaderhidden', function () {
+        _loaderReady = true;
+        tryRevealCards();
+      }, { once: true });
     }
 
     // ── Front card tracking + snap-to-card ───────────────────────────────
@@ -1015,8 +798,8 @@ void main() {
       if (entries[0].isIntersecting && !entryTriggered) {
         entryTriggered = true;
         spiralEntryObs.disconnect();
-        // Videos play only on the active card now (handled in the front-card
-        // detection above), so we no longer start them all on entry.
+        _sectionReady = true;
+        tryRevealCards();
         setTimeout(function () {
           snapTarget        = null;
           targetWheelDeltaY = ENTRY_SPEED;

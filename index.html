@@ -10174,6 +10174,21 @@
     html:not([data-theme="dark"]) .s2-vt-btn { color: rgba(37,37,37,0.50); }
     html:not([data-theme="dark"]) .s2-vt-btn:hover { color: var(--secondary); }
     html:not([data-theme="dark"]) .s2-vt-btn.s2-vt-active { color: var(--secondary); }
+    /* Toggle capsule + thumb: match the light .abt-nav-pill treatment so
+       "spiral / grid" labels stay readable on the cream background */
+    html:not([data-theme="dark"]) .s2-view-toggle { background: rgba(37,37,37,0.08); }
+    html:not([data-theme="dark"]) .s2-view-toggle::before { background: linear-gradient(180deg, rgba(37,37,37,0.12) 9%, rgba(37,37,37,0.06) 92%); }
+    html:not([data-theme="dark"]) .s2-vt-thumb {
+      background: rgba(255,255,255,0.85);
+      box-shadow: 0 1px 4px rgba(37,37,37,0.10) inset, 0 1px 8px rgba(37,37,37,0.06);
+    }
+    /* Section label: solid readable ink instead of the ghost gradient
+       (the mono header inherits a cream text-fill from the dark theme) */
+    html:not([data-theme="dark"]) .s2-fw-header .fw-title {
+      background: none;
+      -webkit-text-fill-color: rgba(37,37,37,0.62);
+      color: rgba(37,37,37,0.62);
+    }
 
     html:not([data-theme="dark"]) .s2-tab-btn {
       color: rgba(37,37,37,0.60);
@@ -16532,10 +16547,12 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
       obs.observe(cardsZone);
     }
 
-    /* ── Mobile accordion — built only on phone-width viewports ── */
+    /* ── Mobile accordion — always built; CSS shows it only ≤767px.
+       (A load-width guard here left the section empty when a tablet
+       rotated or a window was resized into phone width after load.) ── */
     (function () {
       var acc = document.getElementById('s2MobileAccordion');
-      if (!acc || window.innerWidth > 767) return;
+      if (!acc) return;
 
       function buildAccordion() {
         acc.innerHTML = '';
@@ -16629,7 +16646,7 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="/spiral-gallery/spiral.js?v=20260701-listv3" defer></script>
+  <script src="/spiral-gallery/spiral.js?v=20260721-titlefix" defer></script>
 
   <script>
   /* ── Testimonial canvas grain — paints into each .tm-art-frame ── */
