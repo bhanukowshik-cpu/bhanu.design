@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="format-detection" content="telephone=no" />
   <!-- dev: never cache this file so edits always show (Safari was holding stale copies) -->
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
@@ -1712,7 +1712,8 @@
       background: var(--bg);
       box-shadow: -8px 0 32px rgba(0,0,0,0.10);
       display: flex; flex-direction: column; justify-content: flex-start;
-      align-items: flex-start; padding: 100px 32px 48px; gap: 4px;
+      align-items: flex-start; gap: 4px;
+      padding: 100px 32px calc(48px + env(safe-area-inset-bottom, 0px));
       transform: translateX(100%);
       transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1);
     }
@@ -6044,7 +6045,7 @@
        layout every frame, which Safari handles correctly. ── */
     .cb-wrap {
       position: fixed;
-      bottom: 20px;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0px)); /* clear the home indicator on notched phones */
       left: 0;
       right: 0;
       width: max-content;
@@ -10128,6 +10129,14 @@
       .footer-copy-btn::before { content: ''; position: absolute; inset: -6px; border-radius: 12px; }
       .s2-acc-chevron { width: 24px; height: 24px; }
     }
+
+    /* CSS marquees stand still under reduced motion (JS-driven ones bail in their init) */
+    @media (prefers-reduced-motion: reduce) {
+      .oh-marquee-track, .hero-ticker-track { animation: none; }
+    }
+
+    /* Even line lengths on multi-line headings at narrow widths */
+    .tm-headline, .dna2-heading, .oh2-headline { text-wrap: balance; }
 
     /* ═══════════════════════════════════════════════════════════
        LIGHT MODE OVERRIDES — "dark island" sections
@@ -17461,6 +17470,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var carousel = document.querySelector('.hero-carousel');
     var track    = document.querySelector('.hero-carousel-track');
     if (!carousel || !track) return;
+    /* reduced motion: leave the strip static — photos stay visible, nothing scrolls */
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     /* disable CSS animation — JS drives it instead */
     track.style.animation       = 'none';
@@ -17533,6 +17544,8 @@ Fastest way to reach me: kowshibhanu1000@gmail.com.
     var strip = document.querySelector('.hero-facts-strip');
     var track = document.querySelector('.hero-facts-strip-track');
     if (!strip || !track) return;
+    /* reduced motion: keep the first facts visible, skip the marquee */
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     track.style.animation       = 'none';
     track.style.webkitAnimation = 'none';
