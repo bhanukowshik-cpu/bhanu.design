@@ -11,7 +11,7 @@
   <title>Bhanu · Product Designer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=JetBrains+Mono:wght@400;500;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=JetBrains+Mono:wght@400;500;700&family=Poppins:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 
   <style>
@@ -80,6 +80,8 @@
       --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);
       --ease-swift: cubic-bezier(0.22, 0.61, 0.36, 1);
       --focus-ring: #6F7E15;
+      /* Display layer — big statements only; Montserrat stays the base */
+      --font-display: 'Bricolage Grotesque', 'Montserrat', sans-serif;
     }
     [data-theme="dark"] { --focus-ring: #E6F28D; }
     ::selection { background: #E6F28D; color: #191919; }
@@ -796,7 +798,7 @@
       display: inline-block;
       transform-origin: left bottom;   /* bottom-left fixed; top-right drags */
       color: #0D99FF;                  /* Figma selection blue */
-      margin: 0 12px;
+      margin: 0 4px 0 12px;            /* tight right side so the comma hugs the box */
     }
     /* the cursor that "holds" the top-right handle */
     .hv-cursor { display: none; }
@@ -10487,6 +10489,146 @@
       background: rgba(37,37,37,0.07);
       box-shadow: rgba(37,37,37,0.10) 0 1px 4px inset;
     }
+
+    /* ═══ V6 BOLD — editorial recomposition: display type, poster hero, header bars ═══ */
+
+    /* Display layer — the big statements switch to Bricolage Grotesque */
+    .hero-heading,
+    .s2-fw-header .fw-title,
+    .abt-title,
+    .tm-headline,
+    .dna2-heading,
+    .s2-bar-title,
+    .oh2-headline,
+    .fc-line {
+      font-family: var(--font-display);
+    }
+
+    @media (min-width: 768px) {
+      .hero-heading {
+        font-size: clamp(34px, 3vw + 8px, 60px);
+        line-height: 1.14;
+        letter-spacing: -0.028em;
+      }
+    }
+    @media (min-width: 1600px) {
+      .hero-heading { font-size: 64px; line-height: 1.1; }
+    }
+    @media (min-width: 768px) and (max-height: 800px) {
+      .hero-heading { font-size: clamp(30px, 2.4vw + 6px, 44px); }
+    }
+    @media (max-width: 767px) {
+      .hero-heading { font-size: 27px; line-height: 1.22; }
+    }
+    @media (max-width: 480px) {
+      .hero-heading { font-size: 24px; }
+    }
+
+    /* — Poster hero: left-aligned statement, photo collage right (≥1024px, where photos exist) — */
+    @media (min-width: 1024px) {
+      .hero-screen {
+        grid-template-columns: 1.55fr 1fr;
+        column-gap: clamp(24px, 3vw, 56px);
+      }
+      .hero-screen-left {
+        grid-column: 1; grid-row: 1;
+        align-items: flex-start;
+        text-align: left;
+      }
+      .hero-photos-left,
+      .hero-photos:not(.hero-photos-left) {
+        grid-column: 2; grid-row: 1;
+        height: min(100%, 560px);
+        align-self: center;
+        width: 100%;
+      }
+      .polaroid { width: min(190px, 46%, 20vh); }
+      .hero-photos-left .polaroid.p1 { right: auto; left: 4%;  top: 2%;    transform: rotate(-5deg); }
+      .hero-photos-left .polaroid.p2 { right: auto; left: 0%;  bottom: 4%; top: auto; transform: rotate(4deg); }
+      .hero-photos:not(.hero-photos-left) .polaroid.p3 { left: auto; right: 4%; top: 10%; transform: rotate(3deg); }
+      .hero-photos:not(.hero-photos-left) .polaroid.p4 { left: auto; right: 0%; bottom: -2%; top: auto; transform: rotate(-3.5deg); }
+      /* Facts: quiet baseline row, hairline separated — no panel chrome */
+      .hero-facts,
+      [data-theme="dark"] .hero-facts {
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 6px 0 0;
+        gap: 0;
+        align-self: flex-start;
+      }
+      [data-theme="dark"] .hero-facts::before { display: none; }
+      /* The entrance JS wraps facts in .hero-lw > .hero-li — grid the real container */
+      .hero-facts .hero-li,
+      .hero-facts:not(:has(.hero-li)) {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, auto));
+        gap: 16px 0;
+        justify-content: start;
+      }
+      .hero-facts .hfact { align-items: flex-start; text-align: left; }
+      .hero-facts .hfact:nth-child(odd)  { padding: 0 24px 0 0; }
+      .hero-facts .hfact:nth-child(even) { padding: 0 0 0 24px; border-left: 1px solid rgba(37,37,37,0.16); }
+      [data-theme="dark"] .hero-facts .hfact:nth-child(even) { border-left-color: rgba(255,255,255,0.14); }
+    }
+
+    /* — Editorial header bars: title left, controls right (≥768px) — */
+    @media (min-width: 768px) {
+      .s2-fw-header {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 26px 48px 16px;
+      }
+      .s2-fw-header .fw-title { font-size: clamp(30px, 2.6vw, 42px); letter-spacing: -0.02em; }
+
+      .am-section .cinematic-wrap {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        column-gap: 20px;
+        width: min(1440px, 100%);
+        margin: 0 auto;
+      }
+      .am-section .abt-header { grid-column: 1; text-align: left; margin-bottom: 0; }
+      .am-section .abt-nav    { grid-column: 2; justify-content: flex-end; margin-bottom: 0; }
+      .am-section .abt-panes  { grid-column: 1 / -1; margin-top: 34px; }
+      .abt-title { font-size: clamp(28px, 2.4vw, 40px); letter-spacing: -0.02em; }
+
+      .tm-section .cinematic-wrap {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        column-gap: 20px;
+        width: min(1400px, calc(100% - 48px));
+      }
+      .tm-section .tm-header { grid-column: 1; text-align: left; margin-bottom: 0; padding: 0; }
+      .tm-section .tm-tabs   { grid-column: 2; margin-bottom: 0; justify-self: end; }
+      .tm-section .tm-stack-scene { grid-column: 1 / -1; width: 100%; margin-top: 8px; }
+      .tm-headline { font-size: clamp(26px, 2.2vw, 38px); letter-spacing: -0.02em; }
+    }
+
+    /* — DNA heading: allow a balanced 2-line wrap in the display face — */
+    .dna2-heading { white-space: normal; text-wrap: balance; font-size: clamp(24px, 2vw, 32px); }
+
+    /* — Footer: giant closing statement — */
+    .fc-line {
+      font-size: clamp(40px, 6vw, 84px);
+      font-weight: 800;
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+    }
+    .fc-line--em {
+      font-family: var(--font-heading);
+      font-weight: 500;
+      font-size: clamp(28px, 4vw, 54px);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    /* — Project bar title in the display face — */
+    .s2-bar-title { font-size: clamp(22px, 1.9vw, 30px); }
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
