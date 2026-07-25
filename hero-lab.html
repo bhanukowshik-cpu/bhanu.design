@@ -188,6 +188,94 @@
   .cta-text span.on{opacity:1;transform:translateY(0);filter:none;}
   .cta-text span.out{opacity:0;transform:translateY(-11px);filter:blur(3px);}
 
+  /* ══ SECTION 2 — the orb becomes a portal, then a horizontal work reel ══
+     .work-pin is a tall scroll driver; .work-sticky pins one viewport of it.
+     Scroll maps to: (A) orb flies out of the CTA → (B) portal circle opens
+     → (C) .work-track slides sideways. JS owns the numbers; the CSS defaults
+     leave the section fully visible so it never ships blank without JS. */
+  .portal-orb{position:fixed;left:0;top:0;z-index:45;width:120px;height:120px;border-radius:50%;
+    pointer-events:none;opacity:0;transform:scale(.46);
+    background:radial-gradient(circle at 36% 30%, #D9F0FF, var(--ember) 46%, #17456F 80%, #081B2E);
+    box-shadow:0 0 90px rgba(92,169,255,.4), inset -10px -14px 44px rgba(4,12,28,.5);
+    will-change:transform,opacity;}
+
+  .work-pin{position:relative;background:var(--bg);}
+  .work-sticky{position:sticky;top:0;height:100svh;overflow:hidden;}
+  .work-veil{position:absolute;inset:0;clip-path:circle(150% at 50% 50%);will-change:clip-path;}
+  .work-stage{position:absolute;inset:0;display:flex;align-items:center;
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(23,69,111,.5) 0%, transparent 62%),
+      radial-gradient(90% 70% at 50% 108%, rgba(92,169,255,.16) 0%, transparent 60%),
+      var(--bg);}
+  .work-track{flex:none;display:flex;align-items:stretch;gap:clamp(18px,2vw,30px);
+    padding:0 clamp(28px,7vw,110px);will-change:transform;}
+
+  /* left intro panel — reads as the reel's title card */
+  .work-intro{flex:none;width:clamp(280px,25vw,380px);align-self:center;
+    display:flex;flex-direction:column;gap:16px;padding-right:clamp(10px,2vw,28px);}
+  .work-intro .k{font-size:11.5px;font-weight:550;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);}
+  .work-intro h2{font-family:var(--sans);font-weight:570;color:var(--ink);
+    font-size:clamp(30px,2.9vw,44px);line-height:1.14;letter-spacing:-0.022em;}
+  .work-intro h2 .serif{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.08em;}
+  .work-intro p{font-size:14.5px;line-height:1.62;color:var(--ink-2);max-width:34ch;}
+  .work-scroll-hint{display:inline-flex;align-items:center;gap:9px;margin-top:4px;
+    font-size:12px;font-weight:500;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);}
+  .work-scroll-hint i{display:block;width:34px;height:1px;background:var(--line);position:relative;}
+  .work-scroll-hint i::after{content:'';position:absolute;right:0;top:-2px;
+    width:5px;height:5px;border-right:1px solid var(--ink-3);border-top:1px solid var(--ink-3);
+    transform:rotate(45deg);}
+
+  /* project cards */
+  .wcard{flex:none;width:clamp(292px,25vw,362px);
+    display:flex;flex-direction:column;
+    height:min(74vh,624px);align-self:center;
+    padding:22px 22px 20px;border-radius:22px;overflow:hidden;position:relative;
+    border:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(20,29,45,.85) 0%, rgba(11,16,26,.9) 100%);
+    box-shadow:0 30px 70px -34px rgba(0,0,0,.8);}
+  /* per-card accent wash, set inline via --a */
+  .wcard::before{content:'';position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(120% 62% at 50% 0%, var(--a,rgba(92,169,255,.3)) 0%, transparent 68%);
+    opacity:.55;}
+  .wcard>*{position:relative;}
+  .wcard-top{display:flex;align-items:baseline;justify-content:space-between;
+    font-size:11.5px;font-weight:550;letter-spacing:.13em;color:var(--ink-3);}
+  .wcard-top b{color:var(--ember-2);font-weight:600;}
+  .wcard-media{margin:15px 0 16px;border-radius:13px;overflow:hidden;flex:none;
+    aspect-ratio:16/10;background:rgba(255,255,255,.03);border:1px solid var(--line);}
+  .wcard-media img{width:100%;height:100%;object-fit:cover;display:block;}
+  .wcard h3{font-family:var(--sans);font-size:24px;font-weight:570;letter-spacing:-0.018em;color:var(--ink);}
+  .wcard .role{margin-top:5px;font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--ember-2);}
+  .wcard p{margin-top:11px;font-size:13.5px;line-height:1.6;color:var(--ink-2);}
+  .wcard-metrics{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;}
+  .wcard-metrics span{padding:5px 10px;border-radius:999px;border:1px solid var(--line);
+    background:rgba(255,255,255,.03);font-size:11px;font-weight:500;color:var(--ink-2);
+    font-variant-numeric:tabular-nums;}
+  .wcard-cta{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;
+    padding:10px 17px;border-radius:999px;text-decoration:none;
+    background:#F4F7FB;color:#0B1220;font-size:13px;font-weight:570;
+    transition:transform .3s var(--ease),background .3s var(--ease);}
+  .wcard-cta:hover{transform:translateY(-2px);background:#fff;}
+
+  .work-end{flex:none;align-self:center;display:flex;align-items:center;gap:16px;
+    padding:0 clamp(20px,5vw,80px);white-space:nowrap;
+    font-size:11.5px;font-weight:550;letter-spacing:.19em;text-transform:uppercase;color:var(--ink-3);}
+  .work-end i{display:block;width:clamp(40px,6vw,90px);height:1px;background:var(--line);}
+
+  /* no-JS / reduced-motion / touch: plain swipeable rail, no portal */
+  .work-pin.no-portal{height:auto !important;}
+  .work-pin.no-portal .work-sticky{position:static;height:auto;}
+  .work-pin.no-portal .work-veil{clip-path:none !important;}
+  .work-pin.no-portal .work-stage{position:static;padding:clamp(56px,9vh,96px) 0;}
+  .work-pin.no-portal .work-track{transform:none !important;
+    flex:1 1 auto;width:100%;overflow-x:auto;
+    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;padding-bottom:6px;}
+  .work-pin.no-portal .work-track::-webkit-scrollbar{display:none;}
+  .work-pin.no-portal .wcard{scroll-snap-align:center;height:auto;min-height:520px;}
+  .work-pin.no-portal .work-intro{scroll-snap-align:center;}
+
   /* ── CUSTOM CURSOR (ported from index.html — dot / text caret / CTA magnet) ── */
   html.cc-active, html.cc-active *{cursor:none !important;}
   #ccDot{
@@ -417,7 +505,72 @@
     <div class="trail" id="trail" aria-hidden="true"></div>
   </section>
 
-  <section class="next-ph" aria-hidden="true"><span>Featured work — next</span></section>
+  <div class="portal-orb" id="portalOrb" aria-hidden="true"></div>
+
+  <section class="work-pin" id="workPin">
+    <div class="work-sticky">
+      <div class="work-veil" id="workVeil">
+        <div class="work-stage">
+          <div class="work-track" id="workTrack">
+
+            <div class="work-intro">
+              <span class="k">Selected work</span>
+              <h2>Five products, one <span class="serif">thread.</span></h2>
+              <p>Voice, AI, and the people on the other side of it — from first prototype through the version thousands of learners actually use.</p>
+              <span class="work-scroll-hint">Keep scrolling<i></i></span>
+            </div>
+
+            <article class="wcard" style="--a:rgba(92,169,255,.34)">
+              <div class="wcard-top"><b>01</b><span>2023 — 2025</span></div>
+              <div class="wcard-media"><img src="images/card-et-live.webp" alt="EverTutor Live session interface" width="760" height="507"></div>
+              <h3>EverTutor Live</h3>
+              <div class="role">Product Design Lead</div>
+              <p>A voice-first AI tutor that gives every learner a fully adaptive 1:1 session — taken from prototype to product-market fit.</p>
+              <div class="wcard-metrics"><span>2,000+ daily sessions</span><span>2× performance gain</span><span>$250 → $5/hr</span></div>
+              <a class="wcard-cta" href="evertutor-live.html">View case study ↗</a>
+            </article>
+
+            <article class="wcard" style="--a:rgba(140,197,255,.3)">
+              <div class="wcard-top"><b>02</b><span>2024</span></div>
+              <div class="wcard-media"><img src="images/card-et-studio.webp" alt="EverTutor Studio authoring interface" width="760" height="507"></div>
+              <h3>EverTutor Studio</h3>
+              <div class="role">Product Design Lead</div>
+              <p>The authoring environment behind Live — where educators shape, test and ship a tutor's curriculum without ever writing a prompt.</p>
+              <a class="wcard-cta" href="evertutor-studio.html">View case study ↗</a>
+            </article>
+
+            <article class="wcard" style="--a:rgba(92,169,255,.24)">
+              <div class="wcard-top"><b>03</b><span>2024</span></div>
+              <div class="wcard-media"><img src="images/card-et-analytics.webp" alt="EverTutor Analytics dashboard" width="760" height="507" loading="lazy"></div>
+              <h3>EverTutor Analytics</h3>
+              <div class="role">Product Design</div>
+              <p>The measurement layer — how a team sees what a learner actually struggled with, session by session, without drowning in transcripts.</p>
+            </article>
+
+            <article class="wcard" style="--a:rgba(168,132,255,.3)">
+              <div class="wcard-top"><b>04</b><span>2022</span></div>
+              <div class="wcard-media"><img src="images/card-stressie.webp" alt="Stressie mobile app" width="760" height="428" loading="lazy"></div>
+              <h3>Stressie</h3>
+              <div class="role">Founding Product Designer</div>
+              <p>Led customer discovery, behaviour analytics and the design of the first product — pre-launched into market and became the foundation for the company's traction.</p>
+              <a class="wcard-cta" href="stressie-studio.html">View case study ↗</a>
+            </article>
+
+            <article class="wcard" style="--a:rgba(255,160,120,.26)">
+              <div class="wcard-top"><b>05</b><span>2025</span></div>
+              <div class="wcard-media"><img src="images/card-dearly.webp" alt="Dearly app" width="760" height="428" loading="lazy"></div>
+              <h3>Dearly</h3>
+              <div class="role">Product Design</div>
+              <p>A quieter way to keep the people who matter close — built around remembering, not notifying.</p>
+            </article>
+
+            <div class="work-end">End of reel<i></i>More below</div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <div class="chat-backdrop" id="chatBackdrop"></div>
   <aside class="chat" id="chat" data-view="voice" role="dialog" aria-label="Ask me anything" aria-modal="true">
@@ -689,6 +842,105 @@ var topNav = document.getElementById('topNav');
 addEventListener('scroll', function () {
   topNav.classList.toggle('scrolled', scrollY > 40);
 }, { passive: true });
+
+/* ═══ SECTION 2 — the orb becomes a portal, then the work reel scrolls sideways ═══
+   Three scroll phases, all pure functions of scrollY (so scrubbing back up rewinds):
+     A  orb lifts out of the CTA and flies to centre — while the hero scrolls away
+     B  that circle opens into the work stage        — first ZOOM px of the pin
+     C  the track slides sideways                    — the rest of the pin        */
+(function () {
+  var pin = document.getElementById('workPin');
+  var veil = document.getElementById('workVeil');
+  var track = document.getElementById('workTrack');
+  var orb = document.getElementById('portalOrb');
+  var ctaOrb = document.getElementById('ctaOrb');
+  var copy = document.querySelector('.copy');
+  var trailLayer = document.getElementById('trail');
+  if (!pin || !veil || !track || !orb || !ctaOrb) return;
+
+  /* touch, small screens and reduced motion get a plain swipeable rail instead.
+     Re-checked on resize so crossing the breakpoint switches modes cleanly. */
+  function portalFits() {
+    return !matchMedia('(prefers-reduced-motion: reduce)').matches &&
+           matchMedia('(pointer:fine)').matches && innerWidth > 820;
+  }
+  var active = false;
+
+  var R_START = 27.5, R_MID = 118;          // orb radius in the CTA → at the handoff
+  var ZOOM = 0, travel = 0, pinTop = 0, vw = 0, vh = 0, rFull = 0;
+
+  function measure() {
+    vw = innerWidth; vh = innerHeight;
+    ZOOM = Math.round(vh * 1.05);
+    travel = Math.max(0, track.scrollWidth - vw);
+    pin.style.height = (vh + ZOOM + travel) + 'px';
+    pinTop = pin.offsetTop;
+    rFull = Math.hypot(vw, vh) / 2 * 1.06;   // past the viewport corners
+  }
+
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function ease(t) { return 1 - Math.pow(1 - t, 3); }
+  function ramp(a, b, t) { return clamp01((t - a) / (b - a)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function update() {
+    if (!active) return;
+    var y = scrollY;
+    var aSpan = vh * 0.8;
+    var aP = clamp01((y - (pinTop - aSpan)) / aSpan);
+    var bP = clamp01((y - pinTop) / ZOOM);
+    var cP = travel ? clamp01((y - pinTop - ZOOM) / travel) : 0;
+    var ea = ease(aP);
+
+    /* A — seed from wherever the CTA orb actually is, so the handoff is seamless */
+    var src = ctaOrb.getBoundingClientRect();
+    var x = lerp(src.width ? src.left + src.width / 2 : vw / 2, vw / 2, ea);
+    var yy = lerp(src.height ? src.top + src.height / 2 : vh / 2, vh / 2, ea);
+
+    /* B — one radius drives both the sphere and the hole it opens */
+    var rGrow = lerp(R_MID, rFull, ease(bP));
+    var rOrb = bP > 0 ? rGrow : lerp(R_START, R_MID, ea);
+
+    orb.style.transform = 'translate(' + (x - 60).toFixed(1) + 'px,' + (yy - 60).toFixed(1) + 'px) scale(' + (rOrb / 60).toFixed(4) + ')';
+    orb.style.opacity = (ramp(0, .1, aP) * (1 - ramp(.22, .6, bP))).toFixed(3);
+    ctaOrb.style.opacity = (1 - ramp(0, .1, aP)).toFixed(3);
+    if (copy) copy.style.opacity = (1 - ramp(.15, .75, aP)).toFixed(3);
+    if (trailLayer) trailLayer.style.opacity = (1 - ramp(0, .35, aP)).toFixed(3);
+
+    veil.style.clipPath = 'circle(' + rGrow.toFixed(1) + 'px at 50% 50%)';
+    track.style.transform = 'translate3d(' + (-cP * travel).toFixed(1) + 'px,0,0)';
+  }
+
+  function remeasure() {
+    if (!portalFits()) {
+      if (active || !pin.classList.contains('no-portal')) {
+        pin.classList.add('no-portal');
+        active = false;
+        pin.style.height = '';
+        veil.style.clipPath = '';
+        track.style.transform = '';
+        orb.style.opacity = '0';
+        ctaOrb.style.opacity = '';
+        if (copy) copy.style.opacity = '';
+        if (trailLayer) trailLayer.style.opacity = '';
+      }
+      return;
+    }
+    pin.classList.remove('no-portal');
+    active = true;
+    measure();
+    update();
+  }
+  remeasure();
+  addEventListener('scroll', update, { passive: true });
+  addEventListener('resize', remeasure);
+  addEventListener('load', remeasure);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
+  /* card art settles the track width once it decodes */
+  [].forEach.call(track.querySelectorAll('img'), function (im) {
+    if (!im.complete) im.addEventListener('load', remeasure, { once: true });
+  });
+})();
 
 /* ── image trail — photos reveal one after another along the cursor path ── */
 (function () {
