@@ -179,97 +179,122 @@
     var PALE = [0.55, 0.60, 0.70];
     var far = -(TRAVEL + 90);
 
-    /* 1 — RAILS. Long segmented filaments running the corridor's full length.
-       These do the perspective work: six converging lines the eye can lock to. */
-    var railXY = [[-11.2, -6.4], [11.2, -6.4], [-11.2, 6.4], [11.2, 6.4],
-                  [-6.1, 8.6], [6.1, -8.6]];
-    for (var ri = 0; ri < railXY.length; ri++) {
-      var z = 26;
-      while (z > far) {
-        var len = 9 + r() * 22;
-        push(railXY[ri][0] + (r() - 0.5) * 0.5, railXY[ri][1] + (r() - 0.5) * 0.5, z - len * 0.5,
-             0.055 + r() * 0.05, 0.055 + r() * 0.05, len * 0.5,
-             0, 0, (r() - 0.5) * 0.05,
-             PALE[0], PALE[1], PALE[2], 0, 0);
-        z -= len + (2 + r() * 16);                                 // irregular gaps
-      }
-    }
+    /* ── THE LATTICE ────────────────────────────────────────────────────────
+       A structural framework, not a scatter. Girders sit on a regular 3D grid
+       so the eye reads rectangular cells marching into depth the way a
+       building's skeleton does — that density IS the subject. A clear bore is
+       left down the axis for the flight path, which is what turns a solid
+       block of geometry into a corridor you are inside of.
 
-    /* 2 — RIBS. Rectangular portal frames marching into depth. The size
-       pattern is authored so the corridor breathes wide/narrow instead of
-       reading as uniform repetition. */
-    var pattern = [26, 10, 10, 18, 10, 34, 12, 10, 22, 10, 30, 14];
-    var idx = 0;
-    for (var rz = 14; rz > far; rz -= 9.5) {
-      var w = pattern[idx % pattern.length] * (dense ? 1 : 1.05);
-      idx++;
-      if (idx % 7 === 3) continue;                                 // deliberate gaps
-      var h = w * (0.52 + (idx % 3) * 0.07);
-      var th = 0.10 + r() * 0.16;
-      var ro = (r() - 0.5) * 0.10;                                 // slight roll
-      var ox = (r() - 0.5) * 2.2, oy = (r() - 0.5) * 1.6;
-      var lit = (idx % 5 === 0) ? 0.06 : 0;
-      /* top / bottom / left / right */
-      push(ox, oy + h * 0.5, rz, w * 0.5, th, th, 0, 0, ro, PALE[0], PALE[1], PALE[2], lit, 0);
-      push(ox, oy - h * 0.5, rz, w * 0.5, th, th, 0, 0, ro, PALE[0], PALE[1], PALE[2], lit, 0);
-      push(ox - w * 0.5, oy, rz, th, h * 0.5, th, 0, 0, ro, PALE[0], PALE[1], PALE[2], 0, 0);
-      push(ox + w * 0.5, oy, rz, th, h * 0.5, th, 0, 0, ro, PALE[0], PALE[1], PALE[2], 0, 0);
-    }
+       Irregularity comes from broken runs, jittered thickness and skipped
+       stations rather than from random placement: a lattice that wanders isn't
+       architecture, and a lattice that never breaks is wallpaper. */
+    var STEP = dense ? 7.2 : 9.6;                 // cell size
+    var NX = dense ? 4 : 3, NY = dense ? 3 : 2;   // cells out from the axis
+    var BORE = 10.5;                              // radius of the clear flight tube
+    var GIRD = 0.34;                              // girder half-thickness — chunky reads as mass
+    var SPANX = NX * STEP, SPANY = NY * STEP;
 
-    /* 3 — WALLS. The corridor is bounded by four dense fields of small
-       rectangular fragments. This is what makes it read as *architecture*
-       rather than debris in space: the eye finds four surfaces converging on
-       one point, so the depth is unambiguous even before anything moves.
-       Fragments are elongated along one axis and never cubes — cubes read as
-       primitives, beams read as structure. */
-    var WALLS = [
-      [0, -1, 11.6, 7.4], [0, 1, 11.6, 7.4],      // floor / ceiling
-      [-1, 0, 11.6, 7.4], [1, 0, 11.6, 7.4]       // left / right
-    ];
-    var nWall = dense ? 150 : 56;                  // per wall
-    for (var wi = 0; wi < WALLS.length; wi++) {
-      var W = WALLS[wi], vert = W[0] === 0;
-      for (var wj = 0; wj < nWall; wj++) {
-        var u = (r() - 0.5) * 2;                                    // across the wall
-        var t = r();
-        /* near-uniform in Z: perspective already compresses distant fragments
-           into density, so biasing the distribution deep leaves a hole in the
-           mid-field — the band the eye actually reads as "the corridor" */
-        var wz = -6 - Math.pow(t, 1.15) * (TRAVEL + 70);
-        var depth = (r() - 0.5) * 3.4;                              // relief off the wall plane
-        var px = vert ? u * W[2] : W[0] * W[2] + depth;
-        var py = vert ? W[1] * W[3] + depth : u * W[3];
-        /* long in Z (rails/ledges) or long across the wall (ribs/struts) */
-        var along = r() < 0.55;
-        var a1 = 0.06 + r() * 0.14, a2 = 0.06 + r() * 0.12;
-        var lz = along ? (0.5 + r() * 3.4) : (0.10 + r() * 0.30);
-        var lu = along ? a1 : (0.4 + r() * 2.6);
-        push(px, py, wz,
-             vert ? lu : a1, vert ? a1 : lu, lz,
-             0, 0, (r() - 0.5) * 0.14,
-             PALE[0], PALE[1], PALE[2], 0, 0);
-        /* every so often a fragment steps out into the corridor, breaking the
-           plane so the walls never read as flat wallpaper */
-        if (r() < 0.14) {
-          push(px * (0.62 + r() * 0.2), py * (0.62 + r() * 0.2), wz + (r() - 0.5) * 4,
-               0.07 + r() * 0.16, 0.07 + r() * 0.16, 0.4 + r() * 2.2,
-               (r() - 0.5) * 0.3, (r() - 0.5) * 0.5, (r() - 0.5) * 0.3,
+    /* 1 — LONGITUDINAL GIRDERS. The converging lines that own the perspective. */
+    for (var gx = -NX; gx <= NX; gx++) {
+      for (var gy = -NY; gy <= NY; gy++) {
+        var nx = gx * STEP, ny = gy * STEP;
+        var rad = Math.sqrt(nx * nx + ny * ny);
+        if (rad <= BORE) continue;                              // keep the bore clear
+        /* heavier near the bore, tapering outward — reads as load-bearing */
+        var fall = 1 - Math.min(1, (rad - BORE) / SPANX);
+        var th = GIRD * (0.55 + 0.80 * fall) * (0.80 + r() * 0.45);
+        var z = 26;
+        while (z > far) {
+          var len = 16 + r() * 32;
+          push(nx + (r() - 0.5) * 0.30, ny + (r() - 0.5) * 0.30, z - len * 0.5,
+               th, th, len * 0.5, 0, 0, 0,
                PALE[0], PALE[1], PALE[2], 0, 0);
+          /* mostly continuous run, occasionally a real break */
+          z -= len + (r() < 0.74 ? 0.5 : 4 + r() * 15);
         }
       }
     }
 
-    /* 4 — DEEP FIELD. A thin scatter well beyond the walls, only readable once
-       the fog lifts — it is the evidence that the world continues past what
-       you were able to perceive at the start. */
-    var nDeb = dense ? 130 : 50;
+    /* 2 — TRANSVERSE BEAMS. The rungs that turn converging lines into cells.
+       Each one stops at the bore, so the frames you fly through stay open. */
+    var station = 0;
+    for (var sz = 20; sz > far; sz -= STEP * 2) {
+      station++;
+      if (station % 3 === 1) continue;                          // rhythm, not metronome
+      var tb = GIRD * (0.70 + r() * 0.65);
+      var jz = sz + (r() - 0.5) * 1.2;
+      var i2;
+      for (i2 = -NY; i2 <= NY; i2++) {                          // horizontal rungs
+        var hy = i2 * STEP;
+        if (Math.abs(hy) >= BORE) {
+          push(0, hy, jz, SPANX, tb, tb, 0, 0, 0, PALE[0], PALE[1], PALE[2], 0, 0);
+        } else {
+          var xin = Math.sqrt(Math.max(0, BORE * BORE - hy * hy));
+          if (SPANX > xin + 0.5) {
+            var hh = (SPANX - xin) * 0.5, hc = (SPANX + xin) * 0.5;
+            push(-hc, hy, jz, hh, tb, tb, 0, 0, 0, PALE[0], PALE[1], PALE[2], 0, 0);
+            push(hc, hy, jz, hh, tb, tb, 0, 0, 0, PALE[0], PALE[1], PALE[2], 0, 0);
+          }
+        }
+      }
+      for (i2 = -NX; i2 <= NX; i2++) {                          // vertical rungs
+        var vx = i2 * STEP;
+        if (Math.abs(vx) >= BORE) {
+          push(vx, 0, jz, tb, SPANY, tb, 0, 0, 0, PALE[0], PALE[1], PALE[2], 0, 0);
+        } else {
+          var yin = Math.sqrt(Math.max(0, BORE * BORE - vx * vx));
+          if (SPANY > yin + 0.5) {
+            var vh = (SPANY - yin) * 0.5, vc = (SPANY + yin) * 0.5;
+            push(vx, -vc, jz, tb, vh, tb, 0, 0, 0, PALE[0], PALE[1], PALE[2], 0, 0);
+            push(vx, vc, jz, tb, vh, tb, 0, 0, 0, PALE[0], PALE[1], PALE[2], 0, 0);
+          }
+        }
+      }
+    }
+
+    /* 3 — BRACES. Sparse diagonals across the outer cells. They break the grid
+       just enough that it stops reading as a repeating tile. */
+    var nBrace = dense ? 90 : 34;
+    for (var b = 0; b < nBrace; b++) {
+      var bx = (Math.floor(r() * (2 * NX + 1)) - NX) * STEP;
+      var by = (Math.floor(r() * (2 * NY + 1)) - NY) * STEP;
+      if (Math.sqrt(bx * bx + by * by) <= BORE + STEP * 0.5) continue;
+      var bz = 14 - r() * (TRAVEL + 70);
+      var diag = Math.sqrt(2) * STEP * 0.5;
+      push(bx + STEP * 0.5, by + STEP * 0.5, bz,
+           GIRD * 0.55, diag, GIRD * 0.55,
+           0, 0, (r() < 0.5 ? 1 : -1) * Math.PI * 0.25,
+           PALE[0], PALE[1], PALE[2], 0, 0);
+    }
+
+    /* 4 — PLATES. Occasional solid slabs bolted into the framework, so the
+       lattice has mass between its lines and isn't only edges. */
+    var nPlate = dense ? 110 : 44;
+    for (var pl = 0; pl < nPlate; pl++) {
+      var px2 = (Math.floor(r() * (2 * NX + 1)) - NX) * STEP + STEP * 0.5;
+      var py2 = (Math.floor(r() * (2 * NY + 1)) - NY) * STEP + STEP * 0.5;
+      if (Math.sqrt(px2 * px2 + py2 * py2) <= BORE + 1.5) continue;
+      var pz2 = 12 - r() * (TRAVEL + 80);
+      var flat = r() < 0.5;
+      push(px2, py2, pz2,
+           flat ? STEP * (0.20 + r() * 0.28) : GIRD * 0.8,
+           flat ? GIRD * 0.8 : STEP * (0.18 + r() * 0.26),
+           STEP * (0.20 + r() * 0.55),
+           0, 0, 0,
+           PALE[0], PALE[1], PALE[2], 0, 0);
+    }
+
+    /* 5 — DEEP FIELD. A thin scatter well beyond the framework, only readable
+       once the fog lifts — evidence the world continues past what you could
+       perceive at the start. */
+    var nDeb = dense ? 110 : 44;
     for (var d = 0; d < nDeb; d++) {
-      var dt = r();
-      var dz = -40 - dt * (TRAVEL + 120);
+      var dz = -40 - r() * (TRAVEL + 120);
       var da = r() * Math.PI * 2;
-      var dr = 15 + r() * 26;
+      var dr = SPANX * 1.15 + r() * 26;
       push(Math.cos(da) * dr, Math.sin(da) * dr * 0.72, dz,
-           0.10 + r() * 0.30, 0.10 + r() * 0.30, 0.7 + r() * 5.0,
+           0.14 + r() * 0.34, 0.14 + r() * 0.34, 0.9 + r() * 5.0,
            (r() - 0.5) * 0.4, (r() - 0.5) * 0.9, (r() - 0.5) * 0.4,
            PALE[0], PALE[1], PALE[2], 0, 0);
     }
@@ -281,17 +306,16 @@
       var ct = r();
       var cz = -8 - ct * ct * (TRAVEL + 70);
       var wm = r() < 0.34 ? 1 : 0;
-      /* most sit on the corridor walls, so the emission reads as lights set
-         into the structure rather than fireflies drifting in the void */
-      var onWall = r() < 0.78, cx, cy;
-      if (onWall) {
-        var wq = Math.floor(r() * 4);
-        var uu = (r() - 0.5) * 2;
-        cx = (wq < 2) ? uu * 11.4 : (wq === 2 ? -11.4 : 11.4) + (r() - 0.5) * 2.4;
-        cy = (wq < 2) ? (wq === 0 ? -7.2 : 7.2) + (r() - 0.5) * 2.4 : uu * 7.2;
+      /* clamped onto the girder grid, so emission reads as lights set into the
+         structure rather than fireflies drifting in the void */
+      var cx, cy;
+      if (r() < 0.82) {
+        cx = (Math.floor(r() * (2 * NX + 1)) - NX) * STEP + (r() - 0.5) * 0.7;
+        cy = (Math.floor(r() * (2 * NY + 1)) - NY) * STEP + (r() - 0.5) * 0.7;
+        if (Math.sqrt(cx * cx + cy * cy) <= BORE) { cx *= 1.9; cy *= 1.9; }
       } else {
-        var ca = r() * Math.PI * 2, cr = 2.2 + r() * 11;
-        cx = Math.cos(ca) * cr; cy = Math.sin(ca) * cr * 0.8;
+        var ca = r() * Math.PI * 2, cr = BORE + r() * SPANX * 0.9;
+        cx = Math.cos(ca) * cr; cy = Math.sin(ca) * cr * 0.75;
       }
       push(cx, cy, cz,
            0.05 + r() * 0.13, 0.05 + r() * 0.12, 0.05 + r() * 0.26,
@@ -372,15 +396,18 @@
        black; only edges catch anything. That is the difference between "lit
        boxes" and architecture reading as filaments in a void — broad diffuse
        shading is the single biggest tell of a stock Three.js scene. */
-    ' float fres = pow(1.0 - abs(dot(N,V)), 4.5);',
+    ' float fres = pow(1.0 - abs(dot(N,V)), 3.4);',
     ' float key  = max(dot(N, vec3(0.0,0.0,1.0)), 0.0);',
     ' float fill = max(dot(N, normalize(vec3(0.42,0.86,0.28))), 0.0);',
     ' vec3 cold = vec3(0.42,0.66,1.0);',
     ' vec3 warm = vec3(1.0,0.44,0.28);',
-    ' vec3 col = vec3(0.009,0.012,0.018);',
-    ' col += cold * key * 0.030;',
-    ' col += vec3(0.55,0.68,0.86) * fill * 0.010;',
-    ' col += cold * fres * 1.05;',
+    /* girders need enough diffuse to read as solid mass — pure fresnel turns
+       structure into wireframe, which is what made this look like floating
+       bars instead of a building. Still dark: silhouette first, then edges. */
+    ' vec3 col = vec3(0.016,0.020,0.028);',
+    ' col += cold * key * 0.105;',
+    ' col += vec3(0.55,0.68,0.86) * fill * 0.045;',
+    ' col += cold * fres * 0.85;',
     /* emission: cold from the start, warm energy only once we are through */
     ' vec3 em = mix(cold*1.45, warm*1.35, vWarm*uIgnite);',
     ' float pulse = 0.80 + 0.20*sin(uTime*1.6 + vSeed*39.0);',
@@ -522,10 +549,17 @@
          target pattern rather than light caught in a curved boundary */
       ' float ph = band*0.28 + uTime*0.012;',
       ' vec3 spec = vec3(0.5+0.5*sin(6.2831*ph), 0.5+0.5*sin(6.2831*(ph+0.333)), 0.5+0.5*sin(6.2831*(ph+0.666)));',
-      ' col += spec * ring * uSpectral * (0.22 + lum*2.2);',
       ' col *= uExposure;',
       ' col = aces(col);',
       ' col *= 1.0 - uVig*smoothstep(0.42,1.45,r);',
+      /* The arc goes on *after* tonemap and vignette. It is light refracting in
+         the boundary itself, not light in the scene — and both of those stages
+         attack it hardest exactly where it lives, at the frame edge, which is
+         what was crushing it to nothing. It also needs a floor that survives an
+         empty edge, since in the reference it glows against pure black. */
+      /* lum is clamped: at the crossing the bloom buffer is enormous, and an
+         unclamped term turns the arc into a full-frame rainbow */
+      ' col += spec * ring * uSpectral * (0.55 + min(lum,0.5)*1.3);',
       ' col += (hash(gl_FragCoord.xy + fract(uTime))-0.5)*uGrain;',
       ' col = mix(col, uWhiteCol, uWhite);',
       ' gl_FragColor = vec4(col,1.0); }'
@@ -737,7 +771,7 @@
       gl.uniform1f(uS.uReveal, reveal);
       gl.uniform1f(uS.uIgnite, smoothstep(0.60, 0.76, p));
       gl.uniform1f(uS.uArrival, arrival);
-      gl.uniform1f(uS.uEnergy, 1.0 + 2.4 * cross + 0.35 * drive);
+      gl.uniform1f(uS.uEnergy, 1.0 + 1.10 * cross + 0.22 * drive);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, bPos);
       gl.enableVertexAttribArray(aS.pos); gl.vertexAttribPointer(aS.pos, 3, gl.FLOAT, false, 0, 0);
@@ -818,17 +852,23 @@
       gl.uniform1f(uC.uTime, now);
 
       /* refraction tracks velocity, plus a hard spike through the boundary */
-      gl.uniform1f(uC.uRefract, 0.0045 + 0.038 * drive * drive + 0.075 * cross);
-      gl.uniform1f(uC.uDisp, 0.0022 + 0.012 * drive * drive + 0.030 * cross);
-      gl.uniform1f(uC.uWarp, 0.0016 + 0.008 * drive + 0.014 * cross);
-      gl.uniform1f(uC.uSmear, (0.006 * drive + 0.042 * cross) * (1 - arrival));
-      /* the boundary stays peripheral — it sweeps in from the corners but never
-         reaches the centre. A ring that crosses the middle of frame stops being
-         curvature you infer and becomes a shape you look at. */
-      gl.uniform1f(uC.uLensR, mix(1.42, 0.92, smoothstep(0.40, 0.70, p)) + 0.5 * arrival);
-      gl.uniform1f(uC.uLensSoft, mix(0.30, 0.17, drive));
-      gl.uniform1f(uC.uBloomAmt, mix(0.40, 1.00, drive) * mix(1, 0.55, arrival) + 0.35 * cross);
-      gl.uniform1f(uC.uSpectral, 0.012 + 0.030 * drive + 0.100 * cross);
+      /* The glass is always there. At rest it still bends the frame and still
+         throws a spectral arc down each side — that baseline is what makes the
+         whole page feel like it sits behind thick optical glass, rather than
+         like an effect that switches on when you scroll. */
+      gl.uniform1f(uC.uRefract, 0.016 + 0.034 * drive * drive + 0.050 * cross);
+      gl.uniform1f(uC.uDisp, 0.0060 + 0.009 * drive * drive + 0.012 * cross);
+      gl.uniform1f(uC.uWarp, 0.0030 + 0.007 * drive + 0.010 * cross);
+      gl.uniform1f(uC.uSmear, (0.005 * drive + 0.026 * cross) * (1 - arrival));
+      /* r is aspect-corrected: on 16:9 the left/right edges sit near 1.78 while
+         top/bottom sit at 1.0. Parking the boundary *between* them is what makes
+         it read as two tall arcs down the sides instead of a ring drawn on the
+         screen — so the radius has to follow the viewport, not be a constant. */
+      var edgeR = 1.0 + (aspect - 1.0) * 0.58;
+      gl.uniform1f(uC.uLensR, edgeR * mix(1.0, 0.74, smoothstep(0.40, 0.70, p)) + 0.45 * arrival);
+      gl.uniform1f(uC.uLensSoft, mix(0.44, 0.30, drive));
+      gl.uniform1f(uC.uBloomAmt, mix(0.34, 0.72, drive) * mix(1, 0.55, arrival) + 0.14 * cross);
+      gl.uniform1f(uC.uSpectral, 0.24 + 0.09 * drive + 0.10 * cross);
       /* the vignette opens up through the crossing — holding it closed keeps the
          corners dead exactly when the periphery should carry the most speed */
       gl.uniform1f(uC.uVig, mix(0.42, 0.10, arrival) * (1 - 0.6 * cross));
