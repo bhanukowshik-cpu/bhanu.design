@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dimension lab — the crossing</title>
+<style>
+  :root{ --ink:#EFF3F8; --ink-3:#7C8794; --line:rgba(239,243,248,.14); --ember:#5CA9FF; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;background:#05070B;color:var(--ink);
+    font-family:'Instrument Sans',system-ui,-apple-system,sans-serif;overflow:hidden;}
+  #stage{position:fixed;inset:0;display:block;width:100%;height:100%;}
+
+  .hud{position:fixed;left:0;right:0;bottom:0;z-index:10;padding:14px 20px 16px;
+    display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+    background:linear-gradient(to top,rgba(5,7,11,.92),rgba(5,7,11,0));}
+  .hud label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+    display:flex;align-items:center;gap:9px;white-space:nowrap;}
+  input[type=range]{width:min(420px,42vw);accent-color:var(--ember);}
+  .val{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--ink);
+    min-width:46px;text-align:right;}
+  button{font:inherit;font-size:12px;letter-spacing:.04em;color:var(--ink);cursor:pointer;
+    background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:9px;padding:7px 13px;}
+  button:hover{background:rgba(255,255,255,.11);}
+  .stats{position:fixed;top:14px;left:18px;z-index:10;font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:11px;line-height:1.7;color:var(--ink-3);pointer-events:none;}
+  .stats b{color:var(--ink);font-weight:500;}
+  .phase{position:fixed;top:14px;right:18px;z-index:10;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ember);pointer-events:none;}
+  .err{position:fixed;inset:auto 0 0 0;z-index:20;padding:18px 22px;background:#3A0E12;
+    color:#FFD9DC;font-size:13px;line-height:1.5;display:none;}
+  /* marks the seven authored beats along the scrubber */
+  .beats{position:fixed;left:0;right:0;bottom:56px;height:12px;z-index:9;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<canvas id="stage"></canvas>
+
+<div class="stats" id="stats"></div>
+<div class="phase" id="phase"></div>
+
+<div class="hud">
+  <label>p <input id="p" type="range" min="0" max="1" step="0.001" value="0"><span class="val" id="pv">0.000</span></label>
+  <label>scroll vel <input id="v" type="range" min="0" max="1" step="0.01" value="0" style="width:150px"><span class="val" id="vv">0.00</span></label>
+  <button id="play">Play ▶</button>
+  <button id="loop">Loop crossing</button>
+</div>
+
+<div class="err" id="err"></div>
+
+<script src="portal/dimension.js?v=1"></script>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+
+  /* Dev-only: a MessageChannel-driven rAF so the scene still ticks in hidden /
+     headless tabs, where the real rAF is suspended. setTimeout gets throttled
+     to ~1fps there, which stalls uTime — MessageChannel does not. */
+  if (q.has('rafshim')) {
+    var mc = new MessageChannel(), queue = [], nid = 1;
+    mc.port1.onmessage = function () {
+      var run = queue; queue = [];
+      for (var i = 0; i < run.length; i++) { try { run[i].cb(performance.now()); } catch (e) {} }
+    };
+    window.requestAnimationFrame = function (cb) {
+      var id = nid++; queue.push({ id: id, cb: cb }); mc.port2.postMessage(0); return id;
+    };
+    window.cancelAnimationFrame = function (id) {
+      for (var i = 0; i < queue.length; i++) if (queue[i].id === id) { queue.splice(i, 1); return; }
+    };
+  }
+
+  var err = document.getElementById('err');
+  function fail(msg) { err.textContent = msg; err.style.display = 'block'; }
+  window.addEventListener('error', function (e) { fail('Runtime error: ' + (e.message || e)); });
+
+  var cv = document.getElementById('stage');
+
+  /* the hidden preview tab reports a 0×0 viewport, so fall back to screen.* and
+     pin the canvas box explicitly — otherwise everything renders at 0×0 */
+  function fitStage() {
+    var w = window.innerWidth || document.documentElement.clientWidth || screen.width || 1280;
+    var h = window.innerHeight || document.documentElement.clientHeight || screen.height || 720;
+    cv.style.width = w + 'px';
+    cv.style.height = h + 'px';
+  }
+  fitStage();
+  addEventListener('resize', fitStage);
+
+  if (!window.Dimension) { fail('portal/dimension.js did not load — serve this over http://localhost:8080/portal-lab.html'); return; }
+
+  var dim = Dimension.create(cv, { quality: q.get('quality') || 'high' });
+  if (!dim) { fail('WebGL unavailable (or no instancing support) — the engine cannot run here.'); return; }
+
+  var pEl = document.getElementById('p'), vEl = document.getElementById('v');
+  var pv = document.getElementById('pv'), vv = document.getElementById('vv');
+  var statsEl = document.getElementById('stats'), phaseEl = document.getElementById('phase');
+
+  var P = parseFloat(q.get('p') || '0');
+  var V = parseFloat(q.get('vel') || '0');
+  pEl.value = P; vEl.value = V;
+
+  var BEATS = [
+    [0.00, 'calm'], [0.12, 'anomaly'], [0.30, 'approach'], [0.48, 'acceleration'],
+    [0.64, 'crossing'], [0.72, 'snap'], [0.82, 'arrival']
+  ];
+  function phaseOf(p) {
+    var name = BEATS[0][1];
+    for (var i = 0; i < BEATS.length; i++) if (p >= BEATS[i][0]) name = BEATS[i][1];
+    return name;
+  }
+
+  var playing = false, loopCross = false, t0 = 0;
+
+  document.getElementById('play').addEventListener('click', function () {
+    playing = !playing; loopCross = false;
+    this.textContent = playing ? 'Pause ❚❚' : 'Play ▶';
+    t0 = performance.now() - P * 9000;
+  });
+  document.getElementById('loop').addEventListener('click', function () {
+    loopCross = !loopCross; playing = false;
+    document.getElementById('play').textContent = 'Play ▶';
+    t0 = performance.now();
+  });
+  pEl.addEventListener('input', function () { P = parseFloat(pEl.value); playing = false; loopCross = false; });
+  vEl.addEventListener('input', function () { V = parseFloat(vEl.value); });
+
+  /* headless hooks — drive a frame and read state without touching the UI */
+  window.__setP = function (p, v) {
+    P = Math.max(0, Math.min(1, p)); if (v != null) V = v;
+    playing = false; loopCross = false; pEl.value = P;
+    frame(performance.now());
+    return { p: P, cam: dim._camera(P) };
+  };
+  window.__dim = dim;
+
+  function frame(now) {
+    if (playing) {
+      P = ((now - t0) / 9000) % 1;
+      pEl.value = P;
+    } else if (loopCross) {
+      P = 0.42 + (((now - t0) / 2600) % 1) * 0.46;   // scrub just the crossing
+      pEl.value = P;
+    }
+    /* when playing, derive velocity from the flight itself so the HUD shows
+       what the effect is actually reacting to */
+    var autoV = (playing || loopCross) ? 0.35 : 0;
+    var vel = Math.max(V, autoV);
+
+    dim.draw(P, vel);
+
+    pv.textContent = P.toFixed(3);
+    vv.textContent = vel.toFixed(2);
+    var cam = dim._camera(P);
+    statsEl.innerHTML =
+      'p <b>' + P.toFixed(3) + '</b><br>' +
+      'cam.z <b>' + cam.z.toFixed(1) + '</b><br>' +
+      'fov <b>' + (cam.fov * 180 / Math.PI).toFixed(1) + '°</b><br>' +
+      'flight vel <b>' + dim._flight.vel(P).toFixed(3) + '</b><br>' +
+      'instances <b>' + dim.instances + '</b><br>' +
+      'ctx <b>' + (dim.gl2 ? 'webgl2' : 'webgl1') + '</b>';
+    phaseEl.textContent = phaseOf(P);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
