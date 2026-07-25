@@ -692,16 +692,28 @@
       ' vec2 uv = vUv*2.0-1.0; uv.x *= uAspect;',
       ' float dive = pow(clamp(uP,0.0,1.0), 1.25);',
       ' float t = uTime*0.09;',
+      /* the origin: the vortex is born in the hero's own bottom smoke. Its
+         centre starts below the frame edge and rises to centre as the scroll
+         inflates it — the page's smoke and the portal are one object. */
+      ' float rise = smoothstep(0.02, 0.44, uP);',
+      ' vec2 uvc = uv - vec2(0.0, mix(-1.30, 0.0, rise));',
       /* the fall: magnify around the centre as progress climbs — features grow
          and sweep past the frame edge, which is what sells "getting closer" */
       ' float zoom = 1.0 + 3.4*dive*dive + uVel*0.12;',
-      ' vec2 q = uv / zoom;',
+      ' vec2 q = uvc / zoom;',
       ' float r = length(q);',
       /* the swirl: rotation by log(r) shears rings into a spiral, tightening
          toward the core on its own; time + scroll keep it turning */
-      ' float ang = mix(2.3,4.3,dive)*log(max(r,1e-3)) - t*(0.55+dive*1.5) - uP*2.4 - uVel*0.5;',
+      ' float ang = mix(2.3,4.3,dive)*log(max(r,1e-3)) - t*(0.9+dive*1.6) - uP*2.9 - uVel*0.8;',
       ' float cs = cos(ang), sn = sin(ang);',
       ' vec2 w = mat2(cs,-sn,sn,cs)*q;',
+      /* the arms — the part that makes it read as a SPIRAL and not haze with a
+         dot in it. cos(3·angle) in the *swirled* frame winds three distinct
+         arms down to the eye; they fade in as the vortex forms, so the mound
+         starts as plain smoke and organises itself as you commit to the dive */
+      ' float aw = atan(w.y, w.x);',
+      ' float arms = pow(0.5 + 0.5*cos(3.0*aw), 1.7);',
+      ' float g = mix(1.0, 0.20 + 1.80*arms, 0.62*smoothstep(0.10, 0.44, uP));',
       /* domain warp is the silk — unwarped fbm reads as fog, not fabric */
       ' vec2 warp = vec2(fbm(w*1.9 + vec2(t*0.6,0.0)), fbm(w*1.9 + vec2(4.7,-t*0.5))) - 0.5;',
       ' float f = fbm(w*2.7 + warp*1.35);',
@@ -709,10 +721,15 @@
          catch the core light, same trick as the hero caustics */
       ' float rg = 1.0 - abs(2.0*fbm(w*3.8 - warp*0.9 + vec2(2.3,5.1)) - 1.0);',
       ' rg = pow(max(rg,0.0), 2.8);',
-      ' float rs = length(uv);',
+      ' float rs = length(uvc);',
+      /* growth: the smoke is a mound hugging the bottom of the hero, and the
+         scroll inflates it — bigger, bigger, bigger — until it owns the frame */
+      ' float R = mix(0.80, 3.6, smoothstep(0.0, 0.52, uP));',
+      ' float cover = smoothstep(R, R*0.42, rs);',
       /* a large-scale mask sinks whole regions to near-black — the reference
          is mostly void, and the darkness is what makes the silk read */
       ' float mask = mix(0.35, 1.0, smoothstep(0.25, 0.80, fbm(w*0.85 + vec2(7.7,3.1))));',
+      ' mask *= cover*g;',
       ' float dense = smoothstep(0.22, 0.92, f);',
       ' vec3 col = vec3(0.006,0.009,0.016);',
       ' col += vec3(0.115,0.145,0.215)*dense*mask;',
@@ -728,11 +745,14 @@
       /* the core — small and held back early, then it takes the frame. Smoke
          crosses in front of it, so the light sits *inside* the vortex rather
          than pasted on top. */
+      /* the eye ignites only once the vortex has formed — early on the smoke
+         is just smoke, so there is never a lone dot parked in the haze */
       ' float core = exp(-rs*rs*mix(34.0,1.5,smoothstep(0.30,0.90,uP)));',
-      ' float boost = 0.30 + dive*2.1 + uVel*0.45 + uCross*1.7;',
+      ' float boost = (0.30 + dive*2.1 + uVel*0.45 + uCross*1.7)',
+      '             * (0.10 + 0.90*smoothstep(0.30, 0.56, uP));',
       ' col += vec3(0.70,0.81,1.00)*core*(0.35+0.65*f)*boost;',
       ' col += vec3(0.93,0.96,1.00)*core*core*boost*0.8;',
-      ' col *= 1.0 - 0.48*smoothstep(0.45,1.45,rs);',
+      ' col *= 1.0 - 0.48*smoothstep(0.45,1.45,length(uv));',
       /* the page opens: the last stretch bleaches the whole field so the
          composite white-out lands on something already going luminous */
       ' col = mix(col, vec3(0.955,0.968,0.990), smoothstep(0.80,0.965,uP));',

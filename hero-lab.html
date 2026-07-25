@@ -632,7 +632,7 @@
     </div>
   </aside>
 
-<script src="portal/dimension.js?v=5"></script>
+<script src="portal/dimension.js?v=6"></script>
 <script>
 /* ═══ SMOKE SHADER — pure rising smoke, no geometry ═══ */
 (function () {
@@ -1021,15 +1021,18 @@ addEventListener('scroll', function () {
     var tP = travel ? clamp01((y - pinTop - SPAN_B - SPAN_C) / travel) : 0;  // reel
     curP = p;
 
-    /* A — the hero lets go: copy, CTA and photo trail dissolve on the way out */
-    if (copy) copy.style.opacity = (1 - ramp(.12, .72, aP)).toFixed(3);
-    if (ctaDock) ctaDock.style.opacity = (1 - ramp(.05, .55, aP)).toFixed(3);
-    if (trailLayer) trailLayer.style.opacity = (1 - ramp(0, .35, aP)).toFixed(3);
+    /* A — the hero lets go: copy, CTA and photo trail dissolve on the way out.
+       All of it is gone before the canvas reaches full opacity, so the smoke
+       swallowing the page is what you see — not a panel covering the copy. */
+    if (copy) copy.style.opacity = (1 - ramp(.08, .40, aP)).toFixed(3);
+    if (ctaDock) ctaDock.style.opacity = (1 - ramp(.04, .30, aP)).toFixed(3);
+    if (trailLayer) trailLayer.style.opacity = (1 - ramp(0, .28, aP)).toFixed(3);
 
-    /* The world fades up early and under the hero's own copy, so it reads as
-       space opening behind the page rather than a panel sliding over it. It
-       clears at the very end, once it has already whited out to the page. */
-    var tOp = ramp(.10, .46, aP) * (1 - ramp(.94, 1, p));
+    /* The world fades up as the hero's own bottom smoke starts to swell —
+       the canvas smoke begins as the same mound in the same place, so the
+       hand-off is invisible. It clears at the very end, once it has already
+       whited out to the page. */
+    var tOp = ramp(.08, .40, aP) * (1 - ramp(.94, 1, p));
     tcv.style.opacity = tOp.toFixed(3);
     visible = tOp > 0;
     tcv.style.display = visible ? 'block' : 'none';
