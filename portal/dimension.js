@@ -341,6 +341,104 @@
     return { data: new Float32Array(arr), count: arr.length / STRIDE };
   }
 
+  /* ── THE SPIRAL ────────────────────────────────────────────────────────────
+     A vortex you fall into, rather than a corridor you fly down.
+
+     This reads where the lattice did not, and the reason is legibility: an
+     abstract framework has no shape the viewer already expects, so distorting
+     it communicates nothing. A spiral does — rotation is unmistakable, and a
+     centre that everything converges toward is unmistakable. The dimensional
+     feeling comes from the structure itself instead of from an optical trick
+     that has to be sold.
+
+     Radius is large near the camera and converges with depth, so the arms
+     sweep in from off-frame and wind down to a core. Shards are aligned
+     *tangentially* to their arm — that one detail is what makes the field read
+     as flow rather than as scattered debris.                                 */
+  function buildSpiral(flight, dense) {
+    var arr = [], r = rng(20260726);
+
+    function push(px, py, pz, sx, sy, sz, rx, ry, rz, tr, tg, tb, em, warm) {
+      arr.push(px, py, pz, r(),
+               sx, sy, sz, em,
+               rx, ry, rz, 0,
+               tr, tg, tb, warm);
+    }
+
+    var DEPTH = TRAVEL + 150;
+    var ARMS = 3;
+    var TURNS = 2.7;
+    var R0 = 46;                                   // mouth, out past the frame
+    var RMIN = 2.0;                                // the core
+    var COLD = [0.42, 0.66, 1.00];
+    var PALE = [0.62, 0.72, 0.88];
+    var WARM = [1.00, 0.62, 0.42];
+
+    /* 1 — ARM SHARDS */
+    var N = dense ? 4400 : 1400;
+    for (var i = 0; i < N; i++) {
+      var t = Math.pow(r(), 0.82);                 // a little denser toward the mouth
+      var arm = Math.floor(r() * ARMS);
+      var z = -t * DEPTH;
+      var rad = RMIN + (R0 - RMIN) * (1 - t);
+      /* arm thickness — two uniforms make a cheap bell, so arms have a dense
+         spine and a soft edge instead of a hard-edged ribbon */
+      rad += rad * 0.17 * (r() + r() - 1);
+      var theta = t * TURNS * Math.PI * 2 + arm * (Math.PI * 2 / ARMS) + (r() - 0.5) * 0.34;
+
+      /* Long along the arm. Short marks read as a dot field however many you
+         add; drawn-out ones overlap into continuous curves, and the curve is
+         the whole point — it is what tells the eye this is a spiral. */
+      var big = r() < 0.09;
+      var len = (big ? 3.0 + r() * 6.0 : 0.9 + r() * 2.8) * (0.55 + (1 - t) * 1.3);
+      var th = (big ? 0.10 + r() * 0.15 : 0.05 + r() * 0.09) * (0.6 + (1 - t) * 1.0);
+
+      /* emissive fraction climbs toward the core, so the centre is the
+         brightest thing without anything being placed there by hand */
+      var lit = r() < (0.34 + t * 0.34);
+      var wm = lit && r() < 0.30 ? 1 : 0;
+      var c = lit ? COLD : PALE;
+
+      push(Math.cos(theta) * rad, Math.sin(theta) * rad, z,
+           len, th, th * (1 + r() * 1.6),
+           0, 0, theta + Math.PI * 0.5,             // tangential — this is what makes it flow
+           c[0], c[1], c[2],
+           lit ? (0.7 + r() * 1.9) * (0.45 + t) : 0, wm);
+    }
+
+    /* 2 — DUST. Fills the volume between the arms so the vortex sits in a
+       universe rather than in an empty box. Unaligned and tiny. */
+    var nDust = dense ? 900 : 320;
+    for (var d = 0; d < nDust; d++) {
+      var dt = Math.pow(r(), 0.7);
+      var dz = -dt * DEPTH;
+      var drad = (RMIN + (R0 - RMIN) * (1 - dt)) * (0.25 + r() * 1.25);
+      var dth = r() * Math.PI * 2;
+      var dlit = r() < 0.22;
+      push(Math.cos(dth) * drad, Math.sin(dth) * drad, dz,
+           0.04 + r() * 0.10, 0.04 + r() * 0.10, 0.04 + r() * 0.22,
+           0, 0, r() * 3.14,
+           dlit ? COLD[0] : PALE[0], dlit ? COLD[1] : PALE[1], dlit ? COLD[2] : PALE[2],
+           dlit ? 0.35 + r() * 0.9 : 0, r() < 0.25 ? 1 : 0);
+    }
+
+    /* 3 — PASSERS. Placed on the camera's own path through the acceleration
+       window, so something always rushes the lens exactly when it should.
+       Far geometry reads as camera movement; only near geometry reads as SPEED. */
+    for (var k = 0; k < 18; k++) {
+      var pp = 0.48 + (k / 17) * 0.26;
+      var pz = flight.z(pp) - (2 + r() * 8);
+      var pth = r() * Math.PI * 2;
+      var prad = 3.5 + r() * 7;
+      push(Math.cos(pth) * prad, Math.sin(pth) * prad, pz,
+           1.6 + r() * 3.8, 0.09 + r() * 0.16, 0.09 + r() * 0.3,
+           0, 0, pth + Math.PI * 0.5,
+           WARM[0], WARM[1], WARM[2], (k % 3 === 0) ? 0.55 : 0, 1);
+    }
+
+    return { data: new Float32Array(arr), count: arr.length / STRIDE };
+  }
+
   /* unit box — 24 verts so each face gets a clean normal */
   function boxGeo() {
     var p = [], n = [], i = [], f = [
@@ -366,7 +464,7 @@
   var SCENE_VS = [
     'attribute vec3 aPos; attribute vec3 aNorm;',
     'attribute vec4 iPos; attribute vec4 iScale; attribute vec4 iRot; attribute vec4 iTint;',
-    'uniform mat4 uVP; uniform vec3 uEye; uniform float uTime;',
+    'uniform mat4 uVP; uniform vec3 uEye; uniform float uTime; uniform float uSpin;',
     'varying vec3 vN, vW; varying float vEmis, vDist, vWarm, vSeed; varying vec3 vTint;',
     'void main(){',
     ' vec3 e = iRot.xyz;',
@@ -375,7 +473,13 @@
     '          * mat3(cy,0.,-sy,0.,1.,0.,sy,0.,cy)',
     '          * mat3(1.,0.,0.,0.,cx,sx,0.,-sx,cx);',
     ' vec3 w = R * (aPos * iScale.xyz) + iPos.xyz;',
-    /* a hair of drift so the lattice is never dead — far too small to read as motion */
+    /* Spin the whole field about the axis. Deeper rings lag slightly, which
+       shears the arms into a corkscrew instead of turning the vortex like a
+       rigid wheel — differential rotation is what makes it read as a fluid. */
+    ' float sp = uSpin * (1.0 + w.z * 0.0016);',
+    ' float cs = cos(sp), sn = sin(sp);',
+    ' w.xy = vec2(w.x*cs - w.y*sn, w.x*sn + w.y*cs);',
+    /* a hair of drift so the field is never dead — too small to read as motion */
     ' w.y += sin(uTime*0.32 + iPos.w*6.283)*0.035;',
     ' vW = w; vN = R * aNorm;',
     ' vEmis = iScale.w; vWarm = iTint.w; vSeed = iPos.w; vTint = iTint.xyz;',
@@ -462,6 +566,74 @@
     ' float halo = exp(-r*r*2.6)*0.22;',
     ' gl_FragColor = vec4(uCol*(core*1.6+halo)*uInt, 1.0); }'
   ].join('\n');
+
+  /* ── THE TITLE PLANE ───────────────────────────────────────────────────────
+     The single most important part of the illusion, and the easiest to leave
+     out. Abstract geometry can distort as hard as it likes and the eye cannot
+     tell — there is no reference for what it *should* look like, so refraction
+     on a lattice just reads as "the lattice is shaped like that". Type is
+     different. You were reading it a second ago, so when it stretches and bows
+     you attribute the change to the space rather than to the letters. The
+     departure has to be built out of something familiar or the arrival means
+     nothing.                                                                 */
+  var TITLE_VS = [
+    'attribute vec2 aPos;',
+    'uniform mat4 uVP; uniform vec3 uCentre; uniform vec2 uSize;',
+    'varying vec2 vUv;',
+    'void main(){',
+    ' vUv = vec2(aPos.x*0.5+0.5, 0.5-aPos.y*0.5);',
+    ' vec3 w = uCentre + vec3(aPos.x*uSize.x, aPos.y*uSize.y, 0.0);',
+    ' gl_Position = uVP * vec4(w,1.0); }'
+  ].join('\n');
+
+  var TITLE_FS = [
+    'precision mediump float; varying vec2 vUv;',
+    'uniform sampler2D uTex; uniform float uAlpha; uniform vec3 uTint;',
+    'void main(){',
+    ' vec4 t = texture2D(uTex, vUv);',
+    ' gl_FragColor = vec4(uTint * t.a * uAlpha, t.a * uAlpha); }'
+  ].join('\n');
+
+  /* Glyphs are placed by hand rather than with ctx.letterSpacing so the pull
+     is exact, animatable, and identical on every engine. */
+  function drawTitle(cv, lines, spread, family) {
+    var W = cv.width, H = cv.height;
+    var x = cv.getContext('2d');
+    x.clearRect(0, 0, W, H);
+    if (!lines.length) return;
+    x.fillStyle = '#ffffff';
+    x.textBaseline = 'middle';
+
+    var lead = H / (lines.length + 0.55);
+    var size = lead * 0.74;
+
+    function lineWidth(s, sz, gp) {
+      x.font = '560 ' + Math.round(sz) + 'px ' + family;
+      var w = 0;
+      for (var i = 0; i < s.length; i++) w += x.measureText(s[i]).width + (i < s.length - 1 ? gp : 0);
+      return w;
+    }
+    /* shrink to fit — the spread grows the line as it pulls apart, so the fit
+       has to be resolved against the *current* spacing, not the resting one */
+    for (var pass = 0; pass < 3; pass++) {
+      var gp = size * spread * 0.62, mx = 0, li;
+      for (li = 0; li < lines.length; li++) mx = Math.max(mx, lineWidth(lines[li], size, gp));
+      if (mx <= W * 0.86) break;
+      size *= (W * 0.86) / mx;
+    }
+
+    var gap = size * spread * 0.62;                   // the letters pulling apart
+    x.font = '560 ' + Math.round(size) + 'px ' + family;
+    for (var l = 0; l < lines.length; l++) {
+      var s = lines[l], n = s.length, w = lineWidth(s, size, gap), i;
+      x.font = '560 ' + Math.round(size) + 'px ' + family;
+      var cx = (W - w) * 0.5, cy = lead * (l + 0.8);
+      for (i = 0; i < n; i++) {
+        x.fillText(s[i], cx, cy);
+        cx += x.measureText(s[i]).width + gap;
+      }
+    }
+  }
 
   var QUAD_VS = 'attribute vec2 aPos; varying vec2 vUv;' +
                 'void main(){ vUv = aPos*0.5+0.5; gl_Position = vec4(aPos,0.,1.); }';
@@ -626,7 +798,10 @@
 
     var low = opts.quality === 'low';
     var flight = buildFlight();
-    var inst = buildInstances(flight, !low);
+    /* 'lattice' is the earlier architectural corridor — kept because it still
+       builds and is useful to compare against, but the spiral is the default:
+       it reads on its own without needing the optics to explain it. */
+    var inst = (opts.world === 'lattice' ? buildInstances : buildSpiral)(flight, !low);
     var geo = boxGeo();
 
     /* programs */
@@ -635,7 +810,48 @@
     var pBright = makeProgram(gl, QUAD_VS, BRIGHT_FS);
     var pBlur = makeProgram(gl, QUAD_VS, BLUR_FS);
     var pComp = makeProgram(gl, QUAD_VS, compFrag(low ? 2 : 5));
-    if (!pScene || !pAnchor || !pBright || !pBlur || !pComp) return null;
+    var pTitle = makeProgram(gl, TITLE_VS, TITLE_FS);
+    if (!pScene || !pAnchor || !pBright || !pBlur || !pComp || !pTitle) return null;
+
+    /* ---- the headline we fly through ---- */
+    var titleLines = opts.title || [];
+    var titleFamily = opts.titleFont || "'Instrument Sans', system-ui, sans-serif";
+    var TITLE_Z = -26;
+    var titleCv = null, titleTex = null, titleSpread = -1, titleDirty = true, titleAspect = 0;
+    /* The plane is sized once, from the frustum at rest, so it exactly fills the
+       frame at p=0 — and then stays fixed in world space. That is what makes it
+       grow as the camera closes: sizing it to the *current* frustum would hold
+       it at a constant apparent size and it would never rush the lens. */
+    var REF_DIST = -TITLE_Z, REF_FOV = 40 * Math.PI / 180;
+    var titleH = REF_DIST * Math.tan(REF_FOV / 2) * 0.92;
+    if (titleLines.length) {
+      titleCv = document.createElement('canvas');
+      titleCv.width = low ? 1024 : 2048;
+      titleCv.height = low ? 512 : 1024;
+      titleTex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, titleTex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      /* webfonts land after first paint — rebuild once they do, or the type
+         flies past in a fallback face */
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () { titleDirty = true; titleSpread = -1; });
+      }
+    }
+
+    function syncTitle(spread) {
+      /* quantised: redrawing every frame would cost a full texture upload for a
+         change too small to see */
+      var q = Math.round(spread * 14) / 14;
+      if (!titleDirty && q === titleSpread) return;
+      titleSpread = q; titleDirty = false;
+      drawTitle(titleCv, titleLines, q, titleFamily);
+      gl.bindTexture(gl.TEXTURE_2D, titleTex);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, titleCv);
+    }
 
     /* buffers */
     function buf(target, data, usage) {
@@ -657,7 +873,7 @@
       for (var i = 0; i < names.length; i++) o[names[i]] = gl.getUniformLocation(p, names[i]);
       return o;
     }
-    var uS = U(pScene, ['uVP', 'uEye', 'uTime', 'uFog', 'uFogCol', 'uReveal', 'uIgnite', 'uArrival', 'uEnergy']);
+    var uS = U(pScene, ['uVP', 'uEye', 'uTime', 'uFog', 'uFogCol', 'uReveal', 'uIgnite', 'uArrival', 'uEnergy', 'uSpin']);
     var uA = U(pAnchor, ['uVP', 'uCentre', 'uRight', 'uUp', 'uSize', 'uCol', 'uInt']);
     var uBr = U(pBright, ['uTex', 'uThresh']);
     var uBl = U(pBlur, ['uTex', 'uDir']);
@@ -670,6 +886,8 @@
       iPos: gl.getAttribLocation(pScene, 'iPos'), iScale: gl.getAttribLocation(pScene, 'iScale'),
       iRot: gl.getAttribLocation(pScene, 'iRot'), iTint: gl.getAttribLocation(pScene, 'iTint')
     };
+    var uT = U(pTitle, ['uVP', 'uCentre', 'uSize', 'uTex', 'uAlpha', 'uTint']);
+    var aTitle = gl.getAttribLocation(pTitle, 'aPos');
     var aAnchor = gl.getAttribLocation(pAnchor, 'aPos');
     var aQuadB = gl.getAttribLocation(pBright, 'aPos');
     var aQuadL = gl.getAttribLocation(pBlur, 'aPos');
@@ -751,12 +969,16 @@
       gl.disable(gl.BLEND);
 
       /* fog recedes as we approach — the world was always there */
-      var fog = mix(0.0180, 0.0042, smoothstep(0.08, 0.62, p));
-      fog = mix(fog, 0.0026, smoothstep(0.62, 0.78, p));
+      /* The spiral has to be legible from the first frame — its whole job is to
+         be a shape you recognise. So depth opens rather than unveils: the fog
+         thins and the far arms resolve, but nothing is ever hidden outright the
+         way the corridor's structure was. */
+      var fog = mix(0.0052, 0.0021, smoothstep(0.06, 0.62, p));
+      fog = mix(fog, 0.0015, smoothstep(0.62, 0.78, p));
       /* aerial perspective on arrival — structure dissolves into the white
          rather than the whole frame flattening to grey */
-      fog = mix(fog, 0.0082, arrival);
-      var reveal = mix(46, 300, smoothstep(0.05, 0.66, p));
+      fog = mix(fog, 0.0075, arrival);
+      var reveal = mix(210, 620, smoothstep(0.03, 0.60, p));
       var fogR = mix(0.006, 0.957, arrival), fogG = mix(0.009, 0.967, arrival), fogB = mix(0.015, 0.985, arrival);
 
       gl.clearColor(fogR, fogG, fogB, 1);
@@ -772,6 +994,10 @@
       gl.uniform1f(uS.uIgnite, smoothstep(0.60, 0.76, p));
       gl.uniform1f(uS.uArrival, arrival);
       gl.uniform1f(uS.uEnergy, 1.0 + 1.10 * cross + 0.22 * drive);
+      /* Scroll turns the vortex. Most of the rotation is bound to progress so
+         scrubbing back unwinds it exactly; the small time term keeps it alive
+         when the visitor stops, and velocity gives it a kick when they don't. */
+      gl.uniform1f(uS.uSpin, p * 2.9 + now * 0.035 + sv * 0.30);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, bPos);
       gl.enableVertexAttribArray(aS.pos); gl.vertexAttribPointer(aS.pos, 3, gl.FLOAT, false, 0, 0);
@@ -789,6 +1015,47 @@
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bIdx);
       drawInst(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0, inst.count);
 
+      /* ---- the headline, and the camera going through it ----
+         Depth-tested so lattice in front of the plane occludes it, additive so
+         it blooms and picks up the dispersion in the composite. */
+      if (titleLines.length) {
+        var dist = cam.z - TITLE_Z;                    // > 0 while still approaching
+        if (dist > 1.0) {
+          /* the pull: spacing opens as the lens takes hold. Reaching ~2.0 by the
+             time we arrive means the words are already coming apart before the
+             camera is close enough for the scale alone to explain it. */
+          /* keep the texture's shape locked to the viewport, or the glyphs
+             stretch on anything that isn't the aspect it was drawn at */
+          if (Math.abs(aspect - titleAspect) > 0.02) {
+            titleAspect = aspect;
+            titleCv.height = Math.max(64, Math.round(titleCv.width / aspect));
+            titleDirty = true;
+          }
+          syncTitle(smoothstep(0.03, 0.40, p) * 2.0);
+          gl.useProgram(pTitle);
+          gl.uniformMatrix4fv(uT.uVP, false, vp);
+          gl.uniform3f(uT.uCentre, 0, 0, TITLE_Z);
+          gl.uniform2f(uT.uSize, titleH * aspect, titleH);
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, titleTex);
+          gl.uniform1i(uT.uTex, 0);
+          /* fades out before the plane reaches the lens — flying through
+             something still opaque would clip as a hard edge across the frame */
+          gl.uniform1f(uT.uAlpha, smoothstep(1.5, 9.0, dist));
+          gl.uniform3f(uT.uTint, 0.92, 0.95, 1.0);
+          gl.depthMask(false);
+          gl.enable(gl.BLEND);
+          gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+          gl.bindBuffer(gl.ARRAY_BUFFER, bBill);
+          gl.enableVertexAttribArray(aTitle);
+          gl.vertexAttribPointer(aTitle, 2, gl.FLOAT, false, 0, 0);
+          divisor(aTitle, 0);
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+          gl.disable(gl.BLEND);
+          gl.depthMask(true);
+        }
+      }
+
       /* ---- anchor: lags the camera, so the world expands around it ---- */
       var anchorZ = cam.z - mix(52, 14, smoothstep(0.45, 0.80, p));
       gl.useProgram(pAnchor);
@@ -799,9 +1066,11 @@
       /* deliberately small and dim — it is a light *in* the corridor, not a
          glowing sphere parked on the lens. The bloom pass does the glowing;
          if the core itself is hot enough to clip, it reads as a stock asset. */
-      gl.uniform1f(uA.uSize, mix(1.1, 3.2, smoothstep(0.3, 0.7, p)));
+      /* the vortex core — the thing you are falling toward, so it needs real
+         presence, but still small enough that the bloom does the glowing */
+      gl.uniform1f(uA.uSize, mix(3.4, 8.0, smoothstep(0.25, 0.72, p)));
       var warmA = smoothstep(0.66, 0.86, p);
-      gl.uniform3f(uA.uCol, mix(0.34, 1.0, warmA), mix(0.62, 0.90, warmA), mix(1.0, 0.86, warmA));
+      gl.uniform3f(uA.uCol, mix(0.40, 1.0, warmA), mix(0.68, 0.90, warmA), mix(1.0, 0.84, warmA));
       /* gone entirely by arrival — a glowing core makes no sense once the world
          has inverted to dark structure on white */
       gl.uniform1f(uA.uInt, mix(0.20, 0.85, smoothstep(0.1, 0.67, p)) * (1 - arrival));
@@ -871,7 +1140,7 @@
       gl.uniform1f(uC.uSpectral, 0.24 + 0.09 * drive + 0.10 * cross);
       /* the vignette opens up through the crossing — holding it closed keeps the
          corners dead exactly when the periphery should carry the most speed */
-      gl.uniform1f(uC.uVig, mix(0.42, 0.10, arrival) * (1 - 0.6 * cross));
+      gl.uniform1f(uC.uVig, mix(0.28, 0.10, arrival) * (1 - 0.6 * cross));
       gl.uniform1f(uC.uGrain, mix(0.028, 0.012, arrival));
       gl.uniform1f(uC.uExposure, 1.0 + 0.28 * cross + 0.12 * drive);
       gl.uniform1f(uC.uWhite, smoothstep(0.90, 0.995, p));
@@ -890,7 +1159,8 @@
       _camera: function (p) { return cameraAt(flight, p); },
       dispose: function () {
         [bPos, bNorm, bIdx, bInst, bQuad, bBill].forEach(function (b) { gl.deleteBuffer(b); });
-        [pScene, pAnchor, pBright, pBlur, pComp].forEach(function (p) { gl.deleteProgram(p); });
+        [pScene, pAnchor, pBright, pBlur, pComp, pTitle].forEach(function (p) { gl.deleteProgram(p); });
+        if (titleTex) gl.deleteTexture(titleTex);
         if (rtScene) {
           gl.deleteTexture(rtScene.tex); gl.deleteFramebuffer(rtScene.fb); gl.deleteRenderbuffer(rtScene.rb);
           gl.deleteTexture(rtA.tex); gl.deleteFramebuffer(rtA.fb);

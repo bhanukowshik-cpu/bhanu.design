@@ -90,7 +90,13 @@
 
   if (!window.Dimension) { fail('portal/dimension.js did not load — serve this over http://localhost:8080/portal-lab.html'); return; }
 
-  var dim = Dimension.create(cv, { quality: q.get('quality') || 'high' });
+  var dim = Dimension.create(cv, {
+    quality: q.get('quality') || 'high',
+    world: q.get('world') || 'spiral',
+    /* ?title=1 flies the hero copy through the vortex — off by default so the
+       spiral gets judged on its own */
+    title: q.has('title') ? ['DESIGNING PRODUCTS', 'THAT SCALE, CONVERT', '& CONNECT'] : null
+  });
   if (!dim) { fail('WebGL unavailable (or no instancing support) — the engine cannot run here.'); return; }
 
   var pEl = document.getElementById('p'), vEl = document.getElementById('v');
