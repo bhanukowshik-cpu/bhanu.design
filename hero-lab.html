@@ -107,10 +107,10 @@
     font-size:13px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);}
   .eyebrow i{width:1px;height:11px;background:var(--line);}
   h1{
-    margin-top:28px;
+    margin-top:26px;
     font-family:var(--sans);font-weight:570;
-    font-size:clamp(42px,6.2vw,88px);line-height:1.05;letter-spacing:-0.031em;
-    max-width:17ch;text-wrap:balance;
+    font-size:clamp(38px,4.5vw,66px);line-height:1.06;letter-spacing:-0.028em;
+    max-width:18ch;text-wrap:balance;
   }
   h1 .serif{font-family:var(--serif);font-style:italic;font-weight:400;
     font-size:1.07em;letter-spacing:-0.004em;}
@@ -126,34 +126,35 @@
   .fact .v{font-size:clamp(17px,1.45vw,21px);font-weight:600;letter-spacing:-0.012em;color:var(--ink);}
   .fact .k{font-size:13.5px;font-weight:420;color:var(--ink-3);}
 
-  /* ── PHOTO CAROUSEL — proof strip drifting right → left ── */
-  .strip{position:relative;align-self:center;width:100vw;margin-top:clamp(38px,5.5vh,64px);overflow:hidden;
-    -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
-    mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);}
-  .strip-track{display:flex;gap:18px;width:max-content;animation:strip 44s linear infinite;}
+  /* ── PHOTO CAROUSEL — portrait cards, centered band, right → left ── */
+  .strip{position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:6;
+    width:min(62vw,1000px);overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
+    mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);}
+  .strip-track{display:flex;gap:16px;width:max-content;padding-bottom:4px;animation:strip 46s linear infinite;}
   .strip:hover .strip-track{animation-play-state:paused;}
   @keyframes strip{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-  .pcard{position:relative;width:224px;aspect-ratio:3/2;border-radius:14px;overflow:hidden;flex-shrink:0;
+  .pcard{position:relative;width:clamp(150px,12vw,196px);aspect-ratio:4/5;border-radius:14px;overflow:hidden;flex-shrink:0;
     border:1px solid rgba(239,243,248,.10);}
-  .pcard img{width:100%;height:100%;object-fit:cover;filter:saturate(.82) contrast(1.03);}
-  .pcard figcaption{position:absolute;left:0;right:0;bottom:0;padding:24px 12px 9px;
-    font-size:11px;font-weight:500;letter-spacing:.01em;color:var(--ink);
-    background:linear-gradient(transparent,rgba(4,8,14,.8));}
+  .pcard img{width:100%;height:100%;object-fit:cover;
+    filter:grayscale(1) contrast(1.03) brightness(.92);transition:filter .5s var(--ease);}
+  .pcard:hover img{filter:grayscale(0) contrast(1.02) brightness(1);}
 
-  /* ── CTA — glass rounded rectangle, orb inside, hugs its text ── */
-  .cta-dock{position:absolute;bottom:6vh;left:50%;transform:translateX(-50%);z-index:20;}
+  /* ── CTA — glass rounded rectangle sitting on top of the carousel ── */
+  .cta-dock{position:absolute;bottom:clamp(150px,15vw,220px);left:50%;transform:translateX(-50%);z-index:20;}
   .cta{
     display:flex;align-items:center;gap:13px;
     width:auto;max-width:92vw;
-    padding:10px 20px 10px 10px;border-radius:18px;cursor:pointer;
-    background:rgba(255,255,255,.10);
-    border:1px solid rgba(255,255,255,.16);
-    backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);
+    padding:10px 20px 10px 10px;border-radius:16px;cursor:pointer;
+    background:rgba(18,26,40,.34);
+    border:1px solid rgba(255,255,255,.14);
+    backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
+    box-shadow:0 18px 50px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.08);
     color:var(--ink);
     font-family:var(--sans);
-    transition:background .3s var(--ease),border-color .3s var(--ease);
+    transition:background .3s var(--ease),border-color .3s var(--ease),transform .4s var(--ease);
   }
-  .cta:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.26);}
+  .cta:hover{background:rgba(24,34,52,.44);border-color:rgba(255,255,255,.24);transform:translateY(-2px);}
   .cta:focus-visible{outline:2px solid var(--ember);outline-offset:3px;}
   .cta-orb{position:relative;width:44px;height:44px;flex-shrink:0;line-height:0;}
   .cta-orb::before{content:'';position:absolute;inset:3px;border-radius:50%;
@@ -198,49 +199,24 @@
   .chat.open{transform:translateX(0);}
   .chat-head{display:flex;align-items:center;padding:16px 18px;border-bottom:1px solid rgba(0,0,0,.07);}
   @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
-  .chat-head .t{font-family:var(--serif);font-size:21px;letter-spacing:.01em;color:#101720;}
+  .chat-head .t{font-family:var(--serif);font-size:22px;letter-spacing:.01em;color:#101720;}
   .chat-close{margin-left:auto;flex-shrink:0;
-    padding:8px 16px;border-radius:999px;border:1px solid rgba(0,0,0,.16);
+    padding:8px 16px;border-radius:12px;border:1px solid rgba(0,0,0,.16);
     background:transparent;color:#2C3947;font-family:var(--sans);font-size:12.5px;font-weight:600;
     cursor:pointer;transition:background .25s,border-color .25s;}
   .chat-close:hover{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.28);}
-  /* voice stage */
-  .talk-view{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:20px 20px 74px;}
-  .state-tag{display:inline-flex;align-items:center;gap:8px;padding:7px 15px;border-radius:999px;
-    background:rgba(92,169,255,.09);border:1px solid rgba(92,169,255,.3);
-    color:#1D5FB4;font-size:12.5px;font-weight:600;letter-spacing:.02em;}
-  .state-tag i{width:6px;height:6px;border-radius:50%;background:var(--ember);animation:pulse 1.6s var(--ease) infinite;}
-  .state-tag[hidden]{display:none;}
-  .talk-actions{display:flex;gap:10px;}
-  .talk-start{background:var(--ember);color:#071019;border:none;border-radius:999px;
-    padding:13px 26px;font-family:var(--sans);font-size:14.5px;font-weight:600;cursor:pointer;
-    transition:background .25s;}
-  .talk-start:hover{background:var(--ember-2);}
-  .talk-start:disabled{opacity:.6;cursor:default;}
-  .talk-end{background:transparent;color:#C2410C;border:1px solid rgba(194,65,12,.4);border-radius:999px;
-    padding:12px 24px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;
-    transition:background .25s,border-color .25s;}
-  .talk-end:hover{background:rgba(92,169,255,.07);border-color:rgba(194,65,12,.65);}
   [hidden]{display:none !important;}
-  /* chat summon pill — drag or tap to slide the chat up */
-  .chat-pill{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:4;
-    display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:999px;
-    background:#FFFFFF;border:1px solid rgba(0,0,0,.12);color:#2C3947;
-    font-family:var(--sans);font-size:13px;font-weight:600;cursor:grab;touch-action:none;
-    transition:opacity .3s var(--ease),transform .3s var(--ease),border-color .25s;}
-  .chat-pill:hover{border-color:rgba(0,0,0,.26);}
-  .chat-pill svg{width:11px;height:11px;}
-  .chat-pill.hidden{opacity:0;pointer-events:none;transform:translate(-50%,10px);}
-  /* bottom sheet with thread + input */
-  .sheet{position:absolute;left:0;right:0;bottom:0;height:76%;z-index:5;
-    display:flex;flex-direction:column;
-    background:#FFFFFF;border-top:1px solid rgba(0,0,0,.08);border-radius:18px 18px 0 0;
-    transform:translateY(105%);transition:transform .55s var(--ease);}
-  .sheet.open{transform:translateY(0);}
-  .sheet-grip{padding:9px 0 3px;cursor:grab;touch-action:none;flex-shrink:0;}
-  .sheet-grip i{display:block;width:44px;height:5px;border-radius:99px;background:rgba(0,0,0,.16);margin:0 auto;}
-  .chat-thread{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:11px;
+
+  /* panel body — hosts the orb (centered in voice, parked top-right in chat) + thread */
+  .panel-body{position:relative;flex:1;overflow:hidden;}
+  .orb-hold{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);z-index:4;
+    line-height:0;cursor:default;
+    transition:top .55s var(--ease),left .55s var(--ease),transform .55s var(--ease);}
+  .chat[data-view="chat"] .orb-hold{top:44px;left:calc(100% - 44px);transform:translate(-50%,-50%) scale(.3);cursor:pointer;}
+  .thread{position:absolute;inset:0;overflow-y:auto;padding:62px 18px 14px;
+    display:none;flex-direction:column;gap:11px;
     scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.18) transparent;}
+  .chat[data-view="chat"] .thread{display:flex;}
   .m{max-width:86%;padding:11px 14px;border-radius:15px;font-size:14px;line-height:1.55;font-weight:450;}
   .m.ai{align-self:flex-start;background:rgba(0,0,0,.045);border:1px solid rgba(0,0,0,.05);
     color:#1E2732;border-bottom-left-radius:6px;}
@@ -250,25 +226,60 @@
   .m.typing i{width:5px;height:5px;border-radius:50%;background:#7C8794;animation:tp 1.2s infinite;}
   .m.typing i:nth-child(2){animation-delay:.15s}.m.typing i:nth-child(3){animation-delay:.3s}
   @keyframes tp{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
-  .chat-form{display:flex;gap:10px;padding:14px;border-top:1px solid rgba(0,0,0,.07);}
-  .chat-form input{
-    flex:1;background:#ECF1F7;border:1px solid rgba(0,0,0,.1);border-radius:12px;
-    padding:12px 14px;font-family:var(--sans);font-size:14px;color:#101720;outline:none;
-    transition:border-color .25s;}
-  .chat-form input::placeholder{color:#7C8794;}
-  .chat-form input:focus{border-color:rgba(70,140,240,.55);}
-  .mic-btn{width:44px;flex-shrink:0;background:#ECF1F7;border:1px solid rgba(0,0,0,.1);
+
+  /* bottom-docked action zone — clipped to the panel bottom */
+  .panel-foot{flex-shrink:0;padding:16px;border-top:1px solid rgba(0,0,0,.07);}
+  .chat[data-view="chat"] .voice-actions{display:none;}
+  .chat[data-view="voice"] .composer{display:none;}
+
+  .voice-actions{display:flex;flex-direction:column;gap:12px;}
+  .va-live{display:none;align-items:center;gap:10px;}
+  .chat.live .va-live{display:flex;}
+  .chat.live .btn-start,.chat.live .to-chat{display:none;}
+  /* Engine-style gradient CTA — white top-left → blue, rounded rectangle */
+  .btn-start{width:100%;padding:15px;border:none;border-radius:14px;cursor:pointer;
+    font-family:var(--sans);font-size:15px;font-weight:650;color:#08213f;letter-spacing:.005em;
+    background:radial-gradient(135% 135% at 14% 8%, #ffffff 0%, #cfe6ff 18%, #5aa2ff 50%, #1f6fe6 100%);
+    box-shadow:0 10px 26px -10px rgba(31,111,230,.65), inset 0 1px 0 rgba(255,255,255,.75), inset 0 -2px 6px rgba(11,60,140,.35);
+    transition:transform .3s var(--ease),box-shadow .3s var(--ease),filter .3s;}
+  .btn-start:hover{transform:translateY(-1px);filter:brightness(1.03);
+    box-shadow:0 14px 32px -10px rgba(31,111,230,.75), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -2px 6px rgba(11,60,140,.35);}
+  .btn-start:disabled{opacity:.7;cursor:default;transform:none;}
+  /* live-state chip — white rounded rectangle */
+  .state-chip{flex:1;display:inline-flex;align-items:center;gap:9px;padding:13px 16px;border-radius:12px;
+    background:#fff;border:1px solid rgba(0,0,0,.08);color:#101720;font-size:13.5px;font-weight:600;letter-spacing:.01em;
+    box-shadow:0 6px 16px -8px rgba(0,0,0,.18);}
+  .state-chip i{width:7px;height:7px;border-radius:50%;background:#3b8cff;box-shadow:0 0 8px rgba(59,140,255,.6);animation:pulse 1.5s infinite;}
+  /* end call — red rounded rectangle */
+  .btn-end{flex-shrink:0;padding:13px 20px;border:none;border-radius:12px;cursor:pointer;
+    background:#E5484D;color:#fff;font-family:var(--sans);font-size:14px;font-weight:600;
+    box-shadow:0 8px 20px -10px rgba(229,72,77,.7);transition:background .25s,transform .3s var(--ease);}
+  .btn-end:hover{background:#d83a3f;transform:translateY(-1px);}
+  .to-chat{align-self:center;background:none;border:none;cursor:pointer;
+    color:#5D6B7A;font-family:var(--sans);font-size:13px;font-weight:500;padding:2px 6px;
+    transition:color .25s;}
+  .to-chat:hover{color:#101720;text-decoration:underline;text-underline-offset:3px;}
+
+  /* chat composer — input + mic + send (rounded rects) */
+  .composer{display:flex;gap:10px;}
+  .composer input{flex:1;background:#ECF1F7;border:1px solid rgba(0,0,0,.1);border-radius:12px;
+    padding:13px 15px;font-family:var(--sans);font-size:14px;color:#101720;outline:none;transition:border-color .25s;}
+  .composer input::placeholder{color:#7C8794;}
+  .composer input:focus{border-color:rgba(70,140,240,.55);}
+  .mic-btn{width:46px;flex-shrink:0;background:#ECF1F7;border:1px solid rgba(0,0,0,.1);
     border-radius:12px;color:#5D6B7A;cursor:pointer;display:grid;place-items:center;
     transition:color .25s,border-color .25s,background .25s;}
   .mic-btn:hover{color:#101720;border-color:rgba(70,140,240,.45);}
-  .mic-btn.rec{color:#FFF6EC;background:var(--ember);border-color:var(--ember);animation:pulse 1.2s infinite;}
+  .mic-btn.rec{color:#fff;background:var(--ember);border-color:var(--ember);animation:pulse 1.2s infinite;}
   .mic-btn.hide{display:none;}
-  .chat-form button[type="submit"]{
-    background:var(--ember);color:#071019;border:none;border-radius:12px;padding:0 18px;
-    font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;
-    transition:background .25s;}
-  .chat-form button[type="submit"]:hover{background:var(--ember-2);}
-  .chat-form button[type="submit"]:disabled{opacity:.5;cursor:default;}
+  .send-btn{width:52px;flex-shrink:0;border:none;border-radius:12px;cursor:pointer;color:#fff;
+    display:grid;place-items:center;
+    background:radial-gradient(135% 135% at 20% 12%, #7bb4ff 0%, #3b8cff 48%, #1f6fe6 100%);
+    box-shadow:0 8px 18px -8px rgba(31,111,230,.6),inset 0 1px 0 rgba(255,255,255,.4);
+    transition:filter .25s,transform .3s var(--ease);}
+  .send-btn:hover{filter:brightness(1.05);transform:translateY(-1px);}
+  .send-btn:disabled{opacity:.5;cursor:default;transform:none;}
+  .send-btn svg{width:17px;height:17px;}
 
   @media(max-width:760px){
     .nav-links a:not(.nav-contact){display:none;}
@@ -295,8 +306,8 @@
   }
   @media(prefers-reduced-motion:reduce){
     .o1,.o2,.strip-track{animation:none;}
-    .cta-text span,.chat,.chat-backdrop,.sheet,.chat-pill,.top-nav{transition:none;}
-    .state-tag i,.mic-btn.rec{animation:none;}
+    .cta-text span,.chat,.chat-backdrop,.orb-hold,.top-nav{transition:none;}
+    .state-chip i,.mic-btn.rec{animation:none;}
   }
 </style>
 </head>
@@ -336,18 +347,21 @@
         <div class="fact"><span class="v">San Francisco</span><span class="k">Based in</span></div>
       </div>
 
-      <div class="strip" aria-hidden="true">
-        <div class="strip-track">
-          <figure class="pcard"><img src="photos/pic-pitch-win.jpg" alt=""><figcaption>Winning $50K as sole designer</figcaption></figure>
-          <figure class="pcard"><img src="photos/pic-conference.jpg" alt=""><figcaption>My first product showcase</figcaption></figure>
-          <figure class="pcard"><img src="photos/pic-pitch-self.jpg" alt=""><figcaption>Pitching in front of 250+</figcaption></figure>
-          <figure class="pcard"><img src="photos/pic-future.jpg" alt=""><figcaption>48 hours, 0 sleep, grind</figcaption></figure>
-          <!-- duplicate set for the seamless loop -->
-          <figure class="pcard"><img src="photos/pic-pitch-win.jpg" alt=""><figcaption>Winning $50K as sole designer</figcaption></figure>
-          <figure class="pcard"><img src="photos/pic-conference.jpg" alt=""><figcaption>My first product showcase</figcaption></figure>
-          <figure class="pcard"><img src="photos/pic-pitch-self.jpg" alt=""><figcaption>Pitching in front of 250+</figcaption></figure>
-          <figure class="pcard"><img src="photos/pic-future.jpg" alt=""><figcaption>48 hours, 0 sleep, grind</figcaption></figure>
-        </div>
+    </div>
+
+    <div class="strip" aria-hidden="true">
+      <div class="strip-track">
+        <figure class="pcard"><img src="photos/pic-pitch-self.jpg" alt=""></figure>
+        <figure class="pcard"><img src="photos/pic-pitch-win.jpg" alt=""></figure>
+        <figure class="pcard"><img src="photos/pic-conference.jpg" alt=""></figure>
+        <figure class="pcard"><img src="photos/pic-future.jpg" alt=""></figure>
+        <figure class="pcard"><img src="photos/pic-check.jpg" alt=""></figure>
+        <!-- duplicate set for the seamless loop -->
+        <figure class="pcard"><img src="photos/pic-pitch-self.jpg" alt=""></figure>
+        <figure class="pcard"><img src="photos/pic-pitch-win.jpg" alt=""></figure>
+        <figure class="pcard"><img src="photos/pic-conference.jpg" alt=""></figure>
+        <figure class="pcard"><img src="photos/pic-future.jpg" alt=""></figure>
+        <figure class="pcard"><img src="photos/pic-check.jpg" alt=""></figure>
       </div>
     </div>
 
@@ -367,37 +381,37 @@
   <section class="next-ph" aria-hidden="true"><span>Featured work — next</span></section>
 
   <div class="chat-backdrop" id="chatBackdrop"></div>
-  <aside class="chat" id="chat" role="dialog" aria-label="My second brain — talk or chat with Bhanu AI" aria-modal="true">
+  <aside class="chat" id="chat" data-view="voice" role="dialog" aria-label="Ask me anything" aria-modal="true">
     <header class="chat-head">
-      <div class="t">My second brain</div>
+      <div class="t">Ask me anything</div>
       <button class="chat-close" id="chatClose">Close</button>
     </header>
 
-    <div class="talk-view" id="talkView">
-      <div id="talkOrbMount"></div>
-      <div class="state-tag" id="stateTag" hidden><i></i><span id="stateTagText">Listening</span></div>
-      <div class="talk-actions">
-        <button type="button" class="talk-start" id="talkStart">Start conversation</button>
-        <button type="button" class="talk-end" id="talkEnd" hidden>End call</button>
+    <div class="panel-body" id="panelBody">
+      <div class="orb-hold" id="orbHold" title="Back to voice"><div id="talkOrbMount"></div></div>
+      <div class="thread" id="thread">
+        <div class="m ai">Hey — ask me about my work, a project I'm proud of, or why you should hire me.</div>
       </div>
     </div>
 
-    <button type="button" class="chat-pill" id="chatPill" aria-expanded="false" aria-controls="sheet">
-      Chat
-      <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 7.5L6 3.5l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-
-    <div class="sheet" id="sheet">
-      <div class="sheet-grip" id="sheetGrip" role="button" tabindex="0" aria-label="Close chat sheet"><i></i></div>
-      <div class="chat-thread" id="thread">
-        <div class="m ai">Hey — I'm Bhanu's second brain. Ask about his work, a project he's proud of, or why you should hire him.</div>
+    <div class="panel-foot">
+      <div class="voice-actions" id="voiceActions">
+        <div class="va-live">
+          <div class="state-chip" id="stateChip"><i></i><span id="stateChipText">Listening</span></div>
+          <button type="button" class="btn-end" id="talkEnd">End call</button>
+        </div>
+        <button type="button" class="btn-start" id="talkStart">Start conversation</button>
+        <button type="button" class="to-chat" id="toChat">Type a message instead</button>
       </div>
-      <form class="chat-form" id="chatForm">
+
+      <form class="composer" id="chatForm">
         <input id="chatInput" type="text" placeholder="Ask anything…" autocomplete="off" />
         <button type="button" class="mic-btn" id="micBtn" aria-label="Dictate your question">
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="6" y="1.5" width="4" height="8" rx="2" fill="currentColor"/><path d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
         </button>
-        <button type="submit" id="chatSend">Send</button>
+        <button type="submit" id="chatSend" class="send-btn" aria-label="Send">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </form>
     </div>
   </aside>
@@ -521,27 +535,25 @@ var thread = document.getElementById('thread');
 var sendBtn = document.getElementById('chatSend');
 var talkRoot = null, voiceApi = null;
 
-/* ── voice states → tag + action buttons ── */
-var stateTag = document.getElementById('stateTag');
-var stateTagText = document.getElementById('stateTagText');
+/* ── voice states → white chip + start/end buttons ── */
+var stateChipText = document.getElementById('stateChipText');
 var talkStart = document.getElementById('talkStart');
 var talkEnd = document.getElementById('talkEnd');
-var TAG_LABELS = {
+var STATE_LABELS = {
   connecting: 'Connecting…',
   listening: 'Listening',
   'user-speaking': 'Hearing you',
   thinking: 'Thinking…',
   'assistant-speaking': 'Speaking',
+  scheduling: 'Scheduling meeting',
   'mic-denied': 'Mic blocked — enable access',
   error: 'Something went wrong',
 };
 function updateVoiceState(s) {
   var live = s === 'connecting' || s === 'listening' || s === 'user-speaking' ||
-             s === 'thinking' || s === 'assistant-speaking';
-  if (TAG_LABELS[s]) { stateTag.hidden = false; stateTagText.textContent = TAG_LABELS[s]; }
-  else { stateTag.hidden = true; }
-  talkStart.hidden = live;
-  talkEnd.hidden = !live;
+             s === 'thinking' || s === 'assistant-speaking' || s === 'scheduling';
+  chat.classList.toggle('live', live);
+  if (STATE_LABELS[s]) stateChipText.textContent = STATE_LABELS[s];
   talkStart.disabled = s === 'connecting';
   talkStart.textContent = (s === 'mic-denied' || s === 'error') ? 'Try again' : 'Start conversation';
 }
@@ -553,7 +565,7 @@ function mountTalkOrb() {
   if (!(window.BhanuOrb && window.BhanuOrb.mount)) { setTimeout(mountTalkOrb, 80); return; }
   if (!chat.classList.contains('open')) return;
   talkRoot = window.BhanuOrb.mount(document.getElementById('talkOrbMount'), {
-    palette: 'arctic', size: 210, ui: false,
+    palette: 'arctic', size: 200, ui: false,
     onState: updateVoiceState,
     controls: function (api) { voiceApi = api; },
   });
@@ -563,67 +575,37 @@ function unmountTalkOrb() {
   try { talkRoot.unmount(); } catch (e) {}
   talkRoot = null; voiceApi = null;
   document.getElementById('talkOrbMount').innerHTML = '';
-  updateVoiceState('idle');
+  chat.classList.remove('live');
 }
 
-/* ── chat sheet — pill summons it, grip dismisses it (tap or drag) ── */
-var sheet = document.getElementById('sheet');
-var pill = document.getElementById('chatPill');
-var grip = document.getElementById('sheetGrip');
-var sheetOpen = false;
-function setSheet(open) {
-  sheetOpen = open;
-  sheet.classList.toggle('open', open);
-  pill.classList.toggle('hidden', open);
-  pill.setAttribute('aria-expanded', String(open));
-  if (open) setTimeout(function () { input.focus(); }, 320);
+/* ── view: voice (orb centered) ⇄ chat (orb parks top-right + composer) ── */
+function setView(view) {
+  chat.dataset.view = view;
+  if (view === 'chat') setTimeout(function () { input.focus(); }, 320);
 }
-function dragToggle(el, dir) {   /* dir 1: drag up opens · dir -1: drag down closes */
-  el.addEventListener('pointerdown', function (e) {
-    var y0 = e.clientY, moved = 0, H = sheet.offsetHeight || 1;
-    try { el.setPointerCapture(e.pointerId); } catch (err) {}
-    function mv(ev) {
-      moved = (y0 - ev.clientY) * dir;
-      var p = Math.max(0, Math.min(1, moved / H));
-      sheet.style.transition = 'none';
-      sheet.style.transform = dir === 1
-        ? 'translateY(' + ((1 - p) * 105) + '%)'
-        : 'translateY(' + (p * 105) + '%)';
-    }
-    function up(ev) {
-      el.removeEventListener('pointermove', mv);
-      el.removeEventListener('pointerup', up);
-      sheet.style.transition = ''; sheet.style.transform = '';
-      if (Math.abs(y0 - ev.clientY) < 6) setSheet(dir === 1);          // plain tap
-      else setSheet(dir === 1 ? moved > H * 0.2 : !(moved > H * 0.2)); // committed drag
-    }
-    el.addEventListener('pointermove', mv);
-    el.addEventListener('pointerup', up);
-  });
-}
-dragToggle(pill, 1);
-dragToggle(grip, -1);
-grip.addEventListener('keydown', function (e) {
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSheet(false); }
+document.getElementById('toChat').addEventListener('click', function () { setView('chat'); });
+document.getElementById('orbHold').addEventListener('click', function () {
+  if (chat.dataset.view === 'chat') setView('voice');   // tap the parked orb → back to voice
 });
 
 function openChat() {
   chat.classList.add('open'); backdrop.classList.add('open');
   var act = document.querySelector('#ctaText span.on');
   input.value = act ? (act.dataset.q || act.textContent) : '';
-  setSheet(false);                               // voice-first by default
+  setView('voice');                              // voice-first by default
   mountTalkOrb();
 }
 function closeChat() {
   chat.classList.remove('open'); backdrop.classList.remove('open');
-  setSheet(false);
   unmountTalkOrb();                              // tears down any live voice session
 }
 ctaEl.addEventListener('click', openChat);
 document.getElementById('chatClose').addEventListener('click', closeChat);
 backdrop.addEventListener('click', closeChat);
 addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') { if (sheetOpen) setSheet(false); else closeChat(); }
+  if (e.key === 'Escape' && chat.classList.contains('open')) {
+    if (chat.dataset.view === 'chat') setView('voice'); else closeChat();
+  }
 });
 
 /* ── nav — compress to the 80% pill on scroll (ported behavior) ── */
