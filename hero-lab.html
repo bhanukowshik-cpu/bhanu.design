@@ -110,8 +110,10 @@
   .nav-contact:hover{border-color:rgba(239,243,248,.5);background:rgba(255,255,255,.04);}
 
   /* ── FIRST-LOAD CHOREOGRAPHY — elements settle in, ease-out-expo ── */
-  @keyframes riseIn{from{opacity:0;transform:translateY(20px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
-  @keyframes riseInX{from{opacity:0;transform:translateX(-50%) translateY(22px);filter:blur(6px)}to{opacity:1;transform:translateX(-50%);filter:none}}
+  /* NOTE: no `filter` here — a filter on an ancestor silently disables the
+     backdrop-filter (frosted glass) of the CTA nested inside it. */
+  @keyframes riseIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  @keyframes riseInX{from{opacity:0;transform:translateX(-50%) translateY(22px)}to{opacity:1;transform:translateX(-50%)}}
   @keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
   .top-nav{animation:fadeDown .9s var(--ease-expo) both;}
   .eyebrow{animation:riseIn .9s var(--ease-expo) both .12s;}
