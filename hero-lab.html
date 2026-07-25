@@ -267,8 +267,6 @@
   .chat[data-view="voice"] .composer{display:none;}
 
   .voice-actions{display:flex;flex-direction:column;gap:12px;}
-  .va-live{display:none;align-items:center;gap:10px;}
-  .chat.live .va-live{display:flex;}
   .chat.live .btn-start,.chat.live .to-chat{display:none;}
   /* Engine-style gradient CTA — white top-left → blue, rounded rectangle */
   .btn-start{width:100%;padding:15px;border:none;border-radius:14px;cursor:pointer;
@@ -279,20 +277,25 @@
   .btn-start:hover{transform:translateY(-1px);filter:brightness(1.03);
     box-shadow:0 14px 32px -10px rgba(31,111,230,.75), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -2px 6px rgba(11,60,140,.35);}
   .btn-start:disabled{opacity:.7;cursor:default;transform:none;}
-  /* live-state chip — white rounded rectangle */
-  .state-chip{flex:1;display:inline-flex;align-items:center;gap:9px;padding:13px 16px;border-radius:12px;
-    background:#fff;border:1px solid rgba(0,0,0,.08);color:#101720;font-size:13.5px;font-weight:600;letter-spacing:.01em;
-    box-shadow:0 6px 16px -8px rgba(0,0,0,.18);}
-  .state-chip i{width:7px;height:7px;border-radius:50%;background:#3b8cff;box-shadow:0 0 8px rgba(59,140,255,.6);animation:pulse 1.5s infinite;}
-  /* end call — red rounded rectangle */
-  .btn-end{flex-shrink:0;padding:13px 20px;border:none;border-radius:12px;cursor:pointer;
-    background:#E5484D;color:#fff;font-family:var(--sans);font-size:14px;font-weight:600;
-    box-shadow:0 8px 20px -10px rgba(229,72,77,.7);transition:background .25s,transform .3s var(--ease);}
+  /* end call — red rounded rectangle, full width, only while live */
+  .btn-end{display:none;width:100%;padding:14px;border:none;border-radius:14px;cursor:pointer;
+    background:#E5484D;color:#fff;font-family:var(--sans);font-size:14.5px;font-weight:600;
+    box-shadow:0 10px 24px -12px rgba(229,72,77,.7);transition:background .25s,transform .3s var(--ease);}
+  .chat.live .btn-end{display:block;}
   .btn-end:hover{background:#d83a3f;transform:translateY(-1px);}
   .to-chat{align-self:center;background:none;border:none;cursor:pointer;
     color:#5D6B7A;font-family:var(--sans);font-size:13px;font-weight:500;padding:2px 6px;
     transition:color .25s;}
   .to-chat:hover{color:#101720;text-decoration:underline;text-underline-offset:3px;}
+  /* state label as a pill ON the orb (ElevenLabs pattern) */
+  .orb-state{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:6;
+    display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;white-space:nowrap;
+    background:rgba(255,255,255,.9);border:1px solid rgba(8,16,30,.05);
+    box-shadow:0 12px 32px -12px rgba(8,16,30,.4);
+    backdrop-filter:blur(8px) saturate(1.4);-webkit-backdrop-filter:blur(8px) saturate(1.4);
+    color:#101720;font-size:13px;font-weight:600;letter-spacing:.01em;}
+  .orb-state i{width:7px;height:7px;border-radius:50%;background:#3b8cff;box-shadow:0 0 9px rgba(59,140,255,.75);animation:pulse 1.4s infinite;}
+  .chat[data-view="chat"] .orb-state{display:none;}
 
   /* chat composer — input + mic + send (rounded rects) */
   .composer{display:flex;gap:10px;}
@@ -341,7 +344,7 @@
   @media(prefers-reduced-motion:reduce){
     .o1,.o2,.strip-track{animation:none;}
     .cta-text span,.chat,.chat-backdrop,.orb-hold{transition:none;}
-    .state-chip i,.mic-btn.rec{animation:none;}
+    .orb-state i,.mic-btn.rec{animation:none;}
     .top-nav,.eyebrow,h1,.sub,.facts,.strip,.cta-dock{animation:none;}
   }
 </style>
@@ -424,6 +427,7 @@
 
     <div class="panel-body" id="panelBody">
       <div class="orb-hold" id="orbHold" title="Back to voice"><div id="talkOrbMount"></div></div>
+      <div class="orb-state" id="orbState" hidden><i></i><span id="orbStateText">Listening</span></div>
       <div class="thread" id="thread">
         <div class="m ai">Hey — ask me about my work, a project I'm proud of, or why you should hire me.</div>
       </div>
@@ -431,11 +435,8 @@
 
     <div class="panel-foot">
       <div class="voice-actions" id="voiceActions">
-        <div class="va-live">
-          <div class="state-chip" id="stateChip"><i></i><span id="stateChipText">Listening</span></div>
-          <button type="button" class="btn-end" id="talkEnd">End call</button>
-        </div>
         <button type="button" class="btn-start" id="talkStart">Start conversation</button>
+        <button type="button" class="btn-end" id="talkEnd">End call</button>
         <button type="button" class="to-chat" id="toChat">Type a message instead</button>
       </div>
 
@@ -572,7 +573,8 @@ var sendBtn = document.getElementById('chatSend');
 var talkRoot = null, voiceApi = null;
 
 /* ── voice states → white chip + start/end buttons ── */
-var stateChipText = document.getElementById('stateChipText');
+var orbState = document.getElementById('orbState');
+var orbStateText = document.getElementById('orbStateText');
 var talkStart = document.getElementById('talkStart');
 var talkEnd = document.getElementById('talkEnd');
 var STATE_LABELS = {
@@ -589,7 +591,8 @@ function updateVoiceState(s) {
   var live = s === 'connecting' || s === 'listening' || s === 'user-speaking' ||
              s === 'thinking' || s === 'assistant-speaking' || s === 'scheduling';
   chat.classList.toggle('live', live);
-  if (STATE_LABELS[s]) stateChipText.textContent = STATE_LABELS[s];
+  if (STATE_LABELS[s]) orbStateText.textContent = STATE_LABELS[s];
+  orbState.hidden = !live;
   talkStart.disabled = s === 'connecting';
   talkStart.textContent = (s === 'mic-denied' || s === 'error') ? 'Try again' : 'Start conversation';
 }
