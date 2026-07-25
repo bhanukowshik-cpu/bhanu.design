@@ -117,56 +117,59 @@
     transition: left 0.5s cubic-bezier(0.16,1,0.3,1), width 0.5s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease;
   }
 
-  /* ── Lower half: the stem splits it in two ──────────────────
-     Left quadrant = the quote (the T's own negative space).
-     Right quadrant = the depth list. Spine sits dead centre.   */
-  .qt-lower {
+  /* ── Lower half: nothing but the stem ───────────────────────
+     A T only reads if the mass below the bar is narrow and
+     centred. So the whole lower half is one narrow channel
+     dropping from the bar's midpoint — everything else empty. */
+  .qt-lower { display: flex; justify-content: center; }
+  .qt-stem {
     position: relative;
-    display: grid; grid-template-columns: 1fr 1fr;
-    align-items: start; min-height: 300px;
+    width: clamp(236px, 27%, 310px);
+    padding: 6px 0 0;
   }
-  /* the stem — a hairline dropping from the exact centre of the bar */
-  .qt-spine {
-    position: absolute; left: 50%; top: 0; bottom: 34px; width: 1px;
-    background: linear-gradient(180deg, var(--draw) 0%, var(--draw) 76%, transparent 100%);
+  /* the two walls of the stem, fading out at the foot */
+  .qt-stem::before, .qt-stem::after {
+    content: ""; position: absolute; top: 0; bottom: 0; width: 1px;
+    background: linear-gradient(180deg, var(--draw) 0%, var(--draw) 72%, transparent 100%);
   }
+  .qt-stem::before { left: 0; }
+  .qt-stem::after  { right: 0; }
 
-  /* Right quadrant — depth list */
-  .qt-depth { grid-column: 2; padding-left: 40px; padding-top: 26px; }
-  .qt-depth-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; padding-right: 8px; }
   .qt-drow {
     appearance: none; background: none; border: 0; cursor: pointer;
-    display: flex; align-items: center; gap: 15px;
-    padding: 11px 0; position: relative; text-align: left; width: 100%;
+    display: block; width: 100%; position: relative;
+    padding: 14px 10px; text-align: center;
   }
-  /* tick that reaches back toward the spine */
-  .qt-drow::before {
-    content: ""; position: absolute; left: -40px; top: 50%;
-    width: 26px; height: 1px; background: var(--rule);
-    transition: background 0.3s ease, width 0.4s cubic-bezier(0.16,1,0.3,1);
-  }
-  .qt-drow:hover::before, .qt-drow.is-on::before { background: var(--primary); width: 32px; }
-  .qt-drow .qt-ic { width: 22px; height: 22px; }
+  .qt-drow + .qt-drow { border-top: 1px solid rgba(255,255,255,0.06); }
   .qt-drow .qt-nm { font-size: var(--fs-body); white-space: nowrap; }
-  .qt-drow:hover .qt-ic, .qt-drow.is-on .qt-ic { background: var(--primary); transform: none; }
   .qt-drow:hover .qt-nm, .qt-drow.is-on .qt-nm { color: var(--ink-1); }
-  .qt-drow:focus-visible { outline: 1px solid var(--primary); outline-offset: 3px; border-radius: 8px; }
+  /* the active rung lights the full width of the stem */
+  .qt-drow::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+    background: var(--primary); opacity: 0; box-shadow: 0 0 14px 1px rgba(230,242,141,0.4);
+    transition: opacity 0.3s ease;
+  }
+  .qt-drow:hover::after, .qt-drow.is-on::after { opacity: 1; }
+  .qt-drow:focus-visible { outline: 1px solid var(--primary); outline-offset: -3px; }
 
-  /* ── Quote: fixed slot in the left quadrant, never reflows ─ */
+  /* the foot label caps the stem */
+  .qt-foot { text-align: center; padding-top: 16px; }
+
+  /* ── Quote: lives in the aside, so the T stays a T ────────── */
   .qt-say {
-    grid-column: 1; align-self: start;
-    padding: 30px 56px 0 0;
-    min-height: 190px;
+    margin-top: 34px; padding: 20px 0 0 20px;
+    border-left: 2px solid rgba(230,242,141,0.55);
+    min-height: 172px;
   }
   .qt-say-who {
     display: block;
     font-family: var(--font-mono); font-size: var(--fs-label); font-weight: 500;
     letter-spacing: 0.16em; text-transform: uppercase; color: var(--primary);
-    margin-bottom: 14px;
+    margin-bottom: 12px;
   }
   .qt-say-txt {
-    font-family: var(--font-heading); font-size: clamp(17px, 1.45vw, 20px); font-weight: 400;
-    line-height: 1.58; letter-spacing: -0.012em; color: rgba(255,255,255,0.90); margin: 0;
+    font-family: var(--font-heading); font-size: clamp(16px, 1.3vw, 18px); font-weight: 400;
+    line-height: 1.6; letter-spacing: -0.01em; color: rgba(255,255,255,0.90); margin: 0;
   }
   .qt-say-txt em { font-style: normal; font-weight: 600; color: var(--primary); }
   /* Inline quote — phone only; desktop uses the fixed slot in the T's corner */
@@ -177,18 +180,16 @@
   .qt-say.is-swapping .qt-fade { opacity: 0; transform: translateY(7px); }
 
   @media (prefers-reduced-motion: reduce) {
-    .qt-ind, .qt-ic, .qt-nm, .qt-fade, .qt-drow::before { transition: none; }
+    .qt-ind, .qt-ic, .qt-nm, .qt-fade, .qt-drow::after { transition: none; }
     .qt-say.is-swapping .qt-fade { transform: none; }
   }
 
   /* ── Tablet ─────────────────────────────────────────────── */
   @media (max-width: 1100px) {
-    .qt { flex-direction: column; gap: 44px; }
-    .qt-aside { width: 100%; }
+    .qt { flex-direction: column; gap: 40px; }
+    .qt-aside { width: 100%; max-width: 620px; }
     .qt-t { width: 100%; }
-    .qt-say { padding-right: 34px; }
-    .qt-depth { padding-left: 34px; }
-    .qt-drow::before { left: -34px; }
+    .qt-say { min-height: 0; }
   }
   /* ── Phone: the T unfolds into two matching lists ───────── */
   @media (max-width: 767px) {
@@ -199,11 +200,16 @@
 
     /* breadth stops being a row of tiles and becomes a list, like depth */
     .qt-row { grid-template-columns: 1fr; }
-    .qt-item, .qt-drow {
+    .qt-item {
       display: grid; grid-template-columns: 22px 1fr; column-gap: 15px;
       align-items: center; justify-items: start;
       padding: 11px 0; text-align: left; width: 100%;
     }
+    .qt-drow {
+      display: grid; grid-template-columns: 1fr; justify-items: start;
+      padding: 11px 0; text-align: left; width: 100%;
+    }
+    .qt-drow .qt-inline { grid-column: 1; }
     .qt-item .qt-ic { width: 22px; height: 22px; }
     .qt-item .qt-nm { min-height: 0; }
     .qt-item:hover .qt-ic, .qt-item.is-on .qt-ic { transform: none; }
@@ -228,10 +234,14 @@
     .qt-bar { margin-top: 12px; }
     .qt-bar::after { display: none; }
 
-    .qt-lower { grid-template-columns: 1fr; min-height: 0; }
-    .qt-spine { display: none; }
-    .qt-depth { grid-column: 1; grid-row: 1; padding-left: 0; padding-top: 22px; }
-    .qt-drow::before { display: none; }
+    /* the stem loses its walls and becomes the second list */
+    .qt-lower { display: block; }
+    .qt-stem { width: 100%; padding-top: 10px; display: flex; flex-direction: column; }
+    .qt-stem::before, .qt-stem::after { display: none; }
+    .qt-foot { order: -1; }   /* label heads the list on phone, caps the stem on desktop */
+    .qt-drow + .qt-drow { border-top: 0; }
+    .qt-drow::after { display: none; }
+    .qt-foot { text-align: left; padding-top: 18px; }
     .qt-say { display: none; }   /* superseded by the inline lines */
   }
 </style>
@@ -243,6 +253,12 @@
     <h3 class="qt-heading">The shape of how I <em>work.</em></h3>
     <p class="qt-intro">Strategy, design, and technology — building products that create real impact.</p>
     <button class="qt-cta" type="button">Beyond the Pixels <span>&rarr;</span></button>
+
+    <!-- The one thing they say — fixed slot, so nothing reflows -->
+    <div class="qt-say" id="qtSay">
+      <span class="qt-say-who qt-fade"></span>
+      <p class="qt-say-txt qt-fade"></p>
+    </div>
   </div>
 
   <div class="qt-t">
@@ -284,48 +300,31 @@
 
     <div class="qt-bar"><span class="qt-ind" id="qtInd"></span></div>
 
-    <!-- ── Depth: the stem, with the quote in the T's negative space ── -->
+    <!-- ── Depth: the stem, dropping from the centre of the bar ── -->
     <div class="qt-lower">
-      <span class="qt-spine"></span>
+      <div class="qt-stem">
+        <button class="qt-drow" type="button"
+          data-say="I'd rather <em>kill my idea in a 20-minute interview</em> than defend it for six months in production.">
+          <span class="qt-nm">Research</span>
+        </button>
+        <button class="qt-drow" type="button"
+          data-say="I break problems down to what's <em>actually true</em>, then build back up. Best practices are someone else's constraints.">
+          <span class="qt-nm">First Principles</span>
+        </button>
+        <button class="qt-drow" type="button"
+          data-say="I design the <em>system</em>, not the screen. One component should answer ten questions you haven't asked yet.">
+          <span class="qt-nm">Systems Thinking</span>
+        </button>
+        <button class="qt-drow" type="button"
+          data-say="AI isn't a feature I bolt on. It's a <em>material I design with</em>. I prototype, ship, and think AI-native.">
+          <span class="qt-nm">AI Native</span>
+        </button>
+        <button class="qt-drow" type="button"
+          data-say="If I can't tie it to a <em>number that moved</em>, it was decoration. I design for outcomes.">
+          <span class="qt-nm">Measured Impact</span>
+        </button>
 
-      <!-- The one thing they say — fixed slot, left quadrant -->
-      <div class="qt-say" id="qtSay">
-        <span class="qt-say-who qt-fade"></span>
-        <p class="qt-say-txt qt-fade"></p>
-      </div>
-
-      <div class="qt-depth">
-        <div class="qt-depth-head">
-          <span class="qt-axis">Depth — how I think</span>
-          <span class="qt-axis" style="letter-spacing:0.12em">05</span>
-        </div>
-        <div class="qt-depth-list">
-          <button class="qt-drow" type="button"
-            data-say="I'd rather <em>kill my idea in a 20-minute interview</em> than defend it for six months in production.">
-            <span class="qt-ic" style="--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg')"></span>
-            <span class="qt-nm">Research</span>
-          </button>
-          <button class="qt-drow" type="button"
-            data-say="I break problems down to what's <em>actually true</em>, then build back up. Best practices are someone else's constraints.">
-            <span class="qt-ic" style="--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/First%20Principles.svg')"></span>
-            <span class="qt-nm">First Principles</span>
-          </button>
-          <button class="qt-drow" type="button"
-            data-say="I design the <em>system</em>, not the screen. One component should answer ten questions you haven't asked yet.">
-            <span class="qt-ic" style="--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg')"></span>
-            <span class="qt-nm">Systems Thinking</span>
-          </button>
-          <button class="qt-drow" type="button"
-            data-say="AI isn't a feature I bolt on. It's a <em>material I design with</em>. I prototype, ship, and think AI-native.">
-            <span class="qt-ic" style="--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg')"></span>
-            <span class="qt-nm">AI Native</span>
-          </button>
-          <button class="qt-drow" type="button"
-            data-say="If I can't tie it to a <em>number that moved</em>, it was decoration. I design for outcomes.">
-            <span class="qt-ic" style="--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')"></span>
-            <span class="qt-nm">Measured Impact</span>
-          </button>
-        </div>
+        <div class="qt-foot"><span class="qt-axis">Depth — how I think</span></div>
       </div>
     </div>
 
