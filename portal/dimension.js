@@ -666,6 +666,80 @@
   var QUAD_VS = 'attribute vec2 aPos; varying vec2 vUv;' +
                 'void main(){ vUv = aPos*0.5+0.5; gl_Position = vec4(aPos,0.,1.); }';
 
+  /* ── THE SMOKE VORTEX ──────────────────────────────────────────────────────
+     A third world, and a different material entirely: no geometry, one
+     full-screen field. Concentric noise is sheared by an angle proportional
+     to log(r) — a continuous coordinate swirl, so the spiral has no seam and
+     no visible arms-as-objects; it is smoke that happens to be falling into a
+     drain. The same hero-smoke palette (slate body, icy silk edges) keeps it
+     reading as section 1's own smoke gathering into the vortex.
+
+     progress drives everything: the zoom dives toward the core, the swirl
+     tightens, the core swells until it engulfs the frame — and the composite's
+     white-out finishes the hand-off to the arrival page.                     */
+  function smokeFrag(oct) {
+    return [
+      'precision highp float; varying vec2 vUv;',
+      'uniform float uTime, uP, uVel, uCross, uAspect;',
+      'float hash(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p,p+45.32); return fract(p.x*p.y); }',
+      'float noise(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.-2.*f);',
+      ' float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));',
+      ' return mix(mix(a,b,f.x),mix(c,d,f.x),f.y); }',
+      '#define OCT ' + oct,
+      'float fbm(vec2 p){ float v=0.,a=.5; mat2 m=mat2(1.6,1.2,-1.2,1.6);',
+      ' for(int i=0;i<OCT;i++){ v+=a*noise(p); p=m*p; a*=.5; } return v; }',
+      'void main(){',
+      ' vec2 uv = vUv*2.0-1.0; uv.x *= uAspect;',
+      ' float dive = pow(clamp(uP,0.0,1.0), 1.25);',
+      ' float t = uTime*0.09;',
+      /* the fall: magnify around the centre as progress climbs — features grow
+         and sweep past the frame edge, which is what sells "getting closer" */
+      ' float zoom = 1.0 + 3.4*dive*dive + uVel*0.12;',
+      ' vec2 q = uv / zoom;',
+      ' float r = length(q);',
+      /* the swirl: rotation by log(r) shears rings into a spiral, tightening
+         toward the core on its own; time + scroll keep it turning */
+      ' float ang = mix(2.3,4.3,dive)*log(max(r,1e-3)) - t*(0.55+dive*1.5) - uP*2.4 - uVel*0.5;',
+      ' float cs = cos(ang), sn = sin(ang);',
+      ' vec2 w = mat2(cs,-sn,sn,cs)*q;',
+      /* domain warp is the silk — unwarped fbm reads as fog, not fabric */
+      ' vec2 warp = vec2(fbm(w*1.9 + vec2(t*0.6,0.0)), fbm(w*1.9 + vec2(4.7,-t*0.5))) - 0.5;',
+      ' float f = fbm(w*2.7 + warp*1.35);',
+      /* ridged noise makes the bright veil edges — the drawn silk lines that
+         catch the core light, same trick as the hero caustics */
+      ' float rg = 1.0 - abs(2.0*fbm(w*3.8 - warp*0.9 + vec2(2.3,5.1)) - 1.0);',
+      ' rg = pow(max(rg,0.0), 2.8);',
+      ' float rs = length(uv);',
+      /* a large-scale mask sinks whole regions to near-black — the reference
+         is mostly void, and the darkness is what makes the silk read */
+      ' float mask = mix(0.35, 1.0, smoothstep(0.25, 0.80, fbm(w*0.85 + vec2(7.7,3.1))));',
+      ' float dense = smoothstep(0.22, 0.92, f);',
+      ' vec3 col = vec3(0.006,0.009,0.016);',
+      ' col += vec3(0.115,0.145,0.215)*dense*mask;',
+      ' col += vec3(0.30,0.40,0.58)*pow(f,2.5)*mask*0.7;',
+      /* broad ribbons — a second, wider ridged layer. The fine silk alone
+         reads as filaments; these are the big folded sheets underneath it. */
+      ' float rg2 = 1.0 - abs(2.0*fbm(w*1.55 + warp*1.1 + vec2(9.2,1.7)) - 1.0);',
+      ' rg2 = pow(max(rg2,0.0), 3.2);',
+      ' col += vec3(0.50,0.62,0.86)*rg2*mask*(0.10 + 0.55*dense);',
+      /* the silk — bright veil edges, only where there is smoke to catch the
+         light, and focused toward the core the way the reference glows */
+      ' col += vec3(0.62,0.75,1.00)*rg*mask*(0.08 + 0.70*dense)*(0.18 + 0.82*smoothstep(1.30,0.05,rs));',
+      /* the core — small and held back early, then it takes the frame. Smoke
+         crosses in front of it, so the light sits *inside* the vortex rather
+         than pasted on top. */
+      ' float core = exp(-rs*rs*mix(34.0,1.5,smoothstep(0.30,0.90,uP)));',
+      ' float boost = 0.30 + dive*2.1 + uVel*0.45 + uCross*1.7;',
+      ' col += vec3(0.70,0.81,1.00)*core*(0.35+0.65*f)*boost;',
+      ' col += vec3(0.93,0.96,1.00)*core*core*boost*0.8;',
+      ' col *= 1.0 - 0.48*smoothstep(0.45,1.45,rs);',
+      /* the page opens: the last stretch bleaches the whole field so the
+         composite white-out lands on something already going luminous */
+      ' col = mix(col, vec3(0.955,0.968,0.990), smoothstep(0.80,0.965,uP));',
+      ' gl_FragColor = vec4(col,1.0); }'
+    ].join('\n');
+  }
+
   var BRIGHT_FS = [
     'precision mediump float; varying vec2 vUv;',
     'uniform sampler2D uTex; uniform float uThresh;',
@@ -826,10 +900,13 @@
 
     var low = opts.quality === 'low';
     var flight = buildFlight();
-    /* 'lattice' is the earlier architectural corridor — kept because it still
-       builds and is useful to compare against, but the spiral is the default:
-       it reads on its own without needing the optics to explain it. */
-    var inst = (opts.world === 'lattice' ? buildInstances : buildSpiral)(flight, !low);
+    /* 'smoke' is the default — a full-screen field, no instances. 'spiral'
+       (the shard vortex) and 'lattice' (the architectural corridor) are kept
+       because they still build and are useful to compare against. */
+    var world = opts.world || 'smoke';
+    var inst = world === 'lattice' ? buildInstances(flight, !low)
+             : world === 'spiral'  ? buildSpiral(flight, !low)
+                                   : { data: new Float32Array(STRIDE), count: 0 };
     var geo = boxGeo();
 
     /* programs */
@@ -839,7 +916,8 @@
     var pBlur = makeProgram(gl, QUAD_VS, BLUR_FS);
     var pComp = makeProgram(gl, QUAD_VS, compFrag(low ? 2 : 5));
     var pTitle = makeProgram(gl, TITLE_VS, TITLE_FS);
-    if (!pScene || !pAnchor || !pBright || !pBlur || !pComp || !pTitle) return null;
+    var pSmoke = makeProgram(gl, QUAD_VS, smokeFrag(low ? 3 : 5));
+    if (!pScene || !pAnchor || !pBright || !pBlur || !pComp || !pTitle || !pSmoke) return null;
 
     /* ---- the headline we fly through ---- */
     var titleLines = opts.title || [];
@@ -908,6 +986,8 @@
     var uC = U(pComp, ['uScene', 'uBloom', 'uAspect', 'uTime', 'uRefract', 'uDisp', 'uWarp',
                        'uSmear', 'uLensR', 'uLensSoft', 'uBloomAmt', 'uSpectral', 'uVig',
                        'uGrain', 'uWhite', 'uExposure', 'uWhiteCol']);
+    var uSm = U(pSmoke, ['uTime', 'uP', 'uVel', 'uCross', 'uAspect']);
+    var aQuadS = gl.getAttribLocation(pSmoke, 'aPos');
 
     var aS = {
       pos: gl.getAttribLocation(pScene, 'aPos'), norm: gl.getAttribLocation(pScene, 'aNorm'),
@@ -992,6 +1072,22 @@
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, rtScene.fb);
       gl.viewport(0, 0, W, H);
+
+      if (world === 'smoke') {
+        /* one full-screen pass — the field is the world. It writes every
+           pixel, so no clear; bloom and the composite read rtScene exactly
+           as they would from the geometry worlds. */
+        gl.disable(gl.DEPTH_TEST);
+        gl.useProgram(pSmoke);
+        gl.uniform1f(uSm.uTime, now);
+        gl.uniform1f(uSm.uP, p);
+        gl.uniform1f(uSm.uVel, sv);
+        gl.uniform1f(uSm.uCross, cross);
+        gl.uniform1f(uSm.uAspect, aspect);
+        bindQuad(aQuadS);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      } else {
+
       gl.enable(gl.DEPTH_TEST);
       gl.depthMask(true);
       gl.disable(gl.BLEND);
@@ -1113,6 +1209,8 @@
       gl.disable(gl.BLEND);
       gl.depthMask(true);
       gl.disable(gl.DEPTH_TEST);
+
+      } /* end of the geometry worlds */
 
       /* ---- bloom ---- */
       var bw = rtA.w, bh = rtA.h;
