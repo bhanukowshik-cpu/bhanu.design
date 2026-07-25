@@ -193,11 +193,19 @@
      Scroll maps to: (A) orb flies out of the CTA → (B) portal circle opens
      → (C) .work-track slides sideways. JS owns the numbers; the CSS defaults
      leave the section fully visible so it never ships blank without JS. */
-  .portal-orb{position:fixed;left:0;top:0;z-index:45;width:120px;height:120px;border-radius:50%;
-    pointer-events:none;opacity:0;transform:scale(.46);
+  /* NOTE: no transform at rest — the orb bundle sizes its canvas from the element's
+     *rendered* rect, so a scale applied before it mounts would bake in a tiny canvas.
+     JS mounts first, then takes over the transform (transform-only changes don't re-measure). */
+  .portal-orb{position:fixed;left:0;top:0;z-index:45;width:440px;height:440px;border-radius:50%;
+    pointer-events:none;opacity:0;
+    box-shadow:0 0 90px rgba(92,169,255,.35);
+    will-change:transform,opacity;line-height:0;}
+  /* fallback sphere only until the real orb bundle mounts */
+  .portal-orb::before{content:'';position:absolute;inset:0;border-radius:50%;
     background:radial-gradient(circle at 36% 30%, #D9F0FF, var(--ember) 46%, #17456F 80%, #081B2E);
-    box-shadow:0 0 90px rgba(92,169,255,.4), inset -10px -14px 44px rgba(4,12,28,.5);
-    will-change:transform,opacity;}
+    transition:opacity .3s;}
+  .portal-orb.mounted::before{opacity:0;}
+  .portal-orb>div{position:absolute;inset:0;}
   /* the inside of the orb — WebGL dive, scrubbed by scroll */
   #tunnel{position:fixed;inset:0;z-index:46;width:100%;height:100%;display:none;pointer-events:none;}
 
@@ -507,7 +515,7 @@
     <div class="trail" id="trail" aria-hidden="true"></div>
   </section>
 
-  <div class="portal-orb" id="portalOrb" aria-hidden="true"></div>
+  <div class="portal-orb" id="portalOrb" aria-hidden="true"><div id="portalOrbMount"></div></div>
   <canvas id="tunnel" aria-hidden="true"></canvas>
 
   <section class="work-pin" id="workPin">
@@ -870,7 +878,19 @@ addEventListener('scroll', function () {
   var active = false;
 
   var R_START = 27.5;                        // orb radius while docked in the CTA
+  var PORTAL_R = 220;                        // half the .portal-orb box; the real orb mounts at this size
   var SPAN_A = 0, SPAN_B = 0, SPAN_C = 0, travel = 0, pinTop = 0, vw = 0, vh = 0, rFull = 0;
+
+  /* the flying orb IS the real BhanuOrb — same arctic visual as the CTA.
+     It must mount while the element is unscaled so its canvas is full resolution. */
+  var orbMountStarted = false, orbReady = false;
+  function mountPortalOrb() {
+    if (!(window.BhanuOrb && window.BhanuOrb.mountVisual)) { setTimeout(mountPortalOrb, 120); return; }
+    window.BhanuOrb.mountVisual(document.getElementById('portalOrbMount'),
+      { palette: 'arctic', size: PORTAL_R * 2, state: 'idle' });
+    orb.classList.add('mounted');
+    setTimeout(function () { orbReady = true; update(); }, 60);   // now safe to scale
+  }
   var cards = [].slice.call(track.querySelectorAll('.wcard, .work-intro, .work-end'));
 
   /* ── the inside of the orb — a scroll-scrubbed WebGL dive.
@@ -882,32 +902,55 @@ addEventListener('scroll', function () {
     'precision highp float;',
     'uniform vec2 uRes;uniform float uTime;uniform float uP;',
     'float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}',
+    'vec2 hash2(vec2 p){return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);}',
     'float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);',
     ' float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));',
     ' return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}',
     'float fbm(vec2 p){float v=0.,a=.5;mat2 r=mat2(1.6,1.2,-1.2,1.6);',
-    ' for(int i=0;i<4;i++){v+=a*noise(p);p=r*p;a*=.5;}return v;}',
+    ' for(int i=0;i<3;i++){v+=a*noise(p);p=r*p;a*=.5;}return v;}',
+    /* faceted glass sheet: x = distance to the facet seam, yz = per-facet random */
+    'vec3 facets(vec2 x){',
+    ' vec2 n=floor(x),f=fract(x);',
+    ' vec2 mg=vec2(0.0),mr=vec2(0.0);float md=8.0;',
+    ' for(int j=-1;j<=1;j++){for(int i=-1;i<=1;i++){',
+    '  vec2 g=vec2(float(i),float(j));',
+    '  vec2 o=hash2(n+g);',
+    '  vec2 rr=g+o-f;',
+    '  float d=dot(rr,rr);',
+    '  if(d<md){md=d;mr=rr;mg=g;}}}',
+    ' md=8.0;',
+    ' for(int j=-2;j<=2;j++){for(int i=-2;i<=2;i++){',
+    '  vec2 g=mg+vec2(float(i),float(j));',
+    '  vec2 o=hash2(n+g);',
+    '  vec2 rr=g+o-f;',
+    '  vec2 dv=rr-mr;',
+    '  if(dot(dv,dv)>0.00001) md=min(md,dot(0.5*(mr+rr),normalize(dv)));}}',
+    ' vec2 id=n+mg;',
+    ' return vec3(md,hash(id),hash(id+vec2(37.0,17.0)));}',
     'void main(){',
     ' vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y;',
-    ' float r=length(uv);',
-    ' float an=atan(uv.y,uv.x);',
-    ' float fl=uP*uP*30.0+uTime*0.10;',              // distance flown — scroll-driven
-    ' float depth=0.32/max(r,0.015)+fl;',            // classic 1/r tunnel projection
-    ' float rings=pow(abs(sin(depth*2.2)),16.0);',   // glowing bands rushing past
-    ' float streaks=pow(abs(sin(an*10.0+depth*0.8)),24.0)*smoothstep(0.95,0.18,r);',
-    ' float neb=fbm(vec2(an*2.0+fl*0.05,depth*0.45));',
-    ' float core=exp(-r*r*8.0);',                    // the light you are flying toward
-    ' vec3 base=vec3(0.018,0.035,0.075);',
-    ' vec3 deep=vec3(0.07,0.16,0.34);',
-    ' vec3 mid=vec3(0.13,0.34,0.66);',
-    ' vec3 ice=vec3(0.56,0.79,1.0);',
-    ' vec3 col=base;',
-    ' col+=deep*neb*(0.55+0.6*smoothstep(1.05,0.12,r));',
-    ' col+=mid*rings*(0.3+0.7*smoothstep(1.15,0.08,r));',
-    ' col+=ice*streaks*0.75;',
-    ' col+=mid*core*0.75+ice*core*core*0.85;',
-    ' col*=1.0-0.45*smoothstep(0.6,1.25,r);',
-    ' col+=(hash(gl_FragCoord.xy+fract(uTime))-0.5)*0.012;',
+    ' float t=uTime;',
+    /* the sheet rushes toward the camera: facets expand out of the centre */
+    ' float zoom=mix(6.2,1.05,smoothstep(0.0,0.9,uP));',
+    ' vec3 v=facets(uv*zoom+vec2(t*0.02,-uP*2.4));',
+    ' float inside=smoothstep(0.0,0.032,v.x);',      // 0 on the seam, 1 mid-facet
+    /* each facet bends what is behind it — that is the refraction */
+    ' vec2 refr=(vec2(v.y,v.z)-0.5)*0.20*(1.0-0.45*inside);',
+    ' vec2 p=uv+refr;',
+    ' float ca=0.030*(1.0-inside)+0.008;',           // dispersion, strongest at the seams
+    /* the light at the end of the corridor, sampled per channel → prismatic fringe */
+    ' float dr=dot(p*(1.0+ca),p*(1.0+ca)),dg=dot(p,p),db=dot(p*(1.0-ca),p*(1.0-ca));',
+    ' float cr=exp(-dr*6.0),cg=exp(-dg*6.0),cb=exp(-db*6.0);',
+    ' vec3 col=vec3(0.012,0.028,0.062);',
+    ' col+=vec3(0.05,0.13,0.29)*fbm(p*2.2+vec2(0.0,t*0.10));',   // murk suspended in the glass
+    ' col+=vec3(0.30*cr,0.54*cg,0.95*cb)*0.80;',
+    ' col+=vec3(0.85*cr*cr,0.92*cg*cg,1.0*cb*cb)*0.55;',
+    /* bevels: a thin bright rim where facets meet, plus a broad sheen per facet */
+    ' float seam=1.0-inside;',
+    ' col+=vec3(0.46,0.70,1.0)*pow(seam,3.4)*0.62*(0.45+0.55*v.z);',
+    ' col+=vec3(0.30,0.50,0.85)*pow(max(v.y,0.0),3.0)*inside*0.16;',
+    ' col*=1.0-0.42*smoothstep(0.60,1.28,length(uv));',
+    ' col+=(hash(gl_FragCoord.xy+fract(t))-0.5)*0.012;',
     ' float wo=smoothstep(0.70,0.97,uP);',           // white-out into the arrival page
     ' col=mix(col,vec3(0.972,0.980,0.992),wo);',
     ' float ei=smoothstep(0.0,0.10,uP);',            // entry blends from the orb's navy
@@ -946,7 +989,7 @@ addEventListener('scroll', function () {
       tcv.style.background = p > .7 ? '#F7F9FC' : '#081B2E';
       return;
     }
-    var w = Math.round(tcv.clientWidth * .5), h = Math.round(tcv.clientHeight * .5);
+    var w = Math.round(tcv.clientWidth * .58), h = Math.round(tcv.clientHeight * .58);
     if (tcv.width !== w || tcv.height !== h) { tcv.width = w; tcv.height = h; tgl.viewport(0, 0, w, h); }
     tgl.uniform2f(tuRes, w, h);
     tgl.uniform1f(tuTime, performance.now() / 1000);
@@ -986,7 +1029,9 @@ addEventListener('scroll', function () {
     var x = lerp(src.width ? src.left + src.width / 2 : vw / 2, vw / 2, ea);
     var yy = lerp(src.height ? src.top + src.height / 2 : vh / 2, vh / 2, ea);
     var rOrb = lerp(R_START, rFull, easeIn(aP));
-    orb.style.transform = 'translate(' + (x - 60).toFixed(1) + 'px,' + (yy - 60).toFixed(1) + 'px) scale(' + (rOrb / 60).toFixed(4) + ')';
+    if (orbReady) {
+      orb.style.transform = 'translate(' + (x - PORTAL_R).toFixed(1) + 'px,' + (yy - PORTAL_R).toFixed(1) + 'px) scale(' + (rOrb / PORTAL_R).toFixed(4) + ')';
+    }
     orb.style.opacity = (ramp(0, .06, aP) * (1 - ramp(0, .04, bP))).toFixed(3);
     ctaOrb.style.opacity = (1 - ramp(0, .1, aP)).toFixed(3);
     if (copy) copy.style.opacity = (1 - ramp(.15, .75, aP)).toFixed(3);
@@ -1030,6 +1075,7 @@ addEventListener('scroll', function () {
     }
     pin.classList.remove('no-portal');
     active = true;
+    if (!orbMountStarted) { orbMountStarted = true; mountPortalOrb(); }
     measure();
     update();
   }
