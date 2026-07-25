@@ -198,31 +198,33 @@
     background:radial-gradient(circle at 36% 30%, #D9F0FF, var(--ember) 46%, #17456F 80%, #081B2E);
     box-shadow:0 0 90px rgba(92,169,255,.4), inset -10px -14px 44px rgba(4,12,28,.5);
     will-change:transform,opacity;}
+  /* the inside of the orb — WebGL dive, scrubbed by scroll */
+  #tunnel{position:fixed;inset:0;z-index:46;width:100%;height:100%;display:none;pointer-events:none;}
 
   .work-pin{position:relative;background:var(--bg);}
   .work-sticky{position:sticky;top:0;height:100svh;overflow:hidden;}
-  .work-veil{position:absolute;inset:0;clip-path:circle(150% at 50% 50%);will-change:clip-path;}
+  .work-veil{position:absolute;inset:0;}   /* JS reveals it once the dive begins */
+  /* arrival side of the portal — white page */
   .work-stage{position:absolute;inset:0;display:flex;align-items:center;
     background:
-      radial-gradient(120% 90% at 50% 0%, rgba(23,69,111,.5) 0%, transparent 62%),
-      radial-gradient(90% 70% at 50% 108%, rgba(92,169,255,.16) 0%, transparent 60%),
-      var(--bg);}
+      radial-gradient(110% 70% at 50% 0%, rgba(31,111,230,.06) 0%, transparent 60%),
+      #F7F9FC;}
   .work-track{flex:none;display:flex;align-items:stretch;gap:clamp(18px,2vw,30px);
     padding:0 clamp(28px,7vw,110px);will-change:transform;}
 
   /* left intro panel — reads as the reel's title card */
   .work-intro{flex:none;width:clamp(280px,25vw,380px);align-self:center;
     display:flex;flex-direction:column;gap:16px;padding-right:clamp(10px,2vw,28px);}
-  .work-intro .k{font-size:11.5px;font-weight:550;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);}
-  .work-intro h2{font-family:var(--sans);font-weight:570;color:var(--ink);
+  .work-intro .k{font-size:11.5px;font-weight:550;letter-spacing:.18em;text-transform:uppercase;color:#6B7887;}
+  .work-intro h2{font-family:var(--sans);font-weight:570;color:#0F1722;
     font-size:clamp(30px,2.9vw,44px);line-height:1.14;letter-spacing:-0.022em;}
   .work-intro h2 .serif{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.08em;}
-  .work-intro p{font-size:14.5px;line-height:1.62;color:var(--ink-2);max-width:34ch;}
+  .work-intro p{font-size:14.5px;line-height:1.62;color:#3A4756;max-width:34ch;}
   .work-scroll-hint{display:inline-flex;align-items:center;gap:9px;margin-top:4px;
-    font-size:12px;font-weight:500;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);}
-  .work-scroll-hint i{display:block;width:34px;height:1px;background:var(--line);position:relative;}
+    font-size:12px;font-weight:500;letter-spacing:.11em;text-transform:uppercase;color:#6B7887;}
+  .work-scroll-hint i{display:block;width:34px;height:1px;background:rgba(8,16,30,.16);position:relative;}
   .work-scroll-hint i::after{content:'';position:absolute;right:0;top:-2px;
-    width:5px;height:5px;border-right:1px solid var(--ink-3);border-top:1px solid var(--ink-3);
+    width:5px;height:5px;border-right:1px solid #6B7887;border-top:1px solid #6B7887;
     transform:rotate(45deg);}
 
   /* project cards */
@@ -230,43 +232,43 @@
     display:flex;flex-direction:column;
     height:min(74vh,624px);align-self:center;
     padding:22px 22px 20px;border-radius:22px;overflow:hidden;position:relative;
-    border:1px solid var(--line);
-    background:linear-gradient(180deg, rgba(20,29,45,.85) 0%, rgba(11,16,26,.9) 100%);
-    box-shadow:0 30px 70px -34px rgba(0,0,0,.8);}
+    border:1px solid rgba(8,16,30,.08);
+    background:#FFFFFF;
+    box-shadow:0 30px 60px -30px rgba(10,20,40,.22), 0 2px 8px -4px rgba(10,20,40,.08);}
   /* per-card accent wash, set inline via --a */
   .wcard::before{content:'';position:absolute;inset:0;pointer-events:none;
     background:radial-gradient(120% 62% at 50% 0%, var(--a,rgba(92,169,255,.3)) 0%, transparent 68%);
-    opacity:.55;}
+    opacity:.16;}
   .wcard>*{position:relative;}
   .wcard-top{display:flex;align-items:baseline;justify-content:space-between;
-    font-size:11.5px;font-weight:550;letter-spacing:.13em;color:var(--ink-3);}
-  .wcard-top b{color:var(--ember-2);font-weight:600;}
+    font-size:11.5px;font-weight:550;letter-spacing:.13em;color:#6B7887;}
+  .wcard-top b{color:#2463DC;font-weight:600;}
   .wcard-media{margin:15px 0 16px;border-radius:13px;overflow:hidden;flex:none;
-    aspect-ratio:16/10;background:rgba(255,255,255,.03);border:1px solid var(--line);}
+    aspect-ratio:16/10;background:#EDF1F7;border:1px solid rgba(8,16,30,.07);}
   .wcard-media img{width:100%;height:100%;object-fit:cover;display:block;}
-  .wcard h3{font-family:var(--sans);font-size:24px;font-weight:570;letter-spacing:-0.018em;color:var(--ink);}
+  .wcard h3{font-family:var(--sans);font-size:24px;font-weight:570;letter-spacing:-0.018em;color:#0F1722;}
   .wcard .role{margin-top:5px;font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
-    color:var(--ember-2);}
-  .wcard p{margin-top:11px;font-size:13.5px;line-height:1.6;color:var(--ink-2);}
+    color:#2463DC;}
+  .wcard p{margin-top:11px;font-size:13.5px;line-height:1.6;color:#3A4756;}
   .wcard-metrics{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;}
-  .wcard-metrics span{padding:5px 10px;border-radius:999px;border:1px solid var(--line);
-    background:rgba(255,255,255,.03);font-size:11px;font-weight:500;color:var(--ink-2);
+  .wcard-metrics span{padding:5px 10px;border-radius:999px;border:1px solid rgba(8,16,30,.1);
+    background:#F1F5FA;font-size:11px;font-weight:500;color:#3A4756;
     font-variant-numeric:tabular-nums;}
   .wcard-cta{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;
     padding:10px 17px;border-radius:999px;text-decoration:none;
-    background:#F4F7FB;color:#0B1220;font-size:13px;font-weight:570;
+    background:#101720;color:#fff;font-size:13px;font-weight:570;
     transition:transform .3s var(--ease),background .3s var(--ease);}
-  .wcard-cta:hover{transform:translateY(-2px);background:#fff;}
+  .wcard-cta:hover{transform:translateY(-2px);background:#000;}
 
   .work-end{flex:none;align-self:center;display:flex;align-items:center;gap:16px;
     padding:0 clamp(20px,5vw,80px);white-space:nowrap;
-    font-size:11.5px;font-weight:550;letter-spacing:.19em;text-transform:uppercase;color:var(--ink-3);}
-  .work-end i{display:block;width:clamp(40px,6vw,90px);height:1px;background:var(--line);}
+    font-size:11.5px;font-weight:550;letter-spacing:.19em;text-transform:uppercase;color:#6B7887;}
+  .work-end i{display:block;width:clamp(40px,6vw,90px);height:1px;background:rgba(8,16,30,.14);}
 
   /* no-JS / reduced-motion / touch: plain swipeable rail, no portal */
   .work-pin.no-portal{height:auto !important;}
   .work-pin.no-portal .work-sticky{position:static;height:auto;}
-  .work-pin.no-portal .work-veil{clip-path:none !important;}
+  .work-pin.no-portal .work-veil{opacity:1 !important;}
   .work-pin.no-portal .work-stage{position:static;padding:clamp(56px,9vh,96px) 0;}
   .work-pin.no-portal .work-track{transform:none !important;
     flex:1 1 auto;width:100%;overflow-x:auto;
@@ -506,6 +508,7 @@
   </section>
 
   <div class="portal-orb" id="portalOrb" aria-hidden="true"></div>
+  <canvas id="tunnel" aria-hidden="true"></canvas>
 
   <section class="work-pin" id="workPin">
     <div class="work-sticky">
@@ -866,49 +869,145 @@ addEventListener('scroll', function () {
   }
   var active = false;
 
-  var R_START = 27.5, R_MID = 118;          // orb radius in the CTA → at the handoff
-  var ZOOM = 0, travel = 0, pinTop = 0, vw = 0, vh = 0, rFull = 0;
+  var R_START = 27.5;                        // orb radius while docked in the CTA
+  var SPAN_A = 0, SPAN_B = 0, SPAN_C = 0, travel = 0, pinTop = 0, vw = 0, vh = 0, rFull = 0;
+  var cards = [].slice.call(track.querySelectorAll('.wcard, .work-intro, .work-end'));
+
+  /* ── the inside of the orb — a scroll-scrubbed WebGL dive.
+       uP 0→~.7 is flight (rings, streaks, nebula in the orb's blues);
+       uP .7→1 accelerates into the white of the arrival page. ── */
+  var tcv = document.getElementById('tunnel');
+  var tgl = null, tReady = false, tNoGL = false, tuRes, tuTime, tuP;
+  var T_FRAG = [
+    'precision highp float;',
+    'uniform vec2 uRes;uniform float uTime;uniform float uP;',
+    'float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}',
+    'float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);',
+    ' float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));',
+    ' return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}',
+    'float fbm(vec2 p){float v=0.,a=.5;mat2 r=mat2(1.6,1.2,-1.2,1.6);',
+    ' for(int i=0;i<4;i++){v+=a*noise(p);p=r*p;a*=.5;}return v;}',
+    'void main(){',
+    ' vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y;',
+    ' float r=length(uv);',
+    ' float an=atan(uv.y,uv.x);',
+    ' float fl=uP*uP*30.0+uTime*0.10;',              // distance flown — scroll-driven
+    ' float depth=0.32/max(r,0.015)+fl;',            // classic 1/r tunnel projection
+    ' float rings=pow(abs(sin(depth*2.2)),16.0);',   // glowing bands rushing past
+    ' float streaks=pow(abs(sin(an*10.0+depth*0.8)),24.0)*smoothstep(0.95,0.18,r);',
+    ' float neb=fbm(vec2(an*2.0+fl*0.05,depth*0.45));',
+    ' float core=exp(-r*r*8.0);',                    // the light you are flying toward
+    ' vec3 base=vec3(0.018,0.035,0.075);',
+    ' vec3 deep=vec3(0.07,0.16,0.34);',
+    ' vec3 mid=vec3(0.13,0.34,0.66);',
+    ' vec3 ice=vec3(0.56,0.79,1.0);',
+    ' vec3 col=base;',
+    ' col+=deep*neb*(0.55+0.6*smoothstep(1.05,0.12,r));',
+    ' col+=mid*rings*(0.3+0.7*smoothstep(1.15,0.08,r));',
+    ' col+=ice*streaks*0.75;',
+    ' col+=mid*core*0.75+ice*core*core*0.85;',
+    ' col*=1.0-0.45*smoothstep(0.6,1.25,r);',
+    ' col+=(hash(gl_FragCoord.xy+fract(uTime))-0.5)*0.012;',
+    ' float wo=smoothstep(0.70,0.97,uP);',           // white-out into the arrival page
+    ' col=mix(col,vec3(0.972,0.980,0.992),wo);',
+    ' float ei=smoothstep(0.0,0.10,uP);',            // entry blends from the orb's navy
+    ' col=mix(vec3(0.031,0.078,0.140),col,ei);',
+    ' gl_FragColor=vec4(col,1.0);}'
+  ].join('\n');
+
+  function tunnelInit() {
+    if (tReady) return true;
+    if (tNoGL) return false;
+    tgl = tcv.getContext('webgl', { alpha: false, antialias: false, preserveDrawingBuffer: true });
+    if (!tgl) { tNoGL = true; return false; }
+    function sh(type, src) {
+      var s = tgl.createShader(type); tgl.shaderSource(s, src); tgl.compileShader(s);
+      if (!tgl.getShaderParameter(s, tgl.COMPILE_STATUS)) { console.error(tgl.getShaderInfoLog(s)); return null; }
+      return s;
+    }
+    var vs = sh(tgl.VERTEX_SHADER, 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}');
+    var fs = sh(tgl.FRAGMENT_SHADER, T_FRAG);
+    if (!vs || !fs) { tNoGL = true; return false; }
+    var prog = tgl.createProgram();
+    tgl.attachShader(prog, vs); tgl.attachShader(prog, fs);
+    tgl.linkProgram(prog); tgl.useProgram(prog);
+    var buf = tgl.createBuffer();
+    tgl.bindBuffer(tgl.ARRAY_BUFFER, buf);
+    tgl.bufferData(tgl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), tgl.STATIC_DRAW);
+    var loc = tgl.getAttribLocation(prog, 'p');
+    tgl.enableVertexAttribArray(loc); tgl.vertexAttribPointer(loc, 2, tgl.FLOAT, false, 0, 0);
+    tuRes = tgl.getUniformLocation(prog, 'uRes');
+    tuTime = tgl.getUniformLocation(prog, 'uTime');
+    tuP = tgl.getUniformLocation(prog, 'uP');
+    tReady = true; return true;
+  }
+  function tunnelDraw(p) {
+    if (!tunnelInit()) {                     // no WebGL → flat colour crossfade
+      tcv.style.background = p > .7 ? '#F7F9FC' : '#081B2E';
+      return;
+    }
+    var w = Math.round(tcv.clientWidth * .5), h = Math.round(tcv.clientHeight * .5);
+    if (tcv.width !== w || tcv.height !== h) { tcv.width = w; tcv.height = h; tgl.viewport(0, 0, w, h); }
+    tgl.uniform2f(tuRes, w, h);
+    tgl.uniform1f(tuTime, performance.now() / 1000);
+    tgl.uniform1f(tuP, p);
+    tgl.drawArrays(tgl.TRIANGLES, 0, 3);
+  }
+  tcv.__draw = tunnelDraw;                   // debug hook for headless verification
 
   function measure() {
     vw = innerWidth; vh = innerHeight;
-    ZOOM = Math.round(vh * 1.05);
+    SPAN_A = Math.round(vh * 0.85);          // approach — the orb swallows the hero
+    SPAN_B = Math.round(vh * 1.4);           // the dive
+    SPAN_C = Math.round(vh * 0.8);           // white-out + work rises from below
     travel = Math.max(0, track.scrollWidth - vw);
-    pin.style.height = (vh + ZOOM + travel) + 'px';
+    pin.style.height = (vh + SPAN_B + SPAN_C + travel) + 'px';
     pinTop = pin.offsetTop;
     rFull = Math.hypot(vw, vh) / 2 * 1.06;   // past the viewport corners
   }
 
   function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
   function ease(t) { return 1 - Math.pow(1 - t, 3); }
+  function easeIn(t) { return t * t * t; }
   function ramp(a, b, t) { return clamp01((t - a) / (b - a)); }
   function lerp(a, b, t) { return a + (b - a) * t; }
 
   function update() {
     if (!active) return;
     var y = scrollY;
-    var aSpan = vh * 0.8;
-    var aP = clamp01((y - (pinTop - aSpan)) / aSpan);
-    var bP = clamp01((y - pinTop) / ZOOM);
-    var cP = travel ? clamp01((y - pinTop - ZOOM) / travel) : 0;
+    var aP = clamp01((y - (pinTop - SPAN_A)) / SPAN_A);            // approach
+    var bP = clamp01((y - pinTop) / SPAN_B);                       // dive
+    var cP = clamp01((y - pinTop - SPAN_B) / SPAN_C);              // arrival
+    var tP = travel ? clamp01((y - pinTop - SPAN_B - SPAN_C) / travel) : 0;  // reel
     var ea = ease(aP);
 
-    /* A — seed from wherever the CTA orb actually is, so the handoff is seamless */
+    /* A — seed from wherever the CTA orb actually is; ease-in plunge into it */
     var src = ctaOrb.getBoundingClientRect();
     var x = lerp(src.width ? src.left + src.width / 2 : vw / 2, vw / 2, ea);
     var yy = lerp(src.height ? src.top + src.height / 2 : vh / 2, vh / 2, ea);
-
-    /* B — one radius drives both the sphere and the hole it opens */
-    var rGrow = lerp(R_MID, rFull, ease(bP));
-    var rOrb = bP > 0 ? rGrow : lerp(R_START, R_MID, ea);
-
+    var rOrb = lerp(R_START, rFull, easeIn(aP));
     orb.style.transform = 'translate(' + (x - 60).toFixed(1) + 'px,' + (yy - 60).toFixed(1) + 'px) scale(' + (rOrb / 60).toFixed(4) + ')';
-    orb.style.opacity = (ramp(0, .1, aP) * (1 - ramp(.22, .6, bP))).toFixed(3);
+    orb.style.opacity = (ramp(0, .06, aP) * (1 - ramp(0, .04, bP))).toFixed(3);
     ctaOrb.style.opacity = (1 - ramp(0, .1, aP)).toFixed(3);
     if (copy) copy.style.opacity = (1 - ramp(.15, .75, aP)).toFixed(3);
     if (trailLayer) trailLayer.style.opacity = (1 - ramp(0, .35, aP)).toFixed(3);
 
-    veil.style.clipPath = 'circle(' + rGrow.toFixed(1) + 'px at 50% 50%)';
-    track.style.transform = 'translate3d(' + (-cP * travel).toFixed(1) + 'px,0,0)';
+    /* B/C — the dive; one progress value drives the shader through flight → white */
+    var uP = 0.7 * bP + 0.3 * cP;
+    var tOp = ramp(.96, 1, aP) * (1 - ramp(.9, 1, cP));
+    tcv.style.opacity = tOp.toFixed(3);
+    tcv.style.display = tOp > 0 ? 'block' : 'none';
+    if (tOp > 0) tunnelDraw(uP);
+
+    /* the white page stays hidden until the dive begins (dark body shows instead) */
+    veil.style.opacity = y >= pinTop ? '1' : '0';
+
+    /* C/D — work rises from the bottom (staggered), then slides sideways */
+    var rise = 1 - ease(cP);
+    track.style.transform = 'translate3d(' + (-tP * travel).toFixed(1) + 'px,' + (rise * vh * 0.55).toFixed(1) + 'px,0)';
+    for (var i = 0; i < cards.length; i++) {
+      cards[i].style.transform = rise > 0 ? 'translateY(' + (rise * i * 34).toFixed(1) + 'px)' : '';
+    }
   }
 
   function remeasure() {
@@ -917,8 +1016,11 @@ addEventListener('scroll', function () {
         pin.classList.add('no-portal');
         active = false;
         pin.style.height = '';
-        veil.style.clipPath = '';
+        veil.style.opacity = '';
         track.style.transform = '';
+        for (var i = 0; i < cards.length; i++) cards[i].style.transform = '';
+        tcv.style.opacity = '0';
+        tcv.style.display = 'none';
         orb.style.opacity = '0';
         ctaOrb.style.opacity = '';
         if (copy) copy.style.opacity = '';
