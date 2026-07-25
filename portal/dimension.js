@@ -695,7 +695,7 @@
       /* the origin: the vortex is born in the hero's own bottom smoke. Its
          centre starts below the frame edge and rises to centre as the scroll
          inflates it — the page's smoke and the portal are one object. */
-      ' float rise = smoothstep(0.02, 0.44, uP);',
+      ' float rise = smoothstep(0.0, 0.36, uP);',
       ' vec2 uvc = uv - vec2(0.0, mix(-1.30, 0.0, rise));',
       /* the fall: magnify around the centre as progress climbs — features grow
          and sweep past the frame edge, which is what sells "getting closer" */
@@ -713,7 +713,7 @@
          starts as plain smoke and organises itself as you commit to the dive */
       ' float aw = atan(w.y, w.x);',
       ' float arms = pow(0.5 + 0.5*cos(3.0*aw), 1.7);',
-      ' float g = mix(1.0, 0.20 + 1.80*arms, 0.62*smoothstep(0.10, 0.44, uP));',
+      ' float g = mix(1.0, 0.20 + 1.80*arms, 0.62*smoothstep(0.06, 0.36, uP));',
       /* domain warp is the silk — unwarped fbm reads as fog, not fabric */
       ' vec2 warp = vec2(fbm(w*1.9 + vec2(t*0.6,0.0)), fbm(w*1.9 + vec2(4.7,-t*0.5))) - 0.5;',
       ' float f = fbm(w*2.7 + warp*1.35);',
@@ -724,16 +724,20 @@
       ' float rs = length(uvc);',
       /* growth: the smoke is a mound hugging the bottom of the hero, and the
          scroll inflates it — bigger, bigger, bigger — until it owns the frame */
-      ' float R = mix(0.80, 3.6, smoothstep(0.0, 0.52, uP));',
+      ' float R = mix(0.80, 3.6, smoothstep(0.0, 0.40, uP));',
       ' float cover = smoothstep(R, R*0.42, rs);',
       /* a large-scale mask sinks whole regions to near-black — the reference
          is mostly void, and the darkness is what makes the silk read */
       ' float mask = mix(0.35, 1.0, smoothstep(0.25, 0.80, fbm(w*0.85 + vec2(7.7,3.1))));',
       ' mask *= cover*g;',
       ' float dense = smoothstep(0.22, 0.92, f);',
+      /* colour continuity: the young mound wears the hero smoke's azure, and
+         only shifts to the vortex's pale slate-silk as it organises — so the
+         hand-off from the page's own smoke is a colour match, not a cut */
+      ' float formed = smoothstep(0.12, 0.42, uP);',
       ' vec3 col = vec3(0.006,0.009,0.016);',
-      ' col += vec3(0.115,0.145,0.215)*dense*mask;',
-      ' col += vec3(0.30,0.40,0.58)*pow(f,2.5)*mask*0.7;',
+      ' col += mix(vec3(0.050,0.110,0.235), vec3(0.115,0.145,0.215), formed)*dense*mask;',
+      ' col += mix(vec3(0.10,0.28,0.62), vec3(0.30,0.40,0.58), formed)*pow(f,2.5)*mask*0.7;',
       /* broad ribbons — a second, wider ridged layer. The fine silk alone
          reads as filaments; these are the big folded sheets underneath it. */
       ' float rg2 = 1.0 - abs(2.0*fbm(w*1.55 + warp*1.1 + vec2(9.2,1.7)) - 1.0);',
@@ -747,9 +751,9 @@
          than pasted on top. */
       /* the eye ignites only once the vortex has formed — early on the smoke
          is just smoke, so there is never a lone dot parked in the haze */
-      ' float core = exp(-rs*rs*mix(34.0,1.5,smoothstep(0.30,0.90,uP)));',
+      ' float core = exp(-rs*rs*mix(34.0,1.5,smoothstep(0.26,0.88,uP)));',
       ' float boost = (0.30 + dive*2.1 + uVel*0.45 + uCross*1.7)',
-      '             * (0.10 + 0.90*smoothstep(0.30, 0.56, uP));',
+      '             * (0.10 + 0.90*smoothstep(0.24, 0.50, uP));',
       ' col += vec3(0.70,0.81,1.00)*core*(0.35+0.65*f)*boost;',
       ' col += vec3(0.93,0.96,1.00)*core*core*boost*0.8;',
       ' col *= 1.0 - 0.48*smoothstep(0.45,1.45,length(uv));',
@@ -1106,6 +1110,39 @@
         gl.uniform1f(uSm.uAspect, aspect);
         bindQuad(aQuadS);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        /* the headline flies through the smoke — the camera travels the same
+           flight path whether or not there is geometry, so the type you were
+           just reading pulls apart and rushes the lens exactly as it does in
+           the geometry worlds. No depth test: there is nothing to occlude. */
+        if (titleLines.length) {
+          var sDist = cam.z - TITLE_Z;
+          if (sDist > 1.0) {
+            if (Math.abs(aspect - titleAspect) > 0.02) {
+              titleAspect = aspect;
+              titleCv.height = Math.max(64, Math.round(titleCv.width / aspect));
+              titleDirty = true;
+            }
+            syncTitle(smoothstep(0.03, 0.40, p) * 2.0);
+            gl.useProgram(pTitle);
+            gl.uniformMatrix4fv(uT.uVP, false, vp);
+            gl.uniform3f(uT.uCentre, 0, 0, TITLE_Z);
+            gl.uniform2f(uT.uSize, titleH * aspect, titleH);
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, titleTex);
+            gl.uniform1i(uT.uTex, 0);
+            gl.uniform1f(uT.uAlpha, smoothstep(1.5, 9.0, sDist));
+            gl.uniform3f(uT.uTint, 0.92, 0.95, 1.0);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+            gl.bindBuffer(gl.ARRAY_BUFFER, bBill);
+            gl.enableVertexAttribArray(aTitle);
+            gl.vertexAttribPointer(aTitle, 2, gl.FLOAT, false, 0, 0);
+            divisor(aTitle, 0);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+            gl.disable(gl.BLEND);
+          }
+        }
       } else {
 
       gl.enable(gl.DEPTH_TEST);

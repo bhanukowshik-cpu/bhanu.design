@@ -632,7 +632,7 @@
     </div>
   </aside>
 
-<script src="portal/dimension.js?v=6"></script>
+<script src="portal/dimension.js?v=7"></script>
 <script>
 /* ═══ SMOKE SHADER — pure rising smoke, no geometry ═══ */
 (function () {
@@ -976,7 +976,12 @@ addEventListener('scroll', function () {
   function tunnelDraw(p, vel) {
     if (!dimTried) {
       dimTried = true;
-      if (window.Dimension) dim = Dimension.create(tcv, { quality: dimQuality(), world: 'smoke' });
+      if (window.Dimension) dim = Dimension.create(tcv, {
+        quality: dimQuality(), world: 'smoke',
+        /* the hero's own headline flies through the vortex — the DOM copy
+           dissolves as the canvas fades up, and this takes its place */
+        title: ['DESIGNING PRODUCTS', 'THAT SCALE, CONVERT', '& CONNECT']
+      });
     }
     if (dim) { dim.draw(p, vel || 0); return; }
     if (!tunnelInit()) {                     // no WebGL → flat colour crossfade
@@ -994,11 +999,12 @@ addEventListener('scroll', function () {
 
   function measure() {
     vw = innerWidth; vh = innerHeight;
-    /* ~420vh of pinned choreography — the crossing needs room to start almost
-       imperceptibly and still leave the arrival somewhere to breathe */
-    SPAN_A = Math.round(vh * 1.00);          // the hero recedes
-    SPAN_B = Math.round(vh * 2.20);          // anomaly → approach → acceleration
-    SPAN_C = Math.round(vh * 1.00);          // crossing → snap → arrival
+    /* ~350vh of pinned choreography — tightened so there is never a dead
+       stretch: the mound is already growing on the first flick, and the
+       crossing lands within a couple of committed scrolls */
+    SPAN_A = Math.round(vh * 1.00);          // the hero recedes, smoke swells
+    SPAN_B = Math.round(vh * 1.60);          // vortex forms → acceleration
+    SPAN_C = Math.round(vh * 0.90);          // crossing → snap → arrival
     travel = Math.max(0, track.scrollWidth - vw);
     pin.style.height = (vh + SPAN_B + SPAN_C + travel) + 'px';
     pinTop = pin.offsetTop;
