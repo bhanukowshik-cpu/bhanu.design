@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hero Lab — smoke</title>
+<link rel="icon" type="image/png" href="images/logo-bk-favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --bg:#0A0605;            /* warm near-black */
+    --ink:#F3ECE2;           /* warm off-white   */
+    --ink-2:#CBBFB1;
+    --ink-3:#8A7D6F;
+    --line:rgba(243,236,226,0.12);
+    --ember:#FF6A1A;
+    --ember-2:#FF8B45;
+    --serif:'Instrument Serif',Georgia,serif;
+    --sans:'Inter',system-ui,sans-serif;
+    --ease:cubic-bezier(0.16,1,0.3,1);
+  }
+  html,body{height:100%;}
+  body{
+    background:var(--bg);color:var(--ink);font-family:var(--sans);
+    overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    font-optical-sizing:auto;
+  }
+  ::selection{background:var(--ember);color:#160903;}
+
+  /* film grain over everything, incl. the shader */
+  body::after{
+    content:'';position:fixed;inset:0;z-index:5;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .hero{position:relative;height:100svh;overflow:clip;}
+
+  /* ── SMOKE SHADER — giant clipped circle, bottom ── */
+  #smoke{position:absolute;inset:0;z-index:0;width:100%;height:100%;display:block;pointer-events:none;}
+
+  /* ── NAV ── */
+  nav{position:absolute;top:0;left:0;right:0;z-index:30;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:28px clamp(24px,4.5vw,56px);}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+  .logo{width:30px;height:30px;background:var(--ember);
+    -webkit-mask:url("images/logo-bk-mask.png") center/contain no-repeat;
+    mask:url("images/logo-bk-mask.png") center/contain no-repeat;
+    filter:drop-shadow(0 0 10px rgba(255,106,26,0.35));}
+  .brand .name{font-family:var(--serif);font-size:21px;letter-spacing:.01em;}
+  .nav-links{display:flex;align-items:center;gap:32px;}
+  .nav-links a{font-size:13px;font-weight:450;letter-spacing:.02em;color:var(--ink-2);
+    text-decoration:none;transition:color .25s var(--ease);}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links a.avail{display:inline-flex;align-items:center;gap:8px;color:var(--ink);}
+  .nav-links a.avail::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ember);
+    box-shadow:0 0 10px 1px rgba(255,106,26,.6);}
+
+  /* ── COPY — top middle, centered ── */
+  .copy{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;
+    text-align:center;padding:clamp(110px,17vh,190px) 24px 0;}
+  h1{
+    font-family:var(--sans);font-weight:590;
+    font-size:clamp(42px,6.5vw,94px);line-height:1.04;letter-spacing:-0.033em;
+    max-width:17ch;text-wrap:balance;
+  }
+  h1 .serif{font-family:var(--serif);font-style:italic;font-weight:400;
+    font-size:1.06em;letter-spacing:-0.005em;}
+  .meta{margin-top:30px;font-size:13.5px;font-weight:450;letter-spacing:.05em;color:var(--ink-3);}
+  .meta b{color:var(--ink-2);font-weight:500;}
+
+  /* ── CTA PILL — orb + cycling prompts, bottom center ── */
+  .cta{
+    position:absolute;bottom:6.5vh;left:50%;transform:translateX(-50%);z-index:20;
+    display:flex;align-items:center;gap:13px;
+    padding:9px 26px 9px 10px;border-radius:999px;cursor:pointer;
+    background:rgba(16,9,5,0.42);
+    border:1px solid rgba(255,130,55,0.22);
+    backdrop-filter:blur(16px) saturate(1.25);-webkit-backdrop-filter:blur(16px) saturate(1.25);
+    box-shadow:0 18px 50px -12px rgba(0,0,0,.7), 0 0 44px -8px rgba(255,106,26,.28),
+      inset 0 1px 0 rgba(255,255,255,.05);
+    transition:transform .45s var(--ease),border-color .3s var(--ease),box-shadow .45s var(--ease);
+    font-family:var(--sans);color:var(--ink);
+  }
+  .cta:hover{transform:translate(-50%,-3px);border-color:rgba(255,140,66,.42);
+    box-shadow:0 24px 60px -12px rgba(0,0,0,.75), 0 0 60px -8px rgba(255,106,26,.4),
+      inset 0 1px 0 rgba(255,255,255,.07);}
+  .cta:focus-visible{outline:2px solid var(--ember);outline-offset:3px;}
+  .cta-orb{position:relative;width:46px;height:46px;flex-shrink:0;line-height:0;}
+  .cta-orb::before{ /* fallback until the WebGL orb mounts */
+    content:'';position:absolute;inset:3px;border-radius:50%;
+    background:radial-gradient(circle at 36% 30%, #FFC38F, var(--ember) 46%, #7A2604 80%, #2A0D02);
+    opacity:1;transition:opacity .4s;}
+  .cta-orb.mounted::before{opacity:0;}
+  .cta-orb>div{position:absolute;inset:0;}
+  .cta-text{display:grid;text-align:left;}
+  .cta-text span{
+    grid-area:1/1;white-space:nowrap;font-size:14.5px;font-weight:480;letter-spacing:.005em;
+    opacity:0;transform:translateY(7px);transition:opacity .5s var(--ease),transform .5s var(--ease);
+  }
+  .cta-text span.on{opacity:1;transform:translateY(0);}
+
+  /* ── CHAT PANEL — slides from the right ── */
+  .chat-backdrop{position:fixed;inset:0;z-index:70;background:rgba(4,2,1,.55);
+    opacity:0;pointer-events:none;transition:opacity .45s var(--ease);}
+  .chat-backdrop.open{opacity:1;pointer-events:auto;}
+  .chat{
+    position:fixed;top:14px;right:14px;bottom:14px;z-index:80;
+    width:min(400px,calc(100vw - 28px));
+    display:flex;flex-direction:column;
+    background:rgba(15,9,6,0.93);
+    border:1px solid var(--line);border-radius:22px;
+    backdrop-filter:blur(26px) saturate(1.2);-webkit-backdrop-filter:blur(26px) saturate(1.2);
+    box-shadow:-30px 0 80px -30px rgba(0,0,0,.8);
+    transform:translateX(calc(100% + 34px));
+    transition:transform .6s var(--ease);
+  }
+  .chat.open{transform:translateX(0);}
+  .chat-head{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line);}
+  .chat-head .dot{width:8px;height:8px;border-radius:50%;background:var(--ember);
+    box-shadow:0 0 12px 1px rgba(255,106,26,.6);animation:pulse 3s var(--ease) infinite;}
+  @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
+  .chat-head .t{font-family:var(--serif);font-size:20px;letter-spacing:.01em;}
+  .chat-head .s{font-size:11.5px;color:var(--ink-3);margin-top:2px;}
+  .chat-close{margin-left:auto;width:32px;height:32px;border-radius:10px;border:1px solid transparent;
+    background:transparent;color:var(--ink-3);font-size:17px;cursor:pointer;line-height:1;
+    transition:color .25s,border-color .25s;}
+  .chat-close:hover{color:var(--ink);border-color:var(--line);}
+  .chat-thread{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:11px;
+    scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.14) transparent;}
+  .m{max-width:86%;padding:11px 14px;border-radius:15px;font-size:14px;line-height:1.55;font-weight:430;}
+  .m.ai{align-self:flex-start;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);
+    color:#E9DFD2;border-bottom-left-radius:6px;}
+  .m.me{align-self:flex-end;background:rgba(255,106,26,.13);border:1px solid rgba(255,106,26,.26);
+    color:var(--ink);border-bottom-right-radius:6px;}
+  .m.typing{display:flex;gap:5px;padding:14px 16px;}
+  .m.typing i{width:5px;height:5px;border-radius:50%;background:var(--ink-3);animation:tp 1.2s infinite;}
+  .m.typing i:nth-child(2){animation-delay:.15s}.m.typing i:nth-child(3){animation-delay:.3s}
+  @keyframes tp{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+  .chat-form{display:flex;gap:10px;padding:14px;border-top:1px solid var(--line);}
+  .chat-form input{
+    flex:1;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-family:var(--sans);font-size:14px;color:var(--ink);outline:none;
+    transition:border-color .25s;}
+  .chat-form input::placeholder{color:var(--ink-3);}
+  .chat-form input:focus{border-color:rgba(255,130,55,.45);}
+  .chat-form button{
+    background:var(--ember);color:#160903;border:none;border-radius:12px;padding:0 18px;
+    font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;
+    transition:background .25s,transform .3s var(--ease);}
+  .chat-form button:hover{background:var(--ember-2);}
+  .chat-form button:disabled{opacity:.5;cursor:default;}
+
+  /* mode toggle — Talk | Chat */
+  .mode{display:flex;gap:3px;margin-left:auto;background:rgba(255,255,255,.05);
+    border:1px solid var(--line);border-radius:10px;padding:3px;flex-shrink:0;}
+  .mode button{border:none;background:transparent;color:var(--ink-3);font-family:var(--sans);
+    font-size:12px;font-weight:550;padding:5px 12px;border-radius:7px;cursor:pointer;
+    transition:color .25s,background .25s;}
+  .mode button.on{background:rgba(255,106,26,.16);color:var(--ink);}
+  .chat-close{margin-left:6px;flex-shrink:0;}
+
+  /* talk view — voice-first default */
+  .talk-view{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+  .chat[data-mode="talk"] .talk-view{display:flex;}
+  .chat[data-mode="talk"] .chat-thread,
+  .chat[data-mode="talk"] .chat-form{display:none;}
+
+  /* dictation mic in the text input row */
+  .mic-btn{width:44px;flex-shrink:0;background:rgba(255,255,255,.05);border:1px solid var(--line);
+    border-radius:12px;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;
+    transition:color .25s,border-color .25s,background .25s;}
+  .mic-btn:hover{color:var(--ink);border-color:rgba(255,130,55,.4);}
+  .mic-btn.rec{color:#160903;background:var(--ember);border-color:var(--ember);animation:pulse 1.2s infinite;}
+  .mic-btn.hide{display:none;}
+
+  @media(max-width:760px){
+    .nav-links a:not(.avail){display:none;}
+    h1{font-size:clamp(36px,10.5vw,52px);}
+    .copy{padding-top:16vh;}
+    .cta{bottom:5vh;max-width:92vw;}
+    .cta-text span{font-size:13px;}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .cta,.chat,.chat-backdrop,.cta-text span{transition:none;}
+    .chat-head .dot{animation:none;}
+  }
+</style>
+</head>
+<body>
+  <section class="hero">
+    <canvas id="smoke"></canvas>
+
+    <nav>
+      <a class="brand" href="#"><span class="logo" role="img" aria-label="BK monogram"></span><span class="name">Bhanu Kowshik</span></a>
+      <div class="nav-links">
+        <a href="#">Work</a><a href="#">About</a><a href="#">Testimonials</a><a href="#">Résumé</a>
+        <a href="#" class="avail">Open to work</a>
+      </div>
+    </nav>
+
+    <div class="copy">
+      <h1>Designing products that scale, convert <span class="serif">&amp;&nbsp;connect.</span></h1>
+      <p class="meta"><b>Product Designer</b> · AI-native · San Francisco</p>
+    </div>
+
+    <button class="cta" id="cta" aria-label="Chat with Bhanu AI" aria-haspopup="dialog">
+      <span class="cta-orb" id="ctaOrb"><div id="ctaOrbMount"></div></span>
+      <span class="cta-text" id="ctaText">
+        <span class="on">Ask me about my work</span>
+        <span>Tell me about a project you're proud of</span>
+        <span>Why should we hire you?</span>
+      </span>
+    </button>
+  </section>
+
+  <div class="chat-backdrop" id="chatBackdrop"></div>
+  <aside class="chat" id="chat" data-mode="talk" role="dialog" aria-label="Chat with Bhanu AI" aria-modal="true">
+    <header class="chat-head">
+      <span class="dot"></span>
+      <div><div class="t">Bhanu AI</div><div class="s">voice or text — ask anything</div></div>
+      <div class="mode" role="tablist" aria-label="Conversation mode">
+        <button type="button" id="modeTalk" class="on" role="tab" aria-selected="true">Talk</button>
+        <button type="button" id="modeText" role="tab" aria-selected="false">Chat</button>
+      </div>
+      <button class="chat-close" id="chatClose" aria-label="Close chat">✕</button>
+    </header>
+    <div class="talk-view" id="talkView"><div id="talkOrbMount"></div></div>
+    <div class="chat-thread" id="thread">
+      <div class="m ai">Hey — I'm Bhanu's AI. Ask about his work, a project he's proud of, or why you should hire him.</div>
+    </div>
+    <form class="chat-form" id="chatForm">
+      <input id="chatInput" type="text" placeholder="Ask anything…" autocomplete="off" />
+      <button type="button" class="mic-btn" id="micBtn" aria-label="Dictate your question">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="6" y="1.5" width="4" height="8" rx="2" fill="currentColor"/><path d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </button>
+      <button type="submit" id="chatSend">Send</button>
+    </form>
+  </aside>
+
+<script>
+/* ═══ SMOKE SHADER — giant circle clipped at the bottom, ember smoke ═══ */
+(function () {
+  var canvas = document.getElementById('smoke');
+  var gl = canvas.getContext('webgl', { alpha: false, antialias: false, preserveDrawingBuffer: true });
+  if (!gl) { canvas.style.background = 'radial-gradient(120% 55% at 50% 115%, #52200A 0%, #200B04 45%, #0A0605 75%)'; return; }
+
+  var VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+  var FRAG = [
+    'precision highp float;',
+    'uniform vec2 uRes;uniform float uTime;',
+    'float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}',
+    'float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);',
+    ' float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));',
+    ' return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}',
+    'float fbm(vec2 p){float v=0.,a=.5;mat2 r=mat2(1.6,1.2,-1.2,1.6);',
+    ' for(int i=0;i<5;i++){v+=a*noise(p);p=r*p;a*=.5;}return v;}',
+    'void main(){',
+    ' float aspect=uRes.x/uRes.y;',
+    ' vec2 p=vec2(gl_FragCoord.x/uRes.y, gl_FragCoord.y/uRes.y);', // vh units, y up
+    ' float t=uTime;',
+    /* giant circle: wide as the viewport, only its top cap visible */
+    ' float R=aspect*0.62;',
+    ' float CAP=0.30;',                                  // how much of the arc pokes above the bottom (vh)
+    ' vec2 C=vec2(aspect*0.5, CAP-R);',
+    ' float d=length(p-C)-R;',                           // <0 inside
+    /* smoke displacement of the edge */
+    ' vec2 q=p*2.1+vec2(0.,-t*0.055);',
+    ' float w=fbm(q+1.5*fbm(q+t*0.03));',
+    ' float edge=d-(w-0.5)*0.20;',
+    /* fields */
+    ' float body=smoothstep(0.02,-0.30,edge);',
+    ' float rim=exp(-abs(edge)*11.0);',
+    ' float aura=exp(-max(edge,0.0)*2.3);',
+    ' float wisp=smoothstep(0.42,0.95,fbm(p*vec2(1.5,2.3)+vec2(0.,-t*0.09)))*exp(-max(edge,0.0)*3.2);',
+    /* palette */
+    ' vec3 bg=vec3(0.039,0.023,0.019);',
+    ' vec3 deep=vec3(0.10,0.032,0.016);',
+    ' vec3 rust=vec3(0.47,0.145,0.045);',
+    ' vec3 ember=vec3(1.0,0.44,0.13);',
+    ' vec3 col=bg;',
+    ' col=mix(col,deep,body);',
+    ' col+=rust*body*(0.30+0.70*w);',
+    ' col+=ember*rim*(0.38+0.42*w);',
+    ' col+=ember*aura*(0.16+0.22*fbm(p*2.6+t*0.045));',
+    ' col+=ember*wisp*0.16;',
+    /* darken far top so it melts into the page */
+    ' col=mix(col,bg,smoothstep(0.55,1.05,p.y));',
+    ' col+=(hash(gl_FragCoord.xy+fract(t))-0.5)*0.012;', // dither
+    ' gl_FragColor=vec4(col,1.0);}'
+  ].join('\n');
+
+  function sh(type, src) {
+    var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(s)); return null; }
+    return s;
+  }
+  var prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(prog); gl.useProgram(prog);
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  var loc = gl.getAttribLocation(prog, 'p');
+  gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  var uRes = gl.getUniformLocation(prog, 'uRes');
+  var uTime = gl.getUniformLocation(prog, 'uTime');
+
+  var SCALE = 0.55; // render at reduced res — smoke upscales invisibly
+  function size() {
+    var w = Math.round(canvas.clientWidth * SCALE), h = Math.round(canvas.clientHeight * SCALE);
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); }
+  }
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var t0 = performance.now();
+  var lastTick = 0;
+  function frame(now) {
+    lastTick = now;
+    size();
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+    gl.uniform1f(uTime, reduced ? 7.0 : (now - t0) / 1000);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if (!reduced) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  addEventListener('resize', size);
+  // Watchdog: if rAF stalls (tab throttling, backgrounded start), re-kick the loop.
+  if (!reduced) setInterval(function () {
+    if (performance.now() - lastTick > 600) requestAnimationFrame(frame);
+  }, 500);
+})();
+
+/* ═══ CTA — cycling prompts ═══ */
+var PROMPTS = document.querySelectorAll('#ctaText span');
+var activePrompt = 0;
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  setInterval(function () {
+    PROMPTS[activePrompt].classList.remove('on');
+    activePrompt = (activePrompt + 1) % PROMPTS.length;
+    PROMPTS[activePrompt].classList.add('on');
+  }, 3400);
+}
+
+/* ═══ CHAT PANEL ═══ */
+var chat = document.getElementById('chat');
+var backdrop = document.getElementById('chatBackdrop');
+var input = document.getElementById('chatInput');
+var thread = document.getElementById('thread');
+var sendBtn = document.getElementById('chatSend');
+
+var modeTalk = document.getElementById('modeTalk');
+var modeText = document.getElementById('modeText');
+var talkRoot = null;
+
+/* Talk view hosts the INTERACTIVE orb (ElevenLabs voice). Mounted lazily on
+   open, unmounted on close/mode-switch so any live session is torn down. */
+function mountTalkOrb() {
+  if (talkRoot) return;
+  if (!(window.BhanuOrb && window.BhanuOrb.mount)) { setTimeout(mountTalkOrb, 80); return; }
+  if (chat.dataset.mode !== 'talk' || !chat.classList.contains('open')) return;
+  talkRoot = window.BhanuOrb.mount(document.getElementById('talkOrbMount'), { palette: 'ember', size: 200 });
+}
+function unmountTalkOrb() {
+  if (!talkRoot) return;
+  try { talkRoot.unmount(); } catch (e) {}
+  talkRoot = null;
+  document.getElementById('talkOrbMount').innerHTML = '';
+}
+function setMode(mode) {
+  chat.dataset.mode = mode;
+  modeTalk.classList.toggle('on', mode === 'talk');
+  modeTalk.setAttribute('aria-selected', mode === 'talk');
+  modeText.classList.toggle('on', mode === 'text');
+  modeText.setAttribute('aria-selected', mode === 'text');
+  if (mode === 'talk') { mountTalkOrb(); }
+  else { unmountTalkOrb(); setTimeout(function () { input.focus(); input.select(); }, 60); }
+}
+modeTalk.addEventListener('click', function () { setMode('talk'); });
+modeText.addEventListener('click', function () { setMode('text'); });
+
+function openChat() {
+  chat.classList.add('open'); backdrop.classList.add('open');
+  input.value = PROMPTS[activePrompt].textContent;   // seed the text box with the prompt they clicked
+  setMode('talk');                                   // voice-first by default
+}
+function closeChat() {
+  chat.classList.remove('open'); backdrop.classList.remove('open');
+  unmountTalkOrb();                                  // ends any live voice session
+}
+document.getElementById('cta').addEventListener('click', openChat);
+document.getElementById('chatClose').addEventListener('click', closeChat);
+backdrop.addEventListener('click', closeChat);
+addEventListener('keydown', function (e) { if (e.key === 'Escape') closeChat(); });
+
+/* ═══ SPEECH-TO-TEXT on the input (Web Speech API) ═══ */
+var micBtn = document.getElementById('micBtn');
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SR) { micBtn.classList.add('hide'); }
+var rec = null, recOn = false, dictBase = '';
+micBtn.addEventListener('click', function () {
+  if (!SR) return;
+  if (recOn) { try { rec.stop(); } catch (e) {} return; }
+  rec = new SR();
+  rec.lang = 'en-US'; rec.interimResults = true; rec.continuous = false;
+  dictBase = input.value ? input.value.replace(/\s+$/, '') + ' ' : '';
+  rec.onresult = function (ev) {
+    var t = '';
+    for (var i = 0; i < ev.results.length; i++) t += ev.results[i][0].transcript;
+    input.value = dictBase + t;
+  };
+  rec.onstart = function () { recOn = true; micBtn.classList.add('rec'); };
+  rec.onend = function () { recOn = false; micBtn.classList.remove('rec'); input.focus(); };
+  rec.onerror = function () { recOn = false; micBtn.classList.remove('rec'); };
+  try { rec.start(); } catch (e) {}
+});
+
+/* wire to the same proxy contract as index.html (proxy.py :3001 locally) */
+var API_BASE = location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+var SYSTEM = "You are Bhanu AI — the portfolio assistant for Bhanu Kowshik, a product designer in San Francisco (EverTutor Live, EverTutor Studio, Stressie, Dearly; 0→1, B2B & B2C, voice-AI native). Answer recruiters and visitors concisely and warmly, in first person as Bhanu's AI.";
+var messages = [];
+
+function bubble(cls, text) {
+  var el = document.createElement('div');
+  el.className = 'm ' + cls; el.textContent = text;
+  thread.appendChild(el); thread.scrollTop = thread.scrollHeight;
+  return el;
+}
+
+document.getElementById('chatForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  var text = input.value.trim();
+  if (!text || sendBtn.disabled) return;
+  input.value = ''; sendBtn.disabled = true;
+  bubble('me', text);
+  messages.push({ role: 'user', content: text });
+
+  var tp = document.createElement('div');
+  tp.className = 'm ai typing'; tp.innerHTML = '<i></i><i></i><i></i>';
+  thread.appendChild(tp); thread.scrollTop = thread.scrollHeight;
+
+  try {
+    var res = await fetch(API_BASE + '/api/chat', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1024, system: SYSTEM, messages: messages, stream: true }),
+    });
+    if (!res.ok) throw new Error('API ' + res.status);
+    var el = null, full = '';
+    var reader = res.body.getReader(), dec = new TextDecoder(), buf = '';
+    while (true) {
+      var c = await reader.read();
+      if (c.done) break;
+      buf += dec.decode(c.value, { stream: true });
+      var lines = buf.split('\n'); buf = lines.pop();
+      for (var i = 0; i < lines.length; i++) {
+        var L = lines[i];
+        if (L.indexOf('data: ') !== 0) continue;
+        try {
+          var j = JSON.parse(L.slice(6));
+          if (j.type === 'content_block_delta' && j.delta && j.delta.text) {
+            if (!el) { tp.remove(); el = bubble('ai', ''); }
+            full += j.delta.text; el.textContent = full; thread.scrollTop = thread.scrollHeight;
+          }
+        } catch (_) {}
+      }
+    }
+    if (!el) throw new Error('empty stream');
+    messages.push({ role: 'assistant', content: full });
+  } catch (err) {
+    tp.remove();
+    bubble('ai', "I'm offline right now (the chat backend isn't running). Start proxy.py on :3001 and try again — or email kowshikbhanu1000@gmail.com.");
+    messages.pop();
+  } finally {
+    sendBtn.disabled = false; input.focus();
+  }
+});
+
+/* ═══ ORB — mount the fluid orb visual into the CTA pill ═══ */
+(function waitOrb() {
+  if (window.BhanuOrb && window.BhanuOrb.mountVisual) {
+    window.BhanuOrb.mountVisual(document.getElementById('ctaOrbMount'), { palette: 'ember', size: 46, state: 'idle' });
+    document.getElementById('ctaOrb').classList.add('mounted');
+  } else setTimeout(waitOrb, 60);
+})();
+</script>
+<script type="module" src="orb/bhanu-orb.js"></script>
+</body>
+</html>
