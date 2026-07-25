@@ -7,30 +7,33 @@
 <link rel="icon" type="image/png" href="images/logo-bk-favicon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
   :root{
-    --bg:#0A0605;            /* warm near-black */
-    --ink:#F3ECE2;           /* warm off-white   */
-    --ink-2:#CBBFB1;
-    --ink-3:#8A7D6F;
-    --line:rgba(243,236,226,0.12);
-    --ember:#FF6A1A;
-    --ember-2:#FF8B45;
+    /* dark-UI practice: desaturated deep navy, never pure black */
+    --bg:#0A0E15;
+    --ink:#EFF3F8;
+    --ink-2:#B9C4D1;
+    --ink-3:#7C8794;
+    --line:rgba(239,243,248,0.12);
+    --ember:#5CA9FF;      /* azure accent (var name kept to avoid churn) */
+    --ember-2:#8CC5FF;
     --serif:'Instrument Serif',Georgia,serif;
-    --sans:'Inter',system-ui,sans-serif;
+    --sans:'Instrument Sans',system-ui,sans-serif;
     --ease:cubic-bezier(0.16,1,0.3,1);
   }
   html,body{height:100%;}
   body{
     background:var(--bg);color:var(--ink);font-family:var(--sans);
-    overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-    font-optical-sizing:auto;
+    overflow-x:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   }
-  ::selection{background:var(--ember);color:#160903;}
+  /* placeholder for the next section — gives the nav its scroll-compress */
+  .next-ph{height:85vh;display:grid;place-items:center;background:var(--bg);}
+  .next-ph span{font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(239,243,248,.16);}
+  ::selection{background:var(--ember);color:#071019;}
 
-  /* film grain over everything, incl. the shader */
+  /* film grain */
   body::after{
     content:'';position:fixed;inset:0;z-index:5;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -38,155 +41,262 @@
 
   .hero{position:relative;height:100svh;overflow:clip;}
 
-  /* ── SMOKE SHADER — giant clipped circle, bottom ── */
+  /* ── SMOKE — pure rising smoke, no visible shape ── */
   #smoke{position:absolute;inset:0;z-index:0;width:100%;height:100%;display:block;pointer-events:none;}
 
-  /* ── NAV ── */
-  nav{position:absolute;top:0;left:0;right:0;z-index:30;
+  /* ── RINGS — concentric hairlines from the bottom center (artisan-style, subtle) ── */
+  .rings{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
+  .ring,.orbit{position:absolute;left:50%;bottom:0;transform:translate(-50%,50%);border-radius:50%;}
+  .ring{border:1px solid rgba(239,243,248,.05);}
+  .r1{width:58vmax;height:58vmax;}
+  .r2{width:84vmax;height:84vmax;}
+  .r3{width:112vmax;height:112vmax;border-color:rgba(239,243,248,.04);}
+  .r4{width:144vmax;height:144vmax;border-color:rgba(239,243,248,.03);}
+  .o1{width:84vmax;height:84vmax;animation:orbit 90s linear infinite;}
+  .o2{width:112vmax;height:112vmax;animation:orbit 140s linear infinite reverse;}
+  .orbit b{position:absolute;top:-2.5px;left:50%;transform:translateX(-50%);width:5px;height:5px;
+    border-radius:50%;background:rgba(140,197,255,.5);box-shadow:0 0 8px rgba(92,169,255,.35);}
+  @keyframes orbit{from{transform:translate(-50%,50%) rotate(0)}to{transform:translate(-50%,50%) rotate(360deg)}}
+
+  /* ── NAV — ported from index.html: compresses to an ~80% pill on scroll,
+         name swaps to "You can call me Bhanu :)" ── */
+  .top-nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
     display:flex;align-items:center;justify-content:space-between;
-    padding:28px clamp(24px,4.5vw,56px);}
-  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
-  .logo{width:30px;height:30px;background:var(--ember);
-    -webkit-mask:url("images/logo-bk-mask.png") center/contain no-repeat;
-    mask:url("images/logo-bk-mask.png") center/contain no-repeat;
-    filter:drop-shadow(0 0 10px rgba(255,106,26,0.35));}
-  .brand .name{font-family:var(--serif);font-size:21px;letter-spacing:.01em;}
-  .nav-links{display:flex;align-items:center;gap:32px;}
-  .nav-links a{font-size:13px;font-weight:450;letter-spacing:.02em;color:var(--ink-2);
+    padding:10px clamp(24px,4.5vw,56px);height:62px;
+    background:transparent;             /* frameless at rest — just text on the page */
+    border:1px solid transparent;
+    transition:top .45s cubic-bezier(.22,.61,.36,1),left .45s cubic-bezier(.22,.61,.36,1),
+      right .45s cubic-bezier(.22,.61,.36,1),background .45s ease,border-radius .45s ease,
+      padding .45s ease,height .45s ease,border-color .45s ease,box-shadow .45s ease;
+  }
+  .top-nav.scrolled{
+    top:12px;left:calc(10% + 12px);right:calc(10% + 12px);
+    height:74px;padding:10px 28px;border-radius:20px;
+    background:rgba(13,18,27,0.82);
+    backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+    border-color:var(--line);
+    box-shadow:0 12px 40px -18px rgba(0,0,0,.65);
+  }
+  .nav-brand{position:relative;display:flex;align-items:center;gap:12px;min-height:40px;text-decoration:none;color:var(--ink);}
+  .nav-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid var(--line);flex-shrink:0;}
+  .nav-nametext{position:relative;display:flex;align-items:center;min-width:150px;}
+  .nav-name{font-family:var(--serif);font-size:21px;letter-spacing:.01em;white-space:nowrap;
+    transition:opacity .3s ease,transform .3s ease;}
+  .top-nav.scrolled .nav-name{opacity:0;transform:translateY(6px);pointer-events:none;}
+  .nav-callme{position:absolute;left:0;top:50%;transform:translateY(calc(-50% + 6px));
+    display:flex;flex-direction:column;opacity:0;pointer-events:none;white-space:nowrap;
+    transition:opacity .3s ease,transform .3s ease;}
+  .top-nav.scrolled .nav-callme{opacity:1;pointer-events:auto;transform:translateY(-50%);}
+  .nav-callme-label{font-size:10px;font-weight:550;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);line-height:1.5;}
+  .nav-callme-name{font-family:var(--serif);font-size:18px;color:var(--ink);line-height:1.15;}
+  .nav-links{display:flex;align-items:center;gap:30px;}
+  .nav-links a{font-size:13.5px;font-weight:500;letter-spacing:.02em;color:var(--ink-2);
     text-decoration:none;transition:color .25s var(--ease);}
   .nav-links a:hover{color:var(--ink);}
-  .nav-links a.avail{display:inline-flex;align-items:center;gap:8px;color:var(--ink);}
-  .nav-links a.avail::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ember);
-    box-shadow:0 0 10px 1px rgba(255,106,26,.6);}
+  .nav-contact{padding:9px 18px;border:1px solid rgba(239,243,248,.25);border-radius:999px;
+    color:var(--ink) !important;font-weight:550;
+    transition:border-color .25s var(--ease),background .25s var(--ease);}
+  .nav-contact:hover{border-color:rgba(239,243,248,.5);background:rgba(255,255,255,.04);}
 
   /* ── COPY — top middle, centered ── */
   .copy{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;
-    text-align:center;padding:clamp(110px,17vh,190px) 24px 0;}
+    text-align:center;padding:clamp(96px,14vh,168px) 24px 0;}
+  /* plain label row — deliberately chrome-less so it can't read as a button */
+  .eyebrow{display:inline-flex;align-items:center;gap:14px;
+    font-size:13px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);}
+  .eyebrow i{width:1px;height:11px;background:var(--line);}
   h1{
-    font-family:var(--sans);font-weight:590;
-    font-size:clamp(42px,6.5vw,94px);line-height:1.04;letter-spacing:-0.033em;
+    margin-top:28px;
+    font-family:var(--sans);font-weight:570;
+    font-size:clamp(42px,6.2vw,88px);line-height:1.05;letter-spacing:-0.031em;
     max-width:17ch;text-wrap:balance;
   }
   h1 .serif{font-family:var(--serif);font-style:italic;font-weight:400;
-    font-size:1.06em;letter-spacing:-0.005em;}
-  .meta{margin-top:30px;font-size:13.5px;font-weight:450;letter-spacing:.05em;color:var(--ink-3);}
-  .meta b{color:var(--ink-2);font-weight:500;}
+    font-size:1.07em;letter-spacing:-0.004em;}
+  .sub{margin-top:30px;max-width:48ch;
+    font-size:clamp(16px,1.25vw,19px);line-height:1.66;font-weight:400;color:var(--ink-2);
+    text-wrap:pretty;}
+  /* stats band — value leads, quiet label below, hairline dividers between */
+  .facts{margin-top:52px;display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;}
+  .fact{display:flex;flex-direction:column;gap:6px;text-align:left;padding:4px clamp(22px,3vw,40px);}
+  .fact:first-child{padding-left:0;}
+  .fact:last-child{padding-right:0;}
+  .fact+.fact{border-left:1px solid var(--line);}
+  .fact .v{font-size:clamp(17px,1.45vw,21px);font-weight:600;letter-spacing:-0.012em;color:var(--ink);}
+  .fact .k{font-size:13.5px;font-weight:420;color:var(--ink-3);}
 
-  /* ── CTA PILL — orb + cycling prompts, bottom center ── */
+  /* ── PHOTO CAROUSEL — proof strip drifting right → left ── */
+  .strip{position:relative;align-self:center;width:100vw;margin-top:clamp(38px,5.5vh,64px);overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+    mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);}
+  .strip-track{display:flex;gap:18px;width:max-content;animation:strip 44s linear infinite;}
+  .strip:hover .strip-track{animation-play-state:paused;}
+  @keyframes strip{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .pcard{position:relative;width:224px;aspect-ratio:3/2;border-radius:14px;overflow:hidden;flex-shrink:0;
+    border:1px solid rgba(239,243,248,.10);}
+  .pcard img{width:100%;height:100%;object-fit:cover;filter:saturate(.82) contrast(1.03);}
+  .pcard figcaption{position:absolute;left:0;right:0;bottom:0;padding:24px 12px 9px;
+    font-size:11px;font-weight:500;letter-spacing:.01em;color:var(--ink);
+    background:linear-gradient(transparent,rgba(4,8,14,.8));}
+
+  /* ── CTA — glass rounded rectangle, orb inside, hugs its text ── */
+  .cta-dock{position:absolute;bottom:6vh;left:50%;transform:translateX(-50%);z-index:20;}
   .cta{
-    position:absolute;bottom:6.5vh;left:50%;transform:translateX(-50%);z-index:20;
     display:flex;align-items:center;gap:13px;
-    padding:9px 26px 9px 10px;border-radius:999px;cursor:pointer;
-    background:rgba(16,9,5,0.42);
-    border:1px solid rgba(255,130,55,0.22);
-    backdrop-filter:blur(16px) saturate(1.25);-webkit-backdrop-filter:blur(16px) saturate(1.25);
-    box-shadow:0 18px 50px -12px rgba(0,0,0,.7), 0 0 44px -8px rgba(255,106,26,.28),
-      inset 0 1px 0 rgba(255,255,255,.05);
-    transition:transform .45s var(--ease),border-color .3s var(--ease),box-shadow .45s var(--ease);
-    font-family:var(--sans);color:var(--ink);
+    width:auto;max-width:92vw;
+    padding:10px 20px 10px 10px;border-radius:18px;cursor:pointer;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.16);
+    backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);
+    color:var(--ink);
+    font-family:var(--sans);
+    transition:background .3s var(--ease),border-color .3s var(--ease);
   }
-  .cta:hover{transform:translate(-50%,-3px);border-color:rgba(255,140,66,.42);
-    box-shadow:0 24px 60px -12px rgba(0,0,0,.75), 0 0 60px -8px rgba(255,106,26,.4),
-      inset 0 1px 0 rgba(255,255,255,.07);}
+  .cta:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.26);}
   .cta:focus-visible{outline:2px solid var(--ember);outline-offset:3px;}
-  .cta-orb{position:relative;width:46px;height:46px;flex-shrink:0;line-height:0;}
-  .cta-orb::before{ /* fallback until the WebGL orb mounts */
-    content:'';position:absolute;inset:3px;border-radius:50%;
-    background:radial-gradient(circle at 36% 30%, #FFC38F, var(--ember) 46%, #7A2604 80%, #2A0D02);
+  .cta-orb{position:relative;width:44px;height:44px;flex-shrink:0;line-height:0;}
+  .cta-orb::before{content:'';position:absolute;inset:3px;border-radius:50%;
+    background:radial-gradient(circle at 36% 30%, #D9F0FF, var(--ember) 46%, #17456F 80%, #081B2E);
     opacity:1;transition:opacity .4s;}
   .cta-orb.mounted::before{opacity:0;}
   .cta-orb>div{position:absolute;inset:0;}
-  .cta-text{display:grid;text-align:left;}
+  .cta-text{display:grid;overflow:hidden;flex:none;text-align:left;
+    transition:width .55s var(--ease);}   /* width animates to hug each prompt */
   .cta-text span{
-    grid-area:1/1;white-space:nowrap;font-size:14.5px;font-weight:480;letter-spacing:.005em;
-    opacity:0;transform:translateY(7px);transition:opacity .5s var(--ease),transform .5s var(--ease);
+    grid-area:1/1;justify-self:start;width:max-content;
+    white-space:nowrap;font-size:14.5px;font-weight:520;letter-spacing:.002em;color:var(--ink);
+    opacity:0;transform:translateY(11px);filter:blur(3px);
+    transition:opacity .6s var(--ease),transform .6s var(--ease),filter .6s var(--ease);
   }
-  .cta-text span.on{opacity:1;transform:translateY(0);}
+  .cta-text span.on{opacity:1;transform:translateY(0);filter:none;}
+  .cta-text span.out{opacity:0;transform:translateY(-11px);filter:blur(3px);}
 
-  /* ── CHAT PANEL — slides from the right ── */
+  /* ── CUSTOM CURSOR (ported from index.html — dot / text caret / CTA magnet) ── */
+  html.cc-active, html.cc-active *{cursor:none !important;}
+  #ccDot{
+    position:fixed;top:0;left:0;pointer-events:none;z-index:13000;
+    width:12px;height:12px;border-radius:999px;background:rgba(239,243,248,.9);
+    opacity:0;will-change:transform;
+    transition:width .32s cubic-bezier(.34,1.56,.64,1),height .32s cubic-bezier(.34,1.56,.64,1),
+      border-radius .3s cubic-bezier(.34,1.56,.64,1),background .26s ease,opacity .18s ease;
+  }
+
+  /* ── CHAT PANEL ── */
   .chat-backdrop{position:fixed;inset:0;z-index:70;background:rgba(4,2,1,.55);
     opacity:0;pointer-events:none;transition:opacity .45s var(--ease);}
   .chat-backdrop.open{opacity:1;pointer-events:auto;}
   .chat{
     position:fixed;top:14px;right:14px;bottom:14px;z-index:80;
     width:min(400px,calc(100vw - 28px));
-    display:flex;flex-direction:column;
-    background:rgba(15,9,6,0.93);
-    border:1px solid var(--line);border-radius:22px;
-    backdrop-filter:blur(26px) saturate(1.2);-webkit-backdrop-filter:blur(26px) saturate(1.2);
-    box-shadow:-30px 0 80px -30px rgba(0,0,0,.8);
+    display:flex;flex-direction:column;overflow:hidden;
+    background:#F7F9FC;color:#101720;
+    border:1px solid rgba(0,0,0,.08);border-radius:22px;
     transform:translateX(calc(100% + 34px));
     transition:transform .6s var(--ease);
   }
   .chat.open{transform:translateX(0);}
-  .chat-head{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line);}
-  .chat-head .dot{width:8px;height:8px;border-radius:50%;background:var(--ember);
-    box-shadow:0 0 12px 1px rgba(255,106,26,.6);animation:pulse 3s var(--ease) infinite;}
+  .chat-head{display:flex;align-items:center;padding:16px 18px;border-bottom:1px solid rgba(0,0,0,.07);}
   @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
-  .chat-head .t{font-family:var(--serif);font-size:20px;letter-spacing:.01em;}
-  .chat-head .s{font-size:11.5px;color:var(--ink-3);margin-top:2px;}
-  .chat-close{margin-left:auto;width:32px;height:32px;border-radius:10px;border:1px solid transparent;
-    background:transparent;color:var(--ink-3);font-size:17px;cursor:pointer;line-height:1;
-    transition:color .25s,border-color .25s;}
-  .chat-close:hover{color:var(--ink);border-color:var(--line);}
-  .chat-thread{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:11px;
-    scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.14) transparent;}
-  .m{max-width:86%;padding:11px 14px;border-radius:15px;font-size:14px;line-height:1.55;font-weight:430;}
-  .m.ai{align-self:flex-start;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);
-    color:#E9DFD2;border-bottom-left-radius:6px;}
-  .m.me{align-self:flex-end;background:rgba(255,106,26,.13);border:1px solid rgba(255,106,26,.26);
-    color:var(--ink);border-bottom-right-radius:6px;}
+  .chat-head .t{font-family:var(--serif);font-size:21px;letter-spacing:.01em;color:#101720;}
+  .chat-close{margin-left:auto;flex-shrink:0;
+    padding:8px 16px;border-radius:999px;border:1px solid rgba(0,0,0,.16);
+    background:transparent;color:#2C3947;font-family:var(--sans);font-size:12.5px;font-weight:600;
+    cursor:pointer;transition:background .25s,border-color .25s;}
+  .chat-close:hover{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.28);}
+  /* voice stage */
+  .talk-view{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:20px 20px 74px;}
+  .state-tag{display:inline-flex;align-items:center;gap:8px;padding:7px 15px;border-radius:999px;
+    background:rgba(92,169,255,.09);border:1px solid rgba(92,169,255,.3);
+    color:#1D5FB4;font-size:12.5px;font-weight:600;letter-spacing:.02em;}
+  .state-tag i{width:6px;height:6px;border-radius:50%;background:var(--ember);animation:pulse 1.6s var(--ease) infinite;}
+  .state-tag[hidden]{display:none;}
+  .talk-actions{display:flex;gap:10px;}
+  .talk-start{background:var(--ember);color:#071019;border:none;border-radius:999px;
+    padding:13px 26px;font-family:var(--sans);font-size:14.5px;font-weight:600;cursor:pointer;
+    transition:background .25s;}
+  .talk-start:hover{background:var(--ember-2);}
+  .talk-start:disabled{opacity:.6;cursor:default;}
+  .talk-end{background:transparent;color:#C2410C;border:1px solid rgba(194,65,12,.4);border-radius:999px;
+    padding:12px 24px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;
+    transition:background .25s,border-color .25s;}
+  .talk-end:hover{background:rgba(92,169,255,.07);border-color:rgba(194,65,12,.65);}
+  [hidden]{display:none !important;}
+  /* chat summon pill — drag or tap to slide the chat up */
+  .chat-pill{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:4;
+    display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:999px;
+    background:#FFFFFF;border:1px solid rgba(0,0,0,.12);color:#2C3947;
+    font-family:var(--sans);font-size:13px;font-weight:600;cursor:grab;touch-action:none;
+    transition:opacity .3s var(--ease),transform .3s var(--ease),border-color .25s;}
+  .chat-pill:hover{border-color:rgba(0,0,0,.26);}
+  .chat-pill svg{width:11px;height:11px;}
+  .chat-pill.hidden{opacity:0;pointer-events:none;transform:translate(-50%,10px);}
+  /* bottom sheet with thread + input */
+  .sheet{position:absolute;left:0;right:0;bottom:0;height:76%;z-index:5;
+    display:flex;flex-direction:column;
+    background:#FFFFFF;border-top:1px solid rgba(0,0,0,.08);border-radius:18px 18px 0 0;
+    transform:translateY(105%);transition:transform .55s var(--ease);}
+  .sheet.open{transform:translateY(0);}
+  .sheet-grip{padding:9px 0 3px;cursor:grab;touch-action:none;flex-shrink:0;}
+  .sheet-grip i{display:block;width:44px;height:5px;border-radius:99px;background:rgba(0,0,0,.16);margin:0 auto;}
+  .chat-thread{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:11px;
+    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.18) transparent;}
+  .m{max-width:86%;padding:11px 14px;border-radius:15px;font-size:14px;line-height:1.55;font-weight:450;}
+  .m.ai{align-self:flex-start;background:rgba(0,0,0,.045);border:1px solid rgba(0,0,0,.05);
+    color:#1E2732;border-bottom-left-radius:6px;}
+  .m.me{align-self:flex-end;background:rgba(92,169,255,.12);border:1px solid rgba(92,169,255,.25);
+    color:#101720;border-bottom-right-radius:6px;}
   .m.typing{display:flex;gap:5px;padding:14px 16px;}
-  .m.typing i{width:5px;height:5px;border-radius:50%;background:var(--ink-3);animation:tp 1.2s infinite;}
+  .m.typing i{width:5px;height:5px;border-radius:50%;background:#7C8794;animation:tp 1.2s infinite;}
   .m.typing i:nth-child(2){animation-delay:.15s}.m.typing i:nth-child(3){animation-delay:.3s}
   @keyframes tp{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
-  .chat-form{display:flex;gap:10px;padding:14px;border-top:1px solid var(--line);}
+  .chat-form{display:flex;gap:10px;padding:14px;border-top:1px solid rgba(0,0,0,.07);}
   .chat-form input{
-    flex:1;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;
-    padding:12px 14px;font-family:var(--sans);font-size:14px;color:var(--ink);outline:none;
+    flex:1;background:#ECF1F7;border:1px solid rgba(0,0,0,.1);border-radius:12px;
+    padding:12px 14px;font-family:var(--sans);font-size:14px;color:#101720;outline:none;
     transition:border-color .25s;}
-  .chat-form input::placeholder{color:var(--ink-3);}
-  .chat-form input:focus{border-color:rgba(255,130,55,.45);}
-  .chat-form button{
-    background:var(--ember);color:#160903;border:none;border-radius:12px;padding:0 18px;
-    font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;
-    transition:background .25s,transform .3s var(--ease);}
-  .chat-form button:hover{background:var(--ember-2);}
-  .chat-form button:disabled{opacity:.5;cursor:default;}
-
-  /* mode toggle — Talk | Chat */
-  .mode{display:flex;gap:3px;margin-left:auto;background:rgba(255,255,255,.05);
-    border:1px solid var(--line);border-radius:10px;padding:3px;flex-shrink:0;}
-  .mode button{border:none;background:transparent;color:var(--ink-3);font-family:var(--sans);
-    font-size:12px;font-weight:550;padding:5px 12px;border-radius:7px;cursor:pointer;
-    transition:color .25s,background .25s;}
-  .mode button.on{background:rgba(255,106,26,.16);color:var(--ink);}
-  .chat-close{margin-left:6px;flex-shrink:0;}
-
-  /* talk view — voice-first default */
-  .talk-view{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
-  .chat[data-mode="talk"] .talk-view{display:flex;}
-  .chat[data-mode="talk"] .chat-thread,
-  .chat[data-mode="talk"] .chat-form{display:none;}
-
-  /* dictation mic in the text input row */
-  .mic-btn{width:44px;flex-shrink:0;background:rgba(255,255,255,.05);border:1px solid var(--line);
-    border-radius:12px;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;
+  .chat-form input::placeholder{color:#7C8794;}
+  .chat-form input:focus{border-color:rgba(70,140,240,.55);}
+  .mic-btn{width:44px;flex-shrink:0;background:#ECF1F7;border:1px solid rgba(0,0,0,.1);
+    border-radius:12px;color:#5D6B7A;cursor:pointer;display:grid;place-items:center;
     transition:color .25s,border-color .25s,background .25s;}
-  .mic-btn:hover{color:var(--ink);border-color:rgba(255,130,55,.4);}
-  .mic-btn.rec{color:#160903;background:var(--ember);border-color:var(--ember);animation:pulse 1.2s infinite;}
+  .mic-btn:hover{color:#101720;border-color:rgba(70,140,240,.45);}
+  .mic-btn.rec{color:#FFF6EC;background:var(--ember);border-color:var(--ember);animation:pulse 1.2s infinite;}
   .mic-btn.hide{display:none;}
+  .chat-form button[type="submit"]{
+    background:var(--ember);color:#071019;border:none;border-radius:12px;padding:0 18px;
+    font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;
+    transition:background .25s;}
+  .chat-form button[type="submit"]:hover{background:var(--ember-2);}
+  .chat-form button[type="submit"]:disabled{opacity:.5;cursor:default;}
 
   @media(max-width:760px){
-    .nav-links a:not(.avail){display:none;}
-    h1{font-size:clamp(36px,10.5vw,52px);}
-    .copy{padding-top:16vh;}
-    .cta{bottom:5vh;max-width:92vw;}
+    .nav-links a:not(.nav-contact){display:none;}
+    .top-nav{padding:10px 20px;}
+    .top-nav.scrolled{left:calc(5% + 8px);right:calc(5% + 8px);padding:10px 20px;}
+    h1{font-size:clamp(34px,9.8vw,48px);}
+    .copy{padding-top:15vh;}
+    .sub{font-size:14.5px;}
+    .facts{flex-wrap:wrap;gap:18px 28px;}
+    .cta-dock{bottom:4.5vh;}
     .cta-text span{font-size:13px;}
   }
+  @media(max-height:780px) and (min-width:761px){
+    .copy{padding-top:84px;}
+    h1{font-size:clamp(40px,5.6vw,66px);margin-top:20px;}
+    .sub{margin-top:18px;}
+    .facts{margin-top:26px;}
+    .strip{margin-top:26px;}
+    .pcard{width:176px;}
+  }
+  @media(max-width:760px){
+    .pcard{width:158px;}
+    .strip{margin-top:30px;}
+  }
   @media(prefers-reduced-motion:reduce){
-    .cta,.chat,.chat-backdrop,.cta-text span{transition:none;}
-    .chat-head .dot{animation:none;}
+    .o1,.o2,.strip-track{animation:none;}
+    .cta-text span,.chat,.chat-backdrop,.sheet,.chat-pill,.top-nav{transition:none;}
+    .state-tag i,.mic-btn.rec{animation:none;}
   }
 </style>
 </head>
@@ -194,59 +304,110 @@
   <section class="hero">
     <canvas id="smoke"></canvas>
 
-    <nav>
-      <a class="brand" href="#"><span class="logo" role="img" aria-label="BK monogram"></span><span class="name">Bhanu Kowshik</span></a>
+    <div class="rings" aria-hidden="true">
+      <i class="ring r1"></i><i class="ring r2"></i><i class="ring r3"></i><i class="ring r4"></i>
+      <i class="orbit o1"><b></b></i><i class="orbit o2"><b></b></i>
+    </div>
+
+    <nav class="top-nav" id="topNav">
+      <a class="nav-brand" href="#">
+        <img class="nav-avatar" src="images/avatar-bhanu.jpg" alt="Bhanu Kowshik" />
+        <span class="nav-nametext">
+          <span class="nav-name">Bhanu Kowshik</span>
+          <span class="nav-callme" aria-hidden="true">
+            <span class="nav-callme-label">You can call me</span>
+            <span class="nav-callme-name">Bhanu :)</span>
+          </span>
+        </span>
+      </a>
       <div class="nav-links">
         <a href="#">Work</a><a href="#">About</a><a href="#">Testimonials</a><a href="#">Résumé</a>
-        <a href="#" class="avail">Open to work</a>
+        <a href="#" class="nav-contact">Contact</a>
       </div>
     </nav>
 
     <div class="copy">
+      <span class="eyebrow">Product Designer<i></i>Builder<i></i>Explorer</span>
       <h1>Designing products that scale, convert <span class="serif">&amp;&nbsp;connect.</span></h1>
-      <p class="meta"><b>Product Designer</b> · AI-native · San Francisco</p>
+      <p class="sub">From ambiguous problems and undefined flows, through first principles and obsessive detail, to craft that ships.</p>
+      <div class="facts">
+        <div class="fact"><span class="v">5+ Years</span><span class="k">Experience</span></div>
+        <div class="fact"><span class="v">Conversational AI, Agentic Systems, 0→1</span><span class="k">Proven across</span></div>
+        <div class="fact"><span class="v">San Francisco</span><span class="k">Based in</span></div>
+      </div>
+
+      <div class="strip" aria-hidden="true">
+        <div class="strip-track">
+          <figure class="pcard"><img src="photos/pic-pitch-win.jpg" alt=""><figcaption>Winning $50K as sole designer</figcaption></figure>
+          <figure class="pcard"><img src="photos/pic-conference.jpg" alt=""><figcaption>My first product showcase</figcaption></figure>
+          <figure class="pcard"><img src="photos/pic-pitch-self.jpg" alt=""><figcaption>Pitching in front of 250+</figcaption></figure>
+          <figure class="pcard"><img src="photos/pic-future.jpg" alt=""><figcaption>48 hours, 0 sleep, grind</figcaption></figure>
+          <!-- duplicate set for the seamless loop -->
+          <figure class="pcard"><img src="photos/pic-pitch-win.jpg" alt=""><figcaption>Winning $50K as sole designer</figcaption></figure>
+          <figure class="pcard"><img src="photos/pic-conference.jpg" alt=""><figcaption>My first product showcase</figcaption></figure>
+          <figure class="pcard"><img src="photos/pic-pitch-self.jpg" alt=""><figcaption>Pitching in front of 250+</figcaption></figure>
+          <figure class="pcard"><img src="photos/pic-future.jpg" alt=""><figcaption>48 hours, 0 sleep, grind</figcaption></figure>
+        </div>
+      </div>
     </div>
 
-    <button class="cta" id="cta" aria-label="Chat with Bhanu AI" aria-haspopup="dialog">
-      <span class="cta-orb" id="ctaOrb"><div id="ctaOrbMount"></div></span>
-      <span class="cta-text" id="ctaText">
-        <span class="on">Ask me about my work</span>
-        <span>Tell me about a project you're proud of</span>
-        <span>Why should we hire you?</span>
-      </span>
-    </button>
+    <div class="cta-dock">
+      <button class="cta" id="cta" aria-label="Chat with Bhanu AI" aria-haspopup="dialog">
+        <span class="cta-orb" id="ctaOrb"><div id="ctaOrbMount"></div></span>
+        <span class="cta-text" id="ctaText">
+          <span class="on" data-q="Tell me about your work">Ask me about my work</span>
+          <span data-q="What's a project you're proud of?">Ask me about a project I'm proud of</span>
+          <span data-q="Why should we hire you?">Ask me why you should hire me</span>
+          <span data-q="Can we schedule a meeting next week?">Ask me to schedule a meeting</span>
+        </span>
+      </button>
+    </div>
   </section>
 
+  <section class="next-ph" aria-hidden="true"><span>Featured work — next</span></section>
+
   <div class="chat-backdrop" id="chatBackdrop"></div>
-  <aside class="chat" id="chat" data-mode="talk" role="dialog" aria-label="Chat with Bhanu AI" aria-modal="true">
+  <aside class="chat" id="chat" role="dialog" aria-label="My second brain — talk or chat with Bhanu AI" aria-modal="true">
     <header class="chat-head">
-      <span class="dot"></span>
-      <div><div class="t">Bhanu AI</div><div class="s">voice or text — ask anything</div></div>
-      <div class="mode" role="tablist" aria-label="Conversation mode">
-        <button type="button" id="modeTalk" class="on" role="tab" aria-selected="true">Talk</button>
-        <button type="button" id="modeText" role="tab" aria-selected="false">Chat</button>
-      </div>
-      <button class="chat-close" id="chatClose" aria-label="Close chat">✕</button>
+      <div class="t">My second brain</div>
+      <button class="chat-close" id="chatClose">Close</button>
     </header>
-    <div class="talk-view" id="talkView"><div id="talkOrbMount"></div></div>
-    <div class="chat-thread" id="thread">
-      <div class="m ai">Hey — I'm Bhanu's AI. Ask about his work, a project he's proud of, or why you should hire him.</div>
+
+    <div class="talk-view" id="talkView">
+      <div id="talkOrbMount"></div>
+      <div class="state-tag" id="stateTag" hidden><i></i><span id="stateTagText">Listening</span></div>
+      <div class="talk-actions">
+        <button type="button" class="talk-start" id="talkStart">Start conversation</button>
+        <button type="button" class="talk-end" id="talkEnd" hidden>End call</button>
+      </div>
     </div>
-    <form class="chat-form" id="chatForm">
-      <input id="chatInput" type="text" placeholder="Ask anything…" autocomplete="off" />
-      <button type="button" class="mic-btn" id="micBtn" aria-label="Dictate your question">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="6" y="1.5" width="4" height="8" rx="2" fill="currentColor"/><path d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-      </button>
-      <button type="submit" id="chatSend">Send</button>
-    </form>
+
+    <button type="button" class="chat-pill" id="chatPill" aria-expanded="false" aria-controls="sheet">
+      Chat
+      <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 7.5L6 3.5l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+    <div class="sheet" id="sheet">
+      <div class="sheet-grip" id="sheetGrip" role="button" tabindex="0" aria-label="Close chat sheet"><i></i></div>
+      <div class="chat-thread" id="thread">
+        <div class="m ai">Hey — I'm Bhanu's second brain. Ask about his work, a project he's proud of, or why you should hire him.</div>
+      </div>
+      <form class="chat-form" id="chatForm">
+        <input id="chatInput" type="text" placeholder="Ask anything…" autocomplete="off" />
+        <button type="button" class="mic-btn" id="micBtn" aria-label="Dictate your question">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="6" y="1.5" width="4" height="8" rx="2" fill="currentColor"/><path d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </button>
+        <button type="submit" id="chatSend">Send</button>
+      </form>
+    </div>
   </aside>
 
 <script>
-/* ═══ SMOKE SHADER — giant circle clipped at the bottom, ember smoke ═══ */
+/* ═══ SMOKE SHADER — pure rising smoke, no geometry ═══ */
 (function () {
   var canvas = document.getElementById('smoke');
   var gl = canvas.getContext('webgl', { alpha: false, antialias: false, preserveDrawingBuffer: true });
-  if (!gl) { canvas.style.background = 'radial-gradient(120% 55% at 50% 115%, #52200A 0%, #200B04 45%, #0A0605 75%)'; return; }
+  if (!gl) { canvas.style.background = 'radial-gradient(120% 45% at 50% 118%, #12365E 0%, #0B1626 50%, #0A0E15 80%)'; return; }
 
   var VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
   var FRAG = [
@@ -260,36 +421,29 @@
     ' for(int i=0;i<5;i++){v+=a*noise(p);p=r*p;a*=.5;}return v;}',
     'void main(){',
     ' float aspect=uRes.x/uRes.y;',
-    ' vec2 p=vec2(gl_FragCoord.x/uRes.y, gl_FragCoord.y/uRes.y);', // vh units, y up
+    ' vec2 p=vec2(gl_FragCoord.x/uRes.y, gl_FragCoord.y/uRes.y);',
     ' float t=uTime;',
-    /* giant circle: wide as the viewport, only its top cap visible */
-    ' float R=aspect*0.62;',
-    ' float CAP=0.30;',                                  // how much of the arc pokes above the bottom (vh)
-    ' vec2 C=vec2(aspect*0.5, CAP-R);',
-    ' float d=length(p-C)-R;',                           // <0 inside
-    /* smoke displacement of the edge */
-    ' vec2 q=p*2.1+vec2(0.,-t*0.055);',
-    ' float w=fbm(q+1.5*fbm(q+t*0.03));',
-    ' float edge=d-(w-0.5)*0.20;',
-    /* fields */
-    ' float body=smoothstep(0.02,-0.30,edge);',
-    ' float rim=exp(-abs(edge)*11.0);',
-    ' float aura=exp(-max(edge,0.0)*2.3);',
-    ' float wisp=smoothstep(0.42,0.95,fbm(p*vec2(1.5,2.3)+vec2(0.,-t*0.09)))*exp(-max(edge,0.0)*3.2);',
-    /* palette */
-    ' vec3 bg=vec3(0.039,0.023,0.019);',
-    ' vec3 deep=vec3(0.10,0.032,0.016);',
-    ' vec3 rust=vec3(0.47,0.145,0.045);',
-    ' vec3 ember=vec3(1.0,0.44,0.13);',
+    /* two layers of mist, advected upward — no SDF, no shape; slow & silky */
+    ' vec2 q1=p*vec2(1.25,1.9)+vec2(0.,-t*0.055);',
+    ' float n1=fbm(q1+1.35*fbm(q1*1.7+t*0.014));',
+    ' vec2 q2=p*vec2(2.6,3.4)+vec2(t*0.010,-t*0.095);',
+    ' float n2=fbm(q2);',
+    ' float smoke=smoothstep(0.37,0.95,n1*0.62+n2*0.38);',
+    ' float cx=p.x-aspect*0.5;',
+    ' float hb=exp(-cx*cx*1.35);',                    // denser toward center
+    ' float vf=exp(-p.y*2.4);',                       // fades with height
+    ' float dns=smoke*vf*(0.35+0.65*hb);',
+    /* soft shapeless ground glow */
+    ' float ground=exp(-p.y*5.5)*(0.5+0.5*fbm(vec2(p.x*2.0,t*0.035)))*0.5;',
+    ' vec3 bg=vec3(0.039,0.055,0.082);',
+    ' vec3 deep=vec3(0.085,0.19,0.36);',
+    ' vec3 ice=vec3(0.42,0.72,1.0);',
     ' vec3 col=bg;',
-    ' col=mix(col,deep,body);',
-    ' col+=rust*body*(0.30+0.70*w);',
-    ' col+=ember*rim*(0.38+0.42*w);',
-    ' col+=ember*aura*(0.16+0.22*fbm(p*2.6+t*0.045));',
-    ' col+=ember*wisp*0.16;',
-    /* darken far top so it melts into the page */
-    ' col=mix(col,bg,smoothstep(0.55,1.05,p.y));',
-    ' col+=(hash(gl_FragCoord.xy+fract(t))-0.5)*0.012;', // dither
+    ' col+=deep*(dns*0.9+ground*0.5);',
+    ' col+=ice*dns*dns*0.28;',
+    ' col+=ice*ground*0.15;',
+    ' col=mix(col,bg,smoothstep(0.60,1.05,p.y));',
+    ' col+=(hash(gl_FragCoord.xy+fract(t))-0.5)*0.012;',
     ' gl_FragColor=vec4(col,1.0);}'
   ].join('\n');
 
@@ -310,7 +464,7 @@
   var uRes = gl.getUniformLocation(prog, 'uRes');
   var uTime = gl.getUniformLocation(prog, 'uTime');
 
-  var SCALE = 0.55; // render at reduced res — smoke upscales invisibly
+  var SCALE = 0.55;
   function size() {
     var w = Math.round(canvas.clientWidth * SCALE), h = Math.round(canvas.clientHeight * SCALE);
     if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); }
@@ -328,21 +482,35 @@
   }
   requestAnimationFrame(frame);
   addEventListener('resize', size);
-  // Watchdog: if rAF stalls (tab throttling, backgrounded start), re-kick the loop.
   if (!reduced) setInterval(function () {
     if (performance.now() - lastTick > 600) requestAnimationFrame(frame);
   }, 500);
 })();
 
-/* ═══ CTA — cycling prompts ═══ */
+/* ═══ CTA — cycling "Ask me…" prompts (fixed width, directional crossfade) ═══ */
 var PROMPTS = document.querySelectorAll('#ctaText span');
+var ctaText = document.getElementById('ctaText');
 var activePrompt = 0;
+var ctaHover = false;
+var ctaEl = document.getElementById('cta');
+ctaEl.addEventListener('mouseenter', function () { ctaHover = true; });
+ctaEl.addEventListener('mouseleave', function () { ctaHover = false; });
+function sizeCtaText() {                         // hug the active prompt; width animates via CSS
+  ctaText.style.width = PROMPTS[activePrompt].offsetWidth + 'px';
+}
+if (document.fonts && document.fonts.ready) { document.fonts.ready.then(sizeCtaText); }
+sizeCtaText();
+addEventListener('resize', sizeCtaText);
 if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
   setInterval(function () {
-    PROMPTS[activePrompt].classList.remove('on');
+    if (ctaHover) return;                       // don't swap under the reader
+    var cur = PROMPTS[activePrompt];
+    cur.classList.remove('on'); cur.classList.add('out');
+    setTimeout(function () { cur.classList.remove('out'); }, 650);
     activePrompt = (activePrompt + 1) % PROMPTS.length;
     PROMPTS[activePrompt].classList.add('on');
-  }, 3400);
+    sizeCtaText();
+  }, 3600);
 }
 
 /* ═══ CHAT PANEL ═══ */
@@ -351,52 +519,120 @@ var backdrop = document.getElementById('chatBackdrop');
 var input = document.getElementById('chatInput');
 var thread = document.getElementById('thread');
 var sendBtn = document.getElementById('chatSend');
+var talkRoot = null, voiceApi = null;
 
-var modeTalk = document.getElementById('modeTalk');
-var modeText = document.getElementById('modeText');
-var talkRoot = null;
+/* ── voice states → tag + action buttons ── */
+var stateTag = document.getElementById('stateTag');
+var stateTagText = document.getElementById('stateTagText');
+var talkStart = document.getElementById('talkStart');
+var talkEnd = document.getElementById('talkEnd');
+var TAG_LABELS = {
+  connecting: 'Connecting…',
+  listening: 'Listening',
+  'user-speaking': 'Hearing you',
+  thinking: 'Thinking…',
+  'assistant-speaking': 'Speaking',
+  'mic-denied': 'Mic blocked — enable access',
+  error: 'Something went wrong',
+};
+function updateVoiceState(s) {
+  var live = s === 'connecting' || s === 'listening' || s === 'user-speaking' ||
+             s === 'thinking' || s === 'assistant-speaking';
+  if (TAG_LABELS[s]) { stateTag.hidden = false; stateTagText.textContent = TAG_LABELS[s]; }
+  else { stateTag.hidden = true; }
+  talkStart.hidden = live;
+  talkEnd.hidden = !live;
+  talkStart.disabled = s === 'connecting';
+  talkStart.textContent = (s === 'mic-denied' || s === 'error') ? 'Try again' : 'Start conversation';
+}
+talkStart.addEventListener('click', function () { if (voiceApi) voiceApi.start(); });
+talkEnd.addEventListener('click', function () { if (voiceApi) voiceApi.end(); });
 
-/* Talk view hosts the INTERACTIVE orb (ElevenLabs voice). Mounted lazily on
-   open, unmounted on close/mode-switch so any live session is torn down. */
 function mountTalkOrb() {
   if (talkRoot) return;
   if (!(window.BhanuOrb && window.BhanuOrb.mount)) { setTimeout(mountTalkOrb, 80); return; }
-  if (chat.dataset.mode !== 'talk' || !chat.classList.contains('open')) return;
-  talkRoot = window.BhanuOrb.mount(document.getElementById('talkOrbMount'), { palette: 'ember', size: 200 });
+  if (!chat.classList.contains('open')) return;
+  talkRoot = window.BhanuOrb.mount(document.getElementById('talkOrbMount'), {
+    palette: 'arctic', size: 210, ui: false,
+    onState: updateVoiceState,
+    controls: function (api) { voiceApi = api; },
+  });
 }
 function unmountTalkOrb() {
   if (!talkRoot) return;
   try { talkRoot.unmount(); } catch (e) {}
-  talkRoot = null;
+  talkRoot = null; voiceApi = null;
   document.getElementById('talkOrbMount').innerHTML = '';
+  updateVoiceState('idle');
 }
-function setMode(mode) {
-  chat.dataset.mode = mode;
-  modeTalk.classList.toggle('on', mode === 'talk');
-  modeTalk.setAttribute('aria-selected', mode === 'talk');
-  modeText.classList.toggle('on', mode === 'text');
-  modeText.setAttribute('aria-selected', mode === 'text');
-  if (mode === 'talk') { mountTalkOrb(); }
-  else { unmountTalkOrb(); setTimeout(function () { input.focus(); input.select(); }, 60); }
+
+/* ── chat sheet — pill summons it, grip dismisses it (tap or drag) ── */
+var sheet = document.getElementById('sheet');
+var pill = document.getElementById('chatPill');
+var grip = document.getElementById('sheetGrip');
+var sheetOpen = false;
+function setSheet(open) {
+  sheetOpen = open;
+  sheet.classList.toggle('open', open);
+  pill.classList.toggle('hidden', open);
+  pill.setAttribute('aria-expanded', String(open));
+  if (open) setTimeout(function () { input.focus(); }, 320);
 }
-modeTalk.addEventListener('click', function () { setMode('talk'); });
-modeText.addEventListener('click', function () { setMode('text'); });
+function dragToggle(el, dir) {   /* dir 1: drag up opens · dir -1: drag down closes */
+  el.addEventListener('pointerdown', function (e) {
+    var y0 = e.clientY, moved = 0, H = sheet.offsetHeight || 1;
+    try { el.setPointerCapture(e.pointerId); } catch (err) {}
+    function mv(ev) {
+      moved = (y0 - ev.clientY) * dir;
+      var p = Math.max(0, Math.min(1, moved / H));
+      sheet.style.transition = 'none';
+      sheet.style.transform = dir === 1
+        ? 'translateY(' + ((1 - p) * 105) + '%)'
+        : 'translateY(' + (p * 105) + '%)';
+    }
+    function up(ev) {
+      el.removeEventListener('pointermove', mv);
+      el.removeEventListener('pointerup', up);
+      sheet.style.transition = ''; sheet.style.transform = '';
+      if (Math.abs(y0 - ev.clientY) < 6) setSheet(dir === 1);          // plain tap
+      else setSheet(dir === 1 ? moved > H * 0.2 : !(moved > H * 0.2)); // committed drag
+    }
+    el.addEventListener('pointermove', mv);
+    el.addEventListener('pointerup', up);
+  });
+}
+dragToggle(pill, 1);
+dragToggle(grip, -1);
+grip.addEventListener('keydown', function (e) {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSheet(false); }
+});
 
 function openChat() {
   chat.classList.add('open'); backdrop.classList.add('open');
-  input.value = PROMPTS[activePrompt].textContent;   // seed the text box with the prompt they clicked
-  setMode('talk');                                   // voice-first by default
+  var act = document.querySelector('#ctaText span.on');
+  input.value = act ? (act.dataset.q || act.textContent) : '';
+  setSheet(false);                               // voice-first by default
+  mountTalkOrb();
 }
 function closeChat() {
   chat.classList.remove('open'); backdrop.classList.remove('open');
-  unmountTalkOrb();                                  // ends any live voice session
+  setSheet(false);
+  unmountTalkOrb();                              // tears down any live voice session
 }
-document.getElementById('cta').addEventListener('click', openChat);
+ctaEl.addEventListener('click', openChat);
 document.getElementById('chatClose').addEventListener('click', closeChat);
 backdrop.addEventListener('click', closeChat);
-addEventListener('keydown', function (e) { if (e.key === 'Escape') closeChat(); });
+addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') { if (sheetOpen) setSheet(false); else closeChat(); }
+});
 
-/* ═══ SPEECH-TO-TEXT on the input (Web Speech API) ═══ */
+/* ── nav — compress to the 80% pill on scroll (ported behavior) ── */
+var topNav = document.getElementById('topNav');
+addEventListener('scroll', function () {
+  topNav.classList.toggle('scrolled', scrollY > 40);
+}, { passive: true });
+
+/* ═══ SPEECH-TO-TEXT on the input ═══ */
 var micBtn = document.getElementById('micBtn');
 var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 if (!SR) { micBtn.classList.add('hide'); }
@@ -418,9 +654,9 @@ micBtn.addEventListener('click', function () {
   try { rec.start(); } catch (e) {}
 });
 
-/* wire to the same proxy contract as index.html (proxy.py :3001 locally) */
+/* ═══ TEXT CHAT — same proxy contract as index.html ═══ */
 var API_BASE = location.hostname === 'localhost' ? 'http://localhost:3001' : '';
-var SYSTEM = "You are Bhanu AI — the portfolio assistant for Bhanu Kowshik, a product designer in San Francisco (EverTutor Live, EverTutor Studio, Stressie, Dearly; 0→1, B2B & B2C, voice-AI native). Answer recruiters and visitors concisely and warmly, in first person as Bhanu's AI.";
+var SYSTEM = "You are Bhanu AI — the portfolio assistant for Bhanu Kowshik, a product designer in San Francisco (EverTutor Live, EverTutor Studio, Stressie, Dearly; conversational AI, agent systems, 0→1). Answer recruiters and visitors concisely and warmly, in first person as Bhanu's AI.";
 var messages = [];
 
 function bubble(cls, text) {
@@ -479,12 +715,106 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
   }
 });
 
-/* ═══ ORB — mount the fluid orb visual into the CTA pill ═══ */
+/* ═══ ORB in the CTA — visual only ═══ */
 (function waitOrb() {
   if (window.BhanuOrb && window.BhanuOrb.mountVisual) {
-    window.BhanuOrb.mountVisual(document.getElementById('ctaOrbMount'), { palette: 'ember', size: 46, state: 'idle' });
+    window.BhanuOrb.mountVisual(document.getElementById('ctaOrbMount'), { palette: 'arctic', size: 44, state: 'idle' });
     document.getElementById('ctaOrb').classList.add('mounted');
   } else setTimeout(waitOrb, 60);
+})();
+
+/* ═══ CUSTOM CURSOR + CTA MAGNET (ported from index.html cursor system) ═══ */
+(function initCursor() {
+  if (!matchMedia('(pointer:fine)').matches) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var dot = document.createElement('div');
+  dot.id = 'ccDot';
+  document.body.appendChild(dot);
+  document.documentElement.classList.add('cc-active');
+
+  var DOT = 'rgba(239,243,248,0.9)';
+  var CARET = '#FF6A1A';
+  var mx = -300, my = -300, visible = false;
+  var mode = 'dot', magnetEl = null, origCX = 0, origCY = 0, snapW = 0, snapH = 0;
+
+  var CTA_SEL = 'a[href], button, [role="button"]';
+  var TEXT_SEL = 'h1,h2,h3,p,li,.sub,.eyebrow,.fact,.m';
+
+  function setShape(w, h, r, bg) {
+    dot.style.width = w + 'px'; dot.style.height = h + 'px';
+    dot.style.borderRadius = r + 'px'; dot.style.background = bg;
+  }
+  function releaseMagnet() {
+    if (!magnetEl) return;
+    var el = magnetEl; magnetEl = null;
+    el.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    el.style.transform = 'translate(0px, 0px)';
+    setTimeout(function () { el.style.transition = ''; el.style.transform = ''; }, 520);
+  }
+  function enterDot()  { releaseMagnet(); mode = 'dot';  setShape(12, 12, 999, DOT); }
+  function enterText() { releaseMagnet(); mode = 'text'; setShape(3, 30, 3, CARET); }
+  function enterSnap(el) {
+    releaseMagnet(); mode = 'snap'; magnetEl = el;
+    var r = el.getBoundingClientRect();
+    origCX = r.left + r.width / 2; origCY = r.top + r.height / 2;
+    snapW = r.width; snapH = r.height;
+  }
+
+  function isNearRenderedText(x, y) {
+    var PAD = 6;
+    var pts = [[x, y], [x + PAD, y], [x - PAD, y], [x, y + PAD], [x, y - PAD]];
+    for (var i = 0; i < pts.length; i++) {
+      var h = document.elementFromPoint(pts[i][0], pts[i][1]);
+      if (!h || h.closest(CTA_SEL)) continue;
+      if (!h.closest(TEXT_SEL)) continue;
+      var cr = document.caretRangeFromPoint ? document.caretRangeFromPoint(pts[i][0], pts[i][1]) : null;
+      if (!cr || cr.startContainer.nodeType !== Node.TEXT_NODE) continue;
+      var txt = cr.startContainer;
+      var off = Math.min(cr.startOffset, txt.length - 1);
+      if (off < 0 || !txt.length) continue;
+      var range = document.createRange();
+      range.setStart(txt, off); range.setEnd(txt, Math.min(off + 1, txt.length));
+      var rects = range.getClientRects();
+      if (!rects.length) continue;
+      var r = rects[0];
+      if (pts[i][0] >= r.left - PAD && pts[i][0] <= r.right + PAD &&
+          pts[i][1] >= r.top - PAD && pts[i][1] <= r.bottom + PAD) return true;
+    }
+    return false;
+  }
+
+  document.addEventListener('mousemove', function (e) {
+    mx = e.clientX; my = e.clientY;
+    if (!visible) { visible = true; dot.style.opacity = '1'; }
+
+    var el = document.elementFromPoint(mx, my);
+    var cta = el && el.closest(CTA_SEL);
+    if (cta) {
+      if (mode !== 'snap' || magnetEl !== cta) enterSnap(cta);
+      dot.style.opacity = '0';
+      var clamp = function (v, lo, hi) { return Math.max(lo, Math.min(hi, v)); };
+      var moveX = clamp((mx - origCX) / (snapW / 2), -1, 1) * 5;
+      var moveY = clamp((my - origCY) / (snapH / 2), -1, 1) * 5;
+      magnetEl.style.transition = 'transform 0.12s ease-out';
+      magnetEl.style.transform = 'translate(' + moveX + 'px,' + moveY + 'px)';
+      return;
+    }
+    dot.style.opacity = '1';
+    var onLight = !!(el && el.closest('.chat'));   // light surfaces need a dark dot
+    if (isNearRenderedText(mx, my)) { if (mode !== 'text') enterText(); }
+    else { if (mode !== 'dot') enterDot(); dot.style.background = onLight ? 'rgba(16,23,32,.85)' : DOT; }
+  });
+
+  document.addEventListener('mouseleave', function () {
+    visible = false; dot.style.opacity = '0'; releaseMagnet();
+  });
+
+  function tick() {
+    dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0) translate(-50%,-50%)';
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 })();
 </script>
 <script type="module" src="orb/bhanu-orb.js"></script>

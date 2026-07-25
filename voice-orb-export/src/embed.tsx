@@ -1,11 +1,13 @@
 /**
- * Standalone embed entry — mounts the INTERACTIVE voice orb (VoiceOrb visual +
- * @elevenlabs/react conversation) into a host element. The orb itself is the
- * click target: tap to start a voice conversation with Bhanu's public agent,
- * tap again to end. Built as a self-contained ESM bundle for the static site.
+ * Standalone embed entry — mounts the voice orb into a host element.
  *
- *   <div id="bhanu-orb" data-palette="ember" data-size="188"></div>
- *   <script type="module" src="orb/bhanu-orb.js"></script>
+ * Two modes:
+ *   mount(el, {ui:true})   — self-contained: orb is the tap-to-talk button with caption (legacy).
+ *   mount(el, {ui:false, onState, controls}) — headless: renders ONLY the orb visual wired to the
+ *     ElevenLabs conversation; reports state via onState('idle'|'connecting'|'listening'|
+ *     'user-speaking'|'thinking'|'assistant-speaking'|'mic-denied'|'error') and hands the host
+ *     {start, end} through the controls callback. The host renders its own CTA / tags / end-call.
+ *   mountVisual(el, opts)  — decorative orb only, no conversation.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
@@ -13,11 +15,23 @@ import { ConversationProvider, useConversation } from '@elevenlabs/react';
 import { VoiceOrb, PALETTES } from './components/voice-orb';
 import type { PaletteName, VoiceOrbState } from './components/voice-orb';
 
-// Bhanu's public Conversational-AI agent (auth disabled — connects with id only).
 const AGENT_ID = 'agent_6001ky3xa8eded1r959raw2w6jth';
 
-function LiveOrb({ palette = 'ember', size = 188 }: { palette?: PaletteName; size?: number }) {
+type UiState =
+  | 'idle' | 'connecting' | 'listening' | 'user-speaking'
+  | 'thinking' | 'assistant-speaking' | 'mic-denied' | 'error';
+
+interface LiveOrbProps {
+  palette?: PaletteName;
+  size?: number;
+  ui?: boolean;
+  onState?: (state: UiState) => void;
+  controls?: (api: { start: () => void; end: () => void }) => void;
+}
+
+function LiveOrb({ palette = 'ember', size = 188, ui = true, onState, controls }: LiveOrbProps) {
   const [userSpeaking, setUserSpeaking] = useState(false);
+  const [thinking, setThinking] = useState(false);
   const [micDenied, setMicDenied] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -39,6 +53,9 @@ function LiveOrb({ palette = 'ember', size = 188 }: { palette?: PaletteName; siz
   isSpeakingRef.current = isSpeaking;
   const statusRef = useRef(status);
   statusRef.current = status;
+  const userSpeakingRef = useRef(false);
+  const thinkingRef = useRef(false);
+  const lastUserEndRef = useRef(0);
 
   const getFrequencyData = useCallback((): Uint8Array | null => {
     if (statusRef.current !== 'connected') return null;
@@ -49,48 +66,54 @@ function LiveOrb({ palette = 'ember', size = 188 }: { palette?: PaletteName; siz
     }
   }, [getOutputByteFrequencyData, getInputByteFrequencyData]);
 
-  // Derive "user is speaking" from mic level while connected and agent is silent.
+  // Mic-level loop: derives user-speaking (hysteresis) and a "thinking" window
+  // between the user finishing and the agent starting to speak.
   useEffect(() => {
     if (status !== 'connected') {
-      setUserSpeaking(false);
+      userSpeakingRef.current = false; thinkingRef.current = false;
+      setUserSpeaking(false); setThinking(false);
       return;
     }
     let raf = 0;
     const loop = () => {
       raf = requestAnimationFrame(loop);
+      let v = 0;
+      try { v = getInputVolume(); } catch { v = 0; }
+
       if (isSpeakingRef.current) {
-        setUserSpeaking(false);
+        if (userSpeakingRef.current) { userSpeakingRef.current = false; setUserSpeaking(false); }
+        if (thinkingRef.current) { thinkingRef.current = false; setThinking(false); }
+        lastUserEndRef.current = 0;
         return;
       }
-      let v = 0;
-      try {
-        v = getInputVolume();
-      } catch {
-        v = 0;
+      const cur = userSpeakingRef.current;
+      const next = cur ? v > 0.05 : v > 0.12;
+      if (next !== cur) {
+        userSpeakingRef.current = next;
+        setUserSpeaking(next);
+        if (cur && !next) lastUserEndRef.current = performance.now();
       }
-      setUserSpeaking((prev) => (prev ? v > 0.05 : v > 0.12));
+      const th = !next && lastUserEndRef.current > 0 &&
+        performance.now() - lastUserEndRef.current < 7000;
+      if (th !== thinkingRef.current) { thinkingRef.current = th; setThinking(th); }
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
   }, [status, getInputVolume]);
 
-  const orbState: VoiceOrbState =
-    status === 'connecting'
-      ? 'connecting'
-      : status === 'error'
-        ? 'error'
-        : status === 'connected'
-          ? isSpeaking
-            ? 'assistant-speaking'
-            : userSpeaking
-              ? 'user-speaking'
-              : 'listening'
-          : micDenied
-            ? 'error'
-            : 'idle';
+  const uiState: UiState =
+    status === 'connecting' ? 'connecting'
+    : status === 'error' || errorMsg ? 'error'
+    : status === 'connected'
+      ? (isSpeaking ? 'assistant-speaking'
+        : userSpeaking ? 'user-speaking'
+        : thinking ? 'thinking'
+        : 'listening')
+      : micDenied ? 'mic-denied' : 'idle';
 
-  const connected = status === 'connected';
-  const connecting = status === 'connecting';
+  const onStateRef = useRef(onState);
+  onStateRef.current = onState;
+  useEffect(() => { onStateRef.current?.(uiState); }, [uiState]);
 
   const start = useCallback(async () => {
     setMicDenied(false);
@@ -105,26 +128,53 @@ function LiveOrb({ palette = 'ember', size = 188 }: { palette?: PaletteName; siz
     startSession({ agentId: AGENT_ID, connectionType: 'webrtc' });
   }, [startSession]);
 
+  const controlsRef = useRef(controls);
+  controlsRef.current = controls;
+  useEffect(() => {
+    controlsRef.current?.({
+      start: () => { void start(); },
+      end: () => { try { void endSession(); } catch { /* noop */ } },
+    });
+  }, [start, endSession]);
+
+  // Orb visual: "thinking" borrows the connecting preset's faster autonomous
+  // drift so processing reads as motion; everything else maps 1:1.
+  const orbState: VoiceOrbState =
+    uiState === 'connecting' ? 'connecting'
+    : uiState === 'error' || uiState === 'mic-denied' ? 'error'
+    : uiState === 'assistant-speaking' ? 'assistant-speaking'
+    : uiState === 'user-speaking' ? 'user-speaking'
+    : uiState === 'thinking' ? 'connecting'
+    : uiState === 'listening' ? 'listening'
+    : 'idle';
+
+  const orb = (
+    <VoiceOrb
+      state={orbState}
+      getFrequencyData={getFrequencyData}
+      palette={PALETTES[palette]}
+      size={size}
+      audioParams={{ gain: 2.6, noiseFloor: 0.02, attack: 0.05, release: 0.28 }}
+    />
+  );
+
+  if (!ui) return orb;
+
+  /* legacy self-contained chrome (orb-as-button + caption) */
+  const connected = status === 'connected';
+  const connecting = status === 'connecting';
   const onActivate = () => {
     if (connecting) return;
     if (connected) endSession();
     else void start();
   };
-
   let caption: React.ReactNode;
   if (micDenied) caption = 'Enable microphone access, then tap again';
   else if (errorMsg && !connected) caption = errorMsg + ' — tap to retry';
   else if (connecting) caption = 'Connecting…';
-  else if (orbState === 'assistant-speaking') caption = 'Bhanu AI is speaking… (tap to end)';
-  else if (orbState === 'user-speaking') caption = 'Listening… (tap to end)';
-  else if (orbState === 'listening') caption = 'Listening — go ahead (tap to end)';
-  else
-    caption = (
-      <>
-        <b style={{ color: 'var(--ink-2, #e0cdb9)', fontWeight: 600 }}>Talk to my AI</b> — ask it
-        anything about my work
-      </>
-    );
+  else if (uiState === 'assistant-speaking') caption = 'Speaking… (tap to end)';
+  else if (connected) caption = 'Listening — go ahead (tap to end)';
+  else caption = 'Tap to talk';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
@@ -134,47 +184,28 @@ function LiveOrb({ palette = 'ember', size = 188 }: { palette?: PaletteName; siz
         aria-label={connected ? 'End conversation' : 'Talk to Bhanu AI'}
         onClick={onActivate}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onActivate();
-          }
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onActivate(); }
         }}
         style={{ cursor: connecting ? 'progress' : 'pointer', lineHeight: 0, borderRadius: '50%', outline: 'none' }}
       >
-        <VoiceOrb
-          state={orbState}
-          getFrequencyData={getFrequencyData}
-          palette={PALETTES[palette]}
-          size={size}
-          audioParams={{ gain: 2.6, noiseFloor: 0.02, attack: 0.05, release: 0.28 }}
-        />
+        {orb}
       </div>
-      <span
-        style={{
-          fontFamily: 'var(--sans, inherit)',
-          fontSize: 12.5,
-          letterSpacing: '0.04em',
-          color: 'var(--ink-3, #a99177)',
-        }}
-      >
-        {caption}
-      </span>
+      <span style={{ fontSize: 12.5, letterSpacing: '0.04em', opacity: 0.7 }}>{caption}</span>
     </div>
   );
 }
 
-function mount(el: HTMLElement, opts: { palette?: PaletteName; size?: number } = {}): Root {
+function mount(el: HTMLElement, opts: Omit<LiveOrbProps, never> = {}): Root {
   const root = createRoot(el);
   root.render(
     <ConversationProvider>
-      <LiveOrb palette={opts.palette} size={opts.size} />
+      <LiveOrb {...opts} />
     </ConversationProvider>,
   );
   return root;
 }
 
-/** Visual-only mount — the fluid orb with no conversation layer, no caption.
- *  For decorative/inline uses like the hero CTA pill. */
+/** Visual-only mount — no conversation layer. */
 function mountVisual(
   el: HTMLElement,
   opts: {
