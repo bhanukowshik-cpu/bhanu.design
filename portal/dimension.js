@@ -144,7 +144,7 @@
                0.16 * Math.sin((p - 0.5) * 6.0) * Math.exp(-Math.pow((p - 0.67) / 0.10, 2));
 
     var fov = mix(40, 50, smoothstep(0.18, 0.52, p));
-    fov = mix(fov, 88, smoothstep(0.52, 0.675, p));                // space opens
+    fov = mix(fov, 72, smoothstep(0.52, 0.675, p));                // space opens
     fov = mix(fov, 47, smoothstep(0.685, 0.80, p));                // snaps shut
     fov = mix(fov, 43, smoothstep(0.82, 1.0, p));
 
@@ -433,7 +433,7 @@
       push(Math.cos(pth) * prad, Math.sin(pth) * prad, pz,
            1.6 + r() * 3.8, 0.09 + r() * 0.16, 0.09 + r() * 0.3,
            0, 0, pth + Math.PI * 0.5,
-           WARM[0], WARM[1], WARM[2], (k % 3 === 0) ? 0.55 : 0, 1);
+           WARM[0], WARM[1], WARM[2], (k % 3 === 0) ? 0.22 : 0, 1);
     }
 
     return { data: new Float32Array(arr), count: arr.length / STRIDE };
@@ -1125,10 +1125,13 @@
          throws a spectral arc down each side — that baseline is what makes the
          whole page feel like it sits behind thick optical glass, rather than
          like an effect that switches on when you scroll. */
-      gl.uniform1f(uC.uRefract, 0.016 + 0.034 * drive * drive + 0.050 * cross);
-      gl.uniform1f(uC.uDisp, 0.0060 + 0.009 * drive * drive + 0.012 * cross);
-      gl.uniform1f(uC.uWarp, 0.0030 + 0.007 * drive + 0.010 * cross);
-      gl.uniform1f(uC.uSmear, (0.005 * drive + 0.026 * cross) * (1 - arrival));
+      /* The spiral carries the drama on its own, so the optics are seasoning.
+         Every one of these was tuned against a dark sparse lattice; against
+         bright dense arms the same numbers shred the image into rainbow. */
+      gl.uniform1f(uC.uRefract, (0.013 + 0.022 * drive * drive + 0.026 * cross) * (1 - 0.7 * arrival));
+      gl.uniform1f(uC.uDisp, 0.0040 + 0.005 * drive * drive + 0.006 * cross);
+      gl.uniform1f(uC.uWarp, 0.0025 + 0.005 * drive + 0.006 * cross);
+      gl.uniform1f(uC.uSmear, (0.004 * drive + 0.015 * cross) * (1 - arrival));
       /* r is aspect-corrected: on 16:9 the left/right edges sit near 1.78 while
          top/bottom sit at 1.0. Parking the boundary *between* them is what makes
          it read as two tall arcs down the sides instead of a ring drawn on the
@@ -1137,7 +1140,9 @@
       gl.uniform1f(uC.uLensR, edgeR * mix(1.0, 0.74, smoothstep(0.40, 0.70, p)) + 0.45 * arrival);
       gl.uniform1f(uC.uLensSoft, mix(0.44, 0.30, drive));
       gl.uniform1f(uC.uBloomAmt, mix(0.34, 0.72, drive) * mix(1, 0.55, arrival) + 0.14 * cross);
-      gl.uniform1f(uC.uSpectral, 0.24 + 0.09 * drive + 0.10 * cross);
+      /* the boundary lets go once it has been crossed — a rim still glowing on
+         the arrival page is an effect outstaying its purpose */
+      gl.uniform1f(uC.uSpectral, (0.24 + 0.09 * drive + 0.10 * cross) * (1 - 0.92 * arrival));
       /* the vignette opens up through the crossing — holding it closed keeps the
          corners dead exactly when the periphery should carry the most speed */
       gl.uniform1f(uC.uVig, mix(0.28, 0.10, arrival) * (1 - 0.6 * cross));
