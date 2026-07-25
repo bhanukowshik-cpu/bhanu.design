@@ -632,6 +632,7 @@
     </div>
   </aside>
 
+<script src="portal/dimension.js?v=1"></script>
 <script>
 /* ═══ SMOKE SHADER — pure rising smoke, no geometry ═══ */
 (function () {
@@ -864,6 +865,25 @@ addEventListener('scroll', function () {
   }
   var active = false;
 
+  /* ── scroll velocity ──────────────────────────────────────────────────────
+     The dimension has to react to *how hard* you scroll, not only to where you
+     are. Raw delta is normalised against the viewport, then damped and decayed
+     on a rAF, so a trackpad flick intensifies the optics and a stop lets them
+     settle — without a spike ever snapping the image. */
+  var lastY = scrollY, vRaw = 0, vSmooth = 0;
+  var curP = 0, visible = false, raf = 0;
+
+  function tick() {
+    raf = 0;
+    if (!active || !visible) return;
+    vSmooth += (vRaw - vSmooth) * 0.18;
+    vRaw *= 0.90;
+    tunnelDraw(curP, vSmooth);
+    raf = requestAnimationFrame(tick);
+  }
+  function ensureTick() { if (!raf && active && visible) raf = requestAnimationFrame(tick); }
+  function stopTick() { visible = false; if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+
   var SPAN_A = 0, SPAN_B = 0, SPAN_C = 0, travel = 0, pinTop = 0, vw = 0, vh = 0;
   var cards = [].slice.call(track.querySelectorAll('.wcard, .work-intro, .work-end'));
 
@@ -872,6 +892,14 @@ addEventListener('scroll', function () {
        uP .7→1 accelerates into the white of the arrival page. ── */
   var tcv = document.getElementById('tunnel');
   var tgl = null, tReady = false, tNoGL = false, tuRes, tuTime, tuP;
+
+  /* the 3D crossing (portal/dimension.js). If the GPU can't run it — no WebGL,
+     no instancing — we quietly keep the flat glass shader below. */
+  var dim = null, dimTried = false;
+  function dimQuality() {
+    return (innerWidth < 1180 || (navigator.deviceMemory && navigator.deviceMemory <= 4))
+      ? 'low' : 'high';
+  }
   var T_FRAG = [
     'precision highp float;',
     'uniform vec2 uRes;uniform float uTime;uniform float uP;',
@@ -945,7 +973,12 @@ addEventListener('scroll', function () {
     tuP = tgl.getUniformLocation(prog, 'uP');
     tReady = true; return true;
   }
-  function tunnelDraw(p) {
+  function tunnelDraw(p, vel) {
+    if (!dimTried) {
+      dimTried = true;
+      if (window.Dimension) dim = Dimension.create(tcv, { quality: dimQuality() });
+    }
+    if (dim) { dim.draw(p, vel || 0); return; }
     if (!tunnelInit()) {                     // no WebGL → flat colour crossfade
       tcv.style.background = p > .7 ? '#F7F9FC' : '#081B2E';
       return;
@@ -961,9 +994,11 @@ addEventListener('scroll', function () {
 
   function measure() {
     vw = innerWidth; vh = innerHeight;
-    SPAN_A = Math.round(vh * 0.85);          // the hero recedes
-    SPAN_B = Math.round(vh * 1.25);          // the light floods in
-    SPAN_C = Math.round(vh * 0.8);           // breaks white + the work rises
+    /* ~420vh of pinned choreography — the crossing needs room to start almost
+       imperceptibly and still leave the arrival somewhere to breathe */
+    SPAN_A = Math.round(vh * 1.00);          // the hero recedes
+    SPAN_B = Math.round(vh * 2.20);          // anomaly → approach → acceleration
+    SPAN_C = Math.round(vh * 1.00);          // crossing → snap → arrival
     travel = Math.max(0, track.scrollWidth - vw);
     pin.style.height = (vh + SPAN_B + SPAN_C + travel) + 'px';
     pinTop = pin.offsetTop;
@@ -976,23 +1011,29 @@ addEventListener('scroll', function () {
   function update() {
     if (!active) return;
     var y = scrollY;
-    var aP = clamp01((y - (pinTop - SPAN_A)) / SPAN_A);            // recede
-    var bP = clamp01((y - pinTop) / SPAN_B);                       // flood
-    var cP = clamp01((y - pinTop - SPAN_B) / SPAN_C);              // arrival
+    var start = pinTop - SPAN_A, total = SPAN_A + SPAN_B + SPAN_C;
+    /* ONE continuous progress drives the whole crossing. The engine owns its
+       own internal beats (calm → anomaly → approach → acceleration → crossing
+       → snap → arrival), so the page only has to hand it a clean 0→1. */
+    var p = clamp01((y - start) / total);
+    var aP = clamp01((y - start) / SPAN_A);                        // hero recedes
+    var cP = ramp(0.86, 1, p);                                     // work rises
     var tP = travel ? clamp01((y - pinTop - SPAN_B - SPAN_C) / travel) : 0;  // reel
+    curP = p;
 
     /* A — the hero lets go: copy, CTA and photo trail dissolve on the way out */
     if (copy) copy.style.opacity = (1 - ramp(.12, .72, aP)).toFixed(3);
     if (ctaDock) ctaDock.style.opacity = (1 - ramp(.05, .55, aP)).toFixed(3);
     if (trailLayer) trailLayer.style.opacity = (1 - ramp(0, .35, aP)).toFixed(3);
 
-    /* B/C — one progress value carries the light from the hero's smoke to white.
-       It fades up over the tail of A so it grows out of the hero, seamlessly. */
-    var uP = 0.72 * bP + 0.28 * cP;
-    var tOp = ramp(.55, .96, aP) * (1 - ramp(.9, 1, cP));
+    /* The world fades up early and under the hero's own copy, so it reads as
+       space opening behind the page rather than a panel sliding over it. It
+       clears at the very end, once it has already whited out to the page. */
+    var tOp = ramp(.10, .46, aP) * (1 - ramp(.94, 1, p));
     tcv.style.opacity = tOp.toFixed(3);
-    tcv.style.display = tOp > 0 ? 'block' : 'none';
-    if (tOp > 0) tunnelDraw(uP);
+    visible = tOp > 0;
+    tcv.style.display = visible ? 'block' : 'none';
+    if (visible) ensureTick(); else if (raf) { cancelAnimationFrame(raf); raf = 0; }
 
     /* the white page stays hidden until the dive begins (dark body shows instead) */
     veil.style.opacity = y >= pinTop ? '1' : '0';
@@ -1010,6 +1051,7 @@ addEventListener('scroll', function () {
       if (active || !pin.classList.contains('no-portal')) {
         pin.classList.add('no-portal');
         active = false;
+        stopTick();
         pin.style.height = '';
         veil.style.opacity = '';
         track.style.transform = '';
@@ -1028,7 +1070,13 @@ addEventListener('scroll', function () {
     update();
   }
   remeasure();
-  addEventListener('scroll', update, { passive: true });
+  addEventListener('scroll', function () {
+    var y = scrollY, dy = Math.abs(y - lastY);
+    lastY = y;
+    /* half a viewport in one frame counts as full intensity */
+    vRaw = Math.min(1, Math.max(vRaw, dy / Math.max(1, vh * 0.5)));
+    update();
+  }, { passive: true });
   addEventListener('resize', remeasure);
   addEventListener('load', remeasure);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
