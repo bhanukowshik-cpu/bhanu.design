@@ -422,7 +422,32 @@
            dlit ? 0.35 + r() * 0.9 : 0, r() < 0.25 ? 1 : 0);
     }
 
-    /* 3 — PASSERS. Placed on the camera's own path through the acceleration
+    /* 3 — STARS. A deep shell wrapped around the whole flight, so the vortex
+       hangs in a sky instead of a black box. Unaligned, lit from frame one —
+       the tint carries the colour (mostly blue-white, a few warm giants) and
+       the per-seed emissive pulse gives each star its own slow twinkle. The
+       radius hugs the spiral's mouth and thins outward, so the sky is densest
+       right where the arms sweep off-frame. */
+    var nStar = dense ? 1300 : 420;
+    for (var s = 0; s < nStar; s++) {
+      var st = r();
+      var sz2 = 30 - st * (DEPTH + 230);
+      var srad = 60 + Math.pow(r(), 1.6) * 115;
+      var sth = r() * Math.PI * 2;
+      var giant = r() > 0.96;
+      var sc = r();
+      var scol = sc < 0.60 ? [0.82, 0.88, 1.00]
+               : sc < 0.86 ? [0.52, 0.70, 1.00]
+                           : [1.00, 0.78, 0.55];
+      var ss = giant ? 0.22 + r() * 0.18 : 0.06 + r() * 0.10;
+      push(Math.cos(sth) * srad, Math.sin(sth) * srad * 0.9, sz2,
+           ss, ss, ss,
+           r() * 3.14, r() * 3.14, r() * 3.14,
+           scol[0], scol[1], scol[2],
+           (giant ? 1.6 : 0.55) + r() * 0.7, 0);
+    }
+
+    /* 4 — PASSERS. Placed on the camera's own path through the acceleration
        window, so something always rushes the lens exactly when it should.
        Far geometry reads as camera movement; only near geometry reads as SPEED. */
     for (var k = 0; k < 18; k++) {
@@ -513,7 +538,10 @@
     ' col += vec3(0.55,0.68,0.86) * fill * 0.045;',
     ' col += cold * fres * 0.85;',
     /* emission: cold from the start, warm energy only once we are through */
-    ' vec3 em = mix(cold*1.45, warm*1.35, vWarm*uIgnite);',
+    /* emission takes its colour from the instance tint, so a starfield can
+       carry blue-white dwarfs and warm giants in the same draw call — the
+       spiral's own lit shards pass the cold blue as their tint, unchanged */
+    ' vec3 em = mix(vTint*1.45, warm*1.35, vWarm*uIgnite);',
     ' float pulse = 0.80 + 0.20*sin(uTime*1.6 + vSeed*39.0);',
     ' float gate = mix(1.0 - vWarm, 1.0, uIgnite);',
     /* a chip drifting close to the lens would otherwise clip to a white blob —
