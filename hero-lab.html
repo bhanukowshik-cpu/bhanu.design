@@ -19,6 +19,13 @@
     --line:rgba(239,243,248,0.12);
     --ember:#5CA9FF;      /* azure accent (var name kept to avoid churn) */
     --ember-2:#8CC5FF;
+    /* section 2 runs on its own cream scale — the page token set stays dark */
+    --cream:#FFFCF8;
+    --cream-2:#F6F1E9;
+    --cream-ink:#14181F;
+    --cream-ink-2:#3A4756;
+    --cream-ink-3:#6B7887;
+    --cream-line:rgba(20,24,31,0.10);
     --serif:'Instrument Serif',Georgia,serif;
     --sans:'Instrument Sans',system-ui,sans-serif;
     --ease:cubic-bezier(0.16,1,0.3,1);
@@ -95,6 +102,35 @@
   .top-nav.scrolled .nav-callme{opacity:1;pointer-events:auto;transform:translateY(-50%);}
   .nav-callme-label{font-size:10px;font-weight:550;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);line-height:1.5;}
   .nav-callme-name{font-family:var(--sans);font-size:16px;font-weight:550;letter-spacing:-0.005em;color:var(--ink);line-height:1.15;}
+  /* over the cream band the pill inverts — light glass, dark ink */
+  .top-nav.scrolled.on-cream{
+    background:rgba(255,252,248,0.86);
+    border-color:var(--cream-line);
+    box-shadow:0 12px 40px -20px rgba(20,30,50,.30);
+  }
+  .top-nav.on-cream .nav-brand,
+  .top-nav.on-cream .nav-callme-name{color:var(--cream-ink);}
+  .top-nav.on-cream .nav-callme-label{color:var(--cream-ink-3);}
+  .top-nav.on-cream .nav-links a{color:var(--cream-ink-2);}
+  .top-nav.on-cream .nav-links a:hover{color:var(--cream-ink);}
+  .top-nav.on-cream .nav-links a::after{background:var(--cream-ink);}
+
+  /* ── ORB FAB — bottom-right. No scale in any state: mountVisual reads the
+        element's transformed rect, so a scaled mount would size the canvas wrong. ── */
+  .orb-fab{position:fixed;right:clamp(16px,2.4vw,32px);bottom:clamp(16px,2.4vw,32px);z-index:60;
+    width:66px;height:66px;border-radius:50%;display:grid;place-items:center;padding:0;
+    border:1px solid rgba(255,255,255,.14);background:rgba(13,18,27,.72);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    box-shadow:0 18px 44px -16px rgba(0,0,0,.6);cursor:pointer;
+    opacity:0;transform:translateY(14px);pointer-events:none;
+    transition:opacity .45s var(--ease),transform .45s var(--ease),
+      background .3s ease,border-color .3s ease,box-shadow .3s ease;}
+  .orb-fab.show{opacity:1;transform:none;pointer-events:auto;}
+  .orb-fab.show:hover{transform:translateY(-3px);}
+  .orb-fab-mount{display:block;width:52px;height:52px;line-height:0;}
+  .orb-fab.on-cream{background:rgba(255,252,248,.86);border-color:var(--cream-line);
+    box-shadow:0 18px 44px -18px rgba(20,30,50,.34);}
+
   .nav-links{display:flex;align-items:center;gap:30px;}
   .nav-links a{position:relative;font-size:13.5px;font-weight:500;letter-spacing:.02em;color:var(--ink-2);
     text-decoration:none;transition:color .25s var(--ease);}
@@ -188,91 +224,108 @@
   .cta-text span.on{opacity:1;transform:translateY(0);filter:none;}
   .cta-text span.out{opacity:0;transform:translateY(-11px);filter:blur(3px);}
 
-  /* ══ SECTION 2 — the orb becomes a portal, then a horizontal work reel ══
-     .work-pin is a tall scroll driver; .work-sticky pins one viewport of it.
-     Scroll maps to: (A) orb flies out of the CTA → (B) portal circle opens
-     → (C) .work-track slides sideways. JS owns the numbers; the CSS defaults
-     leave the section fully visible so it never ships blank without JS. */
-  /* the crossing — WebGL light, scrubbed by scroll. The hero's own smoke lifts,
-     swells and floods the frame, then breaks into the white arrival page. */
-  #tunnel{position:fixed;inset:0;z-index:46;width:100%;height:100%;display:none;pointer-events:none;}
+  /* ══ SECTION 2 — the work reel, a full-bleed cream band ══
+     No portal and no pin: an ordinary section that scrolls sideways on its own.
+     One and a half cards sit in view at rest, so the reel reads as scrollable
+     without a hint. Native scroll-snap does the paging — no JS owns the numbers. */
+  .work-pin{position:relative;background:var(--cream);color:var(--cream-ink);
+    --reel-pad:clamp(20px,5vw,88px);
+    --card-w:min(62vw,880px);          /* 1 full card + half the next in view */
+    --sys-w:min(92vw,1320px);          /* the EverTutor system slide runs wider */
+    padding:clamp(58px,8vh,104px) 0 clamp(64px,9vh,116px);}
 
-  .work-pin{position:relative;background:var(--bg);}
-  .work-sticky{position:sticky;top:0;height:100svh;overflow:hidden;}
-  .work-veil{position:absolute;inset:0;}   /* JS reveals it once the dive begins */
-  /* arrival side of the portal — white page */
-  .work-stage{position:absolute;inset:0;display:flex;align-items:center;
-    background:
-      radial-gradient(110% 70% at 50% 0%, rgba(31,111,230,.06) 0%, transparent 60%),
-      #F7F9FC;}
-  .work-track{flex:none;display:flex;align-items:stretch;gap:clamp(18px,2vw,30px);
-    padding:0 clamp(28px,7vw,110px);will-change:transform;}
+  .work-track{display:flex;align-items:stretch;gap:clamp(16px,1.8vw,28px);
+    padding:0 var(--reel-pad);
+    overflow-x:auto;overscroll-behavior-x:contain;
+    scroll-snap-type:x mandatory;scroll-padding-left:var(--reel-pad);
+    scrollbar-width:none;-ms-overflow-style:none;}
+  .work-track::-webkit-scrollbar{display:none;}
+  .work-track>*{scroll-snap-align:start;}
 
-  /* left intro panel — reads as the reel's title card */
-  .work-intro{flex:none;width:clamp(280px,25vw,380px);align-self:center;
-    display:flex;flex-direction:column;gap:16px;padding-right:clamp(10px,2vw,28px);}
-  .work-intro .k{font-size:11.5px;font-weight:550;letter-spacing:.18em;text-transform:uppercase;color:#6B7887;}
-  .work-intro h2{font-family:var(--sans);font-weight:570;color:#0F1722;
-    font-size:clamp(30px,2.9vw,44px);line-height:1.14;letter-spacing:-0.022em;}
-  .work-intro h2 .serif{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.08em;}
-  .work-intro p{font-size:14.5px;line-height:1.62;color:#3A4756;max-width:34ch;}
-  .work-scroll-hint{display:inline-flex;align-items:center;gap:9px;margin-top:4px;
-    font-size:12px;font-weight:500;letter-spacing:.11em;text-transform:uppercase;color:#6B7887;}
-  .work-scroll-hint i{display:block;width:34px;height:1px;background:rgba(8,16,30,.16);position:relative;}
-  .work-scroll-hint i::after{content:'';position:absolute;right:0;top:-2px;
-    width:5px;height:5px;border-right:1px solid #6B7887;border-top:1px solid #6B7887;
-    transform:rotate(45deg);}
+  /* section header — sits above the reel, full width */
+  .work-head{display:flex;align-items:flex-end;justify-content:space-between;
+    gap:clamp(18px,4vw,64px);padding:0 var(--reel-pad);flex-wrap:wrap;
+    margin-bottom:clamp(28px,4.5vh,52px);}
+  .work-head .k{display:block;margin-bottom:12px;font-size:11.5px;font-weight:550;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--cream-ink-3);}
+  .work-head h2{font-family:var(--sans);font-weight:570;color:var(--cream-ink);
+    font-size:clamp(30px,3.4vw,50px);line-height:1.1;letter-spacing:-0.024em;}
+  .work-head h2 .serif{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.08em;}
+  .work-head-r{font-size:14.5px;line-height:1.62;color:var(--cream-ink-2);
+    max-width:44ch;padding-bottom:6px;}
 
-  /* project cards */
-  .wcard{flex:none;width:clamp(292px,25vw,362px);
-    display:flex;flex-direction:column;
-    height:min(74vh,624px);align-self:center;
-    padding:22px 22px 20px;border-radius:22px;overflow:hidden;position:relative;
-    border:1px solid rgba(8,16,30,.08);
-    background:#FFFFFF;
-    box-shadow:0 30px 60px -30px rgba(10,20,40,.22), 0 2px 8px -4px rgba(10,20,40,.08);}
-  /* per-card accent wash, set inline via --a */
-  .wcard::before{content:'';position:absolute;inset:0;pointer-events:none;
-    background:radial-gradient(120% 62% at 50% 0%, var(--a,rgba(92,169,255,.3)) 0%, transparent 68%);
-    opacity:.16;}
-  .wcard>*{position:relative;}
-  .wcard-top{display:flex;align-items:baseline;justify-content:space-between;
-    font-size:11.5px;font-weight:550;letter-spacing:.13em;color:#6B7887;}
-  .wcard-top b{color:#2463DC;font-weight:600;}
-  .wcard-media{margin:15px 0 16px;border-radius:13px;overflow:hidden;flex:none;
-    aspect-ratio:16/10;background:#EDF1F7;border:1px solid rgba(8,16,30,.07);}
-  .wcard-media img{width:100%;height:100%;object-fit:cover;display:block;}
-  .wcard h3{font-family:var(--sans);font-size:24px;font-weight:570;letter-spacing:-0.018em;color:#0F1722;}
-  .wcard .role{margin-top:5px;font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
-    color:#2463DC;}
-  .wcard p{margin-top:11px;font-size:13.5px;line-height:1.6;color:#3A4756;}
-  .wcard-metrics{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;}
-  .wcard-metrics span{padding:5px 10px;border-radius:999px;border:1px solid rgba(8,16,30,.1);
-    background:#F1F5FA;font-size:11px;font-weight:500;color:#3A4756;
+  /* ── slides ───────────────────────────────────────────────────────────── */
+  .slide{flex:none;width:var(--card-w);display:flex;flex-direction:column;
+    border-radius:24px;overflow:hidden;position:relative;
+    border:1px solid var(--cream-line);background:#FFFFFF;
+    box-shadow:0 30px 60px -34px rgba(10,20,40,.20), 0 2px 8px -4px rgba(10,20,40,.06);}
+  .slide-top{display:flex;align-items:center;gap:14px;padding:20px 24px 0;
+    font-size:11.5px;font-weight:550;letter-spacing:.13em;color:var(--cream-ink-3);}
+  .slide-top b{color:#2463DC;font-weight:600;}
+  .slide-media{margin:16px 24px 0;border-radius:14px;overflow:hidden;
+    aspect-ratio:16/10;background:#EDF1F7;border:1px solid var(--cream-line);}
+  .slide-media img{width:100%;height:100%;object-fit:cover;display:block;}
+  .slide-body{display:flex;flex-direction:column;flex:1;padding:18px 24px 24px;}
+  .slide-body h3{font-family:var(--sans);font-size:clamp(24px,2vw,30px);font-weight:570;
+    letter-spacing:-0.02em;color:var(--cream-ink);}
+  .slide-body .role{margin-top:5px;font-size:11px;font-weight:600;letter-spacing:.13em;
+    text-transform:uppercase;color:#2463DC;}
+  .slide-body p{margin-top:12px;font-size:14.5px;line-height:1.62;color:var(--cream-ink-2);max-width:58ch;}
+  .slide-body p em{font-style:normal;font-weight:600;color:var(--cream-ink);}
+  .slide-metrics{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px;}
+  .slide-metrics span{padding:6px 11px;border-radius:999px;border:1px solid var(--cream-line);
+    background:var(--cream-2);font-size:11.5px;font-weight:500;color:var(--cream-ink-2);
     font-variant-numeric:tabular-nums;}
-  .wcard-cta{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;
-    padding:10px 17px;border-radius:999px;text-decoration:none;
+  .slide-cta{align-self:flex-start;margin-top:22px;display:inline-flex;align-items:center;gap:8px;
+    padding:11px 18px;border-radius:999px;text-decoration:none;
     background:#101720;color:#fff;font-size:13px;font-weight:570;
     transition:transform .3s var(--ease),background .3s var(--ease);}
-  .wcard-cta:hover{transform:translateY(-2px);background:#000;}
+  .slide-cta:hover{transform:translateY(-2px);background:#000;}
 
-  .work-end{flex:none;align-self:center;display:flex;align-items:center;gap:16px;
-    padding:0 clamp(20px,5vw,80px);white-space:nowrap;
-    font-size:11.5px;font-weight:550;letter-spacing:.19em;text-transform:uppercase;color:#6B7887;}
-  .work-end i{display:block;width:clamp(40px,6vw,90px);height:1px;background:rgba(8,16,30,.14);}
+  /* ── 01 — the EverTutor system slide, wider than the rest ─────────────── */
+  .slide--system{width:var(--sys-w);}
+  .slide--system .slide-top{flex-wrap:wrap;}
+  .sys-tags{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto;}
+  .sys-tag{padding:5px 11px;border-radius:999px;border:1px solid var(--cream-line);
+    background:var(--cream-2);font-size:11px;font-weight:500;letter-spacing:.02em;
+    text-transform:none;color:var(--cream-ink-2);}
+  /* the hero takes the slack when the slide is stretched, so the three tools
+     below keep their natural size instead of cropping their video */
+  .sys-hero{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+    flex:1;gap:clamp(18px,3vw,56px);padding:20px 24px 22px;}
+  .sys-hero-l{flex:1 1 340px;min-width:0;}
+  .sys-hero h3{font-family:var(--sans);font-size:clamp(26px,2.5vw,38px);font-weight:570;
+    letter-spacing:-0.022em;color:var(--cream-ink);}
+  .sys-desc{margin-top:11px;font-size:14.5px;line-height:1.62;color:var(--cream-ink-2);max-width:52ch;}
+  .sys-desc em{font-style:normal;font-weight:600;color:var(--cream-ink);}
+  .sys-hero-r{display:flex;flex:none;gap:clamp(16px,2.4vw,38px);}
+  .sys-metric{display:flex;flex-direction:column;gap:4px;}
+  .sys-metric .v{font-size:clamp(20px,1.9vw,28px);font-weight:600;color:var(--cream-ink);
+    letter-spacing:-0.01em;font-variant-numeric:tabular-nums;}
+  .sys-metric .l{font-size:11.5px;font-weight:500;letter-spacing:.02em;color:var(--cream-ink-3);}
 
-  /* no-JS / reduced-motion / touch: plain swipeable rail, no portal */
-  .work-pin.no-portal{height:auto !important;}
-  .work-pin.no-portal .work-sticky{position:static;height:auto;}
-  .work-pin.no-portal .work-veil{opacity:1 !important;}
-  .work-pin.no-portal .work-stage{position:static;padding:clamp(56px,9vh,96px) 0;}
-  .work-pin.no-portal .work-track{transform:none !important;
-    flex:1 1 auto;width:100%;overflow-x:auto;
-    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
-    scrollbar-width:none;padding-bottom:6px;}
-  .work-pin.no-portal .work-track::-webkit-scrollbar{display:none;}
-  .work-pin.no-portal .wcard{scroll-snap-align:center;height:auto;min-height:520px;}
-  .work-pin.no-portal .work-intro{scroll-snap-align:center;}
+  /* the three tools, nested inside the system slide */
+  /* the slide is stretched to the tallest card in the reel, so the three tools
+     grow to take up the slack rather than leaving a void under the hero */
+  .sys-subs{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.2vw,16px);
+    padding:0 24px 24px;flex:none;align-items:stretch;}
+  .sub{display:flex;flex-direction:column;text-decoration:none;border-radius:14px;overflow:hidden;
+    border:1px solid var(--cream-line);background:var(--cream);
+    transition:transform .3s var(--ease),border-color .3s var(--ease);}
+  a.sub:hover{transform:translateY(-3px);border-color:rgba(36,99,220,.34);}
+  .sub-media{aspect-ratio:16/10;background:#EDF1F7;overflow:hidden;}
+  .sub-media video{width:100%;height:100%;object-fit:cover;display:block;}
+  .sub-info{padding:11px 13px 13px;}
+  .sub-info .n{font-size:10.5px;font-weight:600;letter-spacing:.14em;color:#2463DC;}
+  .sub-info .t{margin-top:4px;font-size:15px;font-weight:570;letter-spacing:-0.012em;color:var(--cream-ink);}
+  .sub-info .d{margin-top:3px;font-size:12.5px;line-height:1.5;color:var(--cream-ink-3);}
+
+  @media (max-width:900px){
+    .work-pin{--card-w:min(86vw,520px);--sys-w:min(88vw,560px);}
+    .sys-hero-r{width:100%;justify-content:flex-start;}
+    .sys-subs{grid-template-columns:1fr;}
+    .sys-tags{margin-left:0;width:100%;}
+  }
 
   /* ── CUSTOM CURSOR (ported from index.html — dot / text caret / CTA magnet) ── */
   html.cc-active, html.cc-active *{cursor:none !important;}
@@ -503,72 +556,141 @@
     <div class="trail" id="trail" aria-hidden="true"></div>
   </section>
 
-  <canvas id="tunnel" aria-hidden="true"></canvas>
-
   <section class="work-pin" id="workPin">
-    <div class="work-sticky">
-      <div class="work-veil" id="workVeil">
-        <div class="work-stage">
-          <div class="work-track" id="workTrack">
 
-            <div class="work-intro">
-              <span class="k">Selected work</span>
-              <h2>Five products, one <span class="serif">thread.</span></h2>
-              <p>Voice, AI, and the people on the other side of it — from first prototype through the version thousands of learners actually use.</p>
-              <span class="work-scroll-hint">Keep scrolling<i></i></span>
-            </div>
+    <header class="work-head">
+      <div class="work-head-l">
+        <span class="k">Selected work</span>
+        <h2>Four products, one <span class="serif">thread.</span></h2>
+      </div>
+      <p class="work-head-r">Voice, AI, and the people on the other side of it — from first
+        prototype through the version thousands of learners actually use.</p>
+    </header>
 
-            <article class="wcard" style="--a:rgba(92,169,255,.34)">
-              <div class="wcard-top"><b>01</b><span>2023 — 2025</span></div>
-              <div class="wcard-media"><img src="images/card-et-live.webp" alt="EverTutor Live session interface" width="760" height="507"></div>
-              <h3>EverTutor Live</h3>
-              <div class="role">Product Design Lead</div>
-              <p>A voice-first AI tutor that gives every learner a fully adaptive 1:1 session — taken from prototype to product-market fit.</p>
-              <div class="wcard-metrics"><span>2,000+ daily sessions</span><span>2× performance gain</span><span>$250 → $5/hr</span></div>
-              <a class="wcard-cta" href="evertutor-live.html">View case study ↗</a>
-            </article>
+    <div class="work-track" id="workTrack">
 
-            <article class="wcard" style="--a:rgba(140,197,255,.3)">
-              <div class="wcard-top"><b>02</b><span>2024</span></div>
-              <div class="wcard-media"><img src="images/card-et-studio.webp" alt="EverTutor Studio authoring interface" width="760" height="507"></div>
-              <h3>EverTutor Studio</h3>
-              <div class="role">Product Design Lead</div>
-              <p>The authoring environment behind Live — where educators shape, test and ship a tutor's curriculum without ever writing a prompt.</p>
-              <a class="wcard-cta" href="evertutor-studio.html">View case study ↗</a>
-            </article>
-
-            <article class="wcard" style="--a:rgba(92,169,255,.24)">
-              <div class="wcard-top"><b>03</b><span>2024</span></div>
-              <div class="wcard-media"><img src="images/card-et-analytics.webp" alt="EverTutor Analytics dashboard" width="760" height="507" loading="lazy"></div>
-              <h3>EverTutor Analytics</h3>
-              <div class="role">Product Design</div>
-              <p>The measurement layer — how a team sees what a learner actually struggled with, session by session, without drowning in transcripts.</p>
-            </article>
-
-            <article class="wcard" style="--a:rgba(168,132,255,.3)">
-              <div class="wcard-top"><b>04</b><span>2022</span></div>
-              <div class="wcard-media"><img src="images/card-stressie.webp" alt="Stressie mobile app" width="760" height="428" loading="lazy"></div>
-              <h3>Stressie</h3>
-              <div class="role">Founding Product Designer</div>
-              <p>Led customer discovery, behaviour analytics and the design of the first product — pre-launched into market and became the foundation for the company's traction.</p>
-              <a class="wcard-cta" href="stressie-studio.html">View case study ↗</a>
-            </article>
-
-            <article class="wcard" style="--a:rgba(255,160,120,.26)">
-              <div class="wcard-top"><b>05</b><span>2025</span></div>
-              <div class="wcard-media"><img src="images/card-dearly.webp" alt="Dearly app" width="760" height="428" loading="lazy"></div>
-              <h3>Dearly</h3>
-              <div class="role">Product Design</div>
-              <p>A quieter way to keep the people who matter close — built around remembering, not notifying.</p>
-            </article>
-
-            <div class="work-end">End of reel<i></i>More below</div>
-
+      <!-- 01 — EverTutor: three tools, shown as the one system they are -->
+      <article class="slide slide--system">
+        <div class="slide-top">
+          <b>01</b><span>2023 — 2025</span>
+          <div class="sys-tags">
+            <span class="sys-tag">Sole Product Designer</span>
+            <span class="sys-tag">0 to 1</span>
+            <span class="sys-tag">Desktop · B2B · B2C</span>
           </div>
         </div>
-      </div>
+
+        <div class="sys-hero">
+          <div class="sys-hero-l">
+            <h3>EverTutor AI System</h3>
+            <p class="sys-desc">World&rsquo;s first multimodal 1:1, voice-first AI tutor powered by
+              <em>3 tools working as one system</em> to enable a billion tutors for a billion minds.</p>
+          </div>
+          <div class="sys-hero-r">
+            <div class="sys-metric"><span class="v">2000+</span><span class="l">Active Learners</span></div>
+            <div class="sys-metric"><span class="v">−96%</span><span class="l">Workflow time</span></div>
+            <div class="sys-metric"><span class="v">0→$500k+</span><span class="l">ARR as sole designer</span></div>
+          </div>
+        </div>
+
+        <div class="sys-subs">
+          <a class="sub" href="evertutor-live.html">
+            <div class="sub-media">
+              <video src="images/et-live.mp4" poster="images/card-et-live.webp"
+                     autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+            </div>
+            <div class="sub-info">
+              <span class="n">1.1</span>
+              <p class="t">EverTutor Live</p>
+              <p class="d">Voice-first AI tutor · prototype to PMF</p>
+            </div>
+          </a>
+          <a class="sub" href="evertutor-studio.html">
+            <div class="sub-media">
+              <video src="images/et-studio.mp4" poster="images/card-et-studio.webp"
+                     autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+            </div>
+            <div class="sub-info">
+              <span class="n">1.2</span>
+              <p class="t">EverTutor Studio</p>
+              <p class="d">100+ hrs → 4 hrs lesson creation</p>
+            </div>
+          </a>
+          <div class="sub sub--flat">
+            <div class="sub-media">
+              <video src="images/et-analytics.mp4" poster="images/card-et-analytics.webp"
+                     autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+            </div>
+            <div class="sub-info">
+              <span class="n">1.3</span>
+              <p class="t">EverTutor Analytics</p>
+              <p class="d">Real-time student insights for educators</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 02 — Stressie -->
+      <article class="slide">
+        <div class="slide-top"><b>02</b><span>2022</span></div>
+        <div class="slide-media">
+          <img src="images/card-stressie.webp" alt="Stressie" width="760" height="428" loading="lazy">
+        </div>
+        <div class="slide-body">
+          <h3>Stressie</h3>
+          <div class="role">Founding Product Designer</div>
+          <p>From pilot research to a <em>Harvard-incubated product</em> — a full redesign of
+            workplace stress management, now live at Amazon and InKind.</p>
+          <div class="slide-metrics">
+            <span>17.4% engagement vs ~2% avg</span><span>Harvard Innovation Labs</span><span>2 live pilots</span>
+          </div>
+          <a class="slide-cta" href="stressie-studio.html">View case study ↗</a>
+        </div>
+      </article>
+
+      <!-- 03 — Dearly -->
+      <article class="slide">
+        <div class="slide-top"><b>03</b><span>2025</span></div>
+        <div class="slide-media">
+          <img src="images/card-dearly.webp" alt="Dearly" width="760" height="428" loading="lazy">
+        </div>
+        <div class="slide-body">
+          <h3>Dearly</h3>
+          <div class="role">Solo Designer &amp; Developer</div>
+          <p>Animated handwriting with your real voice and photos, sent as a unique link —
+            a quieter way to keep the people who matter close. Built in 48 hours.</p>
+          <div class="slide-metrics">
+            <span>Shipped in 48 hours</span><span>140 letters written</span><span>End-to-end ownership</span>
+          </div>
+          <a class="slide-cta" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">Visit the site ↗</a>
+        </div>
+      </article>
+
+      <!-- 04 — The Engine -->
+      <article class="slide">
+        <div class="slide-top"><b>04</b><span>2025</span></div>
+        <div class="slide-media">
+          <img src="images/card-engine.webp" alt="The Engine" width="760" height="507" loading="lazy">
+        </div>
+        <div class="slide-body">
+          <h3>The Engine</h3>
+          <div class="role">Product Design · Landing Page</div>
+          <p>Designed the landing page for an AI growth platform that runs content, marketing
+            and sales autonomously — the whole pitch carried by one glowing funnel.</p>
+          <div class="slide-metrics">
+            <span>Brand &amp; art direction</span><span>Marketing site</span><span>Motion</span>
+          </div>
+          <a class="slide-cta" href="https://www.theengine.dev/" target="_blank" rel="noopener">Visit the site ↗</a>
+        </div>
+      </article>
+
     </div>
   </section>
+
+  <!-- the same orb, parked bottom-right once the hero's own CTA has scrolled off -->
+  <button class="orb-fab" id="orbFab" type="button" aria-label="Talk to Bhanu AI" aria-haspopup="dialog">
+    <span class="orb-fab-mount" id="fabOrbMount"></span>
+  </button>
 
   <div class="chat-backdrop" id="chatBackdrop"></div>
   <aside class="chat" id="chat" data-view="voice" role="dialog" aria-label="Ask me anything" aria-modal="true">
@@ -632,7 +754,15 @@
     </div>
   </aside>
 
-<script src="portal/dimension.js?v=7"></script>
+<script>
+/* Dev-only: ?rafshim drives requestAnimationFrame from setTimeout so the scene
+   renders in headless/hidden tabs where RAF is suspended (used by the local
+   preview tooling to screenshot the smoke and the portal). Harmless otherwise. */
+if (new URLSearchParams(location.search).has('rafshim')) {
+  window.requestAnimationFrame = function (cb) { return window.setTimeout(function () { cb(performance.now()); }, 16); };
+  window.cancelAnimationFrame = function (id) { window.clearTimeout(id); };
+}
+</script>
 <script>
 /* ═══ SMOKE SHADER — pure rising smoke, no geometry ═══ */
 (function () {
@@ -838,262 +968,17 @@ addEventListener('keydown', function (e) {
 
 /* ── nav — compress to the 80% pill on scroll (ported behavior) ── */
 var topNav = document.getElementById('topNav');
+var creamBand = document.getElementById('workPin');
 addEventListener('scroll', function () {
   topNav.classList.toggle('scrolled', scrollY > 40);
+  /* the compressed pill sits ~86px down — invert it once cream is behind it */
+  if (creamBand) {
+    var r = creamBand.getBoundingClientRect();
+    topNav.classList.toggle('on-cream', r.top <= 86 && r.bottom >= 86);
+  }
 }, { passive: true });
 
-/* ═══ SECTION 2 — the crossing, then the work reel scrolls sideways ═══
-   Four scroll phases, all pure functions of scrollY (so scrubbing back up rewinds):
-     A  the hero recedes — copy and photo trail dissolve, its smoke lifts
-     B  the light floods the frame (liquid-glass WebGL, scrubbed)
-     C  it breaks white; the work rises from below
-     D  the track slides sideways                                            */
-(function () {
-  var pin = document.getElementById('workPin');
-  var veil = document.getElementById('workVeil');
-  var track = document.getElementById('workTrack');
-  var copy = document.querySelector('.copy');
-  var ctaDock = document.querySelector('.cta-dock');
-  var trailLayer = document.getElementById('trail');
-  if (!pin || !veil || !track) return;
-
-  /* touch, small screens and reduced motion get a plain swipeable rail instead.
-     Re-checked on resize so crossing the breakpoint switches modes cleanly. */
-  function portalFits() {
-    return !matchMedia('(prefers-reduced-motion: reduce)').matches &&
-           matchMedia('(pointer:fine)').matches && innerWidth > 820;
-  }
-  var active = false;
-
-  /* ── scroll velocity ──────────────────────────────────────────────────────
-     The dimension has to react to *how hard* you scroll, not only to where you
-     are. Raw delta is normalised against the viewport, then damped and decayed
-     on a rAF, so a trackpad flick intensifies the optics and a stop lets them
-     settle — without a spike ever snapping the image. */
-  var lastY = scrollY, vRaw = 0, vSmooth = 0;
-  var curP = 0, visible = false, raf = 0;
-
-  function tick() {
-    raf = 0;
-    if (!active || !visible) return;
-    vSmooth += (vRaw - vSmooth) * 0.18;
-    vRaw *= 0.90;
-    tunnelDraw(curP, vSmooth);
-    raf = requestAnimationFrame(tick);
-  }
-  function ensureTick() { if (!raf && active && visible) raf = requestAnimationFrame(tick); }
-  function stopTick() { visible = false; if (raf) { cancelAnimationFrame(raf); raf = 0; } }
-
-  var SPAN_A = 0, SPAN_B = 0, SPAN_C = 0, travel = 0, pinTop = 0, vw = 0, vh = 0;
-  var cards = [].slice.call(track.querySelectorAll('.wcard, .work-intro, .work-end'));
-
-  /* ── the inside of the orb — a scroll-scrubbed WebGL dive.
-       uP 0→~.7 is flight (rings, streaks, nebula in the orb's blues);
-       uP .7→1 accelerates into the white of the arrival page. ── */
-  var tcv = document.getElementById('tunnel');
-  var tgl = null, tReady = false, tNoGL = false, tuRes, tuTime, tuP;
-
-  /* the 3D crossing (portal/dimension.js). If the GPU can't run it — no WebGL,
-     no instancing — we quietly keep the flat glass shader below. */
-  var dim = null, dimTried = false;
-  function dimQuality() {
-    return (innerWidth < 1180 || (navigator.deviceMemory && navigator.deviceMemory <= 4))
-      ? 'low' : 'high';
-  }
-  var T_FRAG = [
-    'precision highp float;',
-    'uniform vec2 uRes;uniform float uTime;uniform float uP;',
-    'float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}',
-    'vec2 hash2(vec2 p){return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);}',
-    'float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);',
-    ' float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));',
-    ' return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}',
-    'float fbm(vec2 p){float v=0.,a=.5;mat2 r=mat2(1.6,1.2,-1.2,1.6);',
-    ' for(int i=0;i<4;i++){v+=a*noise(p);p=r*p;a*=.5;}return v;}',
-    'void main(){',
-    ' vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y;',
-    ' float t=uTime*0.05;',
-    /* the light starts low — where the hero smoke sits — then rises and swells */
-    ' float cy=mix(-0.46,0.0,smoothstep(0.0,0.6,uP));',
-    ' vec2 c=vec2(0.0,cy);',
-    /* liquid glass: a domain-warped flow bends the light. Continuous — no cells,
-       no repeats, the structure never resolves into a motif. */
-    ' vec2 q=uv*1.25+vec2(0.0,-t*1.1-uP*0.9);',
-    ' float w1=fbm(q+vec2(fbm(q*1.6+vec2(t,0.0)),fbm(q*1.5-vec2(0.0,t)))*1.15);',
-    ' float w2=fbm(q*1.85+vec2(3.7,-t*1.3));',
-    ' vec2 flow=vec2(w1-0.5,w2-0.5);',
-    ' vec2 p=(uv-c)+flow*(0.34*(1.0-0.5*uP));',
-    /* swell toward the viewer as you scroll */
-    ' float grow=mix(0.26,2.30,uP*uP);',
-    ' float ca=0.040*(1.0-0.35*uP);',                // dispersion through the glass
-    ' float dr=length(p*(1.0+ca))/grow;',
-    ' float dg=length(p)/grow;',
-    ' float db=length(p*(1.0-ca))/grow;',
-    ' float gr=exp(-dr*dr*2.6),gg=exp(-dg*dg*2.6),gb=exp(-db*db*2.6);',
-    ' vec3 col=vec3(0.039,0.055,0.082);',            // the hero smoke's own base
-    ' col+=vec3(0.05,0.12,0.27)*w1*0.95;',           // deep blue haze in suspension
-    ' col+=vec3(0.24*gr,0.47*gg,0.88*gb);',          // the light, split by the glass
-    ' col+=vec3(0.80*gr*gr,0.88*gg*gg,1.0*gb*gb)*0.72;',
-    ' float sheen=pow(max(w2,0.0),3.0)*(1.0-smoothstep(0.0,1.25,dg));',
-    ' col+=vec3(0.34,0.56,0.92)*sheen*0.40;',        // soft specular roll across the glass
-    /* caustics — ridged noise makes light veins that flow and never repeat */
-    ' float rg=1.0-abs(2.0*fbm(q*2.15+flow*1.5)-1.0);',
-    ' rg=pow(max(rg,0.0),3.2)*(1.0-smoothstep(0.05,1.45,dg));',
-    ' col+=vec3(0.40,0.66,1.0)*rg*0.55;',
-    ' col*=1.0-0.34*smoothstep(0.55,1.35,length(uv));',
-    ' col+=(hash(gl_FragCoord.xy+fract(uTime))-0.5)*0.012;',
-    ' float wo=smoothstep(0.72,0.985,uP);',          // break into the arrival page
-    ' col=mix(col,vec3(0.972,0.980,0.992),wo);',
-    ' gl_FragColor=vec4(col,1.0);}'
-  ].join('\n');
-
-  function tunnelInit() {
-    if (tReady) return true;
-    if (tNoGL) return false;
-    tgl = tcv.getContext('webgl', { alpha: false, antialias: false, preserveDrawingBuffer: true });
-    if (!tgl) { tNoGL = true; return false; }
-    function sh(type, src) {
-      var s = tgl.createShader(type); tgl.shaderSource(s, src); tgl.compileShader(s);
-      if (!tgl.getShaderParameter(s, tgl.COMPILE_STATUS)) { console.error(tgl.getShaderInfoLog(s)); return null; }
-      return s;
-    }
-    var vs = sh(tgl.VERTEX_SHADER, 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}');
-    var fs = sh(tgl.FRAGMENT_SHADER, T_FRAG);
-    if (!vs || !fs) { tNoGL = true; return false; }
-    var prog = tgl.createProgram();
-    tgl.attachShader(prog, vs); tgl.attachShader(prog, fs);
-    tgl.linkProgram(prog); tgl.useProgram(prog);
-    var buf = tgl.createBuffer();
-    tgl.bindBuffer(tgl.ARRAY_BUFFER, buf);
-    tgl.bufferData(tgl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), tgl.STATIC_DRAW);
-    var loc = tgl.getAttribLocation(prog, 'p');
-    tgl.enableVertexAttribArray(loc); tgl.vertexAttribPointer(loc, 2, tgl.FLOAT, false, 0, 0);
-    tuRes = tgl.getUniformLocation(prog, 'uRes');
-    tuTime = tgl.getUniformLocation(prog, 'uTime');
-    tuP = tgl.getUniformLocation(prog, 'uP');
-    tReady = true; return true;
-  }
-  function tunnelDraw(p, vel) {
-    if (!dimTried) {
-      dimTried = true;
-      if (window.Dimension) dim = Dimension.create(tcv, {
-        quality: dimQuality(), world: 'smoke',
-        /* the hero's own headline flies through the vortex — the DOM copy
-           dissolves as the canvas fades up, and this takes its place */
-        title: ['DESIGNING PRODUCTS', 'THAT SCALE, CONVERT', '& CONNECT']
-      });
-    }
-    if (dim) { dim.draw(p, vel || 0); return; }
-    if (!tunnelInit()) {                     // no WebGL → flat colour crossfade
-      tcv.style.background = p > .7 ? '#F7F9FC' : '#081B2E';
-      return;
-    }
-    var w = Math.round(tcv.clientWidth * .58), h = Math.round(tcv.clientHeight * .58);
-    if (tcv.width !== w || tcv.height !== h) { tcv.width = w; tcv.height = h; tgl.viewport(0, 0, w, h); }
-    tgl.uniform2f(tuRes, w, h);
-    tgl.uniform1f(tuTime, performance.now() / 1000);
-    tgl.uniform1f(tuP, p);
-    tgl.drawArrays(tgl.TRIANGLES, 0, 3);
-  }
-  tcv.__draw = tunnelDraw;                   // debug hook for headless verification
-
-  function measure() {
-    vw = innerWidth; vh = innerHeight;
-    /* ~350vh of pinned choreography — tightened so there is never a dead
-       stretch: the mound is already growing on the first flick, and the
-       crossing lands within a couple of committed scrolls */
-    SPAN_A = Math.round(vh * 1.00);          // the hero recedes, smoke swells
-    SPAN_B = Math.round(vh * 1.60);          // vortex forms → acceleration
-    SPAN_C = Math.round(vh * 0.90);          // crossing → snap → arrival
-    travel = Math.max(0, track.scrollWidth - vw);
-    pin.style.height = (vh + SPAN_B + SPAN_C + travel) + 'px';
-    pinTop = pin.offsetTop;
-  }
-
-  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
-  function ease(t) { return 1 - Math.pow(1 - t, 3); }
-  function ramp(a, b, t) { return clamp01((t - a) / (b - a)); }
-
-  function update() {
-    if (!active) return;
-    var y = scrollY;
-    var start = pinTop - SPAN_A, total = SPAN_A + SPAN_B + SPAN_C;
-    /* ONE continuous progress drives the whole crossing. The engine owns its
-       own internal beats (calm → anomaly → approach → acceleration → crossing
-       → snap → arrival), so the page only has to hand it a clean 0→1. */
-    var p = clamp01((y - start) / total);
-    var aP = clamp01((y - start) / SPAN_A);                        // hero recedes
-    var cP = ramp(0.86, 1, p);                                     // work rises
-    var tP = travel ? clamp01((y - pinTop - SPAN_B - SPAN_C) / travel) : 0;  // reel
-    curP = p;
-
-    /* A — the hero lets go: copy, CTA and photo trail dissolve on the way out.
-       All of it is gone before the canvas reaches full opacity, so the smoke
-       swallowing the page is what you see — not a panel covering the copy. */
-    if (copy) copy.style.opacity = (1 - ramp(.08, .40, aP)).toFixed(3);
-    if (ctaDock) ctaDock.style.opacity = (1 - ramp(.04, .30, aP)).toFixed(3);
-    if (trailLayer) trailLayer.style.opacity = (1 - ramp(0, .28, aP)).toFixed(3);
-
-    /* The world fades up as the hero's own bottom smoke starts to swell —
-       the canvas smoke begins as the same mound in the same place, so the
-       hand-off is invisible. It clears at the very end, once it has already
-       whited out to the page. */
-    var tOp = ramp(.08, .40, aP) * (1 - ramp(.94, 1, p));
-    tcv.style.opacity = tOp.toFixed(3);
-    visible = tOp > 0;
-    tcv.style.display = visible ? 'block' : 'none';
-    if (visible) ensureTick(); else if (raf) { cancelAnimationFrame(raf); raf = 0; }
-
-    /* the white page stays hidden until the dive begins (dark body shows instead) */
-    veil.style.opacity = y >= pinTop ? '1' : '0';
-
-    /* C/D — work rises from the bottom (staggered), then slides sideways */
-    var rise = 1 - ease(cP);
-    track.style.transform = 'translate3d(' + (-tP * travel).toFixed(1) + 'px,' + (rise * vh * 0.55).toFixed(1) + 'px,0)';
-    for (var i = 0; i < cards.length; i++) {
-      cards[i].style.transform = rise > 0 ? 'translateY(' + (rise * i * 34).toFixed(1) + 'px)' : '';
-    }
-  }
-
-  function remeasure() {
-    if (!portalFits()) {
-      if (active || !pin.classList.contains('no-portal')) {
-        pin.classList.add('no-portal');
-        active = false;
-        stopTick();
-        pin.style.height = '';
-        veil.style.opacity = '';
-        track.style.transform = '';
-        for (var i = 0; i < cards.length; i++) cards[i].style.transform = '';
-        tcv.style.opacity = '0';
-        tcv.style.display = 'none';
-        if (copy) copy.style.opacity = '';
-        if (ctaDock) ctaDock.style.opacity = '';
-        if (trailLayer) trailLayer.style.opacity = '';
-      }
-      return;
-    }
-    pin.classList.remove('no-portal');
-    active = true;
-    measure();
-    update();
-  }
-  remeasure();
-  addEventListener('scroll', function () {
-    var y = scrollY, dy = Math.abs(y - lastY);
-    lastY = y;
-    /* half a viewport in one frame counts as full intensity */
-    vRaw = Math.min(1, Math.max(vRaw, dy / Math.max(1, vh * 0.5)));
-    update();
-  }, { passive: true });
-  addEventListener('resize', remeasure);
-  addEventListener('load', remeasure);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
-  /* card art settles the track width once it decodes */
-  [].forEach.call(track.querySelectorAll('img'), function (im) {
-    if (!im.complete) im.addEventListener('load', remeasure, { once: true });
-  });
-})();
+/* Section 2 needs no JS — the reel is a native scroll-snap rail (see .work-track). */
 
 /* ── image trail — photos reveal one after another along the cursor path ── */
 (function () {
@@ -1251,6 +1136,33 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
     window.BhanuOrb.mountVisual(document.getElementById('ctaOrbMount'), { palette: 'arctic', size: 55, state: 'idle' });
     document.getElementById('ctaOrb').classList.add('mounted');
   } else setTimeout(waitOrb, 60);
+})();
+
+/* ═══ ORB FAB — the same orb, parked bottom-right ═══
+   Shows once the hero's own CTA has left the viewport, so the two never
+   compete; inverts to light glass while it sits over the cream band. */
+(function waitFab() {
+  var fab = document.getElementById('orbFab');
+  if (!fab) return;
+  if (!(window.BhanuOrb && window.BhanuOrb.mountVisual)) { setTimeout(waitFab, 60); return; }
+  window.BhanuOrb.mountVisual(document.getElementById('fabOrbMount'),
+    { palette: 'arctic', size: 52, state: 'idle' });
+
+  fab.addEventListener('click', function () { openChat(); });
+
+  var heroCta = document.getElementById('cta');
+  var band = document.getElementById('workPin');
+  function sync() {
+    var gone = heroCta ? heroCta.getBoundingClientRect().bottom < 8 : scrollY > innerHeight * 0.7;
+    fab.classList.toggle('show', gone);
+    if (band) {
+      var r = band.getBoundingClientRect(), y = innerHeight - 50;   /* the FAB's own centre */
+      fab.classList.toggle('on-cream', r.top <= y && r.bottom >= y);
+    }
+  }
+  addEventListener('scroll', sync, { passive: true });
+  addEventListener('resize', sync);
+  sync();
 })();
 
 /* ═══ CUSTOM CURSOR + CTA MAGNET (ported from index.html cursor system) ═══ */
