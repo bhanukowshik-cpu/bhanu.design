@@ -70,12 +70,15 @@ void main() {
   vec3 worldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
   vec3 newPosition   = position;
 
-  newPosition.z = sin(uv.x * PI) * 0.04;
-
+  /* The cards used to carry two standing deformations — a horizontal bow
+     (sin(uv.x)*0.04 on z) and a view-space shear that grew with height
+     (pow(y,2)*0.1) — which together read as warped, crooked corners on
+     every resting card. Both are gone: a card is a flat panel now. The
+     one bend left is the scroll-speed one below, and it decays to zero
+     the moment the reel rests. */
   vec4 modelPosition = modelMatrix * vec4(newPosition, 1.0);
   vec4 viewPosition  = viewMatrix  * modelPosition;
 
-  viewPosition.x += pow(worldPosition.y, 2.0) * 0.1;
   viewPosition.x += sin(uv.y * PI) * uScrollSpeed * 2.0;
 
   gl_Position = projectionMatrix * viewPosition;
