@@ -2170,7 +2170,7 @@ function mountSmoke(canvas) {
        only the top ~18% of it is ever on screen; the rest is clipped away
        by the frame. Everything is expressed in the circle's own radius, so
        the composition holds identically at 320px and at 3440px. */
-    ' float R=aspect*0.5;',                           // radius = half the viewport width
+    ' float R=aspect*0.68;',                          // wider than the viewport now
     ' vec2 c=vec2(aspect*0.5,-0.64*R);',              // sunk: crest lands ~0.36R above the floor
     ' vec2 rel=p-c;',
     ' float d=length(rel)/max(R,0.0001);',            // 1.0 would be a clean rim
@@ -2194,18 +2194,22 @@ function mountSmoke(canvas) {
     ' float plume=smoke*esc*rise;',
     ' float glow=smoothstep(1.30,0.18,dn);',          // the bloom it throws, warped with it
     ' vec3 bg=vec3(0.039,0.055,0.082);',
-    ' vec3 deep=vec3(0.10,0.22,0.42);',
+    /* The mass is coloured by height, not by density: a deep blue where it
+       banks against the floor, paling as it climbs, so the dome has a bottom
+       and a top rather than one flat tint everywhere. */
+    ' float hgt=clamp(p.y/(c.y+R+0.001),0.0,1.0);',   // 0 at the floor, 1 at the crest
+    ' vec3 deep=mix(vec3(0.09,0.20,0.52),vec3(0.42,0.68,1.00),hgt);',
     ' vec3 ice=vec3(0.46,0.74,1.0);',
     /* The smoke belongs to the floor. This envelope holds it at full strength
        along the bottom edge and takes it to nothing by ~60% up, so it reads
        as rising in from below the frame and dissipating — not as a field
        sitting in the middle of the screen. */
-    ' float floorFade=1.0-smoothstep(0.06,0.60,p.y);',
+    ' float floorFade=1.0-smoothstep(0.08,0.84,p.y);',
     /* ONE KNOB. Every additive term is scaled by this, so the whole effect
        dims or lifts together without any of the balance between mass, edge
        and plume changing. Raise toward 1.0 for more, drop toward 0.3 for a
        whisper. */
-    ' float I=0.55*floorFade;',
+    ' float I=0.68*floorFade;',
     ' vec3 col=bg;',
     ' col+=deep*(dns*1.45+glow*0.40)*I;',
     ' col+=ice*dns*dns*0.55*I;',
@@ -2636,13 +2640,22 @@ var topNav = document.getElementById('topNav');
      from the layout box, so it stays right at every breakpoint without a
      second set of numbers to keep in sync. */
   var LINK = 14;                                   /* the join between panels */
-  var step = 0;
+  /* The strip does not climb the right column — it runs on a diagonal, from
+     the top right down to the bottom centre. DIAG is how far it drifts
+     sideways per step, as a fraction of a panel's width; the vertical step
+     stays the panel's own height plus the join, so the panels still touch
+     along the axis they travel on. */
+  var DIAG = 0.42;
+  var step = 0, stepX = 0;
   function measure() {
-    var h = 0;
+    var h = 0, w = 0;
     for (var i = 0; i < medias.length; i++) {
-      if (medias[i] && medias[i].offsetHeight) { h = medias[i].offsetHeight; break; }
+      if (medias[i] && medias[i].offsetHeight) {
+        h = medias[i].offsetHeight; w = medias[i].offsetWidth; break;
+      }
     }
-    step = Math.round((h || innerHeight * 0.42) + LINK);
+    step  = Math.round((h || innerHeight * 0.42) + LINK);
+    stepX = Math.round((w || innerWidth * 0.42) * DIAG);
   }
   measure();
 
@@ -2690,8 +2703,11 @@ var topNav = document.getElementById('topNav');
     slides.forEach(function (s, n) {
       var m = medias[n]; if (!m) return;
       var k = n - pos, a = Math.min(1, Math.abs(k));
+      /* the diagonal: what is coming waits up and to the right, what has
+         passed has slid down and toward the centre of the frame */
       m.style.transform =
-        'translate3d(0,' + (k * step).toFixed(2) + 'px,0) perspective(1100px)' +
+        'translate3d(' + (k * stepX).toFixed(2) + 'px,' + (-k * step).toFixed(2) + 'px,0)' +
+        ' perspective(1100px)' +
         ' rotateY(' + ry + 'deg) rotateX(' + rx + 'deg) rotate(' + rz + 'deg)' +
         ' skewY(' + sk.toFixed(2) + 'deg)' +
         ' scale(' + (1 - 0.035 * a).toFixed(3) + ')';
