@@ -271,11 +271,18 @@
   .slide-media{position:relative;margin:20px 20px 0;border-radius:14px;overflow:hidden;
     aspect-ratio:16/10;background:#EDF1F7;border:1px solid var(--cream-line);}
   .slide-media img{width:100%;height:100%;object-fit:cover;display:block;}
+  /* the video doesn't slide up flat — it swings up, tilted back on X and
+     slightly small, then settles level and opaque over the still. Values
+     read off bymonolog's success-stories reveal: ~72% of its own height
+     below, rotateX(18deg), scale(.95), perspective ~0.9× the box width. */
   .slide-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
-    transform:translateY(101%);will-change:transform;
-    transition:transform .62s cubic-bezier(0.19,1,0.22,1);}
+    transform-origin:50% 50%;
+    transform:perspective(480px) translateY(72%) rotateX(18deg) scale(.95);
+    opacity:0;will-change:transform,opacity;
+    transition:transform .8s cubic-bezier(0.16,1,0.3,1),opacity .5s ease;}
   .slide:hover .slide-vid,
-  .slide:focus-within .slide-vid{transform:translateY(0);}
+  .slide:focus-within .slide-vid{
+    transform:perspective(480px) translateY(0) rotateX(0deg) scale(1);opacity:1;}
 
   .slide-body{display:flex;flex-direction:column;flex:1;padding:18px 20px 22px;}
   .slide-num{font-size:11px;font-weight:600;letter-spacing:.13em;color:#2463DC;margin-bottom:9px;}
@@ -954,8 +961,8 @@ addEventListener('scroll', function () {
     });
     slide.addEventListener('mouseleave', function () {
       vid.pause();
-      /* rewind only after it has slid back out, so you never see it jump */
-      setTimeout(function () { if (vid.paused) vid.currentTime = 0; }, 620);
+      /* rewind only after it has swung back out, so you never see it jump */
+      setTimeout(function () { if (vid.paused) vid.currentTime = 0; }, 820);
     });
   });
 })();
