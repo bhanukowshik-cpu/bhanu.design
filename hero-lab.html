@@ -95,7 +95,7 @@
   .eyebrow,.fact .v,.work-head .k,.chap,.slide-num,.sys-num,
   .slide-body .role,.slide-metrics span,.tc-k,.tc-nm,.tc-card-nm,
   .said-k,.said-name,.said-role,.ft-k,.ft-status,.ft-line,.ft-clock,
-  .sys-metric .v,.sys-metric .l,.state-tag,.gal-next-k,.gal-next-t,
+  .sys-metric .v,.sys-metric .l,.talk-cta,.head-stack span,
   button,input,textarea,select{font-family:var(--sans);}
   /* the serif never stands upright — it is an italic emphasis face here */
   .serif,em.serif,.said-quote,.tc-cap-sub{font-family:var(--serif);font-style:italic;}
@@ -394,28 +394,23 @@
      without a hint. Native scroll-snap does the paging — no JS owns the numbers. */
   .work-pin{position:relative;background:var(--cream);color:var(--cream-ink);
     --reel-pad:clamp(20px,5vw,88px);
-    --card-w:min(42vw,560px);          /* 1 full card + half the next in view */
     --panel-w:clamp(280px,26vw,400px); /* the 01 system panel that opens the reel */
     padding:clamp(58px,8vh,104px) 0 clamp(64px,9vh,116px);}
 
-  /* ── the rail, now the narrow-screen path only ──────────────────────────
-     Below 901px (where the pin never runs either) the section stays the
-     swipeable reel it has always been; the gallery takes over above that. */
-  .gal-stage{display:flex;align-items:stretch;gap:clamp(16px,1.8vw,28px);
-    padding:0 var(--reel-pad);
-    overflow-x:auto;overscroll-behavior-x:contain;
-    scroll-snap-type:x mandatory;scroll-padding-left:var(--reel-pad);
-    scrollbar-width:none;-ms-overflow-style:none;}
-  .gal-stage::-webkit-scrollbar{display:none;}
-  .slide{scroll-snap-align:start;}
+  /* ── the stack, the narrow-screen path ─────────────────────────────────
+     Below 901px (where the pin never runs either) there is no reel and no
+     sideways swipe to discover: the projects are a plain vertical column of
+     cards you scroll like anything else on a phone, each one playing its own
+     video as it comes into view. */
+  .gal-stage{display:flex;flex-direction:column;align-items:stretch;
+    gap:clamp(18px,3.4vw,32px);padding:0 var(--reel-pad);}
 
   /* the gallery's own furniture belongs to the gallery. This has to sit OUTSIDE
      the 901px query: below that width the gallery never initialises, and a
      next-project button with no gallery around it is just a stray control in
      the middle of the rail. */
   .gal:not(.gal-ready) .gal-bg,
-  .gal:not(.gal-ready) .gal-ticks,
-  .gal:not(.gal-ready) .gal-next{display:none;}
+  .gal:not(.gal-ready) .gal-ticks{display:none;}
 
   /* ── pinned mode — scrolling down drives the reel sideways ──────────────
      JS adds .is-pinned once it knows the travel, and sets the section's
@@ -427,18 +422,18 @@
   .work-pin.is-pinned .work-sticky{height:100svh;
     display:flex;flex-direction:column;justify-content:center;overflow:hidden;
     padding:clamp(40px,6vh,72px) 0;}
-  /* on the rail the cards arrive rather than simply being there, staggered by
-     index. The gallery does not use this — it owns its own crossfade. */
-  .gal-stage>.slide{
+  /* The stacked cards arrive rather than simply being there, staggered by
+     index — but the arrival is additive. .is-live is only ever set by the
+     script that also owns the observer which sets .revealed, so a paused
+     tab, a headless render or no JS at all leaves the cards plainly visible
+     instead of stranded at opacity 0. */
+  .gal-stage.is-live>.slide{
     opacity:0;transform:translateY(54px);
     transition:opacity .7s var(--ease),transform .95s cubic-bezier(0.16,1,0.3,1);
     transition-delay:calc(var(--i,0) * 90ms);}
-  .gal-stage.revealed>.slide{opacity:1;transform:none;}
-
-  /* if the observer never runs, nothing should stay invisible */
-  .no-reveal .gal-stage>.slide{opacity:1;transform:none;transition:none;}
+  .gal-stage.is-live.revealed>.slide{opacity:1;transform:none;}
   @media (prefers-reduced-motion: reduce){
-    .gal-stage>.slide{opacity:1;transform:none;transition:none;}
+    .gal-stage.is-live>.slide{opacity:1;transform:none;transition:none;}
   }
 
   /* ── the expanding light behind the reel ──────────────────────────────── */
@@ -503,45 +498,44 @@
     letter-spacing:-0.012em;font-variant-numeric:tabular-nums;line-height:1;}
   .sys-metric .l{font-size:11.5px;font-weight:500;letter-spacing:.02em;color:var(--cream-ink-3);}
 
-  /* ── project cards — every one the same width ─────────────────────────── */
-  .slide{flex:none;width:var(--card-w);display:flex;flex-direction:column;
+  /* ── project cards — one per row, full measure ────────────────────────── */
+  .slide{display:flex;flex-direction:column;
     border-radius:24px;overflow:hidden;position:relative;
-    border:1px solid var(--cream-line);background:var(--card);
-    box-shadow:0 34px 70px -34px rgba(0,0,0,.72), 0 2px 10px -4px rgba(0,0,0,.5);}
+    border:1px solid var(--cream-line);background:var(--card);box-shadow:none;}
 
-  /* thumbnail at rest; the video rises over it from the bottom on hover */
+  /* The video is the card's picture, not a reward for hovering: it fills the
+     frame at its own full size with nothing cropped away, rounded to sit
+     inside the card's corner. The still is only its poster, and hands over
+     the moment the first frame actually plays. */
   .slide-media{position:relative;display:grid;place-items:center;
-    margin:20px 20px 0;border-radius:14px;overflow:hidden;
-    aspect-ratio:16/9;background:#0B0F16;border:1px solid var(--cream-line);}
+    margin:18px 18px 0;border-radius:16px;overflow:hidden;
+    aspect-ratio:16/9;background:#070A10;border:1px solid var(--cream-line);}
   .slide-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
-  /* the still darkens behind the video so the inset panel reads as the lit thing.
-     rgba(8,8,7,.8), as bymonolog's works_home_overlay uses. */
-  .slide-media::after{content:'';position:absolute;inset:0;pointer-events:none;
-    background:rgba(8,8,7,.8);opacity:0;transition:opacity .30s cubic-bezier(0.5,0,0.85,0.4);}
-  .slide:has(.slide-vid):hover .slide-media::after,
-  .slide:has(.slide-vid):focus-within .slide-media::after{
-    transition:opacity .5s ease;opacity:1;}
-  /* the video doesn't slide up flat — it swings up, tilted back on X and
-     slightly small, then settles level and opaque over the still. Values
-     read off bymonolog's success-stories reveal: ~72% of its own height
-     below, rotateX(18deg), scale(.95), perspective ~0.9× the box width. */
-  /* the video never fills the frame — it sits inset and rounded, floating over
-     the darkened still. bymonolog's inset is 71.87%; this runs a little wider. */
-  .slide-vid{position:relative;z-index:1;width:83%;height:83%;object-fit:contain;display:block;
-    border-radius:10px;box-shadow:0 20px 44px -22px rgba(0,0,0,.6);
-    transform-origin:50% 50%;
-    transform:perspective(480px) translateY(72%) rotateX(18deg) scale(.95);
-    opacity:0;will-change:transform,opacity;
-    /* LEAVING. The entrance curve is an ease-out expo — lovely arriving,
-       but reversed it bolts then crawls the last third, which is what read
-       as unsmooth. Going out wants an ease-in, and shorter. */
-    transition:transform .40s cubic-bezier(0.5,0,0.85,0.4),
-               opacity .28s cubic-bezier(0.5,0,0.85,0.4);}
-  .slide:hover .slide-vid,
-  .slide:focus-within .slide-vid{
-    /* ARRIVING */
-    transition:transform .8s cubic-bezier(0.16,1,0.3,1),opacity .5s ease;
-    transform:perspective(480px) translateY(0) rotateX(0deg) scale(1);opacity:1;}
+  .slide-vid{position:absolute;inset:0;z-index:1;display:block;
+    width:100%;height:100%;object-fit:contain;background:#070A10;
+    border-radius:15px;box-shadow:none;
+    opacity:0;transition:opacity .5s var(--ease);}
+  .slide-vid.is-playing{opacity:1;}
+
+  /* ── the system's cover: the EverTutor orb, lit from behind ───────────── */
+  .sys-media{background:none;border:0;overflow:visible;}
+  /* Taken out of flow on purpose: in flow, a 940px image inside an aspect-ratio
+     box pushes the box taller than its ratio, and the panel stops matching the
+     six others. Absolute keeps the frame's 16:9 and lets the orb fill it. */
+  .sys-orb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    display:grid;place-items:center;height:96%;aspect-ratio:1;}
+  .sys-orb img{position:relative;z-index:1;width:100%;height:100%;
+    object-fit:contain;display:block;
+    filter:drop-shadow(0 30px 60px rgba(0,0,0,.55));}
+  /* the green it throws is the chapter's own colour, and nothing else on the
+     page uses it — which is exactly why the system reads as its own world */
+  .sys-orb-glow{position:absolute;inset:-14%;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle at 50% 50%,
+      rgba(96,201,152,.34) 0%,rgba(58,150,110,.16) 42%,transparent 70%);
+    filter:blur(26px);
+    animation:sysPulse 7s ease-in-out infinite;}
+  @keyframes sysPulse{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.045)}}
+  @media (prefers-reduced-motion:reduce){ .sys-orb-glow{animation:none;} }
 
   .slide-body{display:flex;flex-direction:column;flex:1;padding:18px 20px 22px;}
   .slide-num{font-size:11px;font-weight:600;letter-spacing:.13em;color:var(--accent);margin-bottom:9px;}
@@ -551,6 +545,7 @@
     text-transform:uppercase;color:var(--cream-ink-3);margin-bottom:7px;}
   .slide-body h3{font-family:var(--sans);font-size:clamp(22px,1.8vw,27px);font-weight:570;
     letter-spacing:-0.02em;color:var(--cream-ink);}
+  .slide-body h3 .serif{font-size:1.08em;font-weight:400;letter-spacing:-0.01em;}
   .slide-body .role{margin-top:5px;font-size:11px;font-weight:600;letter-spacing:.13em;
     text-transform:uppercase;color:var(--accent);}
   .slide-body p{margin-top:11px;font-size:14px;line-height:1.6;color:var(--cream-ink-2);}
@@ -559,18 +554,24 @@
   .slide-metrics span{padding:5px 10px;border-radius:999px;border:1px solid var(--cream-line);
     background:var(--cream-2);font-size:11px;font-weight:500;color:var(--cream-ink-2);
     font-variant-numeric:tabular-nums;}
-  .slide-cta{align-self:flex-start;margin-top:18px;display:inline-flex;align-items:center;gap:8px;
-    padding:10px 17px;border-radius:999px;text-decoration:none;
-    background:var(--cream-ink);color:#0A0E15;font-size:13px;font-weight:570;
-    transition:transform .3s var(--ease),background .3s var(--ease);}
-  .slide-cta:hover{transform:translateY(-2px);background:#FFFFFF;}
+  /* the project's button is the page's button — .btn-primary carries the
+     look, this only places it and gives it the extra weight a work CTA wants */
+  .slide-cta{align-self:flex-start;margin-top:18px;padding:14px 24px;font-size:14.5px;}
 
   @media (prefers-reduced-motion: reduce){
     .slide-vid{transition:none;}
   }
+  /* the stacked column reads best with a measure, not the full width of a
+     tablet — so the cards centre and stop growing past a comfortable size */
   @media (max-width:900px){
-    .work-pin{--card-w:min(78vw,420px);--panel-w:min(78vw,420px);}
-    .sys-panel{align-self:flex-start;padding-right:0;}
+    .gal-stage{max-width:620px;margin-inline:auto;}
+    .slide-body h3{font-size:clamp(24px,5.4vw,30px);}
+    .slide-cta{margin-top:20px;}
+  }
+  @media (max-width:560px){
+    .work-pin{--reel-pad:20px;}
+    .slide-media{margin:14px 14px 0;}
+    .slide-body{padding:16px 16px 20px;}
   }
 
   /* ── THE GALLERY — 901px and up ──────────────────────────────────────────
@@ -624,9 +625,13 @@
        a new row, which silently splits the two halves vertically */
     .gal.gal-ready .slide-body{grid-area:1 / 1;padding:0;flex:none;}
     .gal.gal-ready .slide-media{grid-area:1 / 2;}
-    .gal.gal-ready .slide-body h3{font-family:var(--serif);font-style:normal;
-      font-weight:400;font-size:clamp(56px,7.2vw,130px);line-height:.94;
-      letter-spacing:-0.03em;margin-top:2px;}
+    /* the title is a mix by rule, not by whim: the family in Instrument Sans,
+       the tool it names in Instrument Serif italic beside it */
+    .gal.gal-ready .slide-body h3{font-family:var(--sans);font-style:normal;
+      font-weight:570;font-size:clamp(44px,5.5vw,92px);line-height:1.02;
+      letter-spacing:-0.032em;margin-top:2px;text-wrap:balance;}
+    .gal.gal-ready .slide-body h3 .serif{font-size:1.06em;font-weight:400;
+      letter-spacing:-0.016em;}
     .gal.gal-ready .slide-num{font-size:12px;letter-spacing:.2em;}
     .gal.gal-ready .slide-body .role{margin-top:12px;}
     .gal.gal-ready .slide-body p{margin-top:16px;font-size:15.5px;max-width:44ch;}
@@ -639,22 +644,26 @@
        its position, skew from its velocity, the tilt eased toward level on
        hover. No transition on it: the spring IS the smoothing, and a
        transition layered on top would double-filter the motion into mush. */
-    .gal.gal-ready .slide-media{margin:0;aspect-ratio:16/10;height:auto;
-      border-radius:18px;transform-origin:50% 50%;will-change:transform,opacity;
-      box-shadow:-56px 64px 120px -44px rgba(0,0,0,.82);}
+    .gal.gal-ready .slide-media{margin:0;aspect-ratio:16/9;height:auto;
+      border-radius:18px;overflow:hidden;transform-origin:50% 50%;
+      will-change:transform,opacity;box-shadow:none;
+      border-color:rgba(255,255,255,.13);background:#070A10;}
 
-    /* the card's hover target is the whole card, which is right for a card. Here
-       the slide is the whole screen, so pointing at the paragraph would raise the
-       video. Hold it down for .slide:hover, and re-arm it on the media alone. */
-    .gal.gal-ready .slide:hover .slide-vid,
-    .gal.gal-ready .slide:focus-within .slide-vid{
-      transform:perspective(480px) translateY(72%) rotateX(18deg) scale(.95);opacity:0;}
-    .gal.gal-ready .slide:has(.slide-vid):hover .slide-media::after{opacity:0;}
-    .gal.gal-ready .slide .slide-media:hover .slide-vid{
-      transition:transform .8s cubic-bezier(0.16,1,0.3,1),opacity .5s ease;
-      transform:perspective(480px) translateY(0) rotateX(0deg) scale(1);opacity:1;}
-    .gal.gal-ready .slide:has(.slide-vid) .slide-media:hover::after{
-      transition:opacity .5s ease;opacity:1;}
+    /* No hover choreography here any more. The project you are on is playing:
+       the video sits in the frame at its own full size — contained, never
+       cropped — and simply fades up when the plane becomes the active one. */
+    .gal.gal-ready .slide-media::after{display:none;}
+    .gal.gal-ready .slide-vid{position:absolute;inset:0;z-index:1;
+      width:100%;height:100%;object-fit:contain;
+      border-radius:16px;box-shadow:none;transform:none;opacity:0;
+      transition:opacity .5s var(--ease);}
+    .gal.gal-ready .slide.is-active .slide-vid.is-playing{opacity:1;}
+
+    /* The system's cover keeps the frame's proportions even though it holds an
+       orb rather than a video — every panel in the strip is the same size, which
+       is what lets one step of travel join all seven of them. */
+    .gal.gal-ready .sys-media{background:none;border:0;overflow:visible;
+      display:grid;place-items:center;}
 
     /* the section label sits out of the way, top left */
     .gal.gal-ready .work-head{position:absolute;left:var(--reel-pad);
@@ -679,28 +688,15 @@
       align-items:flex-end;gap:11px;}
     .gal-chapter-group{display:flex;flex-direction:column;align-items:flex-end;
       gap:11px;padding-right:9px;border-right:1px solid rgba(255,255,255,.28);}
-    .gal-tick{width:13px;height:2px;padding:0;border:0;cursor:pointer;
-      background:rgba(255,255,255,.34);border-radius:2px;
-      transition:width .4s var(--ease),background .4s var(--ease);}
-    .gal-tick:hover{background:rgba(255,255,255,.7);width:20px;}
-    .gal-tick.is-on{width:32px;background:#fff;}
-
-    /* what is coming, bottom left */
-    .gal-next{position:absolute;left:var(--reel-pad);bottom:clamp(30px,5vh,60px);
-      z-index:4;display:flex;align-items:center;gap:14px;padding:0;border:0;
-      background:none;cursor:pointer;text-align:left;
-      transition:opacity .3s var(--ease);}
-    .gal-next:hover{opacity:.82;}
-    .gal-next-thumb{display:block;width:clamp(84px,7.6vw,124px);aspect-ratio:16/10;
-      border-radius:9px;overflow:hidden;border:1px solid rgba(255,255,255,.24);
-      flex:none;}
-    .gal-next-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-    .gal-next-meta{display:flex;flex-direction:column;gap:3px;}
-    .gal-next-k{font-family:var(--sans);font-size:10px;font-weight:600;
-      letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.55);}
-    .gal-next-t{font-family:var(--sans);font-size:13.5px;font-weight:560;
-      color:rgba(255,255,255,.92);}
-    .gal-next.is-last{opacity:0;pointer-events:none;}
+    /* a dot per project; the one you are on grows into a bar. One property
+       animates, so the change reads as the same mark changing shape rather
+       than one mark being swapped for another. */
+    .gal-tick{width:7px;height:7px;padding:0;border:0;cursor:pointer;
+      background:rgba(255,255,255,.32);border-radius:999px;
+      transition:height .6s var(--ease-expo),background .4s var(--ease);}
+    .gal-tick:hover{background:rgba(255,255,255,.72);}
+    .gal-tick.is-on{height:30px;background:#fff;}
+    @media (prefers-reduced-motion:reduce){ .gal-tick{transition:background .2s ease;} }
 
     /* the gallery is light-on-dark whatever the project colour is */
     .gal.gal-ready .slide-body h3,
@@ -712,7 +708,9 @@
     .gal.gal-ready .slide-num{color:rgba(244,247,250,.6);}
     .gal.gal-ready .slide-metrics span{border-color:rgba(255,255,255,.2);
       background:rgba(255,255,255,.07);color:rgba(244,247,250,.82);}
-    .gal.gal-ready .slide-cta{background:#F4F7FA;color:#101822;}
+    /* a work CTA carries the screen — it is the largest instance of the button */
+    .gal.gal-ready .slide-cta{margin-top:28px;padding:16px 30px;font-size:16px;
+      border-radius:20px;}
   }
 
   /* ── the gallery, narrower desktops and laptops ──────────────────────────
@@ -727,7 +725,6 @@
     .gal.gal-ready .slide-body h3{font-size:clamp(42px,5.4vw,78px);}
     .gal.gal-ready .slide-body p{font-size:14.5px;max-width:38ch;}
     .gal.gal-ready .work-head{left:clamp(26px,4vw,60px);}
-    .gal-next{left:clamp(26px,4vw,60px);}
   }
 
   /* short laptops: the vertical budget, not the horizontal one, is what runs
@@ -1527,54 +1524,83 @@
            behind the work, not a lit surface competing with it. -->
       <div class="gal-bg" aria-hidden="true"></div>
 
+      <!-- the section's own geometry — the same hairline vocabulary the hero
+           uses, arranged for a horizontal stage rather than a vertical one -->
+      <div class="geo geo-work" aria-hidden="true">
+        <span class="geo-arc" style="width:96vmax;height:96vmax;left:-34vmax;top:-30vmax;"></span>
+        <span class="geo-arc thin" style="width:132vmax;height:132vmax;left:-52vmax;top:-48vmax;"></span>
+        <span class="geo-orbit" style="width:58vmax;height:58vmax;right:-24vmax;bottom:-26vmax;--spin:150s;"><b></b></span>
+        <span class="geo-sq" style="right:7%;top:16%;"></span>
+        <span class="geo-cross" style="left:7%;bottom:22%;"></span>
+        <span class="geo-cross" style="right:14%;bottom:12%;"></span>
+      </div>
+
       <header class="work-head"><span class="k">Featured <em class="serif">work</em></span></header>
 
       <!-- one screen per project: copy left, tilted media right -->
       <div class="gal-stage" id="galStage">
 
+          <!-- the system itself, before its three tools: the green orb is the
+               EverTutor mark, and it opens the chapter the way a cover does -->
+          <article class="slide slide-system" data-chapter="et" data-bg="#10322B">
+            <div class="slide-media sys-media">
+              <div class="sys-orb">
+                <span class="sys-orb-glow" aria-hidden="true"></span>
+                <img src="images/blob-dark.png" alt="The EverTutor AI system" width="940" height="940">
+              </div>
+            </div>
+            <div class="slide-body">
+              <span class="slide-num">01</span>
+              <h3>EverTutor AI <span class="serif">System</span></h3>
+              <div class="role">Sole Product Designer · 0→1</div>
+              <p>The world&rsquo;s first multimodal, voice-first AI tutor — <em>three tools working
+                as one system</em> to put a tutor beside every learner.</p>
+              <div class="slide-metrics"><span>2,000+ active learners</span><span>−96% workflow time</span><span>0→$500k+ ARR</span></div>
+            </div>
+          </article>
+
           <article class="slide" data-chapter="et" data-bg="#12293D">
             <div class="slide-media">
               <img src="images/card-et-live.webp" alt="EverTutor Live" width="760" height="507">
-              <video class="slide-vid" src="images/et-live.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
+              <video class="slide-vid" src="images/et-live.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
             </div>
             <div class="slide-body">
-              <span class="chap">01 · EverTutor AI System</span>
               <span class="slide-num">1.1</span>
-              <h3>EverTutor Live</h3>
+              <h3>EverTutor <span class="serif">Live</span></h3>
               <div class="role">Product Design Lead</div>
               <p>A voice-first AI tutor that gives every learner a fully adaptive 1:1 session —
                 taken from prototype to product-market fit.</p>
               <div class="slide-metrics"><span>2,000+ daily sessions</span><span>2× performance gain</span><span>$250 → $5/hr</span></div>
-              <a class="slide-cta" href="evertutor-live.html">View case study ↗</a>
+              <a class="btn-primary slide-cta" href="evertutor-live.html">View case study
+                <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5L12.5 4.5M6 4.5h6.5V11"/></svg></a>
             </div>
           </article>
 
           <article class="slide" data-chapter="et" data-bg="#16304A">
             <div class="slide-media">
               <img src="images/card-et-studio.webp" alt="EverTutor Studio" width="760" height="507" loading="lazy">
-              <video class="slide-vid" src="images/et-studio.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
+              <video class="slide-vid" src="images/et-studio.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
             </div>
             <div class="slide-body">
-              <span class="chap">01 · EverTutor AI System</span>
               <span class="slide-num">1.2</span>
-              <h3>EverTutor Studio</h3>
+              <h3>EverTutor <span class="serif">Studio</span></h3>
               <div class="role">Product Design Lead</div>
               <p>The authoring environment behind Live — where educators shape, test and ship a
                 tutor&rsquo;s curriculum without ever writing a prompt.</p>
               <div class="slide-metrics"><span>100+ hrs → 4 hrs</span><span>Lesson creation</span></div>
-              <a class="slide-cta" href="evertutor-studio.html">View case study ↗</a>
+              <a class="btn-primary slide-cta" href="evertutor-studio.html">View case study
+                <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5L12.5 4.5M6 4.5h6.5V11"/></svg></a>
             </div>
           </article>
 
           <article class="slide" data-chapter="et" data-bg="#1A2B4A">
             <div class="slide-media">
               <img src="images/card-et-analytics.webp" alt="EverTutor Analytics" width="760" height="507" loading="lazy">
-              <video class="slide-vid" src="images/et-analytics.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
+              <video class="slide-vid" src="images/et-analytics.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
             </div>
             <div class="slide-body">
-              <span class="chap">01 · EverTutor AI System</span>
               <span class="slide-num">1.3</span>
-              <h3>EverTutor Analytics</h3>
+              <h3>EverTutor <span class="serif">Analytics</span></h3>
               <div class="role">Product Design</div>
               <p>The measurement layer — how a team sees what a learner actually struggled with,
                 session by session, without drowning in transcripts.</p>
@@ -1585,7 +1611,7 @@
         <article class="slide" data-bg="#3A2A28">
           <div class="slide-media">
             <img src="images/card-stressie.webp" alt="Stressie" width="760" height="428" loading="lazy">
-            <video class="slide-vid" src="images/stressie.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
+            <video class="slide-vid" src="images/stressie.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
           </div>
           <div class="slide-body">
             <span class="slide-num">02</span>
@@ -1594,14 +1620,15 @@
             <p>From pilot research to a <em>Harvard-incubated product</em> — a full redesign of
               workplace stress management, now live at Amazon and InKind.</p>
             <div class="slide-metrics"><span>17.4% engagement</span><span>Harvard Innovation Labs</span><span>2 live pilots</span></div>
-            <a class="slide-cta" href="stressie-studio.html">View case study ↗</a>
+            <a class="btn-primary slide-cta" href="stressie-studio.html">View case study
+              <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5L12.5 4.5M6 4.5h6.5V11"/></svg></a>
           </div>
         </article>
 
         <article class="slide" data-bg="#27324A">
           <div class="slide-media">
             <img src="images/card-dearly.webp" alt="Dearly" width="760" height="428" loading="lazy">
-            <video class="slide-vid" src="images/dearly.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
+            <video class="slide-vid" src="images/dearly.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
           </div>
           <div class="slide-body">
             <span class="slide-num">03</span>
@@ -1610,7 +1637,8 @@
             <p>Animated handwriting with your real voice and photos, sent as a unique link —
               a quieter way to keep the people who matter close.</p>
             <div class="slide-metrics"><span>Shipped in 48 hours</span><span>140 letters written</span></div>
-            <a class="slide-cta" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">Visit the site ↗</a>
+            <a class="btn-primary slide-cta" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">Visit the site
+              <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5L12.5 4.5M6 4.5h6.5V11"/></svg></a>
           </div>
         </article>
 
@@ -1620,12 +1648,13 @@
           </div>
           <div class="slide-body">
             <span class="slide-num">04</span>
-            <h3>The Engine</h3>
+            <h3><span class="serif">The</span> Engine</h3>
             <div class="role">Product Design · Landing Page</div>
             <p>Designed the landing page for an AI growth platform that runs content, marketing
               and sales autonomously — the whole pitch carried by one glowing funnel.</p>
             <div class="slide-metrics"><span>Brand &amp; art direction</span><span>Marketing site</span></div>
-            <a class="slide-cta" href="https://www.theengine.dev/" target="_blank" rel="noopener">Visit the site ↗</a>
+            <a class="btn-primary slide-cta" href="https://www.theengine.dev/" target="_blank" rel="noopener">Visit the site
+              <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5L12.5 4.5M6 4.5h6.5V11"/></svg></a>
           </div>
         </article>
 
@@ -1636,15 +1665,6 @@
            JS fills it from the slides so the two can never disagree. -->
       <nav class="gal-ticks" id="galTicks" aria-label="Projects"></nav>
 
-      <!-- what is coming, bottom left — the gallery's only forward affordance
-           besides the scroll itself -->
-      <button class="gal-next" id="galNext" type="button">
-        <span class="gal-next-thumb"><img id="galNextImg" src="images/card-et-studio.webp" alt="" width="760" height="507" loading="lazy"></span>
-        <span class="gal-next-meta">
-          <span class="gal-next-k">Next</span>
-          <span class="gal-next-t" id="galNextT">EverTutor Studio</span>
-        </span>
-      </button>
     </div>
   </section>
 
@@ -2340,9 +2360,6 @@ var topNav = document.getElementById('topNav');
 
   var bg      = pin.querySelector('.gal-bg');
   var ticks   = document.getElementById('galTicks');
-  var nextBtn = document.getElementById('galNext');
-  var nextImg = document.getElementById('galNextImg');
-  var nextT   = document.getElementById('galNextT');
 
   pin.classList.add('is-pinned', 'gal-ready');
 
@@ -2400,17 +2417,19 @@ var topNav = document.getElementById('topNav');
     var col = sl.getAttribute('data-bg');
     if (bg && col) bg.style.backgroundColor = col;
 
-    /* what's next, bottom left — hidden on the last one */
-    var nx = slides[i + 1];
-    if (nextBtn) {
-      nextBtn.classList.toggle('is-last', !nx);
-      if (nx) {
-        var nxImg = nx.querySelector('.slide-media img');
-        var nxH3  = nx.querySelector('h3');
-        if (nextImg && nxImg) nextImg.src = nxImg.getAttribute('src');
-        if (nextT && nxH3) nextT.textContent = nxH3.textContent.trim();
+    /* the project you are on is playing. Everything else rewinds and stops,
+       so only one decoder is ever awake and you never arrive at a video
+       already halfway through. */
+    slides.forEach(function (s, n) {
+      var v = s.querySelector('.slide-vid');
+      if (!v) return;
+      if (n === i) {
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});   /* autoplay refusal is fine */
+      } else if (!v.paused) {
+        v.pause(); v.currentTime = 0;
       }
-    }
+    });
   }
 
   /* ── the reel — the reference's engine, re-homed onto a pinned section.
@@ -2425,13 +2444,20 @@ var topNav = document.getElementById('topNav');
      the reference re-anchors its target to the nearest case. */
   var medias = slides.map(function (s) { return s.querySelector('.slide-media'); });
 
-  /* --gal-step is a CSS clamp the breakpoints retune; a hidden probe reads
-     the resolved pixels so the JS and the CSS can never disagree on it */
-  var probe = document.createElement('div');
-  probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;height:var(--gal-step,62vh);';
-  pin.appendChild(probe);
+  /* The travel between planes is the plane's own height plus a hairline —
+     that is what makes the reel read as a strip with each panel linked to
+     the next rather than a column of separate cards drifting past. Measured
+     from the layout box, so it stays right at every breakpoint without a
+     second set of numbers to keep in sync. */
+  var LINK = 14;                                   /* the join between panels */
   var step = 0;
-  function measure() { step = probe.offsetHeight || Math.round(innerHeight * 0.62); }
+  function measure() {
+    var h = 0;
+    for (var i = 0; i < medias.length; i++) {
+      if (medias[i] && medias[i].offsetHeight) { h = medias[i].offsetHeight; break; }
+    }
+    step = Math.round((h || innerHeight * 0.42) + LINK);
+  }
   measure();
 
   var st = ScrollTrigger.create({
@@ -2460,21 +2486,30 @@ var topNav = document.getElementById('topNav');
     m.addEventListener('mouseleave', function () { hoverGoal[n] = 0; });
   });
 
+  /* One attitude for the whole strip. Every panel sits at the same angle —
+     no per-plane variance and no per-plane hover — so the reel reads as one
+     continuous ribbon whose links happen to be projects. Distance from the
+     active one shows only as a little depth: a touch smaller, a touch dimmer. */
+  var TILT_Y = -14, TILT_X = 4, ROLL = -1.6;
   var idle = false;
   function draw() {
     /* velocity bends the reel — skewY is the flat-plane read of the shader */
-    var sk = Math.max(-6, Math.min(6, vel * 2.2));
+    var sk = Math.max(-5, Math.min(5, vel * 1.9));
+    /* the hover belongs to the strip, not to one link of it */
+    var h = 0;
+    for (var q = 0; q < hoverNow.length; q++) h = Math.max(h, hoverNow[q]);
+    var ry = (TILT_Y + 9 * h).toFixed(2),
+        rx = (TILT_X - 3 * h).toFixed(2),
+        rz = (ROLL + 1.2 * h).toFixed(2);
     slides.forEach(function (s, n) {
       var m = medias[n]; if (!m) return;
-      var k = n - pos, a = Math.min(1, Math.abs(k)), h = hoverNow[n];
+      var k = n - pos, a = Math.min(1, Math.abs(k));
       m.style.transform =
         'translate3d(0,' + (k * step).toFixed(2) + 'px,0) perspective(1100px)' +
-        ' rotateY(' + (-15 - 4 * a + 10 * h).toFixed(2) + 'deg)' +
-        ' rotateX(' + (5 + 2 * a - 3.5 * h).toFixed(2) + 'deg)' +
-        ' rotate(' + (-2 - 0.4 * a + 1.5 * h).toFixed(2) + 'deg)' +
+        ' rotateY(' + ry + 'deg) rotateX(' + rx + 'deg) rotate(' + rz + 'deg)' +
         ' skewY(' + sk.toFixed(2) + 'deg)' +
-        ' scale(' + (1 - 0.06 * a + 0.03 * h).toFixed(3) + ')';
-      m.style.opacity = (1 - 0.62 * a).toFixed(3);
+        ' scale(' + (1 - 0.035 * a).toFixed(3) + ')';
+      m.style.opacity = (1 - 0.5 * a).toFixed(3);
     });
   }
 
@@ -2508,10 +2543,6 @@ var topNav = document.getElementById('topNav');
     if (window.__lenis) window.__lenis.scrollTo(y, { duration: 0.9 });
     else scrollTo({ top: y, behavior: 'smooth' });
   }
-  if (nextBtn) nextBtn.addEventListener('click', function () {
-    if (current < slides.length - 1) goTo(current + 1);
-  });
-
   draw();          /* position the reel before the first frame — no flash */
   paint(0);
   addEventListener('resize', function () { ScrollTrigger.refresh(); });
@@ -2526,10 +2557,9 @@ var topNav = document.getElementById('topNav');
   var items = [].slice.call(stage.querySelectorAll('.slide'));
   items.forEach(function (el, i) { el.style.setProperty('--i', i); });
 
-  if (!('IntersectionObserver' in window)) {
-    document.documentElement.classList.add('no-reveal');
-    return;
-  }
+  /* no observer, no reveal — and the cards were visible all along */
+  if (!('IntersectionObserver' in window)) return;
+  stage.classList.add('is-live');           /* only now is hiding them safe */
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
       if (!e.isIntersecting) return;
@@ -2540,34 +2570,44 @@ var topNav = document.getElementById('topNav');
   io.observe(stage);
 })();
 
-/* ── the hover video ──
-   CSS slides it up from the bottom, this just starts and rewinds playback so
-   nothing decodes until it's actually asked for (the files are preload="none"). */
+/* ── a video only replaces its poster once it is genuinely running ──
+   Both paths (the reel's active plane, and the stacked column's on-screen
+   card) call play(); this is what decides when the frame is safe to show, so
+   a slow or refused decode leaves the designed thumbnail in place instead of
+   a black rectangle. */
+[].forEach.call(document.querySelectorAll('.slide-vid'), function (v) {
+  v.addEventListener('playing', function () { v.classList.add('is-playing'); });
+  v.addEventListener('pause',   function () { v.classList.remove('is-playing'); });
+  v.addEventListener('error',   function () { v.classList.remove('is-playing'); });
+});
+
+/* ── the stacked cards play themselves ──
+   The gallery owns playback for its own active plane (it runs earlier in this
+   file, so .gal-ready is already settled here). Everywhere else — the stacked
+   column on phones and tablets — a card plays while it is on screen and stops
+   when it leaves, so you never scroll past a still thumbnail and never leave
+   six decoders running behind you. */
 (function () {
-  var slides = document.querySelectorAll('.slide');
-  if (!slides.length || !matchMedia('(pointer:fine)').matches) return;
+  if (document.querySelector('.gal.gal-ready')) return;
+  var vids = [].slice.call(document.querySelectorAll('.slide-vid'));
+  if (!vids.length) return;
 
-  /* On the card the whole card is the hover target, which is right — it is a
-     card. In the gallery the slide IS the viewport, so the same wiring would
-     start the video when you point at the paragraph. Scope it to the media.
-     The gallery block runs earlier in this file, so .gal-ready is already
-     settled by the time this reads it. */
-  var gallery = !!document.querySelector('.gal.gal-ready');
-
-  [].forEach.call(slides, function (slide) {
-    var vid = slide.querySelector('.slide-vid');
-    if (!vid) return;                                   /* not every project has one */
-    var host = (gallery && slide.querySelector('.slide-media')) || slide;
-    host.addEventListener('mouseenter', function () {
-      var p = vid.play();
-      if (p && p.catch) p.catch(function () {});        /* autoplay refusal is fine */
+  if (!('IntersectionObserver' in window)) {
+    vids.forEach(function (v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      var v = e.target;
+      if (e.isIntersecting) {
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});
+      } else if (!v.paused) {
+        v.pause(); v.currentTime = 0;
+      }
     });
-    host.addEventListener('mouseleave', function () {
-      vid.pause();
-      /* rewind only after it has swung back out, so you never see it jump */
-      setTimeout(function () { if (vid.paused) vid.currentTime = 0; }, 430);
-    });
-  });
+  }, { threshold: 0.45 });
+  vids.forEach(function (v) { io.observe(v); });
 })();
 
 /* ── image trail — photos reveal one after another along the cursor path ── */
