@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<!-- Source for images/og-image.png (social share card) — section-1 theme:
-     B&W polaroid portrait centered, orbited by hero-verb-styled tags.
+<!-- Source for images/og-image.png (social share card) — hero-lab theme:
+     B&W portrait at the center of the ring system, orbited by fact chips.
      Re-render after edits:
      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
        --screenshot=og-2x.png --window-size=1200,630 --force-device-scale-factor=2 \
@@ -11,158 +11,137 @@
   <meta charset="UTF-8" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 1200px; height: 630px; overflow: hidden; }
     body {
       position: relative;
-      background: #0d0d0d;               /* hero card surface */
-      font-family: 'Bricolage Grotesque', sans-serif;
+      background: #0A0E15;
+      font-family: 'Instrument Sans', system-ui, sans-serif;
+      color: #EFF3F8;
     }
-    /* faint dot mesh, like the page canvas behind the card */
-    .dots {
-      position: absolute; inset: 0;
-      background-image: radial-gradient(rgba(255,255,255,0.10) 1.3px, transparent 1.4px);
-      background-size: 26px 26px; background-position: center;
-      -webkit-mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, #000 40%, transparent 100%);
-              mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, #000 40%, transparent 100%);
-      opacity: .55;
+
+    /* ── rings — concentric hairlines centered on the portrait ── */
+    .ring {
+      position: absolute; left: 600px; top: 278px;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(239,243,248,.06); border-radius: 50%;
     }
-    /* lime glow rising from the bottom — hero card signature */
+    .r1 { width: 480px;  height: 480px;  }
+    .r2 { width: 700px;  height: 700px;  border-color: rgba(239,243,248,.05); }
+    .r3 { width: 950px;  height: 950px;  border-color: rgba(239,243,248,.04); }
+    .r4 { width: 1240px; height: 1240px; border-color: rgba(239,243,248,.03); }
+    /* azure satellites riding the rings */
+    .dot {
+      position: absolute; width: 5px; height: 5px; border-radius: 50%;
+      background: rgba(140,197,255,.55); box-shadow: 0 0 9px rgba(92,169,255,.45);
+    }
+
+    /* geometry ticks — the site's coordinate crosses */
+    .cross { position: absolute; width: 14px; height: 14px; opacity: .5; }
+    .cross::before, .cross::after { content: ''; position: absolute; background: rgba(160,205,255,.14); }
+    .cross::before { left: 0; right: 0; top: 50%; height: 1px; }
+    .cross::after  { top: 0; bottom: 0; left: 50%; width: 1px; }
+
+    /* atmosphere: azure breath at the bottom + edge vignette + film grain */
     .glow {
       position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 72% 36% at 50% 100%, rgba(230,242,141,0.32) 0%, rgba(230,242,141,0.11) 50%, transparent 78%),
-        radial-gradient(ellipse 115% 22% at 50% 110%, rgba(230,242,141,0.13) 0%, transparent 58%);
+      background: radial-gradient(ellipse 70% 34% at 50% 104%, rgba(92,169,255,.14) 0%, rgba(92,169,255,.05) 48%, transparent 76%);
+    }
+    .vignette {
+      position: absolute; inset: 0;
+      background: radial-gradient(135% 105% at 50% 46%, transparent 56%, rgba(3,6,12,0.5) 100%);
+    }
+    .grain {
+      position: absolute; inset: 0; opacity: .05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    /* ── top-left wordmark, like the nav logo ── */
-    .logo {
-      position: absolute; top: 42px; left: 56px;
-      font-weight: 700; font-size: 24px; letter-spacing: -0.01em;
-      color: #F5F5F7;
+    /* ── identity line — the hero's eyebrow ── */
+    .eyebrow {
+      position: absolute; top: 54px; left: 50%; transform: translateX(-50%);
+      display: inline-flex; align-items: center; gap: 18px;
+      font-size: 15px; font-weight: 520; letter-spacing: .09em;
+      text-transform: uppercase; color: #B9C4D1; white-space: nowrap;
     }
-    .logo .shaka { margin-right: 10px; }
+    .eyebrow i { width: 1px; height: 12px; background: rgba(239,243,248,0.12); }
 
-    /* ── centered B&W polaroid ── */
-    .polaroid {
-      position: absolute; left: 50%; top: 50%;
-      transform: translate(-50%, -52%) rotate(-2.5deg);
-      background: #F6F4EF; border-radius: 5px;
-      padding: 9px 9px 0;
-      box-shadow:
-        rgba(0,0,0,0.35) 0 0 0 1px,
-        rgba(0,0,0,0.35) 0 2px 4px 0,
-        rgba(0,0,0,0.6) 0 18px 40px -14px;
-      z-index: 3;
+    /* ── the portrait — trail-img treatment, promoted to centerpiece ── */
+    .portrait {
+      position: absolute; left: 50%; top: 278px; transform: translate(-50%, -50%);
+      width: 248px; height: 310px; border-radius: 14px; overflow: hidden;
+      box-shadow: 0 26px 60px -24px rgba(0,0,0,.7), 0 0 0 1px rgba(239,243,248,.08);
+      background: #0E141D; z-index: 3;
     }
-    .ph {
-      width: 272px; height: 300px; overflow: hidden;
-      border-radius: 2px; position: relative; background: #ddd;
-    }
-    .ph img {
-      position: absolute; width: 640px; left: -64px; top: -195px;
-      filter: grayscale(1) contrast(1.1) brightness(1.03);
-    }
-    .pcap {
-      font-family: 'Caveat', cursive; font-weight: 600;
-      font-size: 30px; color: #252525; text-align: center;
-      padding: 6px 0 12px;
+    .portrait img {
+      position: absolute; width: 600px; left: -60px; top: -173px;
+      filter: grayscale(1) contrast(1.12) brightness(.92);
     }
 
-    /* ── orbit tags — hero-verb styles ── */
-    .tag { position: absolute; white-space: nowrap; z-index: 2; }
-    .mono { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
-
-    /* "0 → 1" — Figma selection box (hv-scale) */
-    .t-zero { top: 128px; left: 178px; font-size: 40px; color: #0F8EDD; transform: rotate(-2deg); }
-    .selbox { position: relative; display: inline-block; padding: 2px 10px; }
-    .selbox::before {
-      content: ""; position: absolute; inset: -2px -8px;
-      border: 2px solid #0D99FF; border-radius: 2px;
+    /* ── name + echo of the headline ── */
+    .name {
+      position: absolute; top: 462px; left: 50%; transform: translateX(-50%);
+      font-weight: 570; font-size: 44px; letter-spacing: -0.028em;
+      color: #EFF3F8; white-space: nowrap; z-index: 3;
     }
-    .h { position: absolute; width: 10px; height: 10px; background: #fff; border: 2px solid #0D99FF; border-radius: 1px; z-index: 1; }
-    .h.tl { top: -2px; left: -8px; transform: translate(-50%,-50%); }
-    .h.tr { top: -2px; right: -8px; transform: translate(50%,-50%); }
-    .h.bl { bottom: -2px; left: -8px; transform: translate(-50%,50%); }
-    .h.br { bottom: -2px; right: -8px; transform: translate(50%,50%); }
-
-    /* "Conversational AI" — convert-green + check badge */
-    .t-convai { top: 138px; right: 96px; font-size: 30px; color: #84BF86; transform: rotate(1.5deg); display: flex; align-items: center; gap: 12px; }
-    .badge {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: #1FA34A; display: inline-flex; align-items: center; justify-content: center;
-      flex: none;
-    }
-    .badge svg { display: block; }
-
-    /* "Metrics Driven" — connect-coral + up-right arrow */
-    .t-metrics { bottom: 158px; right: 142px; font-size: 30px; color: #FB9393; transform: rotate(-1.5deg); display: flex; align-items: center; gap: 10px; }
-    .t-metrics svg { display: block; }
-
-    /* "San Francisco" — lime hero-hi chip */
-    .t-sf {
-      bottom: 168px; left: 168px; transform: rotate(2deg);
-      font-weight: 700; font-size: 27px; color: #252525;
-      background: #E6F28D; border-radius: 8px; padding: 6px 16px;
+    .line {
+      position: absolute; top: 524px; left: 50%; transform: translateX(-50%);
+      font-family: 'Instrument Serif', Georgia, serif; font-style: italic;
+      font-size: 23px; letter-spacing: -0.004em; color: #B9C4D1; white-space: nowrap; z-index: 3;
     }
 
-    /* quiet mono facts */
-    .t-soft { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 19px; color: rgba(245,245,247,0.55); }
-    .t-ds { top: 320px; left: 128px; transform: rotate(-1deg); }
-    .t-yrs { top: 320px; right: 118px; transform: rotate(1deg); }
-
-    /* hand-drawn connector arrows (Caveat energy) */
-    .arrows { position: absolute; inset: 0; z-index: 1; }
-    .arrows path { stroke: rgba(245,245,247,0.4); stroke-width: 2.5; fill: none; stroke-linecap: round; }
+    /* ── orbiting fact chips — the facts-strip face, split into satellites ── */
+    .chip {
+      position: absolute; display: inline-flex; align-items: center; gap: 10px;
+      padding: 11px 20px; border: 1px solid rgba(239,243,248,0.12); border-radius: 18px;
+      background: rgba(13,18,27,.72);
+      font-size: 18.5px; font-weight: 500; letter-spacing: -0.012em;
+      color: rgba(239,243,248,.82); white-space: nowrap; z-index: 2;
+      font-variant-numeric: tabular-nums lining-nums;
+    }
+    .chip b { font-weight: 500; color: #8CC5FF; }
   </style>
 </head>
 <body>
-  <div class="dots"></div>
   <div class="glow"></div>
 
-  <svg class="arrows" width="1200" height="630" viewBox="0 0 1200 630">
-    <!-- from "0 → 1" toward the polaroid -->
-    <path d="M 342 178 C 388 202, 412 226, 438 254" />
-    <path d="M 430 240 L 438 254 L 422 256" />
-    <!-- from "Conversational AI" toward the polaroid -->
-    <path d="M 872 192 C 826 218, 796 238, 764 262" />
-    <path d="M 780 252 L 764 262 L 780 268" />
-    <!-- from "San Francisco" toward the polaroid -->
-    <path d="M 352 452 C 394 434, 420 420, 448 400" />
-    <path d="M 436 398 L 448 400 L 442 412" />
-  </svg>
+  <div class="ring r1"></div>
+  <div class="ring r2"></div>
+  <div class="ring r3"></div>
+  <div class="ring r4"></div>
 
-  <div class="logo"><span class="shaka">🤙</span>Bhanu Kowshik</div>
+  <!-- satellites parked where rings meet chips -->
+  <div class="dot" style="left: 358px; top: 240px;"></div>
+  <div class="dot" style="left: 842px; top: 232px;"></div>
+  <div class="dot" style="left: 260px; top: 420px;"></div>
+  <div class="dot" style="left: 936px; top: 414px;"></div>
+  <div class="dot" style="left: 599px; top: 101px;"></div>
 
-  <div class="tag t-zero mono">
-    <span class="selbox">0 → 1
-      <span class="h tl"></span><span class="h tr"></span>
-      <span class="h bl"></span><span class="h br"></span>
-    </span>
+  <div class="cross" style="left: 158px; top: 128px;"></div>
+  <div class="cross" style="left: 1032px; top: 500px;"></div>
+  <div class="cross" style="left: 1058px; top: 118px;"></div>
+
+  <div class="eyebrow">
+    <span>Product Designer</span><i></i><span>Builder</span><i></i><span>Explorer</span>
   </div>
 
-  <div class="tag t-convai mono">
-    <span class="badge">
-      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M3.5 9.5 L7.2 13 L14.5 5" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </span>
-    Conversational AI
-  </div>
+  <div class="portrait"><img src="About  me Pictures/Kayaking.jpeg" alt="" /></div>
 
-  <div class="tag t-metrics mono">
-    <svg width="30" height="30" viewBox="0 0 30 30"><path d="M6 24 L24 6 M12 6 H24 V18" stroke="#F2674B" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Metrics Driven
-  </div>
+  <!-- left orbit -->
+  <div class="chip" style="right: 850px; top: 196px;">San Francisco</div>
+  <div class="chip" style="right: 890px; top: 316px;"><b>0 → 1</b></div>
+  <div class="chip" style="right: 812px; top: 436px;">Design Systems</div>
 
-  <div class="tag t-sf">San Francisco&nbsp;&nbsp;📍</div>
+  <!-- right orbit -->
+  <div class="chip" style="left: 850px; top: 196px;">Conversational AI</div>
+  <div class="chip" style="left: 890px; top: 316px;">Agentic Systems</div>
+  <div class="chip" style="left: 812px; top: 436px;">Metrics Driven</div>
 
-  <div class="tag t-soft t-ds">Design Systems</div>
-  <div class="tag t-soft t-yrs">5+ yrs shipping</div>
+  <div class="name">Bhanu Kowshik</div>
+  <div class="line">designing products that scale, convert &amp; connect</div>
 
-  <div class="polaroid">
-    <div class="ph"><img src="About  me Pictures/Kayaking.jpeg" alt="" /></div>
-    <div class="pcap">Hi, I'm Bhanu 🤙</div>
-  </div>
+  <div class="vignette"></div>
+  <div class="grain"></div>
 </body>
 </html>
