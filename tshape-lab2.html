@@ -178,6 +178,14 @@
     right: calc(-1 * clamp(38px, 9cqw, 92px));
     top: -82px; bottom: -16px;
   }
+  /* the bar carries the long names; narrow tiers swap in the short ones */
+  .tc-short { display: none; }
+
+  /* positions live in CSS, not inline styles, so each tier can re-space them */
+  .tc-b.b1 { left: 10%; } .tc-b.b2 { left: 30%; } .tc-b.b3 { left: 50%; }
+  .tc-b.b4 { left: 70%; } .tc-b.b5 { left: 90%; }
+  .tc-d.d1 { top: 38%; } .tc-d.d2 { top: 49.5%; } .tc-d.d3 { top: 61%; }
+  .tc-d.d4 { top: 72.5%; } .tc-d.d5 { top: 84%; }
 
   /* depth nodes sit on the stem, labels to the right */
   .tc-d { left: 50%; }
@@ -290,48 +298,105 @@
     .tc-cap-depth::before { height: 104px; }
   }
 
-  /* ── Phone, and any viewport too short to hold the map, fold
-        into two lit lists. A landscape phone is 844px wide but
-        only ~390 tall, so width alone would miss it. ── */
-  @media (max-width: 767px), (max-height: 600px) and (orientation: landscape) {
+  /* ── Phone: still a T. ──────────────────────────────────────
+        The shape is the whole point of the section, so the phone
+        keeps the real constellation and gives up other things
+        instead: shorter labels on the bar, a shorter stem, the
+        depth caption moved into the empty left quadrant, and the
+        card parked full-width at the foot. ── */
+  @media (max-width: 767px) {
+    :root { --fs-label: 10px; --fs-sm: 12px; --fs-body: 14px; --pad: 20px; }
     body {
       padding-top: clamp(28px, 6vh, 40px);
       padding-bottom: max(28px, env(safe-area-inset-bottom));
       align-items: flex-start;
     }
-    /* the list layout scrolls, so the light becomes a fixed backdrop: no seam
-       at either end, and it can't add to the page's scroll height */
+    /* the page scrolls here, so the light becomes a fixed backdrop: no seam at
+       either end, and it can't add to the page's scroll height */
     .tc-atmos { position: fixed; inset: 0; }
     .tc-shaft { width: 60%; right: -10%; }
+    .tc-heading { font-size: clamp(30px, 9vw, 44px); }
+    .tc-intro   { font-size: var(--fs-body); }
 
-    /* 42rem keeps the rows a readable measure when the fold is triggered by a
-       short-but-wide window rather than a phone */
-    .tc-map { height: auto; max-width: 42rem; margin-inline: 0; display: flex; flex-direction: column; gap: 4px; }
+    .tc-map { max-width: none; margin-inline: 0; height: clamp(600px, 168vw, 760px); }
+
+    /* the T sits high; the bottom third belongs to the card */
+    .tc-bar, .tc-b { top: 15%; }
+    .tc-stem { top: 15%; bottom: 34%; }
+    .tc-d.d1 { top: 24%; } .tc-d.d2 { top: 32%; } .tc-d.d3 { top: 40%; }
+    .tc-d.d4 { top: 48%; } .tc-d.d5 { top: 56%; }
+    .tc-pool { bottom: 34%; width: 132px; height: 38px; }
+
+    /* five names across ~350px only works short */
+    .tc-full  { display: none; }
+    .tc-short { display: inline; }
+    .tc-b .tc-nm {
+      bottom: 15px; font-size: clamp(9.5px, 2.9vw, 12px); letter-spacing: -0.012em;
+    }
+    /* pure cqw here: the 38px floor is wider than half the node gap at phone
+       widths, which would make neighbouring zones overlap again */
+    .tc-b::before { left: -9cqw; right: -9cqw; top: -46px; bottom: -14px; }
+
+    .tc-d .tc-nm { left: 18px; font-size: var(--fs-body); }
+    .tc-d::before { left: -14px; top: -24px; width: min(190px, 44cqw); height: 48px; }
+
+    /* the caption drops into the quadrant the T leaves empty */
+    .tc-cap { text-align: left; align-items: flex-start; }
+    .tc-cap-depth {
+      left: 0; right: auto; top: 40%; padding-left: 0; transform: translateY(-50%);
+    }
+    .tc-cap-depth::before { display: none; }
+    .tc-cap-breadth { top: 0; }
+
+    /* with the card sitting directly under the T, the wire has nothing left to
+       explain — and at this height it reads as a second stem */
+    .tc-wire { display: none; }
+
+    /* card comes out of the quadrant and spans the foot */
+    .tc-card {
+      left: 0; right: 0; width: auto; top: auto; bottom: 0;
+      min-height: clamp(150px, 26%, 200px); padding: 20px 20px 18px;
+    }
+    .tc-card-rule { left: 20px; bottom: 20px; }
+  }
+
+  /* Bigger phones have room for the full names — use them. */
+  @media (min-width: 520px) and (max-width: 767px) {
+    .tc-full  { display: inline; }
+    .tc-short { display: none; }
+    .tc-b .tc-nm { font-size: 12px; bottom: 17px; }
+    .tc-b::before { top: -62px; }
+  }
+
+  /* ── Too narrow or too short for any T: two lit lists. ──────
+        A landscape phone is 844px wide but only ~390 tall, so a
+        width test alone would miss it. Must come last. ── */
+  @media (max-width: 359px), (max-height: 620px) {
+    .tc-map { height: auto; max-width: 42rem; display: flex; flex-direction: column; gap: 4px; }
     .tc-bar, .tc-stem, .tc-wire, .tc-pool, .tc-card { display: none; }
     .tc-cap { text-align: left; align-items: flex-start; }
     .tc-cap-breadth, .tc-cap-depth {
-      position: static; transform: none; padding: 0; margin: 22px 0 12px;
+      position: static; transform: none; padding: 0; margin: 22px 0 12px; top: auto;
     }
-    .tc-cap-depth::before { display: none; }
-    .tc-cap-breadth { margin-top: 4px; }
-    /* source order puts the depth caption after its nodes — reorder for the stack */
-    .tc-cap-breadth { order: 1; }
+    .tc-cap-breadth { margin-top: 4px; order: 1; }
     .tc-b          { order: 2; }
     .tc-cap-depth  { order: 3; }
     .tc-d          { order: 4; }
 
-    /* the inline left/top that place each node on the bar and stem must go —
-       hence !important, since they are set per node as inline styles */
-    .tc-node {
+    /* .tc-map raises specificity to match the .tc-b.b1 / .tc-d.d1 position
+       classes — without it they win and the rows staircase across the screen */
+    .tc-map .tc-node {
       position: relative; transform: none; display: block; width: 100%;
-      left: auto !important; top: auto !important;
+      left: auto; top: auto;
       padding: 15px 0 15px 22px; text-align: left;   /* ≥44px row, touch-safe */
     }
     .tc-node .tc-dot { position: absolute; left: 0; top: 21px; margin: 0; }
-    .tc-node::before { display: none; }   /* the row is its own hit area on phone */
+    .tc-node::before { display: none; }   /* the row is its own hit area */
+    .tc-full  { display: inline; }
+    .tc-short { display: none; }
     .tc-nm, .tc-b .tc-nm, .tc-d .tc-nm {
       position: static; transform: none; text-align: left; white-space: normal;
-      font-size: var(--fs-body);
+      font-size: var(--fs-body); bottom: auto; left: auto;
     }
     .tc-nm br { display: none; }   /* the two-line stack is a bar-only device */
     /* the line opens under whatever you tap */
@@ -343,14 +408,6 @@
       color: rgba(255,255,255,0.70); max-width: 60ch; text-wrap: pretty;
     }
     .tc-inline em { font-style: normal; font-weight: 600; color: var(--primary); }
-  }
-
-  /* Type scale and gutter shrink for genuinely narrow screens only — a short
-     wide window folds to the list layout but is not a phone. */
-  @media (max-width: 767px) {
-    :root { --fs-label: 10px; --fs-sm: 12px; --fs-body: 14px; --pad: 20px; }
-    .tc-heading { font-size: clamp(30px, 9vw, 44px); }
-    .tc-intro   { font-size: var(--fs-body); }
   }
 
   /* Coarse pointers get more reach along the stem. Only the hit zone grows —
@@ -400,45 +457,45 @@
     <span class="tc-stem" aria-hidden="true"></span>
 
     <!-- breadth nodes, evenly spaced along the bar -->
-    <button class="tc-node tc-b is-on" type="button" style="left:10%"
+    <button class="tc-node tc-b b1 is-on" type="button"
       data-say="I don't trust what people <em>say</em> they want. I watch what they actually do. Most early calls are just listening.">
-      <span class="tc-dot"></span><span class="tc-nm">Customer<br> Discovery</span>
+      <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Customer<br> Discovery</span><span class="tc-short">Discovery</span></span>
     </button>
-    <button class="tc-node tc-b" type="button" style="left:30%"
+    <button class="tc-node tc-b b2" type="button"
       data-say="Beautiful work that ships the wrong thing is still wrong. I sweat <em>what</em> we build before <em>how</em> it looks.">
-      <span class="tc-dot"></span><span class="tc-nm">Product<br> Strategy</span>
+      <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Product<br> Strategy</span><span class="tc-short">Strategy</span></span>
     </button>
-    <button class="tc-node tc-b" type="button" style="left:50%"
+    <button class="tc-node tc-b b3" type="button"
       data-say="Home base. Flows, states, the tiny moments&mdash;the craft that makes a product feel <em>obvious</em>.">
-      <span class="tc-dot"></span><span class="tc-nm">Experience<br> Design</span>
+      <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Experience<br> Design</span><span class="tc-short">Design</span></span>
     </button>
-    <button class="tc-node tc-b" type="button" style="left:70%"
+    <button class="tc-node tc-b b4" type="button"
       data-say="I don't hand off and walk away. I sit with engineers until it's <em>real and shipped</em>.">
-      <span class="tc-dot"></span><span class="tc-nm">Product<br> Builder</span>
+      <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Product<br> Builder</span><span class="tc-short">Builder</span></span>
     </button>
-    <button class="tc-node tc-b" type="button" style="left:90%"
+    <button class="tc-node tc-b b5" type="button"
       data-say="I speak enough engineering to know what's cheap, what's pricey, and when &ldquo;it's complicated&rdquo; means <em>no</em>.">
-      <span class="tc-dot"></span><span class="tc-nm">Engineering<br> Collaboration</span>
+      <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Engineering<br> Collaboration</span><span class="tc-short">Engineering</span></span>
     </button>
 
     <!-- depth nodes, hanging down the stem -->
-    <button class="tc-node tc-d" type="button" style="top:38%"
+    <button class="tc-node tc-d d1" type="button"
       data-say="I'd rather <em>kill my idea in a 20-minute interview</em> than defend it for six months in production.">
       <span class="tc-dot"></span><span class="tc-nm">Research</span>
     </button>
-    <button class="tc-node tc-d" type="button" style="top:49.5%"
+    <button class="tc-node tc-d d2" type="button"
       data-say="I break problems down to what's <em>actually true</em>, then build back up. Best practices are someone else's constraints.">
       <span class="tc-dot"></span><span class="tc-nm">First Principles</span>
     </button>
-    <button class="tc-node tc-d" type="button" style="top:61%"
+    <button class="tc-node tc-d d3" type="button"
       data-say="I design the <em>system</em>, not the screen. One component should answer ten questions you haven't asked yet.">
       <span class="tc-dot"></span><span class="tc-nm">Systems Thinking</span>
     </button>
-    <button class="tc-node tc-d" type="button" style="top:72.5%"
+    <button class="tc-node tc-d d4" type="button"
       data-say="AI isn't a feature I bolt on. It's a <em>material I design with</em>. I prototype, ship, and think AI-native.">
       <span class="tc-dot"></span><span class="tc-nm">AI Native</span>
     </button>
-    <button class="tc-node tc-d" type="button" style="top:84%"
+    <button class="tc-node tc-d d5" type="button"
       data-say="If I can't tie it to a <em>number that moved</em>, it was decoration. I design for outcomes.">
       <span class="tc-dot"></span><span class="tc-nm">Measured Impact</span>
     </button>
@@ -478,8 +535,11 @@
 
   /* mirrors the CSS exactly — when the constellation folds into lists there is
      no bar, stem or card to wire anything to */
-  var folded = window.matchMedia('(max-width: 767px), (max-height: 600px) and (orientation: landscape)');
-  var calm   = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var folded  = window.matchMedia('(max-width: 359px), (max-height: 620px)');
+  var calm    = window.matchMedia('(prefers-reduced-motion: reduce)');
+  /* on phones the card sits at the foot of a taller-than-screen map, so a tap
+     can update copy the reader can't see */
+  var compact = window.matchMedia('(max-width: 767px)');
 
   /* orthogonal waypoints -> path with softened corners */
   function routeThrough(pts, r) {
@@ -547,9 +607,10 @@
     wire.style.strokeDashoffset = '0';
   }
 
-  /* labels carry a <br> for the two-line stack on the bar — the card wants one line */
+  /* the card always shows the full name, whichever variant the bar is showing */
   function labelOf(node) {
-    return node.querySelector('.tc-nm').innerHTML
+    var el = node.querySelector('.tc-full') || node.querySelector('.tc-nm');
+    return el.innerHTML
       .replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
   }
 
@@ -579,8 +640,14 @@
     node.appendChild(inl);
 
     node.addEventListener('pointerenter', function () { select(node); });
-    node.addEventListener('click',        function () { select(node); });
     node.addEventListener('focus',        function () { select(node); });
+    node.addEventListener('click', function () {
+      select(node);
+      if (!compact.matches || folded.matches) return;
+      var c = card.getBoundingClientRect();
+      if (c.bottom <= window.innerHeight && c.top >= 0) return;   // already in view
+      card.scrollIntoView({ block: 'nearest', behavior: calm.matches ? 'auto' : 'smooth' });
+    });
   });
 
   var first = nodes[0];
