@@ -849,7 +849,7 @@
       inset: 0;
       border-radius: inherit;
       padding: 1px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.10) 0%, rgba(230,242,141,0.38) 100%);
+      background: linear-gradient(90deg, rgba(255,255,255,0.10) 0%, rgba(140,197,255,0.35) 100%);
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
@@ -1019,16 +1019,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #E6F28D;   /* Lucide strokes inherit via currentColor (no --primary token on this page) */
-      background: linear-gradient(145deg, rgba(230,242,141,0.14), rgba(230,242,141,0.03));
-      border: 1px solid rgba(230,242,141,0.20);
+      color: var(--ember-2);   /* Lucide strokes inherit via currentColor — azure, section 1's accent */
+      background: linear-gradient(145deg, rgba(92,169,255,0.14), rgba(92,169,255,0.03));
+      border: 1px solid rgba(92,169,255,0.22);
       box-shadow: none;
       transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
     }
 .s2-bar-icon-tag-ic svg { width: 13px; height: 13px; display: block; }
 .s2-bar-icon-tag:hover .s2-bar-icon-tag-ic {
-      border-color: rgba(230,242,141,0.48);
-      background: linear-gradient(145deg, rgba(230,242,141,0.26), rgba(230,242,141,0.06));
+      border-color: rgba(92,169,255,0.48);
+      background: linear-gradient(145deg, rgba(92,169,255,0.26), rgba(92,169,255,0.06));
       transform: translateY(-1px) scale(1.05);
     }
 .s2-bar-icon-tag-ic img { width: 14px; height: 14px; object-fit: contain; }
@@ -1065,9 +1065,9 @@
       font-family: var(--font-mono);
       font-size: clamp(22px,2.2vw,32px);
       font-weight: 700;
-      /* the numbers are the proof — they carry the lime accent (literal:
-         this page never defines --primary; index.html's token) */
-      color: #E6F28D;
+      /* the numbers are the proof — they carry the page's azure accent
+         (section 1's system; lime belongs to index.html) */
+      color: var(--ember-2);
       line-height: 1;
     }
 .s2-bar-metric-lbl {
@@ -1194,7 +1194,7 @@
       -webkit-backdrop-filter: blur(2px);
       box-shadow:
         rgba(255,255,255,0.7)   6.67px  6.67px 3.36px -6.21px inset,
-        rgba(230,242,141,0.45) -6.70px -6.00px 3.36px -6.73px inset,
+        rgba(140,197,255,0.45) -6.70px -6.00px 3.36px -6.73px inset,
         rgb(140,180,190)       -2.00px  2.39px 18px   -2.60px inset;
       color: rgba(255,255,255,0.8);
       cursor: pointer;
@@ -1205,7 +1205,7 @@
       color: var(--ink);
       box-shadow:
         rgba(255,255,255,0.9)   6.67px  6.67px 3.36px -6.21px inset,
-        rgba(230,242,141,0.65) -6.70px -6.00px 3.36px -6.73px inset,
+        rgba(140,197,255,0.65) -6.70px -6.00px 3.36px -6.73px inset,
         rgb(140,180,190)       -2.00px  2.39px 24px   -2.60px inset;
     }
 .s2-tnav-btn svg { width: 9px; height: 9px; fill: currentColor; }
@@ -1224,7 +1224,7 @@
       -webkit-backdrop-filter: blur(2px);
       box-shadow:
         rgba(255,255,255,0.7)   6.67px  6.67px 3.36px -6.21px inset,
-        rgba(230,242,141,0.45) -6.70px -6.00px 3.36px -6.73px inset,
+        rgba(140,197,255,0.45) -6.70px -6.00px 3.36px -6.73px inset,
         rgb(140,180,190)       -2.00px  2.39px 18px   -2.60px inset;
       color: rgba(255,255,255,0.8);
       display: flex; align-items: center; justify-content: center;
@@ -1234,7 +1234,7 @@
       color: var(--ink);
       box-shadow:
         rgba(255,255,255,0.9)   6.67px  6.67px 3.36px -6.21px inset,
-        rgba(230,242,141,0.65) -6.70px -6.00px 3.36px -6.73px inset,
+        rgba(140,197,255,0.65) -6.70px -6.00px 3.36px -6.73px inset,
         rgb(140,180,190)       -2.00px  2.39px 24px   -2.60px inset;
     }
 /* ── Left/right nav for grid view (mirrors up/down spiral nav) ── */
@@ -1286,10 +1286,9 @@
 .s2-cards-zone {
       position: absolute;
       inset: 0;
-      background: var(--cream);
-      /* Above the s2 intro (z1) so the canvas slides in over the full-bleed
-         image; the work container (z2, later in DOM) and header (z20) keep
-         their places above it. */
+      /* No slab: the zone is clear so the helix floats on the intro's
+         backdrop image below it (z1). */
+      background: transparent;
       z-index: 2;
     }
 /* ── s1→s2 intro — driven inline by the pin's onUpdate ─────────── */
@@ -1863,7 +1862,7 @@ html:not([data-theme="dark"]) .ws-sub-desc { color: rgba(37,37,37,0.55); }
       border-bottom-color: var(--border);
     }
 html:not([data-theme="dark"]) .s2-cs-title { color: var(--secondary); }
-html:not([data-theme="dark"]) .s2-cards-zone { background: var(--bg); }
+html:not([data-theme="dark"]) .s2-cards-zone { background: transparent; }
 html:not([data-theme="dark"]) .s2-video-section { background: var(--surface-alt); }
 html:not([data-theme="dark"]) .s2-bar-title { color: var(--secondary); }
 html:not([data-theme="dark"]) .s2-bar-desc { color: rgba(37,37,37,0.55); }
@@ -1907,12 +1906,7 @@ html:not([data-theme="dark"]) .s2-tnav-btn {
     }
 /* Featured Work spiral gallery — override JS inline style via !important */
     html:not([data-theme="dark"]) #spiral-root {
-      background-color: var(--bg) !important;
-      background-image:
-        radial-gradient(ellipse 65% 60% at 50% 46%, transparent 0%, transparent 45%, rgba(239, 243, 248,0.70) 72%, rgba(239, 243, 248,0.96) 90%),
-        linear-gradient(rgba(37,37,37,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(37,37,37,0.05) 1px, transparent 1px) !important;
-      background-size: 100% 100%, 52px 52px, 52px 52px !important;
+      background: transparent !important;   /* backdrop image owns the stage in light too */
     }
 html:not([data-theme="dark"]) .s2-project-bar {
       background: rgba(239, 243, 248,0.82);
@@ -1941,10 +1935,10 @@ html:not([data-theme="dark"]) .s2-bar-tag {
       border-color: rgba(37,37,37,0.12);
     }
 html:not([data-theme="dark"]) .s2-bar-icon-tag-ic {
-      background: linear-gradient(145deg, rgba(111,126,21,0.12), rgba(111,126,21,0.03));
-      border-color: rgba(111,126,21,0.20);
+      background: linear-gradient(145deg, rgba(51,114,184,0.10), rgba(51,114,184,0.03));
+      border-color: rgba(51,114,184,0.22);
       box-shadow: none;
-      color: #6F7E15;   /* Lucide strokes via currentColor */
+      color: #3372B8;   /* Lucide strokes via currentColor */
     }
 html:not([data-theme="dark"]) .s2-bar-icon-tag-ic .s2-icon-light { display: block; }
 html:not([data-theme="dark"]) .s2-bar-icon-tag-ic .s2-icon-dark  { display: none; }
@@ -1952,7 +1946,7 @@ html:not([data-theme="dark"]) .s2-bar-icon-tag-lbl { color: rgba(37,37,37,0.72);
 html:not([data-theme="dark"]) .s2-bar-title-badge {
       color: rgba(37,37,37,0.55);
     }
-html:not([data-theme="dark"]) .s2-bar-metric-val { color: #6F7E15; }
+html:not([data-theme="dark"]) .s2-bar-metric-val { color: #3372B8; }
 html:not([data-theme="dark"]) .s2-bar-metric-lbl { color: rgba(37,37,37,0.50); }
 html:not([data-theme="dark"]) .s2-side-nav-btn {
       background: rgba(37,37,37,0.07);
@@ -2008,8 +2002,8 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     transition: background .35s var(--ease), border-color .35s var(--ease), transform .4s var(--ease);
   }
   .s2-bar-cta:hover {
-    background: rgba(230,242,141,0.10) !important;
-    border-color: rgba(230,242,141,0.45);
+    background: rgba(92,169,255,0.10) !important;
+    border-color: rgba(92,169,255,0.45);
     filter: none;
     transform: translateY(-2px);
     box-shadow: none !important;
@@ -2058,13 +2052,10 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
      ported markup carries no class, and !important because those are inline
      styles. */
   #spiral-root{
-    background-color:var(--cream) !important;
-    background-image:
-      radial-gradient(ellipse 65% 60% at 50% 46%, transparent 0%, transparent 45%,
-        rgba(8,11,17,.62) 72%, rgba(8,11,17,.96) 90%),
-      linear-gradient(rgba(160,205,255,.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(160,205,255,.05) 1px, transparent 1px) !important;
-    background-size:100% 100%, 52px 52px, 52px 52px !important;}
+    /* Transparent: the intro's blurred still is the section's persistent
+       backdrop, and the cards float straight on it. The renderer is already
+       alpha:true — this (!important) beats spiral.js's inline ground. */
+    background: transparent !important;}
 
   /* ══ RESTORED ═══════════════════════════════════════════════════════
      The custom cursor and the whole talk panel. These sat between the
@@ -5532,9 +5523,9 @@ addEventListener('load', function () {
       introTitle.style.transform = 'translate(-50%, ' + lerpN(0, -70, a).toFixed(2) + 'vh)';
       introTitle.style.opacity = String(1 - Math.min(1, b * 2));
     }
-    /* Once the content has fully slid in, the intro is spent — hide it so
-       nothing lingers behind the canvas. */
-    if (intro) intro.style.visibility = b >= 1 ? 'hidden' : '';
+    /* The intro never hides: its full-bleed blurred still stays on as the
+       section's backdrop, and the transparent canvas floats the helix
+       straight on it. */
     for (var i = 0; i < slideEls.length; i++) {
       slideEls[i].style.transform = b >= 1 ? '' : 'translateY(' + lerpN(100, 0, b).toFixed(2) + 'vh)';
     }
