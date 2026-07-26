@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" href="images/logo-bk-favicon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Caveat:wght@600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&family=Caveat:wght@600&display=swap" rel="stylesheet" />
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
   :root{
@@ -37,10 +37,36 @@
     --cream-line:rgba(226,238,252,0.11);
     --card:#0E141D;                     /* the cards themselves */
     --accent:#7FC0FF;                   /* numbering and roles, azure on dark */
+    /* ── TYPE — three voices, one system ────────────────────────────────
+       Instrument Sans carries every display line and every piece of UI
+       chrome; Instrument Serif appears only in italic, as emphasis inside
+       a sans line; Urbanist reads the prose. Nothing on this site, or in
+       the case studies, uses a fourth. */
     --serif:'Instrument Serif',Georgia,serif;
     --sans:'Instrument Sans',system-ui,sans-serif;
+    --body:'Urbanist','Instrument Sans',system-ui,sans-serif;
     --ease:cubic-bezier(0.16,1,0.3,1);
     --ease-expo:cubic-bezier(0.19,1,0.22,1);   /* ease-out-expo — luxe deceleration */
+
+    /* ── THE CTA — one gradient, every button, every page ────────────────
+       White burns out of the top-left corner and the azure takes the rest,
+       the way the Engine's orange CTA does. A rounded rectangle, never a
+       pill, and never a shadow: the gradient is the depth. */
+    --cta-grad:radial-gradient(125% 125% at 0% 0%,
+      #FFFFFF 0%, #E4EFFF 9%, #93BEFF 26%, #4B8AF0 50%, #2463DC 76%, #1A4CB8 100%);
+    --cta-grad-hover:radial-gradient(125% 125% at 0% 0%,
+      #FFFFFF 0%, #EDF4FF 11%, #A6CBFF 29%, #5A96F5 53%, #2C6FE8 79%, #1F57CA 100%);
+    --cta-r:18px;                        /* the rounded rectangle, everywhere */
+    --cta-r-sm:14px;
+
+    /* ── GEOMETRY — the hairline furniture every section inherits ─────── */
+    --geo-line:rgba(160,205,255,.14);
+    --geo-line-2:rgba(160,205,255,.075);
+    --geo-dot:rgba(140,197,255,.5);
+
+    /* ── DEPTH — a named scale, so nothing ever reaches for 9999 ──────── */
+    --z-geo:0; --z-content:2; --z-nav:50; --z-fab:60; --z-scrim:70;
+    --z-panel:80; --z-toast:90; --z-cursor:100;
   }
   /* elegant, consistent keyboard focus */
   :focus-visible{outline:2px solid var(--ember);outline-offset:3px;border-radius:4px;}
@@ -57,9 +83,25 @@
   html.page-leave body{opacity:0;transition:opacity .24s ease;}
   html,body{height:100%;}
   body{
-    background:var(--bg);color:var(--ink);font-family:var(--sans);
+    background:var(--bg);color:var(--ink);font-family:var(--body);
     overflow-x:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   }
+  /* ── the three voices, assigned once ──────────────────────────────────
+     Urbanist is the default above, so prose needs no rule at all. What
+     needs saying is the opposite: every display line and every piece of
+     chrome is Instrument Sans, and the serif is italic wherever it lands. */
+  h1,h2,h3,h4,h5,h6,
+  .nav-name,.nav-callme-name,.nav-callme-label,.nav-links a,
+  .eyebrow,.fact .v,.work-head .k,.chap,.slide-num,.sys-num,
+  .slide-body .role,.slide-metrics span,.tc-k,.tc-nm,.tc-card-nm,
+  .said-k,.said-name,.said-role,.ft-k,.ft-status,.ft-line,.ft-clock,
+  .sys-metric .v,.sys-metric .l,.state-tag,.gal-next-k,.gal-next-t,
+  button,input,textarea,select{font-family:var(--sans);}
+  /* the serif never stands upright — it is an italic emphasis face here */
+  .serif,em.serif,.said-quote,.tc-cap-sub{font-family:var(--serif);font-style:italic;}
+  /* numbers are tabular wherever they carry meaning */
+  .fact .v,.sys-metric .v,.slide-metrics span,.slide-num,.sys-num{
+    font-variant-numeric:tabular-nums lining-nums;}
   /* form controls don't inherit type — without this the buttons and the chat
      input fall back to the system UI font and break the Instrument setting */
   button,input,textarea,select,optgroup{font-family:inherit;font-size:inherit;
@@ -70,6 +112,71 @@
   body::after{
     content:'';position:fixed;inset:0;z-index:5;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ══ GEOMETRY — the furniture every section shares ══════════════════════
+     One vocabulary of hairline shapes — arcs, a dotted mesh, crosses, a
+     small framed square — art-directed differently per section so the page
+     reads as one hand without repeating one stamp five times. Purely
+     decorative: aria-hidden, pointer-events none, and it never animates
+     layout. */
+  .geo{position:absolute;inset:0;z-index:var(--z-geo);pointer-events:none;
+    overflow:hidden;contain:strict;}
+  .geo>*{position:absolute;}
+  /* a large hairline circle, usually parked half off-canvas */
+  .geo-arc{border:1px solid var(--geo-line);border-radius:50%;}
+  .geo-arc.thin{border-color:var(--geo-line-2);}
+  /* the dotted mesh — Artisan's quiet ground */
+  .geo-mesh{background-image:radial-gradient(var(--geo-dot) .9px,transparent .9px);
+    background-size:34px 34px;opacity:.16;
+    -webkit-mask-image:radial-gradient(ellipse 70% 70% at var(--mx,50%) var(--my,50%),#000 0%,transparent 72%);
+            mask-image:radial-gradient(ellipse 70% 70% at var(--mx,50%) var(--my,50%),#000 0%,transparent 72%);}
+  /* a cross-hair tick, the way a drawing marks a coordinate */
+  .geo-cross{width:14px;height:14px;opacity:.5;}
+  .geo-cross::before,.geo-cross::after{content:'';position:absolute;background:var(--geo-line);}
+  .geo-cross::before{left:0;right:0;top:50%;height:1px;}
+  .geo-cross::after{top:0;bottom:0;left:50%;width:1px;}
+  /* a small framed square, rotated off-axis */
+  .geo-sq{width:clamp(58px,7vw,104px);aspect-ratio:1;border:1px solid var(--geo-line-2);
+    border-radius:10px;transform:rotate(14deg);}
+  /* a ring that turns, with one dot riding it */
+  .geo-orbit{border:1px solid var(--geo-line-2);border-radius:50%;
+    animation:geoSpin var(--spin,120s) linear infinite;}
+  .geo-orbit.rev{animation-direction:reverse;}
+  .geo-orbit b{position:absolute;top:-2.5px;left:50%;width:5px;height:5px;margin-left:-2.5px;
+    border-radius:50%;background:var(--geo-dot);box-shadow:0 0 9px rgba(92,169,255,.45);}
+  @keyframes geoSpin{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){ .geo-orbit{animation:none;} }
+
+  /* ══ THE CTA — one button, every section, every page ════════════════════
+     White out of the top-left corner, azure across the rest, a rounded
+     rectangle and no shadow anywhere. Label sits right of the corner bloom
+     so it always reads on blue. */
+  .btn-primary{
+    position:relative;display:inline-flex;align-items:center;gap:12px;
+    padding:15px 26px;border:0;border-radius:var(--cta-r);cursor:pointer;
+    background:var(--cta-grad);color:#fff;text-decoration:none;
+    font-family:var(--sans);font-size:15px;font-weight:600;letter-spacing:-0.004em;
+    box-shadow:none;isolation:isolate;
+    transition:background .45s var(--ease),transform .4s var(--ease),filter .3s ease;}
+  .btn-primary:hover{background:var(--cta-grad-hover);transform:translateY(-2px);}
+  .btn-primary:active{transform:translateY(0);}
+  .btn-primary:focus-visible{outline:2px solid #A6CBFF;outline-offset:3px;}
+  .btn-primary svg{width:17px;height:17px;flex:none;}
+  /* the same face, quieter: a bordered frame that carries no fill */
+  .btn-secondary{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    padding:14px 24px;border-radius:var(--cta-r);cursor:pointer;text-decoration:none;
+    background:transparent;border:1px solid rgba(150,190,245,.34);color:var(--ink);
+    font-family:var(--sans);font-size:14.5px;font-weight:550;box-shadow:none;
+    transition:border-color .3s var(--ease),background .3s var(--ease),transform .35s var(--ease);}
+  .btn-secondary:hover{border-color:rgba(150,190,245,.62);
+    background:rgba(120,175,255,.09);transform:translateY(-2px);}
+  .btn-secondary:focus-visible{outline:2px solid #A6CBFF;outline-offset:3px;}
+  .btn-secondary svg{width:16px;height:16px;flex:none;}
+  @media (prefers-reduced-motion:reduce){
+    .btn-primary,.btn-secondary{transition:background .2s ease,border-color .2s ease;}
+    .btn-primary:hover,.btn-secondary:hover{transform:none;}
   }
 
   .hero{position:relative;height:100svh;overflow:clip;}
@@ -93,11 +200,56 @@
   .orbit b{position:absolute;top:-2.5px;left:50%;transform:translateX(-50%);width:5px;height:5px;
     border-radius:50%;background:rgba(140,197,255,.5);box-shadow:0 0 8px rgba(92,169,255,.35);}
   @keyframes orbit{from{transform:translate(-50%,50%) rotate(0)}to{transform:translate(-50%,50%) rotate(360deg)}}
+  /* the talk panel holds the whole page still behind it */
+  html.talk-open .orbit,
+  html.talk-open .geo-orbit{animation-play-state:paused;}
+
+  /* ══ ANNOUNCEMENT — a full-bleed strip above the nav ════════════════════
+     What Artisan runs at the top of its site, on this page's palette: deep
+     indigo running into azure, one white rounded-rectangle button on the
+     right of the line. It belongs to the first fold only — the moment you
+     start scrolling it lifts away and the nav takes the top back. */
+  :root{--anno-h:46px;}
+  .anno{position:fixed;top:0;left:0;right:0;z-index:calc(var(--z-nav) + 1);
+    height:var(--anno-h);display:flex;align-items:center;justify-content:center;
+    gap:clamp(10px,1.6vw,18px);padding:0 clamp(14px,3vw,28px);
+    background:linear-gradient(90deg,#101C3F 0%,#1B3A87 26%,#2A62C8 52%,#1D4396 78%,#111F45 100%);
+    color:#EAF1FF;
+    transform:translateY(0);
+    transition:transform .5s var(--ease-expo),opacity .35s ease;}
+  /* the strip carries a soft sheen so it doesn't read as a flat slab */
+  .anno::after{content:'';position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(120% 320% at 50% -160%,rgba(255,255,255,.28),transparent 62%);}
+  .anno.gone{transform:translateY(-100%);opacity:0;pointer-events:none;}
+  .anno-txt{font-family:var(--body);font-size:13.5px;font-weight:500;letter-spacing:.004em;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+  .anno-txt .serif{font-size:1.1em;color:#fff;}
+  .anno-cta{flex:none;display:inline-flex;align-items:center;gap:7px;
+    padding:6px 13px;border-radius:9px;text-decoration:none;
+    background:#FFFFFF;color:#14275A;
+    font-family:var(--sans);font-size:12.5px;font-weight:600;letter-spacing:-0.002em;
+    transition:transform .3s var(--ease),background .25s ease;}
+  .anno-cta:hover{transform:translateY(-1px);background:#F1F6FF;}
+  .anno-cta svg{width:12px;height:12px;}
+  .anno-x{flex:none;width:26px;height:26px;display:grid;place-items:center;padding:0;
+    background:none;border:0;border-radius:8px;cursor:pointer;color:rgba(234,241,255,.66);
+    transition:color .22s ease,background .22s ease;}
+  .anno-x:hover{color:#fff;background:rgba(255,255,255,.13);}
+  .anno-x svg{width:12px;height:12px;}
+  @media (max-width:640px){
+    :root{--anno-h:42px;}
+    .anno-txt{font-size:12px;}
+    .anno-txt .anno-long{display:none;}
+    .anno-cta{padding:6px 11px;font-size:11.5px;}
+  }
+  @media (prefers-reduced-motion:reduce){ .anno{transition:opacity .2s ease;} }
+  /* dismissed for good, or scrolled past — the nav reclaims the top edge */
+  html.anno-off{--anno-h:0px;}
 
   /* ── NAV — ported from index.html: compresses to an ~80% pill on scroll,
          name swaps to "You can call me Bhanu :)" ── */
   .top-nav{
-    position:fixed;top:0;left:0;right:0;z-index:50;
+    position:fixed;top:var(--anno-h);left:0;right:0;z-index:var(--z-nav);
     display:flex;align-items:center;justify-content:space-between;
     padding:10px clamp(24px,4.5vw,56px);height:62px;
     background:transparent;             /* frameless at rest — just text on the page */
@@ -127,17 +279,20 @@
   .nav-callme-name{font-family:var(--sans);font-size:16px;font-weight:550;letter-spacing:-0.005em;color:var(--ink);line-height:1.15;}
   /* ── ORB FAB — bottom-right. No scale in any state: mountVisual reads the
         element's transformed rect, so a scaled mount would size the canvas wrong. ── */
-  .orb-fab{position:fixed;right:clamp(16px,2.4vw,32px);bottom:clamp(16px,2.4vw,32px);z-index:60;
-    width:66px;height:66px;border-radius:50%;display:grid;place-items:center;padding:0;
-    border:1px solid rgba(255,255,255,.14);background:rgba(13,18,27,.72);
-    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-    box-shadow:0 18px 44px -16px rgba(0,0,0,.6);cursor:pointer;
+  /* ── ORB FAB — bottom-right. No frame at all: the orb is the object, and
+        a glass disc around it only announced that it was a widget. No scale
+        in any state either — mountVisual reads the element's transformed
+        rect, so a scaled mount would size the canvas wrong. ── */
+  .orb-fab{position:fixed;right:clamp(16px,2.4vw,32px);bottom:clamp(16px,2.4vw,32px);
+    z-index:var(--z-fab);
+    width:62px;height:62px;display:grid;place-items:center;padding:0;
+    border:0;background:none;box-shadow:none;cursor:pointer;
     opacity:0;transform:translateY(14px);pointer-events:none;
-    transition:opacity .45s var(--ease),transform .45s var(--ease),
-      background .3s ease,border-color .3s ease,box-shadow .3s ease;}
+    transition:opacity .45s var(--ease),transform .45s var(--ease),filter .3s ease;}
   .orb-fab.show{opacity:1;transform:none;pointer-events:auto;}
-  .orb-fab.show:hover{transform:translateY(-3px);}
-  .orb-fab-mount{display:block;width:52px;height:52px;line-height:0;}
+  .orb-fab.show:hover{transform:translateY(-3px);filter:brightness(1.08);}
+  .orb-fab:focus-visible{outline:2px solid var(--ember);outline-offset:6px;border-radius:50%;}
+  .orb-fab-mount{display:block;width:62px;height:62px;line-height:0;}
 
   .nav-links{display:flex;align-items:center;gap:30px;}
   .nav-links a{position:relative;font-size:13.5px;font-weight:500;letter-spacing:.02em;color:var(--ink-2);
@@ -162,7 +317,7 @@
 
   /* ── COPY — top middle, centered ── */
   .copy{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    text-align:center;height:100%;padding:88px 24px 64px;}
+    text-align:center;height:100%;padding:calc(88px + var(--anno-h)) 24px 64px;}
   /* identity line — plain label row, deliberately chrome-less */
   .eyebrow{display:inline-flex;align-items:center;gap:16px;
     margin-bottom:clamp(18px,2.8vh,28px);
@@ -199,24 +354,23 @@
   .trail.static .trail-img{animation:fadeIn 1.2s var(--ease-expo) both .5s;}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-  /* ── CTA — white-led gradient pill, azure blooming from the corner; lives in the copy block ── */
+  /* ── CTA — the page's one button shape: white burning out of the top-left
+        corner, azure across the rest, a rounded rectangle, no shadow. The
+        orb sits inside the white bloom, which is exactly where a dark glass
+        sphere wants to be read. ── */
   .cta-dock{margin-top:44px;}
   .cta{
-    display:flex;align-items:center;gap:16px;
+    display:flex;align-items:center;gap:15px;
     width:auto;max-width:92vw;
-    padding:13px 26px 13px 13px;border-radius:22px;cursor:pointer;border:none;
-    /* flat off-white surface — the orb is the only colour it needs */
-    background:#F4F7FB;
-    box-shadow:0 22px 50px -20px rgba(3,8,18,.7), 0 4px 14px -6px rgba(3,8,18,.5),
-      inset 0 1px 0 rgba(255,255,255,.9);
-    color:#0B1220;
+    padding:11px 28px 11px 11px;border-radius:20px;cursor:pointer;border:none;
+    background:var(--cta-grad);
+    box-shadow:none;
+    color:#fff;
     font-family:var(--sans);
-    transition:transform .4s var(--ease),box-shadow .4s var(--ease),background .3s var(--ease);
+    transition:transform .4s var(--ease),background .45s var(--ease);
   }
-  .cta:hover{transform:translateY(-2px);background:#FFFFFF;
-    box-shadow:0 28px 58px -20px rgba(3,8,18,.75), 0 4px 14px -6px rgba(3,8,18,.5),
-      inset 0 1px 0 rgba(255,255,255,.95);}
-  .cta:focus-visible{outline:2px solid var(--ember);outline-offset:3px;}
+  .cta:hover{transform:translateY(-2px);background:var(--cta-grad-hover);}
+  .cta:focus-visible{outline:2px solid #A6CBFF;outline-offset:3px;}
   .cta-orb{position:relative;width:55px;height:55px;flex-shrink:0;line-height:0;}
   .cta-orb::before{content:'';position:absolute;inset:4px;border-radius:50%;
     background:radial-gradient(circle at 36% 30%, #D9F0FF, var(--ember) 46%, #17456F 80%, #081B2E);
@@ -227,7 +381,7 @@
     transition:width .55s var(--ease);}   /* width animates to hug each prompt */
   .cta-text span{
     grid-area:1/1;justify-self:start;width:max-content;
-    white-space:nowrap;font-size:18px;font-weight:560;letter-spacing:.002em;color:#0B1220;
+    white-space:nowrap;font-size:18px;font-weight:560;letter-spacing:.002em;color:#fff;
     opacity:0;transform:translateY(11px);filter:blur(3px);
     transition:opacity .6s var(--ease),transform .6s var(--ease),filter .6s var(--ease);
   }
@@ -611,136 +765,180 @@
   html.cc-active .slide-media{cursor:none;}
   .slide-media{cursor:pointer;}
 
-  /* ── CHAT PANEL ── */
-  .chat-backdrop{position:fixed;inset:0;z-index:70;background:rgba(4,2,1,.55);
+  /* ══ TALK PANEL ════════════════════════════════════════════════════════
+     The page is dark, so the panel is dark: a light slab sliding in over
+     this hero read as a different product. Same navy, same azure, same
+     hairlines — it is a drawer of the page, not a widget on top of it. */
+  .chat-backdrop{position:fixed;inset:0;z-index:var(--z-scrim);
+    background:rgba(3,6,12,.68);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
     opacity:0;pointer-events:none;transition:opacity .45s var(--ease);}
   .chat-backdrop.open{opacity:1;pointer-events:auto;}
   .chat{
-    position:fixed;top:14px;right:14px;bottom:14px;z-index:80;
-    width:min(408px,calc(100vw - 28px));
+    position:fixed;top:14px;right:14px;bottom:14px;z-index:var(--z-panel);
+    width:min(420px,calc(100vw - 28px));
     display:flex;flex-direction:column;overflow:hidden;
-    background:linear-gradient(180deg,#FBFCFE 0%,#F3F6FB 100%);color:#101720;
-    border:1px solid rgba(255,255,255,.6);border-radius:24px;
-    box-shadow:0 2px 4px rgba(8,16,30,.10), 0 40px 100px -34px rgba(8,16,30,.55), inset 0 1px 0 rgba(255,255,255,.9);
+    background:
+      radial-gradient(120% 60% at 50% 8%,rgba(60,130,235,.16),transparent 62%),
+      linear-gradient(180deg,#0E141F 0%,#0A0E17 58%,#080B12 100%);
+    color:var(--ink);
+    border:1px solid rgba(150,190,245,.16);border-radius:24px;
+    box-shadow:0 40px 100px -34px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06);
     transform:translateX(calc(100% + 40px));
     transition:transform .66s var(--ease-expo);
   }
   .chat.open{transform:translateX(0);}
-  .chat-head{display:flex;align-items:center;gap:10px;padding:16px 16px 14px;border-bottom:1px solid rgba(8,16,30,.06);}
+  /* header — the name of the thing, and what it is actually made of */
+  .chat-head{display:flex;align-items:flex-start;gap:12px;
+    padding:18px 16px 15px 20px;border-bottom:1px solid rgba(150,190,245,.12);}
   @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
-  .head-btn,.chat-close{flex-shrink:0;width:36px;height:36px;padding:0;display:grid;place-items:center;
-    cursor:pointer;background:#fff;border:1px solid rgba(8,16,30,.10);color:#48566A;
-    box-shadow:0 1px 2px rgba(8,16,30,.05);
+  .chat-close{flex-shrink:0;width:34px;height:34px;padding:0;display:grid;place-items:center;
+    cursor:pointer;background:rgba(150,190,245,.08);border:1px solid rgba(150,190,245,.16);
+    color:var(--ink-2);border-radius:50%;
     transition:background .25s,border-color .25s,color .25s;}
-  .head-btn{border-radius:11px;}
-  .chat-close{border-radius:50%;}
-  .head-btn:hover,.chat-close:hover{background:#F1F5FB;border-color:rgba(8,16,30,.22);color:#101720;}
-  .head-btn svg,.chat-close svg{width:16px;height:16px;}
-  .head-mid{flex:1;min-width:0;text-align:center;}
-  .chat-head .t{font-family:var(--serif);font-size:21px;letter-spacing:.01em;color:#101720;line-height:1.2;}
-  .head-status{display:inline-flex;align-items:center;gap:7px;margin-top:2px;
-    font-size:11.5px;font-weight:500;color:#6B7887;}
-  .head-status .dot{width:5px;height:5px;border-radius:50%;background:#B4BEC9;transition:background .3s,box-shadow .3s;}
-  .chat.live .head-status .dot{background:#3b8cff;box-shadow:0 0 8px rgba(59,140,255,.8);animation:pulse 1.4s infinite;}
+  .chat-close:hover{background:rgba(150,190,245,.16);border-color:rgba(150,190,245,.34);color:var(--ink);}
+  .chat-close svg{width:15px;height:15px;}
+  .head-mid{flex:1;min-width:0;text-align:left;}
+  .chat-head .t{font-family:var(--sans);font-size:19px;font-weight:570;
+    letter-spacing:-0.018em;color:var(--ink);line-height:1.2;}
+  .chat-head .t .serif{font-size:1.1em;font-weight:400;}
+  /* the stack, not a label: this is genuinely what answers you */
+  .head-stack{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:7px;}
+  .head-stack span{display:inline-flex;align-items:center;
+    padding:3px 8px;border-radius:6px;
+    border:1px solid rgba(150,190,245,.18);background:rgba(150,190,245,.06);
+    font-family:var(--sans);font-size:10px;font-weight:550;letter-spacing:.045em;
+    text-transform:uppercase;color:var(--ink-3);white-space:nowrap;
+    transition:color .3s ease,border-color .3s ease,background .3s ease;}
+  .chat.live .head-stack span{color:var(--ember-2);border-color:rgba(92,169,255,.3);
+    background:rgba(92,169,255,.1);}
   [hidden]{display:none !important;}
 
   /* panel body — hosts the orb (centered in voice, parked top-right in chat) + thread */
   .panel-body{position:relative;flex:1;overflow:hidden;}
-  .orb-hold{position:absolute;top:42%;left:50%;transform:translate(-50%,-50%) scale(1);z-index:4;
+  .orb-hold{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%) scale(1);z-index:4;
     line-height:0;cursor:default;
     transition:top .55s var(--ease),left .55s var(--ease),transform .55s var(--ease);}
   .chat[data-view="chat"] .orb-hold{top:44px;left:calc(100% - 44px);transform:translate(-50%,-50%) scale(.3);cursor:pointer;}
-  /* faint concentric rings behind the orb, with a dot on each */
-  .orb-rings{position:absolute;top:42%;left:50%;transform:translate(-50%,-50%);z-index:3;
-    display:grid;place-items:center;pointer-events:none;transition:opacity .4s var(--ease);}
-  .orb-rings i{grid-area:1/1;position:relative;border-radius:50%;border:1px solid rgba(31,111,230,.11);}
-  .orb-rings i:nth-child(1){width:236px;height:236px;}
-  .orb-rings i:nth-child(2){width:292px;height:292px;border-color:rgba(31,111,230,.08);}
-  .orb-rings i:nth-child(3){width:348px;height:348px;border-color:rgba(31,111,230,.055);}
-  .orb-rings i::before,.orb-rings i::after{content:'';position:absolute;top:50%;margin-top:-1.5px;
-    width:3px;height:3px;border-radius:50%;background:rgba(31,111,230,.3);}
-  .orb-rings i::before{left:-2px;} .orb-rings i::after{right:-2px;}
-  .chat[data-view="chat"] .orb-rings{opacity:0;}
+  /* while the agent is speaking the orb breathes — a slow, shallow swell.
+     Voice view only: in chat view the same transform parks it top-right. */
+  @keyframes orbBreathe{
+    0%,100%{transform:translate(-50%,-50%) scale(1);}
+    50%    {transform:translate(-50%,-50%) scale(1.055);}
+  }
+  .chat[data-view="voice"].speaking .orb-hold{
+    animation:orbBreathe 1.9s cubic-bezier(0.37,0,0.63,1) infinite;}
 
-  /* under the orb — live state tag + one-line hint */
-  .voice-under{position:absolute;left:0;right:0;bottom:16px;z-index:5;
-    display:flex;flex-direction:column;align-items:center;gap:13px;padding:0 22px;
+  /* the orbits — concentric hairlines that actually turn, each carrying one
+     dot around the orb. They pick up speed the moment the line goes live. */
+  .orb-rings{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);z-index:3;
+    display:grid;place-items:center;pointer-events:none;transition:opacity .4s var(--ease);}
+  .orb-rings i{grid-area:1/1;position:relative;border-radius:50%;
+    border:1px solid rgba(120,175,255,.14);
+    animation:geoSpin var(--spin,30s) linear infinite;
+    transition:border-color .5s ease;}
+  .orb-rings i:nth-child(1){width:236px;height:236px;--spin:24s;}
+  .orb-rings i:nth-child(2){width:292px;height:292px;--spin:38s;
+    border-color:rgba(120,175,255,.1);animation-direction:reverse;}
+  .orb-rings i:nth-child(3){width:348px;height:348px;--spin:54s;
+    border-color:rgba(120,175,255,.07);}
+  .orb-rings i b{position:absolute;top:-2.5px;left:50%;width:5px;height:5px;margin-left:-2.5px;
+    border-radius:50%;background:var(--ember);
+    box-shadow:0 0 10px rgba(92,169,255,.65);transition:box-shadow .5s ease;}
+  .chat.live .orb-rings i{animation-duration:calc(var(--spin) * .5);
+    border-color:rgba(120,175,255,.22);}
+  .chat.live .orb-rings i b{box-shadow:0 0 16px rgba(92,169,255,.9);}
+  .chat[data-view="chat"] .orb-rings{opacity:0;}
+  @media (prefers-reduced-motion:reduce){
+    .orb-rings i{animation:none;}
+    .chat[data-view="voice"].speaking .orb-hold{animation:none;}
+  }
+
+  /* ── the dock — the controls sit directly under the orb, riding over the
+        outer orbit rather than banished to the foot of the panel ── */
+  .voice-dock{position:absolute;left:0;right:0;top:calc(46% + 128px);z-index:5;
+    display:flex;flex-direction:column;align-items:center;gap:11px;padding:0 22px;
     transition:opacity .35s var(--ease);}
-  .chat[data-view="chat"] .voice-under{opacity:0;pointer-events:none;}
-  .state-tag{display:inline-flex;align-items:center;gap:8px;padding:8px 15px;border-radius:999px;
-    background:#fff;border:1px solid rgba(8,16,30,.07);
-    box-shadow:0 8px 22px -12px rgba(8,16,30,.35);
-    font-size:12.5px;font-weight:600;letter-spacing:.01em;color:#3A4756;white-space:nowrap;
-    transition:color .3s;}
-  .state-tag i{width:6px;height:6px;border-radius:50%;background:#B4BEC9;
-    transition:background .3s,box-shadow .3s;}
-  .chat.live .state-tag{color:#0F2E5E;}
-  .chat.live .state-tag i{background:#3b8cff;box-shadow:0 0 9px rgba(59,140,255,.75);animation:pulse 1.4s infinite;}
-  .voice-hint{font-size:13px;font-weight:420;line-height:1.5;color:#6B7887;text-align:center;max-width:30ch;}
+  /* short panels — pull the orbits and the dock in so nothing runs off the foot */
+  @media (max-height:760px){
+    .orb-rings i:nth-child(1){width:196px;height:196px;}
+    .orb-rings i:nth-child(2){width:242px;height:242px;}
+    .orb-rings i:nth-child(3){width:288px;height:288px;}
+    .voice-dock{top:calc(46% + 112px);}
+  }
+  @media (max-height:620px){
+    .orb-rings{opacity:.5;}
+    .orb-rings i:nth-child(3){display:none;}
+    .voice-dock{top:auto;bottom:20px;}
+    .orb-hold{top:40%;}
+    .orb-rings{top:40%;}
+  }
+  .chat[data-view="chat"] .voice-dock{opacity:0;pointer-events:none;}
+  /* the primary CTA carries the state itself — no separate tag underneath */
+  .talk-cta{min-width:236px;justify-content:center;padding:15px 24px;}
+  .talk-cta .talk-dot{width:7px;height:7px;border-radius:50%;flex:none;
+    background:rgba(255,255,255,.55);transition:background .3s,box-shadow .3s;}
+  .chat.live .talk-cta .talk-dot{background:#fff;
+    box-shadow:0 0 10px rgba(255,255,255,.9);animation:pulse 1.4s infinite;}
+  /* a refused mic is a real state, and it says so on the button you press */
+  .chat.denied .talk-cta{
+    background:radial-gradient(125% 125% at 0% 0%,
+      #FFFFFF 0%,#FFE7E4 10%,#F3A6A0 28%,#E5605A 56%,#C33B36 100%);}
+  .chat.denied .talk-cta .talk-dot{background:#fff;}
+  .talk-alt{min-width:236px;}
+  .chat.live .talk-alt{display:none;}
+  .btn-end{display:none;}
+  .chat.live .btn-end{display:inline-flex;}
+
   .thread{position:absolute;inset:0;overflow-y:auto;padding:62px 18px 14px;
     display:none;flex-direction:column;gap:11px;
-    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.18) transparent;}
+    scrollbar-width:thin;scrollbar-color:rgba(150,190,245,.24) transparent;}
   .chat[data-view="chat"] .thread{display:flex;}
-  .m{max-width:86%;padding:11px 14px;border-radius:15px;font-size:14px;line-height:1.55;font-weight:450;}
-  .m.ai{align-self:flex-start;background:#fff;border:1px solid rgba(8,16,30,.06);
-    color:#1E2732;border-bottom-left-radius:6px;box-shadow:0 2px 6px -3px rgba(8,16,30,.12);}
+  .m{max-width:86%;padding:11px 14px;border-radius:15px;font-size:14px;line-height:1.6;font-weight:450;}
+  .m.ai{align-self:flex-start;background:rgba(150,190,245,.07);
+    border:1px solid rgba(150,190,245,.14);
+    color:var(--ink);border-bottom-left-radius:6px;}
   .m.me{align-self:flex-end;
-    background:linear-gradient(180deg,rgba(92,169,255,.16),rgba(70,140,240,.14));
-    border:1px solid rgba(70,140,240,.28);
-    color:#0C2E5A;border-bottom-right-radius:6px;box-shadow:0 2px 8px -3px rgba(31,111,230,.22);}
+    background:linear-gradient(180deg,rgba(92,169,255,.26),rgba(53,118,222,.22));
+    border:1px solid rgba(120,175,255,.34);
+    color:#EAF3FF;border-bottom-right-radius:6px;}
   .m.typing{display:flex;gap:5px;padding:14px 16px;}
-  .m.typing i{width:5px;height:5px;border-radius:50%;background:#7C8794;animation:tp 1.2s infinite;}
+  .m.typing i{width:5px;height:5px;border-radius:50%;background:var(--ink-3);animation:tp 1.2s infinite;}
   .m.typing i:nth-child(2){animation-delay:.15s}.m.typing i:nth-child(3){animation-delay:.3s}
   @keyframes tp{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
 
-  /* bottom-docked action zone — clipped to the panel bottom */
-  .panel-foot{flex-shrink:0;padding:16px;border-top:1px solid rgba(0,0,0,.07);}
-  .chat[data-view="chat"] .voice-actions{display:none;}
-  .chat[data-view="voice"] .composer{display:none;}
+  /* the foot belongs to the chat view alone now — in voice view the controls
+     sit under the orb, so the strip has nothing to hold and gets out of the way */
+  .panel-foot{flex-shrink:0;padding:16px;border-top:1px solid rgba(150,190,245,.12);}
+  .chat[data-view="voice"] .panel-foot{display:none;}
 
-  .voice-actions{display:flex;flex-direction:column;gap:11px;}
-  .chat.live .btn-start,.chat.live .to-chat{display:none;}
-  /* primary voice CTA — blue gradient pill */
-  .btn-start{display:flex;align-items:center;justify-content:center;gap:9px;
-    width:100%;padding:15px;border:none;border-radius:999px;cursor:pointer;
-    font-family:var(--sans);font-size:14.5px;font-weight:600;color:#fff;letter-spacing:.005em;
-    background:linear-gradient(90deg,#5E9DF8 0%,#3B7FEC 52%,#2463DC 100%);
-    box-shadow:0 12px 26px -12px rgba(31,111,230,.8), inset 0 1px 0 rgba(255,255,255,.3);
-    transition:transform .3s var(--ease),box-shadow .3s var(--ease),filter .3s;}
-  .btn-start svg{width:16px;height:16px;flex-shrink:0;}
-  .btn-start:hover{transform:translateY(-1px);filter:brightness(1.04);
-    box-shadow:0 16px 32px -12px rgba(31,111,230,.9), inset 0 1px 0 rgba(255,255,255,.35);}
-  .btn-start:disabled{opacity:.7;cursor:default;transform:none;}
-  /* end call — red pill, only while live */
-  .btn-end{display:none;width:100%;padding:14px;border:none;border-radius:999px;cursor:pointer;
-    background:#E5484D;color:#fff;font-family:var(--sans);font-size:14.5px;font-weight:600;
-    box-shadow:0 10px 24px -12px rgba(229,72,77,.7);transition:background .25s,transform .3s var(--ease);}
-  .chat.live .btn-end{display:block;}
-  .btn-end:hover{background:#d83a3f;transform:translateY(-1px);}
-  .to-chat{display:flex;align-items:center;justify-content:center;gap:7px;align-self:center;
-    background:none;border:none;cursor:pointer;
-    color:#6B7887;font-family:var(--sans);font-size:12.5px;font-weight:500;padding:4px 8px;
-    transition:color .25s;}
-  .to-chat svg{width:14px;height:14px;flex-shrink:0;}
-  .to-chat:hover{color:#101720;}
+  .talk-cta:disabled{opacity:.72;cursor:default;transform:none;}
+  /* end call — the one place on the page that is deliberately not azure */
+  .btn-end{align-items:center;justify-content:center;min-width:236px;padding:13px 24px;
+    border:1px solid rgba(233,110,110,.42);border-radius:var(--cta-r);cursor:pointer;
+    background:rgba(210,70,70,.14);color:#FFC9C6;
+    font-family:var(--sans);font-size:14px;font-weight:570;box-shadow:none;
+    transition:background .25s,border-color .25s,transform .3s var(--ease);}
+  .btn-end:hover{background:rgba(214,64,64,.24);border-color:rgba(233,110,110,.7);
+    transform:translateY(-2px);}
   /* chat composer — input + mic + send (rounded rects) */
   .composer{display:flex;gap:10px;}
-  .composer input{flex:1;background:#ECF1F7;border:1px solid rgba(0,0,0,.1);border-radius:12px;
-    padding:13px 15px;font-family:var(--sans);font-size:14px;color:#101720;outline:none;transition:border-color .25s;}
-  .composer input::placeholder{color:#7C8794;}
-  .composer input:focus{border-color:rgba(70,140,240,.55);}
-  .mic-btn{width:46px;flex-shrink:0;background:#ECF1F7;border:1px solid rgba(0,0,0,.1);
-    border-radius:12px;color:#5D6B7A;cursor:pointer;display:grid;place-items:center;
+  .composer input{flex:1;background:rgba(150,190,245,.07);border:1px solid rgba(150,190,245,.16);
+    border-radius:12px;padding:13px 15px;font-family:var(--body);font-size:14px;
+    color:var(--ink);outline:none;transition:border-color .25s,background .25s;}
+  .composer input::placeholder{color:var(--ink-3);}
+  .composer input:focus{border-color:rgba(120,175,255,.55);background:rgba(150,190,245,.1);}
+  .mic-btn{width:46px;flex-shrink:0;background:rgba(150,190,245,.07);
+    border:1px solid rgba(150,190,245,.16);
+    border-radius:12px;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;
     transition:color .25s,border-color .25s,background .25s;}
-  .mic-btn:hover{color:#101720;border-color:rgba(70,140,240,.45);}
+  .mic-btn:hover{color:var(--ink);border-color:rgba(120,175,255,.5);}
   .mic-btn.rec{color:#fff;background:var(--ember);border-color:var(--ember);animation:pulse 1.2s infinite;}
   .mic-btn.hide{display:none;}
   .send-btn{width:52px;flex-shrink:0;border:none;border-radius:12px;cursor:pointer;color:#fff;
     display:grid;place-items:center;
-    background:radial-gradient(135% 135% at 20% 12%, #7bb4ff 0%, #3b8cff 48%, #1f6fe6 100%);
-    box-shadow:0 8px 18px -8px rgba(31,111,230,.6),inset 0 1px 0 rgba(255,255,255,.4);
-    transition:filter .25s,transform .3s var(--ease);}
-  .send-btn:hover{filter:brightness(1.05);transform:translateY(-1px);}
+    background:var(--cta-grad);box-shadow:none;
+    transition:background .35s var(--ease),transform .3s var(--ease);}
+  .send-btn:hover{background:var(--cta-grad-hover);transform:translateY(-1px);}
   .send-btn:disabled{opacity:.5;cursor:default;transform:none;}
   .send-btn svg{width:17px;height:17px;}
 
@@ -1253,12 +1451,24 @@
   @media(prefers-reduced-motion:reduce){
     .o1,.o2{animation:none;}
     .cta-text span,.chat,.chat-backdrop,.orb-hold{transition:none;}
-    .state-tag i,.head-status .dot,.mic-btn.rec{animation:none;}
+    .talk-cta .talk-dot,.mic-btn.rec{animation:none;}
     .top-nav,.eyebrow,h1,.facts,.trail-img,.cta-dock{animation:none;}
   }
 </style>
 </head>
 <body>
+  <!-- the announcement strip — first fold only, lifts away on scroll -->
+  <aside class="anno" id="anno">
+    <span class="anno-txt">Currently building <span class="serif">Dearly</span><span class="anno-long"> — a side project about keeping people close.</span></span>
+    <a class="anno-cta" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">
+      View Dearly
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9L9 3M4.2 3H9v4.8"/></svg>
+    </a>
+    <button class="anno-x" id="annoX" type="button" aria-label="Dismiss announcement">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6"/></svg>
+    </button>
+  </aside>
+
   <section class="hero">
     <canvas id="smoke"></canvas>
 
@@ -1699,14 +1909,12 @@
   <div class="chat-backdrop" id="chatBackdrop"></div>
   <aside class="chat" id="chat" data-view="voice" role="dialog" aria-label="Ask me anything" aria-modal="true">
     <header class="chat-head">
-      <button type="button" class="head-btn" id="headTranscript" aria-label="Show transcript">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
-          <path d="M2.5 6.5v3M6 3.5v9M9.5 5v6M13 6.5v3"/>
-        </svg>
-      </button>
       <div class="head-mid">
-        <div class="t">Talk to Bhanu</div>
-        <div class="head-status"><span>Voice agent</span><i class="dot" aria-hidden="true"></i></div>
+        <div class="t">Talk with <span class="serif">me</span></div>
+        <!-- not a label — this is genuinely what answers you -->
+        <div class="head-stack" aria-label="Built with">
+          <span>Second&nbsp;Brain</span><span>Voice&nbsp;Clone</span><span>ElevenLabs&nbsp;SDK</span>
+        </div>
       </div>
       <button class="chat-close" id="chatClose" aria-label="Close">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
@@ -1716,28 +1924,16 @@
     </header>
 
     <div class="panel-body" id="panelBody">
-      <div class="orb-rings" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="orb-rings" aria-hidden="true"><i><b></b></i><i><b></b></i><i><b></b></i></div>
       <div class="orb-hold" id="orbHold" title="Back to voice"><div id="talkOrbMount"></div></div>
-      <div class="voice-under">
-        <div class="state-tag" id="stateTag"><i aria-hidden="true"></i><span id="orbStateText">Ready</span></div>
-        <p class="voice-hint">Ask about my work, process, or schedule a call.</p>
-      </div>
-      <div class="thread" id="thread">
-        <div class="m ai">Hey — ask me about my work, a project I'm proud of, or why you should hire me.</div>
-      </div>
-    </div>
-
-    <div class="panel-foot">
-      <div class="voice-actions" id="voiceActions">
-        <button type="button" class="btn-start" id="talkStart">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-            <rect x="6" y="1.6" width="4" height="7.8" rx="2" fill="currentColor" stroke="none"/>
-            <path d="M3.5 7.6a4.5 4.5 0 0 0 9 0M8 12.1v2.3"/>
-          </svg>
-          <span id="talkStartLabel">Start voice conversation</span>
+      <!-- the controls live under the orb, over the outer orbit -->
+      <div class="voice-dock">
+        <button type="button" class="btn-primary talk-cta" id="talkStart">
+          <i class="talk-dot" aria-hidden="true"></i>
+          <span id="talkStartLabel" aria-live="polite">Start talking</span>
         </button>
         <button type="button" class="btn-end" id="talkEnd">End call</button>
-        <button type="button" class="to-chat" id="toChat">
+        <button type="button" class="btn-secondary talk-alt" id="toChat">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
             <rect x="1.6" y="4.2" width="12.8" height="7.6" rx="1.8"/>
             <path d="M4.3 6.8h.01M6.7 6.8h.01M9.1 6.8h.01M11.5 6.8h.01M5 9.6h6"/>
@@ -1745,7 +1941,12 @@
           <span>Chat instead</span>
         </button>
       </div>
+      <div class="thread" id="thread">
+        <div class="m ai">Hey — ask me about my work, a project I'm proud of, or why you should hire me.</div>
+      </div>
+    </div>
 
+    <div class="panel-foot">
       <form class="composer" id="chatForm">
         <input id="chatInput" type="text" placeholder="Ask anything…" autocomplete="off" />
         <button type="button" class="mic-btn" id="micBtn" aria-label="Dictate your question">
@@ -1777,7 +1978,10 @@ if (new URLSearchParams(location.search).has('rafshim')) {
 (function () {
   var canvas = document.getElementById('smoke');
   var gl = canvas.getContext('webgl', { alpha: false, antialias: false, preserveDrawingBuffer: true });
-  if (!gl) { canvas.style.background = 'radial-gradient(120% 45% at 50% 118%, #12365E 0%, #0B1626 50%, #0A0E15 80%)'; return; }
+  /* no WebGL: paint the same composition in CSS — a circle the width of the
+     viewport, its centre pushed below the floor so only the crest shows */
+  if (!gl) { canvas.style.background =
+    'radial-gradient(50vw 50vw at 50% 132%, #2C6FB8 0%, #17406E 34%, #0D1B2E 62%, #0A0E15 78%)'; return; }
 
   var VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
   var FRAG = [
@@ -1799,24 +2003,27 @@ if (new URLSearchParams(location.search).has('rafshim')) {
     ' vec2 q2=p*vec2(2.6,3.4)+vec2(t*0.010,-t*0.095);',
     ' float n2=fbm(q2);',
     ' float smoke=smoothstep(0.37,0.95,n1*0.62+n2*0.38);',
-    /* circular emitter — the smoke pools into a round mass and rises out of its mouth */
-    ' vec2 c=vec2(aspect*0.5,0.20);',
+    /* ── THE DOME ──────────────────────────────────────────────────────
+       One circle as wide as the viewport, sunk below the bottom edge so
+       only the top ~18% of it is ever on screen; the rest is clipped away
+       by the frame. Everything is expressed in the circle's own radius, so
+       the composition holds identically at 320px and at 3440px. */
+    ' float R=aspect*0.5;',                           // radius = half the viewport width
+    ' vec2 c=vec2(aspect*0.5,-0.64*R);',              // sunk: crest lands ~0.36R above the floor
     ' vec2 rel=p-c;',
-    ' float sy=rel.y>0.0?0.76:1.5;',                  // near-round, stretched a little upward
-    ' float d=length(vec2(rel.x,rel.y*sy));',
-    ' float body=smoothstep(0.54,0.06,d);',           // rounded silhouette
+    ' float d=length(rel)/max(R,0.0001);',            // 1.0 is the rim
+    ' float body=smoothstep(1.06,0.52,d);',           // dense at the base, thinning to the crest
+    ' float rim=smoothstep(1.05,0.97,d)*(1.0-smoothstep(0.97,0.83,d));',   // the lit edge itself
+    ' float glow=smoothstep(1.34,0.18,d);',           // the bloom the dome throws
     ' float dns=smoke*body;',
-    ' float rd=length(rel);',
-    ' float core=exp(-rd*rd*11.0);',                  // luminous mouth of the circle
-    ' float disc=smoothstep(0.26,0.10,rd);',          // the circle itself, softly lit
     ' vec3 bg=vec3(0.039,0.055,0.082);',
     ' vec3 deep=vec3(0.10,0.22,0.42);',
     ' vec3 ice=vec3(0.46,0.74,1.0);',
     ' vec3 col=bg;',
-    ' col+=deep*(dns*1.28+core*0.30+disc*0.15);',
-    ' col+=ice*dns*dns*0.46;',
-    ' col+=ice*core*0.11;',
-    ' col+=ice*disc*0.05;',
+    ' col+=deep*(dns*1.24+glow*0.34);',
+    ' col+=ice*dns*dns*0.44;',
+    ' col+=ice*rim*0.30;',                            // the arc reads even where smoke is thin
+    ' col+=ice*glow*0.05;',
     ' col+=ice*pow(dns,3.0)*0.18;',                 // luminous crest highlights
     ' col=mix(col,bg,smoothstep(0.62,1.05,p.y));',
     ' col+=(hash(gl_FragCoord.xy+fract(t))-0.5)*0.012;',
@@ -1848,7 +2055,24 @@ if (new URLSearchParams(location.search).has('rafshim')) {
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var t0 = performance.now();
   var lastTick = 0;
+  var frozen = false, pausedAt = 0;
+
+  /* the talk panel calls this. Stopping the loop is enough to hold the
+     image — the context keeps its buffer — and the clock is rewound by the
+     length of the pause on the way out, so resuming never jumps. */
+  window.__freezeHero = function (on) {
+    if (on) {
+      if (frozen) return;
+      frozen = true; pausedAt = performance.now();
+    } else {
+      if (!frozen) return;
+      frozen = false; t0 += performance.now() - pausedAt;
+      if (!reduced) requestAnimationFrame(frame);
+    }
+  };
+
   function frame(now) {
+    if (frozen) return;                 /* hold the last frame, stop the loop */
     lastTick = now;
     size();
     gl.uniform2f(uRes, canvas.width, canvas.height);
@@ -1859,7 +2083,7 @@ if (new URLSearchParams(location.search).has('rafshim')) {
   requestAnimationFrame(frame);
   addEventListener('resize', size);
   if (!reduced) setInterval(function () {
-    if (performance.now() - lastTick > 600) requestAnimationFrame(frame);
+    if (!frozen && performance.now() - lastTick > 600) requestAnimationFrame(frame);
   }, 500);
 })();
 
@@ -1880,6 +2104,7 @@ addEventListener('resize', sizeCtaText);
 if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
   setInterval(function () {
     if (ctaHover) return;                       // don't swap under the reader
+    if (document.documentElement.classList.contains('talk-open')) return;  // the page is held
     var cur = PROMPTS[activePrompt];
     cur.classList.remove('on'); cur.classList.add('out');
     setTimeout(function () { cur.classList.remove('out'); }, 650);
@@ -1897,8 +2122,9 @@ var thread = document.getElementById('thread');
 var sendBtn = document.getElementById('chatSend');
 var talkRoot = null, voiceApi = null;
 
-/* ── voice states → the tag under the orb + start/end buttons ── */
-var orbStateText = document.getElementById('orbStateText');
+/* ── voice states → they now live INSIDE the primary CTA. There is no tag
+   underneath and no hint line: the button you are looking at is the thing
+   that tells you where the conversation is. ── */
 var talkStart = document.getElementById('talkStart');
 var talkStartLabel = document.getElementById('talkStartLabel');
 var talkEnd = document.getElementById('talkEnd');
@@ -1910,15 +2136,18 @@ var STATE_LABELS = {
   'assistant-speaking': 'Talking',
   scheduling: 'Scheduling meeting',
   'mic-denied': 'Mic blocked — enable access',
-  error: 'Something went wrong',
+  error: 'Something went wrong — try again',
 };
 function updateVoiceState(s) {
   var live = s === 'connecting' || s === 'listening' || s === 'user-speaking' ||
              s === 'thinking' || s === 'assistant-speaking' || s === 'scheduling';
   chat.classList.toggle('live', live);
-  orbStateText.textContent = STATE_LABELS[s] || 'Ready';
+  /* the orb swells only while the agent itself is talking */
+  chat.classList.toggle('speaking', s === 'assistant-speaking');
+  /* a refused mic turns the button itself, so the fix is where the press is */
+  chat.classList.toggle('denied', s === 'mic-denied' || s === 'error');
   talkStart.disabled = s === 'connecting';
-  talkStartLabel.textContent = (s === 'mic-denied' || s === 'error') ? 'Try again' : 'Start voice conversation';
+  talkStartLabel.textContent = STATE_LABELS[s] || 'Start talking';
 }
 talkStart.addEventListener('click', function () { if (voiceApi) voiceApi.start(); });
 talkEnd.addEventListener('click', function () { if (voiceApi) voiceApi.end(); });
@@ -1948,22 +2177,29 @@ function setView(view) {
   if (view === 'chat') setTimeout(function () { input.focus(); }, 320);
 }
 document.getElementById('toChat').addEventListener('click', function () { setView('chat'); });
-document.getElementById('headTranscript').addEventListener('click', function () {
-  setView(chat.dataset.view === 'chat' ? 'voice' : 'chat');
-});
 document.getElementById('orbHold').addEventListener('click', function () {
   if (chat.dataset.view === 'chat') setView('voice');   // tap the parked orb → back to voice
 });
 
+/* While the panel is open the home page stops moving. The smoke freezes on
+   its last frame, the orbits hold, the prompt stops cycling and the image
+   trail stands down — everything behind the scrim goes still so the only
+   living thing on screen is the one you opened. */
+function freezeHome(on) {
+  document.documentElement.classList.toggle('talk-open', on);
+  if (window.__freezeHero) window.__freezeHero(on);
+}
 function openChat() {
   chat.classList.add('open'); backdrop.classList.add('open');
   var act = document.querySelector('#ctaText span.on');
   input.value = act ? (act.dataset.q || act.textContent) : '';
   setView('voice');                              // voice-first by default
+  freezeHome(true);
   mountTalkOrb();
 }
 function closeChat() {
   chat.classList.remove('open'); backdrop.classList.remove('open');
+  freezeHome(false);
   unmountTalkOrb();                              // tears down any live voice session
 }
 ctaEl.addEventListener('click', openChat);
@@ -1975,11 +2211,36 @@ addEventListener('keydown', function (e) {
   }
 });
 
-/* ── nav — compress to the 80% pill on scroll (ported behavior) ── */
+/* ── nav — compress to the 80% pill on scroll (ported behavior), and the
+   announcement strip lifts away with the same gesture. Dismissing it is
+   remembered, so it never comes back for someone who has closed it. ── */
 var topNav = document.getElementById('topNav');
-addEventListener('scroll', function () {
-  topNav.classList.toggle('scrolled', scrollY > 40);
-}, { passive: true });
+(function () {
+  var anno = document.getElementById('anno');
+  var annoX = document.getElementById('annoX');
+  var root = document.documentElement;
+  var dismissed = false;
+  try { dismissed = localStorage.getItem('bk-anno-dearly') === 'off'; } catch (e) {}
+
+  function retire(remember) {
+    if (!anno) return;
+    anno.classList.add('gone');
+    root.classList.add('anno-off');
+    if (remember) { try { localStorage.setItem('bk-anno-dearly', 'off'); } catch (e) {} }
+  }
+  if (dismissed) { retire(false); anno && anno.setAttribute('hidden', ''); }
+  if (annoX) annoX.addEventListener('click', function () { retire(true); });
+
+  addEventListener('scroll', function () {
+    var past = scrollY > 40;
+    topNav.classList.toggle('scrolled', past);
+    /* once dismissed it stays gone; otherwise it rides the first fold */
+    if (!dismissed && anno && !anno.hasAttribute('hidden')) {
+      anno.classList.toggle('gone', past);
+      root.classList.toggle('anno-off', past);
+    }
+  }, { passive: true });
+})();
 
 /* ── in-page anchors: Lenis carries them when it's running, native otherwise.
    The nav also quietly marks the section you're in (scroll-spy on rects,
@@ -2342,8 +2603,9 @@ addEventListener('scroll', function () {
   var hero = document.querySelector('.hero');
   var chatEl = document.getElementById('chat');
   var idx = 0, lastX = -1e4, lastY = -1e4;
-  var GAP = 135;                                    // px of cursor travel between reveals
-  var MAX = 9;                                      // concurrent frames cap
+  var GAP = 215;                                    // px of cursor travel between reveals
+  var MAX = 7;                                      // concurrent frames cap
+  var stackTop = 0;                                 // every frame lands above the one before it
 
   hero.addEventListener('mousemove', function (e) {
     if (chatEl.classList.contains('open')) return;
@@ -2354,16 +2616,36 @@ addEventListener('scroll', function () {
     spawn(e.clientX - rect.left, e.clientY - rect.top, dx);
   }, { passive: true });
 
-  /* frames hold perfectly still — they only fade and sharpen in place */
+  /* Frames hold perfectly still — they only fade and sharpen in place. Two
+     things make the stack read correctly: every new frame is given a higher
+     z-index than the last, so the second photo is always over the first no
+     matter how the DOM churns underneath; and when the cap is reached the
+     oldest frame is retired with its own short fade instead of being cut
+     out of the document mid-animation, which is what made the trail snap. */
+  function retire(el) {
+    if (el.dataset.going) return;
+    el.dataset.going = '1';
+    var out = el.animate(
+      [{ opacity: getComputedStyle(el).opacity, filter: 'blur(0px)' },
+       { opacity: 0, filter: 'blur(5px)' }],
+      { duration: 260, fill: 'forwards', easing: 'cubic-bezier(0.5,0,0.85,0.4)' });
+    out.onfinish = function () { el.remove(); };
+  }
+
   function spawn(x, y, dx) {
     var el = document.createElement('div'); el.className = 'trail-img';
     var im = document.createElement('img'); im.src = SRCS[idx]; im.alt = '';
     idx = (idx + 1) % SRCS.length;
     el.appendChild(im);
     el.style.left = x + 'px'; el.style.top = y + 'px';
+    el.style.zIndex = ++stackTop;                   /* newest always on top */
     var rot = Math.max(-7, Math.min(7, dx * 0.05));
     el.style.transform = 'translate(-50%,-50%) rotate(' + rot + 'deg)';
-    while (layer.children.length >= MAX) layer.removeChild(layer.firstChild);
+
+    /* over the cap: fade the oldest still-living frame out rather than
+       yanking it, so nothing ever disappears in a single frame */
+    var living = [].filter.call(layer.children, function (n) { return !n.dataset.going; });
+    while (living.length >= MAX) retire(living.shift());
     layer.appendChild(el);
 
     var anim = el.animate([
@@ -2371,7 +2653,7 @@ addEventListener('scroll', function () {
       { opacity: 1, filter: 'blur(0px)', offset: .18 },
       { opacity: 1, filter: 'blur(0px)', offset: .72 },
       { opacity: 0, filter: 'blur(4px)' }
-    ], { duration: 1700, fill: 'forwards', easing: 'ease-in-out' });
+    ], { duration: 1900, fill: 'forwards', easing: 'ease-in-out' });
     anim.onfinish = function () { el.remove(); };
   }
 })();
@@ -2475,7 +2757,7 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
   if (!fab) return;
   if (!(window.BhanuOrb && window.BhanuOrb.mountVisual)) { setTimeout(waitFab, 60); return; }
   window.BhanuOrb.mountVisual(document.getElementById('fabOrbMount'),
-    { palette: 'arctic', size: 52, state: 'idle' });
+    { palette: 'arctic', size: 62, state: 'idle' });
 
   fab.addEventListener('click', function () { openChat(); });
 
