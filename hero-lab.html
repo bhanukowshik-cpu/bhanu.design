@@ -19,13 +19,16 @@
     --line:rgba(239,243,248,0.12);
     --ember:#5CA9FF;      /* azure accent (var name kept to avoid churn) */
     --ember-2:#8CC5FF;
-    /* section 2 runs on its own cream scale — the page token set stays dark */
-    --cream:#FFFCF8;
-    --cream-2:#F6F1E9;
-    --cream-ink:#14181F;
-    --cream-ink-2:#3A4756;
-    --cream-ink-3:#6B7887;
-    --cream-line:rgba(20,24,31,0.10);
+    /* Section 2's own scale. Names kept from the cream pass so every rule that
+       already reads them flips with these six values alone. */
+    --cream:#080B11;                    /* the band — a shade under the page */
+    --cream-2:#121822;                  /* chips, the system frame's ground */
+    --cream-ink:#F2F6FB;
+    --cream-ink-2:#A8B6C6;
+    --cream-ink-3:#6F7E90;
+    --cream-line:rgba(226,238,252,0.11);
+    --card:#0E141D;                     /* the cards themselves */
+    --accent:#7FC0FF;                   /* numbering and roles, azure on dark */
     --serif:'Instrument Serif',Georgia,serif;
     --sans:'Instrument Sans',system-ui,sans-serif;
     --ease:cubic-bezier(0.16,1,0.3,1);
@@ -106,19 +109,6 @@
   .top-nav.scrolled .nav-callme{opacity:1;pointer-events:auto;transform:translateY(-50%);}
   .nav-callme-label{font-size:10px;font-weight:550;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);line-height:1.5;}
   .nav-callme-name{font-family:var(--sans);font-size:16px;font-weight:550;letter-spacing:-0.005em;color:var(--ink);line-height:1.15;}
-  /* over the cream band the pill inverts — light glass, dark ink */
-  .top-nav.scrolled.on-cream{
-    background:rgba(255,252,248,0.86);
-    border-color:var(--cream-line);
-    box-shadow:0 12px 40px -20px rgba(20,30,50,.30);
-  }
-  .top-nav.on-cream .nav-brand,
-  .top-nav.on-cream .nav-callme-name{color:var(--cream-ink);}
-  .top-nav.on-cream .nav-callme-label{color:var(--cream-ink-3);}
-  .top-nav.on-cream .nav-links a{color:var(--cream-ink-2);}
-  .top-nav.on-cream .nav-links a:hover{color:var(--cream-ink);}
-  .top-nav.on-cream .nav-links a::after{background:var(--cream-ink);}
-
   /* ── ORB FAB — bottom-right. No scale in any state: mountVisual reads the
         element's transformed rect, so a scaled mount would size the canvas wrong. ── */
   .orb-fab{position:fixed;right:clamp(16px,2.4vw,32px);bottom:clamp(16px,2.4vw,32px);z-index:60;
@@ -132,8 +122,6 @@
   .orb-fab.show{opacity:1;transform:none;pointer-events:auto;}
   .orb-fab.show:hover{transform:translateY(-3px);}
   .orb-fab-mount{display:block;width:52px;height:52px;line-height:0;}
-  .orb-fab.on-cream{background:rgba(255,252,248,.86);border-color:var(--cream-line);
-    box-shadow:0 18px 44px -18px rgba(20,30,50,.34);}
 
   .nav-links{display:flex;align-items:center;gap:30px;}
   .nav-links a{position:relative;font-size:13.5px;font-weight:500;letter-spacing:.02em;color:var(--ink-2);
@@ -278,6 +266,17 @@
     .work-pin.is-pinned .work-head{opacity:1;transform:none;transition:none;}
   }
 
+  /* ── the expanding light behind the reel ──────────────────────────────── */
+  .work-canvas{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+  .work-canvas img{position:absolute;left:50%;top:50%;width:100%;height:100%;
+    object-fit:cover;transform-origin:50% 50%;
+    transform:translate(-50%,-50%) scale(var(--k,.62));
+    border-radius:var(--kr,26px);opacity:var(--ko,0);}
+  /* a soft floor under it so the cards never sit on raw brightness */
+  .work-canvas::after{content:'';position:absolute;inset:0;
+    background:radial-gradient(120% 90% at 50% 50%,transparent 30%,var(--cream) 92%);}
+  .work-sticky>.work-head,.work-sticky>.work-track{position:relative;z-index:1;}
+
   /* section header — just the label, nothing else */
   .work-head{padding:0 var(--reel-pad);margin-bottom:clamp(22px,3.5vh,40px);}
   .work-head .k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
@@ -290,12 +289,12 @@
     gap:clamp(16px,1.8vw,28px);padding:clamp(16px,1.6vw,26px);
     border-radius:30px;border:1px solid var(--cream-line);
     background:linear-gradient(180deg,rgba(36,99,220,.035),rgba(36,99,220,0) 42%),var(--cream-2);}
-  .sys-frame .slide{box-shadow:0 18px 40px -28px rgba(10,20,40,.22);}
+  .sys-frame .slide{box-shadow:0 20px 44px -26px rgba(0,0,0,.66);}
 
   .sys-panel{flex:none;width:var(--panel-w);align-self:center;
     display:flex;flex-direction:column;padding-left:clamp(6px,1vw,16px);
     padding-right:clamp(12px,2vw,28px);}
-  .sys-num{font-size:11.5px;font-weight:600;letter-spacing:.13em;color:#2463DC;}
+  .sys-num{font-size:11.5px;font-weight:600;letter-spacing:.13em;color:var(--accent);}
   .sys-panel h2{margin-top:14px;font-family:var(--sans);font-weight:570;color:var(--cream-ink);
     font-size:clamp(28px,2.9vw,42px);line-height:1.12;letter-spacing:-0.024em;}
   .sys-desc{margin-top:14px;font-size:14.5px;line-height:1.6;color:var(--cream-ink-2);max-width:32ch;}
@@ -309,13 +308,13 @@
   /* ── project cards — every one the same width ─────────────────────────── */
   .slide{flex:none;width:var(--card-w);display:flex;flex-direction:column;
     border-radius:24px;overflow:hidden;position:relative;
-    border:1px solid var(--cream-line);background:#FFFFFF;
-    box-shadow:0 30px 60px -34px rgba(10,20,40,.20), 0 2px 8px -4px rgba(10,20,40,.06);}
+    border:1px solid var(--cream-line);background:var(--card);
+    box-shadow:0 34px 70px -34px rgba(0,0,0,.72), 0 2px 10px -4px rgba(0,0,0,.5);}
 
   /* thumbnail at rest; the video rises over it from the bottom on hover */
   .slide-media{position:relative;display:grid;place-items:center;
     margin:20px 20px 0;border-radius:14px;overflow:hidden;
-    aspect-ratio:16/10;background:#EDF1F7;border:1px solid var(--cream-line);}
+    aspect-ratio:16/10;background:#0B0F16;border:1px solid var(--cream-line);}
   .slide-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
   /* the still darkens behind the video so the inset panel reads as the lit thing.
      rgba(8,8,7,.8), as bymonolog's works_home_overlay uses. */
@@ -340,11 +339,11 @@
     transform:perspective(480px) translateY(0) rotateX(0deg) scale(1);opacity:1;}
 
   .slide-body{display:flex;flex-direction:column;flex:1;padding:18px 20px 22px;}
-  .slide-num{font-size:11px;font-weight:600;letter-spacing:.13em;color:#2463DC;margin-bottom:9px;}
+  .slide-num{font-size:11px;font-weight:600;letter-spacing:.13em;color:var(--accent);margin-bottom:9px;}
   .slide-body h3{font-family:var(--sans);font-size:clamp(22px,1.8vw,27px);font-weight:570;
     letter-spacing:-0.02em;color:var(--cream-ink);}
   .slide-body .role{margin-top:5px;font-size:11px;font-weight:600;letter-spacing:.13em;
-    text-transform:uppercase;color:#2463DC;}
+    text-transform:uppercase;color:var(--accent);}
   .slide-body p{margin-top:11px;font-size:14px;line-height:1.6;color:var(--cream-ink-2);}
   .slide-body p em{font-style:normal;font-weight:600;color:var(--cream-ink);}
   .slide-metrics{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
@@ -353,9 +352,9 @@
     font-variant-numeric:tabular-nums;}
   .slide-cta{align-self:flex-start;margin-top:18px;display:inline-flex;align-items:center;gap:8px;
     padding:10px 17px;border-radius:999px;text-decoration:none;
-    background:#101720;color:#fff;font-size:13px;font-weight:570;
+    background:var(--cream-ink);color:#0A0E15;font-size:13px;font-weight:570;
     transition:transform .3s var(--ease),background .3s var(--ease);}
-  .slide-cta:hover{transform:translateY(-2px);background:#000;}
+  .slide-cta:hover{transform:translateY(-2px);background:#FFFFFF;}
 
   @media (prefers-reduced-motion: reduce){
     .slide-vid{transition:none;}
@@ -836,6 +835,12 @@
   <section class="work-pin" id="workPin">
 
     <div class="work-sticky">
+      <!-- the band's own light: starts as a small panel and expands to full
+           bleed as the pin advances. JS drives --k / --ko / --kr. -->
+      <div class="work-canvas" aria-hidden="true">
+        <img src="images/section2-aurora.webp" alt="" width="2200" height="944" decoding="async">
+      </div>
+
       <header class="work-head"><span class="k">Selected work</span></header>
 
       <div class="work-track" id="workTrack">
@@ -1332,14 +1337,8 @@ addEventListener('keydown', function (e) {
 
 /* ── nav — compress to the 80% pill on scroll (ported behavior) ── */
 var topNav = document.getElementById('topNav');
-var creamBand = document.getElementById('workPin');
 addEventListener('scroll', function () {
   topNav.classList.toggle('scrolled', scrollY > 40);
-  /* the compressed pill sits ~86px down — invert it once cream is behind it */
-  if (creamBand) {
-    var r = creamBand.getBoundingClientRect();
-    topNav.classList.toggle('on-cream', r.top <= 86 && r.bottom >= 86);
-  }
 }, { passive: true });
 
 /* ── the reel, driven by vertical scroll ─────────────────────────────────
@@ -1351,6 +1350,7 @@ addEventListener('scroll', function () {
   var pin = document.getElementById('workPin');
   var track = document.getElementById('workTrack');
   var sticky = pin && pin.querySelector('.work-sticky');
+  var canvas = pin && pin.querySelector('.work-canvas');
   if (!pin || !track || !sticky) return;
 
   function fits() {
@@ -1408,6 +1408,16 @@ addEventListener('scroll', function () {
       'translate3d(' + (-curX).toFixed(1) + 'px,' + y.toFixed(2) + 'vh,0)';
     track.style.opacity = (0.06 + ease * 0.94).toFixed(3);
     pin.classList.toggle('revealed', curE > 0.04);
+
+    /* the light keeps opening across the whole pin, not just the arrival, so
+       it is still growing while the reel walks — a small panel becoming a sky */
+    if (canvas) {
+      var whole = travel > 0 ? (curE * enterPx + curX) / (enterPx + travel) : curE;
+      var g = 1 - Math.pow(1 - clamp01(whole), 2);
+      canvas.style.setProperty('--k',  (0.62 + g * 0.56).toFixed(4));
+      canvas.style.setProperty('--kr', ((1 - g) * 26).toFixed(1) + 'px');
+      canvas.style.setProperty('--ko', (ease * (0.30 + g * 0.34)).toFixed(3));
+    }
   }
 
   function tick() {
@@ -1628,14 +1638,9 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
   fab.addEventListener('click', function () { openChat(); });
 
   var heroCta = document.getElementById('cta');
-  var band = document.getElementById('workPin');
   function sync() {
     var gone = heroCta ? heroCta.getBoundingClientRect().bottom < 8 : scrollY > innerHeight * 0.7;
     fab.classList.toggle('show', gone);
-    if (band) {
-      var r = band.getBoundingClientRect(), y = innerHeight - 50;   /* the FAB's own centre */
-      fab.classList.toggle('on-cream', r.top <= y && r.bottom >= y);
-    }
   }
   addEventListener('scroll', sync, { passive: true });
   addEventListener('resize', sync);
