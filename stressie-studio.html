@@ -6,7 +6,7 @@
   <title>Stressie — Bhanu Kowshik</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&display=swap" rel="stylesheet" />
 
   <style>
     /* ─── RESET ─────────────────────────────────────────────── */
@@ -24,9 +24,20 @@
       --orange-light: #FFF7E9;
       --orange-badge: #8C4A0D;
       --orange-rgb:   191,98,18;
-      --font-display: 'Playfair Display', serif;
-      --font-heading: 'Poppins', sans-serif;
-      --font-mono:    'JetBrains Mono', monospace;
+      /* ── TYPE — the portfolio's system, carried into the case study ──
+         Playfair and Poppins were this page's own pair; the site now has one.
+         The token names stay so the rules below need no edit — only what they
+         resolve to has changed. The display face is the serif, and it is
+         italic wherever it lands, exactly as on the home page. */
+      --font-display: 'Instrument Serif', Georgia, serif;
+      --font-heading: 'Instrument Sans', system-ui, sans-serif;
+      --font-mono:    'Urbanist', 'Instrument Sans', system-ui, sans-serif;
+      --font-serif:   'Instrument Serif', Georgia, serif;
+      /* one button, every page: white out of the top-left, azure across the rest */
+      --cta-grad: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #E4EFFF 9%, #93BEFF 26%, #4B8AF0 50%, #2463DC 76%, #1A4CB8 100%);
+      --cta-grad-hover: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #EDF4FF 11%, #A6CBFF 29%, #5A96F5 53%, #2C6FE8 79%, #1F57CA 100%);
 
       /* ── Font scale ── */
       --fs-xs:   11px;   /* eyebrow labels */
@@ -253,10 +264,14 @@
     }
     .cs-heading .word.visible { animation: word-rise 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
 
-    /* Orange stat portion — Playfair Display */
+    /* the emphasised half of the heading — Instrument Serif, italic, and at
+       its own single weight: it has no bold, and asking for one would make
+       the browser smear a fake 700 across it */
     .heading-orange {
       font-family: var(--font-display);
-      font-weight: 700;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 1.06em;
       color: var(--orange);
     }
     /* Dark continuation — Poppins SemiBold */
@@ -788,9 +803,12 @@
     }
     .st-orange-italic {
       font-family: var(--font-display);
-      font-style: italic; font-weight: 800;
+      font-style: italic; font-weight: 400;
+      font-size: 1.06em;
       color: var(--orange);
     }
+    /* the serif only ever appears in italic, exactly as it does on the home page */
+    .serif { font-family: var(--font-serif); font-style: italic; font-weight: 400; }
 
     /* Equal-height two-column grid — same pattern as pf-grid */
     .st-grid {
@@ -1178,11 +1196,11 @@
     }
     /* ─── DARK MODE TOKENS ───────────────────────────────────── */
     [data-theme="dark"] {
-      --secondary:    #F0EDE8;
-      --bg:           #1A1A1A;
-      --white:        #0C0C0C;
-      --grey:         #999999;
-      --border:       #3A3A3A;
+      --secondary:    #EFF3F8;
+      --bg:           #0A0E15;
+      --white:        #0E141D;
+      --grey:         #7C8794;
+      --border:       #222C3D;
       --orange:       #FF8A3D;
       --orange-light: #2A1A08;
       --orange-rgb:   255,138,61;
@@ -1195,7 +1213,7 @@
       background: rgba(26,26,26,0.92);
       box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.06);
     }
-    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #2C2C2C; }
+    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #182130; }
     [data-theme="dark"] .mobile-menu { box-shadow: -8px 0 32px rgba(0,0,0,0.40); }
     [data-theme="dark"] .hero-pill { border-color: rgba(191,98,18,0.45); }
     [data-theme="dark"] .hero-pill:hover { background: rgba(191,98,18,0.12); }
@@ -1223,11 +1241,11 @@
     [data-theme="dark"] .pf-arc-track { stroke: rgba(240,237,232,0.14); }
     /* ── other projects ── */
     [data-theme="dark"] .op-card { background: #1E1E1E; border-color: rgba(240,237,232,0.1); }
-    [data-theme="dark"] .op-card-img { background: #2C2C2C; }
-    [data-theme="dark"] .op-card-tag { background: #2C2C2C; color: #A0A0A0; }
-    [data-theme="dark"] .op-card-title { color: #F0EDE8; }
-    [data-theme="dark"] .op-card-desc { color: #999999; }
-    [data-theme="dark"] .op-card-cta { background: #F0EDE8; color: #252525; }
+    [data-theme="dark"] .op-card-img { background: #182130; }
+    [data-theme="dark"] .op-card-tag { background: #182130; color: #A0A0A0; }
+    [data-theme="dark"] .op-card-title { color: #EFF3F8; }
+    [data-theme="dark"] .op-card-desc { color: #7C8794; }
+    [data-theme="dark"] .op-card-cta { background: #EFF3F8; color: #131A25; }
     /* ─── THEME TOGGLE BUTTON ────────────────────────────────── */
     .theme-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer !important; flex-shrink: 0; border-radius: 100px; transition: transform 0.15s ease; }
     .theme-toggle:active { transform: scale(0.93); }

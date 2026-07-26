@@ -6,7 +6,7 @@
   <title>EverTutor Studio — Bhanu Kowshik</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&display=swap" rel="stylesheet" />
 
   <style>
     /* ─── RESET ─────────────────────────────────────────────── */
@@ -21,9 +21,22 @@
       --white:        #FFFFFF;
       --grey:         #515151;
       --border:       #EFEFEF;
-      --font-heading: 'Montserrat', sans-serif;
-      --font-mono:    'JetBrains Mono', monospace;
+      /* ── TYPE — the portfolio's system, carried into the case study ──
+         Instrument Sans for every display line and every label, Urbanist for
+         the prose, Instrument Serif in italic for emphasis. The token names
+         are kept so the rules below need no edit; only what they resolve to
+         has changed. */
+      --font-heading: 'Instrument Sans', system-ui, sans-serif;
+      --font-mono:    'Urbanist', 'Instrument Sans', system-ui, sans-serif;
+      --font-serif:   'Instrument Serif', Georgia, serif;
+      /* one button, every page: white out of the top-left, azure across the rest */
+      --cta-grad: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #E4EFFF 9%, #93BEFF 26%, #4B8AF0 50%, #2463DC 76%, #1A4CB8 100%);
+      --cta-grad-hover: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #EDF4FF 11%, #A6CBFF 29%, #5A96F5 53%, #2C6FE8 79%, #1F57CA 100%);
     }
+    /* the serif only ever appears in italic, exactly as it does on the home page */
+    .serif { font-family: var(--font-serif); font-style: italic; font-weight: 400; }
 
     /* smooth scroll handled by JS for proper easing */
 
@@ -1034,13 +1047,13 @@
       color: #999;
       flex-shrink: 0;
     }
-    [data-theme="dark"] .tc-panel { background: #222222; border-color: #3A3A3A; }
+    [data-theme="dark"] .tc-panel { background: #222222; border-color: #222C3D; }
     [data-theme="dark"] .tc-new { background: rgba(230,242,141,0.06); border-color: rgba(230,242,141,0.25); }
-    [data-theme="dark"] .tc-tool { background: #1A1A1A; border-color: #3A3A3A; color: #F0EDE8; }
-    [data-theme="dark"] .tc-tool-studio { background: #E6F28D; border-color: #E6F28D; color: #252525; }
+    [data-theme="dark"] .tc-tool { background: #0A0E15; border-color: #222C3D; color: #EFF3F8; }
+    [data-theme="dark"] .tc-tool-studio { background: #E6F28D; border-color: #E6F28D; color: #131A25; }
     [data-theme="dark"] .tc-panel-label,
     [data-theme="dark"] .tc-sub,
-    [data-theme="dark"] .tc-unit { color: #999999; }
+    [data-theme="dark"] .tc-unit { color: #7C8794; }
     @media (max-width: 767px) {
       .tools-compare { flex-direction: column; }
       .tc-arrow { transform: rotate(90deg); padding: 4px 0; }
@@ -1542,11 +1555,11 @@
     }
     /* ─── DARK MODE TOKENS ───────────────────────────────────── */
     [data-theme="dark"] {
-      --secondary:  #F0EDE8;
-      --bg:         #1A1A1A;
-      --white:      #0C0C0C;
-      --grey:       #999999;
-      --border:     #3A3A3A;
+      --secondary:  #EFF3F8;
+      --bg:         #0A0E15;
+      --white:      #0E141D;
+      --grey:       #7C8794;
+      --border:     #222C3D;
     }
     [data-theme="dark"] body {
       background-image: radial-gradient(circle, rgba(255,255,255,0.15) 0.8px, transparent 0.8px);
@@ -1556,69 +1569,69 @@
       background: rgba(26,26,26,0.92);
       box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.06);
     }
-    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #2C2C2C; }
-    [data-theme="dark"] .desig-pill { background: rgba(44,44,44,0.95); }
-    [data-theme="dark"] #dragLabel { background: #F0EDE8; color: #252525; }
+    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #182130; }
+    [data-theme="dark"] .desig-pill { background: rgba(24,33,48,0.95); }
+    [data-theme="dark"] #dragLabel { background: #EFF3F8; color: #131A25; }
     /* ── carousel ── */
     [data-theme="dark"] .fan-card { background: #1E1E1E; }
     [data-theme="dark"] .fan-card img { background: #1E1E1E; }
-    [data-theme="dark"] .carousel-caption { color: #999999; }
+    [data-theme="dark"] .carousel-caption { color: #7C8794; }
     /* ── all main card containers ── */
     [data-theme="dark"] .tr-card,
     [data-theme="dark"] .imp-card,
     [data-theme="dark"] .ug-card,
-    [data-theme="dark"] .oc-card { background: #1A1A1A; border-color: #3A3A3A; box-shadow: none; }
+    [data-theme="dark"] .oc-card { background: #0A0E15; border-color: #222C3D; box-shadow: none; }
     /* ── sweep highlights — keep text dark so lime/pink bg stays readable ── */
     [data-theme="dark"] .tr-highlight,
     [data-theme="dark"] .imp-hl,
     [data-theme="dark"] .cd-hl,
     [data-theme="dark"] .oc-metric-value,
     [data-theme="dark"] .ug-tag-pain,
-    [data-theme="dark"] .ug-tag-gain { color: #252525; }
+    [data-theme="dark"] .ug-tag-gain { color: #131A25; }
     /* ── team & role section ── */
-    [data-theme="dark"] .tr-image-frame { background: #2C2C2C; }
-    [data-theme="dark"] .tr-bullet { background: #F0EDE8; }
+    [data-theme="dark"] .tr-image-frame { background: #182130; }
+    [data-theme="dark"] .tr-bullet { background: #EFF3F8; }
     [data-theme="dark"] .tr-items-connected::before { background: rgba(240,237,232,0.14); }
     [data-theme="dark"] .tr-label,
     [data-theme="dark"] .tr-item-desc,
     [data-theme="dark"] .tr-mixed,
-    [data-theme="dark"] .tr-mixed-mono { color: #999999; }
-    [data-theme="dark"] .tr-next .tr-next-text { color: #999999; }
+    [data-theme="dark"] .tr-mixed-mono { color: #7C8794; }
+    [data-theme="dark"] .tr-next .tr-next-text { color: #7C8794; }
     /* ── impact section ── */
-    [data-theme="dark"] .imp-image-frame { background: #2C2C2C; }
+    [data-theme="dark"] .imp-image-frame { background: #182130; }
     [data-theme="dark"] .imp-label,
     [data-theme="dark"] .imp-num,
     [data-theme="dark"] .imp-body,
-    [data-theme="dark"] .imp-footnote { color: #999999; }
+    [data-theme="dark"] .imp-footnote { color: #7C8794; }
     /* ── users & goals section ── */
-    [data-theme="dark"] .ug-image-frame { background: #2C2C2C; }
+    [data-theme="dark"] .ug-image-frame { background: #182130; }
     [data-theme="dark"] .ug-label,
     [data-theme="dark"] .ug-role-label,
-    [data-theme="dark"] .ug-body { color: #999999; }
+    [data-theme="dark"] .ug-body { color: #7C8794; }
     /* ── constraints & design section ── */
-    [data-theme="dark"] .cd-image-frame { background: #2C2C2C; }
-    [data-theme="dark"] .cd-blockquote { background: #252525; color: #999999; }
-    [data-theme="dark"] .cd-insight { color: #999999; }
+    [data-theme="dark"] .cd-image-frame { background: #182130; }
+    [data-theme="dark"] .cd-blockquote { background: #131A25; color: #7C8794; }
+    [data-theme="dark"] .cd-insight { color: #7C8794; }
     /* ── outcomes section ── */
-    [data-theme="dark"] .oc-image-frame { background: #2C2C2C; }
+    [data-theme="dark"] .oc-image-frame { background: #182130; }
     [data-theme="dark"] .oc-label,
     [data-theme="dark"] .oc-metric-label,
     [data-theme="dark"] .oc-metric-body,
     [data-theme="dark"] .oc-section-title,
     [data-theme="dark"] .oc-author-role,
-    [data-theme="dark"] .oc-quote { color: #999999; }
-    [data-theme="dark"] .oc-testimonial { background: #222222; border-color: #3A3A3A; }
+    [data-theme="dark"] .oc-quote { color: #7C8794; }
+    [data-theme="dark"] .oc-testimonial { background: #222222; border-color: #222C3D; }
     /* ── section labels shared ── */
-    [data-theme="dark"] .section-label { color: #999999; }
+    [data-theme="dark"] .section-label { color: #7C8794; }
     [data-theme="dark"] .other-projects { border-top-color: rgba(240,237,232,0.08); }
     [data-theme="dark"] .other-projects-label { color: #666; }
     /* ── other projects cards ── */
     [data-theme="dark"] .op-card { background: #1E1E1E; border-color: rgba(240,237,232,0.1); }
-    [data-theme="dark"] .op-card-img { background: #2C2C2C; }
-    [data-theme="dark"] .op-card-tag { background: #2C2C2C; color: #888; }
-    [data-theme="dark"] .op-card-title { color: #F0EDE8; }
-    [data-theme="dark"] .op-card-desc { color: #999999; }
-    [data-theme="dark"] .op-card-cta { background: #F0EDE8; color: #252525; }
+    [data-theme="dark"] .op-card-img { background: #182130; }
+    [data-theme="dark"] .op-card-tag { background: #182130; color: #888; }
+    [data-theme="dark"] .op-card-title { color: #EFF3F8; }
+    [data-theme="dark"] .op-card-desc { color: #7C8794; }
+    [data-theme="dark"] .op-card-cta { background: #EFF3F8; color: #131A25; }
     /* ─── THEME TOGGLE BUTTON ────────────────────────────────── */
     .theme-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer !important; flex-shrink: 0; border-radius: 100px; transition: transform 0.15s ease; }
     .theme-toggle:active { transform: scale(0.93); }
