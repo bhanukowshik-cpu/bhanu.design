@@ -456,7 +456,9 @@
     /* the copy is the only thing that swaps */
     .gal.gal-ready .slide-body{opacity:0;pointer-events:none;
       transition:opacity .5s var(--ease),transform .7s var(--ease);
-      transform:translateY(14px);}
+      /* --enter is set by JS on every swap: the copy leaves against the
+         scroll direction and the next arrives with it, as the reference does */
+      transform:translateY(var(--enter,14px));}
     .gal.gal-ready .slide.is-active .slide-body{opacity:1;transform:none;
       pointer-events:auto;}
 
@@ -478,24 +480,14 @@
     .gal.gal-ready .slide-cta{margin-top:26px;}
 
     /* RIGHT — the media, tilted back into the page. The reference bends the
-       plane in a shader; this is the flat-plane reading of the same idea:
-       perspective + a small Y rotation, lifted a touch on hover. */
+       plane in a shader and moves it only through a spring; here that spring
+       runs in JS and writes the transform inline every frame — travel from
+       its position, skew from its velocity, the tilt eased toward level on
+       hover. No transition on it: the spring IS the smoothing, and a
+       transition layered on top would double-filter the motion into mush. */
     .gal.gal-ready .slide-media{margin:0;aspect-ratio:16/10;height:auto;
-      border-radius:18px;transform-origin:50% 50%;
-      /* translate first, then the 3D tilt — perspective() only applies to the
-         functions that follow it, so the vertical travel stays flat and true */
-      transform:translateY(calc(var(--k,0) * var(--gal-step)))
-                perspective(1100px) rotateY(-19deg) rotateX(7deg) rotate(-2.4deg) scale(.94);
-      box-shadow:-56px 64px 120px -44px rgba(0,0,0,.82);
-      opacity:.34;
-      transition:transform 1.05s cubic-bezier(0.16,1,0.3,1),
-                 opacity .7s var(--ease);}
-    .gal.gal-ready .slide.is-active .slide-media{opacity:1;
-      transform:translateY(0)
-                perspective(1100px) rotateY(-15deg) rotateX(5deg) rotate(-2deg) scale(1);}
-    /* on hover it comes most of the way level — the only reward for pointing at it */
-    .gal.gal-ready .slide-media:hover{
-      transform:perspective(1100px) rotateY(-5deg) rotateX(1.5deg) rotate(-.5deg) scale(1.03);}
+      border-radius:18px;transform-origin:50% 50%;will-change:transform,opacity;
+      box-shadow:-56px 64px 120px -44px rgba(0,0,0,.82);}
 
     /* the card's hover target is the whole card, which is right for a card. Here
        the slide is the whole screen, so pointing at the paragraph would raise the
@@ -2055,9 +2047,10 @@ addEventListener('scroll', function () {
 /* ── the gallery ─────────────────────────────────────────────────────────
    One project per screen, the way robin-noguier.com plays it, adapted to a
    page that still scrolls: instead of hijacking the wheel outright, the
-   section pins and the pin's own progress picks the active project. You keep
-   a real scrollbar, the browser keeps its gestures, and the page can still
-   be left in either direction.
+   section pins and the pin's progress becomes the target of the reference's
+   own scroll spring (its constants lifted from its bundle), which carries
+   the reel continuously. You keep a real scrollbar, the browser keeps its
+   gestures, and the page can still be left in either direction.
 
    The three EverTutor tools are a chapter: they share a colour family, their
    ticks are bracketed, and the system's line and numbers stay on screen for
@@ -2122,19 +2115,24 @@ addEventListener('scroll', function () {
     });
   }
 
-  /* ── paint one index ── */
+  /* ── paint one index — the discrete half of the play: copy, colour, ticks
+     and the next-up teaser swap per project. The reel itself never steps —
+     it is continuous, and lives entirely in the spring below. */
   var current = -1;
   function paint(i) {
     if (i === current) return;
+    var dir = i > current ? 1 : -1;
+    var prev = slides[current];
     current = i;
     var sl = slides[i];
 
-    /* --k is how many steps this project sits from the active one: -1 is the
-       plane above, +1 the plane below. The CSS turns it into the travel, so
-       the whole reel moves off one custom property per slide. */
+    /* the copy leaves against the travel and the next arrives with it —
+       the reference swaps its titles directionally, not from a fixed side */
+    if (prev) prev.style.setProperty('--enter', (dir > 0 ? -22 : 22) + 'px');
+    sl.style.setProperty('--enter', (dir > 0 ? 22 : -22) + 'px');
+
     slides.forEach(function (s, n) {
       s.classList.toggle('is-active', n === i);
-      s.style.setProperty('--k', n - i);
     });
     tickEls.forEach(function (t, n) { t.classList.toggle('is-on', n === i); });
 
@@ -2154,8 +2152,27 @@ addEventListener('scroll', function () {
     }
   }
 
-  /* ── the pin: one viewport of scroll per project, progress picks the index.
-     snap lands you on a project rather than between two of them. */
+  /* ── the reel — the reference's engine, re-homed onto a pinned section.
+     robin-noguier.com never scrolls natively: wheel input feeds a spring
+     (react-spring, mass 2.5 / tension 80 / friction 24 — read straight out
+     of its bundle) and the WebGL reel reads that spring every frame, bending
+     the planes with its velocity. Here the pin converts native scroll into
+     the spring's target instead — you keep a real scrollbar and the browser
+     keeps its gestures — and the very same spring chases it. Scroll fast and
+     the reel leans and lags behind you; stop and it breathes to rest with
+     one soft overshoot. snap re-anchors the input to a project exactly as
+     the reference re-anchors its target to the nearest case. */
+  var medias = slides.map(function (s) { return s.querySelector('.slide-media'); });
+
+  /* --gal-step is a CSS clamp the breakpoints retune; a hidden probe reads
+     the resolved pixels so the JS and the CSS can never disagree on it */
+  var probe = document.createElement('div');
+  probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;height:var(--gal-step,62vh);';
+  pin.appendChild(probe);
+  var step = 0;
+  function measure() { step = probe.offsetHeight || Math.round(innerHeight * 0.62); }
+  measure();
+
   var st = ScrollTrigger.create({
     trigger: pin,
     start: 'top top',
@@ -2163,11 +2180,65 @@ addEventListener('scroll', function () {
     pin: sticky,
     anticipatePin: 1,
     invalidateOnRefresh: true,
-    snap: { snapTo: 1 / (slides.length - 1), duration: 0.35, ease: 'power2.inOut' },
-    onUpdate: function (self) {
-      var i = Math.round(self.progress * (slides.length - 1));
-      paint(Math.max(0, Math.min(slides.length - 1, i)));
-    }
+    snap: { snapTo: 1 / (slides.length - 1), duration: { min: 0.3, max: 0.7 }, ease: 'power2.out', delay: 0.06 },
+    onRefresh: measure
+  });
+
+  /* the spring, in project units — 1.0 of position is one step of travel,
+     which is the same unit the reference runs, so its constants carry over */
+  var MASS = 2.5, TENSION = 80, FRICTION = 24;
+  var pos = 0, vel = 0;
+
+  /* hover eases the active plane toward level — the reference bends its
+     plane toward the pointer; same job, run through the same frame loop */
+  var hoverNow = slides.map(function () { return 0; });
+  var hoverGoal = slides.map(function () { return 0; });
+  medias.forEach(function (m, n) {
+    if (!m) return;
+    m.addEventListener('mouseenter', function () { hoverGoal[n] = 1; });
+    m.addEventListener('mouseleave', function () { hoverGoal[n] = 0; });
+  });
+
+  var idle = false;
+  function draw() {
+    /* velocity bends the reel — skewY is the flat-plane read of the shader */
+    var sk = Math.max(-6, Math.min(6, vel * 2.2));
+    slides.forEach(function (s, n) {
+      var m = medias[n]; if (!m) return;
+      var k = n - pos, a = Math.min(1, Math.abs(k)), h = hoverNow[n];
+      m.style.transform =
+        'translate3d(0,' + (k * step).toFixed(2) + 'px,0) perspective(1100px)' +
+        ' rotateY(' + (-15 - 4 * a + 10 * h).toFixed(2) + 'deg)' +
+        ' rotateX(' + (5 + 2 * a - 3.5 * h).toFixed(2) + 'deg)' +
+        ' rotate(' + (-2 - 0.4 * a + 1.5 * h).toFixed(2) + 'deg)' +
+        ' skewY(' + sk.toFixed(2) + 'deg)' +
+        ' scale(' + (1 - 0.06 * a + 0.03 * h).toFixed(3) + ')';
+      m.style.opacity = (1 - 0.62 * a).toFixed(3);
+    });
+  }
+
+  gsap.ticker.add(function (t, deltaMS) {
+    var dt = Math.min((deltaMS || 16.7) / 1000, 1 / 30);
+    var target = st.progress * (slides.length - 1);
+
+    /* semi-implicit Euler — the same integration react-spring runs */
+    vel += (TENSION * (target - pos) - FRICTION * vel) / MASS * dt;
+    pos += vel * dt;
+
+    var hoverBusy = false;
+    hoverNow.forEach(function (h, n) {
+      var next = h + (hoverGoal[n] - h) * Math.min(1, dt * 8);
+      if (Math.abs(hoverGoal[n] - next) < 0.002) next = hoverGoal[n];
+      if (next !== h) { hoverNow[n] = next; hoverBusy = true; }
+    });
+
+    var settled = Math.abs(target - pos) < 0.0005 && Math.abs(vel) < 0.001;
+    if (settled) { pos = target; vel = 0; }
+    if (settled && !hoverBusy && idle) return;   /* nothing moved — skip the write */
+    idle = settled && !hoverBusy;
+
+    draw();
+    paint(Math.max(0, Math.min(slides.length - 1, Math.round(pos))));
   });
 
   function goTo(i) {
@@ -2180,6 +2251,7 @@ addEventListener('scroll', function () {
     if (current < slides.length - 1) goTo(current + 1);
   });
 
+  draw();          /* position the reel before the first frame — no flash */
   paint(0);
   addEventListener('resize', function () { ScrollTrigger.refresh(); });
 })();
