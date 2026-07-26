@@ -720,8 +720,6 @@
     .gal-ticks{position:absolute;right:clamp(20px,2.1vw,40px);top:50%;z-index:4;
       transform:translateY(-50%);display:flex;flex-direction:column;
       align-items:flex-end;gap:11px;}
-    .gal-chapter-group{display:flex;flex-direction:column;align-items:flex-end;
-      gap:11px;padding-right:9px;border-right:1px solid rgba(255,255,255,.28);}
     /* a dot per project; the one you are on grows into a bar. One property
        animates, so the change reads as the same mark changing shape rather
        than one mark being swapped for another. */
@@ -1653,7 +1651,7 @@
 
           <!-- the system itself, before its three tools: the green orb is the
                EverTutor mark, and it opens the chapter the way a cover does -->
-          <article class="slide slide-system" data-chapter="et">
+          <article class="slide slide-system">
             <div class="slide-media sys-media">
               <div class="sys-orb">
                 <span class="sys-orb-glow" aria-hidden="true"></span>
@@ -1670,7 +1668,7 @@
             </div>
           </article>
 
-          <article class="slide" data-chapter="et">
+          <article class="slide">
             <div class="slide-media">
               <img src="images/card-et-live.webp" alt="EverTutor Live" width="760" height="507">
               <video class="slide-vid" src="images/et-live.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
@@ -1687,7 +1685,7 @@
             </div>
           </article>
 
-          <article class="slide" data-chapter="et">
+          <article class="slide">
             <div class="slide-media">
               <img src="images/card-et-studio.webp" alt="EverTutor Studio" width="760" height="507" loading="lazy">
               <video class="slide-vid" src="images/et-studio.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
@@ -1704,7 +1702,7 @@
             </div>
           </article>
 
-          <article class="slide" data-chapter="et">
+          <article class="slide">
             <div class="slide-media">
               <img src="images/card-et-analytics.webp" alt="EverTutor Analytics" width="760" height="507" loading="lazy">
               <video class="slide-vid" src="images/et-analytics.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
@@ -2556,10 +2554,11 @@ var topNav = document.getElementById('topNav');
   pin.classList.add('is-pinned', 'gal-ready');
 
   /* ── the tick rail, built from the slides so the two cannot disagree.
-     Consecutive slides sharing a data-chapter go inside one bracketed group. */
+     One run, evenly spaced: the EverTutor tools used to sit inside their own
+     bracketed group, which made the rail read as two lists rather than one
+     count of where you are. The chapter is already named on the screen. */
   var tickEls = [];
   if (ticks) {
-    var group = null;
     slides.forEach(function (sl, i) {
       var b = document.createElement('button');
       b.type = 'button';
@@ -2568,20 +2567,7 @@ var topNav = document.getElementById('topNav');
       b.setAttribute('aria-label', name.trim());
       b.addEventListener('click', function () { goTo(i); });
       tickEls.push(b);
-
-      var ch = sl.getAttribute('data-chapter');
-      if (ch) {
-        if (!group || group.getAttribute('data-chapter') !== ch) {
-          group = document.createElement('div');
-          group.className = 'gal-chapter-group';
-          group.setAttribute('data-chapter', ch);
-          ticks.appendChild(group);
-        }
-        group.appendChild(b);
-      } else {
-        group = null;
-        ticks.appendChild(b);
-      }
+      ticks.appendChild(b);
     });
   }
 
