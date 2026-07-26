@@ -339,9 +339,10 @@
   /* the still darkens behind the video so the inset panel reads as the lit thing.
      rgba(8,8,7,.8), as bymonolog's works_home_overlay uses. */
   .slide-media::after{content:'';position:absolute;inset:0;pointer-events:none;
-    background:rgba(8,8,7,.8);opacity:0;transition:opacity .5s ease;}
+    background:rgba(8,8,7,.8);opacity:0;transition:opacity .30s cubic-bezier(0.5,0,0.85,0.4);}
   .slide:has(.slide-vid):hover .slide-media::after,
-  .slide:has(.slide-vid):focus-within .slide-media::after{opacity:1;}
+  .slide:has(.slide-vid):focus-within .slide-media::after{
+    transition:opacity .5s ease;opacity:1;}
   /* the video doesn't slide up flat — it swings up, tilted back on X and
      slightly small, then settles level and opaque over the still. Values
      read off bymonolog's success-stories reveal: ~72% of its own height
@@ -353,9 +354,15 @@
     transform-origin:50% 50%;
     transform:perspective(480px) translateY(72%) rotateX(18deg) scale(.95);
     opacity:0;will-change:transform,opacity;
-    transition:transform .8s cubic-bezier(0.16,1,0.3,1),opacity .5s ease;}
+    /* LEAVING. The entrance curve is an ease-out expo — lovely arriving,
+       but reversed it bolts then crawls the last third, which is what read
+       as unsmooth. Going out wants an ease-in, and shorter. */
+    transition:transform .40s cubic-bezier(0.5,0,0.85,0.4),
+               opacity .28s cubic-bezier(0.5,0,0.85,0.4);}
   .slide:hover .slide-vid,
   .slide:focus-within .slide-vid{
+    /* ARRIVING */
+    transition:transform .8s cubic-bezier(0.16,1,0.3,1),opacity .5s ease;
     transform:perspective(480px) translateY(0) rotateX(0deg) scale(1);opacity:1;}
 
   .slide-body{display:flex;flex-direction:column;flex:1;padding:18px 20px 22px;}
@@ -1767,7 +1774,7 @@ addEventListener('scroll', function () {
     slide.addEventListener('mouseleave', function () {
       vid.pause();
       /* rewind only after it has swung back out, so you never see it jump */
-      setTimeout(function () { if (vid.paused) vid.currentTime = 0; }, 820);
+      setTimeout(function () { if (vid.paused) vid.currentTime = 0; }, 430);
     });
   });
 })();
