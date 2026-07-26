@@ -352,10 +352,17 @@
   h1{
     font-family:var(--sans);font-weight:570;color:var(--ink);
     font-size:clamp(36px,4.4vw,72px);line-height:1.08;letter-spacing:-0.028em;
-    max-width:min(22ch,92vw);text-wrap:balance;
+    /* 30ch + balance settles the headline into three even lines (22ch made four) */
+    max-width:min(30ch,92vw);text-wrap:balance;
   }
   h1 .serif{font-family:var(--serif);font-style:italic;font-weight:400;
     font-size:1.08em;letter-spacing:-0.004em;}
+  /* inline photo pill in the headline — cap-height capsule, narrow, em-based
+     so it rides every clamp size */
+  .hero-pill{display:inline-block;height:1em;width:.6em;border-radius:999px;
+    overflow:hidden;vertical-align:-.14em;margin:0 .08em;
+    border:1px solid rgba(239,243,248,.22);}
+  .hero-pill img{width:100%;height:100%;object-fit:cover;display:block;}
   /* stats band — one framed strip so the three facts read as a single unit */
   .facts{margin-top:46px;display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;
     padding:15px clamp(22px,2.6vw,32px);border:1px solid var(--line);border-radius:18px;
@@ -1012,7 +1019,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--primary);   /* Lucide strokes inherit via currentColor */
+      color: #E6F28D;   /* Lucide strokes inherit via currentColor (no --primary token on this page) */
       background: linear-gradient(145deg, rgba(230,242,141,0.14), rgba(230,242,141,0.03));
       border: 1px solid rgba(230,242,141,0.20);
       box-shadow: none;
@@ -1058,8 +1065,9 @@
       font-family: var(--font-mono);
       font-size: clamp(22px,2.2vw,32px);
       font-weight: 700;
-      /* the numbers are the proof — they carry the brand accent */
-      color: var(--primary);
+      /* the numbers are the proof — they carry the lime accent (literal:
+         this page never defines --primary; index.html's token) */
+      color: #E6F28D;
       line-height: 1;
     }
 .s2-bar-metric-lbl {
@@ -2034,10 +2042,11 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     font-weight: 570;
     letter-spacing: -0.022em;
   }
-  /* the project title is the step below that */
+  /* the project title is the step below that — but it leads the bar, so it
+     sits just under the section header's scale */
   .s2-bar-title {
     font-family: var(--sans);
-    font-size: clamp(20px, 1.7vw, 27px);
+    font-size: clamp(24px, 2.1vw, 33px);
     font-weight: 570;
     letter-spacing: -0.02em;
   }
@@ -3678,7 +3687,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
     <div class="copy">
       <div class="eyebrow"><span>Product Designer</span><i aria-hidden="true"></i><span>Builder</span><i aria-hidden="true"></i><span>Explorer</span></div>
-      <h1>Designing products that scale, convert &amp; connect through first principles and <span class="serif">obsessive detail to craft.</span></h1>
+      <h1>Designing products <span class="hero-pill" aria-hidden="true"><img src="About  me Pictures/Kayaking.jpeg" alt=""></span> that scale, convert &amp; connect through first principles and <span class="serif">obsessive detail to craft.</span></h1>
       <div class="facts">
         <div class="fact"><span class="v">5+ Years</span></div>
         <div class="fact"><span class="v">Conversational AI, Agentic Systems, 0→1</span></div>
