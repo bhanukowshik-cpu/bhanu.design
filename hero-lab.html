@@ -36,7 +36,10 @@
     --cream-ink-3:#6F7E90;
     --cream-line:rgba(226,238,252,0.11);
     --card:#0E141D;                     /* the cards themselves */
-    --accent:#7FC0FF;                   /* numbering and roles, azure on dark */
+    /* The work section carries no accent colour. Its numbering and role
+       labels are muted ink, so the only saturated thing on a project screen
+       is the work itself — and the one blue on it is the button. */
+    --accent:#8695A8;
     /* ── TYPE — three voices, one system ────────────────────────────────
        Instrument Sans carries every display line and every piece of UI
        chrome; Instrument Serif appears only in italic, as emphasis inside
@@ -323,10 +326,19 @@
     margin-bottom:clamp(18px,2.8vh,28px);
     font-size:12.5px;font-weight:520;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);}
   .eyebrow i{width:1px;height:11px;background:var(--line);}
+  /* ── THE DISPLAY SCALE ────────────────────────────────────────────────
+     Four steps, each 1.27× the one below it, and the vw coefficients sit in
+     that same ratio — so the relationship holds at every width, not just at
+     the ceiling. All four cap together around 1680px.
+
+       84px  the project title  — one project per screen earns the top step
+       66px  the hero
+       52px  the footer
+       41px  section headings (about, testimonials — they are peers)          */
   h1{
     font-family:var(--sans);font-weight:570;color:var(--ink);
-    font-size:clamp(33px,3.7vw,54px);line-height:1.16;letter-spacing:-0.022em;
-    max-width:min(30ch,94vw);text-wrap:balance;
+    font-size:clamp(33px,3.94vw,66px);line-height:1.1;letter-spacing:-0.026em;
+    max-width:min(26ch,94vw);text-wrap:balance;
   }
   h1 .serif{font-family:var(--serif);font-style:italic;font-weight:400;
     font-size:1.08em;letter-spacing:-0.004em;}
@@ -354,22 +366,25 @@
   .trail.static .trail-img{animation:fadeIn 1.2s var(--ease-expo) both .5s;}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-  /* ── CTA — the page's one button shape: white burning out of the top-left
-        corner, azure across the rest, a rounded rectangle, no shadow. The
-        orb sits inside the white bloom, which is exactly where a dark glass
-        sphere wants to be read. ── */
+  /* ── THE TALK BUTTON — the hero's, and the footer's copy of it ─────────
+        This one is white. It is the only button on the site that isn't the
+        azure gradient, and deliberately so: it is the invitation, not an
+        action on a project, and the orb is the colour it needs. It keeps the
+        system's logic — light out of the top-left corner, rounded rectangle,
+        no shadow — just in a white palette. ── */
   .cta-dock{margin-top:44px;}
   .cta{
-    display:flex;align-items:center;gap:15px;
+    display:flex;align-items:center;gap:13px;
     width:auto;max-width:92vw;
-    padding:11px 28px 11px 11px;border-radius:20px;cursor:pointer;border:none;
-    background:var(--cta-grad);
+    padding:9px 24px 9px 9px;border-radius:18px;cursor:pointer;border:none;
+    background:linear-gradient(135deg,#FFFFFF 0%,#F6F9FD 42%,#E7EEF8 100%);
     box-shadow:none;
-    color:#fff;
+    color:#0B1220;
     font-family:var(--sans);
     transition:transform .4s var(--ease),background .45s var(--ease);
   }
-  .cta:hover{transform:translateY(-2px);background:var(--cta-grad-hover);}
+  .cta:hover{transform:translateY(-2px);
+    background:linear-gradient(135deg,#FFFFFF 0%,#FBFDFF 46%,#EFF4FB 100%);}
   .cta:focus-visible{outline:2px solid #A6CBFF;outline-offset:3px;}
   .cta-orb{position:relative;width:55px;height:55px;flex-shrink:0;line-height:0;}
   .cta-orb::before{content:'';position:absolute;inset:4px;border-radius:50%;
@@ -381,7 +396,7 @@
     transition:width .55s var(--ease);}   /* width animates to hug each prompt */
   .cta-text span{
     grid-area:1/1;justify-self:start;width:max-content;
-    white-space:nowrap;font-size:18px;font-weight:560;letter-spacing:.002em;color:#fff;
+    white-space:nowrap;font-size:15px;font-weight:560;letter-spacing:-0.002em;color:#0B1220;
     opacity:0;transform:translateY(11px);filter:blur(3px);
     transition:opacity .6s var(--ease),transform .6s var(--ease),filter .6s var(--ease);
   }
@@ -628,7 +643,7 @@
     /* the title is a mix by rule, not by whim: the family in Instrument Sans,
        the tool it names in Instrument Serif italic beside it */
     .gal.gal-ready .slide-body h3{font-family:var(--sans);font-style:normal;
-      font-weight:570;font-size:clamp(44px,5.5vw,92px);line-height:1.02;
+      font-weight:570;font-size:clamp(40px,5vw,84px);line-height:1.02;
       letter-spacing:-0.032em;margin-top:2px;text-wrap:balance;}
     .gal.gal-ready .slide-body h3 .serif{font-size:1.06em;font-weight:400;
       letter-spacing:-0.016em;}
@@ -705,7 +720,8 @@
     .gal.gal-ready .sys-desc{color:rgba(244,247,250,.74);}
     .gal.gal-ready .sys-metric .v{color:#F4F7FA;}
     .gal.gal-ready .sys-metric .l,
-    .gal.gal-ready .slide-num{color:rgba(244,247,250,.6);}
+    .gal.gal-ready .slide-num,
+    .gal.gal-ready .slide-body .role{color:rgba(244,247,250,.58);}
     .gal.gal-ready .slide-metrics span{border-color:rgba(255,255,255,.2);
       background:rgba(255,255,255,.07);color:rgba(244,247,250,.82);}
     /* a work CTA carries the screen — it is the largest instance of the button */
@@ -722,7 +738,9 @@
     .gal.gal-ready .slide{grid-template-columns:minmax(0,47%) minmax(0,53%);
       gap:clamp(20px,3vw,44px);
       padding:clamp(78px,11vh,120px) clamp(26px,4vw,60px) clamp(96px,13vh,140px);}
-    .gal.gal-ready .slide-body h3{font-size:clamp(42px,5.4vw,78px);}
+    /* the title used to need its own reduction here; on the new scale the
+       base clamp already fits every name in this column — measured, not
+       assumed — so it stays one full step above the hero at every width */
     .gal.gal-ready .slide-body p{font-size:14.5px;max-width:38ch;}
     .gal.gal-ready .work-head{left:clamp(26px,4vw,60px);}
   }
@@ -731,7 +749,7 @@
      out first — pull the title and the step down together */
   @media (min-width:901px) and (max-height:780px){
     .gal.gal-ready{--gal-step:clamp(260px,56vh,480px);}
-    .gal.gal-ready .slide-body h3{font-size:clamp(38px,4.6vw,68px);}
+    .gal.gal-ready .slide-body h3{font-size:clamp(34px,4.2vw,60px);}
     .gal.gal-ready .slide-body p{margin-top:12px;}
     .gal.gal-ready .slide-metrics{margin-top:14px;}
     .gal.gal-ready .slide-cta{margin-top:18px;}
@@ -974,7 +992,7 @@
     text-transform:uppercase;color:var(--ember);}
   .tc-aside .tc-k{margin-bottom:clamp(18px,2.4vh,26px);}
   .tc-h{font-family:var(--sans);font-weight:570;color:var(--ink);
-    font-size:clamp(32px,3.4vw,52px);line-height:1.14;letter-spacing:-0.024em;
+    font-size:clamp(25px,2.44vw,41px);line-height:1.16;letter-spacing:-0.022em;
     text-wrap:balance;margin-bottom:clamp(18px,2.4vh,26px);}
   .tc-h .serif{font-family:var(--serif);font-style:italic;font-weight:400;
     font-size:1.08em;letter-spacing:-0.004em;}
@@ -1121,7 +1139,9 @@
   @media(max-width:767px){
     .tc-sec{padding:clamp(56px,9vh,88px) 0 clamp(64px,10vh,104px);}
     .tc{padding:0 20px;}
-    .tc-h{font-size:clamp(30px,8.4vw,42px);}
+    /* the scale compresses on a phone, but the order holds: the hero stays
+       the largest line on the site and the section headings stay under it */
+    .tc-h{font-size:clamp(24px,6.8vw,33px);}
     .tc-sub{font-size:14.5px;}
     .tc-card{padding:18px 18px 16px;}
     .tc-card-rule{left:18px;bottom:18px;}
@@ -1194,7 +1214,7 @@
   .said-k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
     text-transform:uppercase;color:var(--ember);margin-bottom:clamp(16px,2.2vh,24px);}
   .said-h{font-family:var(--sans);font-weight:570;color:var(--ink);
-    font-size:clamp(28px,3vw,44px);line-height:1.16;letter-spacing:-0.022em;
+    font-size:clamp(25px,2.44vw,41px);line-height:1.16;letter-spacing:-0.022em;
     text-wrap:balance;margin-bottom:clamp(40px,6vh,72px);}
   .said-h .serif{font-family:var(--serif);font-style:italic;font-weight:400;
     font-size:1.08em;letter-spacing:-0.004em;}
@@ -1334,9 +1354,9 @@
   /* the hero's copy animates its width to hug each cycling prompt; this one
      carries a single line, so it simply sizes to it */
   .ft-cta-dock .cta-text{width:auto !important;}
-  .ft-cta-dock .cta{padding:10px 26px 10px 10px;}
-  .ft-cta-dock .cta-orb{width:48px;height:48px;}
-  .ft-cta-dock .cta-text span{font-size:16px;}
+  .ft-cta-dock .cta{padding:8px 22px 8px 8px;}
+  .ft-cta-dock .cta-orb{width:46px;height:46px;}
+  .ft-cta-dock .cta-text span{font-size:14px;}
   /* while the footer's own button is on screen the floating one stands down —
      two of the same invitation in one view is one too many */
   .orb-fab.stand-down{opacity:0;pointer-events:none;transform:translateY(10px);}
@@ -1357,10 +1377,10 @@
     box-shadow:0 0 8px rgba(59,140,255,.8);animation:pulse 1.4s infinite;}
 
   .ft-cta{display:flex;flex-direction:column;gap:6px;font-family:var(--sans);}
-  .ft-line{font-size:clamp(32px,4.4vw,60px);font-weight:570;line-height:1.06;
+  .ft-line{font-size:clamp(28px,3.1vw,52px);font-weight:570;line-height:1.08;
     letter-spacing:-0.026em;color:var(--ink);}
   .ft-line.serif{font-family:var(--serif);font-style:italic;font-weight:400;
-    font-size:clamp(34px,4.7vw,64px);letter-spacing:-0.008em;color:var(--ink-2);}
+    font-size:clamp(30px,3.35vw,56px);letter-spacing:-0.008em;color:var(--ink-2);}
 
   .ft-contact{display:flex;flex-direction:column;align-items:flex-start;gap:16px;}
   .ft-mail{position:relative;display:inline-flex;align-items:center;gap:14px;max-width:100%;
@@ -1474,8 +1494,8 @@
     .ft-inner{padding-top:clamp(32px,5vh,56px);padding-bottom:clamp(64px,9vh,96px);}
     /* the ceilings are set so each curve lands where the desktop one does at
        761px — otherwise the heading grew as the screen shrank */
-    .ft-line{font-size:clamp(27px,8.4vw,34px);}
-    .ft-line.serif{font-size:clamp(28px,8.8vw,36px);}
+    .ft-line{font-size:clamp(25px,7.2vw,36px);}
+    .ft-line.serif{font-size:clamp(27px,7.8vw,39px);}
     .ft-mail{padding:14px 16px 14px 20px;gap:12px;}
     .ft-paper{--rl:32px;padding-left:52px;padding-right:24px;}
     .ft-note{max-width:100%;width:100%;}
@@ -1508,7 +1528,7 @@
     .fact:last-child{padding-right:0;padding-bottom:13px;}
     .fact+.fact{border-left:none;border-top:1px solid var(--line);}
     .cta-dock{margin-top:30px;}
-    .cta-text span{font-size:13px;}
+    .cta-text span{font-size:12.5px;}
   }
   @media(max-height:780px) and (min-width:761px){
     h1{font-size:clamp(40px,5.6vw,66px);}
