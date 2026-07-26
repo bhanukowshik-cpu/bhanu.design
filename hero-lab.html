@@ -3575,61 +3575,57 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   .wk-heading .serif{font-size:1.12em;}
   .wk-count{font-size:.85rem;font-weight:500;color:var(--cream-ink-3);
     font-family:var(--sans);font-variant-numeric:tabular-nums lining-nums;}
-  /* the stage — media layers stacked in one 16:9 panel, crossfading */
-  .wk-viewer{position:relative;flex:0 1 auto;height:clamp(250px,44vh,520px);
-    aspect-ratio:16/9;max-width:100%;}
-  .wk-viewer::before{content:'';position:absolute;inset:-12% -14%;
-    background:radial-gradient(closest-side,rgba(92,169,255,.12),transparent 72%);
-    pointer-events:none;}
-  .wk-media{position:absolute;inset:0;border-radius:22px;overflow:hidden;
-    border:1px solid var(--cream-line);background:var(--card);
-    box-shadow:0 30px 80px -20px rgba(0,0,0,.6);
-    opacity:0;transform:scale(.965);pointer-events:none;
-    transition:opacity .55s var(--ease-expo),transform .85s var(--ease-expo);}
-  .wk-media.is-on{opacity:1;transform:none;pointer-events:auto;}
-  .wk-media video,.wk-media img{width:100%;height:100%;object-fit:cover;display:block;}
-  /* the caption — name, one line, one link; swaps as one block */
-  .wk-caption{text-align:center;max-width:min(78ch,100%);
+  /* the caption row — name, subline, metrics, one CTA; swaps as one block */
+  .wk-caption{display:flex;flex-direction:column;align-items:center;gap:13px;
+    text-align:center;max-width:min(84ch,100%);
     transition:opacity .24s ease,transform .24s ease;}
   .wk-caption.wk-swap{opacity:0;transform:translateY(10px);}
   .wk-title{font-size:clamp(1.7rem,3vw,2.6rem);font-weight:600;
     letter-spacing:-.015em;line-height:1.12;color:var(--cream-ink);text-wrap:balance;}
-  .wk-line{margin-top:.5em;font-size:clamp(.98rem,1.2vw,1.1rem);line-height:1.6;
-    color:var(--cream-ink-2);text-wrap:pretty;}
-  .wk-cta{display:inline-flex;align-items:center;gap:.42em;margin-left:.75em;
-    white-space:nowrap;color:var(--ember);font-family:var(--sans);font-weight:600;
+  .wk-sub{font-size:clamp(.98rem,1.2vw,1.1rem);line-height:1.55;
+    color:var(--cream-ink-2);text-wrap:pretty;max-width:64ch;}
+  .wk-metrics{display:flex;justify-content:center;gap:clamp(22px,3.4vw,52px);}
+  .wk-metric{display:flex;flex-direction:column;align-items:center;gap:3px;}
+  .wk-m-val{font-family:var(--sans);font-weight:600;color:var(--cream-ink);
+    font-size:clamp(1.05rem,1.5vw,1.3rem);letter-spacing:-.01em;
+    font-variant-numeric:tabular-nums lining-nums;}
+  .wk-m-lbl{font-family:var(--sans);font-weight:500;font-size:.78rem;
+    color:var(--cream-ink-3);}
+  /* the one CTA — the site-wide gradient rounded rectangle */
+  .wk-cta{display:inline-flex;align-items:center;gap:.5em;margin-top:2px;
+    padding:11px 20px;border-radius:var(--cta-r-sm);background:var(--cta-grad);
+    color:#fff;font-family:var(--sans);font-weight:600;font-size:.95rem;
     text-decoration:none;}
-  .wk-cta svg{width:.78em;height:.78em;transition:transform .3s var(--ease);}
-  .wk-cta:hover svg,.wk-cta:focus-visible svg{transform:translateX(4px);}
-  /* the filmstrip — six thumbs; the active one lifts, the rest dim.
-     first/last margin:auto centers the row while overflow stays scrollable */
-  .wk-strip{display:flex;gap:clamp(10px,1.1vw,16px);max-width:100%;
-    padding:6px 4px 12px;overflow-x:auto;scrollbar-width:none;
-    scroll-snap-type:x proximity;}
-  .wk-strip::-webkit-scrollbar{display:none;}
-  .wk-thumb{flex:0 0 auto;width:clamp(96px,10.5vw,148px);aspect-ratio:16/10;
-    border-radius:12px;overflow:hidden;border:1px solid var(--cream-line);
-    background:var(--card);padding:0;cursor:pointer;opacity:.42;
-    scroll-snap-align:center;
-    transition:opacity .35s var(--ease),transform .45s var(--ease-expo),
-      border-color .35s var(--ease),box-shadow .35s var(--ease);}
-  .wk-thumb:first-child{margin-left:auto;}
-  .wk-thumb:last-child{margin-right:auto;}
-  .wk-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-  .wk-thumb:hover{opacity:.78;}
-  .wk-thumb.is-on{opacity:1;border-color:rgba(92,169,255,.5);
-    transform:translateY(-4px);box-shadow:0 10px 26px rgba(0,0,0,.45);}
+  .wk-cta:hover{background:var(--cta-grad-hover);}
+  .wk-cta svg{width:.8em;height:.8em;transition:transform .3s var(--ease);}
+  .wk-cta:hover svg,.wk-cta:focus-visible svg{transform:translateX(3px);}
+  /* the tape — six cards riding the outside of a drum. The camera stands
+     outside it: the active card faces the room, its neighbours turn away
+     and shrink, the outermost angle off into the dark. JS computes the
+     drum (positions, angles, dimming); this transition owns the glide. */
+  .wk-tape{position:relative;flex:1 1 auto;min-height:0;width:100%;
+    perspective:1200px;perspective-origin:50% 32%;}
+  .wk-belt{position:absolute;inset:0;transform-style:preserve-3d;}
+  .wk-card{position:absolute;left:50%;top:50%;height:clamp(190px,32vh,380px);
+    aspect-ratio:16/9;padding:0;margin:0;cursor:pointer;
+    border:1px solid var(--cream-line);border-radius:18px;overflow:hidden;
+    background:var(--card);box-shadow:0 24px 60px -18px rgba(0,0,0,.65);
+    transform:translate(-50%,-50%);
+    transition:transform .75s var(--ease-expo),filter .55s var(--ease),
+      opacity .55s var(--ease);}
+  .wk-card video,.wk-card img{width:100%;height:100%;object-fit:cover;display:block;}
+  .wk-card.is-on{cursor:default;}
   @media(max-width:900px){
-    /* unpinned on phones: the stage is simply a section, the strip swipes */
-    .wk-stage{min-height:0;gap:18px;padding-top:84px;padding-bottom:48px;}
-    .wk-viewer{height:auto;width:100%;}
+    /* unpinned on phones: the same two rows, sized down; tap a card to jump */
+    .wk-stage{min-height:0;gap:16px;padding-top:84px;padding-bottom:40px;}
     .wk-title{font-size:clamp(1.5rem,6.4vw,2rem);}
-    .wk-line{font-size:.95rem;}
-    .wk-cta{display:flex;margin:.65em auto 0;justify-content:center;width:max-content;}
-    .wk-thumb{width:104px;}
+    .wk-sub{font-size:.95rem;}
+    .wk-metrics{gap:20px;flex-wrap:wrap;}
+    .wk-tape{min-height:250px;perspective:900px;}
+    .wk-card{height:clamp(150px,24vh,220px);}
   }
   @media(prefers-reduced-motion:reduce){
-    .wk-media,.wk-caption,.wk-thumb,.wk-cta svg{transition:none;}
+    .wk-caption,.wk-card,.wk-cta svg{transition:none;}
   }
 </style>
 </head>
@@ -3714,57 +3710,51 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <span class="wk-count" aria-hidden="true"><span id="wkCountNow">01</span>&thinsp;/&thinsp;06</span>
       </header>
 
-      <!-- media layers are stacked; JS lights one and plays/pauses its video -->
-      <div class="wk-viewer" id="wkViewer" aria-hidden="true">
-        <figure class="wk-media">
-          <video muted loop playsinline preload="metadata" poster="images/card-et-live.webp">
-            <source src="images/et-live.mp4" type="video/mp4">
-          </video>
-        </figure>
-        <figure class="wk-media">
-          <video muted loop playsinline preload="none" poster="images/card-et-studio.webp">
-            <source src="images/et-studio.mp4" type="video/mp4">
-          </video>
-        </figure>
-        <figure class="wk-media">
-          <video muted loop playsinline preload="none" poster="images/card-et-analytics.webp">
-            <source src="images/et-analytics.mp4" type="video/mp4">
-          </video>
-        </figure>
-        <figure class="wk-media">
-          <video muted loop playsinline preload="none" poster="images/card-stressie.webp">
-            <source src="images/stressie.mp4" type="video/mp4">
-          </video>
-        </figure>
-        <figure class="wk-media">
-          <video muted loop playsinline preload="none" poster="images/card-dearly.webp">
-            <source src="images/dearly.mp4" type="video/mp4">
-          </video>
-        </figure>
-        <figure class="wk-media">
-          <img src="images/card-engine.webp" alt="" loading="lazy">
-        </figure>
-      </div>
-
+      <!-- row one: the caption — name, subline, metrics, one CTA -->
       <div class="wk-caption" id="wkCaption" aria-live="polite">
         <h3 class="wk-title" id="wkTitle">EverTutor Live</h3>
-        <p class="wk-line">
-          <span id="wkDesc"></span>
-          <a class="wk-cta" id="wkCta" href="evertutor-live.html">
-            <span id="wkCtaLabel">View case study</span>
-            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 6h10M7 2l4 4-4 4"/></svg>
-          </a>
-        </p>
+        <p class="wk-sub" id="wkSub"></p>
+        <div class="wk-metrics" id="wkMetrics"></div>
+        <a class="wk-cta" id="wkCta" href="evertutor-live.html">
+          <span id="wkCtaLabel">View case study</span>
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 6h10M7 2l4 4-4 4"/></svg>
+        </a>
       </div>
 
-      <nav class="wk-strip" id="wkStrip" aria-label="Projects">
-        <button class="wk-thumb" type="button" data-idx="0" aria-label="EverTutor Live"><img src="images/card-et-live.webp" alt=""></button>
-        <button class="wk-thumb" type="button" data-idx="1" aria-label="EverTutor Studio"><img src="images/card-et-studio.webp" alt=""></button>
-        <button class="wk-thumb" type="button" data-idx="2" aria-label="EverTutor Analytics"><img src="images/card-et-analytics.webp" alt=""></button>
-        <button class="wk-thumb" type="button" data-idx="3" aria-label="Stressie"><img src="images/card-stressie.webp" alt=""></button>
-        <button class="wk-thumb" type="button" data-idx="4" aria-label="Dearly"><img src="images/card-dearly.webp" alt=""></button>
-        <button class="wk-thumb" type="button" data-idx="5" aria-label="The Engine"><img src="images/card-engine.webp" alt=""></button>
-      </nav>
+      <!-- row two: the tape — the product videos themselves ride the drum;
+           JS lights the front card and plays it, a click jumps the reel -->
+      <div class="wk-tape" id="wkTape">
+        <div class="wk-belt" id="wkBelt" aria-label="Projects">
+          <button class="wk-card" type="button" data-idx="0" aria-label="EverTutor Live">
+            <video muted loop playsinline preload="metadata" poster="images/card-et-live.webp">
+              <source src="images/et-live.mp4" type="video/mp4">
+            </video>
+          </button>
+          <button class="wk-card" type="button" data-idx="1" aria-label="EverTutor Studio">
+            <video muted loop playsinline preload="none" poster="images/card-et-studio.webp">
+              <source src="images/et-studio.mp4" type="video/mp4">
+            </video>
+          </button>
+          <button class="wk-card" type="button" data-idx="2" aria-label="EverTutor Analytics">
+            <video muted loop playsinline preload="none" poster="images/card-et-analytics.webp">
+              <source src="images/et-analytics.mp4" type="video/mp4">
+            </video>
+          </button>
+          <button class="wk-card" type="button" data-idx="3" aria-label="Stressie">
+            <video muted loop playsinline preload="none" poster="images/card-stressie.webp">
+              <source src="images/stressie.mp4" type="video/mp4">
+            </video>
+          </button>
+          <button class="wk-card" type="button" data-idx="4" aria-label="Dearly">
+            <video muted loop playsinline preload="none" poster="images/card-dearly.webp">
+              <source src="images/dearly.mp4" type="video/mp4">
+            </video>
+          </button>
+          <button class="wk-card" type="button" data-idx="5" aria-label="The Engine">
+            <img src="images/card-engine.webp" alt="" loading="lazy">
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -5183,29 +5173,35 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
   if (!sec) return;
   var DATA = [
     { title: 'EverTutor Live',
-      desc: 'A voice-first AI tutor that took 1:1 learning from $250 to $5 an hour — shaped from early concept to product-market fit.',
+      sub: 'The world’s first voice-first AI tutor — shaped from early concept to product-market fit.',
+      metrics: [['$250→$5/hr', '1:1 tutor cost'], ['2×', 'proven mastery'], ['85%', 'session completion']],
       href: 'evertutor-live.html', cta: 'View case study' },
     { title: 'EverTutor Studio',
-      desc: 'Lesson creation for teachers, cut from 104 hours to 4 — designed overnight, now in 12 schools across 8 districts.',
+      sub: 'Lesson creation for teachers — designed overnight, shipped to schools.',
+      metrics: [['104→4 hrs', 'per lesson'], ['12', 'schools'], ['8', 'districts']],
       href: 'evertutor-studio.html', cta: 'View case study' },
     { title: 'EverTutor Analytics',
-      desc: 'Real-time student insight for educators — complexity on demand, clean by default.',
+      sub: 'Real-time student insight for educators — complexity on demand, clean by default.',
+      metrics: [['Live', 'in production'], ['Dog-ear', 'disclosure system'], ['0', 'extra clicks']],
       href: '', cta: '' },
     { title: 'Stressie',
-      desc: 'Harvard-incubated workplace stress care, redesigned to 17.4% engagement — live at Amazon and InKind.',
+      sub: 'Harvard-incubated workplace stress care, fully redesigned and live in the wild.',
+      metrics: [['17.4%', 'engagement rate'], ['$600k', 'funding'], ['Amazon', '& InKind pilots']],
       href: 'stressie-studio.html', cta: 'View case study' },
     { title: 'Dearly',
-      desc: 'Animated letters in your handwriting, your voice and your photos — built in 48 hours.',
+      sub: 'Animated letters in your handwriting, your voice and your photos, sent as a link.',
+      metrics: [['140', 'letters written'], ['35', 'five-star ratings'], ['48 hrs', 'built in']],
       href: 'https://dearly-rho.vercel.app', cta: 'Visit Dearly' },
     { title: 'The Engine',
-      desc: 'Brand, art direction and the landing page for an AI growth platform that runs its own marketing.',
+      sub: 'Brand, art direction and the landing page for an AI growth platform that runs its own marketing.',
+      metrics: [['Brand', '& art direction'], ['Landing', 'page design']],
       href: 'https://www.theengine.dev/', cta: 'Visit site' }
   ];
-  var medias  = [].slice.call(sec.querySelectorAll('.wk-media'));
-  var thumbs  = [].slice.call(sec.querySelectorAll('.wk-thumb'));
+  var cards   = [].slice.call(sec.querySelectorAll('.wk-card'));
   var caption = document.getElementById('wkCaption');
   var titleEl = document.getElementById('wkTitle');
-  var descEl  = document.getElementById('wkDesc');
+  var subEl   = document.getElementById('wkSub');
+  var metEl   = document.getElementById('wkMetrics');
   var ctaEl   = document.getElementById('wkCta');
   var ctaLbl  = document.getElementById('wkCtaLabel');
   var countEl = document.getElementById('wkCountNow');
@@ -5214,7 +5210,16 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
 
   function applyCopy(d) {
     titleEl.textContent = d.title;
-    descEl.textContent  = d.desc;
+    subEl.textContent   = d.sub;
+    metEl.innerHTML = '';
+    d.metrics.forEach(function (m) {
+      var el = document.createElement('div');
+      el.className = 'wk-metric';
+      var v = document.createElement('span'); v.className = 'wk-m-val'; v.textContent = m[0];
+      var l = document.createElement('span'); l.className = 'wk-m-lbl'; l.textContent = m[1];
+      el.appendChild(v); el.appendChild(l);
+      metEl.appendChild(el);
+    });
     if (d.href) {
       ctaEl.href = d.href;
       ctaLbl.textContent = d.cta;
@@ -5225,12 +5230,44 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
       ctaEl.style.display = 'none';
     }
   }
-  /* light one layer; only the visible video spends decode time */
+  /* the drum: each card sits at d stops from the front, on the outside of a
+     cylinder whose radius scales with the card. sin/cos place it, a capped
+     rotateY turns it away, scale and brightness fall off with distance —
+     the CSS transition on .wk-card glides every move between stops. */
+  function layoutTape() {
+    var cardW = cards[0].offsetWidth ||
+      (parseFloat(getComputedStyle(cards[0]).height) * 16 / 9) || 560;
+    var R = cardW * 1.85;
+    var STEP = 26 * Math.PI / 180;
+    cards.forEach(function (c, i) {
+      var d = i - idx;
+      var phi = d * STEP;
+      var x = Math.sin(phi) * R;
+      var z = (Math.cos(phi) - 1) * R;
+      var rot = Math.max(-58, Math.min(58, d * 24));
+      var s = Math.max(0.6, 1 - Math.abs(d) * 0.1);
+      var b = d === 0 ? 1 : Math.abs(d) === 1 ? 0.55 : 0.35;
+      c.style.transform = 'translate(-50%,-50%) translate3d(' + x.toFixed(1) + 'px,'
+        + (Math.abs(d) * 12) + 'px,' + z.toFixed(1) + 'px) rotateY(' + rot
+        + 'deg) scale(' + s.toFixed(3) + ')';
+      c.style.filter = 'brightness(' + b + ')';
+      c.style.zIndex = String(40 - Math.abs(d));
+      /* two stops per side are on camera; past that the drum's far side
+         would peek out from behind the front card — fade it to nothing */
+      var hidden = Math.abs(d) >= 3;
+      c.style.opacity = hidden ? '0' : '1';
+      c.style.pointerEvents = hidden ? 'none' : '';
+      c.tabIndex = hidden ? -1 : 0;
+    });
+  }
+  /* only the front card spends decode time */
   function setMedia(i) {
-    medias.forEach(function (m, j) {
+    cards.forEach(function (c, j) {
       var on = j === i;
-      m.classList.toggle('is-on', on);
-      var v = m.querySelector('video');
+      c.classList.toggle('is-on', on);
+      if (on) c.setAttribute('aria-current', 'true');
+      else c.removeAttribute('aria-current');
+      var v = c.querySelector('video');
       if (!v) return;
       if (on && !noMotion) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
       else v.pause();
@@ -5240,13 +5277,9 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
     i = Math.max(0, Math.min(N - 1, i));
     if (i === idx) return;
     idx = i;
-    thumbs.forEach(function (t, j) {
-      t.classList.toggle('is-on', j === i);
-      if (j === i) t.setAttribute('aria-current', 'true');
-      else t.removeAttribute('aria-current');
-    });
     countEl.textContent = (i + 1 < 10 ? '0' : '') + (i + 1);
     setMedia(i);
+    layoutTape();
     if (instant || noMotion) { applyCopy(DATA[i]); return; }
     clearTimeout(swapT);
     caption.classList.add('wk-swap');
@@ -5255,11 +5288,12 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
       caption.classList.remove('wk-swap');
     }, 240);
   }
-  /* while the pin owns the section a thumb click scrolls to that stop, so
-     the strip and the scrollbar stay one truth; unpinned, it jumps direct */
-  thumbs.forEach(function (t) {
-    t.addEventListener('click', function () {
-      var i = parseInt(t.dataset.idx, 10);
+  /* while the pin owns the section a card click scrolls to that stop, so
+     the tape and the scrollbar stay one truth; unpinned, it jumps direct */
+  cards.forEach(function (c) {
+    c.addEventListener('click', function () {
+      var i = parseInt(c.dataset.idx, 10);
+      if (i === idx) return;
       var st = window.__wkPin;
       if (st) {
         var y = st.start + (st.end - st.start) * (i / (N - 1));
@@ -5270,14 +5304,28 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
       }
     });
   });
-  /* arrows walk the strip for anyone not using a pointer */
-  document.getElementById('wkStrip').addEventListener('keydown', function (e) {
+  /* a swipe walks the tape where there is no pin (phones, coarse pointers) */
+  (function () {
+    var tape = document.getElementById('wkTape');
+    var x0 = null;
+    tape.addEventListener('pointerdown', function (e) { x0 = e.clientX; }, { passive: true });
+    tape.addEventListener('pointerup', function (e) {
+      if (x0 === null || window.__wkPin) { x0 = null; return; }
+      var dx = e.clientX - x0;
+      x0 = null;
+      if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+  })();
+  /* arrows walk the tape for anyone not using a pointer */
+  document.getElementById('wkBelt').addEventListener('keydown', function (e) {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     e.preventDefault();
     var next = Math.max(0, Math.min(N - 1, idx + (e.key === 'ArrowRight' ? 1 : -1)));
-    thumbs[next].focus();
-    thumbs[next].click();
+    cards[next].focus();
+    cards[next].click();
   });
+  /* the drum radius rides the card size, so re-lay it out when that moves */
+  addEventListener('resize', layoutTape);
   window.__wk = { go: go, count: N };
   go(0, true);
 })();
