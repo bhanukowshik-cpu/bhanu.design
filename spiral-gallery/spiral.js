@@ -72,18 +72,25 @@ void main() {
   vec3 newPosition   = position;
 
   /* Two standing deformations — a horizontal bow (sin(uv.x)*0.04 on z) and
-     a view-space shear that grows with height (pow(y,2)*0.1) — give the
-     resting cards their wrapped, sculptural read. uBend gates both per
-     card: 0 on the active (front) card so it sits flat and crisp, ramping
-     to 1 over one slot of travel as a card leaves the front. The ticker
-     drives it from distFromFront. The scroll-speed bend below stays
-     unconditional and decays to zero the moment the reel rests. */
+     a view-space shear that grows with height — give the resting cards
+     their wrapped, sculptural read. uBend gates both per card: 0 on the
+     active (front) card so it sits flat and crisp, ramping to 1 over one
+     slot of travel as a card leaves the front. The ticker drives it from
+     distFromFront. The scroll-speed bend below stays unconditional and
+     decays to zero the moment the reel rests. */
   newPosition.z = sin(uv.x * PI) * 0.04 * uBend;
 
   vec4 modelPosition = modelMatrix * vec4(newPosition, 1.0);
   vec4 viewPosition  = viewMatrix  * modelPosition;
 
-  viewPosition.x += pow(worldPosition.y, 2.0) * 0.1 * uBend;
+  /* The shear is centre-relative: pow(vertex.y) minus pow(centre.y) keeps
+     the skew shape (top edge leads, more so the higher the card rides)
+     while the card's centre stays planted on its helix lane. The absolute
+     form — pow(worldPosition.y,2)*0.1 alone — displaced whole cards
+     sideways, quadratically more with height, and the top cards slid into
+     each other. */
+  vec3 centerWorld = (modelMatrix * vec4(vec3(0.0), 1.0)).xyz;
+  viewPosition.x += (pow(worldPosition.y, 2.0) - pow(centerWorld.y, 2.0)) * 0.1 * uBend;
   viewPosition.x += sin(uv.y * PI) * uScrollSpeed * 2.0;
 
   gl_Position = projectionMatrix * viewPosition;
