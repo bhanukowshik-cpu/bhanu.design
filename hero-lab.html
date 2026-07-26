@@ -4611,7 +4611,17 @@ addEventListener('load', function () {
       root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: self.progress } }));
     }
   });
+  /* Lenis measures the document once and caches the limit. The pin-spacer is
+     added by ScrollTrigger afterwards, so without re-measuring Lenis still
+     believes the page ends where it did before the pin — it simply refuses to
+     scroll past that point, which caps the pin's progress partway through the
+     tail and strands the reel mid-order. Re-measure after every refresh. */
+  function syncLenis() {
+    if (window.__lenis && typeof window.__lenis.resize === 'function') window.__lenis.resize();
+  }
+  ScrollTrigger.addEventListener('refresh', syncLenis);
   ScrollTrigger.refresh();
+  syncLenis();
   addEventListener('resize', function () { ScrollTrigger.refresh(); });
 });
 </script>
