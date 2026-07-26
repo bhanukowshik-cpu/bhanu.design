@@ -67,6 +67,12 @@
     --geo-line-2:rgba(160,205,255,.075);
     --geo-dot:rgba(140,197,255,.5);
 
+    /* ── THE GUTTER — one margin, every section ──────────────────────────
+       The old cap was 88px, which on a 1920 screen let the content run
+       almost to the glass. This keeps a real margin on big displays and
+       still gives a phone its 20px. */
+    --gutter:clamp(20px,7.5vw,180px);
+
     /* ── DEPTH — a named scale, so nothing ever reaches for 9999 ──────── */
     --z-geo:0; --z-content:2; --z-nav:50; --z-fab:60; --z-scrim:70;
     --z-panel:80; --z-toast:90; --z-cursor:100;
@@ -258,7 +264,7 @@
   .top-nav{
     position:fixed;top:var(--anno-h);left:0;right:0;z-index:var(--z-nav);
     display:flex;align-items:center;justify-content:space-between;
-    padding:10px clamp(24px,4.5vw,56px);height:62px;
+    padding:10px var(--gutter);height:62px;
     background:transparent;             /* frameless at rest — just text on the page */
     border:1px solid transparent;
     transition:top .45s cubic-bezier(.22,.61,.36,1),left .45s cubic-bezier(.22,.61,.36,1),
@@ -412,7 +418,7 @@
      One and a half cards sit in view at rest, so the reel reads as scrollable
      without a hint. Native scroll-snap does the paging — no JS owns the numbers. */
   .work-pin{position:relative;background:var(--cream);color:var(--cream-ink);
-    --reel-pad:clamp(20px,5vw,88px);
+    --reel-pad:var(--gutter);
     --panel-w:clamp(280px,26vw,400px); /* the 01 system panel that opens the reel */
     padding:clamp(58px,8vh,104px) 0 clamp(64px,9vh,116px);}
 
@@ -970,7 +976,7 @@
   .tc-contours path{fill:none;stroke:rgba(140,197,255,.13);stroke-width:1;}
 
   .tc{position:relative;z-index:2;width:100%;max-width:1560px;margin:0 auto;
-    padding:0 clamp(24px,4.5vw,56px);
+    padding:0 var(--gutter);
     display:grid;grid-template-columns:minmax(300px,33%) 1fr;
     gap:clamp(40px,5vw,96px);align-items:center;}
 
@@ -1205,7 +1211,7 @@
     transform:translate(-50%,-50%);filter:blur(40px);pointer-events:none;
     background:radial-gradient(ellipse at center,rgba(92,169,255,.06) 0%,transparent 66%);}
   .said-inner{position:relative;z-index:2;max-width:880px;margin:0 auto;
-    padding:0 clamp(24px,4.5vw,56px);text-align:center;}
+    padding:0 var(--gutter);text-align:center;}
   .said-k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
     text-transform:uppercase;color:var(--ember);margin-bottom:clamp(16px,2.2vh,24px);}
   .said-h{font-family:var(--sans);font-weight:570;color:var(--ink);
@@ -1357,7 +1363,7 @@
   .orb-fab.stand-down{opacity:0;pointer-events:none;transform:translateY(10px);}
 
   .ft-inner{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;
-    padding:clamp(40px,6vh,72px) clamp(20px,4.5vw,56px) clamp(80px,11vh,128px);}
+    padding:clamp(40px,6vh,72px) var(--gutter) clamp(80px,11vh,128px);}
   .ft-spread{flex:1;width:100%;max-width:1240px;margin:0 auto;display:flex;
     align-items:center;justify-content:space-between;gap:clamp(40px,5vw,72px);}
   .ft-left{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:28px;}
@@ -2147,29 +2153,33 @@ function mountSmoke(canvas) {
        only the top ~18% of it is ever on screen; the rest is clipped away
        by the frame. Everything is expressed in the circle's own radius, so
        the composition holds identically at 320px and at 3440px. */
-    ' float R=aspect*0.68;',                          // wider than the viewport now
-    ' vec2 c=vec2(aspect*0.5,-0.64*R);',              // sunk: crest lands ~0.36R above the floor
+    ' float R=aspect*0.55;',                          // a touch wider than the viewport
+    /* Sunk to 0.75R, so the cap on screen is 0.25R — about an eighth of the
+       circle. At -0.62 nearly half the viewport was inside the disc, which
+       is how it stopped being a shape at the bottom and became a wash. */
+    ' vec2 c=vec2(aspect*0.5,-0.75*R);',
     ' vec2 rel=p-c;',
-    ' float d=length(rel)/max(R,0.0001);',            // 1.0 would be a clean rim
-    /* …and a clean rim is exactly what made it read as a drawn circle. The
-       silhouette is displaced by the same turbulence that makes the smoke,
-       so the edge is eaten rather than drawn — the circle is the shape the
-       smoke happens to be holding, not an arc with smoke inside it. */
+    ' float d=length(rel)/max(R,0.0001);',
+    /* The edge is nudged by the turbulence, not dissolved by it. At 0.30 of
+       displacement the circle stopped existing; at 0.11 it reads as a circle
+       whose rim happens to be made of smoke, which is the thing asked for. */
     ' float warp=fbm(vec2(rel.x*2.6, rel.y*2.6 - t*0.05));',
-    ' float dn=d+(warp-0.5)*0.30;',
-    ' float body=smoothstep(1.10,0.26,dn);',          // dense at the base, ragged at the crest
-    ' float dns=smoke*body;',
-    /* The edge still carries the light — without it there is a shape but
-       nothing to see. What keeps it from being a drawn arc is that it is
-       computed on the warped radius AND multiplied by the smoke field, so it
-       only lights where there is actually smoke to light: broken, not swept. */
-    ' float edge=smoothstep(1.10,0.92,dn)*(1.0-smoothstep(0.92,0.66,dn));',
-    /* the plume — what gets away over the crest and keeps rising into the
-       dark. Without this the mass just stops at its own outline. */
-    ' float esc=smoothstep(0.80,1.30,dn);',           // outside the body
-    ' float rise=smoothstep(-0.08,0.70,p.y-(c.y+R));',// above the crest
-    ' float plume=smoke*esc*rise;',
-    ' float glow=smoothstep(1.30,0.18,dn);',          // the bloom it throws, warped with it
+    ' float dn=d+(warp-0.5)*0.11;',
+    /* THE DISC. A narrow falloff, so there is a defined boundary rather than
+       a gradient that fades out over half the screen. */
+    ' float disc=smoothstep(1.005,0.88,dn);',
+    /* …and the smoke lives INSIDE it. Multiplying the disc by the smoke field
+       was the bug: wherever the field thinned, the circle went with it. Mixing
+       instead keeps the form solid and lets the turbulence texture it. */
+    /* A 0.55 floor made the interior a solid fill — the circle came back but
+       as a slab of blue. 0.20 keeps the form readable while leaving the
+       inside dark, so what you see in there is smoke and not paint. */
+    ' float dns=mix(0.20,1.0,smoke)*disc;',
+    /* the lit rim, and wisps getting away just past it */
+    ' float edge=smoothstep(1.01,0.95,dn)*(1.0-smoothstep(0.95,0.86,dn));',
+    ' float esc=smoothstep(0.94,1.14,dn)*(1.0-smoothstep(1.14,1.36,dn));',
+    ' float plume=smoke*smoke*esc;',
+    ' float glow=smoothstep(1.22,0.55,dn);',          // a close bloom, not a wash
     ' vec3 bg=vec3(0.039,0.055,0.082);',
     /* The mass is coloured by height, not by density: a deep blue where it
        banks against the floor, paling as it climbs, so the dome has a bottom
@@ -2181,19 +2191,21 @@ function mountSmoke(canvas) {
        along the bottom edge and takes it to nothing by ~60% up, so it reads
        as rising in from below the frame and dissipating — not as a field
        sitting in the middle of the screen. */
-    ' float floorFade=1.0-smoothstep(0.08,0.84,p.y);',
+    /* the disc's own rim is what ends it now, so this only stops anything
+       stray from hanging around near the headline */
+    ' float floorFade=1.0-smoothstep(0.58,1.00,p.y);',
     /* ONE KNOB. Every additive term is scaled by this, so the whole effect
        dims or lifts together without any of the balance between mass, edge
        and plume changing. Raise toward 1.0 for more, drop toward 0.3 for a
        whisper. */
-    ' float I=0.68*floorFade;',
+    ' float I=0.55*floorFade;',
     ' vec3 col=bg;',
-    ' col+=deep*(dns*1.45+glow*0.40)*I;',
-    ' col+=ice*dns*dns*0.55*I;',
-    ' col+=ice*edge*smoke*0.70*I;',                   // lit only where the smoke is
-    ' col+=deep*plume*1.05*I;',                       // the plume is mass first…
-    ' col+=ice*plume*plume*0.60*I;',                  // …and catches light where it thickens
-    ' col+=ice*pow(dns,3.0)*0.20*I;',               // luminous crest highlights
+    ' col+=deep*(dns*0.90+glow*0.10)*I;',
+    ' col+=ice*dns*dns*0.20*I;',
+    ' col+=ice*edge*mix(0.45,1.0,smoke)*0.42*I;',     // the rim, broken by the smoke on it
+    ' col+=deep*plume*0.60*I;',                       // wisps off the rim are mass first…
+    ' col+=ice*plume*0.30*I;',                        // …and catch a little light
+    ' col+=ice*pow(dns,3.0)*0.10*I;',               // highlights where it is thickest
     ' col+=(hash(gl_FragCoord.xy+fract(t))-0.5)*0.012;',
     ' gl_FragColor=vec4(col,1.0);}'
   ].join('\n');
@@ -2604,11 +2616,13 @@ var topNav = document.getElementById('topNav');
      the next rather than a column of separate cards drifting past. Measured
      from the layout box, so it stays right at every breakpoint without a
      second set of numbers to keep in sync. */
-  var LINK = 14;                                   /* the join between panels */
-  /* The strip runs straight down the column — no arc, no sideways drift. One
-     step of travel is the panel's own height plus the join, so the panels
-     stay touching and the reel reads as one ribbon passing through the
-     frame. What is coming waits above; what has passed has gone below. */
+  var LINK = 20;                                   /* the join between panels */
+
+  /* The strip runs straight down the column — no arc, no sideways drift, and
+     the panels sit face-on. That last part is also what fixes the stacking:
+     while they were rolled and tilted into perspective, a 261px panel took
+     up noticeably more than 261px on screen, so stepping by the layout
+     height left them overlapping. Face-on, the two are the same number. */
   var step = 0;
   function measure() {
     var h = 0;
@@ -2649,28 +2663,25 @@ var topNav = document.getElementById('topNav');
      no per-plane variance and no per-plane hover — so the reel reads as one
      continuous ribbon whose links happen to be projects. Distance from the
      active one shows only as a little depth: a touch smaller, a touch dimmer. */
-  var TILT_Y = -14, TILT_X = 4, ROLL = -1.6;
   var idle = false;
   function draw() {
-    /* velocity bends the reel — skewY is the flat-plane read of the shader */
-    var sk = Math.max(-5, Math.min(5, vel * 1.9));
+    /* velocity still bends the reel a little — that is motion, not attitude,
+       and it settles back to flat the moment you stop */
+    var sk = Math.max(-3, Math.min(3, vel * 1.2));
     /* the hover belongs to the strip, not to one link of it */
     var h = 0;
     for (var q = 0; q < hoverNow.length; q++) h = Math.max(h, hoverNow[q]);
-    var ry = (TILT_Y + 9 * h).toFixed(2),
-        rx = (TILT_X - 3 * h).toFixed(2),
-        rz = (ROLL + 1.2 * h).toFixed(2);
     slides.forEach(function (s, n) {
       var m = medias[n]; if (!m) return;
       var k = n - pos, a = Math.abs(k);
-      /* straight down: what is coming waits above the frame and travels down
-         through it as you scroll, and the one before it carries on below */
+      /* straight down and face-on: what is coming waits above the frame and
+         travels down through it as you scroll, and the one before it carries
+         on below. No rotation of any kind — the panels are flat to the page. */
       var fade = Math.max(0, 1 - 0.34 * a);
       m.style.transform =
-        'translate3d(0,' + (-k * step).toFixed(2) + 'px,0) perspective(1100px)' +
-        ' rotateY(' + ry + 'deg) rotateX(' + rx + 'deg) rotate(' + rz + 'deg)' +
+        'translate3d(0,' + (-k * step).toFixed(2) + 'px,0)' +
         ' skewY(' + sk.toFixed(2) + 'deg)' +
-        ' scale(' + (1 - 0.035 * Math.min(a, 2)).toFixed(3) + ')';
+        ' scale(' + (1 - 0.035 * Math.min(a, 2) + 0.012 * h).toFixed(3) + ')';
       m.style.opacity = fade.toFixed(3);
     });
   }
