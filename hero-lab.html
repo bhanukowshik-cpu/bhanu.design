@@ -508,6 +508,243 @@
   .send-btn:disabled{opacity:.5;cursor:default;transform:none;}
   .send-btn svg{width:17px;height:17px;}
 
+  /* ── 03 — ABOUT: THE T ──────────────────────────────────────────────────
+       The T-shaped-designer diagram as a lit constellation: breadth runs
+       across the bar, depth drops down the stem, one node burning at a time.
+       Back on the page's own dark scale and azure after section 2's cream. */
+  .tc-sec{position:relative;background:var(--bg);overflow:clip;
+    padding:clamp(76px,11vh,132px) 0 clamp(84px,12vh,144px);}
+
+  /* atmosphere — a shaft off the top right and a pool of warmth under the T */
+  .tc-atmos{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .tc-shaft{position:absolute;top:-38%;right:6%;width:30%;height:150%;transform:rotate(19deg);
+    transform-origin:top center;filter:blur(54px);
+    background:linear-gradient(180deg,rgba(92,169,255,.26) 0%,rgba(92,169,255,.07) 44%,transparent 76%);}
+  .tc-halo{position:absolute;left:58%;top:46%;width:48%;height:64%;transform:translate(-50%,-50%);
+    filter:blur(30px);background:radial-gradient(ellipse at center,rgba(92,169,255,.07) 0%,transparent 68%);}
+  .tc-contours{position:absolute;inset:0;width:100%;height:100%;opacity:.5;}
+  .tc-contours path{fill:none;stroke:rgba(140,197,255,.13);stroke-width:1;}
+
+  .tc{position:relative;z-index:2;width:100%;max-width:1560px;margin:0 auto;
+    padding:0 clamp(24px,4.5vw,56px);
+    display:grid;grid-template-columns:minmax(300px,33%) 1fr;
+    gap:clamp(40px,5vw,96px);align-items:center;}
+
+  /* the section arrives rather than simply being there — JS adds .is-live, so
+     with no JS the whole thing is visible from the start */
+  .tc-sec.is-live .tc-aside,.tc-sec.is-live .tc-map{
+    opacity:0;transform:translateY(46px);
+    transition:opacity .8s var(--ease),transform 1s var(--ease-expo);}
+  .tc-sec.is-live .tc-map{transition-delay:.12s;}
+  .tc-sec.is-live.revealed .tc-aside,.tc-sec.is-live.revealed .tc-map{opacity:1;transform:none;}
+
+  .tc-aside{position:relative;z-index:2;}
+  .tc-k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--ember);}
+  .tc-aside .tc-k{margin-bottom:clamp(18px,2.4vh,26px);}
+  .tc-h{font-family:var(--sans);font-weight:570;color:var(--ink);
+    font-size:clamp(32px,3.4vw,52px);line-height:1.14;letter-spacing:-0.024em;
+    text-wrap:balance;margin-bottom:clamp(18px,2.4vh,26px);}
+  .tc-h .serif{font-family:var(--serif);font-style:italic;font-weight:400;
+    font-size:1.08em;letter-spacing:-0.004em;}
+  .tc-sub{font-size:clamp(15px,1.15vw,17px);line-height:1.72;color:var(--ink-2);
+    max-width:34ch;text-wrap:pretty;}
+
+  /* ── the map ── node spacing is a fixed % of this box, so the hit zones and
+       the card size in cqw: they track the map, not the viewport, and stay
+       right in both the two-column and the stacked layout */
+  .tc-map{position:relative;z-index:2;height:clamp(560px,43vw,700px);container-type:inline-size;}
+
+  .tc-cap{display:flex;flex-direction:column;gap:6px;text-align:center;}
+  .tc-cap-sub{font-family:var(--serif);font-style:italic;font-size:clamp(14px,1.05vw,16.5px);
+    letter-spacing:.004em;color:var(--ink-3);}
+  .tc-cap-breadth{position:absolute;left:50%;top:0;transform:translateX(-50%);}
+
+  /* the two lines that draw the T — these carry the shape, so they read */
+  .tc-bar{position:absolute;left:0;right:0;top:25%;height:1.5px;
+    background:linear-gradient(90deg,transparent 0%,rgba(92,169,255,.62) 7%,rgba(92,169,255,.62) 93%,transparent 100%);
+    box-shadow:0 0 7px 0 rgba(92,169,255,.34);}
+  .tc-stem{position:absolute;left:50%;top:25%;bottom:8%;width:1.5px;margin-left:-.75px;
+    background:linear-gradient(180deg,rgba(92,169,255,.62) 0%,rgba(92,169,255,.62) 90%,rgba(92,169,255,.26) 100%);
+    box-shadow:0 0 7px 0 rgba(92,169,255,.34);}
+  .tc-stem::after{content:'';position:absolute;left:50%;bottom:0;width:5px;height:5px;
+    margin:0 0 -2.5px -2.5px;border-radius:50%;background:#DCEEFF;
+    box-shadow:0 0 12px 3px rgba(92,169,255,.55),0 0 34px 10px rgba(92,169,255,.22);}
+
+  .tc-node{position:absolute;z-index:3;background:none;border:0;padding:0;cursor:pointer;appearance:none;}
+  .tc-dot{position:absolute;left:0;top:0;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;
+    border-radius:50%;background:rgba(140,197,255,.85);box-shadow:0 0 6px 1px rgba(92,169,255,.3);
+    transition:background .4s,box-shadow .5s,transform .5s var(--ease);}
+  /* lit state keys off .is-on only — JS sets it on pointerenter, which fires for
+     mouse and touch alike, so a tapped node never gets stranded in :hover */
+  .tc-node.is-on .tc-dot{background:#EAF5FF;transform:scale(1.35);
+    box-shadow:0 0 0 3px rgba(92,169,255,.16),0 0 18px 4px rgba(92,169,255,.5),0 0 44px 12px rgba(92,169,255,.2);}
+  .tc-nm{display:block;font-weight:500;font-size:clamp(14px,1.06vw,16px);line-height:1.3;
+    letter-spacing:-0.008em;color:var(--ink-2);white-space:nowrap;transition:color .4s;}
+  .tc-node.is-on .tc-nm{color:var(--ink);}
+
+  /* the buttons are zero-size anchors, so each node carries its own invisible
+     hit area. Nodes sit 20cqw apart, so 9cqw of reach each side can never let
+     two neighbouring zones touch, at any map width. */
+  .tc-node::before{content:'';position:absolute;}
+  .tc-b{top:25%;transform:translateX(-50%);}
+  .tc-b .tc-nm{position:absolute;left:50%;bottom:27px;transform:translateX(-50%);text-align:center;}
+  .tc-b::before{left:calc(-1 * clamp(38px,9cqw,92px));right:calc(-1 * clamp(38px,9cqw,92px));
+    top:-82px;bottom:-16px;}
+  .tc-short{display:none;}      /* the bar carries long names; narrow tiers swap them */
+
+  /* positions live in CSS, not inline styles, so each tier can re-space them */
+  .tc-b.b1{left:10%;} .tc-b.b2{left:30%;} .tc-b.b3{left:50%;} .tc-b.b4{left:70%;} .tc-b.b5{left:90%;}
+  .tc-d.d1{top:38%;} .tc-d.d2{top:49.5%;} .tc-d.d3{top:61%;} .tc-d.d4{top:72.5%;} .tc-d.d5{top:84%;}
+
+  .tc-d{left:50%;}
+  .tc-d .tc-nm{position:absolute;left:24px;top:50%;transform:translateY(-50%);}
+  .tc-d::before{left:-16px;top:-24px;width:min(208px,30cqw);height:48px;}
+
+  .tc-cap-depth{position:absolute;left:76%;top:62%;transform:translateY(-50%);
+    padding-left:30px;text-align:left;}
+  .tc-cap-depth::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+    width:1px;height:128px;
+    background:linear-gradient(180deg,transparent,rgba(92,169,255,.5) 22%,rgba(92,169,255,.5) 78%,transparent);}
+
+  /* the stem lands in a pool */
+  .tc-pool{position:absolute;left:50%;bottom:8%;transform:translate(-50%,50%);
+    width:200px;height:56px;pointer-events:none;}
+  .tc-pool i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    border:1px solid rgba(92,169,255,.28);border-radius:50%;animation:tcRipple 5s ease-out infinite;}
+  .tc-pool i:nth-child(2){width:62px;height:17px;animation-delay:0s;}
+  .tc-pool i:nth-child(3){width:118px;height:33px;animation-delay:1.6s;}
+  .tc-pool i:nth-child(4){width:178px;height:50px;animation-delay:3.2s;}
+  .tc-pool b{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:120px;height:34px;border-radius:50%;filter:blur(7px);
+    background:radial-gradient(ellipse at center,rgba(92,169,255,.42) 0%,transparent 70%);}
+  @keyframes tcRipple{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.55);}
+    22%{opacity:.85;}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(1.25);}
+  }
+
+  /* the wire from the burning node to the card — JS re-routes it on every change */
+  .tc-wire{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible;}
+  .tc-wire path{fill:none;stroke:rgba(92,169,255,.6);stroke-width:1;
+    filter:drop-shadow(0 0 5px rgba(92,169,255,.5));}
+
+  /* the card — same frosted glass as the hero's stats band */
+  .tc-card{position:absolute;left:0;top:36%;z-index:3;overflow:hidden;
+    width:clamp(196px,40cqw,252px);min-height:clamp(268px,48%,320px);
+    padding:22px 22px 20px;border-radius:20px;border:1px solid var(--line);
+    background:rgba(13,18,27,.55);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    box-shadow:0 26px 60px -28px rgba(3,8,18,.8),inset 0 1px 0 rgba(255,255,255,.06);}
+  .tc-card-grain{position:absolute;right:-10px;bottom:-8px;width:150px;height:96px;opacity:.5;pointer-events:none;}
+  .tc-card-grain path{fill:none;stroke:rgba(140,197,255,.3);stroke-width:1;}
+  .tc-card-hd{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+  .tc-card-hd::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0;
+    background:var(--ember);box-shadow:0 0 10px 2px rgba(92,169,255,.45);}
+  .tc-card-nm{font-weight:550;font-size:15px;letter-spacing:-0.008em;color:var(--ember);line-height:1.3;}
+  .tc-card-tx{font-size:13.5px;line-height:1.8;color:var(--ink-2);}
+  .tc-card-tx em{font-style:normal;font-weight:600;color:var(--ember-2);}
+  .tc-card-rule{position:absolute;left:22px;bottom:22px;width:26px;height:1px;background:rgba(92,169,255,.45);}
+
+  .tc-fade{transition:opacity .24s,transform .5s var(--ease);}
+  .tc-card.is-swapping .tc-fade{opacity:0;transform:translateY(8px);}
+
+  /* the per-node inline line is a list-layout device. Hidden by default and in
+     every constellation layout — left visible it gives each zero-width node
+     button real width, which silently inflates the hit zones. */
+  .tc-inline{display:none;}
+
+  @media(prefers-reduced-motion:reduce){
+    .tc-pool i{animation:none;opacity:.5;}
+    .tc-dot,.tc-nm,.tc-fade{transition:none;}
+    .tc-card.is-swapping .tc-fade{transform:none;}
+    .tc-sec.is-live .tc-aside,.tc-sec.is-live .tc-map{opacity:1;transform:none;transition:none;}
+  }
+
+  /* ── below ~1400 the side-by-side squeezes the map under the width five
+        labels need, so the aside moves on top and the map takes the full
+        measure — capped, so the T never stretches into a flat wire ── */
+  @media(max-width:1400px){
+    .tc{grid-template-columns:1fr;gap:clamp(32px,4.5vw,52px);}
+    /* the aside now sits over a centred map, so it centres with it */
+    .tc-aside{max-width:42rem;margin-inline:auto;text-align:center;}
+    .tc-sub{margin-inline:auto;}
+    .tc-map{width:100%;max-width:940px;margin-inline:auto;height:clamp(560px,62vw,640px);}
+  }
+  @media(max-width:1023px){
+    .tc-map{height:clamp(540px,68vw,600px);}
+    .tc-cap-depth{left:auto;right:0;padding-left:24px;}
+    .tc-cap-depth::before{height:104px;}
+  }
+  /* under ~600 the longest depth labels reach the depth caption; the caption
+     gives up its rule and indent, and steps off the row of the longest label */
+  @media(max-width:600px){
+    .tc-cap-depth{padding-left:0;top:55%;}
+    .tc-cap-depth::before{display:none;}
+  }
+  /* tablet and large phone: type and gutter shrink, composition unchanged */
+  @media(max-width:767px){
+    .tc-sec{padding:clamp(56px,9vh,88px) 0 clamp(64px,10vh,104px);}
+    .tc{padding:0 20px;}
+    .tc-h{font-size:clamp(30px,8.4vw,42px);}
+    .tc-sub{font-size:14.5px;}
+    .tc-card{padding:18px 18px 16px;}
+    .tc-card-rule{left:18px;bottom:18px;}
+    .tc-cap-sub{font-size:14px;}
+  }
+  /* small phone: the left quadrant no longer fits the card, so the composition
+     finally changes. The T itself stays — it is the point of the section. */
+  @media(max-width:519px){
+    .tc-map{max-width:none;margin-inline:0;height:clamp(600px,168vw,760px);}
+    .tc-bar,.tc-b{top:15%;}
+    .tc-stem{top:15%;bottom:34%;}
+    .tc-d.d1{top:24%;} .tc-d.d2{top:32%;} .tc-d.d3{top:40%;}
+    .tc-d.d4{top:48%;} .tc-d.d5{top:56%;}
+    .tc-pool{bottom:34%;width:132px;height:38px;}
+    .tc-full{display:none;} .tc-short{display:inline;}
+    .tc-b .tc-nm{bottom:15px;font-size:clamp(9.5px,2.9vw,12px);letter-spacing:-0.014em;}
+    /* pure cqw: the 38px floor is wider than half the node gap at phone widths */
+    .tc-b::before{left:-9cqw;right:-9cqw;top:-46px;bottom:-14px;}
+    .tc-d .tc-nm{left:18px;font-size:14px;}
+    .tc-d::before{left:-14px;top:-24px;width:min(190px,44cqw);height:48px;}
+    .tc-cap{text-align:left;align-items:flex-start;}
+    .tc-cap-depth{left:0;right:auto;top:40%;padding-left:0;transform:translateY(-50%);}
+    .tc-cap-breadth{top:0;}
+    /* with the card directly under the T the wire has nothing left to explain,
+       and at this height it reads as a second stem */
+    .tc-wire{display:none;}
+    .tc-card{left:0;right:0;width:auto;top:auto;bottom:0;min-height:clamp(150px,26%,200px);}
+  }
+  /* too narrow or too short for any T: two lit lists. A landscape phone is
+     844px wide but only ~390 tall, so a width test alone would miss it. */
+  @media(max-width:359px),(max-height:620px){
+    .tc-map{height:auto;max-width:42rem;display:flex;flex-direction:column;gap:4px;}
+    .tc-bar,.tc-stem,.tc-wire,.tc-pool,.tc-card{display:none;}
+    .tc-cap{text-align:left;align-items:flex-start;}
+    .tc-cap-breadth,.tc-cap-depth{position:static;transform:none;padding:0;margin:22px 0 12px;top:auto;}
+    .tc-cap-breadth{margin-top:4px;order:1;} .tc-b{order:2;}
+    .tc-cap-depth{order:3;} .tc-d{order:4;}
+    /* .tc-map raises specificity to match the .b1/.d1 position classes —
+       without it they win and the rows staircase across the screen */
+    .tc-map .tc-node{position:relative;transform:none;display:block;width:100%;
+      left:auto;top:auto;padding:15px 0 15px 22px;text-align:left;}
+    .tc-node .tc-dot{position:absolute;left:0;top:21px;margin:0;}
+    .tc-node::before{display:none;}
+    .tc-full{display:inline;} .tc-short{display:none;}
+    .tc-nm,.tc-b .tc-nm,.tc-d .tc-nm{position:static;transform:none;text-align:left;
+      white-space:normal;font-size:15px;bottom:auto;left:auto;}
+    .tc-nm br{display:none;}
+    .tc-inline{display:grid;grid-template-rows:0fr;transition:grid-template-rows .42s var(--ease);}
+    .tc-node.is-on .tc-inline{grid-template-rows:1fr;}
+    .tc-inline>span{overflow:hidden;min-height:0;}
+    .tc-inline p{padding:9px 0 2px;font-size:13.5px;line-height:1.7;color:var(--ink-3);
+      max-width:60ch;text-wrap:pretty;}
+    .tc-inline em{font-style:normal;font-weight:600;color:var(--ember-2);}
+  }
+  /* coarse pointers get more reach along the stem. Only the hit zone grows —
+     padding on .tc-node would drag the dot off the line. */
+  @media(pointer:coarse){ .tc-d::before{height:54px;top:-27px;} }
+
   @media(max-width:760px){
     .nav-links a:not(:last-child){display:none;}
     .top-nav{padding:10px 20px;}
@@ -1023,17 +1260,26 @@ addEventListener('scroll', function () {
            innerWidth > 900;
   }
 
-  var travel = 0, pinTop = 0, active = false;
+  /* the pin runs two beats: the reel first rises into the frame from below
+     (theengine.dev's arrival), then it travels sideways. ENTER is how much
+     scroll the arrival gets before the sideways walk begins. */
+  var travel = 0, enterPx = 0, pinTop = 0, active = false;
+  var clamp01 = function (n) { return n < 0 ? 0 : n > 1 ? 1 : n; };
 
   /* stagger order: the label, then the frame, then each trailing card */
   [].concat([pin.querySelector('.work-head')], [].slice.call(track.children))
     .forEach(function (el, i) { if (el) el.style.setProperty('--i', i); });
 
+  /* scroll only ever writes a target; a rAF eases the drawn values toward it.
+     Writing the transform straight from scrollY is what made the sideways
+     walk feel stepped — wheel deltas arrive coarse and unevenly spaced. */
+  var curX = 0, tgtX = 0, curE = 0, tgtE = 0, raf = 0;
+
   function measure() {
     if (!fits()) {
       if (active) {
         pin.classList.remove('is-pinned', 'revealed');
-        pin.style.height = ''; track.style.transform = '';
+        pin.style.height = ''; track.style.transform = ''; track.style.opacity = '';
         active = false;
       }
       return;
@@ -1042,21 +1288,46 @@ addEventListener('scroll', function () {
     pin.style.height = '';                       /* natural height first */
     var padR = parseFloat(getComputedStyle(track).paddingRight) || 0;
     travel = Math.max(0, track.scrollWidth - innerWidth + padR);
-    pin.style.height = (innerHeight + travel) + 'px';
+    enterPx = Math.round(innerHeight * 0.75);    /* the arrival's share of scroll */
+    pin.style.height = (innerHeight + enterPx + travel) + 'px';
     pinTop = pin.offsetTop;
-    update();
+    read();
+    curX = tgtX; curE = tgtE;                    /* a resize must not animate */
+    draw();
   }
 
-  function update() {
+  function read() {
+    var d = scrollY - pinTop;
+    tgtE = clamp01(d / Math.max(1, enterPx));
+    tgtX = clamp01((d - enterPx) / Math.max(1, travel)) * travel;
+  }
+
+  function draw() {
+    var ease = 1 - Math.pow(1 - curE, 3);        /* out-cubic on the arrival */
+    var y = (1 - ease) * 58;                     /* rises in from 58vh below */
+    track.style.transform =
+      'translate3d(' + (-curX).toFixed(1) + 'px,' + y.toFixed(2) + 'vh,0)';
+    track.style.opacity = (0.06 + ease * 0.94).toFixed(3);
+    pin.classList.toggle('revealed', curE > 0.04);
+  }
+
+  function tick() {
+    var dx = tgtX - curX, de = tgtE - curE;
+    curX += dx * 0.11;                           /* ~11% of the gap per frame */
+    curE += de * 0.16;
+    if (Math.abs(dx) < 0.15) curX = tgtX;
+    if (Math.abs(de) < 0.0008) curE = tgtE;
+    draw();
+    raf = (curX !== tgtX || curE !== tgtE) ? requestAnimationFrame(tick) : 0;
+  }
+
+  function onScroll() {
     if (!active) return;
-    var p = (scrollY - pinTop) / Math.max(1, travel);
-    p = p < 0 ? 0 : p > 1 ? 1 : p;
-    track.style.transform = 'translate3d(' + (-p * travel).toFixed(1) + 'px,0,0)';
-    /* let it arrive a little before the section fully lands */
-    pin.classList.toggle('revealed', scrollY > pinTop - innerHeight * 0.55);
+    read();
+    if (!raf) raf = requestAnimationFrame(tick);
   }
 
-  addEventListener('scroll', update, { passive: true });
+  addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', measure);
   addEventListener('load', measure);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
