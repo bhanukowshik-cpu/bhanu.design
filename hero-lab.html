@@ -2626,22 +2626,26 @@ var topNav = document.getElementById('topNav');
      from the layout box, so it stays right at every breakpoint without a
      second set of numbers to keep in sync. */
   var LINK = 14;                                   /* the join between panels */
-  /* The strip does not climb the right column — it runs on a diagonal, from
-     the top right down to the bottom centre. DIAG is how far it drifts
-     sideways per step, as a fraction of a panel's width; the vertical step
-     stays the panel's own height plus the join, so the panels still touch
-     along the axis they travel on. */
-  var DIAG = 0.42;
-  var step = 0, stepX = 0;
+  /* ── THE WHEEL ──────────────────────────────────────────────────────────
+     The projects ride the rim of a circle whose centre sits off to the right
+     of the column. Scrolling turns it: the next project swings up into
+     frame, comes upright at the leftmost point of the circle — nearest the
+     copy, which is why that is where it is legible — and the one before it
+     swings away below.
+
+     The radius is derived from the angular step rather than picked, so that
+     neighbours stay exactly one panel-height plus the join apart vertically:
+     the same spacing the strip had, now measured around an arc. */
+  var STEP_A = 36 * Math.PI / 180;   // angle between projects on the rim
+  var RIM    = 0.45;                 // how much a panel turns with the rim
+  var step = 0, RAD = 0;
   function measure() {
-    var h = 0, w = 0;
+    var h = 0;
     for (var i = 0; i < medias.length; i++) {
-      if (medias[i] && medias[i].offsetHeight) {
-        h = medias[i].offsetHeight; w = medias[i].offsetWidth; break;
-      }
+      if (medias[i] && medias[i].offsetHeight) { h = medias[i].offsetHeight; break; }
     }
-    step  = Math.round((h || innerHeight * 0.42) + LINK);
-    stepX = Math.round((w || innerWidth * 0.42) * DIAG);
+    step = Math.round((h || innerHeight * 0.42) + LINK);
+    RAD  = step / Math.sin(STEP_A);
   }
   measure();
 
@@ -2688,16 +2692,24 @@ var topNav = document.getElementById('topNav');
         rz = (ROLL + 1.2 * h).toFixed(2);
     slides.forEach(function (s, n) {
       var m = medias[n]; if (!m) return;
-      var k = n - pos, a = Math.min(1, Math.abs(k));
-      /* the diagonal: what is coming waits up and to the right, what has
-         passed has slid down and toward the centre of the frame */
+      var k = n - pos, a = Math.abs(k);
+      /* where this project sits on the rim. At angle 0 it is at the circle's
+         leftmost point, which is its home in the column; positive angles are
+         above it and negative below, and both curve away to the right. */
+      var ang = k * STEP_A;
+      var wx  =  RAD * (1 - Math.cos(ang));
+      var wy  = -RAD * Math.sin(ang);
+      /* the falloff reaches zero rather than flooring, so the far side of the
+         wheel is genuinely gone instead of hanging around at half strength */
+      var fade = Math.max(0, 1 - 0.42 * a);
       m.style.transform =
-        'translate3d(' + (k * stepX).toFixed(2) + 'px,' + (-k * step).toFixed(2) + 'px,0)' +
+        'translate3d(' + wx.toFixed(2) + 'px,' + wy.toFixed(2) + 'px,0)' +
         ' perspective(1100px)' +
-        ' rotateY(' + ry + 'deg) rotateX(' + rx + 'deg) rotate(' + rz + 'deg)' +
+        ' rotateY(' + ry + 'deg) rotateX(' + rx + 'deg)' +
+        ' rotate(' + (parseFloat(rz) + ang * 180 / Math.PI * RIM).toFixed(2) + 'deg)' +
         ' skewY(' + sk.toFixed(2) + 'deg)' +
-        ' scale(' + (1 - 0.035 * a).toFixed(3) + ')';
-      m.style.opacity = (1 - 0.5 * a).toFixed(3);
+        ' scale(' + (1 - 0.05 * Math.min(a, 2)).toFixed(3) + ')';
+      m.style.opacity = fade.toFixed(3);
     });
   }
 
