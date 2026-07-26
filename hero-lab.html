@@ -293,7 +293,12 @@
   .sys-frame{flex:none;display:flex;align-items:stretch;
     gap:clamp(16px,1.8vw,28px);padding:clamp(16px,1.6vw,26px);
     border-radius:30px;border:1px solid var(--cream-line);
-    background:linear-gradient(180deg,rgba(36,99,220,.035),rgba(36,99,220,0) 42%),var(--cream-2);}
+    /* glass, not paint — the stage underneath has to read through it, or the
+       system frame becomes a slab that hides the thing it is sitting on */
+    background:linear-gradient(180deg,rgba(127,192,255,.06),rgba(127,192,255,0) 46%),
+      color-mix(in srgb,var(--cream-2) 62%,transparent);
+    backdrop-filter:blur(18px) saturate(120%);
+    -webkit-backdrop-filter:blur(18px) saturate(120%);}
   .sys-frame .slide{box-shadow:0 20px 44px -26px rgba(0,0,0,.66);}
 
   .sys-panel{flex:none;width:var(--panel-w);align-self:center;
@@ -775,7 +780,7 @@
       linear-gradient(105deg,rgba(6,11,21,.85) 0%,rgba(6,11,21,.22) 42%,transparent 64%);}
 
   .ft-inner{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;
-    padding:clamp(40px,6vh,72px) clamp(24px,4.5vw,56px) clamp(80px,11vh,128px);}
+    padding:clamp(40px,6vh,72px) clamp(20px,4.5vw,56px) clamp(80px,11vh,128px);}
   .ft-spread{flex:1;width:100%;max-width:1240px;margin:0 auto;display:flex;
     align-items:center;justify-content:space-between;gap:clamp(40px,5vw,72px);}
   .ft-left{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:28px;}
@@ -804,7 +809,7 @@
     transition:border-color .22s,box-shadow .22s;}
   .ft-mail:hover{border-color:rgba(92,169,255,.4);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset -6px -6px 18px -10px rgba(92,169,255,.8);}
-  .ft-mail a{font-size:clamp(17px,2vw,25px);font-weight:500;letter-spacing:-0.012em;
+  .ft-mail a{font-size:clamp(15px,2vw,25px);font-weight:500;letter-spacing:-0.012em;
     color:var(--ink);text-decoration:none;white-space:nowrap;}
   .ft-copy{position:relative;display:inline-flex;align-items:center;justify-content:center;
     width:28px;height:28px;background:none;border:0;padding:0;cursor:pointer;color:var(--ink-2);}
@@ -824,7 +829,11 @@
   /* ── the paper note — its own visual world on purpose ── */
   .ft-note{display:flex;flex-direction:column;align-items:center;max-width:560px;flex:0 1 auto;}
   .ft-note .ft-k{margin-bottom:14px;}
-  .ft-paper{--rl:clamp(36px,3.2vw,46px);position:relative;width:clamp(340px,38vw,520px);max-width:100%;
+  /* min() keeps the note inside a 320px screen without needing a width
+     override at the phone breakpoint — an override there made it jump from
+     352px to 725px across a single pixel of viewport */
+  .ft-paper{--rl:clamp(36px,3.2vw,46px);position:relative;
+    width:min(100%,clamp(340px,38vw,520px));max-width:100%;
     padding:calc(var(--rl) * .58) 40px calc(var(--rl) * .58) 64px;
     background-color:#E9E4D8;
     background-image:
@@ -890,18 +899,24 @@
     .ft-contact{align-items:center;}
   }
   @media(max-width:760px){
-    .ft-inner{padding:clamp(32px,5vh,56px) 20px clamp(64px,9vh,96px);}
-    .ft-line{font-size:clamp(29px,8.4vw,40px);}
-    .ft-line.serif{font-size:clamp(30px,8.8vw,42px);}
-    /* the mail row is the one thing that must not overflow a 320px screen */
-    .ft-mail{width:100%;max-width:100%;padding:14px 14px 14px 18px;gap:10px;}
-    .ft-mail a{font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;}
-    .ft-copy{width:24px;height:24px;flex-shrink:0;}
-    .ft-copy svg{width:16px;height:16px;}
-    .ft-contact{width:100%;}
-    .ft-paper{width:100%;--rl:32px;padding-left:52px;padding-right:24px;}
+    .ft-inner{padding-top:clamp(32px,5vh,56px);padding-bottom:clamp(64px,9vh,96px);}
+    /* the ceilings are set so each curve lands where the desktop one does at
+       761px — otherwise the heading grew as the screen shrank */
+    .ft-line{font-size:clamp(27px,8.4vw,34px);}
+    .ft-line.serif{font-size:clamp(28px,8.8vw,36px);}
+    .ft-mail{padding:14px 16px 14px 20px;gap:12px;}
+    .ft-paper{--rl:32px;padding-left:52px;padding-right:24px;}
     .ft-note{max-width:100%;width:100%;}
     #ftToast{bottom:84px;}
+  }
+  /* only the narrowest phones need the mail row to give up its intrinsic
+     width and let the address truncate inside itself */
+  @media(max-width:400px){
+    .ft-contact{width:100%;}
+    .ft-mail{width:100%;padding:14px 12px 14px 16px;gap:8px;}
+    .ft-mail a{min-width:0;overflow:hidden;text-overflow:ellipsis;}
+    .ft-copy{width:24px;height:24px;flex-shrink:0;}
+    .ft-copy svg{width:16px;height:16px;}
   }
 
   @media(max-width:760px){
@@ -996,7 +1011,7 @@
       <!-- the band's own light: starts as a small panel and expands to full
            bleed as the pin advances. JS drives --k / --ko / --kr. -->
       <div class="work-canvas" aria-hidden="true">
-        <img src="images/section2-stage.webp" alt="" width="2200" height="1228" decoding="async">
+        <img src="images/section2-stage.webp" alt="" width="2400" height="1339" decoding="async">
       </div>
 
       <header class="work-head"><span class="k">Selected work</span></header>
