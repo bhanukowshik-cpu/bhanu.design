@@ -294,6 +294,8 @@
   .work-pin.is-pinned .work-head .k{font-family:var(--sans);
     font-size:clamp(30px,4vw,60px);font-weight:570;letter-spacing:-0.026em;
     text-transform:none;color:var(--cream-ink);}
+  .work-head .k .serif{font-family:var(--serif);font-style:italic;
+    font-weight:400;font-size:1.08em;letter-spacing:-0.012em;}
 
   /* ── 01 — the whole EverTutor system, bound inside one frame ──────────── */
   /* the frame is what makes the three tools read as one product rather than
@@ -1028,7 +1030,7 @@
         <img src="images/section2-stage.webp" alt="" width="2400" height="1339" decoding="async">
       </div>
 
-      <header class="work-head"><span class="k">Featured work</span></header>
+      <header class="work-head"><span class="k">Featured <em class="serif">work</em></span></header>
 
       <div class="work-track" id="workTrack">
 
@@ -1739,8 +1741,9 @@ addEventListener('scroll', function () {
   tl.to(light,  { v: 1, ease: 'power2.out', duration: 0.34, onUpdate: drawLight }, 0.04);
   /* B  only once it has filled does it darken */
   tl.to(scrim,  { v: 1, ease: 'none',       duration: 0.12, onUpdate: drawScrim }, 0.34);
-  /* C  the title lifts away and the projects arrive onto the darkened stage */
-  if (head) tl.to(head, { autoAlpha: 0, y: -22, ease: 'power2.in', duration: 0.10 }, 0.44);
+  /* B2 the title slides out as the stage grows past it, gone by the time
+        the stage has filled the screen */
+  if (head) tl.to(head, { autoAlpha: 0, y: -70, ease: 'power2.in', duration: 0.18 }, 0.16);
   tl.to(track,  { y: '0vh', autoAlpha: 1, ease: 'power3.out', duration: 0.16 }, 0.46);
   /* D  then the reel walks sideways for the rest of the pin */
   tl.to(track,  { x: function () { return -travel(); }, ease: 'none', duration: 0.38 }, 0.62);
