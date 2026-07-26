@@ -489,33 +489,6 @@
   .work-head .k .serif{font-family:var(--serif);font-style:italic;
     font-weight:400;font-size:1.08em;letter-spacing:-0.012em;}
 
-  /* ── 01 — the whole EverTutor system, bound inside one frame ──────────── */
-  /* the frame is what makes the three tools read as one product rather than
-     three neighbours; Stressie, Dearly and The Engine sit outside it. */
-  .sys-frame{flex:none;display:flex;align-items:stretch;
-    gap:clamp(16px,1.8vw,28px);padding:clamp(16px,1.6vw,26px);
-    border-radius:30px;border:1px solid var(--cream-line);
-    /* glass, not paint — the stage underneath has to read through it, or the
-       system frame becomes a slab that hides the thing it is sitting on */
-    background:linear-gradient(180deg,rgba(127,192,255,.06),rgba(127,192,255,0) 46%),
-      color-mix(in srgb,var(--cream-2) 62%,transparent);
-    backdrop-filter:blur(18px) saturate(120%);
-    -webkit-backdrop-filter:blur(18px) saturate(120%);}
-  .sys-frame .slide{box-shadow:0 20px 44px -26px rgba(0,0,0,.66);}
-
-  .sys-panel{flex:none;width:var(--panel-w);align-self:center;
-    display:flex;flex-direction:column;padding-left:clamp(6px,1vw,16px);
-    padding-right:clamp(12px,2vw,28px);}
-  .sys-num{font-size:11.5px;font-weight:600;letter-spacing:.13em;color:var(--accent);}
-  .sys-panel h2{margin-top:14px;font-family:var(--sans);font-weight:570;color:var(--cream-ink);
-    font-size:clamp(28px,2.9vw,42px);line-height:1.12;letter-spacing:-0.024em;}
-  .sys-desc{margin-top:14px;font-size:14.5px;line-height:1.6;color:var(--cream-ink-2);max-width:32ch;}
-  .sys-desc em{font-style:normal;font-weight:600;color:var(--cream-ink);}
-  .sys-metrics{display:flex;flex-direction:column;gap:18px;margin-top:clamp(24px,3.5vh,40px);}
-  .sys-metric{display:flex;flex-direction:column;gap:3px;}
-  .sys-metric .v{font-size:clamp(22px,2vw,30px);font-weight:600;color:var(--cream-ink);
-    letter-spacing:-0.012em;font-variant-numeric:tabular-nums;line-height:1;}
-  .sys-metric .l{font-size:11.5px;font-weight:500;letter-spacing:.02em;color:var(--cream-ink-3);}
 
   /* ── project cards — one per row, full measure ────────────────────────── */
   .slide{display:flex;flex-direction:column;
@@ -556,12 +529,22 @@
   }
 
   /* ── the system's cover: the EverTutor orb, lit from behind ───────────── */
-  .sys-media{background:none;border:0;overflow:visible;}
+  /* ── 01 — the EverTutor system, bound inside one frame ─────────────────
+     The frame from the earlier version, brought back onto the system's own
+     screen: glass, not paint, so the stage still reads through it rather
+     than the frame becoming a slab that hides what it sits on. It is what
+     says "one product" before the three tools arrive. */
+  .sys-media{border-radius:30px;border:1px solid var(--cream-line);
+    background:linear-gradient(180deg,rgba(127,192,255,.06),rgba(127,192,255,0) 46%),
+      color-mix(in srgb,var(--cream-2) 62%,transparent);
+    backdrop-filter:blur(18px) saturate(120%);
+    -webkit-backdrop-filter:blur(18px) saturate(120%);
+    overflow:visible;}
   /* Taken out of flow on purpose: in flow, a 940px image inside an aspect-ratio
      box pushes the box taller than its ratio, and the panel stops matching the
      six others. Absolute keeps the frame's 16:9 and lets the orb fill it. */
   .sys-orb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    display:grid;place-items:center;height:96%;aspect-ratio:1;}
+    display:grid;place-items:center;height:80%;aspect-ratio:1;}
   .sys-orb img{position:relative;z-index:1;width:100%;height:100%;
     object-fit:contain;display:block;
     filter:drop-shadow(0 30px 60px rgba(0,0,0,.55));}
@@ -696,8 +679,8 @@
     /* The system's cover keeps the frame's proportions even though it holds an
        orb rather than a video — every panel in the strip is the same size, which
        is what lets one step of travel join all seven of them. */
-    .gal.gal-ready .sys-media{background:none;border:0;overflow:visible;
-      display:grid;place-items:center;}
+    /* the frame is the base rule now — it only needs centring here */
+    .gal.gal-ready .sys-media{display:grid;place-items:center;overflow:visible;}
 
     /* the section label sits out of the way, top left */
     .gal.gal-ready .work-head{position:absolute;left:var(--reel-pad);
@@ -730,13 +713,9 @@
     .gal-tick.is-on{height:30px;background:#fff;}
     @media (prefers-reduced-motion:reduce){ .gal-tick{transition:background .2s ease;} }
 
-    /* the gallery is light-on-dark whatever the project colour is */
-    .gal.gal-ready .slide-body h3,
-    .gal.gal-ready .sys-panel h2{color:#F4F7FA;}
-    .gal.gal-ready .slide-body p,
-    .gal.gal-ready .sys-desc{color:rgba(244,247,250,.74);}
-    .gal.gal-ready .sys-metric .v{color:#F4F7FA;}
-    .gal.gal-ready .sys-metric .l,
+    /* the gallery is light-on-dark, on one neutral ground */
+    .gal.gal-ready .slide-body h3{color:#F4F7FA;}
+    .gal.gal-ready .slide-body p{color:rgba(244,247,250,.74);}
     .gal.gal-ready .slide-num,
     .gal.gal-ready .slide-body .role{color:rgba(244,247,250,.58);}
     .gal.gal-ready .slide-metrics span{border-color:rgba(255,255,255,.2);
@@ -2626,26 +2605,17 @@ var topNav = document.getElementById('topNav');
      from the layout box, so it stays right at every breakpoint without a
      second set of numbers to keep in sync. */
   var LINK = 14;                                   /* the join between panels */
-  /* ── THE WHEEL ──────────────────────────────────────────────────────────
-     The projects ride the rim of a circle whose centre sits off to the right
-     of the column. Scrolling turns it: the next project swings up into
-     frame, comes upright at the leftmost point of the circle — nearest the
-     copy, which is why that is where it is legible — and the one before it
-     swings away below.
-
-     The radius is derived from the angular step rather than picked, so that
-     neighbours stay exactly one panel-height plus the join apart vertically:
-     the same spacing the strip had, now measured around an arc. */
-  var STEP_A = 36 * Math.PI / 180;   // angle between projects on the rim
-  var RIM    = 0.45;                 // how much a panel turns with the rim
-  var step = 0, RAD = 0;
+  /* The strip runs straight down the column — no arc, no sideways drift. One
+     step of travel is the panel's own height plus the join, so the panels
+     stay touching and the reel reads as one ribbon passing through the
+     frame. What is coming waits above; what has passed has gone below. */
+  var step = 0;
   function measure() {
     var h = 0;
     for (var i = 0; i < medias.length; i++) {
       if (medias[i] && medias[i].offsetHeight) { h = medias[i].offsetHeight; break; }
     }
     step = Math.round((h || innerHeight * 0.42) + LINK);
-    RAD  = step / Math.sin(STEP_A);
   }
   measure();
 
@@ -2693,22 +2663,14 @@ var topNav = document.getElementById('topNav');
     slides.forEach(function (s, n) {
       var m = medias[n]; if (!m) return;
       var k = n - pos, a = Math.abs(k);
-      /* where this project sits on the rim. At angle 0 it is at the circle's
-         leftmost point, which is its home in the column; positive angles are
-         above it and negative below, and both curve away to the right. */
-      var ang = k * STEP_A;
-      var wx  =  RAD * (1 - Math.cos(ang));
-      var wy  = -RAD * Math.sin(ang);
-      /* the falloff reaches zero rather than flooring, so the far side of the
-         wheel is genuinely gone instead of hanging around at half strength */
-      var fade = Math.max(0, 1 - 0.42 * a);
+      /* straight down: what is coming waits above the frame and travels down
+         through it as you scroll, and the one before it carries on below */
+      var fade = Math.max(0, 1 - 0.34 * a);
       m.style.transform =
-        'translate3d(' + wx.toFixed(2) + 'px,' + wy.toFixed(2) + 'px,0)' +
-        ' perspective(1100px)' +
-        ' rotateY(' + ry + 'deg) rotateX(' + rx + 'deg)' +
-        ' rotate(' + (parseFloat(rz) + ang * 180 / Math.PI * RIM).toFixed(2) + 'deg)' +
+        'translate3d(0,' + (-k * step).toFixed(2) + 'px,0) perspective(1100px)' +
+        ' rotateY(' + ry + 'deg) rotateX(' + rx + 'deg) rotate(' + rz + 'deg)' +
         ' skewY(' + sk.toFixed(2) + 'deg)' +
-        ' scale(' + (1 - 0.05 * Math.min(a, 2)).toFixed(3) + ')';
+        ' scale(' + (1 - 0.035 * Math.min(a, 2)).toFixed(3) + ')';
       m.style.opacity = fade.toFixed(3);
     });
   }
