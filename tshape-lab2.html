@@ -237,7 +237,9 @@
   /* ── The card ───────────────────────────────────────────── */
   .tc-card {
     position: absolute; left: 0; top: 36%; z-index: 3;
-    width: clamp(196px, 27cqw, 252px); min-height: clamp(268px, 48%, 320px);
+    /* 40cqw keeps the card filling its quadrant on narrow maps instead of
+       sitting at the floor width; the ceiling holds it steady on big screens */
+    width: clamp(196px, 40cqw, 252px); min-height: clamp(268px, 48%, 320px);
     padding: 24px 24px 22px;
     border-radius: 18px;
     border: 1px solid rgba(230,242,141,0.16);
@@ -287,7 +289,10 @@
         measure — capped, so the T never stretches into a flat wire. ── */
   @media (max-width: 1400px) {
     .tc { grid-template-columns: 1fr; gap: clamp(32px, 4.5vw, 52px); }
-    .tc-aside { max-width: 42rem; }
+    /* the aside now sits over a centred map, so it centres with it —
+       left-aligned copy above a centred diagram reads as a mistake */
+    .tc-aside { max-width: 42rem; margin-inline: auto; text-align: center; }
+    .tc-intro { margin-inline: auto; }
     .tc-map { width: 100%; max-width: 940px; margin-inline: auto; height: clamp(560px, 62vw, 640px); }
   }
 
@@ -298,12 +303,16 @@
     .tc-cap-depth::before { height: 104px; }
   }
 
-  /* ── Phone: still a T. ──────────────────────────────────────
-        The shape is the whole point of the section, so the phone
-        keeps the real constellation and gives up other things
-        instead: shorter labels on the bar, a shorter stem, the
-        depth caption moved into the empty left quadrant, and the
-        card parked full-width at the foot. ── */
+  /* Under ~600px the longest depth labels reach the depth caption. The caption
+     gives up its rule and its indent, and steps off the row of the longest
+     label, rather than the labels giving up their size. */
+  @media (max-width: 600px) {
+    .tc-cap-depth { padding-left: 0; top: 55%; }
+    .tc-cap-depth::before { display: none; }
+  }
+
+  /* ── Tablet and large phone: type and gutter shrink, but the
+        composition stays exactly as it is on a desktop. ── */
   @media (max-width: 767px) {
     :root { --fs-label: 10px; --fs-sm: 12px; --fs-body: 14px; --pad: 20px; }
     body {
@@ -317,7 +326,14 @@
     .tc-shaft { width: 60%; right: -10%; }
     .tc-heading { font-size: clamp(30px, 9vw, 44px); }
     .tc-intro   { font-size: var(--fs-body); }
+    .tc-card    { padding: 20px 20px 18px; }
+    .tc-card-rule { left: 20px; bottom: 20px; }
+  }
 
+  /* ── Small phone: the left quadrant is now too narrow to hold
+        the card, so the composition finally has to change. The T
+        itself still stays — it's the point of the section. ── */
+  @media (max-width: 519px) {
     .tc-map { max-width: none; margin-inline: 0; height: clamp(600px, 168vw, 760px); }
 
     /* the T sits high; the bottom third belongs to the card */
@@ -355,17 +371,8 @@
     /* card comes out of the quadrant and spans the foot */
     .tc-card {
       left: 0; right: 0; width: auto; top: auto; bottom: 0;
-      min-height: clamp(150px, 26%, 200px); padding: 20px 20px 18px;
+      min-height: clamp(150px, 26%, 200px);
     }
-    .tc-card-rule { left: 20px; bottom: 20px; }
-  }
-
-  /* Bigger phones have room for the full names — use them. */
-  @media (min-width: 520px) and (max-width: 767px) {
-    .tc-full  { display: inline; }
-    .tc-short { display: none; }
-    .tc-b .tc-nm { font-size: 12px; bottom: 17px; }
-    .tc-b::before { top: -62px; }
   }
 
   /* ── Too narrow or too short for any T: two lit lists. ──────
@@ -539,7 +546,7 @@
   var calm    = window.matchMedia('(prefers-reduced-motion: reduce)');
   /* on phones the card sits at the foot of a taller-than-screen map, so a tap
      can update copy the reader can't see */
-  var compact = window.matchMedia('(max-width: 767px)');
+  var compact = window.matchMedia('(max-width: 519px)');
 
   /* orthogonal waypoints -> path with softened corners */
   function routeThrough(pts, r) {
