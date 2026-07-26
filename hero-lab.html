@@ -829,7 +829,7 @@
       border-radius: 20px;
       backdrop-filter: blur(32px);
       -webkit-backdrop-filter: blur(32px);
-      padding: 28px 32px;
+      padding: 32px 40px;
       pointer-events: none;
       opacity: 0;
       transform: translateX(-50%) translateY(28px);
@@ -860,8 +860,8 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 28px;
-      margin-bottom: 12px;
+      gap: 44px;
+      margin-bottom: 18px;
     }
 .s2-bar-title-col {
       display: flex;
@@ -875,7 +875,7 @@
     }
 .s2-bar-title {
       font-family: var(--font-heading);
-      font-size: clamp(20px,1.8vw,28px);
+      font-size: clamp(24px,2.1vw,34px);
       font-weight: 700;
       color: var(--ink);
       margin: 0;
@@ -910,6 +910,7 @@
          sentence — it steps above them. */
       font-size: clamp(16px, 1.35vw, 19px);
       line-height: 1.7;
+      max-width: 58ch;   /* stop the lead hugging the tags column */
       color: rgba(239, 243, 248,0.62);
       margin: 0;
       opacity: 0;
@@ -961,13 +962,15 @@
 .s2-bar-in .s2-bar-tags { animation: s2FadeUp 0.35s 0.09s ease forwards; }
 .s2-bar-tag {
       font-family: var(--font-mono);
-      font-size: var(--fs-sm);
+      /* Explicit caption size — var(--fs-sm) is undefined, so these pills
+         inherited a full 16px and crowded the bar. Quiet metadata now. */
+      font-size: 12px;
       letter-spacing: 0.04em;
-      color: rgba(239, 243, 248,0.68);
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(239, 243, 248,0.60);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
       border-radius: 6px;
-      padding: 5px 11px;
+      padding: 4px 10px;
       white-space: nowrap;
     }
 .s2-bar-tag-shipped {
@@ -1002,18 +1005,20 @@
 .s2-bar-tags-col--merged .s2-bar-icon-tag:nth-child(2) { animation-delay: 0.24s; }
 .s2-bar-tags-col--merged .s2-bar-icon-tag:nth-child(3) { animation-delay: 0.30s; }
 .s2-bar-icon-tag-ic {
-      width: 28px;
-      height: 28px;
-      border-radius: 9px;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(145deg, rgba(230,242,141,0.18), rgba(230,242,141,0.04));
-      border: 1px solid rgba(230,242,141,0.22);
-      box-shadow: 0 2px 10px rgba(230,242,141,0.08);
+      color: var(--primary);   /* Lucide strokes inherit via currentColor */
+      background: linear-gradient(145deg, rgba(230,242,141,0.14), rgba(230,242,141,0.03));
+      border: 1px solid rgba(230,242,141,0.20);
+      box-shadow: none;
       transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
     }
+.s2-bar-icon-tag-ic svg { width: 13px; height: 13px; display: block; }
 .s2-bar-icon-tag:hover .s2-bar-icon-tag-ic {
       border-color: rgba(230,242,141,0.48);
       background: linear-gradient(145deg, rgba(230,242,141,0.26), rgba(230,242,141,0.06));
@@ -1024,7 +1029,7 @@
 .s2-bar-icon-tag-ic .s2-icon-dark  { display: block; }
 .s2-bar-icon-tag-lbl {
       font-family: var(--font-mono);
-      font-size: var(--fs-sm);
+      font-size: 13px;   /* explicit — var(--fs-sm) is undefined */
       letter-spacing: 0.02em;
       color: rgba(239, 243, 248,0.80);
       white-space: nowrap;
@@ -1048,12 +1053,13 @@
       opacity: 0;
     }
 .s2-bar-in .s2-bar-metrics { animation: s2FadeUp 0.38s 0.22s ease forwards; }
-.s2-bar-metric { display: flex; flex-direction: column; gap: 4px; }
+.s2-bar-metric { display: flex; flex-direction: column; gap: 6px; }
 .s2-bar-metric-val {
       font-family: var(--font-mono);
       font-size: clamp(22px,2.2vw,32px);
       font-weight: 700;
-      color: var(--ink);
+      /* the numbers are the proof — they carry the brand accent */
+      color: var(--primary);
       line-height: 1;
     }
 .s2-bar-metric-lbl {
@@ -1289,22 +1295,26 @@
     }
 .s2-intro.s2-intro-armed { visibility: visible; }
 .s2-intro-img-wrap {
+      /* Engine-style: a wide rounded panel anchored to the bottom edge,
+         only its top peeking; it RISES to full-bleed rather than scaling
+         from a centred thumbnail. */
       position: absolute;
-      left: 28vw; right: 28vw; top: 58vh; bottom: 6vh;
-      border-radius: 20px;
+      left: 12vw; right: 12vw; top: 86vh; bottom: 0;
+      border-radius: 28px 28px 0 0;
       overflow: hidden;
-      will-change: left, right, top, bottom;
+      will-change: left, right, top;
     }
 .s2-intro-img {
       width: 100%; height: 100%;
       object-fit: cover;
-      filter: blur(26px) brightness(0.75);
+      /* stays blurred at full-bleed — it's a backdrop, not a reveal */
+      filter: blur(24px) brightness(0.8);
       transform: scale(1.08);        /* keep blur's soft edges outside the crop */
       will-change: filter;
     }
 .s2-intro-title {
       position: absolute;
-      left: 50%; top: 64vh;
+      left: 50%; top: 38vh;
       transform: translate(-50%, 0);
       font-family: var(--font-heading);
       font-size: clamp(34px, 4vw, 56px);
@@ -1926,6 +1936,7 @@ html:not([data-theme="dark"]) .s2-bar-icon-tag-ic {
       background: linear-gradient(145deg, rgba(111,126,21,0.12), rgba(111,126,21,0.03));
       border-color: rgba(111,126,21,0.20);
       box-shadow: none;
+      color: #6F7E15;   /* Lucide strokes via currentColor */
     }
 html:not([data-theme="dark"]) .s2-bar-icon-tag-ic .s2-icon-light { display: block; }
 html:not([data-theme="dark"]) .s2-bar-icon-tag-ic .s2-icon-dark  { display: none; }
@@ -1933,7 +1944,7 @@ html:not([data-theme="dark"]) .s2-bar-icon-tag-lbl { color: rgba(37,37,37,0.72);
 html:not([data-theme="dark"]) .s2-bar-title-badge {
       color: rgba(37,37,37,0.55);
     }
-html:not([data-theme="dark"]) .s2-bar-metric-val { color: var(--secondary); }
+html:not([data-theme="dark"]) .s2-bar-metric-val { color: #6F7E15; }
 html:not([data-theme="dark"]) .s2-bar-metric-lbl { color: rgba(37,37,37,0.50); }
 html:not([data-theme="dark"]) .s2-side-nav-btn {
       background: rgba(37,37,37,0.07);
@@ -1958,7 +1969,7 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
       font-family: var(--font-display);
     }
 /* — Project bar title in the display face — */
-    .s2-bar-title { font-size: clamp(22px, 1.9vw, 30px); }
+    .s2-bar-title { font-size: clamp(24px, 2.1vw, 34px); }
 
   
 
@@ -1968,28 +1979,51 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
      Kept as overrides rather than edits so the port stays diffable against
      its source. */
 
-  /* the button is the page's button: white out of the top-left corner, azure
-     across the rest, a rounded rectangle, and no shadow in any state */
+  /* The bar's CTA steps out of the page-primary azure: sitting beside the
+     chat orb, two glossy blue objects read cheap. It's a quiet glass pill
+     in the bar's own language now — hairline ring, ink text, lime warmth
+     on hover. */
   .s2-bar-cta {
     height: auto;
-    padding: 14px 26px;
+    padding: 13px 24px;
     border-radius: var(--cta-r);
-    background: var(--cta-grad) !important;
-    color: #fff !important;
+    background: rgba(255,255,255,0.045) !important;
+    color: var(--ink) !important;
+    border: 1px solid rgba(239,243,248,0.16);
     font-family: var(--sans);
     font-size: 15px;
     font-weight: 600;
     letter-spacing: -0.004em;
     box-shadow: none !important;
-    transition: background .45s var(--ease), transform .4s var(--ease);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transition: background .35s var(--ease), border-color .35s var(--ease), transform .4s var(--ease);
   }
   .s2-bar-cta:hover {
-    background: var(--cta-grad-hover) !important;
+    background: rgba(230,242,141,0.10) !important;
+    border-color: rgba(230,242,141,0.45);
     filter: none;
     transform: translateY(-2px);
     box-shadow: none !important;
   }
   .s2-bar-cta:active { transform: translateY(0); }
+  /* Tertiary CTA — a text-level action for cards that point somewhere
+     lighter than a case study (e.g. Analytics → footer walkthrough). */
+  .s2-bar-cta--tertiary {
+    background: transparent !important;
+    border-color: transparent;
+    color: var(--ink-2) !important;
+    padding: 13px 10px;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .s2-bar-cta--tertiary:hover {
+    background: transparent !important;
+    border-color: transparent;
+    color: var(--ink) !important;
+  }
+  html:not([data-theme="dark"]) .s2-bar-cta--tertiary { color: rgba(37,37,37,0.62) !important; }
+  html:not([data-theme="dark"]) .s2-bar-cta--tertiary:hover { color: var(--secondary) !important; }
 
   /* the section heading sits on the display scale, one step under the hero */
   .s2-fw-header .fw-title {
@@ -5469,19 +5503,24 @@ addEventListener('load', function () {
     var b = easeOutC(clamp01((vh - INTRO_GROW) / INTRO_SLIDE));
     var reelP = clamp01((vh - INTRO_GROW - INTRO_SLIDE) / REEL);
 
+    /* Engine-style rise: the panel is bottom-anchored; its top edge climbs
+       from an 86vh peek to 0 while the sides open 12vw→0. The blur never
+       clears — full-bleed it reads as a soft backdrop, not a reveal. */
     if (introWrap) {
-      introWrap.style.left   = lerpN(28, 0, a) + 'vw';
-      introWrap.style.right  = lerpN(28, 0, a) + 'vw';
-      introWrap.style.top    = lerpN(58, 0, a) + 'vh';
-      introWrap.style.bottom = lerpN(6, 0, a) + 'vh';
-      introWrap.style.borderRadius = lerpN(20, 0, a) + 'px';
+      introWrap.style.left   = lerpN(12, 0, a) + 'vw';
+      introWrap.style.right  = lerpN(12, 0, a) + 'vw';
+      introWrap.style.top    = lerpN(86, 0, a) + 'vh';
+      var rad = lerpN(28, 0, a).toFixed(1);
+      introWrap.style.borderRadius = rad + 'px ' + rad + 'px 0 0';
     }
     if (introImg) {
       introImg.style.filter =
-        'blur(' + lerpN(26, 0, a).toFixed(1) + 'px) brightness(' + lerpN(0.75, 0.55, a).toFixed(3) + ')';
+        'blur(' + lerpN(24, 16, a).toFixed(1) + 'px) brightness(' + lerpN(0.8, 0.55, a).toFixed(3) + ')';
     }
+    /* The title starts mid-frame (like the Engine's "One system…") and is
+       chased off the top by the panel's rising edge. */
     if (introTitle) {
-      introTitle.style.transform = 'translate(-50%, ' + lerpN(0, -44, a).toFixed(2) + 'vh)';
+      introTitle.style.transform = 'translate(-50%, ' + lerpN(0, -70, a).toFixed(2) + 'vh)';
       introTitle.style.opacity = String(1 - Math.min(1, b * 2));
     }
     /* Once the content has fully slid in, the intro is spent — hide it so
@@ -5741,7 +5780,9 @@ addEventListener('load', function () {
           { icon: 'thunder', label: '0 to 1' }
         ],
         desc: 'Real-time student insights. The dog-ear system: complexity on demand, clean by default.',
-        href: '#'
+        href: '#contactSection',
+        ctaLabel: 'Connect for Walkthrough →',
+        ctaStyle: 'tertiary'
       },
       {
         tab: 'Stressie',
@@ -5776,7 +5817,8 @@ addEventListener('load', function () {
           { icon: 'mic',     label: 'Voice' }
         ],
         desc: 'Animated handwriting with your real voice and photos, sent as a unique link. Built in 48 hours.',
-        href: '#'
+        href: 'https://dearly-rho.vercel.app',
+        ctaLabel: 'Visit Dearly ↗'
       },
       {
         tab: 'The Engine',
@@ -5788,7 +5830,8 @@ addEventListener('load', function () {
         tags: ['Shipped', 'Marketing Site'],
         iconTags: [],
         desc: 'Designed the landing page for an AI growth platform that runs content, marketing and sales autonomously.',
-        href: 'https://www.theengine.dev/'
+        href: 'https://www.theengine.dev/',
+        ctaLabel: 'Visit The Engine ↗'
       }
     ];
     // Single source of truth for grid-view card content (spiral.js reads this
@@ -5815,6 +5858,18 @@ addEventListener('load', function () {
     var barDesc     = document.getElementById('s2BarDesc');
     var barMetrics  = document.getElementById('s2BarMetrics');
     var barCta      = document.getElementById('s2BarCta');
+    /* Hash hrefs (Analytics → #contactSection) ride Lenis out of the pin
+       instead of jumping — the pin-spacer keeps document flow, so a plain
+       anchor jump would land without smoothing. */
+    if (barCta) barCta.addEventListener('click', function (e) {
+      var h = barCta.getAttribute('href') || '';
+      if (h.charAt(0) !== '#' || h === '#') return;
+      var t = document.querySelector(h);
+      if (!t) return;
+      e.preventDefault();
+      if (window.__lenis && typeof window.__lenis.scrollTo === 'function') window.__lenis.scrollTo(t);
+      else t.scrollIntoView({ behavior: 'smooth' });
+    });
 
     if (!spiralRoot) return;
 
@@ -5923,11 +5978,22 @@ addEventListener('load', function () {
           if (card.iconTags && card.iconTags.length) {
             barIconTags.style.display = 'flex';
             card.iconTags.forEach(function (it) {
-              /* Icon glyphs retired — the little art squares fought the
-                 brand. The chips are quiet mono labels now. */
+              /* Lucide strokes (the shadcn set), inlined so nothing is
+                 fetched: user-round / zap / audio-lines. currentColor
+                 strokes pick up the chip square's themed color. */
+              var LUCIDE = {
+                profile: '<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',
+                thunder: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+                mic: '<path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/>'
+              };
               var row = document.createElement('div');
               row.className = 's2-bar-icon-tag';
               row.innerHTML =
+                '<span class="s2-bar-icon-tag-ic">' +
+                  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+                    (LUCIDE[it.icon] || '') +
+                  '</svg>' +
+                '</span>' +
                 '<span class="s2-bar-icon-tag-lbl">' + it.label + '</span>';
               barIconTags.appendChild(row);
             });
@@ -5954,6 +6020,14 @@ addEventListener('load', function () {
         if (barCta) {
           barCta.href = card.href;
           barCta.style.display = card.href === '#' ? 'none' : '';
+          barCta.textContent = card.ctaLabel || 'View Case Study →';
+          /* tertiary = text-level action (Analytics' footer walkthrough) */
+          barCta.classList.toggle('s2-bar-cta--tertiary', card.ctaStyle === 'tertiary');
+          if (/^https?:\/\//.test(card.href)) {
+            barCta.target = '_blank'; barCta.rel = 'noopener';
+          } else {
+            barCta.removeAttribute('target'); barCta.removeAttribute('rel');
+          }
         }
 
         /* Force reflow so animations restart, then slide bar in */
