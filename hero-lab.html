@@ -1451,7 +1451,9 @@
     .hero{height:auto;min-height:100svh;}
     .copy{height:auto;min-height:100svh;padding:12vh 24px 56px;}
     .eyebrow{gap:10px;padding:8px 14px;font-size:10.5px;letter-spacing:.07em;}
-    h1{font-size:clamp(34px,9.8vw,48px);}
+    /* five lines of headline plus the stats band plus the button is the whole
+       of a phone screen — the ceiling comes down so the fold can breathe */
+    h1{font-size:clamp(30px,8.6vw,42px);}
     /* stats stack: centered column, dividers rotate to horizontal hairlines */
     .facts{margin-top:32px;flex-direction:column;align-items:stretch;padding:4px 22px;}
     .fact{justify-content:center;text-align:center;padding:13px 0;}
@@ -3161,6 +3163,26 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
     layout();
   }
 
+  /* The cards are absolutely positioned, so none of them can push the deck
+     open — which means a fixed height is a promise that the longest quote at
+     the narrowest width will fit, and that promise breaks. Measure instead:
+     the deck is as tall as the card that needs the most room, plus the offset
+     the ones behind it are sitting at. */
+  function fitDeck() {
+    deck.style.height = '';                 /* back to the CSS floor first, so
+                                               this can shrink as well as grow */
+    var extra = 0;
+    cards.forEach(function (c) {
+      var body = c.querySelector('.tm-body');
+      if (!body) return;
+      var over = body.scrollHeight - body.clientHeight;   /* what does not fit */
+      if (over > extra) extra = over;
+    });
+    if (extra > 0) {
+      deck.style.height = Math.ceil(deck.getBoundingClientRect().height + extra + 2) + 'px';
+    }
+  }
+
   function setGroup(g) {
     all.forEach(function (c) { c.hidden = c.getAttribute('data-group') !== g; });
     cards = all.filter(function (c) { return !c.hidden; });
@@ -3169,8 +3191,20 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
       b.setAttribute('aria-selected', String(b.getAttribute('data-group') === g));
     });
     buildDots();
+    fitDeck();
     layout();
   }
+
+  var fitT;
+  addEventListener('resize', function () {
+    clearTimeout(fitT);
+    fitT = setTimeout(function () { fitDeck(); layout(); }, 140);
+  });
+  /* the illustrations settle the stacked height, so re-fit once they are in */
+  [].forEach.call(deck.querySelectorAll('.tm-art img'), function (im) {
+    if (im.complete) return;
+    im.addEventListener('load', function () { fitDeck(); layout(); });
+  });
 
   tabBtns.forEach(function (b) {
     b.addEventListener('click', function () { setGroup(b.getAttribute('data-group')); });
