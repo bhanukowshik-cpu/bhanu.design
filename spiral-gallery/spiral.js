@@ -714,8 +714,12 @@ void main() {
         var prevOffset = scrollOffset;
         scrollOffset  += (externalTarget - scrollOffset) * 0.12;
         clampScroll();
-        // the shader's bend reads velocity, so hand it the real frame delta
-        wheelDeltaY       = scrollOffset - prevOffset;
+        /* The shader bends the plane by this. On the wheel path it is a
+           smoothed value in the 0.001-0.01 range; a raw frame delta is an
+           order of magnitude bigger and folds the card in half. Clamp it to
+           the range the shader was tuned against. */
+        var dv = scrollOffset - prevOffset;
+        wheelDeltaY       = Math.max(-0.02, Math.min(0.02, dv));
         targetWheelDeltaY = 0;
       } else {
         wheelDeltaY       += (targetWheelDeltaY - wheelDeltaY) * 0.1;
@@ -850,6 +854,17 @@ void main() {
       }
     }, { threshold: 0.1 });
     spiralEntryObs.observe(el);
+
+    /* Diagnostics. This preview cannot reproduce the scroll path faithfully,
+       so expose the numbers for a real browser to report. */
+    window.__spiralState = function () {
+      return { scrollOffset: +scrollOffset.toFixed(3),
+               SCROLL_MIN: SCROLL_MIN, SCROLL_MAX: SCROLL_MAX,
+               externalTarget: externalTarget,
+               snapTarget: snapTarget, snapRawTarget: snapRawTarget,
+               totalCount: totalCount, centerIndex: centerIndex,
+               frontIdx: lastFrontCardIdx, wheelDeltaY: +wheelDeltaY.toFixed(4) };
+    };
 
     // ── Resize ────────────────────────────────────────────────────────────
     window.addEventListener('resize', function () {
