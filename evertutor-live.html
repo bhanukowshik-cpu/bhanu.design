@@ -4,6 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EverTutor Live — Bhanu Kowshik</title>
+
+  <!-- ── Social share meta (image source: og-image.html → images/og-image.jpg) ── -->
+  <meta name="description" content="EverTutor Live case study — designing a real-time AI tutoring experience. By Bhanu Kowshik, AI Native Product Designer." />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Bhanu Kowshik" />
+  <meta property="og:title" content="EverTutor Live — Bhanu Kowshik" />
+  <meta property="og:description" content="Case study: designing a real-time AI tutoring experience." />
+  <meta property="og:url" content="https://bhanukowshik.netlify.app/evertutor-live.html" />
+  <meta property="og:image" content="https://bhanukowshik.netlify.app/images/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="EverTutor Live — Bhanu Kowshik" />
+  <meta name="twitter:image" content="https://bhanukowshik.netlify.app/images/og-image.jpg" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&family=Shantell+Sans:wght@400;700&display=swap" rel="stylesheet" />
@@ -43,13 +58,20 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       background-color: var(--bg);
-      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
-      background-size: 19px 19px;
-      background-attachment: fixed;
       min-height: 100vh;
       font-family: var(--font-heading);
       overflow-x: hidden;
       cursor: none;
+    }
+
+    /* Film grain — the ground hero-lab uses. Replaces the page-wide dot mesh,
+       which stamped one pattern across every section instead of letting each
+       section carry its own texture. Sits above content but under the nav (10+)
+       and the custom cursor (13000). */
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
     /* ─── CUSTOM CURSOR ──────────────────────────────────────── */
@@ -103,19 +125,98 @@
     .nav-btn:hover:not(.active) { background: #F2F2F2; }
     .nav-btn.active { background: var(--secondary); color: var(--white); }
 
-    /* ─── PAGE / CARD ────────────────────────────────────────── */
-    .page { display: flex; justify-content: center; padding: 94px 10% 90px; }
+    /* ─── PAGE / CONTENT COLUMN ──────────────────────────────── */
+    /* frame retired — the column follows hero-lab's 1400px width system */
+    .page { display: flex; justify-content: center; padding: 74px 0 0; }
     .card {
-      background: var(--white); width: 100%; max-width: 1920px;
-      border-radius: 30px; box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      background: none; width: 100%; max-width: 1400px;
       overflow: clip; display: flex; flex-direction: column;
     }
 
     /* ─── HERO SECTION ───────────────────────────────────────── */
-    .cs-hero { display: flex; flex-direction: column; gap: 24px; padding: 36px 40px 0; }
+    /* Two-column hero — copy left, product right. The scale facts the headline
+       used to carry as prose now sit in a divided strip under the body line,
+       where they read as proof instead of grammar. */
+    .cs-hero {
+      display: block;
+      /* one fluid rule instead of per-breakpoint values — the hero is a panel
+         now, so it needs real inset on every side at every width */
+      padding: clamp(34px, 4.2vw, 64px) clamp(28px, 3.6vw, 52px) clamp(34px, 4.2vw, 60px);
+      /* every other section is a .cs-section-wrap inset 40px a side; the hero
+         is its own panel, so it needs that inset as margin to line up with them */
+      margin: 0 40px;
+      position: relative; isolation: isolate;
+      border-radius: 16px; overflow: hidden;
+    }
+    /* the panorama fills the hero and keeps its own proportions */
+    /* the bloom sits low in the generated plate — anchoring near the bottom
+       keeps it in frame when the hero crops vertically on narrower viewports */
+    /* the generated plate is dark-mode art (its brightest point is luminance
+       ~0.05) — over cream it can only wash out to grey, so light mode hides it
+       and tints the panel instead */
+    .cs-hero > .et-bg-img { z-index: 0; object-position: 50% 86%; display: none; }
+    [data-theme="dark"] .cs-hero > .et-bg-img { display: block; }
+    /* copy sits over the image's darkest side; without this the light-mode ink
+       would land on the dark green and disappear */
+    .hero-scrim {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(100deg, #FFFCF8 0%, #FCFCF0 58%, #F3F7D8 100%);
+    }
+    .hero-grid {
+      position: relative; z-index: 2;
+      display: grid;
+      /* even split — the copy needs the width to keep the headline to two
+         lines; weighting it toward the visual orphans the last word */
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(28px, 4vw, 60px);
+      align-items: center;
+    }
+    /* the column is the container the headline sizes against, so its wrap
+       stays put no matter how the panel's width changes */
+    .hero-copy {
+      display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+      container-type: inline-size;
+    }
+
+    .cs-hero .cs-heading {
+      /* cqi, not vw — sized off the column so it holds two lines at any width */
+      font-size: clamp(28px, 8.6cqi, 46px); line-height: 1.14;
+      letter-spacing: -0.028em; max-width: 15ch;
+    }
+    .cs-hero #heroSubtext { max-width: 42ch; margin-top: 20px; }
+
+    .hero-pills {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      width: 100%; margin-top: 34px; padding-top: 22px;
+      border-top: 1px solid rgba(37,37,37,0.12);
+    }
+
+    /* the product sits on a slight 3D tilt, as in the reference */
+    .hero-visual { perspective: 1500px; }
+    .hero-tilt { transform: rotateY(-8deg) rotateX(2deg); transform-style: preserve-3d; }
+    /* the frame now only carries the product — the green ground is the
+       section backdrop, so this is just the screen and its shadow */
+    .hero-visual .et-live-frame {
+      height: auto; width: 100%; display: block;
+      border-radius: 12px;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+    }
+    .hero-visual .et-screen-img {
+      width: 100%; border-radius: 12px; display: block; box-shadow: none;
+    }
+
+    /* stack only once the columns genuinely get cramped — at 1023px the split
+       still holds comfortably, and collapsing there loses the side-by-side on
+       ordinary laptop widths */
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+      .hero-visual { perspective: none; }
+      .hero-tilt { transform: none; }
+      .hero-visual .et-live-frame { aspect-ratio: 16 / 10; box-shadow: none; }
+    }
 
     /* Designation pills */
-    .designation-row { display: flex; align-items: center; gap: 10px; opacity: 0; }
+    .designation-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; opacity: 0; }
     .designation-row.visible { animation: fade-in 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
     #heroSubtext { opacity: 0; transform: translateY(20px); margin-top: -8px; }
     #heroSubtext.visible { animation: section-rise 0.45s cubic-bezier(0.16,1,0.3,1) both; }
@@ -132,7 +233,7 @@
     @keyframes pulse-subtle { 0% { transform: scale(1); opacity: 0.45; } 100% { transform: scale(1.9); opacity: 0; } }
 
     /* Main heading */
-    .cs-heading { font-family: var(--font-heading); font-weight: 700; font-size: 30px; line-height: 1.5; letter-spacing: -0.8px; color: var(--secondary); }
+    .cs-heading { font-family: var(--font-heading); font-weight: 600; font-size: 30px; line-height: 1.5; letter-spacing: -0.8px; color: var(--secondary); }
     .cs-heading .word { display: inline-block; opacity: 0; transform: translateY(22px); will-change: opacity, transform; }
     .cs-heading .word.visible { animation: word-rise 0.28s cubic-bezier(0.22,0.61,0.36,1) both; }
 
@@ -142,7 +243,7 @@
 
     /* ─── HERO FRAME — uses actual background + screen images ── */
     .et-live-frame {
-      width: 100%; height: 520px;
+      width: 100%; height: 500px;
       position: relative; overflow: hidden; border-radius: 10px;
       display: flex; justify-content: center; align-items: flex-end;
       opacity: 0; transform: translateY(40px);
@@ -155,7 +256,7 @@
     }
     .et-screen-img {
       position: relative; z-index: 1;
-      width: 68%;
+      width: 78%;
       height: auto; display: block;
       border-radius: 10px 10px 0 0;
       box-shadow: 0 -14px 60px rgba(0,0,0,0.45);
@@ -197,10 +298,10 @@
     .prob-dot { width: 10px; height: 10px; background: var(--secondary); flex-shrink: 0; margin-top: 9px; }
     .prob-bullet-content { flex: 1; display: flex; flex-direction: column; gap: 10px; }
     .prob-title { font-family: var(--font-heading); font-weight: 700; font-size: 18px; line-height: 27px; color: var(--secondary); }
-    .prob-body { font-family: var(--font-mono); font-weight: 500; font-size: 14px; line-height: 25px; color: #515151; }
+    .prob-body { font-family: var(--font-mono); font-weight: 500; font-size: 16px; line-height: 27px; color: #515151; }
 
     .insight-box { background: #F9F9F9; border-radius: 10px; padding: 20px; }
-    .insight-box p { font-family: var(--font-mono); font-weight: 500; font-style: italic; font-size: 14px; line-height: 25px; color: #515151; }
+    .insight-box p { font-family: var(--font-mono); font-weight: 500; font-style: italic; font-size: 16px; line-height: 27px; color: #515151; }
 
     /* Bottom — "What if" */
     .problem-bottom { display: flex; flex-direction: column; gap: 15px; }
@@ -210,11 +311,12 @@
     .what-if-title { font-family: var(--font-mono); font-weight: 700; font-size: 14px; line-height: 25px; color: var(--secondary); }
     .et-hl {
       background: linear-gradient(#E6F28D, #E6F28D) no-repeat left center / 0% 100%;
-      transition: background-size 0.55s cubic-bezier(0.22,0.61,0.36,1);
+      transition: background-size 0.55s cubic-bezier(0.22,0.61,0.36,1),
+                  color 0.3s ease 0.15s;
       border-radius: 3px; padding: 1px 3px;
     }
     .et-hl.revealed { background-size: 100% 100%; }
-    .what-if-body { font-family: var(--font-mono); font-weight: 500; font-size: 14px; line-height: 25px; color: #515151; }
+    .what-if-body { font-family: var(--font-mono); font-weight: 500; font-size: 16px; line-height: 27px; color: #515151; }
 
     /* ─── CHALLENGES CARD ──────────────────────────────────── */
     .challenges-card {
@@ -234,7 +336,7 @@
     .chal-item-content .chal-body { margin-top: 15px; }
     .chal-title { font-family: var(--font-heading); font-weight: 600; font-size: 20px; line-height: 28px; color: var(--secondary); }
     .chal-statement { font-family: var(--font-mono); font-weight: 500; font-size: 18px; line-height: 28px; color: var(--secondary); }
-    .chal-body { font-family: var(--font-mono); font-weight: 400; font-size: 15px; line-height: 25px; color: #515151; }
+    .chal-body { font-family: var(--font-mono); font-weight: 400; font-size: 16px; line-height: 27px; color: #515151; }
     .chal-next { font-family: var(--font-mono); font-size: 12px; line-height: 20px; }
     .chal-next strong { font-weight: 700; color: #252525; }
     .chal-next span { font-weight: 400; color: #515151; }
@@ -381,7 +483,7 @@
       animation: hintFloat 2.2s ease-in-out infinite;
     }
     #phaseScrollHint .hint-label {
-      font-family: var(--font-mono); font-size: 11px; color: #888;
+      font-family: var(--font-mono); font-size: 11px; color: #666;
       letter-spacing: 0.06em; text-transform: uppercase;
     }
     .hint-chip svg { animation: hintBounce 1s ease-in-out infinite; flex-shrink: 0; }
@@ -401,7 +503,7 @@
     .nudge-btn {
       background: none; border: none; padding: 0; cursor: pointer;
       display: inline-flex; align-items: center; gap: 7px;
-      font-family: var(--font-mono); font-size: 12px; color: #888;
+      font-family: var(--font-mono); font-size: 12px; color: #666;
       transition: color 0.2s, gap 0.2s;
       letter-spacing: 0.02em;
     }
@@ -446,7 +548,7 @@
     [data-phase="4"] .sys-card { flex: 0 0 calc((100% - 20px) / 2); }
     .sys-card-body { display: flex; flex-direction: column; gap: 8px; }
     .sys-card-title { font-family: var(--font-mono); font-weight: 700; font-size: 15px; line-height: 23px; color: var(--secondary); }
-    .sys-card-desc { font-family: var(--font-mono); font-weight: 400; font-size: 15px; line-height: 24px; color: #515151; }
+    .sys-card-desc { font-family: var(--font-mono); font-weight: 400; font-size: 16px; line-height: 26px; color: #515151; }
     /* Carousel controls */
     .sys-carousel-footer { display: flex; flex-direction: column; gap: 20px; }
     .sys-carousel-controls { display: flex; justify-content: flex-end; }
@@ -511,7 +613,7 @@
     .impact-stat-headline { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
     .impact-stat-hl    { font-family: var(--font-heading); font-weight: 600; font-size: 20px; line-height: 27px; color: var(--secondary); }
     .impact-stat-hl.hi { background: #E6F28D; }
-    .impact-stat-desc  { font-family: var(--font-mono); font-weight: 400; font-size: 15px; line-height: 25px; color: #515151; }
+    .impact-stat-desc  { font-family: var(--font-mono); font-weight: 400; font-size: 16px; line-height: 27px; color: #515151; }
 
     /* ─── GROWTH SECTION ────────────────────────────────── */
     .growth-card { gap: 20px; }
@@ -537,7 +639,7 @@
     .team-item-dot { width: 10px; height: 10px; background: var(--secondary); flex-shrink: 0; margin-top: 10px; }
     .team-item-content { flex: 1; display: flex; flex-direction: column; gap: 10px; }
     .team-role-hl   { display: inline-block; align-self: flex-start; background: #E6F28D; font-family: var(--font-heading); font-weight: 600; font-size: 20px; line-height: 27px; color: var(--secondary); }
-    .team-role-body { font-family: var(--font-mono); font-weight: 500; font-size: 15px; line-height: 25px; color: var(--secondary); }
+    .team-role-body { font-family: var(--font-mono); font-weight: 500; font-size: 16px; line-height: 27px; color: var(--secondary); }
     .team-role-body .dim { color: #515151; font-weight: 500; }
 
     /* ─── THANK YOU FOOTER ───────────────────────────────── */
@@ -548,7 +650,7 @@
       width: 100%; background: #E6F28D;
       display: flex; align-items: center; justify-content: center; gap: 6px;
       padding: 14px 0;
-      border-radius: 0 0 20px 20px;
+      border-radius: 0;
     }
     .thankyou-footer .ty-text {
       font-family: var(--font-mono); font-weight: 500; font-size: 15px;
@@ -617,7 +719,7 @@
       .nav-hamburger  { display: flex; }
       .nav                { padding: 8px 24px; }
       .page               { padding: 74px 10% 70px; }
-      .cs-hero            { padding: 28px 28px 0; gap: 20px; }
+      /* .cs-hero padding is fluid now — see the clamp() on the base rule */
       .cs-heading         { font-size: 26px; }
       .et-live-frame      { height: 300px; }
       .et-screen-img      { width: 72%; }
@@ -638,9 +740,10 @@
       .page               { padding: 60px 5% 56px; }
       .card               { border-radius: 16px; }
       .cs-section-wrap    { padding-left: 18px; padding-right: 18px; }
+      .cs-hero            { margin: 0 18px; }   /* stay level with the cards */
 
       /* Hero */
-      .cs-hero            { padding: 22px 18px 0; gap: 14px; }
+      /* .cs-hero padding is fluid now — see the clamp() on the base rule */
       .designation-row    { flex-wrap: wrap; gap: 8px; }
       .cs-heading         { font-size: 22px; }
       .et-live-frame      { height: 220px; padding-top: 8px; }
@@ -762,7 +865,18 @@
       border: 1px solid rgba(37,37,37,0.1);
       display: flex; flex-direction: column;
       text-decoration: none; color: inherit;
-      cursor: default;
+      /* the whole card is the affordance — no button inside it */
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(0.16,1,0.3,1),
+                  border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .op-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(37,37,37,0.22);
+      box-shadow: 0 12px 32px rgba(37,37,37,0.10);
+    }
+    .op-card:focus-visible {
+      outline: 2px solid #252525; outline-offset: 3px;
     }
     .op-card-img {
       width: 100%; height: 190px; overflow: hidden;
@@ -829,14 +943,17 @@
       padding: 20px 22px 22px;
       display: flex; flex-direction: column; gap: 10px; flex: 1;
     }
+    /* Eyebrow, not chips — the category sits quietly above the title */
     .op-card-tags {
-      display: flex; flex-wrap: wrap; gap: 6px;
+      display: flex; flex-wrap: wrap; gap: 0; align-items: baseline;
     }
     .op-card-tag {
-      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em;
-      text-transform: uppercase; color: #666;
-      background: #F0EDE8; border-radius: 100px;
-      padding: 4px 10px;
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.09em;
+      text-transform: uppercase; color: #8A8A8A;
+      background: none; border-radius: 0; padding: 0;
+    }
+    .op-card-tag + .op-card-tag::before {
+      content: '·'; margin: 0 7px; color: #C4C4C4;
     }
     .op-card-title {
       font-family: var(--font-heading); font-size: 20px; font-weight: 700;
@@ -846,20 +963,20 @@
       font-family: var(--font-mono); font-size: 15px; color: #515151;
       line-height: 1.6; flex: 1;
     }
+    /* Not a button — a quiet text cue. The card carries the click, so a filled
+       CTA here would compete with the page's real one and repeat the affordance. */
     .op-card-cta {
-      display: flex; align-items: center; justify-content: center; gap: 7px;
-      /* the site's one button: white out of the top-left corner, azure across
-         the rest, a rounded rectangle, and no shadow */
-      background: var(--cta-grad); color: #fff; border: 0; box-shadow: none;
-      font-family: var(--font-heading); font-size: 12px; font-weight: 600;
-      letter-spacing: -0.002em; padding: 12px 18px; border-radius: 12px;
-      margin-top: 4px;
-      cursor: pointer;
-      transition: transform 0.18s ease;
+      display: inline-flex; align-items: center; gap: 6px;
+      align-self: flex-start;
+      background: none; color: #252525; border: 0; box-shadow: none;
+      font-family: var(--font-heading); font-size: 13px; font-weight: 600;
+      letter-spacing: -0.002em; padding: 0; border-radius: 0;
+      margin-top: 6px;
     }
-    .op-card-cta:hover { background: var(--cta-grad-hover);
-      transform: translateY(-3px);
+    .op-card-cta svg {
+      transition: transform 0.22s cubic-bezier(0.16,1,0.3,1);
     }
+    .op-card:hover .op-card-cta svg { transform: translate(3px, -3px); }
     @media (max-width: 900px) {
       .other-projects { padding: 48px 24px 64px; }
       .other-projects-grid { grid-template-columns: 1fr; }
@@ -871,12 +988,9 @@
       --secondary:  #EFF3F8;
       --bg:         #0A0E15;
       --white:      #0E141D;
-      --grey:       #7C8794;
+      --grey:       #A9B4C2;
       --border:     #222C3D;
       --green:      #2ABD86;
-    }
-    [data-theme="dark"] body {
-      background-image: radial-gradient(circle, rgba(255,255,255,0.15) 0.8px, transparent 0.8px);
     }
     [data-theme="dark"] .nav-home img { filter: invert(1); }
     [data-theme="dark"] .nav {
@@ -904,7 +1018,8 @@
     [data-theme="dark"] .impact-stat-desc,
     [data-theme="dark"] .team-role-body .dim,
     [data-theme="dark"] .other-projects-label,
-    [data-theme="dark"] .op-card-desc { color: #7C8794; }
+    /* muted ink must clear AA on both the page ground and the lighter #222222 cards */
+    [data-theme="dark"] .op-card-desc { color: #A9B4C2; }
     [data-theme="dark"] .what-if-card { background: #222222; border-color: #222C3D; }
     [data-theme="dark"] .phase-item { background: #131A25; border-color: #222C3D; }
     [data-theme="dark"] .phase-item.active { background: #EFF3F8; border-color: transparent; }
@@ -912,24 +1027,27 @@
     [data-theme="dark"] .phase-item.active .phase-tag { background: rgba(19,26,37,0.12); color: rgba(19,26,37,0.55); }
     [data-theme="dark"] .phase-item.active .phase-expand-title { color: #131A25; }
     [data-theme="dark"] .phase-item.active .phase-expand-desc { color: rgba(19,26,37,0.55); }
-    [data-theme="dark"] .phase-plus-circle { border-color: rgba(240,237,232,0.25); color: #7C8794; }
-    [data-theme="dark"] .phase-num { color: #7C8794; }
-    [data-theme="dark"] .phase-tag { background: rgba(240,237,232,0.08); color: #7C8794; }
+    [data-theme="dark"] .phase-plus-circle { border-color: rgba(240,237,232,0.25); color: #A9B4C2; }
+    [data-theme="dark"] .phase-num { color: #A9B4C2; }
+    [data-theme="dark"] .phase-tag { background: rgba(240,237,232,0.08); color: #A9B4C2; }
     [data-theme="dark"] .sys-card { background: #222222; }
     [data-theme="dark"] .sys-card-img { background: #182130; border-color: rgba(240,237,232,0.04); }
     [data-theme="dark"] .sys-nav { background: #222222; box-shadow: inset 0 0 5px rgba(240,237,232,0.08); border-color: rgba(240,237,232,0.05); }
     [data-theme="dark"] .sys-progress { background: #222C3D; }
     [data-theme="dark"] .sys-progress-fill { background: #555; }
     [data-theme="dark"] .chal-next strong { color: #EFF3F8; }
-    [data-theme="dark"] .nudge-btn { color: #888; }
+    [data-theme="dark"] .nudge-btn { color: #A9B4C2; }
     [data-theme="dark"] .nudge-btn:hover { color: #EFF3F8; }
-    [data-theme="dark"] .nudge-thanks { color: #999; }
+    [data-theme="dark"] .nudge-thanks { color: #A9B4C2; }
     [data-theme="dark"] .bloom-curve { stroke: rgba(240,237,232,0.7); }
     [data-theme="dark"] #phaseScrollHint,
     [data-theme="dark"] #phaseNudge { border-top-color: rgba(240,237,232,0.08); }
     [data-theme="dark"] .hint-chip { background: rgba(240,237,232,0.04); border-color: rgba(240,237,232,0.10); }
-    [data-theme="dark"] .hint-label { color: #888; }
+    [data-theme="dark"] .hint-label,
+    [data-theme="dark"] #phaseScrollHint .hint-label { color: #A9B4C2; }
     [data-theme="dark"] .out-divider { background: rgba(240,237,232,0.08); }
+    /* lime band keeps its light ground in dark mode — ink must stay dark */
+    [data-theme="dark"] .thankyou-footer .ty-text { color: #131A25; }
     [data-theme="dark"] .card-cta { border-color: rgba(240,237,232,0.2); }
     [data-theme="dark"] .card-cta:hover { background: rgba(240,237,232,0.05); border-color: rgba(240,237,232,0.4); }
     [data-theme="dark"] .prob-dot { background: #EFF3F8; }
@@ -938,9 +1056,33 @@
     [data-theme="dark"] .other-projects { border-top-color: rgba(240,237,232,0.08); }
     [data-theme="dark"] .op-card { background: #1E1E1E; border-color: rgba(240,237,232,0.1); }
     [data-theme="dark"] .op-card-img { background: #182130; }
-    [data-theme="dark"] .op-card-tag { background: #182130; color: #888; }
+    [data-theme="dark"] .op-card-tag { background: none; color: #A9B4C2; }
+    [data-theme="dark"] .op-card-tag + .op-card-tag::before { color: #4A5563; }
     [data-theme="dark"] .op-card-title { color: #EFF3F8; }
-    [data-theme="dark"] .impact-stat-hl.hi { background: #789F04; }
+    [data-theme="dark"] .op-card-cta { color: #EFF3F8; }
+    [data-theme="dark"] .op-card:hover {
+      border-color: rgba(240,237,232,0.28);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+    }
+    [data-theme="dark"] .op-card:focus-visible { outline-color: #EFF3F8; }
+    /* hero strip hairlines — the light-mode ink disappears on the dark ground */
+    [data-theme="dark"] .hero-pills { border-color: rgba(240,237,232,0.14); }
+    /* the generated backdrop is already dark where the copy sits, so this only
+       needs to steady the left edge — not blanket the image */
+    [data-theme="dark"] .hero-scrim {
+      background: linear-gradient(100deg,
+        rgba(10,14,21,0.86) 0%, rgba(10,14,21,0.62) 30%,
+        rgba(10,14,21,0.18) 55%, rgba(10,14,21,0) 74%);
+    }
+    /* Olive reads as its own accent for the stats row, but it needs dark text —
+       inheriting --secondary left it near-white at 2.79:1 */
+    [data-theme="dark"] .impact-stat-hl.hi { background: #789F04; color: #131A25; }
+    /* Lime highlights keep dark text in dark mode — they inherit --secondary
+       otherwise, which goes near-white and leaves 1.08:1 against the lime.
+       .et-hl only flips once the lime has wiped in, so the pre-reveal text
+       stays light against the dark card instead of going dark-on-dark. */
+    [data-theme="dark"] .et-hl.revealed,
+    [data-theme="dark"] .team-role-hl { color: #131A25; }
     /* SVG chart — override hardcoded fill/stroke presentation attributes */
     [data-theme="dark"] #bloomsGraph line { stroke: #555; }
     [data-theme="dark"] #bloomsGraph polygon { stroke: #555; fill: #555; }
@@ -1079,19 +1221,41 @@
       <!-- ══ OVERVIEW ══════════════════════════════════════════ -->
       <section class="cs-hero" id="overview">
 
-        <div class="designation-row" id="desigRow">
-          <div class="desig-pill">Sole Product Designer</div>
-          <div class="desig-pill">$9.5M Seed-Funded Startup</div>
-          <div class="desig-pill">March 2025 - May 2026</div>
-        </div>
+        <!-- the 2240×800 panorama is the hero's own backdrop, uncropped -->
+        <img id="etBgImg" class="et-bg-img" alt="" />
+        <div class="hero-scrim" aria-hidden="true"></div>
 
-        <h1 class="cs-heading" id="csHeading">Designed a 0→1 AI Tutor experience, from prototypes to live classrooms across 8+ schools, serving ~2,000+ learners in real time</h1>
-        <p class="chal-body" id="heroSubtext">I owned interaction design, voice UX, and the curriculum tooling system, end to end, from the first prototype to live classroom deployment.</p>
+        <div class="hero-grid">
+          <div class="hero-copy">
 
-        <!-- Hero frame: real background + real screen UI image -->
-        <div class="et-live-frame" id="liveFrame">
-          <img id="etBgImg"     class="et-bg-img"    alt="" />
-          <img id="etScreenImg" class="et-screen-img" alt="" />
+            <h1 class="cs-heading" id="csHeading">Designed a 0→1 AI Tutor that <span class="serif">actually scales.</span></h1>
+            <p class="chal-body" id="heroSubtext">I owned interaction design, voice UX, and the curriculum tooling system, end to end.</p>
+
+            <!-- the facts the headline used to carry as prose, as pill tags.
+                 Reuses .desig-pill so they match the pill language already in
+                 the file rather than introducing a second one. -->
+            <!-- keeps #desigRow so the existing reveal timing still finds it -->
+            <div class="hero-pills" id="desigRow">
+              <span class="desig-pill">Sole Product Designer</span>
+              <span class="desig-pill">Mar 2025 – May 2026</span>
+              <span class="desig-pill">$9.5M seed-funded</span>
+              <span class="desig-pill">8+ schools</span>
+              <span class="desig-pill">~2,000 learners</span>
+            </div>
+
+          </div>
+
+          <!-- Just the product now — the backdrop moved up to the section.
+               The tilt lives on its own wrapper because #liveFrame's reveal
+               animation ends on transform:translateY(0), which would otherwise
+               overwrite a rotate set on the frame itself. -->
+          <div class="hero-visual">
+            <div class="hero-tilt">
+              <div class="et-live-frame" id="liveFrame">
+                <video id="etScreenImg" class="et-screen-img" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+          </div>
         </div>
 
       </section>
@@ -1712,8 +1876,16 @@
 
   <script>
     /* ── IMAGES — set src via JS to handle spaces in filenames ── */
-    document.getElementById('etBgImg').src     = 'ET Live Case Study/Section 1 Images/Backgorund.png';
-    document.getElementById('etScreenImg').src = 'ET Live Case Study/Section 1 Images/New Student home page.png';
+    document.getElementById('etBgImg').src     = 'images/hero-bg-a.png';
+    /* Hero screen is a video; the old still stays as the poster so nothing flashes empty */
+    const etScreenVid = document.getElementById('etScreenImg');
+    etScreenVid.poster = 'ET Live Case Study/Section 1 Images/New Student home page.png';
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      etScreenVid.removeAttribute('autoplay');
+    } else {
+      etScreenVid.src = 'images/et-live.mp4';
+      etScreenVid.play().catch(() => {});
+    }
     document.getElementById('etChalImg').src   = 'ET Live Case Study/Section 3 Images/Section hero image.png';
     document.getElementById('etSysImg').src    = 'ET Live Case Study/Section 4 Images/Section Heading.png';
     document.getElementById('etImpactImg').src = 'ET Live Case Study/Section 5 (Impact)/Section Image.png';
@@ -1782,6 +1954,9 @@
         for (const [px, py] of [[x,y],[x+PAD,y],[x-PAD,y],[x,y+PAD],[x,y-PAD]]) {
           const h = document.elementFromPoint(px, py);
           if (!h || h.closest(CTA_SEL)) continue;
+          /* the whole card is the link now — an I-beam over its copy would
+             read as "selectable text" rather than "clickable" */
+          if (h.closest('.op-card')) continue;
           if (!h.closest(TEXT_SEL)) continue;
           const cr = document.caretRangeFromPoint ? document.caretRangeFromPoint(px, py) : null;
           if (!cr || cr.startContainer.nodeType !== Node.TEXT_NODE) continue;
@@ -1892,12 +2067,25 @@
     document.querySelectorAll('#overview, #problem, #challenges, #system, #impact, #team').forEach(el => navObs.observe(el));
 
     /* ── WORD-BY-WORD HEADING ────────────────────────────────── */
+    /* Walks text nodes instead of innerHTML so inline markup inside the
+       heading — the serif italic emphasis — survives the split. Splitting the
+       HTML string would tear the tags apart on their internal whitespace. */
     function splitWords(el) {
-      el.innerHTML = el.innerHTML.split(/(\s+)/).map(chunk => {
-        if (/^\s+$/.test(chunk)) return chunk;
-        if (!chunk) return '';
-        return `<span class="word">${chunk}</span>`;
-      }).join('');
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      const texts = [];
+      while (walker.nextNode()) texts.push(walker.currentNode);
+      texts.forEach(node => {
+        const frag = document.createDocumentFragment();
+        node.textContent.split(/(\s+)/).forEach(chunk => {
+          if (!chunk) return;
+          if (/^\s+$/.test(chunk)) { frag.appendChild(document.createTextNode(chunk)); return; }
+          const s = document.createElement('span');
+          s.className = 'word';
+          s.textContent = chunk;
+          frag.appendChild(s);
+        });
+        node.parentNode.replaceChild(frag, node);
+      });
     }
     const heading = document.getElementById('csHeading');
     splitWords(heading);

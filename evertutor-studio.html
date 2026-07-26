@@ -4,6 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EverTutor Studio — Bhanu Kowshik</title>
+
+  <!-- ── Social share meta (image source: og-image.html → images/og-image.jpg) ── -->
+  <meta name="description" content="EverTutor Studio case study — designing an AI-powered course creation studio. By Bhanu Kowshik, AI Native Product Designer." />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Bhanu Kowshik" />
+  <meta property="og:title" content="EverTutor Studio — Bhanu Kowshik" />
+  <meta property="og:description" content="Case study: designing an AI-powered course creation studio." />
+  <meta property="og:url" content="https://bhanukowshik.netlify.app/evertutor-studio.html" />
+  <meta property="og:image" content="https://bhanukowshik.netlify.app/images/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="EverTutor Studio — Bhanu Kowshik" />
+  <meta name="twitter:image" content="https://bhanukowshik.netlify.app/images/og-image.jpg" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&display=swap" rel="stylesheet" />
@@ -40,16 +55,23 @@
 
     /* smooth scroll handled by JS for proper easing */
 
-    /* ─── BODY — dot-grid fixed (doesn't scroll) ────────────── */
+    /* ─── BODY ───────────────────────────────────────────────── */
     body {
       background-color: var(--bg);
-      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
-      background-size: 19px 19px;
-      background-attachment: fixed;   /* ← grid stays put */
       min-height: 100vh;
       font-family: var(--font-heading);
       overflow-x: hidden;
       cursor: none;
+    }
+
+    /* Film grain — the ground hero-lab uses. Replaces the page-wide dot mesh,
+       which stamped one pattern across every section instead of letting each
+       section carry its own texture. Sits above content but under the nav
+       and the custom cursor. */
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
     /* ─── CUSTOM CURSOR ──────────────────────────────────────── */
@@ -71,31 +93,6 @@
         background    0.26s ease,
         opacity       0.18s ease;
     }
-
-    /* "Hold & Drag" label — positioned independently */
-    #dragLabel {
-      position: fixed;
-      top: 0; left: 0;
-      pointer-events: none;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 500; /* JetBrains Mono only loads 300/400/500 — 700 was synthesized */
-      color: #FFFCF8;
-      text-align: center;
-      line-height: 1.3;
-      white-space: nowrap;
-      padding: 8px;
-      opacity: 0;
-      transition: opacity 0.18s ease;
-      background: #252525;
-      border-radius: 50%;
-      width: 64px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #dragLabel.visible { opacity: 1; }
 
     /* ─── NAV — Figma 191:14841 ──────────────────────────────── */
     .nav {
@@ -173,20 +170,18 @@
       color: var(--white);
     }
 
-    /* ─── PAGE — same structure as portfolio ─────────────────── */
+    /* ─── PAGE ───────────────────────────────────────────────── */
     .page {
       display: flex;
       justify-content: center;
-      padding: 94px 10% 90px;
+      padding: 74px 0 0;
     }
 
-    /* ─── CARD — same as portfolio ───────────────────────────── */
+    /* ─── CONTENT COLUMN — frame retired, hero-lab 1400px width ── */
     .card {
-      background: var(--white);
+      background: none;
       width: 100%;
-      max-width: 1920px;
-      border-radius: 30px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      max-width: 1400px;
       overflow: hidden;
       overflow-x: hidden;
       display: flex;
@@ -194,11 +189,63 @@
     }
 
     /* ─── HERO — Figma 191:14423 ─────────────────────────────── */
+    /* ─── HERO — two-column panel, matching evertutor-live ───── */
     .cs-hero {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      padding: 36px 30px 48px;
+      display: block;
+      padding: clamp(34px, 4.2vw, 64px) clamp(28px, 3.6vw, 52px) clamp(34px, 4.2vw, 60px);
+      /* .cs-section-wrap insets its cards 40px a side; match it so the hero
+         panel lines up with every section below */
+      margin: 0 40px;
+      position: relative; isolation: isolate;
+      border-radius: 16px; overflow: hidden;
+    }
+    /* the generated plate is dark-mode art — over cream it can only wash out
+       to grey, so light mode hides it and tints the panel instead */
+    .cs-hero > .et-bg-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: 50% 86%;
+      display: none; pointer-events: none; z-index: 0;
+    }
+    [data-theme="dark"] .cs-hero > .et-bg-img { display: block; }
+    .hero-scrim {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(100deg, #FFFCF8 0%, #F8FCF6 58%, #E4F5E6 100%);
+    }
+    .hero-grid {
+      position: relative; z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(28px, 4vw, 60px);
+      align-items: center;
+    }
+    /* the column is the container the headline sizes against */
+    .hero-copy {
+      display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+      container-type: inline-size;
+    }
+    .hero-pills {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      width: 100%; margin-top: 34px; padding-top: 22px;
+      border-top: 1px solid rgba(37,37,37,0.12);
+      opacity: 0;
+    }
+    .hero-pills.visible { animation: fade-in 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
+
+    /* the product on a slight 3D tilt */
+    .hero-visual { perspective: 1500px; }
+    .hero-tilt { transform: rotateY(-8deg) rotateX(2deg); transform-style: preserve-3d; }
+    /* the frame was absolutely centred inside the old full-bleed band; in a
+       column it sits static, and its .visible transform must not fight the tilt */
+    .hero-visual .chv-video-frame {
+      position: static; width: 100%; max-width: none;
+      transform: none; box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+    }
+    .hero-visual .chv-video-frame.visible { transform: none; }
+
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+      .hero-visual { perspective: none; }
+      .hero-tilt { transform: none; }
     }
 
     /* Designation pills — Figma 191:14424 */
@@ -225,11 +272,14 @@
     /* Main heading — Figma: Montserrat Bold 40px, lh 55px */
     .cs-heading {
       font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 30px;
-      line-height: 1.5;
-      letter-spacing: -0.8px;
+      font-weight: 600;
+      /* cqi, not a fixed px — sized off the copy column so the wrap holds
+         at any panel width */
+      font-size: clamp(28px, 8.6cqi, 46px);
+      line-height: 1.14;
+      letter-spacing: -0.028em;
       color: var(--secondary);
+      max-width: 15ch;
     }
     /* Italic part — "104 hours to 4." */
     .cs-heading em {
@@ -248,13 +298,15 @@
     }
 
     /* Subtitle — Figma: Montserrat Bold 25px, lh 55px */
+    /* body-scale now — 25px/55px was sized for the old full-width block */
     .cs-subtitle {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 25px;
-      line-height: 55px;
-      margin-top: -8px;
-      color: var(--secondary);
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 1.6;
+      margin-top: 20px;
+      max-width: 42ch;
+      color: #515151;
       opacity: 0;
     }
     .cs-subtitle.visible {
@@ -330,68 +382,6 @@
     @media (max-width: 767px) {
       .cs-hero-visual { height: 260px; }
       .chv-video-frame { width: 88%; border-radius: 12px; }
-    }
-
-    /* ─── CAROUSEL SECTION ───────────────────────────────────── */
-    .cs-carousel-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      padding: 0 0 56px;
-      opacity: 0;
-      transform: translateY(40px);
-    }
-    .cs-carousel-section.visible {
-      animation: section-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    /* Carousel viewport — overflow:visible lets card shadow bleed out without being clipped */
-    .carousel-viewport {
-      width: 100%;
-      position: relative;
-      height: 387px;
-      overflow: visible;
-      cursor: none;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    /*
-      Card sized to Studio Core Features master image ratio:
-      534.57 ÷ 347 = 1.541
-      560 ÷ 1.541 = 363px height
-      object-fit:contain → master image fills card perfectly, no cropping.
-      Lesson images (different ratio) get a subtle white BG fill — acceptable.
-    */
-    .fan-card {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 560px;
-      height: 363px;
-      border-radius: 17px;
-      overflow: hidden;
-      background: #FFFFFF;
-      box-shadow: 0px 4px 14px rgba(37,37,37,0.08);
-      will-change: transform, opacity, filter;
-    }
-    .fan-card img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;   /* no cropping on any image */
-      background: #FFFFFF;
-      display: block;
-      pointer-events: none;
-    }
-
-    /* Caption */
-    .carousel-caption {
-      font-family: var(--font-mono);
-      font-weight: 400;
-      font-size: 12px;
-      color: #515151;
-      text-align: center;
     }
 
     /* ─── SECTION SEPARATOR WRAPPER ─────────────────────────── */
@@ -589,8 +579,8 @@
     .tr-item-desc {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 15px;
-      line-height: 25px;
+      font-size: 16px;
+      line-height: 27px;
       color: #515151;
     }
     /* Label part: Montserrat SemiBold */
@@ -638,10 +628,9 @@
 
     /* Hide custom cursor on touch devices */
     @media (hover: none) {
-      #ccDot, #dragLabel { display: none; }
+      #ccDot { display: none; }
       body { cursor: auto; }
       a, button { cursor: pointer; }
-      .carousel-viewport { cursor: grab; }
     }
 
     /* ─── HAMBURGER + MOBILE MENU ───────────────────────────── */
@@ -741,13 +730,7 @@
     @media (max-width: 1023px) {
       .nav                  { padding: 8px 24px; }
       .page                 { padding: 74px 10% 70px; }
-      .cs-hero              { padding: 28px 24px 36px; gap: 16px; }
-      .cs-heading           { font-size: 26px; }
-      .cs-subtitle          { font-size: 20px; line-height: 40px; }
-
-      /* Fan carousel — scale cards for tablet */
-      .carousel-viewport    { height: 300px; }
-      .fan-card             { width: 420px; height: 272px; }
+      /* .cs-hero padding and .cs-heading size are fluid now — see the base rules */
 
       /* Team & Role */
       .tr-card              { padding: 18px; gap: 24px; }
@@ -778,17 +761,9 @@
       .card                 { border-radius: 16px; }
 
       /* Hero */
-      .cs-hero              { padding: 24px 18px 20px; gap: 12px; }
-      .cs-heading           { font-size: 22px; }
-      .cs-subtitle          { font-size: 15px; line-height: 28px; }
+      .cs-hero              { margin: 0 10px; }   /* stay level with the cards */
       .designation-row      { flex-wrap: wrap; gap: 8px; }
       .desig-pill { font-size: 10px; padding: 4px 10px; }
-
-      /* Carousel */
-      .cs-carousel-section { padding: 0 0 32px; }
-      .carousel-viewport    { height: 210px; }
-      .fan-card             { width: 260px; height: 169px; border-radius: 12px; }
-      .carousel-caption     { font-size: 11px; padding: 0 16px; }
 
       /* Section wrapper */
       .cs-section-wrap { padding: 0 10px 20px; }
@@ -803,8 +778,8 @@
       .tr-bullet-wrap { padding: 6px 0 0; }
       .tr-highlight         { font-size: 16px; }
       .tr-body              { font-size: 13px; line-height: 24px; }
-      .tr-item-desc { font-size: 13px; line-height: 20px; }
-      .tr-mixed { font-size: 13px; line-height: 20px; }
+      .tr-item-desc { font-size: 14px; line-height: 21px; }
+      .tr-mixed { font-size: 14px; line-height: 21px; }
       .tr-mixed-mono { font-size: 13px; line-height: 20px; }
 
       /* Impact */
@@ -838,10 +813,6 @@
 
     /* ── Small mobile: up to 480px ───────────────────────────── */
     @media (max-width: 480px) {
-      .cs-heading           { font-size: 20px; }
-      .cs-subtitle          { font-size: 13px; line-height: 24px; }
-      .fan-card             { width: calc(100vw - 60px); height: auto; aspect-ratio: 560 / 363; }
-      .carousel-viewport    { height: auto; min-height: 180px; }
       .section-heading      { font-size: 18px; line-height: 28px; }
       .oc-testimonial       { width: calc(100vw - 44px); }
     }
@@ -971,8 +942,8 @@
     .imp-body {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 15px;
-      line-height: 25px;
+      font-size: 16px;
+      line-height: 27px;
       color: #515151;
     }
     .imp-footnote {
@@ -981,7 +952,7 @@
       font-style: italic;
       font-size: 12px;
       line-height: 25px;
-      color: rgba(147,147,147,0.6);
+      color: #6E6E6E;
     }
 
     /* ─── OLD vs NEW WORKFLOW COMPARISON ─────────────────────── */
@@ -1035,8 +1006,8 @@
     .tc-unit { font-size: 18px; font-weight: 600; color: #515151; }
     .tc-sub {
       font-family: var(--font-mono);
-      font-size: 13px;
-      line-height: 20px;
+      font-size: 14px;
+      line-height: 22px;
       color: #515151;
     }
     .tc-arrow {
@@ -1053,7 +1024,7 @@
     [data-theme="dark"] .tc-tool-studio { background: #E6F28D; border-color: #E6F28D; color: #131A25; }
     [data-theme="dark"] .tc-panel-label,
     [data-theme="dark"] .tc-sub,
-    [data-theme="dark"] .tc-unit { color: #7C8794; }
+    [data-theme="dark"] .tc-unit { color: #A9B4C2; }
     @media (max-width: 767px) {
       .tools-compare { flex-direction: column; }
       .tc-arrow { transform: rotate(90deg); padding: 4px 0; }
@@ -1074,7 +1045,7 @@
       .imp-desc { font-size: 14px; line-height: 22px; }
       .imp-num { font-size: 15px; }
       .imp-title-plain, .imp-hl { font-size: 16px; white-space: normal; }
-      .imp-body { font-size: 13px; line-height: 22px; }
+      .imp-body { font-size: 14px; line-height: 23px; }
     }
 
     /* ─── USERS & GOALS SECTION ──────────────────────────────── */
@@ -1188,8 +1159,8 @@
     .ug-body {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 15px;
-      line-height: 25px;
+      font-size: 16px;
+      line-height: 27px;
       color: #515151;
     }
 
@@ -1233,7 +1204,7 @@
       .ug-role-goal { font-size: 15px; line-height: 22px; }
       .ug-role-label { font-size: 11px; }
       .ug-tag { font-size: 14px; }
-      .ug-body { font-size: 13px; line-height: 20px; }
+      .ug-body { font-size: 14px; line-height: 21px; }
     }
     /* ─── CONSTRAINTS & DESIGN APPROACH ─────────────────────── */
     .cd-image-frame {
@@ -1267,8 +1238,8 @@
     .cd-insight {
       font-family: var(--font-mono);
       font-weight: 500;
-      font-size: 15px;
-      line-height: 25px;
+      font-size: 16px;
+      line-height: 27px;
       color: #515151;
     }
     .cd-hl {
@@ -1289,16 +1260,16 @@
       padding: 16px 20px;
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 15px;
-      line-height: 25px;
+      font-size: 16px;
+      line-height: 27px;
       color: #515151;
       font-style: italic;
     }
 
     @media (max-width: 767px) {
       .cd-image-frame { width: 72px; height: 90px; }
-      .cd-blockquote { font-size: 13px; line-height: 22px; padding: 12px 14px; }
-      .cd-insight { font-size: 13px; }
+      .cd-blockquote { font-size: 14px; line-height: 23px; padding: 12px 14px; }
+      .cd-insight { font-size: 14px; }
     }
 
     /* ─── OUTCOMES SECTION ───────────────────────────────────── */
@@ -1386,8 +1357,8 @@
     .oc-metric-body {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 15px;
-      line-height: 25px;
+      font-size: 16px;
+      line-height: 27px;
       color: #515151;
     }
 
@@ -1439,8 +1410,8 @@
     .oc-quote {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 13px;
-      line-height: 22px;
+      font-size: 14px;
+      line-height: 23px;
       color: #515151;
       font-style: italic;
     }
@@ -1456,7 +1427,7 @@
       .oc-testimonial { width: 300px; }
       .oc-desc { font-size: 14px; line-height: 22px; }
       .oc-metric-value { font-size: 16px; }
-      .oc-metric-label, .oc-metric-body { font-size: 13px; }
+      .oc-metric-label, .oc-metric-body { font-size: 14px; }
     }
 
     /* ─── THANK YOU BAR ─────────────────────────────────────── */
@@ -1560,11 +1531,8 @@
       --secondary:  #EFF3F8;
       --bg:         #0A0E15;
       --white:      #0E141D;
-      --grey:       #7C8794;
+      --grey:       #A9B4C2;
       --border:     #222C3D;
-    }
-    [data-theme="dark"] body {
-      background-image: radial-gradient(circle, rgba(255,255,255,0.15) 0.8px, transparent 0.8px);
     }
     [data-theme="dark"] .nav-home img { filter: invert(1); }
     [data-theme="dark"] .nav {
@@ -1573,11 +1541,6 @@
     }
     [data-theme="dark"] .nav-btn:hover:not(.active) { background: #182130; }
     [data-theme="dark"] .desig-pill { background: rgba(24,33,48,0.95); }
-    [data-theme="dark"] #dragLabel { background: #EFF3F8; color: #131A25; }
-    /* ── carousel ── */
-    [data-theme="dark"] .fan-card { background: #1E1E1E; }
-    [data-theme="dark"] .fan-card img { background: #1E1E1E; }
-    [data-theme="dark"] .carousel-caption { color: #7C8794; }
     /* ── all main card containers ── */
     [data-theme="dark"] .tr-card,
     [data-theme="dark"] .imp-card,
@@ -1597,23 +1560,23 @@
     [data-theme="dark"] .tr-label,
     [data-theme="dark"] .tr-item-desc,
     [data-theme="dark"] .tr-mixed,
-    [data-theme="dark"] .tr-mixed-mono { color: #7C8794; }
-    [data-theme="dark"] .tr-next .tr-next-text { color: #7C8794; }
+    [data-theme="dark"] .tr-mixed-mono { color: #A9B4C2; }
+    [data-theme="dark"] .tr-next .tr-next-text { color: #A9B4C2; }
     /* ── impact section ── */
     [data-theme="dark"] .imp-image-frame { background: #182130; }
     [data-theme="dark"] .imp-label,
     [data-theme="dark"] .imp-num,
     [data-theme="dark"] .imp-body,
-    [data-theme="dark"] .imp-footnote { color: #7C8794; }
+    [data-theme="dark"] .imp-footnote { color: #A9B4C2; }
     /* ── users & goals section ── */
     [data-theme="dark"] .ug-image-frame { background: #182130; }
     [data-theme="dark"] .ug-label,
     [data-theme="dark"] .ug-role-label,
-    [data-theme="dark"] .ug-body { color: #7C8794; }
+    [data-theme="dark"] .ug-body { color: #A9B4C2; }
     /* ── constraints & design section ── */
     [data-theme="dark"] .cd-image-frame { background: #182130; }
-    [data-theme="dark"] .cd-blockquote { background: #131A25; color: #7C8794; }
-    [data-theme="dark"] .cd-insight { color: #7C8794; }
+    [data-theme="dark"] .cd-blockquote { background: #131A25; color: #A9B4C2; }
+    [data-theme="dark"] .cd-insight { color: #A9B4C2; }
     /* ── outcomes section ── */
     [data-theme="dark"] .oc-image-frame { background: #182130; }
     [data-theme="dark"] .oc-label,
@@ -1621,18 +1584,31 @@
     [data-theme="dark"] .oc-metric-body,
     [data-theme="dark"] .oc-section-title,
     [data-theme="dark"] .oc-author-role,
-    [data-theme="dark"] .oc-quote { color: #7C8794; }
+    [data-theme="dark"] .oc-quote { color: #A9B4C2; }
     [data-theme="dark"] .oc-testimonial { background: #222222; border-color: #222C3D; }
     /* ── section labels shared ── */
-    [data-theme="dark"] .section-label { color: #7C8794; }
+    [data-theme="dark"] .section-label { color: #A9B4C2; }
     [data-theme="dark"] .other-projects { border-top-color: rgba(240,237,232,0.08); }
-    [data-theme="dark"] .other-projects-label { color: #666; }
+    [data-theme="dark"] .other-projects-label { color: #A9B4C2; }
     /* ── other projects cards ── */
     [data-theme="dark"] .op-card { background: #1E1E1E; border-color: rgba(240,237,232,0.1); }
     [data-theme="dark"] .op-card-img { background: #182130; }
-    [data-theme="dark"] .op-card-tag { background: #182130; color: #888; }
+    [data-theme="dark"] .op-card-tag { background: #182130; color: #A9B4C2; }
     [data-theme="dark"] .op-card-title { color: #EFF3F8; }
-    [data-theme="dark"] .op-card-desc { color: #7C8794; }
+    /* lifted from #7C8794 — that value fell below AA on the lighter cards */
+    [data-theme="dark"] .op-card-desc { color: #A9B4C2; }
+
+    /* hero panel — dark counterparts */
+    [data-theme="dark"] .hero-scrim {
+      background: linear-gradient(100deg,
+        rgba(10,14,21,0.86) 0%, rgba(10,14,21,0.62) 30%,
+        rgba(10,14,21,0.18) 55%, rgba(10,14,21,0) 74%);
+    }
+    [data-theme="dark"] .hero-pills { border-color: rgba(240,237,232,0.14); }
+    [data-theme="dark"] .cs-subtitle { color: #A9B4C2; }
+    [data-theme="dark"] .ug-subtitle { color: var(--secondary); }
+    /* lime band keeps its light ground in dark mode — ink must stay dark */
+    [data-theme="dark"] .cs-thankyou-text { color: #131A25; }
     /* ─── THEME TOGGLE BUTTON ────────────────────────────────── */
     .theme-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer !important; flex-shrink: 0; border-radius: 100px; transition: transform 0.15s ease; }
     .theme-toggle:active { transform: scale(0.93); }
@@ -1710,7 +1686,6 @@
 
   <!-- ── CURSOR ────────────────────────────────────────────── -->
   <div id="ccDot" aria-hidden="true"></div>
-  <div id="dragLabel">Hold &amp;<br>Drag</div>
 
   <!-- ── NAV — 191:14841 ───────────────────────────────────── -->
   <nav class="nav">
@@ -1765,42 +1740,36 @@
 
       <section id="overview">
 
-        <!-- ── Full-bleed hero visual: card graphic backdrop + video ── -->
-        <div class="cs-hero-visual" id="csHeroVisual">
-          <div class="chv-bg-pan"></div>
-          <div class="chv-scrim"></div>
-          <div class="chv-video-frame" id="chvVideoFrame">
-            <video autoplay muted loop playsinline preload="auto">
-              <source src="Projects videos/ET Studio Case study.mp4" type="video/mp4">
-            </video>
-          </div>
-        </div>
-
-        <!-- ── Frame 1: Hero Section and Designation Frame ── -->
+        <!-- ── Hero: copy left, product right, generated backdrop behind ── -->
         <div class="cs-hero">
-          <div class="designation-row" id="desigRow">
-            <span class="desig-pill">Lead Product Designer</span>
-            <span class="desig-pill">Lead Curriculum Designer</span>
-            <span class="desig-pill"><span class="status-dot"></span>2025 - Mid 2026</span>
-          </div>
+          <img id="etBgImg" class="et-bg-img" alt="" />
+          <div class="hero-scrim" aria-hidden="true"></div>
 
-          <!-- Word-by-word animated heading -->
-          <div class="cs-heading" id="csHeading">
-            Built the content creation tool that cut lesson production from <em>104 hours to 4</em>
-          </div>
+          <div class="hero-grid">
+            <div class="hero-copy">
+              <!-- Word-by-word animated heading -->
+              <div class="cs-heading" id="csHeading">Built the content creation tool that cut lesson production from <em>104 hours to 4</em></div>
 
-          <!-- Subtitle (Montserrat Bold 25px per Figma) -->
-          <p class="cs-subtitle" id="csSubtitle">
-            Enabling non-technical educators to build structured AI Tutor experiences at scale.
-          </p>
-        </div>
+              <p class="cs-subtitle" id="csSubtitle">Enabling non-technical educators to build structured AI Tutor experiences at scale.</p>
 
-        <!-- ── Frame 2: Carousel Frame — drag fan carousel ── -->
-        <div class="cs-carousel-section" id="csCarouselSection">
-          <div class="carousel-viewport" id="carouselViewport">
-            <!-- fan cards injected by JS -->
+              <!-- keeps #desigRow so the existing fade-in timing still finds it -->
+              <div class="hero-pills" id="desigRow">
+                <span class="desig-pill">Lead Product Designer</span>
+                <span class="desig-pill">Lead Curriculum Designer</span>
+                <span class="desig-pill"><span class="status-dot"></span>2025 - Mid 2026</span>
+              </div>
+            </div>
+
+            <div class="hero-visual">
+              <div class="hero-tilt">
+                <div class="chv-video-frame" id="chvVideoFrame">
+                  <video autoplay muted loop playsinline preload="auto">
+                    <source src="images/et-studio.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </div>
           </div>
-          <p class="carousel-caption">Images of Core Studio Experience &amp; Lessons created on studio</p>
         </div>
 
       </section>
@@ -2374,28 +2343,6 @@
     (function tick() { dot.style.transform = `translate3d(${mx}px,${my}px,0) translate(-50%,-50%)`; requestAnimationFrame(tick); })();
   })();
 
-  /* ── DRAG LABEL FOLLOW ── */
-  (function() {
-    const label = document.getElementById('dragLabel');
-    if (!label) return;
-    document.addEventListener('mousemove', e => {
-      if (label.classList.contains('visible')) {
-        label.style.transform = `translate3d(${e.clientX}px,${e.clientY}px,0) translate(-50%,-50%)`;
-      }
-    });
-  })();
-
-  const dragLabel = document.getElementById('dragLabel');
-  const carouselViewport = document.getElementById('carouselViewport');
-  carouselViewport.addEventListener('mouseenter', () => {
-    dragLabel.classList.add('visible');
-  });
-  carouselViewport.addEventListener('mouseleave', () => {
-    if (!isDragging) {
-      dragLabel.classList.remove('visible');
-    }
-  });
-
   /* ═══════════════════════════════════════════════════════════
      WORD-BY-WORD ANIMATION
      Splits heading text nodes into .word spans, preserving <em>
@@ -2428,200 +2375,22 @@
     });
   }
 
+  document.getElementById('etBgImg').src = 'images/hero-bg-studio.png';
+
   const csHeading  = document.getElementById('csHeading');
   const csSubtitle = document.getElementById('csSubtitle');
   const desigRow   = document.getElementById('desigRow');
   const heroVisual = document.getElementById('chvVideoFrame');
-  const carouselSec = document.getElementById('csCarouselSection');
 
   splitWords(csHeading);
   const allWords = csHeading.querySelectorAll('.word');
 
-  // Stagger: hero visual → pills → words → subtitle → carousel
+  // Stagger: hero visual → pills → words → subtitle
   setTimeout(() => heroVisual.classList.add('visible'), 80);
   setTimeout(() => desigRow.classList.add('visible'), 420);
   allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 600 + i * 52));
   const afterWords = 600 + allWords.length * 52 + 60;
   setTimeout(() => csSubtitle.classList.add('visible'),  afterWords);
-  setTimeout(() => carouselSec.classList.add('visible'), afterWords + 280);
-
-  /* ═══════════════════════════════════════════════════════════
-     FAN CAROUSEL — infinite loop, one image per drag gesture
-     ─────────────────────────────────────────────────────────
-     Infinite-loop trick: animate floatOffset to ±1, then after
-     the transition silently rotate the images[] array and reset
-     floatOffset to 0. The "hidden" outer slots (±3) absorb the
-     jump invisibly because they're fully transparent.
-  ═══════════════════════════════════════════════════════════ */
-
-  // Mutable circular buffer — rotate on each snap so center is always slot HALF
-  // Center image must be at index HALF (= 3) — that is the slot render() maps to position 0
-  let images = [
-    'cs-slide-04.jpg',        // slot 0  (−3 from center, nearly transparent)
-    'cs-slide-05.jpg',        // slot 1  (−2)
-    'cs-slide-06.jpg',        // slot 2  (−1)
-    'cs-overlay-center.jpg',  // slot 3  (CENTER = HALF)
-    'cs-slide-01.jpg',        // slot 4  (+1)
-    'cs-slide-02.jpg',        // slot 5  (+2)
-    'cs-slide-03.jpg',        // slot 6  (+3, nearly transparent)
-  ];
-
-  const N           = images.length; // 7
-  const HALF        = Math.floor(N / 2); // 3 — center slot index
-  const isMobile    = window.innerWidth < 768;
-  const GAP         = isMobile ? 155 : 210;   // center-to-center px
-  const SCALE_STEP  = 0.165;
-  const MIN_SCALE   = 0.55;
-  const DRAG_THR    = 55;    // min px to commit a snap
-
-  function levelOpacity(absRel) {
-    if (absRel < 0.01) return 1;
-    if (absRel <= 1)   return 1 - absRel * 0.5;
-    if (absRel <= 2)   return 0.5 - (absRel - 1) * 0.2;
-    return Math.max(0, 0.3 - (absRel - 2) * 0.3);
-  }
-  function levelBlur(absRel) {
-    if (absRel < 0.01) return 0;
-    if (absRel <= 1)   return absRel * 4;
-    return 4 + (absRel - 1) * 5;
-  }
-
-  // Build N DOM card elements (slot i always shows images[i])
-  const viewport  = document.getElementById('carouselViewport');
-  const fanCards  = images.map((src, i) => {
-    const div = document.createElement('div');
-    div.className = 'fan-card';
-    const img = document.createElement('img');
-    img.src = src; img.alt = ''; img.draggable = false;
-    div.appendChild(img);
-    viewport.appendChild(div);
-    return div;
-  });
-
-  let floatOffset = 0;    // visual offset in slot-units (0 = no drag)
-  let isDragging  = false;
-  let isAnimating = false;
-  let pointerStartX = 0;
-  let lastDragX   = 0;
-  const ANIM_MS   = 400;  // must match CSS transition duration
-
-  function refreshImages() {
-    fanCards.forEach((card, i) => {
-      card.querySelector('img').src = images[i];
-    });
-  }
-
-  function render(animated) {
-    fanCards.forEach((card, slot) => {
-      const rel    = (slot - HALF) - floatOffset;
-      const absRel = Math.abs(rel);
-      const scale  = Math.max(MIN_SCALE, 1 - absRel * SCALE_STEP);
-      const tx     = rel * GAP;
-      const op     = levelOpacity(absRel);
-      const blur   = levelBlur(absRel);
-      const z      = 10 - Math.round(absRel);
-
-      card.style.transition = animated
-        ? `transform ${ANIM_MS}ms cubic-bezier(0.22,0.61,0.36,1), opacity ${ANIM_MS}ms ease, filter ${ANIM_MS}ms ease`
-        : 'none';
-      card.style.transform = `translateX(calc(-50% + ${tx}px)) translateY(-50%) scale(${scale})`;
-      card.style.opacity   = String(op);
-      card.style.filter    = blur > 0 ? `blur(${blur.toFixed(1)}px)` : '';
-      card.style.zIndex    = String(Math.max(0, z));
-    });
-  }
-
-  /*
-    snapBy(delta): advance +1 or -1 image
-    Phase 1 — animate cards sliding by delta units
-    Phase 2 — after transition: rotate images[], reset offset, re-render instantly
-  */
-  function snapBy(delta) {
-    if (isAnimating) return;
-    isAnimating = true;
-
-    floatOffset = delta;   // e.g. +1: cards slide left by 1 GAP
-    render(true);          // CSS transition kicks in
-
-    setTimeout(() => {
-      // Rotate the images circular buffer (so slot HALF always = center)
-      if (delta > 0) {
-        // advanced forward: push front image to back
-        images.push(images.shift());
-      } else {
-        // went backward: bring back image to front
-        images.unshift(images.pop());
-      }
-      floatOffset = 0;   // reset offset — instant, same visual positions
-      refreshImages();   // update srcs on newly-positioned slots
-      render(false);     // apply positions instantly (no transition)
-      isAnimating = false;
-    }, ANIM_MS + 10);
-  }
-
-  function snapBack() {
-    floatOffset = 0;
-    render(true);
-  }
-
-  /* ── Pointer / Touch events ─────────────────────────────── */
-  function onDragStart(px) {
-    if (isAnimating) return;
-    isDragging    = true;
-    pointerStartX = px;
-    lastDragX     = px;
-  }
-
-  function onDragMove(px) {
-    if (!isDragging) return;
-    lastDragX   = px;
-    floatOffset = -(px - pointerStartX) / GAP; // neg drag = positive offset = advance
-    render(false);
-  }
-
-  function onDragEnd() {
-    if (!isDragging) return;
-    isDragging = false;
-    const dragPx = lastDragX - pointerStartX;
-
-    if (dragPx < -DRAG_THR) {
-      snapBy(+1);  // dragged left → next image
-    } else if (dragPx > DRAG_THR) {
-      snapBy(-1);  // dragged right → previous image
-    } else {
-      snapBack();  // small drag → snap back
-    }
-
-    if (!viewport.matches(':hover')) {
-      dragLabel.classList.remove('visible');
-    }
-  }
-
-  /* Mouse */
-  viewport.addEventListener('mousedown', e => { onDragStart(e.clientX); e.preventDefault(); });
-  document.addEventListener('mousemove', e => { if (isDragging) onDragMove(e.clientX); });
-  document.addEventListener('mouseup',   () => onDragEnd());
-
-  /* Touch */
-  viewport.addEventListener('touchstart', e => onDragStart(e.touches[0].clientX), { passive: true });
-  viewport.addEventListener('touchmove',  e => { if (isDragging) onDragMove(e.touches[0].clientX); }, { passive: true });
-  viewport.addEventListener('touchend',   () => onDragEnd());
-
-  /* Mobile auto-play — advances one image every 3s, pauses on touch, resumes after */
-  if (isMobile) {
-    let autoPlay;
-    const startAuto = () => {
-      autoPlay = setInterval(() => {
-        if (!isDragging && !isAnimating) snapBy(+1);
-      }, 3000);
-    };
-    startAuto();
-    viewport.addEventListener('touchstart', () => clearInterval(autoPlay), { passive: true });
-    viewport.addEventListener('touchend',   () => { setTimeout(startAuto, 1500); });
-  }
-
-  /* Initial render */
-  render(false);
 
   /* Counts a .tc-counter element up from 0 to its data-target over ~900ms */
   function animateCounter(el) {
@@ -2808,9 +2577,8 @@
 
     requestAnimationFrame(() => {
       const halfW     = tTrack.scrollWidth / 2;
-      const DURATION  = 66;   // seconds per full cycle (another 25% slower)
-      const FPS       = 60;
-      const BASE_SPD  = halfW / (DURATION * FPS);
+      const DURATION  = 66;   // seconds per full cycle
+      const BASE_SPD  = halfW / DURATION;   // px per SECOND — independent of display refresh rate
       const SLOW_SPD  = BASE_SPD / 12;
       let tPos  = 0;
       let tSpd  = BASE_SPD;
@@ -2828,16 +2596,20 @@
         }, 16);
       });
 
-      let tRaf;
-      function animateT() {
-        tPos -= tSpd;
-        if (tPos <= -halfW) tPos += halfW;
-        tTrack.style.transform = `translateX(${tPos}px)`;
+      let tRaf, tPrev = null;
+      function animateT(ts) {
+        if (tPrev !== null) {
+          const dt = Math.min((ts - tPrev) / 1000, 0.1);
+          tPos -= tSpd * dt;
+          if (tPos <= -halfW) tPos += halfW;
+          tTrack.style.transform = `translateX(${tPos}px)`;
+        }
+        tPrev = ts;
         tRaf = requestAnimationFrame(animateT);
       }
       tRaf = requestAnimationFrame(animateT);
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) cancelAnimationFrame(tRaf);
+        if (document.hidden) { cancelAnimationFrame(tRaf); tPrev = null; }
         else tRaf = requestAnimationFrame(animateT);
       });
     });

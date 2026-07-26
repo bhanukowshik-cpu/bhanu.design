@@ -4,6 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Stressie — Bhanu Kowshik</title>
+
+  <!-- ── Social share meta (image source: og-image.html → images/og-image.jpg) ── -->
+  <meta name="description" content="Stressie case study — designing a stress-management companion. By Bhanu Kowshik, AI Native Product Designer." />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Bhanu Kowshik" />
+  <meta property="og:title" content="Stressie — Bhanu Kowshik" />
+  <meta property="og:description" content="Case study: designing a stress-management companion." />
+  <meta property="og:url" content="https://bhanukowshik.netlify.app/stressie-studio.html" />
+  <meta property="og:image" content="https://bhanukowshik.netlify.app/images/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Stressie — Bhanu Kowshik" />
+  <meta name="twitter:image" content="https://bhanukowshik.netlify.app/images/og-image.jpg" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&display=swap" rel="stylesheet" />
@@ -42,21 +57,28 @@
       /* ── Font scale ── */
       --fs-xs:   11px;   /* eyebrow labels */
       --fs-sm:   13px;   /* tags, small meta */
-      --fs-base: 15px;   /* body copy */
+      --fs-base: 16px;   /* body copy */
       --fs-md:   18px;   /* subtitle, card sub-labels */
       --fs-lg:   22px;   /* section titles, card headings */
     }
 
-    /* ─── BODY — dot-grid fixed ──────────────────────────────── */
+    /* ─── BODY ───────────────────────────────────────────────── */
     body {
       background-color: var(--bg);
-      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
-      background-size: 19px 19px;
-      background-attachment: fixed;
       min-height: 100vh;
       font-family: var(--font-heading);
       overflow-x: hidden;
       cursor: none;
+    }
+
+    /* Film grain — the ground hero-lab uses. Replaces the page-wide dot mesh,
+       which stamped one pattern across every section instead of letting each
+       section carry its own texture. Sits above content but under the nav
+       and the custom cursor. */
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
     /* ─── CUSTOM CURSOR ──────────────────────────────────────── */
@@ -190,26 +212,45 @@
     .mobile-menu a:nth-child(8) { transition-delay: 0.35s; }
     .mobile-menu a.active { font-weight: 700; color: var(--orange); }
 
-    /* ─── PAGE + CARD ────────────────────────────────────────── */
+    /* ─── PAGE + CONTENT COLUMN ──────────────────────────────── */
+    /* frame retired — the column follows hero-lab's 1400px width system */
     .page {
       display: flex; justify-content: center;
-      padding: 94px 10% 90px;
+      padding: 74px 0 0;
     }
     .card {
-      background: var(--white);
+      background: none;
       width: 100%;
-      max-width: 1920px;
-      border-radius: 30px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      max-width: 1400px;
       overflow: hidden;
       display: flex; flex-direction: column;
     }
 
     /* ─── HERO ───────────────────────────────────────────────── */
+    /* ─── HERO — backdrop panel, aligned with the section cards ───── */
     .cs-hero {
       display: flex; flex-direction: column;
-      gap: 24px; padding: 44px 48px 56px;
+      gap: 24px;
+      padding: clamp(34px, 4.2vw, 64px) clamp(28px, 3.6vw, 52px) clamp(34px, 4.2vw, 60px);
+      /* .cs-section-wrap insets its cards 48px a side — match it */
+      margin: 0 48px;
+      position: relative; isolation: isolate;
+      border-radius: 16px; overflow: hidden;
     }
+    /* the generated plate is dark-mode art — over cream it can only wash out
+       to grey, so light mode hides it and tints the panel instead */
+    .cs-hero > .et-bg-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: 50% 86%;
+      display: none; pointer-events: none; z-index: 0;
+    }
+    [data-theme="dark"] .cs-hero > .et-bg-img { display: block; }
+    .hero-scrim {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(100deg, #FFFCF8 0%, #FEF9F2 58%, #FBEEDD 100%);
+    }
+    /* lift the existing column above the backdrop without restructuring it */
+    .cs-hero > *:not(.et-bg-img):not(.hero-scrim) { position: relative; z-index: 2; }
 
     /* ── Pills + date row ── */
     .hero-top-row {
@@ -395,7 +436,7 @@
       font-family: var(--font-heading);
       font-weight: 400; font-size: var(--fs-xs);
       text-transform: uppercase; letter-spacing: 0.1em;
-      color: #9C8B70;
+      color: #7A6C52;
     }
 
     .summary-value {
@@ -491,7 +532,8 @@
       .nav               { padding: 8px 24px; }
       .nav-sections      { display: none; }
       .nav-hamburger     { display: flex; }
-      .cs-hero           { padding: 28px 28px 40px; gap: 20px; }
+      /* padding is fluid now — only the alignment margin changes here */
+      .cs-hero           { margin: 0 28px; gap: 20px; }
       .cs-heading        { font-size: 44px; line-height: 62px; }
       .hero-dark-card    { padding: 32px 28px; gap: 32px; }
       .overview-summary  { padding-left: 28px; padding-right: 28px; }
@@ -508,7 +550,7 @@
     /* ── Mobile ── */
     @media (max-width: 767px) {
       .page              { padding: 60px 5% 56px; }
-      .cs-hero           { padding: 22px 18px 28px; gap: 16px; }
+      .cs-hero           { gap: 16px; }
       .cs-heading        { font-size: 30px; line-height: 48px; }
       .cs-subtitle       { font-size: 15px; }
       .hero-pill         { font-size: 12px; padding: 8px 16px; }
@@ -606,7 +648,7 @@
 
     .timeline-val {
       font-family: var(--font-heading);
-      font-weight: 400; font-size: var(--fs-sm); color: #9C8B70;
+      font-weight: 400; font-size: var(--fs-sm); color: #7A6C52;
     }
     .timeline-val strong {
       font-weight: 800; font-size: 28px;
@@ -635,7 +677,7 @@
       font-family: var(--font-heading); font-weight: 700;
       font-size: var(--fs-base); color: var(--secondary);
     }
-    .team-name.nda-badge { color: #9C8B70; }
+    .team-name.nda-badge { color: #7A6C52; }
 
     .team-role {
       font-family: var(--font-heading); font-weight: 400;
@@ -1201,14 +1243,11 @@
       --secondary:    #EFF3F8;
       --bg:           #0A0E15;
       --white:        #0E141D;
-      --grey:         #7C8794;
+      --grey:         #A9B4C2;
       --border:       #222C3D;
       --orange:       #FF8A3D;
       --orange-light: #2A1A08;
       --orange-rgb:   255,138,61;
-    }
-    [data-theme="dark"] body {
-      background-image: radial-gradient(circle, rgba(255,255,255,0.15) 0.8px, transparent 0.8px);
     }
     [data-theme="dark"] .nav-home img { filter: invert(1); }
     [data-theme="dark"] .nav {
@@ -1219,10 +1258,10 @@
     [data-theme="dark"] .mobile-menu { box-shadow: -8px 0 32px rgba(0,0,0,0.40); }
     [data-theme="dark"] .hero-pill { border-color: rgba(191,98,18,0.45); }
     [data-theme="dark"] .hero-pill:hover { background: rgba(191,98,18,0.12); }
-    [data-theme="dark"] .hero-date { color: #9C8B70; }
+    [data-theme="dark"] .hero-date { color: #B8AA8E; }
     [data-theme="dark"] .cs-subtitle { color: rgba(240,237,232,0.65); }
-    [data-theme="dark"] .summary-label { color: #9C8B70; }
-    [data-theme="dark"] .summary-desc { color: #9C8B70; }
+    [data-theme="dark"] .summary-label { color: #B8AA8E; }
+    [data-theme="dark"] .summary-desc { color: #B8AA8E; }
     [data-theme="dark"] .section-line { background: rgba(240,237,232,0.12); }
     /* ── overview section ── */
     [data-theme="dark"] .skill-tag {
@@ -1230,9 +1269,9 @@
       border-color: rgba(255,138,61,0.35);
       border-radius: 999px;
     }
-    [data-theme="dark"] .timeline-val { color: #9C8B70; }
-    [data-theme="dark"] .team-role { color: #9C8B70; }
-    [data-theme="dark"] .team-name.nda-badge { color: #9C8B70; }
+    [data-theme="dark"] .timeline-val { color: #B8AA8E; }
+    [data-theme="dark"] .team-role { color: #B8AA8E; }
+    [data-theme="dark"] .team-name.nda-badge { color: #B8AA8E; }
     [data-theme="dark"] .team-divider { background: rgba(240,237,232,0.08); }
     /* ── pilot findings section ── */
     [data-theme="dark"] .pf-stat-chip {
@@ -1244,9 +1283,15 @@
     /* ── other projects ── */
     [data-theme="dark"] .op-card { background: #1E1E1E; border-color: rgba(240,237,232,0.1); }
     [data-theme="dark"] .op-card-img { background: #182130; }
-    [data-theme="dark"] .op-card-tag { background: #182130; color: #A0A0A0; }
+    [data-theme="dark"] .op-card-tag { background: #182130; color: #B4B4B4; }
     [data-theme="dark"] .op-card-title { color: #EFF3F8; }
-    [data-theme="dark"] .op-card-desc { color: #7C8794; }
+    /* muted ink must clear AA on both the page ground and the lighter cards */
+    [data-theme="dark"] .op-card-desc { color: #A9B4C2; }
+    [data-theme="dark"] .hero-scrim {
+      background: linear-gradient(100deg,
+        rgba(10,14,21,0.88) 0%, rgba(10,14,21,0.68) 38%,
+        rgba(10,14,21,0.30) 64%, rgba(10,14,21,0.05) 88%);
+    }
     /* ─── THEME TOGGLE BUTTON ────────────────────────────────── */
     .theme-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer !important; flex-shrink: 0; border-radius: 100px; transition: transform 0.15s ease; }
     .theme-toggle:active { transform: scale(0.93); }
@@ -1383,6 +1428,9 @@
       <section id="summary" data-has-content="true">
 
         <div class="cs-hero">
+
+          <img id="etBgImg" class="et-bg-img" alt="" />
+          <div class="hero-scrim" aria-hidden="true"></div>
 
           <!-- Pills + site link row -->
           <div class="hero-top-row" id="heroTopRow">
@@ -2293,6 +2341,8 @@
       }
     });
   }
+
+  document.getElementById('etBgImg').src = 'images/hero-bg-stressie.png';
 
   const csHeading     = document.getElementById('csHeading');
   const csSubtitle    = document.getElementById('csSubtitle');
