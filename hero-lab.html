@@ -2293,9 +2293,9 @@ function mountSmoke(canvas) {
     ' vec2 p=vec2(gl_FragCoord.x/uRes.y, gl_FragCoord.y/uRes.y);',
     ' float t=uTime;',
     /* two layers of mist, advected upward — no SDF, no shape; slow & silky */
-    ' vec2 q1=p*vec2(1.25,1.9)+vec2(0.,-t*0.055);',
-    ' float n1=fbm(q1+1.35*fbm(q1*1.7+t*0.014));',
-    ' vec2 q2=p*vec2(2.6,3.4)+vec2(t*0.010,-t*0.095);',
+    ' vec2 q1=p*vec2(1.25,1.9)+vec2(0.,-t*0.16);',
+    ' float n1=fbm(q1+1.35*fbm(q1*1.7+t*0.045));',
+    ' vec2 q2=p*vec2(2.6,3.4)+vec2(t*0.030,-t*0.26);',
     ' float n2=fbm(q2);',
     /* The threshold decides how much of the field counts as smoke at all —
        it multiplies every term below, so it is the coarse control. */
@@ -2309,7 +2309,7 @@ function mountSmoke(canvas) {
     ' vec2 c=vec2(aspect*0.5,-0.72*R);',              // sunk, so only the crest is on screen
     ' vec2 rel=p-c;',
     ' float d=length(rel)/max(R,0.0001);',
-    ' float warp=fbm(vec2(rel.x*2.4, rel.y*2.4 - t*0.05));',
+    ' float warp=fbm(vec2(rel.x*2.4, rel.y*2.4 - t*0.15));',
     ' float dn=d+(warp-0.5)*0.18;',
     /* ── ONE MASS ────────────────────────────────────────────────────────
        There were three terms here with three different radii: a tight disc,
@@ -2325,7 +2325,7 @@ function mountSmoke(canvas) {
        weighted toward the centre puts all its density below the frame. This
        is dense across the band you can see and gone by the crest. */
     ' float mass=smoothstep(1.08,0.55,dn);',
-    ' float dns=mix(0.30,1.0,smoke)*mass;',
+    ' float dns=mix(0.22,1.0,smoke)*mass;',
     ' vec3 bg=vec3(0.039,0.055,0.082);',
     /* deep blue where it is densest, paling a little as it climbs, and
        nothing at all by the time it reaches its own edge */
