@@ -905,9 +905,12 @@
     }
 .s2-bar-desc {
       font-family: var(--font-heading);
-      font-size: var(--fs-body);
+      /* Explicit size: var(--fs-body) was undefined, so this inherited 16px
+         and sat level with the metric captions. The desc is the card's lead
+         sentence — it steps above them. */
+      font-size: clamp(16px, 1.35vw, 19px);
       line-height: 1.7;
-      color: rgba(239, 243, 248,0.55);
+      color: rgba(239, 243, 248,0.62);
       margin: 0;
       opacity: 0;
       /* Always exactly 2 lines regardless of copy length or viewport width —
@@ -1055,7 +1058,10 @@
     }
 .s2-bar-metric-lbl {
       font-family: var(--font-mono);
-      font-size: var(--fs-sm);
+      /* Explicit caption size: var(--fs-sm) was undefined and inherited a
+         full 16px, which outweighed the desc. Captions sit under the
+         numbers, two steps below the lead sentence. */
+      font-size: clamp(11.5px, 0.95vw, 13px);
       letter-spacing: 0.06em;
       color: rgba(239, 243, 248,0.65);
       white-space: nowrap;
