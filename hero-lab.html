@@ -784,7 +784,76 @@
      padding on .tc-node would drag the dot off the line. */
   @media(pointer:coarse){ .tc-d::before{height:54px;top:-27px;} }
 
-  /* ── 04 — FOOTER ────────────────────────────────────────────────────────
+  /* ── 04 — SAID: word of mouth ───────────────────────────────────────────
+       One voice at a time, set like an epigraph: a serif quote on a still
+       stage, the four names waiting quietly underneath. The dwell line under
+       the active name is the only thing that moves on its own. */
+  .said{position:relative;background:var(--bg);overflow:clip;
+    padding:clamp(84px,12vh,150px) 0 clamp(92px,13vh,158px);}
+  .said-pool{position:absolute;left:50%;top:52%;width:min(920px,86vw);height:70%;
+    transform:translate(-50%,-50%);filter:blur(40px);pointer-events:none;
+    background:radial-gradient(ellipse at center,rgba(92,169,255,.06) 0%,transparent 66%);}
+  .said-inner{position:relative;z-index:2;max-width:880px;margin:0 auto;
+    padding:0 clamp(24px,4.5vw,56px);text-align:center;}
+  .said-k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--ember);margin-bottom:clamp(16px,2.2vh,24px);}
+  .said-h{font-family:var(--sans);font-weight:570;color:var(--ink);
+    font-size:clamp(28px,3vw,44px);line-height:1.16;letter-spacing:-0.022em;
+    text-wrap:balance;margin-bottom:clamp(40px,6vh,72px);}
+  .said-h .serif{font-family:var(--serif);font-style:italic;font-weight:400;
+    font-size:1.08em;letter-spacing:-0.004em;}
+
+  .said-stage{min-height:clamp(240px,30vh,320px);display:flex;flex-direction:column;
+    justify-content:center;align-items:center;gap:clamp(26px,3.6vh,38px);}
+  .said-quote{font-family:var(--serif);font-weight:400;color:var(--ink-2);
+    font-size:clamp(21px,2.2vw,30px);line-height:1.5;letter-spacing:.002em;
+    max-width:64ch;text-wrap:pretty;}
+  .said-quote em{font-style:italic;color:var(--ink);}
+  .said-swap{transition:opacity .26s var(--ease),transform .26s var(--ease);}
+  .said-stage.is-swapping .said-swap{opacity:0;transform:translateY(7px);}
+
+  .said-who{display:flex;align-items:center;justify-content:center;gap:14px;}
+  .said-mono{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;
+    border:1px solid var(--line);color:var(--ember-2);font-size:14px;font-weight:600;
+    letter-spacing:.02em;background:radial-gradient(circle at 32% 28%,rgba(92,169,255,.16),rgba(92,169,255,.03));}
+  .said-id{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;}
+  .said-name{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-0.006em;}
+  .said-role{font-size:12.5px;font-weight:500;color:var(--ink-3);letter-spacing:.015em;}
+
+  .said-rail{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;
+    gap:clamp(18px,3vw,38px);margin-top:clamp(44px,6.5vh,76px);}
+  .said-voice{position:relative;appearance:none;background:none;border:0;cursor:pointer;
+    font-family:var(--sans);font-size:13px;font-weight:550;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--ink-3);padding:6px 2px;
+    transition:color .3s var(--ease);}
+  .said-voice:hover{color:var(--ink-2);}
+  .said-voice[aria-pressed="true"]{color:var(--ink);}
+  .said-voice::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
+    background:var(--ember);opacity:.55;transform:scaleX(0);transform-origin:left;}
+  @keyframes saidDwell{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  .said-voice.is-timing::after{animation:saidDwell var(--dwell,8s) linear forwards;}
+  .said-rail.is-paused .said-voice.is-timing::after{animation-play-state:paused;}
+  .said-voice[aria-pressed="true"]:not(.is-timing)::after{transform:scaleX(1);}
+
+  /* arrival — same grammar as the T: only if JS is there to lift it */
+  .said.is-live .said-inner>*{opacity:0;transform:translateY(42px);
+    transition:opacity .8s var(--ease),transform 1s var(--ease-expo);}
+  .said.is-live .said-h{transition-delay:.06s;}
+  .said.is-live .said-stage{transition-delay:.14s;}
+  .said.is-live .said-rail{transition-delay:.22s;}
+  .said.is-live.revealed .said-inner>*{opacity:1;transform:none;}
+
+  @media (max-width:640px){
+    .said-quote{font-size:18.5px;line-height:1.56;}
+    .said-rail{gap:16px 22px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .said-swap{transition:none;}
+    .said.is-live .said-inner>*{opacity:1;transform:none;transition:none;}
+    .said-voice.is-timing::after{animation:none;transform:scaleX(1);}
+  }
+
+  /* ── 05 — FOOTER ────────────────────────────────────────────────────────
        Ported from index.html and put on this page's scale: the lime grain
        frame becomes azure, the mono labels become tracked Instrument Sans,
        and the italic line becomes Instrument Serif like the hero's. The
@@ -1263,7 +1332,34 @@
     </div>
   </section>
 
-  <!-- ── 04 — FOOTER ───────────────────────────────────────────────────── -->
+  <!-- ── 04 — SAID: word of mouth ──────────────────────────────────────── -->
+  <section class="said" id="saidSection" aria-label="Testimonials">
+    <div class="said-pool" aria-hidden="true"></div>
+    <div class="said-inner">
+      <span class="said-k">Word of mouth</span>
+      <h2 class="said-h">From people who <span class="serif">know my work</span></h2>
+
+      <figure class="said-stage" id="saidStage">
+        <blockquote class="said-quote said-swap" id="saidQuote">Bhanu became our <em>Founding Product Designer</em> at Stressie, where he led customer discovery, behavior analytics, and design of our first product — which pre-launched into the market and <em>became the foundation for our traction</em>. I thank my lucky stars everyday.</blockquote>
+        <figcaption class="said-who said-swap">
+          <span class="said-mono" id="saidMono" aria-hidden="true">L</span>
+          <span class="said-id">
+            <span class="said-name" id="saidName">Lupita</span>
+            <span class="said-role" id="saidRole">Co-Founder &amp; CEO · Stressie</span>
+          </span>
+        </figcaption>
+      </figure>
+
+      <div class="said-rail" id="saidRail" role="group" aria-label="Choose whose words to read">
+        <button class="said-voice" type="button" data-voice="0" aria-pressed="true">Lupita</button>
+        <button class="said-voice" type="button" data-voice="1" aria-pressed="false">Subash</button>
+        <button class="said-voice" type="button" data-voice="2" aria-pressed="false">Shaini</button>
+        <button class="said-voice" type="button" data-voice="3" aria-pressed="false">AnuShree</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 05 — FOOTER ───────────────────────────────────────────────────── -->
   <footer class="ft" id="contactSection">
 
     <div class="ft-grain" aria-hidden="true">
@@ -2269,7 +2365,94 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
 })();
 </script>
 <script>
-/* ── 04 — FOOTER: copy, the heart, and the note's arrival ────────────── */
+/* ── 04 — SAID: one voice at a time ─────────────────────────────────────
+   The stage crossfades between four short testimonies. On screen, each one
+   holds for a dwell; a hairline under the active name counts it down. While
+   the reader's pointer is inside the section, time stops. Reduced motion:
+   no autoplay, no fades — the rail still works by hand. */
+(function () {
+  var sec   = document.getElementById('saidSection');
+  var stage = document.getElementById('saidStage');
+  var rail  = document.getElementById('saidRail');
+  if (!sec || !stage || !rail) return;
+  var quote = document.getElementById('saidQuote');
+  var mono  = document.getElementById('saidMono');
+  var name  = document.getElementById('saidName');
+  var role  = document.getElementById('saidRole');
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var voices = [
+    { m: 'L', n: 'Lupita', r: 'Co-Founder & CEO · Stressie',
+      q: 'Bhanu became our <em>Founding Product Designer</em> at Stressie, where he led customer discovery, behavior analytics, and design of our first product — which pre-launched into the market and <em>became the foundation for our traction</em>. I thank my lucky stars everyday.' },
+    { m: 'S', n: 'Subash Rajaseelan', r: 'Chief of Staff & PM · EverTutor',
+      q: 'Bhanu stands apart. He wasn’t just executing on design briefs — he was <em>shaping the product vision</em>, pushing back when something didn’t serve the user, and <em>holding a ridiculously high bar for craft</em> even when timelines were brutal. What struck me most was his ability to <em>hold ambiguity without flinching</em>.' },
+    { m: 'S', n: 'Shaini', r: 'Content Designer · EverTutor',
+      q: 'Thank you Bhanu for being such a great mentor. The way you onboarded and guided me from the beginning made a huge difference. Your patience and ability to explain complex concepts clearly helped me <em>grow more in those few months than I had in years</em>.' },
+    { m: 'A', n: 'AnuShree', r: 'Content Designer · EverTutor',
+      q: 'It was a great experience working with you. Your design sensibility and the way you approached user problems always inspired me to <em>think deeper about the work</em>. Hope to collaborate again someday.' }
+  ];
+
+  var DWELL = 8000, idx = 0, timer = null, running = false;
+  var btns = [].slice.call(rail.querySelectorAll('.said-voice'));
+  rail.style.setProperty('--dwell', DWELL + 'ms');
+
+  function render(i) {
+    quote.innerHTML = voices[i].q;
+    mono.textContent = voices[i].m;
+    name.textContent = voices[i].n;
+    role.textContent = voices[i].r;
+  }
+  function mark(i, timing) {
+    btns.forEach(function (b, j) {
+      b.setAttribute('aria-pressed', j === i ? 'true' : 'false');
+      b.classList.remove('is-timing');
+    });
+    if (timing && !reduced) {
+      void btns[i].offsetWidth;          /* restart the dwell line from zero */
+      btns[i].classList.add('is-timing');
+    }
+  }
+  function show(i, timing) {
+    idx = i;
+    mark(i, timing);
+    if (reduced) { render(i); return; }
+    stage.classList.add('is-swapping');
+    setTimeout(function () {
+      render(i);
+      stage.classList.remove('is-swapping');
+    }, 270);
+  }
+  function arm()   { clearTimeout(timer); if (!reduced && running) timer = setTimeout(next, DWELL); }
+  function disarm(){ clearTimeout(timer); timer = null; }
+  function next()  { show((idx + 1) % voices.length, true); arm(); }
+
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () { show(+b.dataset.voice, true); arm(); });
+  });
+
+  /* while the reader is inside, time stops; leaving starts a fresh dwell */
+  sec.addEventListener('pointerenter', function () { rail.classList.add('is-paused'); disarm(); });
+  sec.addEventListener('pointerleave', function () {
+    rail.classList.remove('is-paused');
+    if (running) { mark(idx, true); arm(); }
+  });
+
+  /* arrive, then breathe — only while on screen */
+  sec.classList.add('is-live');
+  new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        sec.classList.add('revealed');
+        if (!running) { running = true; mark(idx, true); arm(); }
+      } else if (running) {
+        running = false; disarm(); mark(idx, false);
+      }
+    });
+  }, { threshold: 0.25 }).observe(sec);
+})();
+</script>
+<script>
+/* ── 05 — FOOTER: copy, the heart, and the note's arrival ────────────── */
 (function () {
   var toast = document.getElementById('ftToast');
   var toastMsg = document.getElementById('ftToastMsg');
