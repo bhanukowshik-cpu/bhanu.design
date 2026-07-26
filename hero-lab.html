@@ -280,14 +280,24 @@
     box-shadow:0 30px 60px -34px rgba(10,20,40,.20), 0 2px 8px -4px rgba(10,20,40,.06);}
 
   /* thumbnail at rest; the video rises over it from the bottom on hover */
-  .slide-media{position:relative;margin:20px 20px 0;border-radius:14px;overflow:hidden;
+  .slide-media{position:relative;display:grid;place-items:center;
+    margin:20px 20px 0;border-radius:14px;overflow:hidden;
     aspect-ratio:16/10;background:#EDF1F7;border:1px solid var(--cream-line);}
-  .slide-media img{width:100%;height:100%;object-fit:cover;display:block;}
+  .slide-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+  /* the still darkens behind the video so the inset panel reads as the lit thing.
+     rgba(8,8,7,.8), as bymonolog's works_home_overlay uses. */
+  .slide-media::after{content:'';position:absolute;inset:0;pointer-events:none;
+    background:rgba(8,8,7,.8);opacity:0;transition:opacity .5s ease;}
+  .slide:has(.slide-vid):hover .slide-media::after,
+  .slide:has(.slide-vid):focus-within .slide-media::after{opacity:1;}
   /* the video doesn't slide up flat — it swings up, tilted back on X and
      slightly small, then settles level and opaque over the still. Values
      read off bymonolog's success-stories reveal: ~72% of its own height
      below, rotateX(18deg), scale(.95), perspective ~0.9× the box width. */
-  .slide-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+  /* the video never fills the frame — it sits inset at ~72% and rounded,
+     floating over the darkened still (bymonolog's inset is 71.87%) */
+  .slide-vid{position:relative;z-index:1;width:72%;height:72%;object-fit:cover;display:block;
+    border-radius:10px;box-shadow:0 20px 44px -22px rgba(0,0,0,.6);
     transform-origin:50% 50%;
     transform:perspective(480px) translateY(72%) rotateX(18deg) scale(.95);
     opacity:0;will-change:transform,opacity;
