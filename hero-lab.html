@@ -1152,54 +1152,114 @@
   .said-h .serif{font-family:var(--serif);font-style:italic;font-weight:400;
     font-size:1.08em;letter-spacing:-0.004em;}
 
-  .said-stage{min-height:clamp(240px,30vh,320px);display:flex;flex-direction:column;
-    justify-content:center;align-items:center;gap:clamp(26px,3.6vh,38px);}
-  .said-quote{font-family:var(--serif);font-weight:400;color:var(--ink-2);
-    font-size:clamp(21px,2.2vw,30px);line-height:1.5;letter-spacing:.002em;
-    max-width:64ch;text-wrap:pretty;}
-  .said-quote em{font-style:italic;color:var(--ink);}
-  .said-swap{transition:opacity .26s var(--ease),transform .26s var(--ease);}
-  .said-stage.is-swapping .said-swap{opacity:0;transform:translateY(7px);}
+  /* ── the two groups ─────────────────────────────────────────────────────
+     Names meant nothing to a stranger; the relationship does. One segmented
+     control, two answers: the people above me, and the people I looked after. */
+  .tm-tabs{display:inline-flex;gap:4px;padding:4px;margin:0 auto clamp(30px,4.5vh,52px);
+    border:1px solid var(--line);border-radius:14px;background:rgba(13,18,27,.55);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+  .tm-tab{appearance:none;border:0;cursor:pointer;padding:9px 18px;border-radius:10px;
+    background:none;color:var(--ink-3);
+    font-family:var(--sans);font-size:13px;font-weight:550;letter-spacing:-0.002em;
+    white-space:nowrap;transition:background .35s var(--ease),color .3s var(--ease);}
+  .tm-tab:hover{color:var(--ink-2);}
+  .tm-tab[aria-selected="true"]{color:var(--ink);
+    background:linear-gradient(180deg,rgba(120,175,255,.2),rgba(92,169,255,.1));
+    box-shadow:inset 0 0 0 1px rgba(120,175,255,.28);}
 
-  .said-who{display:flex;align-items:center;justify-content:center;gap:14px;}
-  .said-mono{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;
-    border:1px solid var(--line);color:var(--ember-2);font-size:14px;font-weight:600;
-    letter-spacing:.02em;background:radial-gradient(circle at 32% 28%,rgba(92,169,255,.16),rgba(92,169,255,.03));}
-  .said-id{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;}
-  .said-name{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-0.006em;}
-  .said-role{font-size:12.5px;font-weight:500;color:var(--ink-3);letter-spacing:.015em;}
+  /* ── the deck ───────────────────────────────────────────────────────────
+     A stack of framed cards. The one on top is draggable: throw it in any
+     direction and it goes to the back, and whoever was behind it steps up. */
+  .tm-deck{position:relative;width:100%;max-width:720px;margin:0 auto;
+    height:clamp(400px,44vh,430px);perspective:1400px;}
+  .tm-card{position:absolute;inset:0;display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,238px);
+    gap:clamp(18px,2.6vw,32px);align-items:center;
+    padding:clamp(22px,3vw,34px);border-radius:24px;
+    border:1px solid var(--line);
+    background:linear-gradient(165deg,rgba(21,30,45,.92),rgba(11,15,23,.96));
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    box-shadow:0 40px 90px -46px rgba(0,0,0,.85);
+    text-align:left;
+    /* JS writes the transform; this is the settle when it stops writing */
+    transition:transform .62s var(--ease-expo),opacity .45s var(--ease),
+      box-shadow .45s var(--ease);
+    will-change:transform;}
+  .tm-card.is-front{cursor:grab;}
+  .tm-card.is-front:active,.tm-card.is-dragging{cursor:grabbing;}
+  .tm-card.is-dragging{transition:none;}
+  .tm-card[hidden]{display:none;}
+  /* the frame marks — four hairline corners, the "frame" of the frame */
+  .tm-fh{position:absolute;width:15px;height:15px;pointer-events:none;
+    border:1px solid rgba(140,197,255,.3);}
+  .tm-fh.tl{top:13px;left:13px;border-right:0;border-bottom:0;border-radius:5px 0 0 0;}
+  .tm-fh.tr{top:13px;right:13px;border-left:0;border-bottom:0;border-radius:0 5px 0 0;}
+  .tm-fh.bl{bottom:13px;left:13px;border-right:0;border-top:0;border-radius:0 0 0 5px;}
+  .tm-fh.br{bottom:13px;right:13px;border-left:0;border-top:0;border-radius:0 0 5px 0;}
 
-  .said-rail{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;
-    gap:clamp(18px,3vw,38px);margin-top:clamp(44px,6.5vh,76px);}
-  .said-voice{position:relative;appearance:none;background:none;border:0;cursor:pointer;
-    font-family:var(--sans);font-size:13px;font-weight:550;letter-spacing:.05em;
-    text-transform:uppercase;color:var(--ink-3);padding:6px 2px;
-    transition:color .3s var(--ease);}
-  .said-voice:hover{color:var(--ink-2);}
-  .said-voice[aria-pressed="true"]{color:var(--ink);}
-  .said-voice::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
-    background:var(--ember);opacity:.55;transform:scaleX(0);transform-origin:left;}
-  @keyframes saidDwell{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-  .said-voice.is-timing::after{animation:saidDwell var(--dwell,8s) linear forwards;}
-  .said-rail.is-paused .said-voice.is-timing::after{animation-play-state:paused;}
-  .said-voice[aria-pressed="true"]:not(.is-timing)::after{transform:scaleX(1);}
+  .tm-body{display:flex;flex-direction:column;min-width:0;}
+  .tm-qmark{display:block;font-family:var(--serif);font-style:italic;
+    font-size:52px;line-height:.6;color:rgba(120,175,255,.4);margin-bottom:10px;}
+  .tm-quote{font-family:var(--body);font-size:clamp(14.5px,1.25vw,16.5px);
+    font-weight:400;line-height:1.68;color:var(--ink-2);text-wrap:pretty;}
+  .tm-quote em{font-style:normal;font-weight:600;color:var(--ink);}
+  .tm-attr{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:22px;}
+  .tm-avatar{display:grid;place-items:center;width:40px;height:40px;flex:none;
+    border-radius:50%;border:1px solid rgba(120,175,255,.28);
+    background:radial-gradient(circle at 32% 28%,rgba(92,169,255,.24),rgba(92,169,255,.05));
+    font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ember-2);}
+  .tm-who{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .tm-name{font-family:var(--sans);font-size:14.5px;font-weight:600;color:var(--ink);
+    letter-spacing:-0.008em;}
+  .tm-role{font-family:var(--sans);font-size:12px;font-weight:500;color:var(--ink-3);}
+
+  .tm-art{position:relative;align-self:stretch;border-radius:18px;overflow:hidden;
+    border:1px solid var(--line);background:#070A10;}
+  /* the illustrations are painted on the same near-black as the page, so a
+     cropped column of one is darker than the plate it sits in — the lift is
+     what keeps the art from reading as an empty panel */
+  .tm-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+    filter:brightness(1.32) saturate(1.08) contrast(1.04);}
+  /* a wash that ties any illustration back to the page's own blue */
+  .tm-art::after{content:'';position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(150deg,rgba(92,169,255,.1),transparent 58%);}
+
+  /* the deck's own control — how many, and which one you are on */
+  .tm-dots{display:flex;justify-content:center;gap:8px;margin-top:clamp(24px,3.4vh,36px);}
+  .tm-dot{width:7px;height:7px;padding:0;border:0;border-radius:999px;cursor:pointer;
+    background:rgba(239,243,248,.24);
+    transition:width .55s var(--ease-expo),background .35s var(--ease);}
+  .tm-dot:hover{background:rgba(239,243,248,.5);}
+  .tm-dot.is-on{width:26px;background:var(--ember);}
+  .tm-hint{display:block;margin-top:14px;font-size:12px;font-weight:500;
+    letter-spacing:.03em;color:var(--ink-3);}
 
   /* arrival — same grammar as the T: only if JS is there to lift it */
   .said.is-live .said-inner>*{opacity:0;transform:translateY(42px);
     transition:opacity .8s var(--ease),transform 1s var(--ease-expo);}
   .said.is-live .said-h{transition-delay:.06s;}
-  .said.is-live .said-stage{transition-delay:.14s;}
-  .said.is-live .said-rail{transition-delay:.22s;}
+  .said.is-live .tm-tabs{transition-delay:.12s;}
+  .said.is-live .tm-deck{transition-delay:.2s;}
   .said.is-live.revealed .said-inner>*{opacity:1;transform:none;}
 
-  @media (max-width:640px){
-    .said-quote{font-size:18.5px;line-height:1.56;}
-    .said-rail{gap:16px 22px;}
+  @media (max-width:760px){
+    .tm-deck{height:clamp(470px,64vh,540px);}
+    .tm-card{grid-template-columns:1fr;grid-template-rows:minmax(0,150px) minmax(0,1fr);
+      align-items:stretch;gap:18px;}
+    /* the picture leads on a phone, the words follow */
+    .tm-art{grid-row:1;}
+    .tm-body{grid-row:2;}
+    .tm-qmark{font-size:40px;margin-bottom:6px;}
+    .tm-attr{padding-top:16px;}
+  }
+  @media (max-width:420px){
+    .tm-tabs{width:100%;}
+    .tm-tab{flex:1;padding:9px 10px;font-size:12px;}
+    .tm-card{padding:18px;}
   }
   @media (prefers-reduced-motion:reduce){
-    .said-swap{transition:none;}
+    .tm-card,.tm-dot,.tm-tab{transition:none;}
     .said.is-live .said-inner>*{opacity:1;transform:none;transition:none;}
-    .said-voice.is-timing::after{animation:none;transform:scaleX(1);}
   }
 
   /* ── 05 — FOOTER ────────────────────────────────────────────────────────
@@ -1211,19 +1271,28 @@
   .ft{position:relative;min-height:100svh;background:var(--bg);
     display:flex;flex-direction:column;overflow:hidden;isolation:isolate;}
 
-  /* the grain frame — bars rise from the floor, dotted lines fall through them */
+  /* the page closes the way it opened: the same dome, the same rising smoke,
+     the same circle as wide as the viewport with only its crest on screen */
   .ft-grain{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
-  .ft-grain-svg{position:absolute;bottom:0;left:0;right:0;width:100%;height:44%;overflow:visible;}
-  .ft-glow{position:absolute;left:50%;bottom:-2%;transform:translateX(-50%);width:100%;height:55%;
-    filter:blur(18px);
-    background:radial-gradient(90% 100% at 50% 100%,
-      rgba(226,240,255,1) 0%,rgba(140,197,255,.92) 8%,
-      rgba(92,169,255,.5) 28%,rgba(24,74,150,.12) 52%,transparent 68%);}
-  /* scrim keeps the headline readable where the glow is brightest */
+  #ftSmoke{position:absolute;inset:0;width:100%;height:100%;display:block;}
+  /* scrim keeps the headline readable where the dome is brightest */
   .ft-scrim{position:absolute;inset:0;
     background:
       linear-gradient(to bottom,rgba(6,11,21,.92) 0%,rgba(6,11,21,.35) 26%,transparent 52%),
       linear-gradient(105deg,rgba(6,11,21,.85) 0%,rgba(6,11,21,.22) 42%,transparent 64%);}
+
+  /* the hero's own button, closing the page — so the invitation is in the
+     copy where the reader already is, not only in a floating orb */
+  .ft-cta-dock{margin-top:4px;}
+  /* the hero's copy animates its width to hug each cycling prompt; this one
+     carries a single line, so it simply sizes to it */
+  .ft-cta-dock .cta-text{width:auto !important;}
+  .ft-cta-dock .cta{padding:10px 26px 10px 10px;}
+  .ft-cta-dock .cta-orb{width:48px;height:48px;}
+  .ft-cta-dock .cta-text span{font-size:16px;}
+  /* while the footer's own button is on screen the floating one stands down —
+     two of the same invitation in one view is one too many */
+  .orb-fab.stand-down{opacity:0;pointer-events:none;transform:translateY(10px);}
 
   .ft-inner{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;
     padding:clamp(40px,6vh,72px) clamp(20px,4.5vw,56px) clamp(80px,11vh,128px);}
@@ -1727,27 +1796,96 @@
   <!-- ── 04 — SAID: word of mouth ──────────────────────────────────────── -->
   <section class="said" id="saidSection" aria-label="Testimonials">
     <div class="said-pool" aria-hidden="true"></div>
+
+    <div class="geo geo-said" aria-hidden="true">
+      <span class="geo-arc" style="width:88vmax;height:88vmax;left:50%;top:36%;margin-left:-44vmax;margin-top:-44vmax;"></span>
+      <span class="geo-arc thin" style="width:120vmax;height:120vmax;left:50%;top:36%;margin-left:-60vmax;margin-top:-60vmax;"></span>
+      <span class="geo-orbit" style="width:64vmax;height:64vmax;left:50%;top:36%;margin-left:-32vmax;margin-top:-32vmax;--spin:165s;"><b></b></span>
+      <span class="geo-cross" style="left:10%;top:24%;"></span>
+      <span class="geo-cross" style="right:12%;bottom:20%;"></span>
+      <span class="geo-sq" style="right:6%;top:18%;"></span>
+    </div>
+
     <div class="said-inner">
-      <span class="said-k">Word of mouth</span>
       <h2 class="said-h">From people who <span class="serif">know my work</span></h2>
 
-      <figure class="said-stage" id="saidStage">
-        <blockquote class="said-quote said-swap" id="saidQuote">Bhanu became our <em>Founding Product Designer</em> at Stressie, where he led customer discovery, behavior analytics, and design of our first product — which pre-launched into the market and <em>became the foundation for our traction</em>. I thank my lucky stars everyday.</blockquote>
-        <figcaption class="said-who said-swap">
-          <span class="said-mono" id="saidMono" aria-hidden="true">L</span>
-          <span class="said-id">
-            <span class="said-name" id="saidName">Lupita</span>
-            <span class="said-role" id="saidRole">Co-Founder &amp; CEO · Stressie</span>
-          </span>
-        </figcaption>
-      </figure>
-
-      <div class="said-rail" id="saidRail" role="group" aria-label="Choose whose words to read">
-        <button class="said-voice" type="button" data-voice="0" aria-pressed="true">Lupita</button>
-        <button class="said-voice" type="button" data-voice="1" aria-pressed="false">Subash</button>
-        <button class="said-voice" type="button" data-voice="2" aria-pressed="false">Shaini</button>
-        <button class="said-voice" type="button" data-voice="3" aria-pressed="false">AnuShree</button>
+      <div class="tm-tabs" id="tmTabs" role="tablist" aria-label="Whose words to read">
+        <button class="tm-tab" type="button" role="tab" data-group="reported" aria-selected="true">People I reported to</button>
+        <button class="tm-tab" type="button" role="tab" data-group="managed" aria-selected="false">Designers I managed</button>
       </div>
+
+      <div class="tm-deck" id="tmDeck">
+        <article class="tm-card" data-group="reported">
+          <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+          <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+          <div class="tm-body">
+            <span class="tm-qmark" aria-hidden="true">&ldquo;</span>
+            <blockquote class="tm-quote">Bhanu became our <em>Founding Product Designer</em> at Stressie, where he led customer discovery, behavior analytics, and design of our first product &mdash; which pre-launched into the market and <em>became the foundation for our traction</em>. I thank my lucky stars everyday.</blockquote>
+            <div class="tm-attr">
+              <span class="tm-avatar" aria-hidden="true">L</span>
+              <span class="tm-who">
+                <span class="tm-name">Lupita</span>
+                <span class="tm-role">Co-Founder &amp; CEO · Stressie</span>
+              </span>
+            </div>
+          </div>
+          <div class="tm-art"><img src="images/tm-lupita.webp" alt="" width="720" height="720" loading="lazy"></div>
+        </article>
+
+        <article class="tm-card" data-group="reported">
+          <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+          <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+          <div class="tm-body">
+            <span class="tm-qmark" aria-hidden="true">&ldquo;</span>
+            <blockquote class="tm-quote">Bhanu stands apart. He wasn&rsquo;t just executing on design briefs &mdash; he was <em>shaping the product vision</em>, pushing back when something didn&rsquo;t serve the user, and <em>holding a ridiculously high bar for craft</em> even when timelines were brutal. What struck me most was his ability to <em>hold ambiguity without flinching</em>.</blockquote>
+            <div class="tm-attr">
+              <span class="tm-avatar" aria-hidden="true">SR</span>
+              <span class="tm-who">
+                <span class="tm-name">Subash Rajaseelan</span>
+                <span class="tm-role">Chief of Staff &amp; PM · EverTutor</span>
+              </span>
+            </div>
+          </div>
+          <div class="tm-art"><img src="images/tm-subash.webp" alt="" width="720" height="720" loading="lazy"></div>
+        </article>
+
+        <article class="tm-card" data-group="managed">
+          <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+          <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+          <div class="tm-body">
+            <span class="tm-qmark" aria-hidden="true">&ldquo;</span>
+            <blockquote class="tm-quote">Thank you Bhanu for being such a great mentor. The way you onboarded and guided me from the beginning made a huge difference. Your patience and ability to explain complex concepts clearly helped me <em>grow more in those few months than I had in years</em>.</blockquote>
+            <div class="tm-attr">
+              <span class="tm-avatar" aria-hidden="true">S</span>
+              <span class="tm-who">
+                <span class="tm-name">Shaini</span>
+                <span class="tm-role">Content Designer · EverTutor</span>
+              </span>
+            </div>
+          </div>
+          <div class="tm-art"><img src="images/tm-shaini.webp" alt="" width="720" height="720" loading="lazy"></div>
+        </article>
+
+        <article class="tm-card" data-group="managed">
+          <span class="tm-fh tl"></span><span class="tm-fh tr"></span>
+          <span class="tm-fh bl"></span><span class="tm-fh br"></span>
+          <div class="tm-body">
+            <span class="tm-qmark" aria-hidden="true">&ldquo;</span>
+            <blockquote class="tm-quote">It was a great experience working with you. Your design sensibility and the way you approached user problems always inspired me to <em>think deeper about the work</em>. Hope to collaborate again someday.</blockquote>
+            <div class="tm-attr">
+              <span class="tm-avatar" aria-hidden="true">AS</span>
+              <span class="tm-who">
+                <span class="tm-name">AnuShree</span>
+                <span class="tm-role">Content Designer · EverTutor</span>
+              </span>
+            </div>
+          </div>
+          <div class="tm-art"><img src="images/tm-anushree.webp" alt="" width="720" height="720" loading="lazy"></div>
+        </article>
+      </div>
+
+      <div class="tm-dots" id="tmDots" role="group" aria-label="Choose a testimonial"></div>
+      <span class="tm-hint">Drag a card away to read the next one</span>
     </div>
   </section>
 
@@ -1755,74 +1893,18 @@
   <footer class="ft" id="contactSection">
 
     <div class="ft-grain" aria-hidden="true">
-      <svg class="ft-grain-svg" viewBox="0 0 1481 535" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <!-- bars: transparent at the top, azure at the floor -->
-          <linearGradient id="ftBar4" x1="0" y1="152" x2="0" y2="535" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#5CA9FF" stop-opacity="0"/>
-            <stop offset="35%" stop-color="#5CA9FF" stop-opacity="0.22"/>
-            <stop offset="100%" stop-color="#8CC5FF" stop-opacity="0.66"/>
-          </linearGradient>
-          <linearGradient id="ftBar3" x1="0" y1="221" x2="0" y2="535" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#5CA9FF" stop-opacity="0"/>
-            <stop offset="35%" stop-color="#5CA9FF" stop-opacity="0.17"/>
-            <stop offset="100%" stop-color="#8CC5FF" stop-opacity="0.55"/>
-          </linearGradient>
-          <linearGradient id="ftBar2" x1="0" y1="284" x2="0" y2="535" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#5CA9FF" stop-opacity="0"/>
-            <stop offset="30%" stop-color="#5CA9FF" stop-opacity="0.13"/>
-            <stop offset="100%" stop-color="#8CC5FF" stop-opacity="0.42"/>
-          </linearGradient>
-          <linearGradient id="ftBar1" x1="0" y1="355" x2="0" y2="535" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#5CA9FF" stop-opacity="0"/>
-            <stop offset="25%" stop-color="#5CA9FF" stop-opacity="0.09"/>
-            <stop offset="100%" stop-color="#8CC5FF" stop-opacity="0.3"/>
-          </linearGradient>
-          <!-- grain — azure particles, clipped to the bars' own alpha -->
-          <filter id="ftGrain" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
-            <feTurbulence type="fractalNoise" baseFrequency="0.88 0.88" numOctaves="3" seed="7" stitchTiles="stitch" result="noise"/>
-            <feColorMatrix type="matrix"
-              values="0 0 0 0 0.55
-                      0 0 0 0 0.78
-                      0 0 0 0 1.00
-                      0 0 0 9 -3.5"
-              in="noise" result="particles"/>
-            <feComposite in="particles" in2="SourceGraphic" operator="in"/>
-          </filter>
-          <linearGradient id="ftDot1" x1="635" y1="0" x2="635" y2="535" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="white" stop-opacity="0"/>
-            <stop offset="100%" stop-color="white" stop-opacity="0.5"/>
-          </linearGradient>
-          <linearGradient id="ftDot2" x1="424" y1="155" x2="424" y2="535" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="white" stop-opacity="0"/>
-            <stop offset="100%" stop-color="white" stop-opacity="0.5"/>
-          </linearGradient>
-          <linearGradient id="ftDot3" x1="213" y1="238" x2="213" y2="535" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="white" stop-opacity="0"/>
-            <stop offset="100%" stop-color="white" stop-opacity="0.5"/>
-          </linearGradient>
-        </defs>
-        <g filter="url(#ftGrain)">
-          <rect x="0" y="355" width="213" height="180" fill="url(#ftBar1)"/>
-          <rect x="212" y="284" width="213" height="251" fill="url(#ftBar2)"/>
-          <rect x="423" y="221" width="213" height="314" fill="url(#ftBar3)"/>
-          <rect x="634" y="152" width="214" height="383" fill="url(#ftBar4)"/>
-          <rect x="846" y="221" width="213" height="314" fill="url(#ftBar3)"/>
-          <rect x="1057" y="284" width="213" height="251" fill="url(#ftBar2)"/>
-          <rect x="1268" y="355" width="213" height="180" fill="url(#ftBar1)"/>
-        </g>
-        <g>
-          <line x1="213" y1="238" x2="213" y2="541" stroke="url(#ftDot3)" stroke-width="2" stroke-dasharray="2 10"/>
-          <line x1="424" y1="155" x2="424" y2="541" stroke="url(#ftDot2)" stroke-width="2" stroke-dasharray="2 10"/>
-          <line x1="635" y1="0" x2="635" y2="541" stroke="url(#ftDot1)" stroke-width="2" stroke-dasharray="2 10"/>
-          <line x1="847" y1="0" x2="847" y2="541" stroke="url(#ftDot1)" stroke-width="2" stroke-dasharray="2 10"/>
-          <line x1="1058" y1="155" x2="1058" y2="541" stroke="url(#ftDot2)" stroke-width="2" stroke-dasharray="2 10"/>
-          <line x1="1270" y1="238" x2="1270" y2="541" stroke="url(#ftDot3)" stroke-width="2" stroke-dasharray="2 10"/>
-        </g>
-      </svg>
-      <div class="ft-glow"></div>
+      <canvas id="ftSmoke"></canvas>
       <div class="ft-scrim"></div>
     </div>
+
+    <div class="geo geo-ft" aria-hidden="true">
+      <span class="geo-arc thin" style="width:120vmax;height:120vmax;left:50%;bottom:-88vmax;margin-left:-60vmax;"></span>
+      <span class="geo-orbit" style="width:86vmax;height:86vmax;left:50%;bottom:-64vmax;margin-left:-43vmax;--spin:210s;"><b></b></span>
+      <span class="geo-cross" style="left:8%;top:22%;"></span>
+      <span class="geo-cross" style="right:10%;top:32%;"></span>
+      <span class="geo-sq" style="right:8%;bottom:26%;"></span>
+    </div>
+
 
     <div class="ft-inner">
       <div class="ft-spread">
@@ -1834,6 +1916,17 @@
             <span class="ft-line">Building something&nbsp;cool?</span>
             <span class="ft-line serif">I&rsquo;m just a mail away.</span>
           </h2>
+
+          <!-- the hero's own button, so the page closes on the same invitation
+               it opened with rather than on a floating orb in the corner -->
+          <div class="ft-cta-dock">
+            <button class="cta" id="ftTalk" aria-label="Chat with Bhanu AI" aria-haspopup="dialog">
+              <span class="cta-orb" id="ftCtaOrb"><div id="ftOrbMount"></div></span>
+              <span class="cta-text" id="ftCtaText">
+                <span class="on">Ask me anything</span>
+              </span>
+            </button>
+          </div>
 
           <div class="ft-contact">
             <span class="ft-k">Shoot me a mail at</span>
@@ -1953,14 +2046,19 @@ if (new URLSearchParams(location.search).has('rafshim')) {
 }
 </script>
 <script>
-/* ═══ SMOKE SHADER — pure rising smoke, no geometry ═══ */
+/* ═══ SMOKE SHADER — the dome, and the smoke rising off it ═══
+   Written once and mounted twice: the hero opens on it and the footer closes
+   on it, which is what makes the page feel like one object rather than five
+   sections that happen to share a palette. */
 (function () {
-  var canvas = document.getElementById('smoke');
+function mountSmoke(canvas) {
+  if (!canvas) return null;
   var gl = canvas.getContext('webgl', { alpha: false, antialias: false, preserveDrawingBuffer: true });
   /* no WebGL: paint the same composition in CSS — a circle the width of the
      viewport, its centre pushed below the floor so only the crest shows */
   if (!gl) { canvas.style.background =
-    'radial-gradient(50vw 50vw at 50% 132%, #2C6FB8 0%, #17406E 34%, #0D1B2E 62%, #0A0E15 78%)'; return; }
+    'radial-gradient(50vw 50vw at 50% 132%, #2C6FB8 0%, #17406E 34%, #0D1B2E 62%, #0A0E15 78%)';
+    return null; }
 
   var VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
   var FRAG = [
@@ -2036,10 +2134,11 @@ if (new URLSearchParams(location.search).has('rafshim')) {
   var lastTick = 0;
   var frozen = false, pausedAt = 0;
 
-  /* the talk panel calls this. Stopping the loop is enough to hold the
-     image — the context keeps its buffer — and the clock is rewound by the
-     length of the pause on the way out, so resuming never jumps. */
-  window.__freezeHero = function (on) {
+  /* Stopping the loop is enough to hold the image — the context keeps its
+     buffer — and the clock is rewound by the length of the pause on the way
+     out, so resuming never jumps. The talk panel freezes the hero's; the
+     footer's freezes itself whenever it is off screen. */
+  function freeze(on) {
     if (on) {
       if (frozen) return;
       frozen = true; pausedAt = performance.now();
@@ -2048,7 +2147,7 @@ if (new URLSearchParams(location.search).has('rafshim')) {
       frozen = false; t0 += performance.now() - pausedAt;
       if (!reduced) requestAnimationFrame(frame);
     }
-  };
+  }
 
   function frame(now) {
     if (frozen) return;                 /* hold the last frame, stop the loop */
@@ -2064,6 +2163,26 @@ if (new URLSearchParams(location.search).has('rafshim')) {
   if (!reduced) setInterval(function () {
     if (!frozen && performance.now() - lastTick > 600) requestAnimationFrame(frame);
   }, 500);
+
+  return { freeze: freeze };
+}
+
+/* the hero's — the talk panel holds this one still */
+var heroSmoke = mountSmoke(document.getElementById('smoke'));
+window.__freezeHero = heroSmoke ? heroSmoke.freeze : function () {};
+
+/* the footer's — the same field, but it only runs while you are looking at
+   it, so the page is never paying for two shaders at once */
+var ftSmoke = mountSmoke(document.getElementById('ftSmoke'));
+if (ftSmoke) {
+  var ftEl = document.querySelector('.ft');
+  if (ftEl && 'IntersectionObserver' in window) {
+    ftSmoke.freeze(true);
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { ftSmoke.freeze(!e.isIntersecting); });
+    }, { threshold: 0.02 }).observe(ftEl);
+  }
+}
 })();
 
 /* ═══ CTA — cycling "Ask me…" prompts (fixed width, directional crossfade) ═══ */
@@ -2740,12 +2859,33 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
   }
 });
 
-/* ═══ ORB in the CTA — visual only ═══ */
+/* ═══ ORB in the CTAs — visual only. The hero opens on this button and the
+   footer closes on it, so both carry the same orb. ═══ */
 (function waitOrb() {
-  if (window.BhanuOrb && window.BhanuOrb.mountVisual) {
-    window.BhanuOrb.mountVisual(document.getElementById('ctaOrbMount'), { palette: 'arctic', size: 55, state: 'idle' });
-    document.getElementById('ctaOrb').classList.add('mounted');
-  } else setTimeout(waitOrb, 60);
+  if (!(window.BhanuOrb && window.BhanuOrb.mountVisual)) { setTimeout(waitOrb, 60); return; }
+  window.BhanuOrb.mountVisual(document.getElementById('ctaOrbMount'),
+    { palette: 'arctic', size: 55, state: 'idle' });
+  document.getElementById('ctaOrb').classList.add('mounted');
+
+  var ftMount = document.getElementById('ftOrbMount');
+  if (ftMount) {
+    window.BhanuOrb.mountVisual(ftMount, { palette: 'arctic', size: 48, state: 'idle' });
+    document.getElementById('ftCtaOrb').classList.add('mounted');
+  }
+})();
+
+/* the footer's button opens the same panel, and while it is on screen the
+   floating orb steps aside — one invitation per view */
+(function () {
+  var ftTalk = document.getElementById('ftTalk');
+  if (!ftTalk) return;
+  ftTalk.addEventListener('click', openChat);
+
+  var fab = document.getElementById('orbFab');
+  if (!fab || !('IntersectionObserver' in window)) return;
+  new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { fab.classList.toggle('stand-down', e.isIntersecting); });
+  }, { threshold: 0.4 }).observe(ftTalk);
 })();
 
 /* ═══ ORB FAB — the same orb, parked bottom-right ═══
@@ -2964,90 +3104,140 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
 })();
 </script>
 <script>
-/* ── 04 — SAID: one voice at a time ─────────────────────────────────────
-   The stage crossfades between four short testimonies. On screen, each one
-   holds for a dwell; a hairline under the active name counts it down. While
-   the reader's pointer is inside the section, time stops. Reduced motion:
-   no autoplay, no fades — the rail still works by hand. */
+/* ── 04 — SAID: a deck you can throw ────────────────────────────────────
+   Four framed cards in a stack. The one on top is draggable in any
+   direction; throw it far enough and it goes to the back, and whoever was
+   behind it steps forward. The two tabs decide which stack you are holding:
+   the people I reported to, or the designers I looked after. Dots give the
+   same navigation to a keyboard. */
 (function () {
-  var sec   = document.getElementById('saidSection');
-  var stage = document.getElementById('saidStage');
-  var rail  = document.getElementById('saidRail');
-  if (!sec || !stage || !rail) return;
-  var quote = document.getElementById('saidQuote');
-  var mono  = document.getElementById('saidMono');
-  var name  = document.getElementById('saidName');
-  var role  = document.getElementById('saidRole');
-  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var sec  = document.getElementById('saidSection');
+  var deck = document.getElementById('tmDeck');
+  var tabs = document.getElementById('tmTabs');
+  var dotsWrap = document.getElementById('tmDots');
+  if (!sec || !deck || !tabs || !dotsWrap) return;
 
-  var voices = [
-    { m: 'L', n: 'Lupita', r: 'Co-Founder & CEO · Stressie',
-      q: 'Bhanu became our <em>Founding Product Designer</em> at Stressie, where he led customer discovery, behavior analytics, and design of our first product — which pre-launched into the market and <em>became the foundation for our traction</em>. I thank my lucky stars everyday.' },
-    { m: 'S', n: 'Subash Rajaseelan', r: 'Chief of Staff & PM · EverTutor',
-      q: 'Bhanu stands apart. He wasn’t just executing on design briefs — he was <em>shaping the product vision</em>, pushing back when something didn’t serve the user, and <em>holding a ridiculously high bar for craft</em> even when timelines were brutal. What struck me most was his ability to <em>hold ambiguity without flinching</em>.' },
-    { m: 'S', n: 'Shaini', r: 'Content Designer · EverTutor',
-      q: 'Thank you Bhanu for being such a great mentor. The way you onboarded and guided me from the beginning made a huge difference. Your patience and ability to explain complex concepts clearly helped me <em>grow more in those few months than I had in years</em>.' },
-    { m: 'A', n: 'AnuShree', r: 'Content Designer · EverTutor',
-      q: 'It was a great experience working with you. Your design sensibility and the way you approached user problems always inspired me to <em>think deeper about the work</em>. Hope to collaborate again someday.' }
-  ];
+  var all  = [].slice.call(deck.querySelectorAll('.tm-card'));
+  var calm = matchMedia('(prefers-reduced-motion: reduce)');
+  var tabBtns = [].slice.call(tabs.querySelectorAll('.tm-tab'));
+  var cards = [], base = [], dots = [], drag = null;
 
-  var DWELL = 8000, idx = 0, timer = null, running = false;
-  var btns = [].slice.call(rail.querySelectorAll('.said-voice'));
-  rail.style.setProperty('--dwell', DWELL + 'ms');
+  var THROW = 110;             /* px of travel that counts as a throw */
 
-  function render(i) {
-    quote.innerHTML = voices[i].q;
-    mono.textContent = voices[i].m;
-    name.textContent = voices[i].n;
-    role.textContent = voices[i].r;
+  function place(c, i) {
+    c.style.zIndex = String(40 - i);
+    c.style.transform = 'translate3d(0,' + (i * 13) + 'px,0) scale(' + (1 - i * 0.035).toFixed(3) + ')';
+    c.style.opacity = i > 2 ? '0' : String(1 - i * 0.16);
+    c.classList.toggle('is-front', i === 0);
+    /* only the card you can actually read is in the tree */
+    c.setAttribute('aria-hidden', i === 0 ? 'false' : 'true');
   }
-  function mark(i, timing) {
-    btns.forEach(function (b, j) {
-      b.setAttribute('aria-pressed', j === i ? 'true' : 'false');
-      b.classList.remove('is-timing');
+  function layout() { cards.forEach(place); markDots(); }
+
+  function markDots() {
+    var at = base.indexOf(cards[0]);
+    dots.forEach(function (d, n) {
+      d.classList.toggle('is-on', n === at);
+      d.setAttribute('aria-current', n === at ? 'true' : 'false');
     });
-    if (timing && !reduced) {
-      void btns[i].offsetWidth;          /* restart the dwell line from zero */
-      btns[i].classList.add('is-timing');
-    }
   }
-  function show(i, timing) {
-    idx = i;
-    mark(i, timing);
-    if (reduced) { render(i); return; }
-    stage.classList.add('is-swapping');
+
+  function buildDots() {
+    dotsWrap.innerHTML = '';
+    dots = base.map(function (c, i) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'tm-dot';
+      var nm = c.querySelector('.tm-name');
+      b.setAttribute('aria-label', nm ? nm.textContent.trim() : 'Testimonial ' + (i + 1));
+      b.addEventListener('click', function () { bringUp(c); });
+      dotsWrap.appendChild(b);
+      return b;
+    });
+  }
+
+  function bringUp(c) {
+    var guard = 0;
+    while (cards[0] !== c && guard++ < cards.length) cards.push(cards.shift());
+    layout();
+  }
+
+  function setGroup(g) {
+    all.forEach(function (c) { c.hidden = c.getAttribute('data-group') !== g; });
+    cards = all.filter(function (c) { return !c.hidden; });
+    base = cards.slice();
+    tabBtns.forEach(function (b) {
+      b.setAttribute('aria-selected', String(b.getAttribute('data-group') === g));
+    });
+    buildDots();
+    layout();
+  }
+
+  tabBtns.forEach(function (b) {
+    b.addEventListener('click', function () { setGroup(b.getAttribute('data-group')); });
+  });
+
+  /* ── the throw ── */
+  deck.addEventListener('pointerdown', function (e) {
+    var front = cards[0];
+    if (!front || !front.contains(e.target)) return;
+    if (e.target.closest('a,button')) return;
+    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, dy: 0 };
+    front.classList.add('is-dragging');
+    try { front.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+
+  deck.addEventListener('pointermove', function (e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    drag.dx = e.clientX - drag.x;
+    drag.dy = e.clientY - drag.y;
+    cards[0].style.transform =
+      'translate3d(' + drag.dx + 'px,' + drag.dy + 'px,0) rotate(' + (drag.dx * 0.045).toFixed(2) + 'deg)';
+  });
+
+  function release() {
+    if (!drag) return;
+    var front = cards[0];
+    var dx = drag.dx, dy = drag.dy;
+    drag = null;
+    front.classList.remove('is-dragging');
+
+    if (Math.sqrt(dx * dx + dy * dy) < THROW) { layout(); return; }   /* not far enough — settle back */
+
+    /* carry it off in the direction it was thrown, then re-seat it at the
+       back with no transition so it never flies back across the screen */
+    var k = 1100 / Math.max(1, Math.sqrt(dx * dx + dy * dy));
+    front.style.transform =
+      'translate3d(' + (dx * k) + 'px,' + (dy * k) + 'px,0) rotate(' + (dx * 0.09).toFixed(2) + 'deg)';
+    front.style.opacity = '0';
+
     setTimeout(function () {
-      render(i);
-      stage.classList.remove('is-swapping');
-    }, 270);
+      front.classList.add('is-dragging');        /* borrows its transition:none */
+      cards.push(cards.shift());
+      layout();
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { front.classList.remove('is-dragging'); });
+      });
+    }, calm.matches ? 0 : 300);
   }
-  function arm()   { clearTimeout(timer); if (!reduced && running) timer = setTimeout(next, DWELL); }
-  function disarm(){ clearTimeout(timer); timer = null; }
-  function next()  { show((idx + 1) % voices.length, true); arm(); }
+  deck.addEventListener('pointerup', release);
+  deck.addEventListener('pointercancel', release);
 
-  btns.forEach(function (b) {
-    b.addEventListener('click', function () { show(+b.dataset.voice, true); arm(); });
+  /* arrows work the deck too, for anyone not using a pointer */
+  deck.setAttribute('tabindex', '0');
+  deck.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { cards.push(cards.shift()); layout(); e.preventDefault(); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { cards.unshift(cards.pop()); layout(); e.preventDefault(); }
   });
 
-  /* while the reader is inside, time stops; leaving starts a fresh dwell */
-  sec.addEventListener('pointerenter', function () { rail.classList.add('is-paused'); disarm(); });
-  sec.addEventListener('pointerleave', function () {
-    rail.classList.remove('is-paused');
-    if (running) { mark(idx, true); arm(); }
-  });
+  setGroup('reported');
 
-  /* arrive, then breathe — only while on screen */
-  sec.classList.add('is-live');
-  new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (e.isIntersecting) {
-        sec.classList.add('revealed');
-        if (!running) { running = true; mark(idx, true); arm(); }
-      } else if (running) {
-        running = false; disarm(); mark(idx, false);
-      }
-    });
-  }, { threshold: 0.25 }).observe(sec);
+  /* arrive on scroll — .is-live arms it, so with no observer it is simply there */
+  if ('IntersectionObserver' in window) {
+    sec.classList.add('is-live');
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) sec.classList.add('revealed'); });
+    }, { threshold: 0.2 }).observe(sec);
+  }
 })();
 </script>
 <script>
