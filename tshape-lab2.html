@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>T-Shape Lab 2 — constellation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,17 +18,24 @@
 
     --ink-1: #F7F7F2;                   /* active label */
     --ink-2: rgba(255,255,255,0.60);    /* resting label */
-    --ink-3: rgba(255,255,255,0.34);    /* meta */
+    --ink-3: rgba(255,255,255,0.56);    /* meta — 0.34 read as ~3.1:1, under the 4.5 floor */
     --wire:  rgba(230,242,141,0.72);    /* the constellation lines — these ARE the T, so they carry */
     --wire-glow: 0 0 7px 0 rgba(230,242,141,0.42);
+
+    /* one source of truth for the page gutter — the atmosphere cancels it exactly */
+    --pad: clamp(20px, 4vw, 72px);
   }
   * { box-sizing: border-box; }
+  /* clip, not hidden: no scroll container, so nothing can scroll sideways */
+  html { overflow-x: clip; }
   body {
     margin: 0; background: #08080A; color: var(--ink-1);
     font-family: var(--font-heading);
-    min-height: 100vh; display: flex; align-items: center;
-    padding: 40px clamp(20px, 4vw, 72px);
-    overflow-x: hidden;
+    min-height: 100svh; display: flex; align-items: center;
+    padding: clamp(36px, 6vh, 64px) var(--pad);
+    padding-left: max(var(--pad), env(safe-area-inset-left));
+    padding-right: max(var(--pad), env(safe-area-inset-right));
+    overflow-x: clip;
   }
 
   /* ─────────────────────────────────────────────────────────
@@ -42,7 +49,15 @@
   }
 
   /* ── Atmosphere ─────────────────────────────────────────── */
-  .tc-atmos { position: absolute; inset: -12% -6%; pointer-events: none; z-index: 0; overflow: hidden; }
+  /* The inline insets cancel the page gutter *exactly* — including the safe-area
+     side, so a notched phone in landscape is covered too. The glow reaches the
+     screen edges with no seam, and can never create a sideways scroll. */
+  .tc-atmos {
+    position: absolute; top: -14%; bottom: -14%;
+    left:  calc(-1 * max(var(--pad), env(safe-area-inset-left)));
+    right: calc(-1 * max(var(--pad), env(safe-area-inset-right)));
+    pointer-events: none; z-index: 0; overflow: hidden;
+  }
   /* the shaft of light falling from the top right */
   .tc-shaft {
     position: absolute; top: -46%; right: 4%; width: 30%; height: 150%;
@@ -70,18 +85,22 @@
   .tc-heading {
     font-family: var(--font-heading); font-weight: 300;
     font-size: clamp(38px, 4.4vw, 68px); line-height: 1.06; letter-spacing: -0.035em;
-    color: var(--ink-1); margin: 0 0 30px;
+    color: var(--ink-1); margin: 0 0 30px; text-wrap: balance;
   }
   .tc-intro {
     font-family: var(--font-heading); font-weight: 400;
     font-size: clamp(15px, 1.15vw, 17px); line-height: 1.75;
-    color: var(--ink-2); margin: 0; max-width: 34ch;
+    color: var(--ink-2); margin: 0; max-width: 34ch; text-wrap: pretty;
   }
 
   /* ── The map ────────────────────────────────────────────── */
   .tc-map {
     position: relative; z-index: 2;
     height: clamp(560px, 43vw, 700px);
+    /* node spacing is a fixed % of this box, so hit zones and the card are
+       sized in cqw — they track the map, not the viewport, and therefore stay
+       correct in both the two-column and the stacked layout */
+    container-type: inline-size;
   }
 
   /* axis captions — mono cap for the name, italic for the aside */
@@ -129,7 +148,9 @@
     box-shadow: 0 0 6px 1px rgba(230,242,141,0.30);
     transition: background 0.4s ease, box-shadow 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1);
   }
-  .tc-node:hover .tc-dot, .tc-node.is-on .tc-dot {
+  /* lit state keys off .is-on only — JS sets it on pointerenter, which fires for
+     mouse and touch alike, so a tapped node never gets stranded in :hover */
+  .tc-node.is-on .tc-dot {
     background: #F4FBC8; transform: scale(1.35);
     box-shadow: 0 0 0 3px rgba(230,242,141,0.18), 0 0 18px 4px rgba(230,242,141,0.55), 0 0 44px 12px rgba(230,242,141,0.22);
   }
@@ -140,22 +161,28 @@
     color: var(--ink-2); white-space: nowrap;
     transition: color 0.4s ease;
   }
-  .tc-node:hover .tc-nm, .tc-node.is-on .tc-nm { color: var(--ink-1); }
+  .tc-node.is-on .tc-nm { color: var(--ink-1); }
   .tc-node:focus-visible { outline: 1px solid var(--primary); outline-offset: 6px; border-radius: 6px; }
 
   /* the button itself is a zero-size anchor, so each node carries its own
      invisible hit area covering the dot and its label */
   .tc-node::before { content: ""; position: absolute; }
 
-  /* breadth nodes sit on the bar, labels stacked above it */
+  /* breadth nodes sit on the bar, labels stacked above it.
+     Nodes are 20cqw apart, so 9cqw of reach each side never lets two
+     neighbouring hit zones touch, at any map width. */
   .tc-b { top: 25%; transform: translateX(-50%); }
   .tc-b .tc-nm { position: absolute; left: 50%; bottom: 27px; transform: translateX(-50%); text-align: center; }
-  .tc-b::before { left: -78px; right: -78px; top: -82px; bottom: -16px; }
+  .tc-b::before {
+    left:  calc(-1 * clamp(38px, 9cqw, 92px));
+    right: calc(-1 * clamp(38px, 9cqw, 92px));
+    top: -82px; bottom: -16px;
+  }
 
   /* depth nodes sit on the stem, labels to the right */
   .tc-d { left: 50%; }
   .tc-d .tc-nm { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); }
-  .tc-d::before { left: -16px; top: -23px; width: 208px; height: 46px; }
+  .tc-d::before { left: -16px; top: -24px; width: min(208px, 30cqw); height: 48px; }
 
   /* ── Depth caption, off to the right with its own rule ──── */
   .tc-cap-depth {
@@ -202,7 +229,7 @@
   /* ── The card ───────────────────────────────────────────── */
   .tc-card {
     position: absolute; left: 0; top: 36%; z-index: 3;
-    width: clamp(212px, 17.5vw, 252px); min-height: 300px;
+    width: clamp(196px, 27cqw, 252px); min-height: clamp(268px, 48%, 320px);
     padding: 24px 24px 22px;
     border-radius: 18px;
     border: 1px solid rgba(230,242,141,0.16);
@@ -233,6 +260,11 @@
   .tc-card-tx em { font-style: normal; font-weight: 600; color: var(--primary); }
   .tc-card-rule { position: absolute; left: 24px; bottom: 26px; width: 26px; height: 1px; background: rgba(230,242,141,0.45); }
 
+  /* The per-node inline line is a list-layout device. Hidden by default and in
+     every constellation layout — left visible it gives each zero-width node
+     button real width, which silently inflates the hit zones. */
+  .tc-inline { display: none; }
+
   .tc-fade { transition: opacity 0.24s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1); }
   .tc-card.is-swapping .tc-fade { opacity: 0; transform: translateY(8px); }
 
@@ -242,21 +274,39 @@
     .tc-card.is-swapping .tc-fade { transform: none; }
   }
 
-  /* ── Tablet ─────────────────────────────────────────────── */
-  @media (max-width: 1180px) {
-    .tc { grid-template-columns: 1fr; gap: 44px; }
-    .tc-map { height: 620px; }
-    .tc-card { left: 0; width: 230px; }
-    .tc-cap-depth { left: 78%; }
+  /* ── Below ~1400 the side-by-side squeezes the map under the width five
+        labels need, so the aside moves on top and the map takes the full
+        measure — capped, so the T never stretches into a flat wire. ── */
+  @media (max-width: 1400px) {
+    .tc { grid-template-columns: 1fr; gap: clamp(32px, 4.5vw, 52px); }
+    .tc-aside { max-width: 42rem; }
+    .tc-map { width: 100%; max-width: 940px; margin-inline: auto; height: clamp(560px, 62vw, 640px); }
   }
 
-  /* ── Phone: the constellation folds into a lit list ─────── */
-  @media (max-width: 767px) {
-    body { padding: 40px 20px; align-items: flex-start; }
-    .tc-atmos { inset: 0; }
+  /* ── iPad portrait: same constellation, tighter type ────── */
+  @media (max-width: 1023px) {
+    .tc-map { height: clamp(540px, 68vw, 600px); }
+    .tc-cap-depth { left: auto; right: 0; padding-left: 24px; }
+    .tc-cap-depth::before { height: 104px; }
+  }
+
+  /* ── Phone, and any viewport too short to hold the map, fold
+        into two lit lists. A landscape phone is 844px wide but
+        only ~390 tall, so width alone would miss it. ── */
+  @media (max-width: 767px), (max-height: 600px) and (orientation: landscape) {
+    body {
+      padding-top: clamp(28px, 6vh, 40px);
+      padding-bottom: max(28px, env(safe-area-inset-bottom));
+      align-items: flex-start;
+    }
+    /* the list layout scrolls, so the light becomes a fixed backdrop: no seam
+       at either end, and it can't add to the page's scroll height */
+    .tc-atmos { position: fixed; inset: 0; }
     .tc-shaft { width: 60%; right: -10%; }
 
-    .tc-map { height: auto; display: flex; flex-direction: column; gap: 4px; }
+    /* 42rem keeps the rows a readable measure when the fold is triggered by a
+       short-but-wide window rather than a phone */
+    .tc-map { height: auto; max-width: 42rem; margin-inline: 0; display: flex; flex-direction: column; gap: 4px; }
     .tc-bar, .tc-stem, .tc-wire, .tc-pool, .tc-card { display: none; }
     .tc-cap { text-align: left; align-items: flex-start; }
     .tc-cap-breadth, .tc-cap-depth {
@@ -275,9 +325,9 @@
     .tc-node {
       position: relative; transform: none; display: block; width: 100%;
       left: auto !important; top: auto !important;
-      padding: 13px 0 13px 22px; text-align: left;
+      padding: 15px 0 15px 22px; text-align: left;   /* ≥44px row, touch-safe */
     }
-    .tc-node .tc-dot { position: absolute; left: 0; top: 22px; margin: 0; }
+    .tc-node .tc-dot { position: absolute; left: 0; top: 21px; margin: 0; }
     .tc-node::before { display: none; }   /* the row is its own hit area on phone */
     .tc-nm, .tc-b .tc-nm, .tc-d .tc-nm {
       position: static; transform: none; text-align: left; white-space: normal;
@@ -290,11 +340,25 @@
     .tc-inline > span { overflow: hidden; min-height: 0; }
     .tc-inline p {
       margin: 0; padding: 9px 0 2px; font-size: var(--fs-sm); line-height: 1.7;
-      color: rgba(255,255,255,0.70);
+      color: rgba(255,255,255,0.70); max-width: 60ch; text-wrap: pretty;
     }
     .tc-inline em { font-style: normal; font-weight: 600; color: var(--primary); }
   }
-  @media (min-width: 768px) { .tc-inline { display: none; } }
+
+  /* Type scale and gutter shrink for genuinely narrow screens only — a short
+     wide window folds to the list layout but is not a phone. */
+  @media (max-width: 767px) {
+    :root { --fs-label: 10px; --fs-sm: 12px; --fs-body: 14px; --pad: 20px; }
+    .tc-heading { font-size: clamp(30px, 9vw, 44px); }
+    .tc-intro   { font-size: var(--fs-body); }
+  }
+
+  /* Coarse pointers get more reach along the stem. Only the hit zone grows —
+     padding on .tc-node would drag the dot off the line, since the dot is
+     positioned against the button's padding box. */
+  @media (pointer: coarse) {
+    .tc-d::before { height: 54px; top: -27px; }
+  }
 </style>
 </head>
 <body>
@@ -412,6 +476,11 @@
   var nodes = Array.prototype.slice.call(map.querySelectorAll('.tc-node'));
   var swapT;
 
+  /* mirrors the CSS exactly — when the constellation folds into lists there is
+     no bar, stem or card to wire anything to */
+  var folded = window.matchMedia('(max-width: 767px), (max-height: 600px) and (orientation: landscape)');
+  var calm   = window.matchMedia('(prefers-reduced-motion: reduce)');
+
   /* orthogonal waypoints -> path with softened corners */
   function routeThrough(pts, r) {
     var d = 'M' + pts[0][0].toFixed(1) + ',' + pts[0][1].toFixed(1);
@@ -431,7 +500,7 @@
   }
 
   function drawWire(node) {
-    if (window.innerWidth <= 767) { wire.setAttribute('d', ''); return; }
+    if (folded.matches) { wire.setAttribute('d', ''); return; }
     var m = map.getBoundingClientRect();
     var dot = node.querySelector('.tc-dot').getBoundingClientRect();
     var c = card.getBoundingClientRect();
@@ -462,6 +531,12 @@
     }
 
     wire.setAttribute('d', routeThrough(pts, 16));
+    if (calm.matches) {                      // reduced motion: the route, no travel
+      wire.style.transition = 'none';
+      wire.style.strokeDasharray = 'none';
+      wire.style.strokeDashoffset = '0';
+      return;
+    }
     // let the light travel the new route
     var len = wire.getTotalLength();
     wire.style.transition = 'none';
@@ -513,13 +588,18 @@
   select(first, true);
 
   var rt;
-  window.addEventListener('resize', function () {
+  function reroute() {
     clearTimeout(rt);
     rt = setTimeout(function () {
       var on = map.querySelector('.tc-node.is-on');
       if (on) drawWire(on);
     }, 120);
-  });
+  }
+  window.addEventListener('resize', reroute);
+  // crossing the fold, or rotating a tablet, changes the geometry the wire is
+  // drawn against — and doesn't always arrive as a resize
+  if (folded.addEventListener) folded.addEventListener('change', reroute);
+  if (window.ResizeObserver) new ResizeObserver(reroute).observe(map);
 })();
 </script>
 </body>
