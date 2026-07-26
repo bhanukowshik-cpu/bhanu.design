@@ -274,9 +274,12 @@
     object-fit:cover;transform-origin:50% 50%;
     transform:translate(-50%,-50%) scale(var(--k,.62));
     border-radius:var(--kr,26px);opacity:var(--ko,0);}
-  /* a soft floor under it so the cards never sit on raw brightness */
+  /* Only a soft edge-fade — it must not smother the image. Transparent well
+     past the middle, and never fully opaque, or the light disappears behind
+     the cards that sit in exactly that middle. */
   .work-canvas::after{content:'';position:absolute;inset:0;
-    background:radial-gradient(120% 90% at 50% 50%,transparent 30%,var(--cream) 92%);}
+    background:radial-gradient(135% 105% at 50% 48%,transparent 62%,
+      color-mix(in srgb,var(--cream) 82%,transparent) 100%);}
   .work-sticky>.work-head,.work-sticky>.work-track{position:relative;z-index:1;}
 
   /* section header — just the label, nothing else */
@@ -1670,7 +1673,8 @@ addEventListener('scroll', function () {
     var g = light.v;
     canvas.style.setProperty('--k',  (0.62 + g * 0.56).toFixed(4));
     canvas.style.setProperty('--kr', ((1 - g) * 26).toFixed(1) + 'px');
-    canvas.style.setProperty('--ko', (g * 0.64).toFixed(3));
+    /* present from the moment the section lands, not only at the end of it */
+    canvas.style.setProperty('--ko', (0.38 + g * 0.52).toFixed(3));
   }
 
   gsap.set(track, { y: '58vh', autoAlpha: 0.06 });
@@ -1687,12 +1691,13 @@ addEventListener('scroll', function () {
     }
   });
 
-  /* A — the reel arrives from below */
-  tl.to(track, { y: '0vh', autoAlpha: 1, ease: 'power3.out', duration: 0.22 }, 0);
-  /* B — then it walks sideways */
-  tl.to(track, { x: function () { return -travel(); }, ease: 'none', duration: 0.78 }, 0.22);
-  /* the light opens across the whole pin, still growing during the walk */
+  /* A — the light gets the first beat to itself, so the image is actually
+     seen opening before the cards land on top of it and cover the middle */
   tl.to(light, { v: 1, ease: 'none', duration: 1, onUpdate: drawLight }, 0);
+  /* B — the reel arrives from below, once the light has opened a little */
+  tl.to(track, { y: '0vh', autoAlpha: 1, ease: 'power3.out', duration: 0.24 }, 0.14);
+  /* C — then it walks sideways for the rest of the pin */
+  tl.to(track, { x: function () { return -travel(); }, ease: 'none', duration: 0.62 }, 0.38);
 
   addEventListener('resize', function () { ScrollTrigger.refresh(); });
 })();
