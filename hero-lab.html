@@ -1302,22 +1302,31 @@
     }
 .s2-intro.s2-intro-armed { visibility: visible; }
 .s2-intro-img-wrap {
-      /* Engine-style: a wide rounded panel anchored to the bottom edge,
-         only its top peeking; it RISES to full-bleed rather than scaling
-         from a centred thumbnail. */
+      /* Engine-style rise, compositor-friendly: the image is mounted
+         full-bleed ONCE and a clip-path window opens onto it — no layout
+         or re-raster per frame, unlike animating left/right/top. The
+         initial clip matches drive(0): a wide rounded panel at the
+         bottom edge, top peeking. */
       position: absolute;
-      left: 12vw; right: 12vw; top: 86vh; bottom: 0;
-      border-radius: 28px 28px 0 0;
-      overflow: hidden;
-      will-change: left, right, top;
+      inset: 0;
+      clip-path: inset(86vh 12vw 0 12vw round 28px 28px 0 0);
+      will-change: clip-path;
     }
 .s2-intro-img {
       width: 100%; height: 100%;
       object-fit: cover;
-      /* stays blurred at full-bleed — it's a backdrop, not a reveal */
-      filter: blur(24px) brightness(0.8);
-      transform: scale(1.08);        /* keep blur's soft edges outside the crop */
-      will-change: filter;
+      /* blur is CONSTANT — animating filter() re-blurs a viewport-sized
+         image every frame and is exactly what janky feels like. The
+         darkening rides the .s2-intro-shade overlay's opacity instead. */
+      filter: blur(22px);
+      transform: scale(1.06);        /* keep blur's soft edges outside the crop */
+    }
+.s2-intro-shade {
+      position: absolute;
+      inset: 0;
+      background: #05070B;
+      opacity: 0.22;
+      will-change: opacity;
     }
 .s2-intro-title {
       position: absolute;
@@ -3715,6 +3724,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="s2-intro" id="s2Intro" aria-hidden="true">
         <div class="s2-intro-img-wrap" id="s2IntroImgWrap">
           <img class="s2-intro-img" src="images/card-et-live.png" alt="">
+          <div class="s2-intro-shade" id="s2IntroShade" aria-hidden="true"></div>
         </div>
         <h2 class="s2-intro-title" id="s2IntroTitle">Featured Work</h2>
       </div>
@@ -5480,11 +5490,13 @@ addEventListener('load', function () {
      Phase C (reel, REEL viewports): the remaining travel drives the helix
      exactly as before. All inline-driven from onUpdate: scrubbed, no
      tweens, so it tracks the finger. */
-  var INTRO_GROW = 1.2, INTRO_SLIDE = 0.55, REEL = 1.1 * 7;
-  var TOTAL = INTRO_GROW + INTRO_SLIDE + REEL;
+  /* Phases OVERLAP — the slide starts before the grow lands and hands to
+     the reel without a gap; hard sequential gates read as dead stops. */
+  var GROW_END = 1.2, SLIDE_START = 0.95, SLIDE_END = 1.6, REEL = 1.1 * 7;
+  var TOTAL = SLIDE_END + REEL;
   var intro      = document.getElementById('s2Intro');
   var introWrap  = document.getElementById('s2IntroImgWrap');
-  var introImg   = intro ? intro.querySelector('.s2-intro-img') : null;
+  var introShade = document.getElementById('s2IntroShade');
   var introTitle = document.getElementById('s2IntroTitle');
   var fwHeader   = document.getElementById('s2FwHeader');
   var slideEls   = [
@@ -5499,24 +5511,23 @@ addEventListener('load', function () {
   function easeOutC(t) { return 1 - Math.pow(1 - t, 3); }
 
   function drive(vh) {
-    var a = easeInOut(clamp01(vh / INTRO_GROW));
-    var b = easeOutC(clamp01((vh - INTRO_GROW) / INTRO_SLIDE));
-    var reelP = clamp01((vh - INTRO_GROW - INTRO_SLIDE) / REEL);
+    var a = easeInOut(clamp01(vh / GROW_END));
+    var b = easeOutC(clamp01((vh - SLIDE_START) / (SLIDE_END - SLIDE_START)));
+    var reelP = clamp01((vh - SLIDE_END) / REEL);
 
-    /* Engine-style rise: the panel is bottom-anchored; its top edge climbs
-       from an 86vh peek to 0 while the sides open 12vw→0. The blur never
-       clears — full-bleed it reads as a soft backdrop, not a reveal. */
+    /* Engine-style rise, one compositor-friendly write: the image sits
+       full-bleed and a clip window opens onto it — top edge climbs from
+       the 86vh peek, sides open 12vw→0, corners relax. No layout, no
+       re-raster, no filter churn. */
     if (introWrap) {
-      introWrap.style.left   = lerpN(12, 0, a) + 'vw';
-      introWrap.style.right  = lerpN(12, 0, a) + 'vw';
-      introWrap.style.top    = lerpN(86, 0, a) + 'vh';
       var rad = lerpN(28, 0, a).toFixed(1);
-      introWrap.style.borderRadius = rad + 'px ' + rad + 'px 0 0';
+      introWrap.style.clipPath = 'inset(' +
+        lerpN(86, 0, a).toFixed(2) + 'vh ' +
+        lerpN(12, 0, a).toFixed(2) + 'vw 0 ' +
+        lerpN(12, 0, a).toFixed(2) + 'vw round ' + rad + 'px ' + rad + 'px 0 0)';
     }
-    if (introImg) {
-      introImg.style.filter =
-        'blur(' + lerpN(24, 16, a).toFixed(1) + 'px) brightness(' + lerpN(0.8, 0.55, a).toFixed(3) + ')';
-    }
+    /* darkening rides a composited opacity, not brightness() */
+    if (introShade) introShade.style.opacity = lerpN(0.22, 0.46, a).toFixed(3);
     /* The title starts mid-frame (like the Engine's "One system…") and is
        chased off the top by the panel's rising edge. */
     if (introTitle) {
@@ -5538,6 +5549,23 @@ addEventListener('load', function () {
     root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: reelP } }));
   }
 
+  /* Scrub smoothing: drive() chases the scroll through a framerate-
+     normalized lerp instead of snapping 1:1 to each wheel step. The
+     plushness is the difference between gliding and twitching; the
+     ticker detaches itself the moment it lands. */
+  var driveTarget = 0, driveState = 0, driveTicking = false;
+  function driveTick() {
+    var k = 1 - Math.pow(1 - 0.16, gsap.ticker.deltaRatio());
+    driveState += (driveTarget - driveState) * k;
+    if (Math.abs(driveTarget - driveState) < 0.0004) driveState = driveTarget;
+    drive(driveState);
+    if (driveState === driveTarget) { gsap.ticker.remove(driveTick); driveTicking = false; }
+  }
+  function requestDrive(vh) {
+    driveTarget = vh;
+    if (!driveTicking) { driveTicking = true; gsap.ticker.add(driveTick); }
+  }
+
   var st = ScrollTrigger.create({
     trigger: sec,
     start: 'top top',
@@ -5547,7 +5575,7 @@ addEventListener('load', function () {
     anticipatePin: 1,
     invalidateOnRefresh: true,
     onUpdate: function (self) {
-      drive(self.progress * TOTAL);
+      requestDrive(self.progress * TOTAL);
     }
   });
   /* Lenis measures the document once and caches the limit. The pin-spacer is
@@ -5563,8 +5591,10 @@ addEventListener('load', function () {
   syncLenis();
   /* Paint the resting state immediately — content parked below the fold,
      intro at its small blurred pose — so arriving at the section never
-     flashes the un-driven layout. */
-  drive(st.progress * TOTAL);
+     flashes the un-driven layout. Seed the smoother so there's no
+     catch-up glide on load. */
+  driveState = driveTarget = st.progress * TOTAL;
+  drive(driveState);
   addEventListener('resize', function () { ScrollTrigger.refresh(); });
 });
 </script>
