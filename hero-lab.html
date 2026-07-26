@@ -562,9 +562,18 @@
      six others. Absolute keeps the frame's 16:9 and lets the orb fill it. */
   .sys-orb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
     display:grid;place-items:center;height:80%;aspect-ratio:1;}
-  .sys-orb img{position:relative;z-index:1;width:100%;height:100%;
-    object-fit:contain;display:block;
-    filter:drop-shadow(0 30px 60px rgba(0,0,0,.55));}
+  /* the orb sits inside the ring, not over it — the ticks are at 0.71 of the
+     SVG's half-width, so 62% leaves a clear band between the two */
+  .sys-orb img{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    z-index:2;width:62%;height:62%;object-fit:contain;display:block;
+    filter:drop-shadow(0 24px 48px rgba(0,0,0,.6));}
+  /* the ring — 80 ticks that pulse like a voice, because that is what the
+     system is. JS drives it; at rest they sit at an even 12px so the ring
+     is a ring with no script at all. */
+  .sys-wave{position:absolute;inset:0;width:100%;height:100%;z-index:1;
+    pointer-events:none;overflow:visible;
+    filter:drop-shadow(0 0 6px rgba(74,222,128,.35));}
+  .sys-wave g{opacity:.72;}
   /* a neutral lift, not a colour: the orb is the only green in the section,
      and the glow is only here so it doesn't sit flat on the ground */
   .sys-orb-glow{position:absolute;inset:-14%;border-radius:50%;pointer-events:none;
@@ -1656,6 +1665,90 @@
             <div class="slide-media sys-media">
               <div class="sys-orb">
                 <span class="sys-orb-glow" aria-hidden="true"></span>
+                <svg class="sys-wave" viewBox="0 0 340 340" aria-hidden="true">
+                  <g stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round">
+                    <line x1="170.00" y1="56.00" x2="170.00" y2="44.00"/>
+                    <line x1="178.94" y1="56.35" x2="179.89" y2="44.39"/>
+                    <line x1="187.83" y1="57.40" x2="189.71" y2="45.55"/>
+                    <line x1="196.61" y1="59.15" x2="199.41" y2="47.48"/>
+                    <line x1="205.23" y1="61.58" x2="208.94" y2="50.17"/>
+                    <line x1="213.63" y1="64.68" x2="218.22" y2="53.59"/>
+                    <line x1="221.75" y1="68.43" x2="227.20" y2="57.73"/>
+                    <line x1="229.56" y1="72.80" x2="235.83" y2="62.57"/>
+                    <line x1="237.01" y1="77.77" x2="244.06" y2="68.06"/>
+                    <line x1="244.04" y1="83.31" x2="251.83" y2="74.19"/>
+                    <line x1="250.61" y1="89.39" x2="259.10" y2="80.90"/>
+                    <line x1="256.69" y1="95.96" x2="265.81" y2="88.17"/>
+                    <line x1="262.23" y1="102.99" x2="271.94" y2="95.94"/>
+                    <line x1="267.20" y1="110.44" x2="277.43" y2="104.17"/>
+                    <line x1="271.57" y1="118.25" x2="282.27" y2="112.80"/>
+                    <line x1="275.32" y1="126.37" x2="286.41" y2="121.78"/>
+                    <line x1="278.42" y1="134.77" x2="289.83" y2="131.06"/>
+                    <line x1="280.85" y1="143.39" x2="292.52" y2="140.59"/>
+                    <line x1="282.60" y1="152.17" x2="294.45" y2="150.29"/>
+                    <line x1="283.65" y1="161.06" x2="295.61" y2="160.11"/>
+                    <line x1="284.00" y1="170.00" x2="296.00" y2="170.00"/>
+                    <line x1="283.65" y1="178.94" x2="295.61" y2="179.89"/>
+                    <line x1="282.60" y1="187.83" x2="294.45" y2="189.71"/>
+                    <line x1="280.85" y1="196.61" x2="292.52" y2="199.41"/>
+                    <line x1="278.42" y1="205.23" x2="289.83" y2="208.94"/>
+                    <line x1="275.32" y1="213.63" x2="286.41" y2="218.22"/>
+                    <line x1="271.57" y1="221.75" x2="282.27" y2="227.20"/>
+                    <line x1="267.20" y1="229.56" x2="277.43" y2="235.83"/>
+                    <line x1="262.23" y1="237.01" x2="271.94" y2="244.06"/>
+                    <line x1="256.69" y1="244.04" x2="265.81" y2="251.83"/>
+                    <line x1="250.61" y1="250.61" x2="259.10" y2="259.10"/>
+                    <line x1="244.04" y1="256.69" x2="251.83" y2="265.81"/>
+                    <line x1="237.01" y1="262.23" x2="244.06" y2="271.94"/>
+                    <line x1="229.56" y1="267.20" x2="235.83" y2="277.43"/>
+                    <line x1="221.75" y1="271.57" x2="227.20" y2="282.27"/>
+                    <line x1="213.63" y1="275.32" x2="218.22" y2="286.41"/>
+                    <line x1="205.23" y1="278.42" x2="208.94" y2="289.83"/>
+                    <line x1="196.61" y1="280.85" x2="199.41" y2="292.52"/>
+                    <line x1="187.83" y1="282.60" x2="189.71" y2="294.45"/>
+                    <line x1="178.94" y1="283.65" x2="179.89" y2="295.61"/>
+                    <line x1="170.00" y1="284.00" x2="170.00" y2="296.00"/>
+                    <line x1="161.06" y1="283.65" x2="160.11" y2="295.61"/>
+                    <line x1="152.17" y1="282.60" x2="150.29" y2="294.45"/>
+                    <line x1="143.39" y1="280.85" x2="140.59" y2="292.52"/>
+                    <line x1="134.77" y1="278.42" x2="131.06" y2="289.83"/>
+                    <line x1="126.37" y1="275.32" x2="121.78" y2="286.41"/>
+                    <line x1="118.25" y1="271.57" x2="112.80" y2="282.27"/>
+                    <line x1="110.44" y1="267.20" x2="104.17" y2="277.43"/>
+                    <line x1="102.99" y1="262.23" x2="95.94" y2="271.94"/>
+                    <line x1="95.96" y1="256.69" x2="88.17" y2="265.81"/>
+                    <line x1="89.39" y1="250.61" x2="80.90" y2="259.10"/>
+                    <line x1="83.31" y1="244.04" x2="74.19" y2="251.83"/>
+                    <line x1="77.77" y1="237.01" x2="68.06" y2="244.06"/>
+                    <line x1="72.80" y1="229.56" x2="62.57" y2="235.83"/>
+                    <line x1="68.43" y1="221.75" x2="57.73" y2="227.20"/>
+                    <line x1="64.68" y1="213.63" x2="53.59" y2="218.22"/>
+                    <line x1="61.58" y1="205.23" x2="50.17" y2="208.94"/>
+                    <line x1="59.15" y1="196.61" x2="47.48" y2="199.41"/>
+                    <line x1="57.40" y1="187.83" x2="45.55" y2="189.71"/>
+                    <line x1="56.35" y1="178.94" x2="44.39" y2="179.89"/>
+                    <line x1="56.00" y1="170.00" x2="44.00" y2="170.00"/>
+                    <line x1="56.35" y1="161.06" x2="44.39" y2="160.11"/>
+                    <line x1="57.40" y1="152.17" x2="45.55" y2="150.29"/>
+                    <line x1="59.15" y1="143.39" x2="47.48" y2="140.59"/>
+                    <line x1="61.58" y1="134.77" x2="50.17" y2="131.06"/>
+                    <line x1="64.68" y1="126.37" x2="53.59" y2="121.78"/>
+                    <line x1="68.43" y1="118.25" x2="57.73" y2="112.80"/>
+                    <line x1="72.80" y1="110.44" x2="62.57" y2="104.17"/>
+                    <line x1="77.77" y1="102.99" x2="68.06" y2="95.94"/>
+                    <line x1="83.31" y1="95.96" x2="74.19" y2="88.17"/>
+                    <line x1="89.39" y1="89.39" x2="80.90" y2="80.90"/>
+                    <line x1="95.96" y1="83.31" x2="88.17" y2="74.19"/>
+                    <line x1="102.99" y1="77.77" x2="95.94" y2="68.06"/>
+                    <line x1="110.44" y1="72.80" x2="104.17" y2="62.57"/>
+                    <line x1="118.25" y1="68.43" x2="112.80" y2="57.73"/>
+                    <line x1="126.37" y1="64.68" x2="121.78" y2="53.59"/>
+                    <line x1="134.77" y1="61.58" x2="131.06" y2="50.17"/>
+                    <line x1="143.39" y1="59.15" x2="140.59" y2="47.48"/>
+                    <line x1="152.17" y1="57.40" x2="150.29" y2="45.55"/>
+                    <line x1="161.06" y1="56.35" x2="160.11" y2="44.39"/>
+                  </g>
+                </svg>
                 <img src="images/blob-dark.png" alt="The EverTutor AI system" width="940" height="940">
               </div>
             </div>
@@ -2752,6 +2845,62 @@ var topNav = document.getElementById('topNav');
   v.addEventListener('pause',   function () { v.classList.remove('is-playing'); });
   v.addEventListener('error',   function () { v.classList.remove('is-playing'); });
 });
+
+/* ── the system's ring ──
+   Eighty ticks around the EverTutor orb, each one breathing on its own phase
+   and speed so the ring reads as a voice rather than a spinner. Ported from
+   the earlier version of this section. It only runs while it is on screen,
+   it holds still when the talk panel has the page frozen, and under reduced
+   motion it never starts — the markup already has the ticks at an even
+   height, so the ring is simply a ring. */
+(function () {
+  var svg = document.querySelector('.sys-wave');
+  if (!svg) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var lines = [].slice.call(svg.querySelectorAll('line'));
+  var N = lines.length, cx = 170, cy = 170, r = 120;
+  var angles = lines.map(function (_, i) { return (i / N) * 2 * Math.PI - Math.PI / 2; });
+  var phases = lines.map(function () { return Math.random() * Math.PI * 2; });
+  var speeds = lines.map(function () { return 0.6 + Math.random() * 1.0; });
+  var running = false, t0 = null, raf = 0;
+
+  function height(i, t) {
+    var h = 9 * Math.sin(t * speeds[i]) * Math.cos(phases[i])
+          + 9 * Math.cos(t * speeds[i]) * Math.sin(phases[i])
+          + 4 * Math.sin(t * speeds[i] * 1.8 + phases[i] + 1.3)
+          + 2 * Math.sin(t * speeds[i] * 2.7 + phases[i] + 0.7);
+    return Math.max(3, Math.min(26, 12 + h));
+  }
+
+  function frame(ts) {
+    if (!running) return;
+    if (document.documentElement.classList.contains('talk-open')) { raf = requestAnimationFrame(frame); return; }
+    if (t0 === null) t0 = ts;
+    var t = (ts - t0) / 1000;
+    for (var i = 0; i < N; i++) {
+      var a = angles[i], half = height(i, t) / 2, ln = lines[i];
+      ln.setAttribute('x1', (cx + (r - half) * Math.cos(a)).toFixed(2));
+      ln.setAttribute('y1', (cy + (r - half) * Math.sin(a)).toFixed(2));
+      ln.setAttribute('x2', (cx + (r + half) * Math.cos(a)).toFixed(2));
+      ln.setAttribute('y2', (cy + (r + half) * Math.sin(a)).toFixed(2));
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  function run(on) {
+    if (on === running) return;
+    running = on;
+    if (on) { t0 = null; raf = requestAnimationFrame(frame); }
+    else cancelAnimationFrame(raf);
+  }
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) { run(e.isIntersecting); });
+    }, { threshold: 0.05 }).observe(svg);
+  } else run(true);
+})();
 
 /* ── the stacked cards play themselves ──
    The gallery owns playback for its own active plane (it runs earlier in this
