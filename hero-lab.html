@@ -413,6 +413,15 @@
   .cta-text span.on{opacity:1;transform:translateY(0);filter:none;}
   .cta-text span.out{opacity:0;transform:translateY(-11px);filter:blur(3px);}
 
+  /* Keyframes the section's animations depend on. These were dropped by
+     the rule-level extraction — an @keyframes block has no selector to
+     match on, so nothing in the project bar ever animated in. */
+  @keyframes s2FadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+  @keyframes s2IconTagIn { to { opacity: 1; transform: translateX(0); } }
+
   /* ══ SECTION 2 — ported from index.html ════════════════════════════════
      The rules below are that section's own, lifted unchanged. They lean on
      three tokens this page does not define; aliasing them here is what lets
@@ -4905,7 +4914,7 @@ addEventListener('load', function () {
 <script src="vendor/three.min.js"></script>
 <!-- the ?v= is a cache-bust: this file is edited often and browsers hold on
      to it hard. Bump it whenever spiral.js changes. -->
-<script src="spiral-gallery/spiral.js?v=20260726-pinned"></script>
+<script src="spiral-gallery/spiral.js?v=20260726-tailfade"></script>
 
 <script type="module" src="orb/bhanu-orb.js"></script>
 </body>

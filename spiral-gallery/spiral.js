@@ -223,11 +223,12 @@ void main() {
     var BASE_RADIUS  = 2 * CARD_SCALE;
     var totalCount   = allCards.length;
     var centerIndex  = Math.floor(totalCount / 2);
-    // B's two wrap edges (where a mesh's position resets as scrollOffset
-    // advances) — used below to fade cards out before they reach either edge.
-    var B_MIN        = -centerIndex;
-    var B_MAX        = totalCount - 1 - centerIndex;
-    var EDGE_FADE_MARGIN = 2.5;
+    // There is no wrap any more — B runs linearly across a finite tail, so the
+    // old B_MIN/B_MAX edges are meaningless here. What the fade is for now is
+    // simply the far ends of that tail: full opacity within FADE_FULL slots of
+    // the front, gone by FADE_OUT.
+    var FADE_FULL = 4.0;
+    var FADE_OUT  = 6.0;
 
     var uniforms       = [];
     var hiddenProgress = [];
@@ -781,14 +782,11 @@ void main() {
         var distFromFront = Math.abs(B - 2);
         uniforms[i].uFogOpacity.value = Math.max(0.15, 1.0 - distFromFront * 0.25);
 
-        // Edge fade: each mesh's B wraps (modulo) as scrollOffset advances —
-        // that wrap is an instant jump from B_MIN to B_MAX (or vice versa).
-        // Fade alpha to 0 near EITHER edge (signed distance, not distance-
-        // from-front — those aren't the same thing and using distFromFront
-        // here would incorrectly fade out cards mid-spiral on one side).
-        var edgeFadeLow  = Math.max(0, Math.min(1, (B - B_MIN) / EDGE_FADE_MARGIN));
-        var edgeFadeHigh = Math.max(0, Math.min(1, (B_MAX - B) / EDGE_FADE_MARGIN));
-        var edgeFade     = edgeFadeLow * edgeFadeHigh;
+        // Tail fade: symmetric around the front slot, because the tail has two
+        // far ends and no seam. Keying this off the old wrap edges left every
+        // card but the first at alpha 0 once the modulo was removed.
+        var edgeFade = Math.max(0, Math.min(1,
+          (FADE_OUT - distFromFront) / (FADE_OUT - FADE_FULL)));
 
         uniforms[i].uZoom.value           = 1 + 0.05 * hoverProgress[i];
         uniforms[i].uRevealProgress.value = (1 - hoverProgress[i] * 0.05) * (1 - hiddenProgress[i]) * edgeFade;
