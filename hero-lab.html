@@ -515,8 +515,19 @@
   .slide-media:has(.slide-vid.is-playing)::after{opacity:1;}
   /* it swings up from below, tilted back on X and slightly small, then
      settles level and opaque over the darkened still */
-  .slide-vid{position:relative;z-index:1;display:block;
-    width:83%;height:83%;object-fit:contain;
+  /* Sized to the video's own shape, not to a share of the frame. At a fixed
+     83%×83% the element is the frame's aspect, so anything that isn't 16:9 —
+     Dearly is 2.16:1, Stressie is portrait — gets letterboxed inside it: the
+     element's corners are rounded but the picture's are square, sitting
+     inset. Letting it size to its intrinsic ratio under a max means the
+     element IS the picture, so the radius clips the video itself. */
+  /* Absolute with inset:0 and margin:auto — not for the centring (the grid
+     did that) but because a percentage max-height needs a containing block
+     with a definite height, and .slide-media's comes from aspect-ratio with
+     height:auto. In flow the cap silently did nothing and Stressie's portrait
+     video ran to 677px inside a 261px frame. */
+  .slide-vid{position:absolute;inset:0;margin:auto;z-index:1;display:block;
+    width:auto;height:auto;max-width:86%;max-height:86%;object-fit:contain;
     border-radius:10px;box-shadow:0 20px 44px -22px rgba(0,0,0,.6);
     transform-origin:50% 50%;
     transform:perspective(480px) translateY(72%) rotateX(18deg) scale(.95);
@@ -2652,14 +2663,19 @@ var topNav = document.getElementById('topNav');
     slides.forEach(function (s, n) {
       var m = medias[n]; if (!m) return;
       var k = n - pos, a = Math.abs(k);
-      /* straight down and face-on: what is coming waits above the frame and
-         travels down through it as you scroll, and the one before it carries
-         on below. No rotation of any kind — the panels are flat to the page. */
-      var fade = Math.max(0, 1 - 0.34 * a);
+      /* The reel hangs downward: the system's cover is at the top and every
+         project after it trails below, in order. Scrolling down pulls the
+         strip up through the frame, which is the way a page is supposed to
+         move — the sign was inverted here, and that is what made the reel
+         travel the wrong way. Face-on, no rotation. */
+      /* the tail below reaches further than the end above it: what is coming
+         stays legible, what has gone clears out */
+      var fade = k > 0 ? Math.max(0, 1 - 0.20 * k)
+                       : Math.max(0, 1 + 0.42 * k);
       m.style.transform =
-        'translate3d(0,' + (-k * step).toFixed(2) + 'px,0)' +
+        'translate3d(0,' + (k * step).toFixed(2) + 'px,0)' +
         ' skewY(' + sk.toFixed(2) + 'deg)' +
-        ' scale(' + (1 - 0.035 * Math.min(a, 2) + 0.012 * h).toFixed(3) + ')';
+        ' scale(' + (1 - 0.030 * Math.min(a, 3) + 0.012 * h).toFixed(3) + ')';
       m.style.opacity = fade.toFixed(3);
     });
   }
