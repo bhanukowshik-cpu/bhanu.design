@@ -65,20 +65,25 @@ varying vec3 vWorldPosition;
 
 uniform float uScrollSpeed;
 uniform float uVideoReveal;
+uniform float uBend;
 
 void main() {
   vec3 worldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
   vec3 newPosition   = position;
 
-  /* The cards used to carry two standing deformations — a horizontal bow
-     (sin(uv.x)*0.04 on z) and a view-space shear that grew with height
-     (pow(y,2)*0.1) — which together read as warped, crooked corners on
-     every resting card. Both are gone: a card is a flat panel now. The
-     one bend left is the scroll-speed one below, and it decays to zero
-     the moment the reel rests. */
+  /* Two standing deformations — a horizontal bow (sin(uv.x)*0.04 on z) and
+     a view-space shear that grows with height (pow(y,2)*0.1) — give the
+     resting cards their wrapped, sculptural read. uBend gates both per
+     card: 0 on the active (front) card so it sits flat and crisp, ramping
+     to 1 over one slot of travel as a card leaves the front. The ticker
+     drives it from distFromFront. The scroll-speed bend below stays
+     unconditional and decays to zero the moment the reel rests. */
+  newPosition.z = sin(uv.x * PI) * 0.04 * uBend;
+
   vec4 modelPosition = modelMatrix * vec4(newPosition, 1.0);
   vec4 viewPosition  = viewMatrix  * modelPosition;
 
+  viewPosition.x += pow(worldPosition.y, 2.0) * 0.1 * uBend;
   viewPosition.x += sin(uv.y * PI) * uScrollSpeed * 2.0;
 
   gl_Position = projectionMatrix * viewPosition;
@@ -256,6 +261,7 @@ void main() {
         uRevealProgress: { value: 0 },
         uVideoReveal:    { value: 0 },
         uScrollSpeed:    { value: 0 },
+        uBend:           { value: 1 },
         uFogOpacity:      { value: 1 },
         uAuroraStrength:  { value: 0 },
         uTime:            { value: 0 },
@@ -786,6 +792,11 @@ void main() {
         // Depth fog: darken cards further from the front slot (B=2)
         var distFromFront = Math.abs(B - 2);
         uniforms[i].uFogOpacity.value = Math.max(0.15, 1.0 - distFromFront * 0.25);
+
+        // Standing bend: flat on the active (front) card, full wrap on the
+        // rest. distFromFront is continuous, so a card straightens as it
+        // glides into the front slot and re-bends as it leaves.
+        uniforms[i].uBend.value = Math.min(1, distFromFront);
 
         // Tail fade: symmetric around the front slot, because the tail has two
         // far ends and no seam. Keying this off the old wrap edges left every
