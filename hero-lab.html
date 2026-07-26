@@ -560,13 +560,15 @@
     letter-spacing:.004em;color:var(--ink-3);}
   .tc-cap-breadth{position:absolute;left:50%;top:0;transform:translateX(-50%);}
 
-  /* the two lines that draw the T — these carry the shape, so they read */
+  /* the two lines that draw the T. These ARE the shape, so they carry —
+     and azure sits lower in luminance than the lab's lime did, so it needs
+     more of both opacity and bloom to read the same on this navy. */
   .tc-bar{position:absolute;left:0;right:0;top:25%;height:1.5px;
-    background:linear-gradient(90deg,transparent 0%,rgba(92,169,255,.62) 7%,rgba(92,169,255,.62) 93%,transparent 100%);
-    box-shadow:0 0 7px 0 rgba(92,169,255,.34);}
+    background:linear-gradient(90deg,transparent 0%,rgba(150,203,255,.9) 7%,rgba(150,203,255,.9) 93%,transparent 100%);
+    box-shadow:0 0 9px 0 rgba(92,169,255,.6);}
   .tc-stem{position:absolute;left:50%;top:25%;bottom:8%;width:1.5px;margin-left:-.75px;
-    background:linear-gradient(180deg,rgba(92,169,255,.62) 0%,rgba(92,169,255,.62) 90%,rgba(92,169,255,.26) 100%);
-    box-shadow:0 0 7px 0 rgba(92,169,255,.34);}
+    background:linear-gradient(180deg,rgba(150,203,255,.9) 0%,rgba(150,203,255,.9) 90%,rgba(150,203,255,.38) 100%);
+    box-shadow:0 0 9px 0 rgba(92,169,255,.6);}
   .tc-stem::after{content:'';position:absolute;left:50%;bottom:0;width:5px;height:5px;
     margin:0 0 -2.5px -2.5px;border-radius:50%;background:#DCEEFF;
     box-shadow:0 0 12px 3px rgba(92,169,255,.55),0 0 34px 10px rgba(92,169,255,.22);}
@@ -626,8 +628,8 @@
 
   /* the wire from the burning node to the card — JS re-routes it on every change */
   .tc-wire{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible;}
-  .tc-wire path{fill:none;stroke:rgba(92,169,255,.6);stroke-width:1;
-    filter:drop-shadow(0 0 5px rgba(92,169,255,.5));}
+  .tc-wire path{fill:none;stroke:rgba(160,209,255,.85);stroke-width:1;
+    filter:drop-shadow(0 0 5px rgba(92,169,255,.6));}
 
   /* the card — same frosted glass as the hero's stats band */
   .tc-card{position:absolute;left:0;top:36%;z-index:3;overflow:hidden;
@@ -948,6 +950,103 @@
           </div>
         </article>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 03 — ABOUT: the T ─────────────────────────────────────────────── -->
+  <section class="tc-sec" id="aboutSection">
+
+    <div class="tc-atmos" aria-hidden="true">
+      <div class="tc-shaft"></div>
+      <div class="tc-halo"></div>
+      <svg class="tc-contours" viewBox="0 0 1400 800" preserveAspectRatio="none">
+        <path d="M-20 96 C 90 40, 150 150, 262 104 S 400 30, 486 92" />
+        <path d="M-20 130 C 96 74, 156 186, 268 140 S 406 66, 492 128" />
+        <path d="M-20 166 C 102 110, 162 222, 274 176 S 412 102, 498 164" />
+        <path d="M1420 596 C 1310 540, 1250 650, 1138 604 S 1000 530, 914 592" />
+        <path d="M1420 632 C 1316 576, 1256 686, 1144 640 S 1006 566, 920 628" />
+        <path d="M1420 668 C 1322 612, 1262 722, 1150 676 S 1012 602, 926 664" />
+      </svg>
+    </div>
+
+    <div class="tc">
+      <div class="tc-aside">
+        <span class="tc-k">About me</span>
+        <h2 class="tc-h">The shape of <span class="serif">how I work.</span></h2>
+        <p class="tc-sub">Strategy, design, and technology&mdash;building products that create real impact.</p>
+      </div>
+
+      <div class="tc-map" id="tcMap">
+        <svg class="tc-wire" id="tcWire" aria-hidden="true"><path d=""></path></svg>
+
+        <div class="tc-cap tc-cap-breadth">
+          <span class="tc-k">Breadth</span>
+          <span class="tc-cap-sub">what I build across</span>
+        </div>
+
+        <span class="tc-bar" aria-hidden="true"></span>
+        <span class="tc-stem" aria-hidden="true"></span>
+
+        <button class="tc-node tc-b b1 is-on" type="button"
+          data-say="I don't trust what people <em>say</em> they want. I watch what they actually do. Most early calls are just listening.">
+          <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Customer<br> Discovery</span><span class="tc-short">Discovery</span></span>
+        </button>
+        <button class="tc-node tc-b b2" type="button"
+          data-say="Beautiful work that ships the wrong thing is still wrong. I sweat <em>what</em> we build before <em>how</em> it looks.">
+          <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Product<br> Strategy</span><span class="tc-short">Strategy</span></span>
+        </button>
+        <button class="tc-node tc-b b3" type="button"
+          data-say="Home base. Flows, states, the tiny moments&mdash;the craft that makes a product feel <em>obvious</em>.">
+          <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Experience<br> Design</span><span class="tc-short">Design</span></span>
+        </button>
+        <button class="tc-node tc-b b4" type="button"
+          data-say="I don't hand off and walk away. I sit with engineers until it's <em>real and shipped</em>.">
+          <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Product<br> Builder</span><span class="tc-short">Builder</span></span>
+        </button>
+        <button class="tc-node tc-b b5" type="button"
+          data-say="I speak enough engineering to know what's cheap, what's pricey, and when &ldquo;it's complicated&rdquo; means <em>no</em>.">
+          <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Engineering<br> Collaboration</span><span class="tc-short">Engineering</span></span>
+        </button>
+
+        <button class="tc-node tc-d d1" type="button"
+          data-say="I'd rather <em>kill my idea in a 20-minute interview</em> than defend it for six months in production.">
+          <span class="tc-dot"></span><span class="tc-nm">Research</span>
+        </button>
+        <button class="tc-node tc-d d2" type="button"
+          data-say="I break problems down to what's <em>actually true</em>, then build back up. Best practices are someone else's constraints.">
+          <span class="tc-dot"></span><span class="tc-nm">First Principles</span>
+        </button>
+        <button class="tc-node tc-d d3" type="button"
+          data-say="I design the <em>system</em>, not the screen. One component should answer ten questions you haven't asked yet.">
+          <span class="tc-dot"></span><span class="tc-nm">Systems Thinking</span>
+        </button>
+        <button class="tc-node tc-d d4" type="button"
+          data-say="AI isn't a feature I bolt on. It's a <em>material I design with</em>. I prototype, ship, and think AI-native.">
+          <span class="tc-dot"></span><span class="tc-nm">AI Native</span>
+        </button>
+        <button class="tc-node tc-d d5" type="button"
+          data-say="If I can't tie it to a <em>number that moved</em>, it was decoration. I design for outcomes.">
+          <span class="tc-dot"></span><span class="tc-nm">Measured Impact</span>
+        </button>
+
+        <div class="tc-cap tc-cap-depth">
+          <span class="tc-k">Depth</span>
+          <span class="tc-cap-sub">how I think</span>
+        </div>
+
+        <div class="tc-pool" aria-hidden="true"><b></b><i></i><i></i><i></i></div>
+
+        <div class="tc-card" id="tcCard">
+          <div class="tc-card-hd"><span class="tc-card-nm tc-fade"></span></div>
+          <p class="tc-card-tx tc-fade"></p>
+          <span class="tc-card-rule"></span>
+          <svg class="tc-card-grain" viewBox="0 0 150 96" aria-hidden="true">
+            <path d="M6 88 C 40 62, 62 96, 96 70 S 140 40, 168 62" />
+            <path d="M14 96 C 48 70, 70 104, 104 78 S 148 48, 176 70" />
+            <path d="M32 100 C 66 74, 88 108, 122 82 S 166 52, 194 74" />
+          </svg>
+        </div>
       </div>
     </div>
   </section>
@@ -1635,6 +1734,163 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
+})();
+</script>
+<script>
+/* ── 03 — ABOUT: the T ──────────────────────────────────────────────────
+   One node burns at a time; a wire re-routes from it to the card on every
+   change. The wire picks its own shape: a straight drop when the node stands
+   over the card, a straight ray when it sits level with it, an elbow when
+   neither. */
+(function () {
+  var map = document.getElementById('tcMap');
+  if (!map) return;
+  var sec   = document.getElementById('aboutSection');
+  var card  = document.getElementById('tcCard');
+  var wire  = document.getElementById('tcWire').querySelector('path');
+  var nm    = card.querySelector('.tc-card-nm');
+  var tx    = card.querySelector('.tc-card-tx');
+  var nodes = [].slice.call(map.querySelectorAll('.tc-node'));
+  var swapT;
+
+  /* mirror the CSS exactly — when the T folds into lists there is no bar,
+     stem or card for the wire to reach */
+  var folded  = matchMedia('(max-width: 359px), (max-height: 620px)');
+  var compact = matchMedia('(max-width: 519px)');
+  var calm    = matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* orthogonal waypoints -> path with softened corners */
+  function route(pts, r) {
+    var d = 'M' + pts[0][0].toFixed(1) + ',' + pts[0][1].toFixed(1);
+    for (var i = 1; i < pts.length - 1; i++) {
+      var p = pts[i], prev = pts[i - 1], next = pts[i + 1];
+      var inL = Math.abs(p[0] - prev[0]) + Math.abs(p[1] - prev[1]);
+      var outL = Math.abs(next[0] - p[0]) + Math.abs(next[1] - p[1]);
+      var rr = Math.min(r, inL / 2, outL / 2);
+      var dx1 = Math.sign(p[0] - prev[0]), dy1 = Math.sign(p[1] - prev[1]);
+      var dx2 = Math.sign(next[0] - p[0]), dy2 = Math.sign(next[1] - p[1]);
+      d += ' L' + (p[0] - dx1 * rr).toFixed(1) + ',' + (p[1] - dy1 * rr).toFixed(1);
+      d += ' Q' + p[0].toFixed(1) + ',' + p[1].toFixed(1) +
+           ' '  + (p[0] + dx2 * rr).toFixed(1) + ',' + (p[1] + dy2 * rr).toFixed(1);
+    }
+    var last = pts[pts.length - 1];
+    return d + ' L' + last[0].toFixed(1) + ',' + last[1].toFixed(1);
+  }
+
+  function drawWire(node) {
+    if (folded.matches || compact.matches) { wire.setAttribute('d', ''); return; }
+    var m = map.getBoundingClientRect();
+    var dot = node.querySelector('.tc-dot').getBoundingClientRect();
+    var c = card.getBoundingClientRect();
+    var nx = dot.left - m.left + dot.width / 2;
+    var ny = dot.top  - m.top  + dot.height / 2;
+    var cl = c.left - m.left, cr = c.right - m.left;
+    var ct = c.top  - m.top,  cb = c.bottom - m.top;
+    var pts;
+
+    if (node.classList.contains('tc-b')) {
+      if (nx > cl + 20 && nx < cr - 20) {           // standing over the card
+        pts = [[nx, ny], [nx, ct]];
+      } else {
+        var cx = cl + c.width / 2, mid = ct - 26;   // hug the card, not the bar
+        pts = [[nx, ny], [nx, mid], [cx, mid], [cx, ct]];
+      }
+    } else {
+      if (ny > ct + 20 && ny < cb - 20) {           // level with the card
+        pts = [[nx, ny], [cr, ny]];
+      } else {
+        var ey = ny < ct ? ct + 30 : cb - 30;
+        var mx = cr + (nx - cr) / 2;
+        pts = [[nx, ny], [mx, ny], [mx, ey], [cr, ey]];
+      }
+    }
+
+    wire.setAttribute('d', route(pts, 16));
+    if (calm.matches) {                             // the route, without the travel
+      wire.style.transition = 'none';
+      wire.style.strokeDasharray = 'none';
+      wire.style.strokeDashoffset = '0';
+      return;
+    }
+    var len = wire.getTotalLength();
+    wire.style.transition = 'none';
+    wire.style.strokeDasharray = len;
+    wire.style.strokeDashoffset = len;
+    void wire.getBoundingClientRect();
+    wire.style.transition = 'stroke-dashoffset .62s ' +
+      getComputedStyle(document.documentElement).getPropertyValue('--ease').trim();
+    wire.style.strokeDashoffset = '0';
+  }
+
+  /* the card always shows the full name, whichever variant the bar is showing */
+  function labelOf(node) {
+    var el = node.querySelector('.tc-full') || node.querySelector('.tc-nm');
+    return el.innerHTML.replace(/<br\s*\/?>/gi, ' ')
+      .replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  }
+
+  function select(node, instant) {
+    if (node.classList.contains('is-on')) return;
+    nodes.forEach(function (n) { n.classList.remove('is-on'); });
+    node.classList.add('is-on');
+    drawWire(node);
+    var name = labelOf(node), body = node.getAttribute('data-say') || '';
+    if (instant) { nm.textContent = name; tx.innerHTML = body; return; }
+    card.classList.add('is-swapping');
+    clearTimeout(swapT);
+    swapT = setTimeout(function () {
+      nm.textContent = name; tx.innerHTML = body;
+      card.classList.remove('is-swapping');
+    }, 200);
+  }
+
+  nodes.forEach(function (node) {
+    var inl = document.createElement('span');       // list-layout only
+    inl.className = 'tc-inline';
+    inl.innerHTML = '<span><p>' + (node.getAttribute('data-say') || '') + '</p></span>';
+    node.appendChild(inl);
+
+    node.addEventListener('pointerenter', function () { select(node); });
+    node.addEventListener('focus',        function () { select(node); });
+    node.addEventListener('click', function () {
+      select(node);
+      /* on phones the card sits at the foot of a taller-than-screen map, so a
+         tap can update copy the reader cannot see */
+      if (!compact.matches || folded.matches) return;
+      var c = card.getBoundingClientRect();
+      if (c.bottom <= innerHeight && c.top >= 0) return;
+      card.scrollIntoView({ block: 'nearest', behavior: calm.matches ? 'auto' : 'smooth' });
+    });
+  });
+
+  var first = nodes[0];
+  first.classList.remove('is-on');
+  select(first, true);
+
+  var rt;
+  function reroute() {
+    clearTimeout(rt);
+    rt = setTimeout(function () {
+      var on = map.querySelector('.tc-node.is-on');
+      if (on) drawWire(on);
+    }, 120);
+  }
+  addEventListener('resize', reroute);
+  if (folded.addEventListener) folded.addEventListener('change', reroute);
+  if (window.ResizeObserver) new ResizeObserver(reroute).observe(map);
+
+  /* the section arrives on scroll. .is-live is what arms the transition, so
+     without JS everything is simply visible. */
+  if ('IntersectionObserver' in window) {
+    sec.classList.add('is-live');
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        sec.classList.add('revealed');
+        reroute();
+      });
+    }, { threshold: 0.16 }).observe(sec);
+  }
 })();
 </script>
 <script type="module" src="orb/bhanu-orb.js"></script>
