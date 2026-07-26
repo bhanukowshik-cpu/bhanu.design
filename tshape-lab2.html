@@ -19,7 +19,8 @@
     --ink-1: #F7F7F2;                   /* active label */
     --ink-2: rgba(255,255,255,0.60);    /* resting label */
     --ink-3: rgba(255,255,255,0.34);    /* meta */
-    --wire:  rgba(230,242,141,0.36);    /* the constellation lines */
+    --wire:  rgba(230,242,141,0.72);    /* the constellation lines — these ARE the T, so they carry */
+    --wire-glow: 0 0 7px 0 rgba(230,242,141,0.42);
   }
   * { box-sizing: border-box; }
   body {
@@ -98,14 +99,16 @@
 
   /* ── The bar ────────────────────────────────────────────── */
   .tc-bar {
-    position: absolute; left: 0; right: 0; top: 25%; height: 1px;
+    position: absolute; left: 0; right: 0; top: 25%; height: 1.5px;
     background: linear-gradient(90deg, transparent 0%, var(--wire) 7%, var(--wire) 93%, transparent 100%);
+    box-shadow: var(--wire-glow);
   }
 
   /* ── The stem ───────────────────────────────────────────── */
   .tc-stem {
-    position: absolute; left: 50%; top: 25%; bottom: 8%; width: 1px;
-    background: linear-gradient(180deg, var(--wire) 0%, var(--wire) 88%, rgba(230,242,141,0.10) 100%);
+    position: absolute; left: 50%; top: 25%; bottom: 8%; width: 1.5px; margin-left: -0.75px;
+    background: linear-gradient(180deg, var(--wire) 0%, var(--wire) 90%, rgba(230,242,141,0.32) 100%);
+    box-shadow: var(--wire-glow);
   }
   /* the stem lands in the pool with a bright point */
   .tc-stem::after {
@@ -122,7 +125,8 @@
   /* the dot itself */
   .tc-dot {
     position: absolute; left: 0; top: 0; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px;
-    border-radius: 50%; background: rgba(230,242,141,0.55);
+    border-radius: 50%; background: rgba(230,242,141,0.85);
+    box-shadow: 0 0 6px 1px rgba(230,242,141,0.30);
     transition: background 0.4s ease, box-shadow 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1);
   }
   .tc-node:hover .tc-dot, .tc-node.is-on .tc-dot {
