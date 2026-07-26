@@ -365,8 +365,6 @@ void main() {
       if (scrollOffset > SCROLL_MAX) { scrollOffset = SCROLL_MAX; wheelDeltaY = 0; targetWheelDeltaY = 0; }
     }
     var entryTriggered    = false;
-    var ENTRY_SPEED       = 0.6;     // initial spin speed on section enter (one full card cycle)
-    var SLOW_DRIFT        = 0.00025; // gentle continuous forward drift after entry settles — halved again, still felt too fast
 
     // Only the center 60% of the section's width drives the helix — the
     // outer 20% on each side lets the wheel event pass through untouched so
@@ -837,20 +835,19 @@ void main() {
       renderer.render(scene, camera);
     });
 
-    // ── Entry animation: fast spin → slow drift on section enter ─────────
-    // Observes the spiral root element. On first intersect, waits until
-    // the card-reveal animation (600ms) has started, then kicks off a fast
-    // forward spin (ENTRY_SPEED) that naturally decays into SLOW_DRIFT.
+    // ── Entry: reveal the cards, and stay on the first one ───────────────
+    // There used to be a fast forward spin here (ENTRY_SPEED, "one full card
+    // cycle"). That belonged to the looping reel, where it whirled through and
+    // settled harmlessly anywhere. On a bounded tail it integrates straight
+    // from SCROLL_MIN to SCROLL_MAX and clampScroll parks it on the LAST card —
+    // which is why the section was opening on The Engine. The reel now opens
+    // where the tail starts and waits to be scrolled.
     var spiralEntryObs = new IntersectionObserver(function (entries) {
       if (entries[0].isIntersecting && !entryTriggered) {
         entryTriggered = true;
         spiralEntryObs.disconnect();
         _sectionReady = true;
         tryRevealCards();
-        setTimeout(function () {
-          snapTarget        = null;
-          targetWheelDeltaY = ENTRY_SPEED;
-        }, 800);
       }
     }, { threshold: 0.1 });
     spiralEntryObs.observe(el);
