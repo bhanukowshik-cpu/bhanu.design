@@ -522,19 +522,38 @@
     border-radius:24px;overflow:hidden;position:relative;
     border:1px solid var(--cream-line);background:var(--card);box-shadow:none;}
 
-  /* The video is the card's picture, not a reward for hovering: it fills the
-     frame at its own full size with nothing cropped away, rounded to sit
-     inside the card's corner. The still is only its poster, and hands over
-     the moment the first frame actually plays. */
+  /* The still is the frame; the video plays on top of it. It sits inset and
+     rounded, floating over the poster once the poster has darkened behind
+     it — the layered read the section had before, but driven by playback
+     rather than by hover, so the project you are on is simply running. */
   .slide-media{position:relative;display:grid;place-items:center;
     margin:18px 18px 0;border-radius:16px;overflow:hidden;
     aspect-ratio:16/9;background:#070A10;border:1px solid var(--cream-line);}
   .slide-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
-  .slide-vid{position:absolute;inset:0;z-index:1;display:block;
-    width:100%;height:100%;object-fit:contain;background:#070A10;
-    border-radius:15px;box-shadow:none;
-    opacity:0;transition:opacity .5s var(--ease);}
-  .slide-vid.is-playing{opacity:1;}
+  /* the still steps back so the inset panel is the lit thing */
+  .slide-media::after{content:'';position:absolute;inset:0;pointer-events:none;
+    background:rgba(8,8,7,.8);opacity:0;transition:opacity .5s ease;}
+  .slide-media:has(.slide-vid.is-playing)::after{opacity:1;}
+  /* it swings up from below, tilted back on X and slightly small, then
+     settles level and opaque over the darkened still */
+  .slide-vid{position:relative;z-index:1;display:block;
+    width:83%;height:83%;object-fit:contain;
+    border-radius:10px;box-shadow:0 20px 44px -22px rgba(0,0,0,.6);
+    transform-origin:50% 50%;
+    transform:perspective(480px) translateY(72%) rotateX(18deg) scale(.95);
+    opacity:0;will-change:transform,opacity;
+    /* LEAVING wants an ease-in, and shorter — the entrance curve reversed
+       bolts then crawls the last third, which is what read as unsmooth */
+    transition:transform .40s cubic-bezier(0.5,0,0.85,0.4),
+               opacity .28s cubic-bezier(0.5,0,0.85,0.4);}
+  .slide-vid.is-playing{
+    /* ARRIVING */
+    transition:transform .8s cubic-bezier(0.16,1,0.3,1),opacity .5s ease;
+    transform:perspective(480px) translateY(0) rotateX(0deg) scale(1);opacity:1;}
+  @media (prefers-reduced-motion:reduce){
+    .slide-vid{transition:opacity .3s ease;transform:none;}
+    .slide-vid.is-playing{transition:opacity .3s ease;transform:none;}
+  }
 
   /* ── the system's cover: the EverTutor orb, lit from behind ───────────── */
   .sys-media{background:none;border:0;overflow:visible;}
@@ -670,15 +689,9 @@
       will-change:transform,opacity;box-shadow:none;
       border-color:rgba(255,255,255,.13);background:#070A10;}
 
-    /* No hover choreography here any more. The project you are on is playing:
-       the video sits in the frame at its own full size — contained, never
-       cropped — and simply fades up when the plane becomes the active one. */
-    .gal.gal-ready .slide-media::after{display:none;}
-    .gal.gal-ready .slide-vid{position:absolute;inset:0;z-index:1;
-      width:100%;height:100%;object-fit:contain;
-      border-radius:16px;box-shadow:none;transform:none;opacity:0;
-      transition:opacity .5s var(--ease);}
-    .gal.gal-ready .slide.is-active .slide-vid.is-playing{opacity:1;}
+    /* The layered treatment is the base rule now — the still darkens and the
+       video swings up over it. Nothing to override here: what changed is only
+       what triggers it, and that is playback, not the pointer. */
 
     /* The system's cover keeps the frame's proportions even though it holds an
        orb rather than a video — every panel in the strip is the same size, which
