@@ -241,8 +241,10 @@
      JS adds .is-pinned once it knows the travel, and sets the section's
      height to one viewport plus that travel. Without JS, on touch, or under
      reduced motion the section stays an ordinary swipeable rail above. */
+  /* ScrollTrigger owns the pinning (it wraps this in its own pin-spacer), so
+     the wrapper must NOT also be position:sticky or the two fight. */
   .work-pin.is-pinned{padding:0;}
-  .work-pin.is-pinned .work-sticky{position:sticky;top:0;height:100svh;
+  .work-pin.is-pinned .work-sticky{height:100svh;
     display:flex;flex-direction:column;justify-content:center;overflow:hidden;
     padding:clamp(40px,6vh,72px) 0;}
   .work-pin.is-pinned .work-track{overflow:visible;scroll-snap-type:none;
@@ -1404,6 +1406,11 @@
     </div>
   </aside>
 
+<!-- same stack the-engine-site-final runs on: GSAP + ScrollTrigger for the
+     pin and scrub, Lenis for the smooth scroll. Vendored, no CDN. -->
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis.min.js"></script>
 <script>
 /* Dev-only: ?rafshim drives requestAnimationFrame from setTimeout so the scene
    renders in headless/hidden tabs where RAF is suspended (used by the local
@@ -1623,108 +1630,71 @@ addEventListener('scroll', function () {
 }, { passive: true });
 
 /* ── the reel, driven by vertical scroll ─────────────────────────────────
-   On a fine pointer with motion allowed, one viewport of the section is
-   pinned and downward scroll is mapped onto the track's X, so scrolling
-   down walks the reel to the right. Touch, narrow screens and reduced
-   motion keep the plain swipeable rail the CSS ships by default. */
+   Same stack the-engine-site-final runs on: Lenis smooths the page scroll,
+   GSAP ScrollTrigger pins this section and scrubs a timeline across it.
+   The easing that stops the sideways walk feeling stepped comes from those
+   two together — Lenis on the input, scrub on the output — not from a
+   hand-rolled lerp. Touch, narrow screens, reduced motion and a failed
+   vendor load all fall through to the plain CSS rail. */
 (function () {
-  var pin = document.getElementById('workPin');
-  var track = document.getElementById('workTrack');
+  var pin    = document.getElementById('workPin');
+  var track  = document.getElementById('workTrack');
   var sticky = pin && pin.querySelector('.work-sticky');
   var canvas = pin && pin.querySelector('.work-canvas');
   if (!pin || !track || !sticky) return;
+  if (!(window.gsap && window.ScrollTrigger && window.Lenis)) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!matchMedia('(pointer:fine)').matches || innerWidth <= 900) return;
 
-  function fits() {
-    return matchMedia('(pointer:fine)').matches &&
-           !matchMedia('(prefers-reduced-motion: reduce)').matches &&
-           innerWidth > 900;
-  }
+  gsap.registerPlugin(ScrollTrigger);
 
-  /* the pin runs two beats: the reel first rises into the frame from below
-     (theengine.dev's arrival), then it travels sideways. ENTER is how much
-     scroll the arrival gets before the sideways walk begins. */
-  var travel = 0, enterPx = 0, pinTop = 0, active = false;
-  var clamp01 = function (n) { return n < 0 ? 0 : n > 1 ? 1 : n; };
+  /* page-wide smooth scroll, driven off gsap's ticker — the engine's setup */
+  var lenis = new Lenis({ duration: 1.1 });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
+  gsap.ticker.lagSmoothing(0);
+  window.__lenis = lenis;                     /* verify/debug hook */
 
-  /* stagger order: the label, then the frame, then each trailing card */
-  [].concat([pin.querySelector('.work-head')], [].slice.call(track.children))
-    .forEach(function (el, i) { if (el) el.style.setProperty('--i', i); });
+  pin.classList.add('is-pinned');
 
-  /* scroll only ever writes a target; a rAF eases the drawn values toward it.
-     Writing the transform straight from scrollY is what made the sideways
-     walk feel stepped — wheel deltas arrive coarse and unevenly spaced. */
-  var curX = 0, tgtX = 0, curE = 0, tgtE = 0, raf = 0;
-
-  function measure() {
-    if (!fits()) {
-      if (active) {
-        pin.classList.remove('is-pinned', 'revealed');
-        pin.style.height = ''; track.style.transform = ''; track.style.opacity = '';
-        active = false;
-      }
-      return;
-    }
-    if (!active) { pin.classList.add('is-pinned'); active = true; }
-    pin.style.height = '';                       /* natural height first */
+  function travel() {
     var padR = parseFloat(getComputedStyle(track).paddingRight) || 0;
-    travel = Math.max(0, track.scrollWidth - innerWidth + padR);
-    enterPx = Math.round(innerHeight * 0.75);    /* the arrival's share of scroll */
-    pin.style.height = (innerHeight + enterPx + travel) + 'px';
-    pinTop = pin.offsetTop;
-    read();
-    curX = tgtX; curE = tgtE;                    /* a resize must not animate */
-    draw();
+    return Math.max(0, track.scrollWidth - innerWidth + padR);
   }
 
-  function read() {
-    var d = scrollY - pinTop;
-    tgtE = clamp01(d / Math.max(1, enterPx));
-    tgtX = clamp01((d - enterPx) / Math.max(1, travel)) * travel;
+  /* the light is a proxy tween: gsap writes the three custom properties the
+     CSS reads, so the expansion rides the same scrub as everything else */
+  var light = { v: 0 };
+  function drawLight() {
+    if (!canvas) return;
+    var g = light.v;
+    canvas.style.setProperty('--k',  (0.62 + g * 0.56).toFixed(4));
+    canvas.style.setProperty('--kr', ((1 - g) * 26).toFixed(1) + 'px');
+    canvas.style.setProperty('--ko', (g * 0.64).toFixed(3));
   }
 
-  function draw() {
-    var ease = 1 - Math.pow(1 - curE, 3);        /* out-cubic on the arrival */
-    var y = (1 - ease) * 58;                     /* rises in from 58vh below */
-    track.style.transform =
-      'translate3d(' + (-curX).toFixed(1) + 'px,' + y.toFixed(2) + 'vh,0)';
-    track.style.opacity = (0.06 + ease * 0.94).toFixed(3);
-    pin.classList.toggle('revealed', curE > 0.04);
+  gsap.set(track, { y: '58vh', autoAlpha: 0.06 });
+  drawLight();
 
-    /* the light keeps opening across the whole pin, not just the arrival, so
-       it is still growing while the reel walks — a small panel becoming a sky */
-    if (canvas) {
-      var whole = travel > 0 ? (curE * enterPx + curX) / (enterPx + travel) : curE;
-      var g = 1 - Math.pow(1 - clamp01(whole), 2);
-      canvas.style.setProperty('--k',  (0.62 + g * 0.56).toFixed(4));
-      canvas.style.setProperty('--kr', ((1 - g) * 26).toFixed(1) + 'px');
-      canvas.style.setProperty('--ko', (ease * (0.30 + g * 0.34)).toFixed(3));
+  var tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: pin, start: 'top top',
+      end: function () { return '+=' + Math.round(innerHeight * 0.75 + travel()); },
+      pin: sticky, scrub: 0.9, anticipatePin: 1, invalidateOnRefresh: true,
+      onEnter:      function () { pin.classList.add('revealed'); },
+      onEnterBack:  function () { pin.classList.add('revealed'); },
+      onLeaveBack:  function () { pin.classList.remove('revealed'); }
     }
-  }
-
-  function tick() {
-    var dx = tgtX - curX, de = tgtE - curE;
-    curX += dx * 0.11;                           /* ~11% of the gap per frame */
-    curE += de * 0.16;
-    if (Math.abs(dx) < 0.15) curX = tgtX;
-    if (Math.abs(de) < 0.0008) curE = tgtE;
-    draw();
-    raf = (curX !== tgtX || curE !== tgtE) ? requestAnimationFrame(tick) : 0;
-  }
-
-  function onScroll() {
-    if (!active) return;
-    read();
-    if (!raf) raf = requestAnimationFrame(tick);
-  }
-
-  addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', measure);
-  addEventListener('load', measure);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
-  [].forEach.call(track.querySelectorAll('img'), function (im) {
-    if (!im.complete) im.addEventListener('load', measure, { once: true });
   });
-  measure();
+
+  /* A — the reel arrives from below */
+  tl.to(track, { y: '0vh', autoAlpha: 1, ease: 'power3.out', duration: 0.22 }, 0);
+  /* B — then it walks sideways */
+  tl.to(track, { x: function () { return -travel(); }, ease: 'none', duration: 0.78 }, 0.22);
+  /* the light opens across the whole pin, still growing during the walk */
+  tl.to(light, { v: 1, ease: 'none', duration: 1, onUpdate: drawLight }, 0);
+
+  addEventListener('resize', function () { ScrollTrigger.refresh(); });
 })();
 
 /* ── the hover video ──
