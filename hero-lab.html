@@ -227,12 +227,16 @@
   .anno-txt{font-family:var(--body);font-size:13.5px;font-weight:500;letter-spacing:.004em;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
   .anno-txt .serif{font-size:1.1em;color:#fff;}
+  /* secondary: a frame, not a fill. The strip is already the loud thing on
+     the page — a solid white button on top of it was two announcements. */
   .anno-cta{flex:none;display:inline-flex;align-items:center;gap:7px;
     padding:6px 13px;border-radius:9px;text-decoration:none;
-    background:#FFFFFF;color:#14275A;
+    background:transparent;border:1px solid rgba(255,255,255,.42);color:#EAF1FF;
     font-family:var(--sans);font-size:12.5px;font-weight:600;letter-spacing:-0.002em;
-    transition:transform .3s var(--ease),background .25s ease;}
-  .anno-cta:hover{transform:translateY(-1px);background:#F1F6FF;}
+    transition:transform .3s var(--ease),background .25s ease,border-color .25s ease;}
+  .anno-cta:hover{transform:translateY(-1px);
+    background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.78);}
+  .anno-cta:focus-visible{outline:2px solid #fff;outline-offset:2px;}
   .anno-cta svg{width:12px;height:12px;}
   .anno-x{flex:none;width:26px;height:26px;display:grid;place-items:center;padding:0;
     background:none;border:0;border-radius:8px;cursor:pointer;color:rgba(234,241,255,.66);
@@ -331,14 +335,14 @@
      that same ratio — so the relationship holds at every width, not just at
      the ceiling. All four cap together around 1680px.
 
-       84px  the project title  — one project per screen earns the top step
-       66px  the hero
+       84px  the hero — the page's own headline, and nothing outranks it
+       66px  the project title
        52px  the footer
        41px  section headings (about, testimonials — they are peers)          */
   h1{
     font-family:var(--sans);font-weight:570;color:var(--ink);
-    font-size:clamp(33px,3.94vw,66px);line-height:1.1;letter-spacing:-0.026em;
-    max-width:min(26ch,94vw);text-wrap:balance;
+    font-size:clamp(40px,5vw,84px);line-height:1.06;letter-spacing:-0.03em;
+    max-width:min(24ch,94vw);text-wrap:balance;
   }
   h1 .serif{font-family:var(--serif);font-style:italic;font-weight:400;
     font-size:1.08em;letter-spacing:-0.004em;}
@@ -542,11 +546,11 @@
   .sys-orb img{position:relative;z-index:1;width:100%;height:100%;
     object-fit:contain;display:block;
     filter:drop-shadow(0 30px 60px rgba(0,0,0,.55));}
-  /* the green it throws is the chapter's own colour, and nothing else on the
-     page uses it — which is exactly why the system reads as its own world */
+  /* a neutral lift, not a colour: the orb is the only green in the section,
+     and the glow is only here so it doesn't sit flat on the ground */
   .sys-orb-glow{position:absolute;inset:-14%;border-radius:50%;pointer-events:none;
     background:radial-gradient(circle at 50% 50%,
-      rgba(96,201,152,.34) 0%,rgba(58,150,110,.16) 42%,transparent 70%);
+      rgba(226,236,248,.12) 0%,rgba(190,208,230,.05) 44%,transparent 70%);
     filter:blur(26px);
     animation:sysPulse 7s ease-in-out infinite;}
   @keyframes sysPulse{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.045)}}
@@ -603,8 +607,10 @@
        project shows roughly a 130px sliver top and bottom at 1080. */
     .gal.gal-ready{--gal-step:clamp(360px,62vh,700px);}
     .gal.gal-ready .work-sticky{overflow:hidden;padding:0;}
-    .gal-bg{position:absolute;inset:0;z-index:0;background:#12293D;
-      transition:background-color .85s var(--ease);}
+    /* No per-project colour wash. The stage is the section's own dark and it
+       stays that dark for all seven — the work is the only thing on screen
+       carrying colour. */
+    .gal-bg{position:absolute;inset:0;z-index:0;background:var(--cream);}
 
     .gal.gal-ready .gal-stage{position:absolute;inset:0;z-index:1;
       display:block;overflow:visible;scroll-snap-type:none;padding:0;}
@@ -643,8 +649,8 @@
     /* the title is a mix by rule, not by whim: the family in Instrument Sans,
        the tool it names in Instrument Serif italic beside it */
     .gal.gal-ready .slide-body h3{font-family:var(--sans);font-style:normal;
-      font-weight:570;font-size:clamp(40px,5vw,84px);line-height:1.02;
-      letter-spacing:-0.032em;margin-top:2px;text-wrap:balance;}
+      font-weight:570;font-size:clamp(34px,3.94vw,66px);line-height:1.04;
+      letter-spacing:-0.03em;margin-top:2px;text-wrap:balance;}
     .gal.gal-ready .slide-body h3 .serif{font-size:1.06em;font-weight:400;
       letter-spacing:-0.016em;}
     .gal.gal-ready .slide-num{font-size:12px;letter-spacing:.2em;}
@@ -760,8 +766,7 @@
   @media (min-width:901px) and (prefers-reduced-motion: reduce){
     .gal.gal-ready .slide,
     .gal.gal-ready .slide-body,
-    .gal.gal-ready .slide-media,
-    .gal-bg{transition:none;}
+    .gal.gal-ready .slide-media{transition:none;}
   }
 
   /* ── CUSTOM CURSOR (ported from index.html — dot / text caret / CTA magnet) ── */
@@ -1531,7 +1536,7 @@
     .cta-text span{font-size:12.5px;}
   }
   @media(max-height:780px) and (min-width:761px){
-    h1{font-size:clamp(40px,5.6vw,66px);}
+    h1{font-size:clamp(38px,4.4vw,62px);}
     .facts{margin-top:26px;}
     .cta-dock{margin-top:28px;}
   }
@@ -1635,7 +1640,7 @@
 
           <!-- the system itself, before its three tools: the green orb is the
                EverTutor mark, and it opens the chapter the way a cover does -->
-          <article class="slide slide-system" data-chapter="et" data-bg="#10322B">
+          <article class="slide slide-system" data-chapter="et">
             <div class="slide-media sys-media">
               <div class="sys-orb">
                 <span class="sys-orb-glow" aria-hidden="true"></span>
@@ -1652,7 +1657,7 @@
             </div>
           </article>
 
-          <article class="slide" data-chapter="et" data-bg="#12293D">
+          <article class="slide" data-chapter="et">
             <div class="slide-media">
               <img src="images/card-et-live.webp" alt="EverTutor Live" width="760" height="507">
               <video class="slide-vid" src="images/et-live.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
@@ -1669,7 +1674,7 @@
             </div>
           </article>
 
-          <article class="slide" data-chapter="et" data-bg="#16304A">
+          <article class="slide" data-chapter="et">
             <div class="slide-media">
               <img src="images/card-et-studio.webp" alt="EverTutor Studio" width="760" height="507" loading="lazy">
               <video class="slide-vid" src="images/et-studio.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
@@ -1686,7 +1691,7 @@
             </div>
           </article>
 
-          <article class="slide" data-chapter="et" data-bg="#1A2B4A">
+          <article class="slide" data-chapter="et">
             <div class="slide-media">
               <img src="images/card-et-analytics.webp" alt="EverTutor Analytics" width="760" height="507" loading="lazy">
               <video class="slide-vid" src="images/et-analytics.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
@@ -1701,7 +1706,7 @@
             </div>
           </article>
 
-        <article class="slide" data-bg="#3A2A28">
+        <article class="slide">
           <div class="slide-media">
             <img src="images/card-stressie.webp" alt="Stressie" width="760" height="428" loading="lazy">
             <video class="slide-vid" src="images/stressie.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
@@ -1718,7 +1723,7 @@
           </div>
         </article>
 
-        <article class="slide" data-bg="#27324A">
+        <article class="slide">
           <div class="slide-media">
             <img src="images/card-dearly.webp" alt="Dearly" width="760" height="428" loading="lazy">
             <video class="slide-vid" src="images/dearly.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
@@ -1735,7 +1740,7 @@
           </div>
         </article>
 
-        <article class="slide" data-bg="#2C2320">
+        <article class="slide">
           <div class="slide-media">
             <img src="images/card-engine.webp" alt="The Engine" width="760" height="507" loading="lazy">
           </div>
@@ -2144,7 +2149,9 @@ function mountSmoke(canvas) {
     ' float n1=fbm(q1+1.35*fbm(q1*1.7+t*0.014));',
     ' vec2 q2=p*vec2(2.6,3.4)+vec2(t*0.010,-t*0.095);',
     ' float n2=fbm(q2);',
-    ' float smoke=smoothstep(0.37,0.95,n1*0.62+n2*0.38);',
+    /* The threshold decides how much of the field counts as smoke at all —
+       it multiplies every term below, so it is the coarse control. */
+    ' float smoke=smoothstep(0.28,0.84,n1*0.62+n2*0.38);',
     /* ── THE DOME ──────────────────────────────────────────────────────
        One circle as wide as the viewport, sunk below the bottom edge so
        only the top ~18% of it is ever on screen; the rest is clipped away
@@ -2153,21 +2160,46 @@ function mountSmoke(canvas) {
     ' float R=aspect*0.5;',                           // radius = half the viewport width
     ' vec2 c=vec2(aspect*0.5,-0.64*R);',              // sunk: crest lands ~0.36R above the floor
     ' vec2 rel=p-c;',
-    ' float d=length(rel)/max(R,0.0001);',            // 1.0 is the rim
-    ' float body=smoothstep(1.06,0.52,d);',           // dense at the base, thinning to the crest
-    ' float rim=smoothstep(1.05,0.97,d)*(1.0-smoothstep(0.97,0.83,d));',   // the lit edge itself
-    ' float glow=smoothstep(1.34,0.18,d);',           // the bloom the dome throws
+    ' float d=length(rel)/max(R,0.0001);',            // 1.0 would be a clean rim
+    /* …and a clean rim is exactly what made it read as a drawn circle. The
+       silhouette is displaced by the same turbulence that makes the smoke,
+       so the edge is eaten rather than drawn — the circle is the shape the
+       smoke happens to be holding, not an arc with smoke inside it. */
+    ' float warp=fbm(vec2(rel.x*2.6, rel.y*2.6 - t*0.05));',
+    ' float dn=d+(warp-0.5)*0.30;',
+    ' float body=smoothstep(1.10,0.26,dn);',          // dense at the base, ragged at the crest
     ' float dns=smoke*body;',
+    /* The edge still carries the light — without it there is a shape but
+       nothing to see. What keeps it from being a drawn arc is that it is
+       computed on the warped radius AND multiplied by the smoke field, so it
+       only lights where there is actually smoke to light: broken, not swept. */
+    ' float edge=smoothstep(1.10,0.92,dn)*(1.0-smoothstep(0.92,0.66,dn));',
+    /* the plume — what gets away over the crest and keeps rising into the
+       dark. Without this the mass just stops at its own outline. */
+    ' float esc=smoothstep(0.80,1.30,dn);',           // outside the body
+    ' float rise=smoothstep(-0.08,0.70,p.y-(c.y+R));',// above the crest
+    ' float plume=smoke*esc*rise;',
+    ' float glow=smoothstep(1.30,0.18,dn);',          // the bloom it throws, warped with it
     ' vec3 bg=vec3(0.039,0.055,0.082);',
     ' vec3 deep=vec3(0.10,0.22,0.42);',
     ' vec3 ice=vec3(0.46,0.74,1.0);',
+    /* The smoke belongs to the floor. This envelope holds it at full strength
+       along the bottom edge and takes it to nothing by ~60% up, so it reads
+       as rising in from below the frame and dissipating — not as a field
+       sitting in the middle of the screen. */
+    ' float floorFade=1.0-smoothstep(0.06,0.60,p.y);',
+    /* ONE KNOB. Every additive term is scaled by this, so the whole effect
+       dims or lifts together without any of the balance between mass, edge
+       and plume changing. Raise toward 1.0 for more, drop toward 0.3 for a
+       whisper. */
+    ' float I=0.55*floorFade;',
     ' vec3 col=bg;',
-    ' col+=deep*(dns*1.24+glow*0.34);',
-    ' col+=ice*dns*dns*0.44;',
-    ' col+=ice*rim*0.30;',                            // the arc reads even where smoke is thin
-    ' col+=ice*glow*0.05;',
-    ' col+=ice*pow(dns,3.0)*0.18;',                 // luminous crest highlights
-    ' col=mix(col,bg,smoothstep(0.62,1.05,p.y));',
+    ' col+=deep*(dns*1.45+glow*0.40)*I;',
+    ' col+=ice*dns*dns*0.55*I;',
+    ' col+=ice*edge*smoke*0.70*I;',                   // lit only where the smoke is
+    ' col+=deep*plume*1.05*I;',                       // the plume is mass first…
+    ' col+=ice*plume*plume*0.60*I;',                  // …and catches light where it thickens
+    ' col+=ice*pow(dns,3.0)*0.20*I;',               // luminous crest highlights
     ' col+=(hash(gl_FragCoord.xy+fract(t))-0.5)*0.012;',
     ' gl_FragColor=vec4(col,1.0);}'
   ].join('\n');
@@ -2557,8 +2589,6 @@ var topNav = document.getElementById('topNav');
     });
     tickEls.forEach(function (t, n) { t.classList.toggle('is-on', n === i); });
 
-    var col = sl.getAttribute('data-bg');
-    if (bg && col) bg.style.backgroundColor = col;
 
     /* the project you are on is playing. Everything else rewinds and stops,
        so only one decoder is ever awake and you never arrive at a video
