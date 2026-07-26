@@ -690,27 +690,14 @@ void main() {
     gsap.ticker.lagSmoothing(0);
 
     gsap.ticker.add(function (time, deltaTime) {
-      // Snap-to-card (overrides free scroll while active)
-      // Target the B=2 slot (visually closest to camera) rather than B=0
-      if (snapRawTarget !== null) {
-        var diff = snapRawTarget - scrollOffset;
-        scrollOffset      += diff * 0.1;
-        wheelDeltaY        = 0;
-        targetWheelDeltaY  = 0;
-        if (Math.abs(diff) < 0.01) { scrollOffset = snapRawTarget; snapRawTarget = null; }
-      } else if (snapTarget !== null) {
-        var desired = Math.max(SCROLL_MIN, Math.min(SCROLL_MAX, snapTarget - centerIndex - 2));
-        var diff    = desired - scrollOffset;
-        scrollOffset      += diff * 0.1;
-        wheelDeltaY        = 0;
-        targetWheelDeltaY  = 0;
-        if (Math.abs(diff) < 0.01) { scrollOffset = desired; snapTarget = null; }
-      }
-
-      // Scroll physics — or the host's, when it is driving
+      /* When the host is driving, it owns the travel outright. This used to be
+         two sequential blocks — snap first, then physics — so a live snap and
+         the host's target pulled scrollOffset in opposite directions every
+         frame and the reel parked wherever the two balanced. Exclusive now. */
       if (externalTarget !== null) {
+        snapTarget = null; snapRawTarget = null;
         var prevOffset = scrollOffset;
-        scrollOffset  += (externalTarget - scrollOffset) * 0.12;
+        scrollOffset  += (externalTarget - scrollOffset) * 0.14;
         clampScroll();
         /* The shader bends the plane by this. On the wheel path it is a
            smoothed value in the 0.001-0.01 range; a raw frame delta is an
@@ -719,6 +706,19 @@ void main() {
         var dv = scrollOffset - prevOffset;
         wheelDeltaY       = Math.max(-0.02, Math.min(0.02, dv));
         targetWheelDeltaY = 0;
+      } else if (snapRawTarget !== null) {
+        var diff = snapRawTarget - scrollOffset;
+        scrollOffset      += diff * 0.1;
+        wheelDeltaY        = 0;
+        targetWheelDeltaY  = 0;
+        if (Math.abs(diff) < 0.01) { scrollOffset = snapRawTarget; snapRawTarget = null; }
+      } else if (snapTarget !== null) {
+        var desired = Math.max(SCROLL_MIN, Math.min(SCROLL_MAX, snapTarget - centerIndex - 2));
+        var diff2   = desired - scrollOffset;
+        scrollOffset      += diff2 * 0.1;
+        wheelDeltaY        = 0;
+        targetWheelDeltaY  = 0;
+        if (Math.abs(diff2) < 0.01) { scrollOffset = desired; snapTarget = null; }
       } else {
         wheelDeltaY       += (targetWheelDeltaY - wheelDeltaY) * 0.1;
         scrollOffset      += wheelDeltaY;

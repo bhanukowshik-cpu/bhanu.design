@@ -4575,18 +4575,44 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
            !matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!ok) { root.removeAttribute('id'); return; }
   root.classList.add('is-live');
-  /* No data-driven: spiral.js keeps its own wheel handling, exactly as it
-     does on index.html. Its handler only claims the centre 60% of the
-     section's width, so the outer fifth on each side still scrolls the page
-     on through. */
+  /* data-driven stands spiral.js's own wheel handler down: the pin below owns
+     the travel. That handler calls preventDefault, which would stop the pin
+     advancing and trap the page inside the section. */
+  root.setAttribute('data-driven', '');
 })();
 
-/* The pin is gone. It was mine, not index.html's — and it was the thing
-   stopping the reel: Analytics at the front is scrollOffset -2, which is
-   exactly the midpoint of the travel, i.e. the pin's progress was topping
-   out at 0.5. ScrollTrigger pinning while Lenis also drives scroll on this
-   page double-counts. index.html has no pin and owns its own wheel, which
-   is the version that works. */
+/* ── the section is locked until the tail has played ──────────────────────
+   Pin the section and map the pin's progress straight onto the reel, so the
+   projects come in their order — Glimpse, Live, Studio, Analytics, Stressie,
+   Dearly, The Engine — and the page only moves on to the T once the last of
+   them is through.
+
+   This failed the first time because the reel's own snap logic ran alongside
+   the pin's drive and fought it; the drive is exclusive now. The pin is
+   registered after load so ScrollTrigger measures a settled document, and
+   ScrollTrigger.normalizeScroll is left alone — Lenis is already feeding it. */
+addEventListener('load', function () {
+  var root = document.getElementById('spiral-root');
+  if (!root || !root.hasAttribute('data-driven')) return;
+  if (!(window.gsap && window.ScrollTrigger)) return;
+  var sec = document.getElementById('s2Section');
+  if (!sec) return;
+
+  gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.create({
+    trigger: sec,
+    start: 'top top',
+    end: function () { return '+=' + Math.round(innerHeight * 1.1 * 7); },
+    pin: true,
+    pinSpacing: true,
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
+    onUpdate: function (self) {
+      root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: self.progress } }));
+    }
+  });
+  ScrollTrigger.refresh();
+  addEventListener('resize', function () { ScrollTrigger.refresh(); });
 });
 </script>
 <script>
@@ -5150,7 +5176,7 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
 <script src="vendor/three.min.js"></script>
 <!-- the ?v= is a cache-bust: this file is edited often and browsers hold on
      to it hard. Bump it whenever spiral.js changes. -->
-<script src="spiral-gallery/spiral.js?v=20260726-entry"></script>
+<script src="spiral-gallery/spiral.js?v=20260726-lock"></script>
 
 <script type="module" src="orb/bhanu-orb.js"></script>
 </body>
