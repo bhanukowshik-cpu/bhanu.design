@@ -2153,59 +2153,37 @@ function mountSmoke(canvas) {
        only the top ~18% of it is ever on screen; the rest is clipped away
        by the frame. Everything is expressed in the circle's own radius, so
        the composition holds identically at 320px and at 3440px. */
-    ' float R=aspect*0.55;',                          // a touch wider than the viewport
-    /* Sunk to 0.75R, so the cap on screen is 0.25R — about an eighth of the
-       circle. At -0.62 nearly half the viewport was inside the disc, which
-       is how it stopped being a shape at the bottom and became a wash. */
-    ' vec2 c=vec2(aspect*0.5,-0.75*R);',
+    ' float R=aspect*0.62;',                          // wider than the viewport
+    ' vec2 c=vec2(aspect*0.5,-0.72*R);',              // sunk, so only the crest is on screen
     ' vec2 rel=p-c;',
     ' float d=length(rel)/max(R,0.0001);',
-    /* The edge is nudged by the turbulence, not dissolved by it. At 0.30 of
-       displacement the circle stopped existing; at 0.11 it reads as a circle
-       whose rim happens to be made of smoke, which is the thing asked for. */
-    ' float warp=fbm(vec2(rel.x*2.6, rel.y*2.6 - t*0.05));',
-    ' float dn=d+(warp-0.5)*0.11;',
-    /* THE DISC. A narrow falloff, so there is a defined boundary rather than
-       a gradient that fades out over half the screen. */
-    ' float disc=smoothstep(1.005,0.88,dn);',
-    /* …and the smoke lives INSIDE it. Multiplying the disc by the smoke field
-       was the bug: wherever the field thinned, the circle went with it. Mixing
-       instead keeps the form solid and lets the turbulence texture it. */
-    /* A 0.55 floor made the interior a solid fill — the circle came back but
-       as a slab of blue. 0.20 keeps the form readable while leaving the
-       inside dark, so what you see in there is smoke and not paint. */
-    ' float dns=mix(0.20,1.0,smoke)*disc;',
-    /* the lit rim, and wisps getting away just past it */
-    ' float edge=smoothstep(1.01,0.95,dn)*(1.0-smoothstep(0.95,0.86,dn));',
-    ' float esc=smoothstep(0.94,1.14,dn)*(1.0-smoothstep(1.14,1.36,dn));',
-    ' float plume=smoke*smoke*esc;',
-    ' float glow=smoothstep(1.22,0.55,dn);',          // a close bloom, not a wash
+    ' float warp=fbm(vec2(rel.x*2.4, rel.y*2.4 - t*0.05));',
+    ' float dn=d+(warp-0.5)*0.18;',
+    /* ── ONE MASS ────────────────────────────────────────────────────────
+       There were three terms here with three different radii: a tight disc,
+       a lit rim riding just outside it, and a wider bloom outside that.
+       Three falloffs means three edges — which is exactly why it read as a
+       circle with a separate smoke frame around it.
+
+       This is a single, very wide falloff, from beyond the rim all the way
+       in toward the centre, so there is no boundary anywhere to see. The
+       mass simply thins out. */
+    /* The ramp ends at 0.55 rather than 0.10 because the circle is sunk: the
+       only part on screen runs from about d=0.72 up to the rim, and a falloff
+       weighted toward the centre puts all its density below the frame. This
+       is dense across the band you can see and gone by the crest. */
+    ' float mass=smoothstep(1.08,0.55,dn);',
+    ' float dns=mix(0.30,1.0,smoke)*mass;',
     ' vec3 bg=vec3(0.039,0.055,0.082);',
-    /* The mass is coloured by height, not by density: a deep blue where it
-       banks against the floor, paling as it climbs, so the dome has a bottom
-       and a top rather than one flat tint everywhere. */
-    ' float hgt=clamp(p.y/(c.y+R+0.001),0.0,1.0);',   // 0 at the floor, 1 at the crest
-    ' vec3 deep=mix(vec3(0.09,0.20,0.52),vec3(0.42,0.68,1.00),hgt);',
-    ' vec3 ice=vec3(0.46,0.74,1.0);',
-    /* The smoke belongs to the floor. This envelope holds it at full strength
-       along the bottom edge and takes it to nothing by ~60% up, so it reads
-       as rising in from below the frame and dissipating — not as a field
-       sitting in the middle of the screen. */
-    /* the disc's own rim is what ends it now, so this only stops anything
-       stray from hanging around near the headline */
-    ' float floorFade=1.0-smoothstep(0.58,1.00,p.y);',
-    /* ONE KNOB. Every additive term is scaled by this, so the whole effect
-       dims or lifts together without any of the balance between mass, edge
-       and plume changing. Raise toward 1.0 for more, drop toward 0.3 for a
-       whisper. */
-    ' float I=0.55*floorFade;',
+    /* deep blue where it is densest, paling a little as it climbs, and
+       nothing at all by the time it reaches its own edge */
+    ' float hgt=clamp(p.y/(c.y+R+0.001),0.0,1.0);',
+    ' vec3 core=mix(vec3(0.10,0.22,0.56),vec3(0.34,0.56,0.94),hgt);',
+    /* ONE KNOB. Raise toward 1.0 for more, drop toward 0.3 for a whisper. */
+    ' float I=0.85;',
     ' vec3 col=bg;',
-    ' col+=deep*(dns*0.90+glow*0.10)*I;',
-    ' col+=ice*dns*dns*0.20*I;',
-    ' col+=ice*edge*mix(0.45,1.0,smoke)*0.42*I;',     // the rim, broken by the smoke on it
-    ' col+=deep*plume*0.60*I;',                       // wisps off the rim are mass first…
-    ' col+=ice*plume*0.30*I;',                        // …and catch a little light
-    ' col+=ice*pow(dns,3.0)*0.10*I;',               // highlights where it is thickest
+    ' col+=core*dns*I;',
+    ' col+=vec3(0.46,0.74,1.0)*dns*dns*dns*0.26*I;',  // only the very densest catches light
     ' col+=(hash(gl_FragCoord.xy+fract(t))-0.5)*0.012;',
     ' gl_FragColor=vec4(col,1.0);}'
   ].join('\n');
