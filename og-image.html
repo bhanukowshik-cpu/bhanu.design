@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!-- Source for images/og-image.png (social share card).
+     Re-render after edits:
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
+       --screenshot=og-2x.png --window-size=1200,630 --force-device-scale-factor=2 \
+       --virtual-time-budget=10000 --hide-scrollbars "file://$PWD/og-image.html"
+     sips -z 630 1200 og-2x.png --out images/og-image.png -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 1200px; height: 630px; overflow: hidden; }
+    body {
+      position: relative;
+      background: #0b0b0d;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex; align-items: center; justify-content: center;
+    }
+    /* dot mesh — same recipe as the site loader */
+    .dots {
+      position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.15) 1.3px, transparent 1.4px);
+      background-size: 26px 26px; background-position: center;
+      -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 55%, transparent 100%);
+              mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 55%, transparent 100%);
+    }
+    /* lime glow rising from the bottom — same as the homepage card */
+    .glow {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 72% 38% at 50% 100%, rgba(230,242,141,0.36) 0%, rgba(230,242,141,0.12) 50%, transparent 78%),
+        radial-gradient(ellipse 115% 24% at 50% 110%, rgba(230,242,141,0.14) 0%, transparent 58%);
+    }
+
+    /* ── Figma artboard frame ── */
+    .stage { position: relative; z-index: 2; margin-top: -4px; }
+    .frame {
+      position: relative;
+      padding: 68px 76px 72px;
+      background: #2E2E2E;
+      border: 1.5px solid #1A73E8;
+      border-radius: 2px;
+      text-align: center;
+    }
+    .tab {
+      position: absolute; top: -30px; left: -1.5px;
+      font-size: 15px; letter-spacing: .04em; font-weight: 500;
+      color: #fff; background: #1A73E8; padding: 4px 12px;
+      border-radius: 4px 4px 0 0; white-space: nowrap;
+    }
+    .handle { position: absolute; background: #fff; border: 2px solid #1A73E8; z-index: 4; }
+    .handle.c { width: 13px; height: 13px; border-radius: 50%; }
+    .handle.tl { top: -7px; left: -7px; }
+    .handle.tr { top: -7px; right: -7px; }
+    .handle.bl { bottom: -7px; left: -7px; }
+    .handle.br { bottom: -7px; right: -7px; }
+    .handle.tc, .handle.bc { width: 26px; height: 9px; border-radius: 6px; left: 50%; transform: translateX(-50%); }
+    .handle.lc, .handle.rc { width: 9px; height: 26px; border-radius: 6px; top: 50%; transform: translateY(-50%); }
+    .handle.tc { top: -5px; } .handle.bc { bottom: -5px; }
+    .handle.lc { left: -5px; } .handle.rc { right: -5px; }
+
+    .name {
+      font-weight: 500; font-size: 17px; letter-spacing: .34em;
+      color: #9aa0a6; margin-bottom: 24px;
+      text-indent: .34em; /* recenters letterspaced text */
+    }
+    .title {
+      font-weight: 700; color: #fff;
+      font-size: 44px; line-height: 1.15;
+      letter-spacing: -0.01em; white-space: nowrap;
+    }
+    .ai {
+      display: inline-flex; align-items: center; justify-content: center;
+      vertical-align: middle;
+      font-weight: 700; color: #fff;
+      background:
+        linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+        linear-gradient(270deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.3) 21.1%, rgba(0,0,0,0.3) 84.9%, rgba(0,0,0,0.3) 100%);
+      border-radius: 16px;
+      padding: 0.18em 0.8em; margin-right: 0.18em;
+      box-shadow:
+        rgba(255, 255, 255, 0.7)  6.67px  6.67px 3.36px -6.21px inset,
+        rgba(255, 61,  61,  0.5) -6.70px -6.00px 3.36px -6.73px inset,
+        rgba(34,  211, 238, 0.55) -8px   6px 16px -4px inset,
+        rgba(99,  102, 241, 0.50) -2px   5px 14px -5px inset,
+        rgba(168, 85,  247, 0.45)  2px   5px 14px -5px inset,
+        rgba(236, 72,  153, 0.40)  8px   4px 12px -6px inset;
+    }
+
+    /* ── dimension measure: the card labels itself ── */
+    .measure {
+      position: absolute; left: 0; right: 0; bottom: -46px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .mline { position: relative; width: 100%; height: 1.5px; background: #1A73E8; }
+    .mline::before, .mline::after {
+      content: ''; position: absolute; top: -5px; width: 1.5px; height: 12px; background: #1A73E8;
+    }
+    .mline::before { left: 0; } .mline::after { right: 0; }
+    .mchip {
+      font-size: 14px; font-weight: 500; color: #fff;
+      background: #1A73E8; padding: 3px 10px; border-radius: 4px;
+    }
+
+    /* ── multiplayer cursor, in the portfolio lime ── */
+    .cursor { position: fixed; right: 178px; top: 92px; z-index: 5; }
+    .cursor svg { display: block; }
+    .cursor-tag {
+      position: absolute; left: 20px; top: 22px;
+      font-size: 15px; font-weight: 700; color: #252525;
+      background: #E6F28D; padding: 4px 12px; border-radius: 999px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="dots"></div>
+  <div class="glow"></div>
+
+  <div class="stage">
+    <div class="frame">
+      <div class="tab">og:image</div>
+      <div class="handle c tl"></div><div class="handle c tr"></div>
+      <div class="handle c bl"></div><div class="handle c br"></div>
+      <div class="handle tc"></div><div class="handle bc"></div>
+      <div class="handle lc"></div><div class="handle rc"></div>
+
+      <div class="name">BHANU&nbsp;KOWSHIK</div>
+      <div class="title"><span class="ai">AI&nbsp;Native</span> Product Designer</div>
+
+      <div class="measure">
+        <div class="mline"></div>
+        <div class="mchip">1200 × 630</div>
+      </div>
+    </div>
+
+    <div class="cursor">
+      <svg width="22" height="24" viewBox="0 0 22 24" fill="none">
+        <path d="M2 1 L2 19 L7 14.5 L10.5 22 L14 20.3 L10.6 13 L17 13 Z"
+              fill="#E6F28D" stroke="#252525" stroke-width="1.4" stroke-linejoin="round"/>
+      </svg>
+      <div class="cursor-tag">Bhanu</div>
+    </div>
+  </div>
+</body>
+</html>
