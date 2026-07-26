@@ -230,8 +230,8 @@
      without a hint. Native scroll-snap does the paging — no JS owns the numbers. */
   .work-pin{position:relative;background:var(--cream);color:var(--cream-ink);
     --reel-pad:clamp(20px,5vw,88px);
-    --card-w:min(62vw,880px);          /* 1 full card + half the next in view */
-    --sys-w:min(92vw,1320px);          /* the EverTutor system slide runs wider */
+    --card-w:min(42vw,560px);          /* 1 full card + half the next in view */
+    --panel-w:clamp(280px,26vw,400px); /* the 01 system panel that opens the reel */
     padding:clamp(58px,8vh,104px) 0 clamp(64px,9vh,116px);}
 
   .work-track{display:flex;align-items:stretch;gap:clamp(16px,1.8vw,28px);
@@ -242,89 +242,65 @@
   .work-track::-webkit-scrollbar{display:none;}
   .work-track>*{scroll-snap-align:start;}
 
-  /* section header — sits above the reel, full width */
-  .work-head{display:flex;align-items:flex-end;justify-content:space-between;
-    gap:clamp(18px,4vw,64px);padding:0 var(--reel-pad);flex-wrap:wrap;
-    margin-bottom:clamp(28px,4.5vh,52px);}
-  .work-head .k{display:block;margin-bottom:12px;font-size:11.5px;font-weight:550;
-    letter-spacing:.18em;text-transform:uppercase;color:var(--cream-ink-3);}
-  .work-head h2{font-family:var(--sans);font-weight:570;color:var(--cream-ink);
-    font-size:clamp(30px,3.4vw,50px);line-height:1.1;letter-spacing:-0.024em;}
-  .work-head h2 .serif{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.08em;}
-  .work-head-r{font-size:14.5px;line-height:1.62;color:var(--cream-ink-2);
-    max-width:44ch;padding-bottom:6px;}
+  /* section header — just the label, nothing else */
+  .work-head{padding:0 var(--reel-pad);margin-bottom:clamp(22px,3.5vh,40px);}
+  .work-head .k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--cream-ink-3);}
 
-  /* ── slides ───────────────────────────────────────────────────────────── */
+  /* ── 01 — the system, stated once at the head of the reel ─────────────── */
+  .sys-panel{flex:none;width:var(--panel-w);align-self:center;
+    display:flex;flex-direction:column;padding-right:clamp(12px,2vw,32px);}
+  .sys-num{font-size:11.5px;font-weight:600;letter-spacing:.13em;color:#2463DC;}
+  .sys-panel h2{margin-top:14px;font-family:var(--sans);font-weight:570;color:var(--cream-ink);
+    font-size:clamp(28px,2.9vw,42px);line-height:1.12;letter-spacing:-0.024em;}
+  .sys-desc{margin-top:14px;font-size:14.5px;line-height:1.6;color:var(--cream-ink-2);max-width:32ch;}
+  .sys-desc em{font-style:normal;font-weight:600;color:var(--cream-ink);}
+  .sys-metrics{display:flex;flex-direction:column;gap:18px;margin-top:clamp(24px,3.5vh,40px);}
+  .sys-metric{display:flex;flex-direction:column;gap:3px;}
+  .sys-metric .v{font-size:clamp(22px,2vw,30px);font-weight:600;color:var(--cream-ink);
+    letter-spacing:-0.012em;font-variant-numeric:tabular-nums;line-height:1;}
+  .sys-metric .l{font-size:11.5px;font-weight:500;letter-spacing:.02em;color:var(--cream-ink-3);}
+
+  /* ── project cards — every one the same width ─────────────────────────── */
   .slide{flex:none;width:var(--card-w);display:flex;flex-direction:column;
     border-radius:24px;overflow:hidden;position:relative;
     border:1px solid var(--cream-line);background:#FFFFFF;
     box-shadow:0 30px 60px -34px rgba(10,20,40,.20), 0 2px 8px -4px rgba(10,20,40,.06);}
-  .slide-top{display:flex;align-items:center;gap:14px;padding:20px 24px 0;
-    font-size:11.5px;font-weight:550;letter-spacing:.13em;color:var(--cream-ink-3);}
-  .slide-top b{color:#2463DC;font-weight:600;}
-  .slide-media{margin:16px 24px 0;border-radius:14px;overflow:hidden;
+
+  /* thumbnail at rest; the video rises over it from the bottom on hover */
+  .slide-media{position:relative;margin:20px 20px 0;border-radius:14px;overflow:hidden;
     aspect-ratio:16/10;background:#EDF1F7;border:1px solid var(--cream-line);}
   .slide-media img{width:100%;height:100%;object-fit:cover;display:block;}
-  .slide-body{display:flex;flex-direction:column;flex:1;padding:18px 24px 24px;}
-  .slide-body h3{font-family:var(--sans);font-size:clamp(24px,2vw,30px);font-weight:570;
+  .slide-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+    transform:translateY(101%);will-change:transform;
+    transition:transform .62s cubic-bezier(0.19,1,0.22,1);}
+  .slide:hover .slide-vid,
+  .slide:focus-within .slide-vid{transform:translateY(0);}
+
+  .slide-body{display:flex;flex-direction:column;flex:1;padding:18px 20px 22px;}
+  .slide-num{font-size:11px;font-weight:600;letter-spacing:.13em;color:#2463DC;margin-bottom:9px;}
+  .slide-body h3{font-family:var(--sans);font-size:clamp(22px,1.8vw,27px);font-weight:570;
     letter-spacing:-0.02em;color:var(--cream-ink);}
   .slide-body .role{margin-top:5px;font-size:11px;font-weight:600;letter-spacing:.13em;
     text-transform:uppercase;color:#2463DC;}
-  .slide-body p{margin-top:12px;font-size:14.5px;line-height:1.62;color:var(--cream-ink-2);max-width:58ch;}
+  .slide-body p{margin-top:11px;font-size:14px;line-height:1.6;color:var(--cream-ink-2);}
   .slide-body p em{font-style:normal;font-weight:600;color:var(--cream-ink);}
-  .slide-metrics{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px;}
-  .slide-metrics span{padding:6px 11px;border-radius:999px;border:1px solid var(--cream-line);
-    background:var(--cream-2);font-size:11.5px;font-weight:500;color:var(--cream-ink-2);
+  .slide-metrics{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+  .slide-metrics span{padding:5px 10px;border-radius:999px;border:1px solid var(--cream-line);
+    background:var(--cream-2);font-size:11px;font-weight:500;color:var(--cream-ink-2);
     font-variant-numeric:tabular-nums;}
-  .slide-cta{align-self:flex-start;margin-top:22px;display:inline-flex;align-items:center;gap:8px;
-    padding:11px 18px;border-radius:999px;text-decoration:none;
+  .slide-cta{align-self:flex-start;margin-top:18px;display:inline-flex;align-items:center;gap:8px;
+    padding:10px 17px;border-radius:999px;text-decoration:none;
     background:#101720;color:#fff;font-size:13px;font-weight:570;
     transition:transform .3s var(--ease),background .3s var(--ease);}
   .slide-cta:hover{transform:translateY(-2px);background:#000;}
 
-  /* ── 01 — the EverTutor system slide, wider than the rest ─────────────── */
-  .slide--system{width:var(--sys-w);}
-  .slide--system .slide-top{flex-wrap:wrap;}
-  .sys-tags{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto;}
-  .sys-tag{padding:5px 11px;border-radius:999px;border:1px solid var(--cream-line);
-    background:var(--cream-2);font-size:11px;font-weight:500;letter-spacing:.02em;
-    text-transform:none;color:var(--cream-ink-2);}
-  /* the hero takes the slack when the slide is stretched, so the three tools
-     below keep their natural size instead of cropping their video */
-  .sys-hero{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
-    flex:1;gap:clamp(18px,3vw,56px);padding:20px 24px 22px;}
-  .sys-hero-l{flex:1 1 340px;min-width:0;}
-  .sys-hero h3{font-family:var(--sans);font-size:clamp(26px,2.5vw,38px);font-weight:570;
-    letter-spacing:-0.022em;color:var(--cream-ink);}
-  .sys-desc{margin-top:11px;font-size:14.5px;line-height:1.62;color:var(--cream-ink-2);max-width:52ch;}
-  .sys-desc em{font-style:normal;font-weight:600;color:var(--cream-ink);}
-  .sys-hero-r{display:flex;flex:none;gap:clamp(16px,2.4vw,38px);}
-  .sys-metric{display:flex;flex-direction:column;gap:4px;}
-  .sys-metric .v{font-size:clamp(20px,1.9vw,28px);font-weight:600;color:var(--cream-ink);
-    letter-spacing:-0.01em;font-variant-numeric:tabular-nums;}
-  .sys-metric .l{font-size:11.5px;font-weight:500;letter-spacing:.02em;color:var(--cream-ink-3);}
-
-  /* the three tools, nested inside the system slide */
-  /* the slide is stretched to the tallest card in the reel, so the three tools
-     grow to take up the slack rather than leaving a void under the hero */
-  .sys-subs{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.2vw,16px);
-    padding:0 24px 24px;flex:none;align-items:stretch;}
-  .sub{display:flex;flex-direction:column;text-decoration:none;border-radius:14px;overflow:hidden;
-    border:1px solid var(--cream-line);background:var(--cream);
-    transition:transform .3s var(--ease),border-color .3s var(--ease);}
-  a.sub:hover{transform:translateY(-3px);border-color:rgba(36,99,220,.34);}
-  .sub-media{aspect-ratio:16/10;background:#EDF1F7;overflow:hidden;}
-  .sub-media video{width:100%;height:100%;object-fit:cover;display:block;}
-  .sub-info{padding:11px 13px 13px;}
-  .sub-info .n{font-size:10.5px;font-weight:600;letter-spacing:.14em;color:#2463DC;}
-  .sub-info .t{margin-top:4px;font-size:15px;font-weight:570;letter-spacing:-0.012em;color:var(--cream-ink);}
-  .sub-info .d{margin-top:3px;font-size:12.5px;line-height:1.5;color:var(--cream-ink-3);}
-
+  @media (prefers-reduced-motion: reduce){
+    .slide-vid{transition:none;}
+  }
   @media (max-width:900px){
-    .work-pin{--card-w:min(86vw,520px);--sys-w:min(88vw,560px);}
-    .sys-hero-r{width:100%;justify-content:flex-start;}
-    .sys-subs{grid-template-columns:1fr;}
-    .sys-tags{margin-left:0;width:100%;}
+    .work-pin{--card-w:min(78vw,420px);--panel-w:min(78vw,420px);}
+    .sys-panel{align-self:flex-start;padding-right:0;}
   }
 
   /* ── CUSTOM CURSOR (ported from index.html — dot / text caret / CTA magnet) ── */
@@ -558,128 +534,113 @@
 
   <section class="work-pin" id="workPin">
 
-    <header class="work-head">
-      <div class="work-head-l">
-        <span class="k">Selected work</span>
-        <h2>Four products, one <span class="serif">thread.</span></h2>
-      </div>
-      <p class="work-head-r">Voice, AI, and the people on the other side of it — from first
-        prototype through the version thousands of learners actually use.</p>
-    </header>
+    <header class="work-head"><span class="k">Selected work</span></header>
 
     <div class="work-track" id="workTrack">
 
-      <!-- 01 — EverTutor: three tools, shown as the one system they are -->
-      <article class="slide slide--system">
-        <div class="slide-top">
-          <b>01</b><span>2023 — 2025</span>
-          <div class="sys-tags">
-            <span class="sys-tag">Sole Product Designer</span>
-            <span class="sys-tag">0 to 1</span>
-            <span class="sys-tag">Desktop · B2B · B2C</span>
-          </div>
+      <!-- the system, stated once on the left — then its three tools follow as cards -->
+      <div class="sys-panel">
+        <span class="sys-num">01</span>
+        <h2>EverTutor AI System</h2>
+        <p class="sys-desc">World&rsquo;s first multimodal, voice-first AI tutor —
+          <em>three tools working as one system</em>.</p>
+        <div class="sys-metrics">
+          <div class="sys-metric"><span class="v">2000+</span><span class="l">Active learners</span></div>
+          <div class="sys-metric"><span class="v">−96%</span><span class="l">Workflow time</span></div>
+          <div class="sys-metric"><span class="v">0→$500k+</span><span class="l">ARR as sole designer</span></div>
         </div>
+      </div>
 
-        <div class="sys-hero">
-          <div class="sys-hero-l">
-            <h3>EverTutor AI System</h3>
-            <p class="sys-desc">World&rsquo;s first multimodal 1:1, voice-first AI tutor powered by
-              <em>3 tools working as one system</em> to enable a billion tutors for a billion minds.</p>
-          </div>
-          <div class="sys-hero-r">
-            <div class="sys-metric"><span class="v">2000+</span><span class="l">Active Learners</span></div>
-            <div class="sys-metric"><span class="v">−96%</span><span class="l">Workflow time</span></div>
-            <div class="sys-metric"><span class="v">0→$500k+</span><span class="l">ARR as sole designer</span></div>
-          </div>
+      <article class="slide">
+        <div class="slide-media">
+          <img src="images/card-et-live.webp" alt="EverTutor Live" width="760" height="507">
+          <video class="slide-vid" src="images/et-live.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
         </div>
-
-        <div class="sys-subs">
-          <a class="sub" href="evertutor-live.html">
-            <div class="sub-media">
-              <video src="images/et-live.mp4" poster="images/card-et-live.webp"
-                     autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
-            </div>
-            <div class="sub-info">
-              <span class="n">1.1</span>
-              <p class="t">EverTutor Live</p>
-              <p class="d">Voice-first AI tutor · prototype to PMF</p>
-            </div>
-          </a>
-          <a class="sub" href="evertutor-studio.html">
-            <div class="sub-media">
-              <video src="images/et-studio.mp4" poster="images/card-et-studio.webp"
-                     autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
-            </div>
-            <div class="sub-info">
-              <span class="n">1.2</span>
-              <p class="t">EverTutor Studio</p>
-              <p class="d">100+ hrs → 4 hrs lesson creation</p>
-            </div>
-          </a>
-          <div class="sub sub--flat">
-            <div class="sub-media">
-              <video src="images/et-analytics.mp4" poster="images/card-et-analytics.webp"
-                     autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
-            </div>
-            <div class="sub-info">
-              <span class="n">1.3</span>
-              <p class="t">EverTutor Analytics</p>
-              <p class="d">Real-time student insights for educators</p>
-            </div>
-          </div>
+        <div class="slide-body">
+          <span class="slide-num">1.1</span>
+          <h3>EverTutor Live</h3>
+          <div class="role">Product Design Lead</div>
+          <p>A voice-first AI tutor that gives every learner a fully adaptive 1:1 session —
+            taken from prototype to product-market fit.</p>
+          <div class="slide-metrics"><span>2,000+ daily sessions</span><span>2× performance gain</span><span>$250 → $5/hr</span></div>
+          <a class="slide-cta" href="evertutor-live.html">View case study ↗</a>
         </div>
       </article>
 
-      <!-- 02 — Stressie -->
       <article class="slide">
-        <div class="slide-top"><b>02</b><span>2022</span></div>
         <div class="slide-media">
-          <img src="images/card-stressie.webp" alt="Stressie" width="760" height="428" loading="lazy">
+          <img src="images/card-et-studio.webp" alt="EverTutor Studio" width="760" height="507" loading="lazy">
+          <video class="slide-vid" src="images/et-studio.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
         </div>
         <div class="slide-body">
+          <span class="slide-num">1.2</span>
+          <h3>EverTutor Studio</h3>
+          <div class="role">Product Design Lead</div>
+          <p>The authoring environment behind Live — where educators shape, test and ship a
+            tutor&rsquo;s curriculum without ever writing a prompt.</p>
+          <div class="slide-metrics"><span>100+ hrs → 4 hrs</span><span>Lesson creation</span></div>
+          <a class="slide-cta" href="evertutor-studio.html">View case study ↗</a>
+        </div>
+      </article>
+
+      <article class="slide">
+        <div class="slide-media">
+          <img src="images/card-et-analytics.webp" alt="EverTutor Analytics" width="760" height="507" loading="lazy">
+          <video class="slide-vid" src="images/et-analytics.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
+        </div>
+        <div class="slide-body">
+          <span class="slide-num">1.3</span>
+          <h3>EverTutor Analytics</h3>
+          <div class="role">Product Design</div>
+          <p>The measurement layer — how a team sees what a learner actually struggled with,
+            session by session, without drowning in transcripts.</p>
+          <div class="slide-metrics"><span>Real-time insight</span><span>For educators</span></div>
+        </div>
+      </article>
+
+      <article class="slide">
+        <div class="slide-media">
+          <img src="images/card-stressie.webp" alt="Stressie" width="760" height="428" loading="lazy">
+          <video class="slide-vid" src="images/stressie.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
+        </div>
+        <div class="slide-body">
+          <span class="slide-num">02</span>
           <h3>Stressie</h3>
           <div class="role">Founding Product Designer</div>
           <p>From pilot research to a <em>Harvard-incubated product</em> — a full redesign of
             workplace stress management, now live at Amazon and InKind.</p>
-          <div class="slide-metrics">
-            <span>17.4% engagement vs ~2% avg</span><span>Harvard Innovation Labs</span><span>2 live pilots</span>
-          </div>
+          <div class="slide-metrics"><span>17.4% engagement</span><span>Harvard Innovation Labs</span><span>2 live pilots</span></div>
           <a class="slide-cta" href="stressie-studio.html">View case study ↗</a>
         </div>
       </article>
 
-      <!-- 03 — Dearly -->
       <article class="slide">
-        <div class="slide-top"><b>03</b><span>2025</span></div>
         <div class="slide-media">
           <img src="images/card-dearly.webp" alt="Dearly" width="760" height="428" loading="lazy">
+          <video class="slide-vid" src="images/dearly.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
         </div>
         <div class="slide-body">
+          <span class="slide-num">03</span>
           <h3>Dearly</h3>
           <div class="role">Solo Designer &amp; Developer</div>
           <p>Animated handwriting with your real voice and photos, sent as a unique link —
-            a quieter way to keep the people who matter close. Built in 48 hours.</p>
-          <div class="slide-metrics">
-            <span>Shipped in 48 hours</span><span>140 letters written</span><span>End-to-end ownership</span>
-          </div>
+            a quieter way to keep the people who matter close.</p>
+          <div class="slide-metrics"><span>Shipped in 48 hours</span><span>140 letters written</span></div>
           <a class="slide-cta" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">Visit the site ↗</a>
         </div>
       </article>
 
-      <!-- 04 — The Engine -->
       <article class="slide">
-        <div class="slide-top"><b>04</b><span>2025</span></div>
         <div class="slide-media">
           <img src="images/card-engine.webp" alt="The Engine" width="760" height="507" loading="lazy">
         </div>
         <div class="slide-body">
+          <span class="slide-num">04</span>
           <h3>The Engine</h3>
           <div class="role">Product Design · Landing Page</div>
           <p>Designed the landing page for an AI growth platform that runs content, marketing
             and sales autonomously — the whole pitch carried by one glowing funnel.</p>
-          <div class="slide-metrics">
-            <span>Brand &amp; art direction</span><span>Marketing site</span><span>Motion</span>
-          </div>
+          <div class="slide-metrics"><span>Brand &amp; art direction</span><span>Marketing site</span></div>
           <a class="slide-cta" href="https://www.theengine.dev/" target="_blank" rel="noopener">Visit the site ↗</a>
         </div>
       </article>
@@ -978,7 +939,26 @@ addEventListener('scroll', function () {
   }
 }, { passive: true });
 
-/* Section 2 needs no JS — the reel is a native scroll-snap rail (see .work-track). */
+/* ── the reel is a native scroll-snap rail; the only JS is the hover video ──
+   CSS slides it up from the bottom, this just starts and rewinds playback so
+   nothing decodes until it's actually asked for (the files are preload="none"). */
+(function () {
+  var slides = document.querySelectorAll('.slide');
+  if (!slides.length || !matchMedia('(pointer:fine)').matches) return;
+  [].forEach.call(slides, function (slide) {
+    var vid = slide.querySelector('.slide-vid');
+    if (!vid) return;                                   /* not every project has one */
+    slide.addEventListener('mouseenter', function () {
+      var p = vid.play();
+      if (p && p.catch) p.catch(function () {});        /* autoplay refusal is fine */
+    });
+    slide.addEventListener('mouseleave', function () {
+      vid.pause();
+      /* rewind only after it has slid back out, so you never see it jump */
+      setTimeout(function () { if (vid.paused) vid.currentTime = 0; }, 620);
+    });
+  });
+})();
 
 /* ── image trail — photos reveal one after another along the cursor path ── */
 (function () {
