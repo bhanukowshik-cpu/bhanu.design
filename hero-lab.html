@@ -44,6 +44,17 @@
   }
   /* elegant, consistent keyboard focus */
   :focus-visible{outline:2px solid var(--ember);outline-offset:3px;border-radius:4px;}
+  /* even the text you select is on-palette */
+  ::selection{background:rgba(92,169,255,.30);color:var(--ink);}
+  /* the scrollbar belongs to the page, not the OS */
+  html{scrollbar-width:thin;scrollbar-color:rgba(124,135,148,.30) transparent;}
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:rgba(124,135,148,.26);border-radius:99px;
+    border:3px solid var(--bg);}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(124,135,148,.4);}
+  /* a breath out before a case study takes over */
+  html.page-leave body{opacity:0;transition:opacity .24s ease;}
   html,body{height:100%;}
   body{
     background:var(--bg);color:var(--ink);font-family:var(--sans);
@@ -411,6 +422,12 @@
     transition:width .32s cubic-bezier(.34,1.56,.64,1),height .32s cubic-bezier(.34,1.56,.64,1),
       border-radius .3s cubic-bezier(.34,1.56,.64,1),background .26s ease,opacity .18s ease;
   }
+  /* over a project's imagery the dot speaks — a small white pill, an invitation */
+  #ccDot.cc-say{width:auto !important;height:auto !important;padding:9px 15px;
+    border-radius:999px !important;background:rgba(239,243,248,.96) !important;
+    color:#0A0E15;font:600 12px/1 var(--sans);letter-spacing:.05em;white-space:nowrap;}
+  html.cc-active .slide-media{cursor:none;}
+  .slide-media{cursor:pointer;}
 
   /* ── CHAT PANEL ── */
   .chat-backdrop{position:fixed;inset:0;z-index:70;background:rgba(4,2,1,.55);
@@ -923,6 +940,9 @@
   .ft-copy.done .ic-check{opacity:1;transform:scale(1);}
 
   .ft-socials{display:flex;gap:12px;margin-top:6px;}
+  /* proof there's a person on this end, right now */
+  .ft-clock{display:block;margin-top:20px;font-size:12.5px;letter-spacing:.02em;color:var(--ink-3);}
+  .ft-clock time{color:var(--ink-2);font-variant-numeric:tabular-nums;}
   .ft-soc{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;
     border-radius:12px;color:var(--ink-2);background:rgba(239,243,248,.06);
     border:1px solid var(--line);
@@ -1463,6 +1483,7 @@
                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5 0-.3 0-1 0-1.8-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2 0 1.6 0 2.9 0 3.3 0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
               </a>
             </div>
+            <span class="ft-clock">Currently <time id="ftTime">—:—</time> for me in San&nbsp;Francisco</span>
           </div>
         </div>
 
@@ -2142,10 +2163,15 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
     el.style.transform = 'translate(0px, 0px)';
     setTimeout(function () { el.style.transition = ''; el.style.transform = ''; }, 520);
   }
-  function enterDot()  { releaseMagnet(); mode = 'dot';  setShape(12, 12, 999, DOT); }
-  function enterText() { releaseMagnet(); mode = 'text'; setShape(3, 30, 3, CARET); }
+  function clearSay()  { if (dot.classList.contains('cc-say')) { dot.classList.remove('cc-say'); dot.textContent = ''; } }
+  function enterDot()  { releaseMagnet(); clearSay(); mode = 'dot';  setShape(12, 12, 999, DOT); }
+  function enterText() { releaseMagnet(); clearSay(); mode = 'text'; setShape(3, 30, 3, CARET); }
+  function enterSay(label) {
+    releaseMagnet(); mode = 'say';
+    dot.classList.add('cc-say'); dot.textContent = label;
+  }
   function enterSnap(el) {
-    releaseMagnet(); mode = 'snap'; magnetEl = el;
+    releaseMagnet(); clearSay(); mode = 'snap'; magnetEl = el;
     var r = el.getBoundingClientRect();
     origCX = r.left + r.width / 2; origCY = r.top + r.height / 2;
     snapW = r.width; snapH = r.height;
@@ -2191,6 +2217,11 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
       return;
     }
     dot.style.opacity = '1';
+    /* over a card's imagery, the cursor becomes the invitation */
+    if (el && el.closest('.slide-media')) {
+      if (mode !== 'say') enterSay('View case ↗');
+      return;
+    }
     var onLight = !!(el && el.closest('.chat'));   // light surfaces need a dark dot
     if (isNearRenderedText(mx, my)) { if (mode !== 'text') enterText(); }
     else { if (mode !== 'dot') enterDot(); dot.style.background = onLight ? 'rgba(16,23,32,.85)' : DOT; }
@@ -2205,6 +2236,30 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
+})();
+</script>
+<script>
+/* ── CARD IMAGERY IS A DOOR + THE EXIT BREATH ───────────────────────────
+   The picture is what people try to click, so it goes where the small
+   link goes. And any walk to a case study starts with a short breath
+   out — the page dims for a beat instead of hard-cutting. */
+(function () {
+  document.querySelectorAll('.slide-media').forEach(function (m) {
+    m.addEventListener('click', function () {
+      var a = m.closest('.slide') && m.closest('.slide').querySelector('.slide-cta');
+      if (a) a.click();
+    });
+  });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href$=".html"]');
+    if (!a || a.target === '_blank' || a.origin !== location.origin) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.defaultPrevented) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    e.preventDefault();
+    document.documentElement.classList.add('page-leave');
+    setTimeout(function () { location.href = a.href; }, 230);
+  });
 })();
 </script>
 <script>
@@ -2454,6 +2509,16 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
 <script>
 /* ── 05 — FOOTER: copy, the heart, and the note's arrival ────────────── */
 (function () {
+  /* the clock keeps my time, not the visitor's */
+  var ftTime = document.getElementById('ftTime');
+  function tickClock() {
+    if (!ftTime) return;
+    ftTime.textContent = new Intl.DateTimeFormat('en-US',
+      { hour: 'numeric', minute: '2-digit', timeZone: 'America/Los_Angeles' }).format(new Date());
+  }
+  tickClock();
+  setInterval(tickClock, 30000);
+
   var toast = document.getElementById('ftToast');
   var toastMsg = document.getElementById('ftToastMsg');
   var toastT;
