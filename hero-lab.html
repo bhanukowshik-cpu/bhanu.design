@@ -244,12 +244,15 @@
     --panel-w:clamp(280px,26vw,400px); /* the 01 system panel that opens the reel */
     padding:clamp(58px,8vh,104px) 0 clamp(64px,9vh,116px);}
 
-  .work-track{display:flex;align-items:stretch;gap:clamp(16px,1.8vw,28px);
+  /* ── the rail, now the narrow-screen path only ──────────────────────────
+     Below 901px (where the pin never runs either) the section stays the
+     swipeable reel it has always been; the bento takes over above that. */
+  .work-bento{display:flex;align-items:stretch;gap:clamp(16px,1.8vw,28px);
     padding:0 var(--reel-pad);
     overflow-x:auto;overscroll-behavior-x:contain;
     scroll-snap-type:x mandatory;scroll-padding-left:var(--reel-pad);
     scrollbar-width:none;-ms-overflow-style:none;}
-  .work-track::-webkit-scrollbar{display:none;}
+  .work-bento::-webkit-scrollbar{display:none;}
   /* snap to the cards themselves, not to the frame — it is far wider than the
      viewport, so snapping to it would strand you at its left edge */
   .sys-panel,.slide{scroll-snap-align:start;}
@@ -265,22 +268,23 @@
   .work-pin.is-pinned .work-sticky{height:100svh;
     display:flex;flex-direction:column;justify-content:center;overflow:hidden;
     padding:clamp(40px,6vh,72px) 0;}
-  .work-pin.is-pinned .work-track{overflow:visible;scroll-snap-type:none;
-    will-change:transform;}
-
-  /* the reel arrives rather than simply being there: each item lifts from
-     below as the section comes up, staggered by its index */
-  .work-pin.is-pinned .sys-frame,
-  .work-pin.is-pinned .work-track>.slide{
+  /* the tiles arrive rather than simply being there: each lifts from below as
+     the grid comes up, staggered by its index. Driven by an observer on the
+     grid itself, not the pin, so it also plays on the narrow-screen rail. */
+  .work-bento>.sys-frame,
+  .work-bento>.slide{
     opacity:0;transform:translateY(54px);
     transition:opacity .7s var(--ease),transform .95s cubic-bezier(0.16,1,0.3,1);
     transition-delay:calc(var(--i,0) * 90ms);}
-  .work-pin.is-pinned.revealed .sys-frame,
-  .work-pin.is-pinned.revealed .work-track>.slide{opacity:1;transform:none;}
+  .work-bento.revealed>.sys-frame,
+  .work-bento.revealed>.slide{opacity:1;transform:none;}
 
+  /* if the observer never runs, nothing should stay invisible */
+  .no-reveal .work-bento>.sys-frame,
+  .no-reveal .work-bento>.slide{opacity:1;transform:none;transition:none;}
   @media (prefers-reduced-motion: reduce){
-    .work-pin.is-pinned .sys-frame,
-    .work-pin.is-pinned .work-track>.slide{opacity:1;transform:none;transition:none;}
+    .work-bento>.sys-frame,
+    .work-bento>.slide{opacity:1;transform:none;transition:none;}
   }
 
   /* ── the expanding light behind the reel ──────────────────────────────── */
@@ -301,7 +305,7 @@
     background:#05070C;opacity:var(--kd,0);}
   /* the stage belongs to the pinned play only — on the swipe rail it's noise */
   .work-pin:not(.is-pinned) .work-canvas{display:none;}
-  .work-sticky>.work-head,.work-sticky>.work-track{position:relative;z-index:1;}
+  .work-sticky>.work-head{position:relative;z-index:1;}
 
   /* section header — just the label, nothing else */
   .work-head{padding:0 var(--reel-pad);margin-bottom:clamp(22px,3.5vh,40px);}
@@ -409,6 +413,44 @@
   @media (max-width:900px){
     .work-pin{--card-w:min(78vw,420px);--panel-w:min(78vw,420px);}
     .sys-panel{align-self:flex-start;padding-right:0;}
+  }
+
+  /* ── THE BENTO — 901px and up ────────────────────────────────────────────
+     One twelve-column grid on the dark surface the stage leaves behind. The
+     system keeps its frame and spans the full width, holding its own 1+3
+     sub-grid: the three tools are literally inside one container. Stressie,
+     Dearly and The Engine are peers below it at 5 / 4 / 3 of twelve, so the
+     row reads as a bento rather than three equal columns. */
+  @media (min-width:901px){
+    .work-bento{display:grid;grid-template-columns:repeat(12,1fr);
+      overflow:visible;scroll-snap-type:none;
+      padding:clamp(30px,6vh,72px) var(--reel-pad) clamp(64px,9vh,116px);
+      background:#05070C;}
+    .work-bento>.sys-frame{grid-column:1 / -1;}
+    .work-bento>.slide:nth-of-type(1){grid-column:span 5;}
+    .work-bento>.slide:nth-of-type(2){grid-column:span 4;}
+    .work-bento>.slide:nth-of-type(3){grid-column:span 3;}
+
+    /* the frame's own grid: the panel, then the three tools */
+    .sys-frame{display:grid;
+      grid-template-columns:minmax(0,1.12fr) repeat(3,minmax(0,1fr));}
+    .sys-panel{width:auto;min-width:0;}
+    .slide{width:auto;min-width:0;}
+
+    /* the peers are deliberately unequal widths, so a shared aspect-ratio would
+       give each a different media height and start their titles at three
+       different baselines. One fixed height instead: widths stay varied, the
+       text lines up across the row. */
+    .work-bento>.slide .slide-media{aspect-ratio:auto;height:clamp(200px,20vh,280px);}
+  }
+
+  /* between 901 and 1240 the four-up band gets tight: fold the frame to 2×2
+     and let the peers share two rows */
+  @media (min-width:901px) and (max-width:1240px){
+    .sys-frame{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .work-bento>.slide:nth-of-type(1){grid-column:span 6;}
+    .work-bento>.slide:nth-of-type(2){grid-column:span 6;}
+    .work-bento>.slide:nth-of-type(3){grid-column:span 12;}
   }
 
   /* ── CUSTOM CURSOR (ported from index.html — dot / text caret / CTA magnet) ── */
@@ -1135,8 +1177,11 @@
       </div>
 
       <header class="work-head"><span class="k">Featured <em class="serif">work</em></span></header>
+    </div>
 
-      <div class="work-track" id="workTrack">
+    <!-- the bento sits AFTER the pinned stage, so it scrolls normally on the
+         dark surface the stage leaves behind and the tiles get room to breathe -->
+    <div class="work-bento" id="workBento">
 
         <!-- the system, stated once on the left — then its three tools follow as cards -->
         <!-- everything EverTutor lives inside one frame: the system, then its three tools -->
@@ -1248,7 +1293,6 @@
           </div>
         </article>
 
-      </div>
     </div>
   </section>
 
@@ -1842,38 +1886,38 @@ addEventListener('scroll', function () {
   spy();
 })();
 
-/* ── the reel, driven by vertical scroll ─────────────────────────────────
-   Same stack the-engine-site-final runs on: Lenis smooths the page scroll,
-   GSAP ScrollTrigger pins this section and scrubs a timeline across it.
-   The easing that stops the sideways walk feeling stepped comes from those
-   two together — Lenis on the input, scrub on the output — not from a
-   hand-rolled lerp. Touch, narrow screens, reduced motion and a failed
-   vendor load all fall through to the plain CSS rail. */
+/* ── page-wide smooth scroll ─────────────────────────────────────────────
+   Lenis on the input, ScrollTrigger on the output — the pairing is what keeps
+   scrubbed motion from feeling stepped. It lives in its own block so the whole
+   page keeps its feel no matter what any one section does with it. */
 (function () {
-  var pin    = document.getElementById('workPin');
-  var track  = document.getElementById('workTrack');
-  var sticky = pin && pin.querySelector('.work-sticky');
-  var canvas = pin && pin.querySelector('.work-canvas');
-  if (!pin || !track || !sticky) return;
   if (!(window.gsap && window.ScrollTrigger && window.Lenis)) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (!matchMedia('(pointer:fine)').matches || innerWidth <= 900) return;
 
   gsap.registerPlugin(ScrollTrigger);
-
-  /* page-wide smooth scroll, driven off gsap's ticker — the engine's setup */
   var lenis = new Lenis({ duration: 1.1 });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
   gsap.ticker.lagSmoothing(0);
   window.__lenis = lenis;                     /* verify/debug hook */
+})();
 
+/* ── the stage, driven by vertical scroll ────────────────────────────────
+   ScrollTrigger pins the section briefly and scrubs the stage across it: the
+   title lands, the stage rises and grows until it is the viewport, then it
+   darkens and the pin releases into the bento below. Touch, narrow screens,
+   reduced motion and a failed vendor load all fall through to the CSS rail. */
+(function () {
+  var pin    = document.getElementById('workPin');
+  var sticky = pin && pin.querySelector('.work-sticky');
+  var canvas = pin && pin.querySelector('.work-canvas');
+  if (!pin || !sticky) return;
+  if (!(window.gsap && window.ScrollTrigger)) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!matchMedia('(pointer:fine)').matches || innerWidth <= 900) return;
+
+  gsap.registerPlugin(ScrollTrigger);
   pin.classList.add('is-pinned');
-
-  function travel() {
-    var padR = parseFloat(getComputedStyle(track).paddingRight) || 0;
-    return Math.max(0, track.scrollWidth - innerWidth + padR);
-  }
 
   /* the light is a proxy tween: gsap writes the three custom properties the
      CSS reads, so the expansion rides the same scrub as everything else */
@@ -1889,45 +1933,62 @@ addEventListener('scroll', function () {
     canvas.style.setProperty('--kr', ((1 - g) * 22).toFixed(1) + 'px');
   }
 
+  /* the scrim runs almost to opaque: the bento below is flat #05070C, and the
+     stage's last frame has to match it or the handoff shows as a seam */
   var scrim = { v: 0 };
   function drawScrim() {
-    if (canvas) canvas.style.setProperty('--kd', (scrim.v * 0.58).toFixed(3));
+    if (canvas) canvas.style.setProperty('--kd', (scrim.v * 0.88).toFixed(3));
   }
 
-  /* nothing of the reel is visible until beat C — autoAlpha 0 also sets
-     visibility:hidden, so it cannot catch a hover through the stage either */
-  gsap.set(track, { y: '58vh', autoAlpha: 0 });
   var head = pin.querySelector('.work-head');
   if (head) gsap.set(head, { autoAlpha: 0, y: 18 });
   drawLight();
   drawScrim();
 
+  /* the pin is now only as long as the stage needs — no travel to add */
   var tl = gsap.timeline({
     scrollTrigger: {
       trigger: pin, start: 'top top',
-      end: function () { return '+=' + Math.round(innerHeight * 0.75 + travel()); },
-      pin: sticky, scrub: 0.9, anticipatePin: 1, invalidateOnRefresh: true,
-      onEnter:      function () { pin.classList.add('revealed'); },
-      onEnterBack:  function () { pin.classList.add('revealed'); },
-      onLeaveBack:  function () { pin.classList.remove('revealed'); }
+      end: function () { return '+=' + Math.round(innerHeight * 0.9); },
+      pin: sticky, scrub: 0.9, anticipatePin: 1, invalidateOnRefresh: true
     }
   });
 
-  /* Four beats, strictly in order — nothing overlaps.
+  /* Three beats, strictly in order — nothing overlaps.
      A  the title lands first, then the stage slides up and grows until it is
         exactly the viewport; the title holds the empty screen while it rises */
-  if (head) tl.to(head, { autoAlpha: 1, y: 0, ease: 'power3.out', duration: 0.14 }, 0);
-  tl.to(light,  { v: 1, ease: 'power2.out', duration: 0.34, onUpdate: drawLight }, 0.04);
-  /* B  only once it has filled does it darken */
-  tl.to(scrim,  { v: 1, ease: 'none',       duration: 0.12, onUpdate: drawScrim }, 0.34);
-  /* B2 the title slides out as the stage grows past it, gone by the time
-        the stage has filled the screen */
-  if (head) tl.to(head, { autoAlpha: 0, y: -70, ease: 'power2.in', duration: 0.18 }, 0.16);
-  tl.to(track,  { y: '0vh', autoAlpha: 1, ease: 'power3.out', duration: 0.16 }, 0.46);
-  /* D  then the reel walks sideways for the rest of the pin */
-  tl.to(track,  { x: function () { return -travel(); }, ease: 'none', duration: 0.38 }, 0.62);
+  if (head) tl.to(head, { autoAlpha: 1, y: 0, ease: 'power3.out', duration: 0.10 }, 0);
+  tl.to(light,  { v: 1, ease: 'power2.out', duration: 0.64, onUpdate: drawLight }, 0.06);
+  /* B  the title slides out as the stage grows past it */
+  if (head) tl.to(head, { autoAlpha: 0, y: -70, ease: 'power2.in', duration: 0.20 }, 0.34);
+  /* C  only once it has filled does it darken, handing the section to the bento */
+  tl.to(scrim,  { v: 1, ease: 'none',       duration: 0.26, onUpdate: drawScrim }, 0.72);
 
   addEventListener('resize', function () { ScrollTrigger.refresh(); });
+})();
+
+/* ── the bento arrives ──
+   The tiles lift in on first sight, staggered by index. An observer owns this
+   rather than the pin, so it plays on the narrow-screen rail too; if the API
+   is missing the CSS fallback shows everything instead of hiding it. */
+(function () {
+  var bento = document.getElementById('workBento');
+  if (!bento) return;
+  var items = bento.querySelectorAll(':scope > .sys-frame, :scope > .slide');
+  [].forEach.call(items, function (el, i) { el.style.setProperty('--i', i); });
+
+  if (!('IntersectionObserver' in window)) {
+    document.documentElement.classList.add('no-reveal');
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      bento.classList.add('revealed');
+      io.disconnect();
+    });
+  }, { threshold: 0.08 });
+  io.observe(bento);
 })();
 
 /* ── the hover video ──
