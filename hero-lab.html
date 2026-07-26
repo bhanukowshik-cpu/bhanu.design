@@ -431,7 +431,11 @@
     --secondary:var(--ink);
     --font-heading:var(--sans);
     --font-mono:var(--body);
-    --font-display:var(--serif);
+    /* --font-display was Bricolage Grotesque: the display SANS the big
+       statements are set in, not a serif. Instrument Serif only ever appears
+       italic here, so pointing this at --serif would set the whole display
+       layer (hero, section heads, project + footer lines) upright serif. */
+    --font-display:var(--sans);
   }
 
 /* ─── FEATURED WORK HEADER ──────────────────────────────────── */
@@ -1940,6 +1944,9 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
 
   /* the section heading sits on the display scale, one step under the hero */
   .s2-fw-header .fw-title {
+    /* the port had this on --font-display, i.e. upright serif. Display lines
+       are Instrument Sans here, and the serif only ever appears in italic. */
+    font-family: var(--sans);
     font-size: clamp(22px, 2.13vw, 35px);
     font-weight: 570;
     letter-spacing: -0.022em;
@@ -2163,248 +2170,1045 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
   .send-btn svg{width:17px;height:17px;}
 
 
-/* ── 03 — ABOUT: THE T ──────────────────────────────────────────────────
-       The T-shaped-designer diagram as a lit constellation: breadth runs
-       across the bar, depth drops down the stem, one node burning at a time.
-       Back on the page's own dark scale and azure after section 2's cream. */
-  .tc-sec{position:relative;background:var(--bg);overflow:clip;
-    padding:clamp(76px,11vh,132px) 0 clamp(84px,12vh,144px);}
+/* ══ SECTION 3 — ported from index.html ════════════════════════════════
+     The DNA T-shape's own rules, lifted whole. Type and colour resolve
+     through the same aliases section 2 uses, so it lands on this page's
+     system rather than importing index.html's. */
+@keyframes abt-fade-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+@keyframes oh-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+/* ── Cinematic scroll wrappers ─────────────────────────────────────────
+       Sit INSIDE section containers so the section background always fills
+       its full area. Only the content inside transforms — no card bleed.
 
-  /* atmosphere — a shaft off the top right and a pool of warmth under the T */
-  .tc-atmos{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
-  .tc-shaft{position:absolute;top:-38%;right:6%;width:30%;height:150%;transform:rotate(19deg);
-    transform-origin:top center;filter:blur(54px);
-    background:linear-gradient(180deg,rgba(92,169,255,.26) 0%,rgba(92,169,255,.07) 44%,transparent 76%);}
-  .tc-halo{position:absolute;left:58%;top:46%;width:48%;height:64%;transform:translate(-50%,-50%);
-    filter:blur(30px);background:radial-gradient(ellipse at center,rgba(92,169,255,.07) 0%,transparent 68%);}
-  .tc-contours{position:absolute;inset:0;width:100%;height:100%;opacity:.5;}
-  .tc-contours path{fill:none;stroke:rgba(140,197,255,.13);stroke-width:1;}
+       The reveal is ADDITIVE over a visible default. .cw-armed is added by JS
+       before observing; only then does the content hide. If the observer never
+       runs — no JS, headless render, background tab — the section still shows.
+       .cw-visible then plays it in.
 
-  .tc{position:relative;z-index:2;width:100%;max-width:1560px;margin:0 auto;
-    padding:0 var(--gutter);
-    display:grid;grid-template-columns:minmax(300px,33%) 1fr;
-    gap:clamp(40px,5vw,96px);align-items:center;}
+       cubic-bezier(0.16, 1, 0.3, 1) is an expo-out curve: very fast start,
+       extreme deceleration into the final position. This is what gives it
+       the "heavy, expensive, settling" feel rather than a bounce or spring.
+    ─────────────────────────────────────────────────────────────────────── */
+    .am-section > .cinematic-wrap {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+    }
+    .am-section > .cinematic-wrap.cw-armed {
+      opacity: 0;
+      transform: translateY(80px) scale(1.05);
+      transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .am-section > .cinematic-wrap.cw-armed.cw-visible {
+      opacity: 1;
+      transform: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .am-section > .cinematic-wrap.cw-armed {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+/* ─── ABOUT ME TAB PANEL ────────────────────────────────── */
+    /* Full-viewport snap section — exactly one screen, same as .tm-section / .s2-section-wrap */
+    .am-section {
+      padding: 40px 2% 40px;
+      scroll-snap-align: start;
+      /* At least one screen (snaps like tm-section), but grows rather than clipping if content is taller */
+      min-height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      /* Header+nav fixed top; pane content centers in remaining space */
+      justify-content: flex-start;
+      /* Same ruled grid as the testimonials section — bright in the centre, fading to dark at the edges */
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(65% 60% at 50% 50%, transparent 0%, transparent 45%, rgba(13,13,13,0.6) 72%, rgba(13,13,13,0.96) 90%),
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 52px 52px, 52px 52px;
+    }
+.am-inner {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: 28px;
+      align-items: start;
+    }
+/* Apple AAP timing tokens */
+    .am-section {
+      --aap-min-height: 56px;
+      --aap-border-radius: 28px;
+      --aap-bg: rgba(232,232,237,0.72);
+      --aap-glow: rgba(0,0,0,0.11) 0px 0px 0.5px 0px inset;
+      --aap-text: rgb(29,29,31);
+      --aap-pane-out-dur: 300ms; --aap-pane-out-delay: 0ms;
+      --aap-pane-in-dur:  600ms; --aap-pane-in-delay: 250ms;
+      --aap-pane-y: 28px;       --aap-pane-y-dur: 400ms;
+      --card-btn-fade-out-dur: 400ms; --card-btn-fade-out-delay: 350ms;
+      --card-content-in-opacity-dur: 600ms; --card-content-in-opacity-delay: 250ms;
+      --card-content-in-y-dur: 400ms;      --card-content-in-y-delay: 0ms;
+      --card-content-y: 28px;
+      --card-btn-fade-in-dur: 50ms; --card-btn-fade-in-delay: 0ms;
+    }
+/* ── Pill controls container ── */
+    .am-controls { position: relative; }
+.am-intro-el {
+      position: absolute;
+      width: 56px; height: 56px;
+      border-radius: 56px;
+      background: var(--aap-bg);
+      opacity: 0; transform: scale(0.01);
+      top: 0; left: 0;
+      z-index: -1;
+      will-change: opacity, transform;
+      pointer-events: none;
+    }
+.am-control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      list-style: none;
+      padding: 0; margin: 0;
+    }
+/* ── Individual pill ── */
+    .am-control-item {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      width: fit-content;
+      min-height: var(--aap-min-height);
+      flex-shrink: 0;
+      border-radius: var(--aap-border-radius);
+      overflow: visible;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+.am-item-bg-wrap {
+      position: absolute; inset: 0;
+      border-radius: var(--aap-border-radius);
+      overflow: hidden;
+      z-index: 0; pointer-events: none;
+    }
+/* Glass surface — exact testimonial toggle CTA (.tm-tab.active) */
+    .am-item-bg {
+      position: absolute; inset: 0;
+      border-radius: var(--aap-border-radius);
+      background: var(--aap-bg);
+      box-shadow:
+         1.1px  2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+        -1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+         2.0px  3.0px 2.0px  0.0px rgba(0,0,0,0.1)       inset;
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      backdrop-filter: blur(20px) saturate(160%);
+      transition: box-shadow 0.25s ease;
+    }
+/* Gradient rim border — exact testimonial toggle (.tm-tabs::before) */
+    .am-item-bg::before {
+      content: "";
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(180deg, rgba(100,100,100,0.5) 9.46%, rgba(180,180,180,0.5) 92.23%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+/* ── Pill button ── */
+    .am-item-btn {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; justify-content: flex-start;
+      gap: 8px;
+      height: var(--aap-min-height);
+      padding-inline: 52px 18px;
+      background: none; border: none;
+      cursor: pointer; white-space: nowrap;
+      opacity: 1;
+      transition: opacity var(--card-btn-fade-out-dur) ease-in-out var(--card-btn-fade-out-delay);
+    }
+.am-control-item.expanded .am-item-btn {
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--card-btn-fade-in-dur) ease-in-out var(--card-btn-fade-in-delay);
+    }
+.am-item-label {
+      font-family: var(--font-heading);
+      font-size: var(--fs-body); font-weight: 600;
+      color: var(--aap-text);
+      line-height: 1.3;
+      user-select: none;
+    }
+/* ── ⊕ icon ── */
+    .am-item-icon {
+      position: absolute; left: 16px; right: auto;
+      top: 50%; transform: translateY(-50%);
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+    }
+.am-item-icon svg { width: 22px; height: 22px; overflow: visible; }
+.am-item-icon .bar-v {
+      transition: transform 300ms ease-in-out;
+      transform-origin: 10px 10px;
+    }
+.am-control-item.expanded .bar-v { transform: rotate(90deg); }
+/* ── Content mask ── */
+    .am-item-mask {
+      border-radius: var(--aap-border-radius);
+      overflow: hidden;
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 1;
+    }
+.am-control-item.expanded .am-item-mask { pointer-events: auto; }
+.am-item-content { width: 100%; height: 100%; }
+/* ── Content inner ── */
+    .am-item-inner {
+      opacity: 0; visibility: hidden;
+      transform: translateY(var(--card-content-y));
+      transition:
+        opacity  var(--card-content-in-opacity-dur) ease-in-out var(--card-content-in-opacity-delay),
+        transform var(--card-content-in-y-dur)      ease-in-out var(--card-content-in-y-delay),
+        visibility 0ms linear var(--card-content-in-opacity-dur);
+      padding: 24px 22px;
+    }
+.am-control-item.expanded .am-item-inner {
+      opacity: 1; visibility: visible; transform: translateY(0);
+      transition:
+        opacity  var(--card-content-in-opacity-dur) ease-in-out var(--card-content-in-opacity-delay),
+        transform var(--card-content-in-y-dur)      ease-in-out var(--card-content-in-y-delay),
+        visibility 0ms linear 0ms;
+    }
+.am-item-inner-title {
+      font-family: var(--font-heading);
+      font-size: 16px; font-weight: 700;
+      color: var(--aap-text);
+      letter-spacing: -0.02em; line-height: 1.2;
+      margin-bottom: 8px;
+    }
+.am-item-inner-body {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm); font-weight: 400;
+      color: rgba(29,29,31,0.58);
+      line-height: 1.75;
+    }
+/* Dark mode pills */
+    [data-theme="dark"] .am-item-bg       { background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 2.45%, rgba(255,255,255,0) 126.14%), rgba(23,23,23,0.88); }
+[data-theme="dark"] .am-item-label    { color: var(--secondary); }
+[data-theme="dark"] .am-item-inner-title { color: var(--secondary); }
+[data-theme="dark"] .am-item-inner-body  { color: rgba(240,237,232,0.45); }
+[data-theme="dark"] .am-item-icon svg circle { stroke: rgba(240,237,232,0.6); }
+[data-theme="dark"] .am-item-icon svg line   { stroke: rgba(240,237,232,0.6); }
+.am-panel {
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 20px;
+      min-height: 560px;
+      position: relative;
+      overflow: hidden;
+    }
+/* Off-hours pane needs extra room for story + photos */
+    .am-panel:has([data-am-pane="off-hours"].is-active) {
+      min-height: 560px;
+    }
+/* Design DNA pane floats free — no container chrome (Apple-style) */
+    .am-panel:has([data-am-pane="design-dna"].is-active) {
+      min-height: 800px;
+      border-color: transparent;
+      overflow: visible;
+    }
+/* Off-hours: 20% accordion, 80% content — same grid rule as DNA */
+    .am-inner:has([data-am-pane="off-hours"].is-active) {
+      grid-template-columns: 20% 1fr;
+      gap: 24px;
+    }
+.am-inner:has([data-am-pane="off-hours"].is-active) .am-controls { min-width: 0; }
+.am-inner:has([data-am-pane="off-hours"].is-active) .am-control-item { height: auto; }
+.am-inner:has([data-am-pane="off-hours"].is-active) .am-item-btn {
+      height: auto; min-height: var(--aap-min-height);
+      padding-block: 10px; white-space: normal;
+    }
+.am-inner:has([data-am-pane="off-hours"].is-active) .am-item-label { white-space: normal; }
+/* ── Off-hours: hero photo + marquee layout ─────────────────── */
+    .am-panel-pane[data-am-pane="off-hours"] {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+/* ── Me Outside Work: two-col layout ───────────────────────── */
+    .oh2 {
+      display: grid;
+      grid-template-columns: 38% 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+/* Left: deck */
+    .oh2-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+.oh2-deck {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      height: 480px;
+    }
+.oh2-card {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px 10px 52px;
+      box-shadow: 0 24px 72px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.07);
+      transition: transform 0.55s cubic-bezier(0.34,1.4,0.64,1), box-shadow 0.4s ease, opacity 0.35s ease;
+      will-change: transform;
+      touch-action: none;
+    }
+.oh2-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+      border-radius: 6px;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+/* JS sets transforms/z-index directly via applySlot */
+    /* Caveat handwritten label inside each polaroid */
+    .oh2-label {
+      display: block;
+      font-family: 'Caveat', cursive;
+      font-size: 18px;
+      font-weight: 600;
+      color: rgba(29,29,31,0.72);
+      text-align: center;
+      padding: 8px 4px 0;
+      line-height: 1.2;
+      user-select: none;
+      pointer-events: none;
+    }
+[data-theme="dark"] .oh2-label { color: rgba(240,237,232,0.75); }
+/* Right: text — 3 rows */
+    .oh2-right {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-width: 0;
+    }
+.oh2-row {
+      padding: 32px 0;
+    }
+.oh2-row--head {
+      padding-top: 4px;
+      padding-bottom: 28px;
+    }
+.oh2-row--body {
+      border-top: 1px solid rgba(29,29,31,0.08);
+    }
+.oh2-row--marquee {
+      border-top: 1px solid rgba(29,29,31,0.08);
+      padding: 20px 0 0;
+      overflow: hidden;
+    }
+.oh2-marquee-frame {
+      border: 1px solid rgba(29,29,31,0.1);
+      border-radius: 10px;
+      background: rgba(29,29,31,0.03);
+      overflow: hidden;
+      position: relative;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+    }
+[data-theme="dark"] .oh2-row--body    { border-color: rgba(240,237,232,0.07); }
+[data-theme="dark"] .oh2-row--marquee { border-color: rgba(240,237,232,0.07); }
+[data-theme="dark"] .oh2-marquee-frame {
+      border-color: rgba(240,237,232,0.08);
+      background: rgba(240,237,232,0.03);
+    }
+.oh2-eyebrow {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #86DE5C;
+      margin: 0 0 12px;
+    }
+.oh2-headline {
+      font-family: var(--font-heading);
+      font-size: 52px;
+      font-weight: 900;
+      letter-spacing: -0.045em;
+      line-height: 1.0;
+      color: rgba(29,29,31,0.95);
+      margin: 0;
+    }
+.oh2-body {
+      font-family: var(--font-heading);
+      font-size: 17px;
+      font-weight: 500;
+      line-height: 1.75;
+      color: rgba(29,29,31,0.68);
+      margin: 0;
+    }
+.oh2-body strong { color: rgba(29,29,31,0.9); font-weight: 700; }
+.oh2-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+.oh2-tag {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: rgba(29,29,31,0.6);
+      background: rgba(29,29,31,0.04);
+      border: 1px solid rgba(29,29,31,0.1);
+      border-radius: 100px;
+      padding: 6px 16px;
+    }
+/* Dark mode */
+    [data-theme="dark"] .oh2-card     { background: #242424; }
+[data-theme="dark"] .oh2-headline { color: rgba(240,237,232,0.96); }
+[data-theme="dark"] .oh2-body     { color: rgba(240,237,232,0.55); }
+[data-theme="dark"] .oh2-body strong { color: rgba(240,237,232,0.9); }
+[data-theme="dark"] .oh2-tag      { color: rgba(240,237,232,0.45); background: rgba(240,237,232,0.06); border-color: rgba(240,237,232,0.1); }
+/* Marquee strip */
+    .oh-marquee-wrap {
+      border-top: 1px solid rgba(29,29,31,0.08);
+      padding: 14px 0;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+.oh-marquee-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      animation: oh-scroll 24s linear infinite;
+      padding: 14px 0;
+    }
+.oh-marquee-item {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(29,29,31,0.65);
+      padding: 0 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+.oh-marquee-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+    }
+.oh-marquee-icon svg { display: block; }
+.oh-icon--bowling,   [data-theme="dark"] .oh-icon--bowling   { background: #FF7043 !important; color: #fff !important; }
+.oh-icon--chess,     [data-theme="dark"] .oh-icon--chess     { background: #7C4DFF !important; color: #fff !important; }
+.oh-icon--coffee,    [data-theme="dark"] .oh-icon--coffee    { background: #F59E0B !important; color: #fff !important; }
+.oh-icon--cinema,    [data-theme="dark"] .oh-icon--cinema    { background: #EF4444 !important; color: #fff !important; }
+.oh-icon--keyboard,  [data-theme="dark"] .oh-icon--keyboard  { background: #3B82F6 !important; color: #fff !important; }
+.oh-icon--hiking,    [data-theme="dark"] .oh-icon--hiking    { background: #22C55E !important; color: #fff !important; }
+.oh-icon--typedesign,[data-theme="dark"] .oh-icon--typedesign{ background: #14B8A6 !important; color: #fff !important; }
+.oh-icon--kayaking,  [data-theme="dark"] .oh-icon--kayaking  { background: #06B6D4 !important; color: #fff !important; }
+/* Dark mode */
+    [data-theme="dark"] .oh-marquee-wrap  { border-color: rgba(240,237,232,0.07); }
+[data-theme="dark"] .oh-marquee-item  { color: rgba(240,237,232,0.75); }
+[data-theme="dark"] .oh-marquee-icon  { background: rgba(240,237,232,0.07); color: rgba(240,237,232,0.4); }
+/* DNA view: narrow 20% accordion, wide content column */
+    .am-inner:has([data-am-pane="design-dna"].is-active) {
+      grid-template-columns: 20% 1fr;
+      gap: 24px;
+    }
+.am-inner:has([data-am-pane="design-dna"].is-active) .am-controls { min-width: 0; }
+/* Pills wrap to fit the narrow column */
+    .am-inner:has([data-am-pane="design-dna"].is-active) .am-control-item { height: auto; }
+.am-inner:has([data-am-pane="design-dna"].is-active) .am-item-btn {
+      height: auto; min-height: var(--aap-min-height);
+      padding-block: 10px; white-space: normal;
+    }
+.am-inner:has([data-am-pane="design-dna"].is-active) .am-item-label { white-space: normal; }
+/* DNA content column: T-shape centered both axes */
+    .am-panel-pane[data-am-pane="design-dna"] {
+      padding: 40px 44px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+.am-panel-pane[data-am-pane="design-dna"] .dna-t-grid { margin: auto 0; }
+/* DNA pill sub-copy — white & readable on the dark glass */
+    .am-control-item[data-am-tab="design-dna"] .am-item-inner-body {
+      font-size: var(--fs-sm);
+      line-height: 1.65;
+      color: rgba(29,29,31,0.7);
+    }
+[data-theme="dark"] .am-control-item[data-am-tab="design-dna"] .am-item-inner-title { color: var(--ink); }
+[data-theme="dark"] .am-control-item[data-am-tab="design-dna"] .am-item-inner-body  { color: rgba(255,255,255,0.82); }
+/* Default (off-screen below) + enter animation — Apple: 600ms / 250ms delay */
+    .am-panel-pane {
+      position: absolute;
+      inset: 0;
+      padding: 40px 44px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(var(--am-pane-y));
+      transition:
+        opacity   var(--am-pane-in-dur) ease                        var(--am-pane-in-delay),
+        transform var(--am-pane-y-dur)  cubic-bezier(0.16,1,0.3,1) var(--am-pane-in-delay);
+    }
+.am-panel-pane.is-active { opacity: 1; pointer-events: auto; transform: translateY(0); }
+/* Exit — Apple: 300ms / 0ms delay */
+    .am-panel-pane.is-leaving {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(calc(var(--am-pane-y) * -1));
+      transition:
+        opacity   var(--am-pane-out-dur) ease                        var(--am-pane-out-delay),
+        transform var(--am-pane-y-dur)   cubic-bezier(0.16,1,0.3,1) var(--am-pane-out-delay);
+    }
+.am-panel-placeholder {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: rgba(29,29,31,0.22);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      text-align: center;
+      white-space: nowrap;
+      margin: 0;
+    }
+[data-theme="dark"] .am-panel          { border-color: rgba(255,255,255,0.07); }
+[data-theme="dark"] .am-panel-placeholder { color: rgba(240,237,232,0.18); }
+/* Panel content styles */
+    .am-pane-pull {
+      font-family: var(--font-heading);
+      font-size: 17px;
+      font-weight: 700;
+      color: rgba(29,29,31,0.82);
+      letter-spacing: -0.02em;
+      line-height: 1.35;
+      margin: 0 0 20px;
+    }
+.am-pane-divider {
+      height: 1px;
+      background: rgba(29,29,31,0.09);
+      margin: 24px 0;
+    }
+[data-theme="dark"] .am-pane-pull   { color: rgba(240,237,232,0.88); }
+[data-theme="dark"] .am-pane-divider { background: rgba(240,237,232,0.09); }
+.am-pane-eyebrow {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(29,29,31,0.38);
+      margin: 0 0 20px;
+    }
+.am-pane-body {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      font-weight: 400;
+      color: rgba(29,29,31,0.7);
+      line-height: 1.85;
+      margin: 0 0 28px;
+      max-width: 42ch;
+    }
+.am-pane-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+    }
+.am-pane-tag {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: rgba(29,29,31,0.55);
+      background: rgba(29,29,31,0.06);
+      border: 1px solid rgba(29,29,31,0.1);
+      border-radius: 100px;
+      padding: 5px 12px;
+    }
+.am-pane-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+.am-pane-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+.am-pane-num {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      font-weight: 700;
+      color: rgba(29,29,31,0.28);
+      letter-spacing: 0.08em;
+      padding-top: 2px;
+      flex-shrink: 0;
+    }
+.am-pane-item-text {
+      font-family: var(--font-heading);
+      font-size: var(--fs-body);
+      font-weight: 600;
+      color: rgba(29,29,31,0.82);
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+.am-pane-item-sub {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      color: rgba(29,29,31,0.45);
+      line-height: 1.6;
+      margin-top: 3px;
+    }
+/* Dark mode panel content */
+    [data-theme="dark"] .am-pane-eyebrow    { color: rgba(240,237,232,0.35); }
+[data-theme="dark"] .am-pane-body       { color: rgba(240,237,232,0.65); }
+[data-theme="dark"] .am-pane-tag        { color: rgba(240,237,232,0.5); background: rgba(240,237,232,0.06); border-color: rgba(240,237,232,0.1); }
+[data-theme="dark"] .am-pane-num        { color: rgba(240,237,232,0.25); }
+[data-theme="dark"] .am-pane-item-text  { color: rgba(240,237,232,0.82); }
+[data-theme="dark"] .am-pane-item-sub   { color: rgba(240,237,232,0.4); }
+/* ── About section: horizontal tab layout ─────────────────── */
+    /* Section title */
+    .abt-header { text-align: center; margin-bottom: 12px; }
+.abt-title {
+      /* the section-heading step of the display scale, same as .s2-fw-header .fw-title */
+      font-family: var(--font-display); font-weight: 570;
+      font-size: clamp(22px, 2.13vw, 35px); letter-spacing: -0.022em; line-height: 1.2;
+      color: var(--ink); opacity: 1; margin: 0;
+    }
+html:not([data-theme="dark"]) .abt-title { color: var(--secondary); }
+.abt-title-sub {
+      display: block; margin-top: 8px;
+      font-family: var(--font-mono); font-size: var(--fs-label); font-weight: 600;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: rgba(255,255,255,0.36);
+    }
+.abt-nav { display: flex; justify-content: center; margin-bottom: 36px; }
+.abt-panes {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+/* Tab strip — exact testimonial .tm-tabs glass treatment */
+    .abt-nav-pill {
+      display: inline-flex; gap: 2px;
+      background: rgba(23,23,23,0.88);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-radius: 999px;
+      padding: 4px;
+      position: relative;
+      isolation: isolate;
+    }
+.abt-nav-pill::before {
+      content: ""; position: absolute; inset: 0; z-index: -1;
+      border-radius: inherit; padding: 1px;
+      background: linear-gradient(180deg, rgba(100,100,100,0.5) 9.46%, rgba(180,180,180,0.5) 92.23%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+    }
+/* Sliding highlight — glides between tabs (JS sets --x / --w) */
+    .abt-nav-thumb {
+      position: absolute; top: 4px; left: 0; z-index: 0;
+      height: calc(100% - 8px);
+      width: var(--w, 0px);
+      transform: translateX(var(--x, 0px));
+      border-radius: 999px;
+      background: linear-gradient(0deg,
+        rgba(255,255,255,0)    0%,
+        rgba(255,255,255,0.18) 2.45%,
+        rgba(255,255,255,0)    126.14%
+      );
+      box-shadow:
+         1.1px  2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+        -1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+         2.0px  3.0px 2.0px  0.0px rgba(0,0,0,0.1) inset;
+      transition: transform 0.42s cubic-bezier(0.34,1.2,0.4,1), width 0.42s cubic-bezier(0.34,1.2,0.4,1);
+      pointer-events: none;
+    }
+.abt-nav-thumb.no-anim { transition: none; }
+.abt-tab {
+      display: inline-flex; align-items: center; gap: 9px;
+      font-family: var(--font-mono); font-size: var(--fs-body); font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: none; background: transparent;
+      color: rgba(255,255,255,0.55);
+      cursor: pointer; white-space: nowrap;
+      position: relative; z-index: 2; overflow: visible;
+      transition: color 0.25s ease;
+    }
+/* Bottom glow halo — same as .tm-tab::after */
+    .abt-tab::after {
+      content: ""; position: absolute; bottom: -5px; left: 50%;
+      transform: translateX(-50%);
+      width: 70%; height: 10px; border-radius: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, transparent 70%);
+      filter: blur(4px); pointer-events: none; opacity: 0;
+      transition: opacity 250ms cubic-bezier(0.4,0,0.2,1);
+    }
+.abt-tab-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      flex-shrink: 0; opacity: 0.5;
+      transition: opacity 0.25s;
+    }
+.abt-tab:hover { color: rgba(255,255,255,0.8); }
+/* Highlight now lives on the sliding .abt-nav-thumb, not the tab itself */
+    .abt-tab.is-active { color: var(--ink); }
+.abt-tab.is-active::after { opacity: 1; }
+.abt-tab.is-active .abt-tab-dot { opacity: 1; }
+/* Pane visibility */
+    .abt-pane { display: none; }
+.abt-pane.is-active {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: center;
+      animation: abt-fade-in 0.32s cubic-bezier(0.16,1,0.3,1);
+    }
+/* Standard (Looking For / Why Me) pane wrapper */
+    .abt-std-pane { max-width: 700px; margin: 0 auto; padding: 40px 0; }
+/* ── Under-construction pane ───────────────────────────────── */
+    .abt-wip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 40px 36px;
+      gap: 10px;
+    }
+.abt-wip-sub {
+      font-family: var(--font-mono);
+      font-size: 17px;
+      line-height: 1.9;
+      color: rgba(29,29,31,0.42);
+      max-width: 38ch;
+      margin: 0;
+    }
+[data-theme="dark"] .abt-wip-sub { color: rgba(240,237,232,0.35); }
+.wip-canvas {
+      display: block;
+      width: 100%;
+      max-width: 600px;
+      height: 220px;
+      flex-shrink: 0;
+      cursor: none;
+    }
+/* ── Off-hours polaroid grid ───────────────────────────────── */
+    .oh-polaroids {
+      display: flex;
+      gap: 14px;
+      margin: 18px 0 20px;
+      align-items: flex-end;
+    }
+.oh-polaroid {
+      background: #fff;
+      padding: 7px 7px 30px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.06);
+      border-radius: 2px;
+      flex: 1;
+      min-width: 0;
+      transform-origin: center bottom;
+      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease;
+      cursor: default;
+    }
+.oh-polaroid:nth-child(1) { transform: rotate(-2.8deg); }
+.oh-polaroid:nth-child(2) { transform: rotate(1.8deg); margin-bottom: 12px; }
+.oh-polaroid:nth-child(3) { transform: rotate(-1.2deg); }
+.oh-polaroid:hover {
+      transform: rotate(0deg) scale(1.05) !important;
+      box-shadow: 0 14px 42px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.09);
+      z-index: 10;
+    }
+.oh-polaroid img {
+      width: 100%;
+      height: 155px;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+.oh-caption {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      font-weight: 500;
+      color: rgba(29,29,31,0.42);
+      text-align: center;
+      margin-top: 9px;
+      line-height: 1.5;
+      letter-spacing: 0.02em;
+    }
+[data-theme="dark"] .oh-polaroid {
+      background: #2a2826;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.2);
+    }
+[data-theme="dark"] .oh-caption { color: rgba(240,237,232,0.35); }
+/* Per-skill icon/label colors are set inline via --c1/--c2/--lc on each cell */
 
-  /* the section arrives rather than simply being there — JS adds .is-live, so
-     with no JS the whole thing is visible from the start */
-  .tc-sec.is-live .tc-aside,.tc-sec.is-live .tc-map{
-    opacity:0;transform:translateY(46px);
-    transition:opacity .8s var(--ease),transform 1s var(--ease-expo);}
-  .tc-sec.is-live .tc-map{transition-delay:.12s;}
-  .tc-sec.is-live.revealed .tc-aside,.tc-sec.is-live.revealed .tc-map{opacity:1;transform:none;}
+    /* ═══ DESIGN DNA — heading on the left, the T on the right ═══ */
+    .dna2 {
+      width: 100%; max-width: 1440px; margin: 0 auto;
+      display: flex; align-items: stretch; gap: clamp(80px, 9vw, 160px);
+      position: relative; padding-bottom: 0;
+    }
+.dna2-aside { width: 360px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; }
+.dna2-eyebrow {
+      display: block; font-family: var(--font-mono); font-size: var(--fs-label); font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase; color: rgba(230,242,141,0.85);
+      margin-bottom: 22px;
+    }
+.dna2-heading {
+      font-family: var(--font-display); font-weight: 570;
+      font-size: clamp(22px, 2.13vw, 35px); line-height: 1.1; letter-spacing: -0.022em;
+      color: var(--ink); margin: 0 0 20px; white-space: nowrap;
+    }
+.dna2-heading .circled { position: relative; white-space: nowrap; }
+.dna2-heading .circled svg {
+      position: absolute; left: -9%; top: -20%; width: 118%; height: 150%;
+      overflow: visible; pointer-events: none;
+    }
+.dna2-heading .circled svg path { fill: none; stroke: var(--ember-2); stroke-width: 2.4; stroke-linecap: round; }
+.dna2-intro {
+      font-family: var(--font-heading); font-size: 18px; line-height: 1.7;
+      color: rgba(255,255,255,0.58); margin: 0 0 24px;
+    }
+/* CTA — light frosted-glass pill, same treatment as the "View Case Study" bar button (.s2-bar-cta) */
+    .dna2-cta {
+      margin-top: 8px; align-self: flex-start;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px 26px; cursor: pointer; border: none; border-radius: 999px;
+      font-family: var(--font-mono); font-size: clamp(14px, 1.1vw, 16px); font-weight: 500; letter-spacing: 0.03em;
+      color: rgb(23,23,23);
+      background:
+        linear-gradient(0deg, rgba(255,255,255,0.70), rgba(255,255,255,0.70)),
+        linear-gradient(270deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.81) 21.1%, rgba(255,255,255,0.68) 84.9%, rgba(255,255,255,0) 100%);
+      box-shadow:
+        rgb(255,255,255)        7px    7px   3px   -6px  inset,
+        rgba(140,180,190,0.60)  0px    4px   20px   4px  inset,
+        rgb(140,180,190)       -2px  2.39px 18.11px -2.62px inset,
+        rgba(255,255,255,0.50)  6.67px 6.67px 3.36px -6.21px inset;
+      backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+      filter: brightness(1.05);
+      transition: filter 0.2s ease, transform 0.18s cubic-bezier(0.16,1,0.3,1), box-shadow 0.22s ease;
+    }
+.dna2-cta:hover { filter: brightness(1.12); transform: scale(1.04); box-shadow: 0 0 14px 4px rgba(255,255,255,0.55), 0 0 32px 10px rgba(255,255,255,0.22); }
+.dna2-cta:active { transform: scale(0.97); }
+.dna2-cta-arrow { transition: transform 0.2s cubic-bezier(0.16,1,0.3,1); }
+.dna2-cta:hover .dna2-cta-arrow { transform: translateX(3px); }
+.dna2-legend {
+      position: absolute; right: 0; bottom: 0;
+      display: flex; align-items: center; gap: 13px;
+      background: #141418;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 12px 13px;
+    }
+.dna2-legend-icon {
+      width: 34px; height: 34px; flex-shrink: 0; position: relative;
+      border: 1.5px solid rgba(255,255,255,0.18); border-radius: 9px;
+    }
+.dna2-legend-icon .lt-top  { position: absolute; top: 10px; left: 8px; right: 8px; height: 3px; border-radius: 2px; background: var(--ember-2); }
+.dna2-legend-icon .lt-stem { position: absolute; top: 10px; bottom: 7px; left: 50%; transform: translateX(-50%); width: 3px; border-radius: 2px; background: #fff; }
+.dna2-legend-rows { display: flex; flex-direction: column; gap: 12px; }
+.dna2-legend-row {
+      display: flex; align-items: center; gap: 13px;
+      font-family: var(--font-mono); font-size: var(--fs-body); font-weight: 500; letter-spacing: 0.02em;
+      color: rgba(255,255,255,0.85); white-space: nowrap;
+    }
+.dna2-legend-row::before { content: ""; width: 26px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+.dna2-legend-row.breadth::before { background: var(--ember-2); }
+.dna2-legend-row.depth::before   { background: #fff; }
+/* Signature — the one photo that says "these are my words" */
+    .dna2-sig { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+.dna2-sig img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+.dna2-sig-txt { display: flex; flex-direction: column; line-height: 1.25; }
+.dna2-sig-name { font-family: var(--font-heading); font-size: var(--fs-sm); font-weight: 700; color: var(--ink); letter-spacing: -0.005em; }
+.dna2-sig-role { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.65); }
+/* The T: breadth bar on top, then quote panel (left) + depth stem (right column) */
+    .dna2-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+/* Axis labels — Caveat, flanked by arrows that expand outward from the centre */
+    .dna2-axis { display: flex; align-items: center; gap: 12px; }
+.dna2-axis.breadth { justify-content: center; }
+.dna2-axis.breadth .dna2-axis-label { color: var(--ember-2); }
+.dna2-axis-label { font-family: 'Caveat', cursive; font-size: 24px; font-weight: 600; line-height: 1; letter-spacing: 0.01em; color: rgba(255,255,255,0.72); white-space: nowrap; }
+/* Arrow arms: a fading line tipped with an outward arrowhead */
+    .dna2-arm.left, .dna2-arm.right { flex: 1; height: 1.5px; max-width: 230px; position: relative; }
+.dna2-arm.left  { background: linear-gradient(90deg, rgba(230,242,141,0.60), transparent); }
+.dna2-arm.right { background: linear-gradient(90deg, transparent, rgba(230,242,141,0.60)); }
+.dna2-arm.left::before  { content: ""; position: absolute; left: 0;  top: 50%; transform: translateY(-50%); border: 4px solid transparent; border-right: 7px solid rgba(230,242,141,0.85); border-left: 0; }
+.dna2-arm.right::after  { content: ""; position: absolute; right: 0; top: 50%; transform: translateY(-50%); border: 4px solid transparent; border-left: 7px solid rgba(230,242,141,0.85); border-right: 0; }
+.dna2-arm.up, .dna2-arm.down { flex: 1; width: 1.5px; min-height: 22px; position: relative; }
+.dna2-arm.up    { background: linear-gradient(180deg, rgba(255,255,255,0.55), transparent); }
+.dna2-arm.down  { background: linear-gradient(180deg, transparent, rgba(255,255,255,0.55)); }
+.dna2-arm.up::before   { content: ""; position: absolute; top: 0;    left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-bottom: 7px solid rgba(255,255,255,0.8); border-top: 0; }
+.dna2-arm.down::after  { content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-top: 7px solid rgba(255,255,255,0.8); border-bottom: 0; }
+.dna2-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+/* Lower band shares the bar's 5-col rhythm: quote sits bottom-left, stem drops from centre (col 3), depth axis runs down col 4 */
+    .dna2-lower { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; align-items: stretch; }
+.dna2-stem { grid-column: 3 / 4; grid-row: 1; align-self: start; display: flex; flex-direction: column; gap: 14px; }
+.dna2-axis.depth { grid-column: 4 / 5; grid-row: 1; align-self: stretch; flex-direction: column; align-items: flex-start; justify-content: center; gap: 10px; }
+.dna2-axis.depth .dna2-axis-label { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; color: rgba(255,255,255,0.92); }
+/* Tile — calm dark glass, accent only on hover/select */
+    /* Every block — breadth and depth — is the SAME size for a groomed T */
+    .dna2-tile {
+      position: relative; min-height: 110px; background: #121212; border-radius: 14px;
+      padding: 12px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+      cursor: pointer; overflow: hidden; text-align: center;
+      border: 1px solid transparent;
+      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s ease, background 0.3s ease;
+    }
+.dna2-tile-ic {
+      width: 40px; height: 40px; flex-shrink: 0;
+      background: linear-gradient(150deg, var(--c1), var(--c2));
+      -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
+      opacity: 1; transition: opacity 0.3s ease;
+    }
+.dna2-tile-nm { font-family: var(--font-heading); font-size: var(--fs-body); font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: rgba(255,255,255,0.7); transition: color 0.3s ease; }
+.dna2-tile::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 0; height: 2px; border-radius: 2px; background: linear-gradient(90deg, transparent, var(--lc), transparent); opacity: 0; transition: opacity 0.3s ease; }
+.dna2-tile:hover, .dna2-tile.is-sel { transform: translateY(-2px); border-color: color-mix(in srgb, var(--lc) 52%, transparent); }
+.dna2-tile.is-sel { background: color-mix(in srgb, var(--lc) 14%, #0c0c10); }
+.dna2-tile:hover .dna2-tile-nm, .dna2-tile.is-sel .dna2-tile-nm { color: var(--lc); }
+.dna2-tile:hover .dna2-tile-ic, .dna2-tile.is-sel .dna2-tile-ic { opacity: 1; }
+.dna2-tile.is-sel::after { opacity: 1; }
+/* Quote panel — the big glass card in the open corner, drives off the selected tile */
+    .dna2-panel {
+      grid-column: 1 / 3; grid-row: 1; align-self: end; position: relative; background: #141418; border-radius: 18px;
+      padding: 20px 22px 18px; display: flex; flex-direction: column; overflow: hidden;
+      margin-right: 20px;
+      border-left: 2px solid color-mix(in srgb, var(--lc) 42%, transparent);
+    }
+.dna2-panel::before {
+      content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit; padding: 1px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--lc) 26%, rgba(255,255,255,0.10)), rgba(255,255,255,0.03));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+    }
+.dna2-panel::after {
+      content: ""; position: absolute; right: -16%; bottom: -28%; width: 56%; height: 80%;
+      z-index: 0; pointer-events: none;
+      background: radial-gradient(circle, color-mix(in srgb, var(--lc) 22%, transparent) 0%, transparent 66%);
+      transition: background 0.4s ease;
+    }
+.dna2-panel > * { position: relative; z-index: 1; }
+.dna2-cardhead { display: flex; align-items: center; gap: 11px; margin-bottom: 10px; }
+.dna2-ic {
+      width: 32px; height: 32px; flex-shrink: 0;
+      background: linear-gradient(150deg, var(--c1), var(--c2));
+      -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
+    }
+.dna2-name { font-family: var(--font-heading); font-size: var(--fs-body); font-weight: 700; letter-spacing: -0.01em; color: var(--lc); line-height: 1.2; }
+.dna2-qmark { font-family: Georgia, 'Times New Roman', serif; font-size: 40px; line-height: 0; color: var(--lc); opacity: 0.85; display: block; height: 11px; margin-bottom: 2px; }
+.dna2-quote { font-family: var(--font-heading); font-size: clamp(14px, 1.25vw, 17px); line-height: 1.55; color: var(--ink); margin: 0; letter-spacing: 0.005em; }
+.dna2-quote em { font-style: normal; font-weight: 700; color: var(--lc); }
+/* soft cross-fade when the quote swaps */
+    .dna2-fade { transition: opacity 0.18s ease; }
+.dna2-panel.is-swapping .dna2-fade { opacity: 0; }
+/* Even line lengths on multi-line headings at narrow widths */
+    .tm-headline, .dna2-heading, .oh2-headline { text-wrap: balance; }
+/* Toggle capsule + thumb: match the light .abt-nav-pill treatment so
+       "spiral / grid" labels stay readable on the cream background */
+    html:not([data-theme="dark"]) .s2-view-toggle { background: rgba(37,37,37,0.08); }
+/* ── About / AI Chat section ─────────────────────────────── */
+    html:not([data-theme="dark"]) .am-section {
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(65% 60% at 50% 50%, transparent 0%, transparent 45%, rgba(239, 243, 248,0.7) 72%, var(--bg) 90%),
+        linear-gradient(rgba(37,37,37,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,37,37,0.05) 1px, transparent 1px);
+    }
+/* ── T-shape / DNA section ───────────────────────────────── */
+    html:not([data-theme="dark"]) .dna2-tile { background: var(--surface); }
+html:not([data-theme="dark"]) .dna2-tile.is-sel { background: color-mix(in srgb, var(--lc) 12%, var(--surface-warm)); }
+html:not([data-theme="dark"]) .dna2-heading { color: var(--secondary); }
+html:not([data-theme="dark"]) .dna2-intro { color: rgba(37,37,37,0.58); }
+html:not([data-theme="dark"]) .dna2-sig-name { color: var(--secondary); }
+html:not([data-theme="dark"]) .dna2-quote { color: var(--secondary); }
+html:not([data-theme="dark"]) .dna2-axis.breadth .dna2-axis-label { color: var(--ink-3); }
+html:not([data-theme="dark"]) .dna2-arm.left  { background: linear-gradient(90deg, rgba(111,126,21,0.35), transparent); }
+html:not([data-theme="dark"]) .dna2-arm.right { background: linear-gradient(90deg, transparent, rgba(111,126,21,0.35)); }
+html:not([data-theme="dark"]) .dna2-arm.up    { background: linear-gradient(180deg, rgba(37,37,37,0.25), transparent); }
+html:not([data-theme="dark"]) .dna2-arm.down  { background: linear-gradient(180deg, transparent, rgba(37,37,37,0.25)); }
+html:not([data-theme="dark"]) .dna2-legend-icon .lt-stem { background: var(--secondary); }
+html:not([data-theme="dark"]) .dna2-legend-row.depth::before { background: var(--secondary); }
+/* ── DNA legend box + panel ──────────────────────────────── */
+    html:not([data-theme="dark"]) .dna2-legend {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+html:not([data-theme="dark"]) .dna2-legend-icon {
+      border-color: var(--border);
+    }
+html:not([data-theme="dark"]) .dna2-panel {
+      background: var(--surface);
+      border-left-color: color-mix(in srgb, var(--lc) 50%, transparent);
+    }
+html:not([data-theme="dark"]) .dna2-panel::before {
+      background: none;
+    }
+/* About section tab nav pill */
+    html:not([data-theme="dark"]) .abt-nav-pill { background: rgba(37,37,37,0.08); }
+html:not([data-theme="dark"]) .abt-nav-pill::before { background: linear-gradient(180deg, rgba(37,37,37,0.12) 9%, rgba(37,37,37,0.06) 92%); }
+html:not([data-theme="dark"]) .abt-tab { color: rgba(37,37,37,0.50); }
+html:not([data-theme="dark"]) .abt-tab:hover { color: rgba(37,37,37,0.85); }
+html:not([data-theme="dark"]) .abt-tab.is-active { color: var(--secondary); }
+html:not([data-theme="dark"]) .abt-nav-thumb {
+      background: rgba(255,255,255,0.85);
+      box-shadow: 0 1px 4px rgba(37,37,37,0.10) inset, 0 1px 8px rgba(37,37,37,0.06);
+    }
+/* DNA tile labels */
+    html:not([data-theme="dark"]) .dna2-tile-nm { color: rgba(37,37,37,0.65); }
+html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
+    html:not([data-theme="dark"]) .dna2-tile.is-sel .dna2-tile-nm { color: var(--lc); }
+/* ═══ V6 BOLD — editorial recomposition: display type, poster hero, header bars ═══ */
 
-  .tc-aside{position:relative;z-index:2;}
-  .tc-k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
-    text-transform:uppercase;color:var(--ember);}
-  .tc-aside .tc-k{margin-bottom:clamp(18px,2.4vh,26px);}
-  .tc-h{font-family:var(--sans);font-weight:570;color:var(--ink);
-    font-size:clamp(22px,2.13vw,35px);line-height:1.16;letter-spacing:-0.022em;
-    text-wrap:balance;margin-bottom:clamp(18px,2.4vh,26px);}
-  .tc-h .serif{font-family:var(--serif);font-style:italic;font-weight:400;
-    font-size:1.08em;letter-spacing:-0.004em;}
-  .tc-sub{font-size:clamp(15px,1.15vw,17px);line-height:1.72;color:var(--ink-2);
-    max-width:34ch;text-wrap:pretty;}
-
-  /* ── the map ── node spacing is a fixed % of this box, so the hit zones and
-       the card size in cqw: they track the map, not the viewport, and stay
-       right in both the two-column and the stacked layout */
-  .tc-map{position:relative;z-index:2;height:clamp(560px,43vw,700px);container-type:inline-size;}
-
-  .tc-cap{display:flex;flex-direction:column;gap:6px;text-align:center;}
-  .tc-cap-sub{font-family:var(--serif);font-style:italic;font-size:clamp(14px,1.05vw,16.5px);
-    letter-spacing:.004em;color:var(--ink-3);}
-  .tc-cap-breadth{position:absolute;left:50%;top:0;transform:translateX(-50%);}
-
-  /* the two lines that draw the T. These ARE the shape, so they carry —
-     and azure sits lower in luminance than the lab's lime did, so it needs
-     more of both opacity and bloom to read the same on this navy. */
-  .tc-bar{position:absolute;left:0;right:0;top:25%;height:1.5px;
-    background:linear-gradient(90deg,transparent 0%,rgba(150,203,255,.9) 7%,rgba(150,203,255,.9) 93%,transparent 100%);
-    box-shadow:0 0 9px 0 rgba(92,169,255,.6);}
-  .tc-stem{position:absolute;left:50%;top:25%;bottom:8%;width:1.5px;margin-left:-.75px;
-    background:linear-gradient(180deg,rgba(150,203,255,.9) 0%,rgba(150,203,255,.9) 90%,rgba(150,203,255,.38) 100%);
-    box-shadow:0 0 9px 0 rgba(92,169,255,.6);}
-  .tc-stem::after{content:'';position:absolute;left:50%;bottom:0;width:5px;height:5px;
-    margin:0 0 -2.5px -2.5px;border-radius:50%;background:#DCEEFF;
-    box-shadow:0 0 12px 3px rgba(92,169,255,.55),0 0 34px 10px rgba(92,169,255,.22);}
-
-  .tc-node{position:absolute;z-index:3;background:none;border:0;padding:0;cursor:pointer;appearance:none;}
-  .tc-dot{position:absolute;left:0;top:0;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;
-    border-radius:50%;background:rgba(140,197,255,.85);box-shadow:0 0 6px 1px rgba(92,169,255,.3);
-    transition:background .4s,box-shadow .5s,transform .5s var(--ease);}
-  /* lit state keys off .is-on only — JS sets it on pointerenter, which fires for
-     mouse and touch alike, so a tapped node never gets stranded in :hover */
-  .tc-node.is-on .tc-dot{background:#EAF5FF;transform:scale(1.35);
-    box-shadow:0 0 0 3px rgba(92,169,255,.16),0 0 18px 4px rgba(92,169,255,.5),0 0 44px 12px rgba(92,169,255,.2);}
-  .tc-nm{display:block;font-weight:500;font-size:clamp(14px,1.06vw,16px);line-height:1.3;
-    letter-spacing:-0.008em;color:var(--ink-2);white-space:nowrap;transition:color .4s;}
-  .tc-node.is-on .tc-nm{color:var(--ink);}
-
-  /* the buttons are zero-size anchors, so each node carries its own invisible
-     hit area. Nodes sit 20cqw apart, so 9cqw of reach each side can never let
-     two neighbouring zones touch, at any map width. */
-  .tc-node::before{content:'';position:absolute;}
-  .tc-b{top:25%;transform:translateX(-50%);}
-  .tc-b .tc-nm{position:absolute;left:50%;bottom:27px;transform:translateX(-50%);text-align:center;}
-  .tc-b::before{left:calc(-1 * clamp(38px,9cqw,92px));right:calc(-1 * clamp(38px,9cqw,92px));
-    top:-82px;bottom:-16px;}
-  .tc-short{display:none;}      /* the bar carries long names; narrow tiers swap them */
-
-  /* positions live in CSS, not inline styles, so each tier can re-space them */
-  .tc-b.b1{left:10%;} .tc-b.b2{left:30%;} .tc-b.b3{left:50%;} .tc-b.b4{left:70%;} .tc-b.b5{left:90%;}
-  .tc-d.d1{top:38%;} .tc-d.d2{top:49.5%;} .tc-d.d3{top:61%;} .tc-d.d4{top:72.5%;} .tc-d.d5{top:84%;}
-
-  .tc-d{left:50%;}
-  .tc-d .tc-nm{position:absolute;left:24px;top:50%;transform:translateY(-50%);}
-  .tc-d::before{left:-16px;top:-24px;width:min(208px,30cqw);height:48px;}
-
-  .tc-cap-depth{position:absolute;left:76%;top:62%;transform:translateY(-50%);
-    padding-left:30px;text-align:left;}
-  .tc-cap-depth::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
-    width:1px;height:128px;
-    background:linear-gradient(180deg,transparent,rgba(92,169,255,.5) 22%,rgba(92,169,255,.5) 78%,transparent);}
-
-  /* the stem lands in a pool */
-  .tc-pool{position:absolute;left:50%;bottom:8%;transform:translate(-50%,50%);
-    width:200px;height:56px;pointer-events:none;}
-  .tc-pool i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    border:1px solid rgba(92,169,255,.28);border-radius:50%;animation:tcRipple 5s ease-out infinite;}
-  .tc-pool i:nth-child(2){width:62px;height:17px;animation-delay:0s;}
-  .tc-pool i:nth-child(3){width:118px;height:33px;animation-delay:1.6s;}
-  .tc-pool i:nth-child(4){width:178px;height:50px;animation-delay:3.2s;}
-  .tc-pool b{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:120px;height:34px;border-radius:50%;filter:blur(7px);
-    background:radial-gradient(ellipse at center,rgba(92,169,255,.42) 0%,transparent 70%);}
-  @keyframes tcRipple{
-    0%{opacity:0;transform:translate(-50%,-50%) scale(.55);}
-    22%{opacity:.85;}
-    100%{opacity:0;transform:translate(-50%,-50%) scale(1.25);}
-  }
-
-  /* the wire from the burning node to the card — JS re-routes it on every change */
-  .tc-wire{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible;}
-  .tc-wire path{fill:none;stroke:rgba(160,209,255,.85);stroke-width:1;
-    filter:drop-shadow(0 0 5px rgba(92,169,255,.6));}
-
-  /* the card — same frosted glass as the hero's stats band */
-  .tc-card{position:absolute;left:0;top:36%;z-index:3;overflow:hidden;
-    /* no minimum: a two-line thought gets a two-line card. A half-empty box
-       under a short sentence is what stopped this feeling considered. */
-    width:clamp(196px,40cqw,252px);
-    padding:22px 22px 20px;border-radius:20px;border:1px solid var(--line);
-    background:rgba(13,18,27,.55);
-    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-    box-shadow:0 26px 60px -28px rgba(3,8,18,.8),inset 0 1px 0 rgba(255,255,255,.06);}
-  .tc-card-grain{position:absolute;right:-10px;bottom:-8px;width:150px;height:96px;opacity:.5;pointer-events:none;}
-  .tc-card-grain path{fill:none;stroke:rgba(140,197,255,.3);stroke-width:1;}
-  .tc-card-hd{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
-  .tc-card-hd::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0;
-    background:var(--ember);box-shadow:0 0 10px 2px rgba(92,169,255,.45);}
-  .tc-card-nm{font-weight:550;font-size:15px;letter-spacing:-0.008em;color:var(--ember);line-height:1.3;}
-  .tc-card-tx{font-size:13.5px;line-height:1.8;color:var(--ink-2);}
-  .tc-card-tx em{font-style:normal;font-weight:600;color:var(--ember-2);}
-  .tc-card-rule{position:absolute;left:22px;bottom:22px;width:26px;height:1px;background:rgba(92,169,255,.45);}
-
-  .tc-fade{transition:opacity .24s,transform .5s var(--ease);}
-  .tc-card.is-swapping .tc-fade{opacity:0;transform:translateY(8px);}
-
-  /* the per-node inline line is a list-layout device. Hidden by default and in
-     every constellation layout — left visible it gives each zero-width node
-     button real width, which silently inflates the hit zones. */
-  .tc-inline{display:none;}
-
-  @media(prefers-reduced-motion:reduce){
-    .tc-pool i{animation:none;opacity:.5;}
-    .tc-dot,.tc-nm,.tc-fade{transition:none;}
-    .tc-card.is-swapping .tc-fade{transform:none;}
-    .tc-sec.is-live .tc-aside,.tc-sec.is-live .tc-map{opacity:1;transform:none;transition:none;}
-  }
-
-  /* ── below ~1400 the side-by-side squeezes the map under the width five
-        labels need, so the aside moves on top and the map takes the full
-        measure — capped, so the T never stretches into a flat wire ── */
-  @media(max-width:1400px){
-    .tc{grid-template-columns:1fr;gap:clamp(32px,4.5vw,52px);}
-    /* the aside now sits over a centred map, so it centres with it */
-    .tc-aside{max-width:42rem;margin-inline:auto;text-align:center;}
-    .tc-sub{margin-inline:auto;}
-    .tc-map{width:100%;max-width:940px;margin-inline:auto;height:clamp(560px,62vw,640px);}
-  }
-  @media(max-width:1023px){
-    .tc-map{height:clamp(540px,68vw,600px);}
-    .tc-cap-depth{left:auto;right:0;padding-left:24px;}
-    .tc-cap-depth::before{height:104px;}
-  }
-  /* under ~600 the longest depth labels reach the depth caption; the caption
-     gives up its rule and indent, and steps off the row of the longest label */
-  @media(max-width:600px){
-    .tc-cap-depth{padding-left:0;top:55%;}
-    .tc-cap-depth::before{display:none;}
-  }
-  /* tablet and large phone: type and gutter shrink, composition unchanged */
-  @media(max-width:767px){
-    .tc-sec{padding:clamp(56px,9vh,88px) 0 clamp(64px,10vh,104px);}
-    .tc{padding:0 20px;}
-    /* the scale compresses on a phone, but the order holds: the hero stays
-       the largest line on the site and the section headings stay under it */
-    .tc-h{font-size:clamp(24px,6.8vw,33px);}
-    .tc-sub{font-size:14.5px;}
-    .tc-card{padding:18px 18px 16px;}
-    .tc-card-rule{left:18px;bottom:18px;}
-    .tc-cap-sub{font-size:14px;}
-  }
-  /* small phone: the left quadrant no longer fits the card, so the composition
-     finally changes. The T itself stays — it is the point of the section. */
-  @media(max-width:519px){
-    .tc-map{max-width:none;margin-inline:0;height:clamp(600px,168vw,760px);}
-    .tc-bar,.tc-b{top:15%;}
-    .tc-stem{top:15%;bottom:34%;}
-    .tc-d.d1{top:24%;} .tc-d.d2{top:32%;} .tc-d.d3{top:40%;}
-    .tc-d.d4{top:48%;} .tc-d.d5{top:56%;}
-    .tc-pool{bottom:34%;width:132px;height:38px;}
-    .tc-full{display:none;} .tc-short{display:inline;}
-    .tc-b .tc-nm{bottom:15px;font-size:clamp(9.5px,2.9vw,12px);letter-spacing:-0.014em;}
-    /* pure cqw: the 38px floor is wider than half the node gap at phone widths */
-    .tc-b::before{left:-9cqw;right:-9cqw;top:-46px;bottom:-14px;}
-    .tc-d .tc-nm{left:18px;font-size:14px;}
-    .tc-d::before{left:-14px;top:-24px;width:min(190px,44cqw);height:48px;}
-    .tc-cap{text-align:left;align-items:flex-start;}
-    .tc-cap-depth{left:0;right:auto;top:40%;padding-left:0;transform:translateY(-50%);}
-    .tc-cap-breadth{top:0;}
-    /* with the card directly under the T the wire has nothing left to explain,
-       and at this height it reads as a second stem */
-    .tc-wire{display:none;}
-    .tc-card{left:0;right:0;width:auto;top:auto;bottom:0;min-height:clamp(150px,26%,200px);}
-  }
-  /* too narrow or too short for any T: two lit lists. A landscape phone is
-     844px wide but only ~390 tall, so a width test alone would miss it. */
-  @media(max-width:359px),(max-height:620px){
-    .tc-map{height:auto;max-width:42rem;display:flex;flex-direction:column;gap:4px;}
-    .tc-bar,.tc-stem,.tc-wire,.tc-pool,.tc-card{display:none;}
-    .tc-cap{text-align:left;align-items:flex-start;}
-    .tc-cap-breadth,.tc-cap-depth{position:static;transform:none;padding:0;margin:22px 0 12px;top:auto;}
-    .tc-cap-breadth{margin-top:4px;order:1;} .tc-b{order:2;}
-    .tc-cap-depth{order:3;} .tc-d{order:4;}
-    /* .tc-map raises specificity to match the .b1/.d1 position classes —
-       without it they win and the rows staircase across the screen */
-    .tc-map .tc-node{position:relative;transform:none;display:block;width:100%;
-      left:auto;top:auto;padding:15px 0 15px 22px;text-align:left;}
-    .tc-node .tc-dot{position:absolute;left:0;top:21px;margin:0;}
-    .tc-node::before{display:none;}
-    .tc-full{display:inline;} .tc-short{display:none;}
-    .tc-nm,.tc-b .tc-nm,.tc-d .tc-nm{position:static;transform:none;text-align:left;
-      white-space:normal;font-size:15px;bottom:auto;left:auto;}
-    .tc-nm br{display:none;}
-    .tc-inline{display:grid;grid-template-rows:0fr;transition:grid-template-rows .42s var(--ease);}
-    .tc-node.is-on .tc-inline{grid-template-rows:1fr;}
-    .tc-inline>span{overflow:hidden;min-height:0;}
-    .tc-inline p{padding:9px 0 2px;font-size:13.5px;line-height:1.7;color:var(--ink-3);
-      max-width:60ch;text-wrap:pretty;}
-    .tc-inline em{font-style:normal;font-weight:600;color:var(--ember-2);}
-  }
-  /* coarse pointers get more reach along the stem. Only the hit zone grows —
-     padding on .tc-node would drag the dot off the line. */
-  @media(pointer:coarse){ .tc-d::before{height:54px;top:-27px;} }
+    /* Display layer — the big statements switch to Bricolage Grotesque */
+    .hero-heading,
+    .s2-fw-header .fw-title,
+    .abt-title,
+    .tm-headline,
+    .dna2-heading,
+    .s2-bar-title,
+    .oh2-headline,
+    .fc-line {
+      font-family: var(--font-display);
+    }
+/* — DNA heading: allow a balanced 2-line wrap in the display face — */
+    /* size comes from the display scale on .dna2-heading; this only frees the wrap */
+    .dna2-heading { white-space: normal; text-wrap: balance; }
 
   /* ── 04 — SAID: word of mouth ───────────────────────────────────────────
        One voice at a time, set like an epigraph: a serif quote on a still
@@ -2850,11 +3654,8 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
         <div class="s2-fwh-row">
           <h2 class="fw-title">Featured Work</h2>
         </div>
-        <div class="s2-view-toggle">
-          <span class="s2-vt-thumb" aria-hidden="true"></span>
-          <button class="s2-vt-btn s2-vt-btn-text s2-vt-active" id="s2SpiralBtn" aria-label="Spiral view">spiral</button>
-          <button class="s2-vt-btn s2-vt-btn-text" id="s2ListBtn" aria-label="Grid view">grid</button>
-        </div>
+        <!-- the spiral/grid toggle is gone: there is one view of the work now.
+             The JS that wired it is null-guarded, so it simply stands down. -->
       </div>
 
       <!-- ── SECTION 2: FEATURED WORK — full-viewport spiral ── -->
@@ -3140,101 +3941,171 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
       </section><!-- /s2-section-wrap -->
 
   <!-- ── 03 — ABOUT: the T ─────────────────────────────────────────────── -->
-  <section class="tc-sec" id="aboutSection">
+  <!-- ══ SECTION 3 — ported from index.html ══════════════════════════
+       The DNA T-shape as it ships on the reference, not a rebuild. -->
+      <section class="am-section" id="aboutSection">
+        <div class="cinematic-wrap">
 
-    <!-- the shared geometry, art-directed for a centred diagram: two arcs
-         bracketing it and a slow orbit behind the stem -->
-    <div class="geo geo-about" aria-hidden="true">
-      <span class="geo-arc" style="width:74vmax;height:74vmax;left:-30vmax;bottom:-34vmax;"></span>
-      <span class="geo-arc thin" style="width:98vmax;height:98vmax;right:-40vmax;top:-38vmax;"></span>
-      <span class="geo-orbit" style="width:40vmax;height:40vmax;left:50%;top:44%;margin-left:-20vmax;margin-top:-20vmax;--spin:190s;"><b></b></span>
-      <span class="geo-cross" style="left:9%;top:18%;"></span>
-      <span class="geo-cross" style="right:11%;bottom:16%;"></span>
-      <span class="geo-sq" style="left:5%;bottom:12%;"></span>
-    </div>
-
-    <div class="tc-atmos" aria-hidden="true">
-      <div class="tc-shaft"></div>
-      <div class="tc-halo"></div>
-      <svg class="tc-contours" viewBox="0 0 1400 800" preserveAspectRatio="none">
-        <path d="M-20 96 C 90 40, 150 150, 262 104 S 400 30, 486 92" />
-        <path d="M-20 130 C 96 74, 156 186, 268 140 S 406 66, 492 128" />
-        <path d="M-20 166 C 102 110, 162 222, 274 176 S 412 102, 498 164" />
-        <path d="M1420 596 C 1310 540, 1250 650, 1138 604 S 1000 530, 914 592" />
-        <path d="M1420 632 C 1316 576, 1256 686, 1144 640 S 1006 566, 920 628" />
-        <path d="M1420 668 C 1322 612, 1262 722, 1150 676 S 1012 602, 926 664" />
-      </svg>
-    </div>
-
-    <div class="tc">
-      <div class="tc-aside">
-        <span class="tc-k">About me</span>
-        <h2 class="tc-h">The shape of <span class="serif">how I work.</span></h2>
-      </div>
-
-      <div class="tc-map" id="tcMap">
-        <svg class="tc-wire" id="tcWire" aria-hidden="true"><path d=""></path></svg>
-
-        <span class="tc-bar" aria-hidden="true"></span>
-        <span class="tc-stem" aria-hidden="true"></span>
-
-        <button class="tc-node tc-b b1 is-on" type="button"
-          data-say="I don't trust what people <em>say</em> they want. I watch what they actually do. Most early calls are just listening.">
-          <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Customer<br> Discovery</span><span class="tc-short">Discovery</span></span>
-        </button>
-        <button class="tc-node tc-b b2" type="button"
-          data-say="Beautiful work that ships the wrong thing is still wrong. I sweat <em>what</em> we build before <em>how</em> it looks.">
-          <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Product<br> Strategy</span><span class="tc-short">Strategy</span></span>
-        </button>
-        <button class="tc-node tc-b b3" type="button"
-          data-say="Home base. Flows, states, the tiny moments&mdash;the craft that makes a product feel <em>obvious</em>.">
-          <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Experience<br> Design</span><span class="tc-short">Design</span></span>
-        </button>
-        <button class="tc-node tc-b b4" type="button"
-          data-say="I don't hand off and walk away. I sit with engineers until it's <em>real and shipped</em>.">
-          <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Product<br> Builder</span><span class="tc-short">Builder</span></span>
-        </button>
-        <button class="tc-node tc-b b5" type="button"
-          data-say="I speak enough engineering to know what's cheap, what's pricey, and when &ldquo;it's complicated&rdquo; means <em>no</em>.">
-          <span class="tc-dot"></span><span class="tc-nm"><span class="tc-full">Engineering<br> Collaboration</span><span class="tc-short">Engineering</span></span>
-        </button>
-
-        <button class="tc-node tc-d d1" type="button"
-          data-say="I'd rather <em>kill my idea in a 20-minute interview</em> than defend it for six months in production.">
-          <span class="tc-dot"></span><span class="tc-nm">Research</span>
-        </button>
-        <button class="tc-node tc-d d2" type="button"
-          data-say="I break problems down to what's <em>actually true</em>, then build back up. Best practices are someone else's constraints.">
-          <span class="tc-dot"></span><span class="tc-nm">First Principles</span>
-        </button>
-        <button class="tc-node tc-d d3" type="button"
-          data-say="I design the <em>system</em>, not the screen. One component should answer ten questions you haven't asked yet.">
-          <span class="tc-dot"></span><span class="tc-nm">Systems Thinking</span>
-        </button>
-        <button class="tc-node tc-d d4" type="button"
-          data-say="AI isn't a feature I bolt on. It's a <em>material I design with</em>. I prototype, ship, and think AI-native.">
-          <span class="tc-dot"></span><span class="tc-nm">AI Native</span>
-        </button>
-        <button class="tc-node tc-d d5" type="button"
-          data-say="If I can't tie it to a <em>number that moved</em>, it was decoration. I design for outcomes.">
-          <span class="tc-dot"></span><span class="tc-nm">Measured Impact</span>
-        </button>
-
-        <div class="tc-pool" aria-hidden="true"><b></b><i></i><i></i><i></i></div>
-
-        <div class="tc-card" id="tcCard">
-          <div class="tc-card-hd"><span class="tc-card-nm tc-fade"></span></div>
-          <p class="tc-card-tx tc-fade"></p>
-          <span class="tc-card-rule"></span>
-          <svg class="tc-card-grain" viewBox="0 0 150 96" aria-hidden="true">
-            <path d="M6 88 C 40 62, 62 96, 96 70 S 140 40, 168 62" />
-            <path d="M14 96 C 48 70, 70 104, 104 78 S 148 48, 176 70" />
-            <path d="M32 100 C 66 74, 88 108, 122 82 S 166 52, 194 74" />
-          </svg>
+        <!-- Section title -->
+        <div class="abt-header">
+          <h2 class="abt-title">About Me</h2>
         </div>
-      </div>
-    </div>
-  </section>
+
+        <!-- Tab navigation -->
+        <div class="abt-nav">
+          <div class="abt-nav-pill">
+            <button class="abt-tab is-active" data-pane="dna">My Design DNA</button>
+            <button class="abt-tab" data-pane="outside">Beyond the Pixels</button>
+            <button class="abt-tab" data-pane="looking">What I&rsquo;m Looking For</button>
+            <button class="abt-tab" data-pane="whyme">Why Me</button>
+          </div>
+        </div>
+
+        <!-- Pane content -->
+        <div class="abt-panes">
+
+          <!-- ── DNA pane ── -->
+          <div class="abt-pane is-active" id="abt-dna">
+            <div class="dna2">
+              <div class="dna2-aside">
+                <h3 class="dna2-heading">The shape of how I <span class="circled">work.</span></h3>
+                <p class="dna2-intro">Strategy, design, and technology —<br>building products that create real impact.</p>
+                <button class="dna2-cta" data-pane="outside" type="button">Beyond the Pixels <span class="dna2-cta-arrow">&rarr;</span></button>
+              </div>
+              <div class="dna2-legend">
+                <span class="dna2-legend-icon"><span class="lt-top"></span><span class="lt-stem"></span></span>
+                <div class="dna2-legend-rows">
+                  <span class="dna2-legend-row breadth">Breadth of impact</span>
+                  <span class="dna2-legend-row depth">Depth of thinking</span>
+                </div>
+              </div>
+              <div class="dna2-t">
+                <div class="dna2-axis breadth"><span class="dna2-arm left"></span><span class="dna2-axis-label">Breadth: what I build</span><span class="dna2-arm right"></span></div>
+                <div class="dna2-bar">
+                  <button class="dna2-tile" style="--c1:#86DE5C;--c2:#2FA24E;--lc:#43C167;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Customer.svg')">
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Customer Discovery</span>
+                    <span class="dna2-q" hidden>I don't trust what people <em>say</em> they want. I watch what they actually do. Most early calls are just listening.</span>
+                  </button>
+                  <button class="dna2-tile" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Strategy.svg')">
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Product Strategy</span>
+                    <span class="dna2-q" hidden>Beautiful work that ships the wrong thing is still wrong. I sweat <em>what</em> we build before <em>how</em> it looks.</span>
+                  </button>
+                  <button class="dna2-tile" style="--c1:#B486F2;--c2:#7C3AED;--lc:#9D6BF0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Experience%20Design.svg')">
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Experience Design</span>
+                    <span class="dna2-q" hidden>Home base. Flows, states, the tiny moments, the craft that makes a product feel <em>obvious</em>.</span>
+                  </button>
+                  <button class="dna2-tile" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Build.svg')">
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Product Builder</span>
+                    <span class="dna2-q" hidden>I don't hand off and walk away. I sit with engineers until it's <em>real and shipped</em>.</span>
+                  </button>
+                  <button class="dna2-tile" style="--c1:#6FE0A0;--c2:#1FA55E;--lc:#34BE72;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg')">
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Engineering Collab</span>
+                    <span class="dna2-q" hidden>I speak enough engineering to know what's cheap, what's pricey, and when &ldquo;it's complicated&rdquo; means <em>no</em>.</span>
+                  </button>
+                </div>
+                <div class="dna2-lower">
+                  <div class="dna2-stem">
+                      <button class="dna2-tile" style="--c1:#5FD9B4;--c2:#149E78;--lc:#1FC096;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg')">
+                        <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Research</span>
+                        <span class="dna2-q" hidden>I'd rather <em>kill my idea in a 20-minute interview</em> than defend it for six months in production.</span>
+                      </button>
+                      <button class="dna2-tile" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/First%20Principles.svg')">
+                        <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">First Principles</span>
+                        <span class="dna2-q" hidden>I break problems down to what's <em>actually true</em>, then build back up. Best practices are someone else's constraints.</span>
+                      </button>
+                      <button class="dna2-tile" style="--c1:#CD7CEE;--c2:#B0379E;--lc:#CB5AD0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg')">
+                        <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Systems Thinking</span>
+                        <span class="dna2-q" hidden>I design the <em>system</em>, not the screen. One component should answer ten questions you haven't asked yet.</span>
+                      </button>
+                      <button class="dna2-tile" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/AI%20Native.svg')">
+                        <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">AI Native</span>
+                        <span class="dna2-q" hidden>AI isn't a feature I bolt on. It's a <em>material I design with</em>. I prototype, ship, and think AI-native.</span>
+                      </button>
+                      <button class="dna2-tile" style="--c1:#5FE0CE;--c2:#12A38E;--lc:#1FC0A8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')">
+                        <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Measured Impact</span>
+                        <span class="dna2-q" hidden>If I can't tie it to a <em>number that moved</em>, it was decoration. I design for outcomes.</span>
+                      </button>
+                  </div>
+                  <div class="dna2-axis depth"><span class="dna2-arm up"></span><span class="dna2-axis-label">Depth: how I think</span><span class="dna2-arm down"></span></div>
+                  <div class="dna2-panel" id="dnaPanel">
+                    <div class="dna2-cardhead"><span class="dna2-ic"></span><span class="dna2-name dna2-fade"></span></div>
+                    <span class="dna2-qmark">&ldquo;</span>
+                    <p class="dna2-quote dna2-fade"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /abt-pane dna -->
+
+          <!-- ── Me Outside Work pane ── -->
+          <div class="abt-pane" id="abt-outside">
+            <div class="oh2">
+
+              <!-- Draggable card deck -->
+              <div class="oh2-left">
+                <div class="oh2-deck" id="ohDeck">
+                  <div class="oh2-card" id="ohc-0">
+                    <img src="About%20%20me%20Pictures/Flight.jpeg" alt="On a flight">
+                    <span class="oh2-label">making new friends 🐱</span>
+                  </div>
+                  <div class="oh2-card" id="ohc-1">
+                    <img src="About%20%20me%20Pictures/Keywest.jpeg" alt="Key West">
+                    <span class="oh2-label">Key West, sunset o'clock ☀️</span>
+                  </div>
+                  <div class="oh2-card" id="ohc-2">
+                    <img src="About%20%20me%20Pictures/Kayaking.jpeg" alt="Kayaking in Austin">
+                    <span class="oh2-label">Ladybird Lake, Austin 🛶</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right 70%: 3 rows -->
+              <div class="oh2-right">
+
+                <!-- Row 1: Heading -->
+                <div class="oh2-row oh2-row--head">
+                  <h3 class="oh2-headline">Same curiosity,<br>different medium.</h3>
+                </div>
+
+                <!-- Row 2: Body + tags -->
+                <div class="oh2-row oh2-row--body">
+                  <p class="oh2-body">When the laptop closes, I trade pixels for paddle strokes, kayaking Ladybird Lake with Austin&rsquo;s skyline at my back. I&rsquo;m the person hunting the city&rsquo;s best espresso, demanding chess rematches I probably won&rsquo;t win, and befriending every cat in the room. <strong>Creativity doesn&rsquo;t clock out. It just finds new playgrounds.</strong></p>
+
+                </div>
+
+                <!-- Row 3: Marquee — clipped to this 70% column only -->
+                <div class="oh2-row oh2-row--marquee">
+                  <div class="oh2-marquee-frame">
+                  <div class="oh-marquee-track">
+                    <span class="oh-marquee-item">Kayaking</span><span class="oh-marquee-icon oh-icon--bowling"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="5.5"/><circle cx="5.5" cy="5.5" r="0.6" fill="currentColor" stroke="none"/><circle cx="8" cy="5" r="0.6" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg></span><span class="oh-marquee-item">Bowling</span><span class="oh-marquee-icon oh-icon--chess"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12h5M5 12l.5-2.5h3L9 12M7 2v2M5.5 3.5h3M6 4c0 1.5-2 2-2 4h6c0-2-2-2.5-2-4"/></svg></span><span class="oh-marquee-item">Chess</span><span class="oh-marquee-icon oh-icon--coffee"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 6h7v4a2 2 0 01-2 2H5a2 2 0 01-2-2V6z"/><path d="M10 7h1a1.5 1.5 0 010 3h-1"/><path d="M5.5 2.5 Q6 1.5 5.5 0.5M7.5 2.5 Q8 1.5 7.5 0.5"/></svg></span><span class="oh-marquee-item">Coffee ritual</span><span class="oh-marquee-icon oh-icon--cinema"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="12" height="8" rx="1"/><path d="M1 6h12M1 9h12M4 3v8M10 3v8"/></svg></span><span class="oh-marquee-item">Cinema</span><span class="oh-marquee-icon oh-icon--keyboard"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3.5" width="12" height="7" rx="1.5"/><path d="M3.5 6.5h1M6.5 6.5h1M9.5 6.5h1M4 8.5h6"/></svg></span><span class="oh-marquee-item">Mechanical keyboards</span><span class="oh-marquee-icon oh-icon--hiking"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12 L5.5 4 L8 8 L10 6 L13 12Z"/></svg></span><span class="oh-marquee-item">Hiking</span><span class="oh-marquee-icon oh-icon--typedesign"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 L7 3 L11 11"/><path d="M4.5 8.5h5"/></svg></span><span class="oh-marquee-item">Type design</span><span class="oh-marquee-icon oh-icon--kayaking"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 12 L12 2"/><path d="M1 9 Q3.5 7.5 7 9 Q10.5 10.5 13 9"/></svg></span><span class="oh-marquee-item">Kayaking</span><span class="oh-marquee-icon oh-icon--bowling"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="5.5"/><circle cx="5.5" cy="5.5" r="0.6" fill="currentColor" stroke="none"/><circle cx="8" cy="5" r="0.6" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg></span><span class="oh-marquee-item">Bowling</span><span class="oh-marquee-icon oh-icon--chess"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12h5M5 12l.5-2.5h3L9 12M7 2v2M5.5 3.5h3M6 4c0 1.5-2 2-2 4h6c0-2-2-2.5-2-4"/></svg></span><span class="oh-marquee-item">Chess</span><span class="oh-marquee-icon oh-icon--coffee"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 6h7v4a2 2 0 01-2 2H5a2 2 0 01-2-2V6z"/><path d="M10 7h1a1.5 1.5 0 010 3h-1"/><path d="M5.5 2.5 Q6 1.5 5.5 0.5M7.5 2.5 Q8 1.5 7.5 0.5"/></svg></span><span class="oh-marquee-item">Coffee ritual</span><span class="oh-marquee-icon oh-icon--cinema"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="12" height="8" rx="1"/><path d="M1 6h12M1 9h12M4 3v8M10 3v8"/></svg></span><span class="oh-marquee-item">Cinema</span><span class="oh-marquee-icon oh-icon--keyboard"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3.5" width="12" height="7" rx="1.5"/><path d="M3.5 6.5h1M6.5 6.5h1M9.5 6.5h1M4 8.5h6"/></svg></span><span class="oh-marquee-item">Mechanical keyboards</span><span class="oh-marquee-icon oh-icon--hiking"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12 L5.5 4 L8 8 L10 6 L13 12Z"/></svg></span><span class="oh-marquee-item">Hiking</span><span class="oh-marquee-icon oh-icon--typedesign"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 L7 3 L11 11"/><path d="M4.5 8.5h5"/></svg></span><span class="oh-marquee-item">Type design</span><span class="oh-marquee-icon oh-icon--kayaking"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 12 L12 2"/><path d="M1 9 Q3.5 7.5 7 9 Q10.5 10.5 13 9"/></svg></span>
+                  </div>
+                  </div>
+                </div>
+
+              </div><!-- /oh2-right -->
+
+            </div><!-- /oh2 -->
+          </div><!-- /abt-pane outside -->
+
+          <!-- ── What I'm Looking For pane ── -->
+          <div class="abt-pane" id="abt-looking">
+            <div class="abt-wip">
+              <canvas class="wip-canvas" data-wip-id="looking"></canvas>
+              <p class="abt-wip-sub">This section is still taking shape. Check back soon. It'll be worth the wait.</p>
+            </div>
+          </div><!-- /abt-pane looking -->
+
+          <!-- ── Why Me pane ── -->
+          <div class="abt-pane" id="abt-whyme">
+            <div class="abt-wip">
+              <canvas class="wip-canvas" data-wip-id="whyme"></canvas>
+              <p class="abt-wip-sub">Numbers, stories, and proof points are being curated. This one matters too much to rush.</p>
+            </div>
+          </div><!-- /abt-pane whyme -->
+
+        </div><!-- /abt-panes -->
+        </div><!-- /cinematic-wrap -->
+      </section>
 
   <!-- ── 04 — SAID: word of mouth ──────────────────────────────────────── -->
   <section class="said" id="saidSection" aria-label="Testimonials">
@@ -4124,161 +4995,75 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
 })();
 </script>
 <script>
-/* ── 03 — ABOUT: the T ──────────────────────────────────────────────────
-   One node burns at a time; a wire re-routes from it to the card on every
-   change. The wire picks its own shape: a straight drop when the node stands
-   over the card, a straight ray when it sits level with it, an elbow when
-   neither. */
-(function () {
-  var map = document.getElementById('tcMap');
-  if (!map) return;
-  var sec   = document.getElementById('aboutSection');
-  var card  = document.getElementById('tcCard');
-  var wire  = document.getElementById('tcWire').querySelector('path');
-  var nm    = card.querySelector('.tc-card-nm');
-  var tx    = card.querySelector('.tc-card-tx');
-  var nodes = [].slice.call(map.querySelectorAll('.tc-node'));
-  var swapT;
+/* ── SECTION 3 — cinematic reveal ─────────────────────────────────────
+   Arms the hidden start state only once we know the observer will run,
+   so the section is never left invisible by a reveal that never fired. */
+    (function () {
+      var el = document.querySelector('#aboutSection .cinematic-wrap');
+      if (!el || !('IntersectionObserver' in window)) return;
+      el.classList.add('cw-armed');
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('cw-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      observer.observe(el);
+    })();
 
-  /* mirror the CSS exactly — when the T folds into lists there is no bar,
-     stem or card for the wire to reach */
-  var folded  = matchMedia('(max-width: 359px), (max-height: 620px)');
-  var compact = matchMedia('(max-width: 519px)');
-  var calm    = matchMedia('(prefers-reduced-motion: reduce)');
+/* ── SECTION 3 — the DNA tiles, behaviour from index.html ──────────────
+   Guarded on .dna2 and on having tiles, so it is inert if the markup
+   ever changes out from under it. */
+    (function () {
+      var dna = document.querySelector('.dna2');
+      if (!dna) return;
+      var panel = dna.querySelector('#dnaPanel');
+      var pName = panel && panel.querySelector('.dna2-name');
+      var pQuote = panel && panel.querySelector('.dna2-quote');
+      var tiles = Array.from(dna.querySelectorAll('.dna2-tile'));
+      if (!panel || !tiles.length) return;
 
-  /* orthogonal waypoints -> path with softened corners */
-  function route(pts, r) {
-    var d = 'M' + pts[0][0].toFixed(1) + ',' + pts[0][1].toFixed(1);
-    for (var i = 1; i < pts.length - 1; i++) {
-      var p = pts[i], prev = pts[i - 1], next = pts[i + 1];
-      var inL = Math.abs(p[0] - prev[0]) + Math.abs(p[1] - prev[1]);
-      var outL = Math.abs(next[0] - p[0]) + Math.abs(next[1] - p[1]);
-      var rr = Math.min(r, inL / 2, outL / 2);
-      var dx1 = Math.sign(p[0] - prev[0]), dy1 = Math.sign(p[1] - prev[1]);
-      var dx2 = Math.sign(next[0] - p[0]), dy2 = Math.sign(next[1] - p[1]);
-      d += ' L' + (p[0] - dx1 * rr).toFixed(1) + ',' + (p[1] - dy1 * rr).toFixed(1);
-      d += ' Q' + p[0].toFixed(1) + ',' + p[1].toFixed(1) +
-           ' '  + (p[0] + dx2 * rr).toFixed(1) + ',' + (p[1] + dy2 * rr).toFixed(1);
-    }
-    var last = pts[pts.length - 1];
-    return d + ' L' + last[0].toFixed(1) + ',' + last[1].toFixed(1);
-  }
-
-  function drawWire(node) {
-    if (folded.matches || compact.matches) { wire.setAttribute('d', ''); return; }
-    var m = map.getBoundingClientRect();
-    var dot = node.querySelector('.tc-dot').getBoundingClientRect();
-    var c = card.getBoundingClientRect();
-    var nx = dot.left - m.left + dot.width / 2;
-    var ny = dot.top  - m.top  + dot.height / 2;
-    var cl = c.left - m.left, cr = c.right - m.left;
-    var ct = c.top  - m.top,  cb = c.bottom - m.top;
-    var pts;
-
-    if (node.classList.contains('tc-b')) {
-      if (nx > cl + 20 && nx < cr - 20) {           // standing over the card
-        pts = [[nx, ny], [nx, ct]];
-      } else {
-        var cx = cl + c.width / 2, mid = ct - 26;   // hug the card, not the bar
-        pts = [[nx, ny], [nx, mid], [cx, mid], [cx, ct]];
+      var swapT;
+      function select(tile) {
+        if (tile.classList.contains('is-sel')) return;
+        tiles.forEach(function (t) { t.classList.remove('is-sel'); });
+        tile.classList.add('is-sel');
+        var q = tile.querySelector('.dna2-q');
+        var name = tile.querySelector('.dna2-tile-nm').textContent;
+        var quote = q ? q.innerHTML : '';
+        // carry the skill's accent + icon onto the panel
+        panel.style.setProperty('--c1', tile.style.getPropertyValue('--c1'));
+        panel.style.setProperty('--c2', tile.style.getPropertyValue('--c2'));
+        panel.style.setProperty('--lc', tile.style.getPropertyValue('--lc'));
+        panel.style.setProperty('--icon', tile.style.getPropertyValue('--icon'));
+        // soft cross-fade the text
+        panel.classList.add('is-swapping');
+        clearTimeout(swapT);
+        swapT = setTimeout(function () {
+          pName.textContent = name;
+          pQuote.innerHTML = quote;
+          panel.classList.remove('is-swapping');
+        }, 170);
       }
-    } else {
-      if (ny > ct + 20 && ny < cb - 20) {           // level with the card
-        pts = [[nx, ny], [cr, ny]];
-      } else {
-        var ey = ny < ct ? ct + 30 : cb - 30;
-        var mx = cr + (nx - cr) / 2;
-        pts = [[nx, ny], [mx, ny], [mx, ey], [cr, ey]];
-      }
-    }
 
-    wire.setAttribute('d', route(pts, 16));
-    if (calm.matches) {                             // the route, without the travel
-      wire.style.transition = 'none';
-      wire.style.strokeDasharray = 'none';
-      wire.style.strokeDashoffset = '0';
-      return;
-    }
-    var len = wire.getTotalLength();
-    wire.style.transition = 'none';
-    wire.style.strokeDasharray = len;
-    wire.style.strokeDashoffset = len;
-    void wire.getBoundingClientRect();
-    wire.style.transition = 'stroke-dashoffset .62s ' +
-      getComputedStyle(document.documentElement).getPropertyValue('--ease').trim();
-    wire.style.strokeDashoffset = '0';
-  }
-
-  /* the card always shows the full name, whichever variant the bar is showing */
-  function labelOf(node) {
-    var el = node.querySelector('.tc-full') || node.querySelector('.tc-nm');
-    return el.innerHTML.replace(/<br\s*\/?>/gi, ' ')
-      .replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
-  }
-
-  function select(node, instant) {
-    if (node.classList.contains('is-on')) return;
-    nodes.forEach(function (n) { n.classList.remove('is-on'); });
-    node.classList.add('is-on');
-    drawWire(node);
-    var name = labelOf(node), body = node.getAttribute('data-say') || '';
-    if (instant) { nm.textContent = name; tx.innerHTML = body; return; }
-    card.classList.add('is-swapping');
-    clearTimeout(swapT);
-    swapT = setTimeout(function () {
-      nm.textContent = name; tx.innerHTML = body;
-      card.classList.remove('is-swapping');
-    }, 200);
-  }
-
-  nodes.forEach(function (node) {
-    var inl = document.createElement('span');       // list-layout only
-    inl.className = 'tc-inline';
-    inl.innerHTML = '<span><p>' + (node.getAttribute('data-say') || '') + '</p></span>';
-    node.appendChild(inl);
-
-    node.addEventListener('pointerenter', function () { select(node); });
-    node.addEventListener('focus',        function () { select(node); });
-    node.addEventListener('click', function () {
-      select(node);
-      /* on phones the card sits at the foot of a taller-than-screen map, so a
-         tap can update copy the reader cannot see */
-      if (!compact.matches || folded.matches) return;
-      var c = card.getBoundingClientRect();
-      if (c.bottom <= innerHeight && c.top >= 0) return;
-      card.scrollIntoView({ block: 'nearest', behavior: calm.matches ? 'auto' : 'smooth' });
-    });
-  });
-
-  var first = nodes[0];
-  first.classList.remove('is-on');
-  select(first, true);
-
-  var rt;
-  function reroute() {
-    clearTimeout(rt);
-    rt = setTimeout(function () {
-      var on = map.querySelector('.tc-node.is-on');
-      if (on) drawWire(on);
-    }, 120);
-  }
-  addEventListener('resize', reroute);
-  if (folded.addEventListener) folded.addEventListener('change', reroute);
-  if (window.ResizeObserver) new ResizeObserver(reroute).observe(map);
-
-  /* the section arrives on scroll. .is-live is what arms the transition, so
-     without JS everything is simply visible. */
-  if ('IntersectionObserver' in window) {
-    sec.classList.add('is-live');
-    new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        sec.classList.add('revealed');
-        reroute();
+      tiles.forEach(function (tile) {
+        tile.addEventListener('pointerenter', function () { select(tile); });
+        tile.addEventListener('click', function () { select(tile); });
+        tile.addEventListener('focus', function () { select(tile); });
       });
-    }, { threshold: 0.16 }).observe(sec);
-  }
-})();
+
+      // seed with the first breadth tile, no fade
+      var first = tiles[0];
+      first.classList.add('is-sel');
+      panel.style.setProperty('--c1', first.style.getPropertyValue('--c1'));
+      panel.style.setProperty('--c2', first.style.getPropertyValue('--c2'));
+      panel.style.setProperty('--lc', first.style.getPropertyValue('--lc'));
+      panel.style.setProperty('--icon', first.style.getPropertyValue('--icon'));
+      pName.textContent = first.querySelector('.dna2-tile-nm').textContent;
+      pQuote.innerHTML = first.querySelector('.dna2-q').innerHTML;
+    })();
 </script>
 <script>
 /* ── 04 — SAID: a deck you can throw ────────────────────────────────────
@@ -5186,7 +5971,7 @@ addEventListener('load', function () {
 <script src="vendor/three.min.js"></script>
 <!-- the ?v= is a cache-bust: this file is edited often and browsers hold on
      to it hard. Bump it whenever spiral.js changes. -->
-<script src="spiral-gallery/spiral.js?v=20260726-lock"></script>
+<script src="spiral-gallery/spiral.js?v=20260726-s3"></script>
 
 <script type="module" src="orb/bhanu-orb.js"></script>
 </body>
