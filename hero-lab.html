@@ -413,611 +413,1489 @@
   .cta-text span.on{opacity:1;transform:translateY(0);filter:none;}
   .cta-text span.out{opacity:0;transform:translateY(-11px);filter:blur(3px);}
 
-  /* ══ SECTION 2 — the work reel, a full-bleed cream band ══
-     No portal and no pin: an ordinary section that scrolls sideways on its own.
-     One and a half cards sit in view at rest, so the reel reads as scrollable
-     without a hint. Native scroll-snap does the paging — no JS owns the numbers. */
-  .work-pin{position:relative;background:var(--cream);color:var(--cream-ink);
-    --reel-pad:var(--gutter);
-    --panel-w:clamp(280px,26vw,400px); /* the 01 system panel that opens the reel */
-    padding:clamp(58px,8vh,104px) 0 clamp(64px,9vh,116px);}
-
-  /* ══ THE HELIX ═════════════════════════════════════════════════════════
-     spiral.js owns everything inside #spiral-root — the WebGL canvas, its
-     grid overlay, its own wheel handling. All this does is give it a stage
-     of the right size and decide which of the two paths is on screen. */
-  .spiral-root{position:relative;width:100%;height:100svh;display:none;}
-  /* spiral.js paints its own ground inline — index.html's #0D0D0D and a white
-     grid. Overridden onto this page's scale: the section's own dark, and the
-     mesh in the same azure hairline the rest of the geometry uses. !important
-     because those are inline styles set at init. */
-  .spiral-root{
-    background-color:var(--cream) !important;
-    background-image:
-      radial-gradient(ellipse 65% 60% at 50% 46%, transparent 0%, transparent 45%,
-        rgba(8,11,17,.62) 72%, rgba(8,11,17,.96) 90%),
-      linear-gradient(rgba(160,205,255,.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(160,205,255,.05) 1px, transparent 1px) !important;
-    background-size:100% 100%, 52px 52px, 52px 52px !important;}
-  /* wide, pointer-driven, motion-ok: the helix, and the column steps aside */
-  @media (min-width:901px) and (pointer:fine){
-    .spiral-root{display:block;}
-    .work-pin:has(.spiral-root.is-live) .gal-stage{display:none;}
-    .work-pin:has(.spiral-root.is-live){padding:0;}
-    .work-pin:has(.spiral-root.is-live) .work-head{position:absolute;
-      left:var(--reel-pad);top:clamp(30px,4.4vh,52px);z-index:3;margin:0;padding:0;}
-  }
-  @media (prefers-reduced-motion:reduce){ .spiral-root{display:none !important;} }
-
-  /* ── the stack, the narrow-screen path ─────────────────────────────────
-     Below 901px (where the pin never runs either) there is no reel and no
-     sideways swipe to discover: the projects are a plain vertical column of
-     cards you scroll like anything else on a phone, each one playing its own
-     video as it comes into view. */
-  .gal-stage{display:flex;flex-direction:column;align-items:stretch;
-    gap:clamp(18px,3.4vw,32px);padding:0 var(--reel-pad);}
-
-  /* the gallery's own furniture belongs to the gallery. This has to sit OUTSIDE
-     the 901px query: below that width the gallery never initialises, and a
-     next-project button with no gallery around it is just a stray control in
-     the middle of the rail. */
-  .gal:not(.gal-ready) .gal-bg,
-  .gal:not(.gal-ready) .gal-ticks{display:none;}
-
-  /* ── pinned mode — scrolling down drives the reel sideways ──────────────
-     JS adds .is-pinned once it knows the travel, and sets the section's
-     height to one viewport plus that travel. Without JS, on touch, or under
-     reduced motion the section stays an ordinary swipeable rail above. */
-  /* ScrollTrigger owns the pinning (it wraps this in its own pin-spacer), so
-     the wrapper must NOT also be position:sticky or the two fight. */
-  .work-pin.is-pinned{padding:0;}
-  .work-pin.is-pinned .work-sticky{height:100svh;
-    display:flex;flex-direction:column;justify-content:center;overflow:hidden;
-    padding:clamp(40px,6vh,72px) 0;}
-  /* The stacked cards arrive rather than simply being there, staggered by
-     index — but the arrival is additive. .is-live is only ever set by the
-     script that also owns the observer which sets .revealed, so a paused
-     tab, a headless render or no JS at all leaves the cards plainly visible
-     instead of stranded at opacity 0. */
-  .gal-stage.is-live>.slide{
-    opacity:0;transform:translateY(54px);
-    transition:opacity .7s var(--ease),transform .95s cubic-bezier(0.16,1,0.3,1);
-    transition-delay:calc(var(--i,0) * 90ms);}
-  .gal-stage.is-live.revealed>.slide{opacity:1;transform:none;}
-  @media (prefers-reduced-motion: reduce){
-    .gal-stage.is-live>.slide{opacity:1;transform:none;transition:none;}
+  /* ══ SECTION 2 — ported from index.html ════════════════════════════════
+     The rules below are that section's own, lifted unchanged. They lean on
+     three tokens this page does not define; aliasing them here is what lets
+     the section adopt Instrument Sans / Urbanist / this page's ink rather
+     than dragging Montserrat and JetBrains Mono across with it. */
+  :root{
+    --secondary:var(--ink);
+    --font-heading:var(--sans);
+    --font-mono:var(--body);
   }
 
-  /* ── the expanding light behind the reel ──────────────────────────────── */
-  /* The image is the stage, not a wash: it slides up from the bottom centre
-     and grows until it fills the viewport, and the cards sit on top of it.
-     Fully opaque throughout — anything less and it reads as a faint texture
-     rather than a surface. */
-  .work-canvas{position:absolute;inset:0;pointer-events:none;z-index:0;
-    display:grid;place-items:end center;overflow:hidden;}
-  .work-canvas img{display:block;
-    width:var(--kw,72%);height:var(--kh,58%);object-fit:cover;
-    transform:translateY(var(--ky,26%));
-    border-radius:var(--kr,22px);
-    box-shadow:0 -30px 90px -40px rgba(0,0,0,.9);}
-  /* the scrim: once the stage has filled the screen it darkens, and only
-     then do the projects arrive onto it */
-  .work-canvas::after{content:'';position:absolute;inset:0;pointer-events:none;
-    background:#05070C;opacity:var(--kd,0);}
-  /* the stage belongs to the pinned play only — on the swipe rail it's noise */
-  .work-pin:not(.is-pinned) .work-canvas{display:none;}
-  .work-sticky>.work-head{position:relative;z-index:1;}
+/* ─── FEATURED WORK HEADER ──────────────────────────────────── */
+    .fw-header {
+      padding: 0 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+/* Figma-frame wrapper — sizes to the text's natural width */
+    .fw-figma-frame {
+      display: inline-block;
+      position: relative;
+      border: 2px solid #1A73E8;
+      padding: 28px 48px;
+    }
+/* Layer name tab above top-left corner */
+    .fw-ff-tab {
+      position: absolute;
+      top: -24px;
+      left: -2px;
+      background: #1A73E8;
+      color: var(--color-white);
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      font-weight: 500;
+      padding: 4px 9px;
+      line-height: 1;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+/* Corner handles — circles */
+    .fw-ff-h {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #ffffff;
+      border: 2px solid #1A73E8;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+.fw-ff-h--tl { top: -5px;    left: -5px;  }
+.fw-ff-h--tr { top: -5px;    right: -5px; }
+.fw-ff-h--bl { bottom: -5px; left: -5px;  }
+.fw-ff-h--br { bottom: -5px; right: -5px; }
+/* Mid-edge handles — rounded bars */
+    .fw-ff-m {
+      position: absolute;
+      background: #ffffff;
+      border: 1.5px solid #1A73E8;
+      border-radius: 3px;
+      pointer-events: none;
+    }
+.fw-ff-m--t { width: 22px; height: 8px;  top: -4px;    left: 50%; transform: translateX(-50%); }
+.fw-ff-m--b { width: 22px; height: 8px;  bottom: -4px; left: 50%; transform: translateX(-50%); }
+.fw-ff-m--l { width: 8px;  height: 22px; left: -4px;   top: 50%;  transform: translateY(-50%); }
+.fw-ff-m--r { width: 8px;  height: 22px; right: -4px;  top: 50%;  transform: translateY(-50%); }
+.fw-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 100px;
+      line-height: 1;
+      background: linear-gradient(to bottom, rgba(26,26,26,0.08) 0%, rgba(26,26,26,0.02) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+[data-theme="dark"] .fw-title {
+      background: linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.015) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+.fw-desc {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: var(--fs-body);
+      line-height: 1.7;
+      color: var(--grey);
+      max-width: 100%;
+    }
+/* ─── PROJECT CARD STACK (new) — parallax pile of project cards ──
+       Replaces the old hero-frame. Each .proj-card sticks beneath the
+       previous one on desktop so they pile up while scrolling. Add more
+       cards with --i:1,2… to extend the stack. */
+    .proj-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      width: 100%;
+    }
+.proj-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid rgba(37,37,37,0.07);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.6) inset,
+        0 2px 8px rgba(0,0,0,0.03),
+        0 18px 56px rgba(0,0,0,0.05);
+    }
+[data-theme="dark"] .proj-card {
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.05) inset,
+        0 18px 56px rgba(0,0,0,0.35);
+    }
+.proj-card-inner {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 30px;
+      padding: 48px 56px;
+      min-height: 540px;
+    }
+@media (min-width: 1024px) {
 
-  /* section header — just the label, nothing else */
-  .work-head{padding:0 var(--reel-pad);margin-bottom:clamp(22px,3.5vh,40px);}
-  .work-head .k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
-    text-transform:uppercase;color:var(--cream-ink-3);}
-  /* while the stage rises there is nothing else on screen, so the title takes
-     the space properly — centred and large — and hands over to the projects */
-  .work-pin.is-pinned .work-head{position:absolute;left:0;right:0;
-    top:clamp(76px,16vh,150px);z-index:2;margin:0;text-align:center;}
-  .work-pin.is-pinned .work-head .k{font-family:var(--sans);
-    font-size:clamp(30px,4vw,60px);font-weight:570;letter-spacing:-0.026em;
-    text-transform:none;color:var(--cream-ink);}
-  .work-head .k .serif{font-family:var(--serif);font-style:italic;
-    font-weight:400;font-size:1.08em;letter-spacing:-0.012em;}
+      .proj-card {
+        position: -webkit-sticky;
+        position: sticky;
+        top: calc(96px + var(--i, 0) * 18px);
+      }
+}
+@media (max-width: 560px) {
 
+      .proj-card-inner { padding: 32px 24px; }
+}
+/* ─── ABOUT ME TAB PANEL ────────────────────────────────── */
+    /* Full-viewport snap section — exactly one screen, same as .tm-section / .s2-section-wrap */
+    .am-section {
+      padding: 40px 2% 40px;
+      scroll-snap-align: start;
+      /* At least one screen (snaps like tm-section), but grows rather than clipping if content is taller */
+      min-height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      /* Header+nav fixed top; pane content centers in remaining space */
+      justify-content: flex-start;
+      /* Same ruled grid as the testimonials section — bright in the centre, fading to dark at the edges */
+      background-color: #0D0D0D;
+      background-image:
+        radial-gradient(65% 60% at 50% 50%, transparent 0%, transparent 45%, rgba(13,13,13,0.6) 72%, rgba(13,13,13,0.96) 90%),
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 52px 52px, 52px 52px;
+    }
+/* CTA — light frosted-glass pill, same treatment as the "View Case Study" bar button (.s2-bar-cta) */
+    .dna2-cta {
+      margin-top: 8px; align-self: flex-start;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px 26px; cursor: pointer; border: none; border-radius: 999px;
+      font-family: var(--font-mono); font-size: clamp(14px, 1.1vw, 16px); font-weight: 500; letter-spacing: 0.03em;
+      color: rgb(23,23,23);
+      background:
+        linear-gradient(0deg, rgba(255,255,255,0.70), rgba(255,255,255,0.70)),
+        linear-gradient(270deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.81) 21.1%, rgba(255,255,255,0.68) 84.9%, rgba(255,255,255,0) 100%);
+      box-shadow:
+        rgb(255,255,255)        7px    7px   3px   -6px  inset,
+        rgba(140,180,190,0.60)  0px    4px   20px   4px  inset,
+        rgb(140,180,190)       -2px  2.39px 18.11px -2.62px inset,
+        rgba(255,255,255,0.50)  6.67px 6.67px 3.36px -6.21px inset;
+      backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+      filter: brightness(1.05);
+      transition: filter 0.2s ease, transform 0.18s cubic-bezier(0.16,1,0.3,1), box-shadow 0.22s ease;
+    }
+/* Videos in the work section are always visible — the JS observer-based
+       fade-in system doesn't work inside overflow:hidden sticky containers */
+    .work-full-slide .product-img-live,
+    .work-full-slide .product-img-analytics,
+    .fw-card .product-img-live,
+    .fw-card .product-img-analytics {
+      opacity: 1;
+      transform: translateY(0);
+    }
+/* Green blob: 30% larger in the fw-card layout */
+    .fw-card .work-cs-card .product-area::before {
+      background: radial-gradient(ellipse 143% 111% at 50% 90%,
+        rgba(100,155,0,0.55) 0%,
+        rgba(55,95,0,0.28) 38%,
+        transparent 68%);
+    }
+/* Round top corners of the product area so the blob clips correctly */
+    .fw-card .work-cs-card .product-area {
+      border-radius: 10px 10px 0 0;
+    }
+/* Video sized to 88% of product-area, anchored bottom, with rounded top corners */
+    .fw-card .work-cs-card .product-img-live,
+    .fw-card .work-cs-card .product-img-analytics {
+      width: 88%;
+      height: 88%;
+      left: 6%;
+      top: auto;
+      bottom: 0;
+      object-fit: contain;
+      object-position: bottom center;
+      border-radius: 10px 10px 0 0;
+      transform: translateY(0);
+    }
+.work-full-slide .product-video,
+    .fw-card .product-video {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+/* ── "Featured Work" label pinned inside dark work section ─── */
+    .fw-section-label {
+      position: absolute;
+      top: 28px;
+      left: 40px;
+      font-family: var(--font-heading);
+      font-size: 100px;
+      font-weight: 700;
+      line-height: 1;
+      background: linear-gradient(to bottom, #FFFCF8 0%, #0D0D0D 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      pointer-events: none;
+      z-index: 0;
+      white-space: nowrap;
+    }
+.ws-section {
+      background: #0D0D0D;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+/* EverTutor hero — 3-col grid: left info | blob | right info */
+    .ws-et-hero {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      min-height: 0;
+      padding: 40px 60px;
+      max-width: 1400px;
+      margin: 0 auto;
+      gap: 0 40px;
+    }
+.ws-et-left {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+.ws-et-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      align-self: center;
+    }
+.ws-et-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+      gap: 28px;
+    }
+/* ── Section 2 wrapper — contains header + spiral + list ── */
+    .s2-section-wrap {
+      height: calc(100vh - 80px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      scroll-snap-align: start;
+      position: relative;
+    }
+/* ── Section 2 redesign — Featured Work ─────────────────── */
+    .s2-fw-header {
+      padding: 20px 40px 10px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1),
+                  transform 0.9s cubic-bezier(0.22,1,0.36,1);
+      position: relative;
+      z-index: 20;
+    }
+.s2-fw-header.s2-fwh-in { opacity: 1; transform: none; }
+.s2-fwh-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+/* "Featured Work" — confident section title over the spiral canvas */
+    .s2-fw-header .fw-title {
+      font-family: var(--font-heading);
+      font-size: clamp(24px, 1.6vw + 10px, 30px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      margin: 0;
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      -webkit-text-fill-color: #FFFCF8;
+      color: #FFFCF8;
+      text-shadow: 0 2px 24px rgba(0,0,0,0.45);
+    }
+/* View toggle (SPIRAL / LIST) — same glass pill as testimonial .tm-tabs */
+    .s2-view-toggle {
+      display: flex; gap: 2px; flex-shrink: 0;
+      background: rgba(23,23,23,0.88);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-radius: 999px;
+      padding: 4px;
+      position: relative;
+      isolation: isolate;
+    }
+.s2-view-toggle::before {
+      content: "";
+      position: absolute; inset: 0; z-index: -1;
+      border-radius: inherit; padding: 1px;
+      background: linear-gradient(180deg, rgba(100,100,100,0.5) 9%, rgba(180,180,180,0.5) 92%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+/* Sliding thumb — a single highlight pill that glides between the two buttons.
+       Position + width are driven by JS off the active button's geometry. */
+    .s2-vt-thumb {
+      position: absolute; top: 4px; bottom: 4px; left: 0; width: 0;
+      border-radius: 999px;
+      background: linear-gradient(0deg,
+        rgba(255,255,255,0)    0%,
+        rgba(255,255,255,0.18) 2.45%,
+        rgba(255,255,255,0)    126.14%
+      );
+      box-shadow:
+         1.1px  2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+        -1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,
+         2.0px  3.0px 2.0px  0.0px rgba(0,0,0,0.1) inset;
+      transform: translateX(0);
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1),
+                  width     0.4s cubic-bezier(0.4,0,0.2,1);
+      pointer-events: none;
+      z-index: 0;
+    }
+.s2-vt-btn {
+      display: flex; align-items: center; justify-content: center;
+      padding: 8px 16px;
+      border-radius: 999px; border: none; cursor: pointer;
+      background: transparent;
+      color: rgba(255,255,255,0.55);
+      position: relative; overflow: visible; z-index: 1;
+      transition: color 0.25s ease;
+    }
+.s2-vt-btn-text {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-transform: lowercase;
+      padding: 8px 18px;
+    }
+.s2-vt-btn::after {
+      content: "";
+      position: absolute; bottom: -5px; left: 50%;
+      transform: translateX(-50%);
+      width: 70%; height: 10px; border-radius: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, transparent 70%);
+      filter: blur(4px);
+      pointer-events: none; opacity: 0;
+      transition: opacity 250ms cubic-bezier(0.4,0,0.2,1);
+    }
+.s2-vt-btn:hover { color: rgba(255,255,255,0.8); }
+/* Active button now only lifts the icon colour — the highlight lives on the
+       sliding .s2-vt-thumb behind it. */
+    .s2-vt-btn.s2-vt-active {
+      color: #F5F5F7;
+    }
+.s2-vt-btn.s2-vt-active::after { opacity: 1; }
+.s2-project-bar {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      width: min(1250px, calc(100% - 80px));
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      background: rgba(14,14,14,0.55);
+      border-radius: 20px;
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      padding: 28px 32px;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateX(-50%) translateY(28px);
+      transition: opacity 0.55s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.55s cubic-bezier(0.16,1,0.3,1);
+    }
+.s2-project-bar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.10) 0%, rgba(230,242,141,0.38) 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+.s2-project-bar.s2-bar-in {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+/* Top row: title+desc left, tags top-right */
+    .s2-bar-top-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 28px;
+      margin-bottom: 12px;
+    }
+.s2-bar-title-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      /* flex-basis:auto (not 0%) so this column carries real weight in the
+         shrink calculation — with a 0% basis it was getting squeezed to 0
+         width whenever the tags column's content asked for more room. */
+      flex: 1 1 auto;
+      min-width: 220px;
+    }
+.s2-bar-title {
+      font-family: var(--font-heading);
+      font-size: clamp(20px,1.8vw,28px);
+      font-weight: 700;
+      color: #FFFCF8;
+      margin: 0;
+      line-height: 1.2;
+      white-space: nowrap;
+      opacity: 0;
+    }
+.s2-bar-in .s2-bar-title {
+      animation: s2FadeUp 0.45s 0.05s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+.s2-bar-title-badge {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #E6F28D;
+      background: rgba(230, 242, 141, 0.08);
+      border: 1px solid rgba(230, 242, 141, 0.35);
+      border-radius: 6px;
+      padding: 3px 10px;
+      vertical-align: middle;
+      margin-left: 14px;
+      position: relative;
+      top: -2px;
+    }
+.s2-bar-desc {
+      font-family: var(--font-heading);
+      font-size: var(--fs-body);
+      line-height: 1.7;
+      color: rgba(255,252,248,0.55);
+      margin: 0;
+      opacity: 0;
+      /* Always exactly 2 lines regardless of copy length or viewport width —
+         this is what keeps every card's frame the same height. */
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      min-height: 3.4em;
+    }
+.s2-bar-in .s2-bar-desc { animation: s2FadeUp 0.38s 0.12s ease forwards; }
+.s2-bar-tags-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      flex-shrink: 1;
+      max-width: 460px;
+      /* Hard ceiling covering up to 3 wrapped rows — narrow viewports can force
+         a long tag list to wrap that far. Never clip a tag/icon row; the row
+         height below is set to match so the frame still stays fixed everywhere. */
+      max-height: 108px;
+      overflow: hidden;
+    }
+/* When a card has icon-description rows (card.iconTags), the pill row and
+       the icon rows flatten into ONE wrapping group so total height always
+       matches a plain card's tag block — never taller, never a separate frame size. */
+    .s2-bar-tags-col--merged {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 9px 10px;
+    }
+.s2-bar-tags-col--merged > .s2-bar-tags,
+    .s2-bar-tags-col--merged > .s2-bar-icon-tags {
+      display: contents;
+    }
+.s2-bar-tags {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: flex-start;
+      gap: 5px;
+      opacity: 0;
+    }
+.s2-bar-in .s2-bar-tags { animation: s2FadeUp 0.35s 0.09s ease forwards; }
+.s2-bar-tag {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      letter-spacing: 0.04em;
+      color: rgba(255,252,248,0.68);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 6px;
+      padding: 5px 11px;
+      white-space: nowrap;
+    }
+.s2-bar-tag-shipped {
+      /* Deliberately no accent color — Shipped reads as a normal, plain tag everywhere */
+    }
+/* Icon-description rows — richer alternative to plain tag pills, used when
+       a card has extra right-side space (card.iconTags in S2_DATA) */
+    .s2-bar-icon-tags {
+      display: none;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 9px 10px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+.s2-bar-icon-tag {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+.s2-bar-tags-col--merged .s2-bar-tag,
+    .s2-bar-tags-col--merged .s2-bar-icon-tag {
+      opacity: 0;
+      transform: translateX(8px);
+    }
+.s2-bar-in .s2-bar-tags-col--merged .s2-bar-tag,
+    .s2-bar-in .s2-bar-tags-col--merged .s2-bar-icon-tag {
+      animation: s2IconTagIn 0.45s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+.s2-bar-tags-col--merged .s2-bar-tag             { animation-delay: 0.12s; }
+.s2-bar-tags-col--merged .s2-bar-icon-tag:nth-child(1) { animation-delay: 0.18s; }
+.s2-bar-tags-col--merged .s2-bar-icon-tag:nth-child(2) { animation-delay: 0.24s; }
+.s2-bar-tags-col--merged .s2-bar-icon-tag:nth-child(3) { animation-delay: 0.30s; }
+.s2-bar-icon-tag-ic {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, rgba(230,242,141,0.18), rgba(230,242,141,0.04));
+      border: 1px solid rgba(230,242,141,0.22);
+      box-shadow: 0 2px 10px rgba(230,242,141,0.08);
+      transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+    }
+.s2-bar-icon-tag:hover .s2-bar-icon-tag-ic {
+      border-color: rgba(230,242,141,0.48);
+      background: linear-gradient(145deg, rgba(230,242,141,0.26), rgba(230,242,141,0.06));
+      transform: translateY(-1px) scale(1.05);
+    }
+.s2-bar-icon-tag-ic img { width: 14px; height: 14px; object-fit: contain; }
+.s2-bar-icon-tag-ic .s2-icon-light { display: none; }
+.s2-bar-icon-tag-ic .s2-icon-dark  { display: block; }
+.s2-bar-icon-tag-lbl {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      letter-spacing: 0.02em;
+      color: rgba(255,252,248,0.80);
+      white-space: nowrap;
+    }
+/* Spacer (was a visible hairline divider — kept invisible for spacing only) */
+    .s2-bar-rule {
+      width: 100%;
+      height: 1px;
+      background: transparent;
+      margin-bottom: 12px;
+    }
+/* Bottom row: metrics left, CTA right */
+    .s2-bar-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+.s2-bar-metrics {
+      display: flex;
+      gap: 36px;
+      opacity: 0;
+    }
+.s2-bar-in .s2-bar-metrics { animation: s2FadeUp 0.38s 0.22s ease forwards; }
+.s2-bar-metric { display: flex; flex-direction: column; gap: 4px; }
+.s2-bar-metric-val {
+      font-family: var(--font-mono);
+      font-size: clamp(22px,2.2vw,32px);
+      font-weight: 700;
+      color: #E6F28D;
+      line-height: 1;
+    }
+.s2-bar-metric-lbl {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255,252,248,0.65);
+      white-space: nowrap;
+    }
+/* Frosted glass CTA */
+    .s2-bar-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      padding: 0 24px;
+      border-radius: 40px;
+      border: none;
+      text-decoration: none;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+      font-size: clamp(14px, 1.1vw, 16px);
+      font-weight: 500;
+      color: rgb(23,23,23);
+      background:
+        linear-gradient(0deg, rgba(255,255,255,0.70), rgba(255,255,255,0.70)),
+        linear-gradient(270deg,
+          rgba(255,255,255,0)    0%,
+          rgba(255,255,255,0.81) 21.1%,
+          rgba(255,255,255,0.68) 84.9%,
+          rgba(255,255,255,0)    100%);
+      box-shadow:
+        rgb(255,255,255)          7px    7px   3px   -6px  inset,
+        rgba(140,180,190,0.60)    0px    4px   20px   4px  inset,
+        rgb(140,180,190)         -2px  2.39px 18.11px -2.62px inset,
+        rgba(255,255,255,0.50)   6.67px 6.67px 3.36px -6.21px inset;
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      filter: brightness(1.05);
+      cursor: pointer;
+      pointer-events: all;
+      transition: filter 0.2s ease, transform 0.18s cubic-bezier(0.16,1,0.3,1), box-shadow 0.22s ease;
+      opacity: 0;
+    }
+.s2-bar-cta:hover { filter: brightness(1.12); transform: scale(1.04); box-shadow: 0 0 14px 4px rgba(255,255,255,0.55), 0 0 32px 10px rgba(255,255,255,0.22); }
+.s2-bar-cta:active { transform: scale(0.96); }
+.s2-bar-in .s2-bar-cta { animation: s2FadeUp 0.38s 0.30s ease forwards; }
+/* Project tab strip — centered below Featured Work */
+    .s2-project-tabs {
+      align-self: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.85s cubic-bezier(0.16,1,0.3,1);
+    }
+.s2-project-tabs.s2-tabs-in {
+      opacity: 1;
+      transform: none;
+    }
+/* Glass pill — wraps only the tab buttons */
+    .s2-tabs-list {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: rgba(22,22,22,0.82);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 100px;
+      padding: 5px 6px;
+    }
+.s2-tab-btn {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      letter-spacing: 0.02em;
+      padding: 6px 11px;
+      border-radius: 100px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.38);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+.s2-tab-btn:hover:not(.s2-tab-active) {
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.65);
+    }
+.s2-tab-btn.s2-tab-active {
+      background: rgba(255,255,255,0.14);
+      color: #F5F5F7;
+    }
+.s2-tabs-divider {
+      width: 1px; height: 14px;
+      background: rgba(255,255,255,0.1);
+      flex-shrink: 0; margin: 0 2px;
+    }
+/* Thicker separator between ET family and other projects */
+    .s2-tabs-divider.s2-group-sep {
+      height: 20px;
+      background: rgba(255,255,255,0.18);
+      margin: 0 4px;
+    }
+/* Circular nav buttons — float to the right of the pill */
+    .s2-tabs-nav {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+    }
+.s2-tnav-btn {
+      width: 30px; height: 30px;
+      border: none; border-radius: 999px;
+      background:
+        linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+        linear-gradient(270deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.3) 100%);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      box-shadow:
+        rgba(255,255,255,0.7)   6.67px  6.67px 3.36px -6.21px inset,
+        rgba(230,242,141,0.45) -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140,180,190)       -2.00px  2.39px 18px   -2.60px inset;
+      color: rgba(255,255,255,0.8);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s, box-shadow 0.2s;
+    }
+.s2-tnav-btn:hover {
+      color: #F5F5F7;
+      box-shadow:
+        rgba(255,255,255,0.9)   6.67px  6.67px 3.36px -6.21px inset,
+        rgba(230,242,141,0.65) -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140,180,190)       -2.00px  2.39px 24px   -2.60px inset;
+    }
+.s2-tnav-btn svg { width: 9px; height: 9px; fill: currentColor; }
+/* Stacked up/down project nav — same glass style as testimonial arrows, pinned right */
+    .s2-side-nav {
+      position: absolute; right: 24px; top: 50%; transform: translateY(-50%);
+      z-index: 5;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+.s2-side-nav-btn {
+      width: 62px; height: 62px; border-radius: 999px; border: none;
+      background:
+        linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+        linear-gradient(270deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.3) 100%);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      box-shadow:
+        rgba(255,255,255,0.7)   6.67px  6.67px 3.36px -6.21px inset,
+        rgba(230,242,141,0.45) -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140,180,190)       -2.00px  2.39px 18px   -2.60px inset;
+      color: rgba(255,255,255,0.8);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: color 0.2s, box-shadow 0.2s;
+    }
+.s2-side-nav-btn:hover {
+      color: #F5F5F7;
+      box-shadow:
+        rgba(255,255,255,0.9)   6.67px  6.67px 3.36px -6.21px inset,
+        rgba(230,242,141,0.65) -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140,180,190)       -2.00px  2.39px 24px   -2.60px inset;
+    }
+/* ── Left/right nav for grid view (mirrors up/down spiral nav) ── */
+    .s2-grid-nav-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      z-index: 16;
+    }
+.s2-grid-nav-prev { left: 24px; }
+.s2-grid-nav-next { right: 24px; }
+/* Full glimpse wrapper */
+    .s2-glimpse-full { position: relative; }
+/* Compact strip — sticks at nav bottom while cards scroll */
+    .s2-compact-strip {
+      position: sticky;
+      top: 54px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 48px;
+      background: #0D0D0D;
+      border-bottom: 1px solid rgba(255,252,248,0.07);
+    }
+.s2-cs-blob {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      flex-shrink: 0;
+      border-radius: 50%;
+    }
+.s2-cs-title {
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: 700;
+      color: #FFFCF8;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+/* Cards zone: dark bg */
+    .s2-work-container {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+      pointer-events: none;
+    }
+.s2-project-bar { pointer-events: auto; }
+.s2-cards-zone {
+      position: absolute;
+      inset: 0;
+      background: #0D0D0D;
+    }
+/* Video + content row */
+    .s2-video-section {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      background: #0D0D0D;
+      padding: 60px 48px 80px;
+    }
+.s2-video-left {
+      flex: 0 0 58%;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+.s2-video-left video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+.s2-video-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 0 0 48px;
+    }
+.s2-video-title {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      font-weight: 700;
+      color: #F0EDE8;
+      line-height: 1.3;
+      letter-spacing: -0.4px;
+      margin: 10px 0 24px;
+    }
+.ws-et-title {
+      font-family: var(--font-heading);
+      font-size: 30px;
+      font-weight: 700;
+      color: #F5F5F7;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      margin: 0;
+      white-space: nowrap;
+    }
+.ws-et-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+.ws-et-metric-row {
+      display: flex;
+      align-items: center;
+    }
+.ws-et-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+.ws-et-val {
+      font-family: var(--font-mono);
+      font-size: 36px;
+      font-weight: 700;
+      color: #E5F28D;
+      line-height: 1;
+    }
+.ws-et-lbl {
+      font-family: var(--font-mono);
+      font-size: var(--fs-body);
+      color: rgba(255,252,248,0.60);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+.ws-et-mdivider {
+      width: 1px;
+      height: 44px;
+      background: rgba(255,252,248,0.15);
+      margin: 0 24px;
+      flex-shrink: 0;
+    }
+.ws-et-tags {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+.ws-et-tag-row {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+.ws-et-desc {
+      font-size: 18px;
+      line-height: 1.7;
+      color: #FFFCF8;
+      margin: 0;
+    }
+.ws-et-desc strong {
+      color: #FFFCF8;
+      font-weight: 700;
+    }
+.ws-et-desc em {
+      font-style: italic;
+      font-weight: 700;
+      color: #FFFCF8;
+    }
+/* orb / blob */
+    .ws-orb-wrap {
+      position: relative;
+      width: 340px;
+      height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+.ws-orb-bg {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgba(5,5,5,0.88);
+      filter: blur(28px);
+      z-index: 0;
+    }
+.ws-orb-glow {
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(163,230,53,0.55) 0%, rgba(163,230,53,0.25) 40%, transparent 70%);
+      filter: blur(30px);
+      z-index: 0;
+    }
+.ws-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid #E5F28D;
+    }
+.ws-waveform {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+.ws-ring-2 { width: 280px; height: 280px; opacity: 0.35; }
+.ws-ring-3 { width: 340px; height: 340px; opacity: 0.18; }
+.ws-orb-img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 50%;
+      position: relative;
+      z-index: 1;
+      display: block;
+    }
+.ws-role-tag {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: var(--fs-body);
+      font-weight: 500;
+      color: rgba(255,252,248,0.80);
+      background: rgba(255,252,248,0.08);
+      border: 1px solid rgba(255,252,248,0.18);
+      border-radius: 6px;
+      padding: 7px 14px;
+      gap: 7px;
+      letter-spacing: 0.03em;
+    }
+.ws-role-tag img { display: block; flex-shrink: 0; }
+/* sub-case study cards */
+    .ws-sub-section {
+      position: relative; z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 60px 60px;
+    }
+.ws-sub-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+.ws-sub-card {
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(255,252,248,0.04);
+      border: 1px solid rgba(255,252,248,0.07);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+.ws-sub-card:hover { border-color: rgba(163,230,53,0.35); transform: translateY(-3px); }
+.ws-sub-video {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: #0D0D0D;
+    }
+.ws-sub-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ws-sub-info { padding: 12px 14px 14px; }
+.ws-sub-num {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      color: rgba(163,230,53,0.65);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 3px;
+    }
+.ws-sub-title {
+      font-family: var(--font-heading);
+      font-size: var(--fs-body);
+      font-weight: 700;
+      color: rgba(255,252,248,0.88);
+      margin: 0 0 3px;
+    }
+.ws-sub-desc {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      color: rgba(255,252,248,0.38);
+      margin: 0;
+    }
+/* Stressie / shared project styles */
+    .ws-project-divider {
+      position: relative; z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto 56px;
+      padding: 0 60px;
+    }
+.ws-project-divider::after {
+      content: '';
+      display: block;
+      height: 1px;
+      background: rgba(255,252,248,0.06);
+    }
+.ws-project {
+      position: relative; z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 56px 60px 0;
+    }
+.ws-project-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+.ws-project-inner > * { min-width: 0; }
+.ws-project--alt .ws-visual { order: -1; }
+.ws-visual {
+      background: rgba(255,252,248,0.03);
+      border: 1px solid rgba(255,252,248,0.06);
+      border-radius: 18px;
+      min-height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+.ws-phones-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      padding: 24px;
+    }
+.ws-phone-img {
+      width: 118px;
+      border-radius: 22px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+    }
+.ws-phone-img:nth-child(2) { transform: translateY(-18px); }
+.ws-info {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+.ws-num {
+      font-family: var(--font-heading);
+      font-size: 80px;
+      font-weight: 800;
+      color: rgba(163,230,53,0.10);
+      line-height: 1;
+      display: block;
+      letter-spacing: -0.03em;
+    }
+.ws-title {
+      font-family: var(--font-heading);
+      font-size: 34px;
+      font-weight: 700;
+      color: #FFFCF8;
+      margin: -18px 0 0;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+    }
+.ws-roles { display: flex; flex-wrap: wrap; gap: 7px; }
+.ws-desc {
+      font-size: var(--fs-body);
+      line-height: 1.72;
+      color: rgba(255,252,248,0.58);
+      margin: 0;
+    }
+.ws-desc strong { color: rgba(255,252,248,0.88); font-weight: 600; }
+.ws-metrics {
+      display: flex;
+      gap: 24px;
+      border-top: 1px solid rgba(255,252,248,0.07);
+      padding-top: 18px;
+    }
+.ws-metric { display: flex; flex-direction: column; gap: 4px; }
+.ws-metric-val {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      font-weight: 700;
+      color: #E5F28D;
+      line-height: 1;
+    }
+.ws-metric-lbl {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      color: rgba(255,252,248,0.38);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+.ws-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      align-self: flex-start;
+      font-family: var(--font-heading);
+      font-size: clamp(14px, 1.1vw, 16px);
+      font-weight: 700;
+      color: #E5F28D;
+      text-decoration: none;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 28px;
+      background:
+        linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+        linear-gradient(270deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.3) 21.1%, rgba(0,0,0,0.3) 84.9%, rgba(0,0,0,0.3) 100%);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      box-shadow:
+        rgba(255, 255, 255, 0.7)  6.67px  6.67px 3.36px -6.21px inset,
+        rgba(255, 61,  61,  0.5) -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140, 180, 190)       -2.00px  2.39px 18px   -2.60px inset;
+      transition: filter 0.25s cubic-bezier(0,0,0.2,1), transform 0.25s cubic-bezier(0,0,0.2,1), box-shadow 0.25s cubic-bezier(0,0,0.2,1);
+    }
+.ws-cta:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow:
+        rgba(255, 255, 255, 0.85)  6.67px  6.67px 3.36px -6.21px inset,
+        rgba(255, 61,  61,  0.65) -6.70px -6.00px 3.36px -6.73px inset,
+        rgb(140, 200, 215)        -2.00px  2.39px 22px   -2.60px inset,
+        0 0 16px 4px  rgba(230, 242, 141, 0.50),
+        0 0 36px 10px rgba(230, 242, 141, 0.26);
+    }
+@media (min-width: 1600px) {
 
-  /* ── project cards — one per row, full measure ────────────────────────── */
-  .slide{display:flex;flex-direction:column;
-    border-radius:24px;overflow:hidden;position:relative;
-    border:1px solid var(--cream-line);background:var(--card);box-shadow:none;}
+      .ws-et-title { font-size: 40px; line-height: 1.15; }
+}
+@media (max-width: 1280px) {
 
-  /* The still is the frame; the video plays on top of it. It sits inset and
-     rounded, floating over the poster once the poster has darkened behind
-     it — the layered read the section had before, but driven by playback
-     rather than by hover, so the project you are on is simply running. */
-  .slide-media{position:relative;display:grid;place-items:center;
-    margin:18px 18px 0;border-radius:16px;overflow:hidden;
-    aspect-ratio:16/9;background:#070A10;border:1px solid var(--cream-line);}
-  .slide-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
-  /* the still steps back so the inset panel is the lit thing */
-  .slide-media::after{content:'';position:absolute;inset:0;pointer-events:none;
-    background:rgba(8,8,7,.8);opacity:0;transition:opacity .5s ease;}
-  .slide-media:has(.slide-vid.is-playing)::after{opacity:1;}
-  /* A portrait recording leaves most of a 16:9 frame empty, and a black scrim
-     behind it reads as a hole. Stressie gets its own bed instead — the
-     product's warm landscape, so the phone sits on something rather than in
-     front of nothing. */
-  .slide-media[data-bed="stressie"]:has(.slide-vid.is-playing)::after{
-    background:
-      radial-gradient(120% 85% at 50% 118%, #A8391A 0%, transparent 62%),
-      radial-gradient(90% 65% at 22% -8%, #F2AE72 0%, transparent 58%),
-      linear-gradient(180deg,#E4834C 0%,#CE6330 44%,#9E3A18 100%);}
-  /* it swings up from below, tilted back on X and slightly small, then
-     settles level and opaque over the darkened still */
-  /* Sized to the video's own shape, not to a share of the frame. At a fixed
-     83%×83% the element is the frame's aspect, so anything that isn't 16:9 —
-     Dearly is 2.16:1, Stressie is portrait — gets letterboxed inside it: the
-     element's corners are rounded but the picture's are square, sitting
-     inset. Letting it size to its intrinsic ratio under a max means the
-     element IS the picture, so the radius clips the video itself. */
-  /* Absolute with inset:0 and margin:auto — not for the centring (the grid
-     did that) but because a percentage max-height needs a containing block
-     with a definite height, and .slide-media's comes from aspect-ratio with
-     height:auto. In flow the cap silently did nothing and Stressie's portrait
-     video ran to 677px inside a 261px frame. */
-  .slide-vid{position:absolute;inset:0;margin:auto;z-index:1;display:block;
-    width:auto;height:auto;max-width:86%;max-height:86%;object-fit:contain;
-    border-radius:10px;box-shadow:0 20px 44px -22px rgba(0,0,0,.6);
-    transform-origin:50% 50%;
-    transform:perspective(480px) translateY(72%) rotateX(18deg) scale(.95);
-    opacity:0;will-change:transform,opacity;
-    /* LEAVING wants an ease-in, and shorter — the entrance curve reversed
-       bolts then crawls the last third, which is what read as unsmooth */
-    transition:transform .40s cubic-bezier(0.5,0,0.85,0.4),
-               opacity .28s cubic-bezier(0.5,0,0.85,0.4);}
-  .slide-vid.is-playing{
-    /* ARRIVING */
-    transition:transform .8s cubic-bezier(0.16,1,0.3,1),opacity .5s ease;
-    transform:perspective(480px) translateY(0) rotateX(0deg) scale(1);opacity:1;}
-  @media (prefers-reduced-motion:reduce){
-    .slide-vid{transition:opacity .3s ease;transform:none;}
-    .slide-vid.is-playing{transition:opacity .3s ease;transform:none;}
-  }
+      .ws-et-hero    { padding: 60px 40px; gap: 0 60px; }
+      .ws-sub-section { padding: 0 40px 48px; }
+      .ws-project    { padding: 48px 40px 0; }
+      .ws-project-divider { padding: 0 40px; }
+}
+@media (max-width: 1023px) {
 
-  /* ── the system's cover: the EverTutor orb, lit from behind ───────────── */
-  /* ── 01 — the EverTutor system, bound inside one frame ─────────────────
-     The frame from the earlier version, brought back onto the system's own
-     screen: glass, not paint, so the stage still reads through it rather
-     than the frame becoming a slab that hides what it sits on. It is what
-     says "one product" before the three tools arrive. */
-  .sys-media{border-radius:30px;border:1px solid var(--cream-line);
-    background:linear-gradient(180deg,rgba(127,192,255,.06),rgba(127,192,255,0) 46%),
-      color-mix(in srgb,var(--cream-2) 62%,transparent);
-    backdrop-filter:blur(18px) saturate(120%);
-    -webkit-backdrop-filter:blur(18px) saturate(120%);
-    overflow:visible;}
-  /* Taken out of flow on purpose: in flow, a 940px image inside an aspect-ratio
-     box pushes the box taller than its ratio, and the panel stops matching the
-     six others. Absolute keeps the frame's 16:9 and lets the orb fill it. */
-  .sys-orb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    display:grid;place-items:center;height:80%;aspect-ratio:1;}
-  /* the orb sits inside the ring, not over it — the ticks are at 0.71 of the
-     SVG's half-width, so 62% leaves a clear band between the two */
-  .sys-orb img{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    z-index:2;width:62%;height:62%;object-fit:contain;display:block;
-    filter:drop-shadow(0 24px 48px rgba(0,0,0,.6));}
-  /* the ring — 80 ticks that pulse like a voice, because that is what the
-     system is. JS drives it; at rest they sit at an even 12px so the ring
-     is a ring with no script at all. */
-  .sys-wave{position:absolute;inset:0;width:100%;height:100%;z-index:1;
-    pointer-events:none;overflow:visible;
-    filter:drop-shadow(0 0 6px rgba(74,222,128,.35));}
-  .sys-wave g{opacity:.72;}
-  /* a neutral lift, not a colour: the orb is the only green in the section,
-     and the glow is only here so it doesn't sit flat on the ground */
-  .sys-orb-glow{position:absolute;inset:-14%;border-radius:50%;pointer-events:none;
-    background:radial-gradient(circle at 50% 50%,
-      rgba(226,236,248,.12) 0%,rgba(190,208,230,.05) 44%,transparent 70%);
-    filter:blur(26px);
-    animation:sysPulse 7s ease-in-out infinite;}
-  @keyframes sysPulse{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.045)}}
-  @media (prefers-reduced-motion:reduce){ .sys-orb-glow{animation:none;} }
+      .ws-et-hero {
+        grid-template-columns: 1fr;
+        gap: 40px 0;
+        padding: 48px 40px;
+        min-height: auto;
+        text-align: center;
+      }
+      .ws-et-left  { align-items: center; }
+      .ws-et-right { align-items: center; text-align: center; }
+      .ws-et-tags  { align-items: center; }
+      .ws-et-tag-row { justify-content: center; }
+      .ws-project-inner { grid-template-columns: 1fr; gap: 28px; }
+      .ws-project--alt .ws-visual { order: -1; }
+      .ws-visual   { min-height: 260px; }
+      .ws-orb-wrap { width: 260px; height: 260px; }
+      .ws-ring-1   { width: 168px; height: 168px; }
+      .ws-ring-2   { width: 212px; height: 212px; }
+      .ws-ring-3   { width: 260px; height: 260px; }
+      .ws-orb-img  { width: 156px; height: 156px; }
+}
+@media (max-width: 767px) {
 
-  .slide-body{display:flex;flex-direction:column;flex:1;padding:18px 20px 22px;}
-  .slide-num{font-size:11px;font-weight:600;letter-spacing:.13em;color:var(--accent);margin-bottom:9px;}
-  /* the chapter names itself on each of its own tools, so the grouping reads
-     on the rail too — where there are no ticks to bracket them */
-  .chap{display:block;font-size:10px;font-weight:600;letter-spacing:.17em;
-    text-transform:uppercase;color:var(--cream-ink-3);margin-bottom:7px;}
-  .slide-body h3{font-family:var(--sans);font-size:clamp(22px,1.8vw,27px);font-weight:570;
-    letter-spacing:-0.02em;color:var(--cream-ink);}
-  .slide-body h3 .serif{font-size:1.08em;font-weight:400;letter-spacing:-0.01em;}
-  .slide-body .role{margin-top:5px;font-size:11px;font-weight:600;letter-spacing:.13em;
-    text-transform:uppercase;color:var(--accent);}
-  .slide-body p{margin-top:11px;font-size:14px;line-height:1.6;color:var(--cream-ink-2);}
-  .slide-body p em{font-style:normal;font-weight:600;color:var(--cream-ink);}
-  .slide-metrics{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
-  .slide-metrics span{padding:5px 10px;border-radius:999px;border:1px solid var(--cream-line);
-    background:var(--cream-2);font-size:11px;font-weight:500;color:var(--cream-ink-2);
-    font-variant-numeric:tabular-nums;}
-  /* the project's button is the page's button — .btn-primary carries the
-     look, this only places it and gives it the extra weight a work CTA wants */
-  .slide-cta{align-self:flex-start;margin-top:18px;padding:14px 24px;font-size:14.5px;}
+      .ws-et-hero  { padding: 40px 24px; gap: 32px 0; }
+      .ws-sub-section { padding: 0 24px 40px; }
+      .ws-et-title { font-size: 24px; }
+      .ws-project  { padding: 40px 24px 0; }
+      .ws-project-divider { padding: 0 24px; }
+      .ws-sub-row  { grid-template-columns: 1fr; }
+      .ws-title    { font-size: 24px; margin-top: -12px; }
+      .ws-num      { font-size: 60px; }
+      .ws-metric-val { font-size: 18px; }
+      .ws-phone-img { width: 90px; }
+}
+/* ── Featured Work section ────────────────────────────────── */
+    .fw-eyebrow-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(37,37,37,0.4);
+      margin-bottom: 14px;
+    }
+[data-theme="dark"] .fw-eyebrow-label { color: rgba(255,252,248,0.4); }
+.fw-title {
+      font-family: var(--font-heading);
+      font-size: clamp(40px, 5.5vw, 72px);
+      font-weight: 700;
+      color: var(--secondary);
+      line-height: 1;
+      letter-spacing: -2px;
+      margin: 0;
+    }
+[data-theme="dark"] .fw-title { color: #FFFCF8; }
+.fw-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+.fw-card {
+      background: #181818;
+      border-radius: 20px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(40px);
+    }
+.fw-card-top {
+      position: relative;
+      overflow: hidden;
+      background: url('Porject Background image/Light Green.png') center/cover no-repeat;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      padding-top: 46px;
+    }
+.fw-card-top video {
+      width: 100%;
+      height: auto;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+      border-radius: 10px;
+    }
+.fw-card-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 32px 32px;
+    }
+.fw-card-eyebrow {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(229,242,141,0.6);
+      margin: 0;
+    }
+.fw-card-title {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      font-weight: 700;
+      color: #FFFCF8;
+      line-height: 1.3;
+      margin: 0;
+    }
+.fw-card--placeholder .fw-card-top {
+      background: #222;
+      justify-content: center;
+      align-items: center;
+    }
+.fw-placeholder-label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: rgba(255,252,248,0.2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+/* ─── MOBILE ACCORDION (Section 2) ───────────────────────── */
+    .s2-mobile-accordion { display: none; }
+/* ═══════════════════════════════════════════════════════════
+       LIGHT MODE OVERRIDES — "dark island" sections
+       All sections below used hardcoded #0D0D0D / #111 / #252525
+       backgrounds with no light-mode variant. These rules give
+       them proper light-mode appearance when the toggle is off.
+       ══════════════════════════════════════════════════════════ */
 
-  @media (prefers-reduced-motion: reduce){
-    .slide-vid{transition:none;}
-  }
-  /* the stacked column reads best with a measure, not the full width of a
-     tablet — so the cards centre and stop growing past a comfortable size */
-  @media (max-width:900px){
-    .gal-stage{max-width:620px;margin-inline:auto;}
-    .slide-body h3{font-size:clamp(24px,5.4vw,30px);}
-    .slide-cta{margin-top:20px;}
-  }
-  @media (max-width:560px){
-    .work-pin{--reel-pad:20px;}
-    .slide-media{margin:14px 14px 0;}
-    .slide-body{padding:16px 16px 20px;}
-  }
+    /* ── Featured Work section (ws-section) ─────────────────── */
+    html:not([data-theme="dark"]) .ws-section { background: var(--bg); }
+html:not([data-theme="dark"]) .ws-title { color: var(--secondary); }
+html:not([data-theme="dark"]) .ws-desc { color: rgba(37,37,37,0.58); }
+html:not([data-theme="dark"]) .ws-desc strong { color: var(--secondary); }
+html:not([data-theme="dark"]) .ws-metric-val { color: #6F7E15; }
+html:not([data-theme="dark"]) .ws-metric-lbl { color: rgba(37,37,37,0.45); }
+html:not([data-theme="dark"]) .ws-metrics { border-top-color: var(--border); }
+html:not([data-theme="dark"]) .ws-cta { color: var(--secondary); }
+html:not([data-theme="dark"]) .ws-role-tag {
+      color: rgba(37,37,37,0.75);
+      background: rgba(37,37,37,0.06);
+      border-color: rgba(37,37,37,0.14);
+    }
+html:not([data-theme="dark"]) .ws-sub-card {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+html:not([data-theme="dark"]) .ws-sub-video { background: var(--surface-alt); }
+html:not([data-theme="dark"]) .ws-sub-num { color: rgba(100,126,21,0.75); }
+html:not([data-theme="dark"]) .ws-sub-title { color: var(--secondary); }
+html:not([data-theme="dark"]) .ws-sub-desc { color: rgba(37,37,37,0.55); }
+/* ── Section 2 — parallax cards & case study viewer ─────── */
+    html:not([data-theme="dark"]) .s2-compact-strip {
+      background: var(--surface);
+      border-bottom-color: var(--border);
+    }
+html:not([data-theme="dark"]) .s2-cs-title { color: var(--secondary); }
+html:not([data-theme="dark"]) .s2-cards-zone { background: var(--bg); }
+html:not([data-theme="dark"]) .s2-video-section { background: var(--surface-alt); }
+html:not([data-theme="dark"]) .s2-bar-title { color: var(--secondary); }
+html:not([data-theme="dark"]) .s2-bar-desc { color: rgba(37,37,37,0.55); }
+html:not([data-theme="dark"]) .s2-bar-desc strong { color: var(--secondary); }
+html:not([data-theme="dark"]) .s2-vt-btn { color: rgba(37,37,37,0.50); }
+html:not([data-theme="dark"]) .s2-vt-btn:hover { color: var(--secondary); }
+html:not([data-theme="dark"]) .s2-vt-btn.s2-vt-active { color: var(--secondary); }
+/* Toggle capsule + thumb: match the light .abt-nav-pill treatment so
+       "spiral / grid" labels stay readable on the cream background */
+    html:not([data-theme="dark"]) .s2-view-toggle { background: rgba(37,37,37,0.08); }
+html:not([data-theme="dark"]) .s2-view-toggle::before { background: linear-gradient(180deg, rgba(37,37,37,0.12) 9%, rgba(37,37,37,0.06) 92%); }
+html:not([data-theme="dark"]) .s2-vt-thumb {
+      background: rgba(255,255,255,0.85);
+      box-shadow: 0 1px 4px rgba(37,37,37,0.10) inset, 0 1px 8px rgba(37,37,37,0.06);
+    }
+/* Section label: solid readable ink instead of the ghost gradient
+       (the mono header inherits a cream text-fill from the dark theme) */
+    html:not([data-theme="dark"]) .s2-fw-header .fw-title {
+      background: none;
+      -webkit-text-fill-color: rgba(37,37,37,0.62);
+      color: rgba(37,37,37,0.62);
+    }
+html:not([data-theme="dark"]) .s2-tab-btn {
+      color: rgba(37,37,37,0.60);
+      background: rgba(37,37,37,0.07);
+    }
+html:not([data-theme="dark"]) .s2-tab-btn:hover:not(.s2-tab-active) {
+      background: rgba(37,37,37,0.11);
+      color: var(--secondary);
+    }
+html:not([data-theme="dark"]) .s2-tab-btn.s2-tab-active {
+      background: rgba(37,37,37,0.16);
+      color: var(--secondary);
+    }
+html:not([data-theme="dark"]) .s2-tabs-divider,
+    html:not([data-theme="dark"]) .s2-tabs-divider.s2-group-sep { background: rgba(37,37,37,0.15); }
+html:not([data-theme="dark"]) .s2-tnav-btn {
+      background: rgba(37,37,37,0.10);
+      color: rgba(37,37,37,0.70);
+      box-shadow: none;
+    }
+/* Featured Work spiral gallery — override JS inline style via !important */
+    html:not([data-theme="dark"]) #spiral-root {
+      background-color: var(--bg) !important;
+      background-image:
+        radial-gradient(ellipse 65% 60% at 50% 46%, transparent 0%, transparent 45%, rgba(255,252,248,0.70) 72%, rgba(255,252,248,0.96) 90%),
+        linear-gradient(rgba(37,37,37,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,37,37,0.05) 1px, transparent 1px) !important;
+      background-size: 100% 100%, 52px 52px, 52px 52px !important;
+    }
+html:not([data-theme="dark"]) .s2-project-bar {
+      background: rgba(255,252,248,0.82);
+      border: 1px solid rgba(37,37,37,0.09);
+    }
+html:not([data-theme="dark"]) .s2-project-bar::before { display: none; }
+html:not([data-theme="dark"]) .fw-title {
+      background: linear-gradient(to bottom, rgba(37,37,37,0.22) 0%, rgba(37,37,37,0.07) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+/* Solid s2 header title needs real ink in light mode (beats the ghost-gradient rule above) */
+    html:not([data-theme="dark"]) .s2-fw-header .fw-title {
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      -webkit-text-fill-color: var(--secondary);
+      color: var(--secondary);
+      text-shadow: none;
+    }
+html:not([data-theme="dark"]) .s2-bar-cta { color: var(--secondary); border-color: rgba(37,37,37,0.20); }
+html:not([data-theme="dark"]) .s2-bar-cta:hover { background: rgba(37,37,37,0.06); border-color: rgba(37,37,37,0.35); }
+html:not([data-theme="dark"]) .s2-bar-tag {
+      color: rgba(37,37,37,0.65);
+      background: rgba(37,37,37,0.06);
+      border-color: rgba(37,37,37,0.12);
+    }
+html:not([data-theme="dark"]) .s2-bar-icon-tag-ic {
+      background: linear-gradient(145deg, rgba(111,126,21,0.12), rgba(111,126,21,0.03));
+      border-color: rgba(111,126,21,0.20);
+      box-shadow: none;
+    }
+html:not([data-theme="dark"]) .s2-bar-icon-tag-ic .s2-icon-light { display: block; }
+html:not([data-theme="dark"]) .s2-bar-icon-tag-ic .s2-icon-dark  { display: none; }
+html:not([data-theme="dark"]) .s2-bar-icon-tag-lbl { color: rgba(37,37,37,0.72); }
+html:not([data-theme="dark"]) .s2-bar-title-badge {
+      color: #6F7E15;
+      background: rgba(111,126,21,0.08);
+      border-color: rgba(111,126,21,0.38);
+    }
+html:not([data-theme="dark"]) .s2-bar-metric-val { color: #6F7E15; }
+html:not([data-theme="dark"]) .s2-bar-metric-lbl { color: rgba(37,37,37,0.50); }
+html:not([data-theme="dark"]) .s2-side-nav-btn {
+      background: rgba(37,37,37,0.07);
+      color: rgba(37,37,37,0.65);
+      box-shadow: rgba(37,37,37,0.10) 0 1px 6px inset;
+    }
+html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
+      background: rgba(37,37,37,0.12);
+      color: var(--secondary);
+    }
+/* ═══ V6 BOLD — editorial recomposition: display type, poster hero, header bars ═══ */
 
-  /* ── THE GALLERY — 901px and up ──────────────────────────────────────────
-     One project per screen: copy left, media right and tilted, a flat colour
-     behind. The whole thing only engages once JS has taken over (.gal-ready);
-     without it the markup stays the swipeable rail, so a vendor failure can
-     never leave this section blank.
-
-     The chapter idea: the three EverTutor tools share a colour family and hold
-     the system's line and its three numbers on screen while you move through
-     them. Nothing draws a box — the persistence is the containment. */
-  @media (min-width:901px){
-    /* how far apart the planes sit in the reel. Tuned so the neighbouring
-       project shows roughly a 130px sliver top and bottom at 1080. */
-    .gal.gal-ready{--gal-step:clamp(360px,62vh,700px);}
-    .gal.gal-ready .work-sticky{overflow:hidden;padding:0;}
-    /* No per-project colour wash. The stage is the section's own dark and it
-       stays that dark for all seven — the work is the only thing on screen
-       carrying colour. */
-    .gal-bg{position:absolute;inset:0;z-index:0;background:var(--cream);}
-
-    .gal.gal-ready .gal-stage{position:absolute;inset:0;z-index:1;
-      display:block;overflow:visible;scroll-snap-type:none;padding:0;}
-
-    /* Every project occupies the whole stage, and they ALL stay rendered: the
-       reel is the point. JS writes --k (this slide's distance from the active
-       one, in steps) and the media translates by that many --gal-step, so the
-       one before sits above the fold and the one after sits below it. Only the
-       copy belongs to the active project, so only the copy crossfades. */
-    .gal.gal-ready .slide{position:absolute;inset:0;width:auto;min-width:0;z-index:1;
-      display:grid;grid-template-columns:minmax(0,44%) minmax(0,56%);
-      align-items:center;gap:clamp(24px,4vw,80px);
-      padding:clamp(96px,13vh,150px) var(--reel-pad) clamp(120px,16vh,180px);
-      background:none;border:0;border-radius:0;box-shadow:none;overflow:visible;
-      opacity:1;visibility:visible;pointer-events:none;transform:none;
-      transition:none;}
-    /* On a 2560 display the gutters alone left 2200px of content, which made
-       the media column enormous and the two halves drift apart. The shell
-       caps the composition and centres it; the gutters still do the work
-       everywhere below this. */
-    .gal.gal-ready .slide{max-width:1720px;margin-inline:auto;}
-    .gal.gal-ready .slide.is-active{z-index:3;pointer-events:auto;}
-
-    /* the copy is the only thing that swaps */
-    .gal.gal-ready .slide-body{opacity:0;pointer-events:none;
-      transition:opacity .5s var(--ease),transform .7s var(--ease);
-      /* --enter is set by JS on every swap: the copy leaves against the
-         scroll direction and the next arrives with it, as the reference does */
-      transform:translateY(var(--enter,14px));}
-    .gal.gal-ready .slide.is-active .slide-body{opacity:1;transform:none;
-      pointer-events:auto;}
-
-    /* LEFT — the copy. The media comes first in the markup (it always has, for
-       the card layout), so the columns are assigned explicitly rather than by
-       source order: copy left, media right. */
-    /* both are pinned to row 1 explicitly: giving only a column to the item
-       that comes second in the markup lets sparse auto-placement drop it into
-       a new row, which silently splits the two halves vertically */
-    .gal.gal-ready .slide-body{grid-area:1 / 1;padding:0;flex:none;}
-    .gal.gal-ready .slide-media{grid-area:1 / 2;}
-    /* the title is a mix by rule, not by whim: the family in Instrument Sans,
-       the tool it names in Instrument Serif italic beside it */
-    .gal.gal-ready .slide-body h3{font-family:var(--sans);font-style:normal;
-      font-weight:570;font-size:clamp(30px,3.47vw,57px);line-height:1.06;
-      letter-spacing:-0.03em;margin-top:2px;text-wrap:balance;}
-    .gal.gal-ready .slide-body h3 .serif{font-size:1.06em;font-weight:400;
-      letter-spacing:-0.016em;}
-    .gal.gal-ready .slide-num{font-size:12px;letter-spacing:.2em;}
-    .gal.gal-ready .slide-body .role{margin-top:12px;}
-    .gal.gal-ready .slide-body p{margin-top:16px;font-size:15.5px;max-width:44ch;}
-    .gal.gal-ready .slide-metrics{margin-top:20px;}
-    .gal.gal-ready .slide-cta{margin-top:26px;}
-
-    /* RIGHT — the media, tilted back into the page. The reference bends the
-       plane in a shader and moves it only through a spring; here that spring
-       runs in JS and writes the transform inline every frame — travel from
-       its position, skew from its velocity, the tilt eased toward level on
-       hover. No transition on it: the spring IS the smoothing, and a
-       transition layered on top would double-filter the motion into mush. */
-    .gal.gal-ready .slide-media{margin:0;aspect-ratio:16/9;height:auto;
-      border-radius:18px;overflow:hidden;transform-origin:50% 50%;
-      will-change:transform,opacity;box-shadow:none;
-      border-color:rgba(255,255,255,.13);background:#070A10;}
-
-    /* The layered treatment is the base rule now — the still darkens and the
-       video swings up over it. Nothing to override here: what changed is only
-       what triggers it, and that is playback, not the pointer. */
-
-    /* The system's cover keeps the frame's proportions even though it holds an
-       orb rather than a video — every panel in the strip is the same size, which
-       is what lets one step of travel join all seven of them. */
-    /* the frame is the base rule now — it only needs centring here */
-    .gal.gal-ready .sys-media{display:grid;place-items:center;overflow:visible;}
-
-    /* the section label sits out of the way, top left */
-    .gal.gal-ready .work-head{position:absolute;left:var(--reel-pad);
-      top:clamp(30px,4.4vh,52px);z-index:3;margin:0;padding:0;text-align:left;}
-    .gal.gal-ready .work-head .k{font-family:var(--sans);font-size:11.5px;
-      font-weight:550;letter-spacing:.18em;text-transform:uppercase;
-      color:rgba(255,255,255,.62);}
-    .gal.gal-ready .work-head .k .serif{font-size:1em;letter-spacing:.18em;}
-
-    /* the chapter now names itself in one line above the project title, which
-       is where the eye already is — no block in the corner to read separately */
-    .gal.gal-ready .chap{display:block;font-size:11px;font-weight:600;
-      letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px;
-      color:rgba(244,247,250,.55);}
-    .gal.gal-ready .chap::after{content:'';display:inline-block;width:34px;
-      height:1px;margin-left:12px;vertical-align:middle;
-      background:rgba(244,247,250,.32);}
-
-    /* the rail of ticks, right edge */
-    .gal-ticks{position:absolute;right:clamp(20px,2.1vw,40px);top:50%;z-index:4;
-      transform:translateY(-50%);display:flex;flex-direction:column;
-      align-items:flex-end;gap:11px;}
-    /* a dot per project; the one you are on grows into a bar. One property
-       animates, so the change reads as the same mark changing shape rather
-       than one mark being swapped for another. */
-    .gal-tick{width:7px;height:7px;padding:0;border:0;cursor:pointer;
-      background:rgba(255,255,255,.32);border-radius:999px;
-      transition:height .6s var(--ease-expo),background .4s var(--ease);}
-    .gal-tick:hover{background:rgba(255,255,255,.72);}
-    .gal-tick.is-on{height:30px;background:#fff;}
-    @media (prefers-reduced-motion:reduce){ .gal-tick{transition:background .2s ease;} }
-
-    /* the gallery is light-on-dark, on one neutral ground */
-    .gal.gal-ready .slide-body h3{color:#F4F7FA;}
-    .gal.gal-ready .slide-body p{color:rgba(244,247,250,.74);}
-    .gal.gal-ready .slide-num,
-    .gal.gal-ready .slide-body .role{color:rgba(244,247,250,.58);}
-    .gal.gal-ready .slide-metrics span{border-color:rgba(255,255,255,.2);
-      background:rgba(255,255,255,.07);color:rgba(244,247,250,.82);}
-    /* a work CTA carries the screen — it is the largest instance of the button */
-    .gal.gal-ready .slide-cta{margin-top:28px;padding:16px 30px;font-size:16px;
-      border-radius:20px;}
-  }
-
-  /* ── the gallery, narrower desktops and laptops ──────────────────────────
-     Between 901 and 1280 the two columns get tight and the display title has
-     to come down or "EverTutor Analytics" eats the column. The reel step
-     shortens with it so the neighbouring planes stay in frame. */
-  @media (min-width:901px) and (max-width:1280px){
-    .gal.gal-ready{--gal-step:clamp(300px,52vh,560px);}
-    .gal.gal-ready .slide{grid-template-columns:minmax(0,47%) minmax(0,53%);
-      gap:clamp(20px,3vw,44px);
-      padding:clamp(78px,11vh,120px) clamp(26px,4vw,60px) clamp(96px,13vh,140px);}
-    /* the title used to need its own reduction here; on the new scale the
-       base clamp already fits every name in this column — measured, not
-       assumed — so it stays one full step above the hero at every width */
-    .gal.gal-ready .slide-body p{font-size:14.5px;max-width:38ch;}
-    .gal.gal-ready .work-head{left:clamp(26px,4vw,60px);}
-  }
-
-  /* short laptops: the vertical budget, not the horizontal one, is what runs
-     out first — pull the title and the step down together */
-  @media (min-width:901px) and (max-height:780px){
-    .gal.gal-ready{--gal-step:clamp(260px,56vh,480px);}
-    .gal.gal-ready .slide-body h3{font-size:clamp(34px,4.2vw,60px);}
-    .gal.gal-ready .slide-body p{margin-top:12px;}
-    .gal.gal-ready .slide-metrics{margin-top:14px;}
-    .gal.gal-ready .slide-cta{margin-top:18px;}
-    .gal.gal-ready .slide{padding-top:clamp(64px,9vh,100px);
-      padding-bottom:clamp(78px,11vh,120px);}
-  }
-
-  @media (min-width:901px) and (prefers-reduced-motion: reduce){
-    .gal.gal-ready .slide,
-    .gal.gal-ready .slide-body,
-    .gal.gal-ready .slide-media{transition:none;}
-  }
-
-  /* ── CUSTOM CURSOR (ported from index.html — dot / text caret / CTA magnet) ── */
-  html.cc-active, html.cc-active *{cursor:none !important;}
-  #ccDot{
-    position:fixed;top:0;left:0;pointer-events:none;z-index:13000;
-    width:12px;height:12px;border-radius:999px;background:rgba(239,243,248,.9);
-    opacity:0;will-change:transform;
-    transition:width .32s cubic-bezier(.34,1.56,.64,1),height .32s cubic-bezier(.34,1.56,.64,1),
-      border-radius .3s cubic-bezier(.34,1.56,.64,1),background .26s ease,opacity .18s ease;
-  }
-  /* over a project's imagery the dot speaks — a small white pill, an invitation */
-  #ccDot.cc-say{width:auto !important;height:auto !important;padding:9px 15px;
-    border-radius:999px !important;background:rgba(239,243,248,.96) !important;
-    color:#0A0E15;font:600 12px/1 var(--sans);letter-spacing:.05em;white-space:nowrap;}
-  html.cc-active .slide-media{cursor:none;}
-  .slide-media{cursor:pointer;}
-
-  /* ══ TALK PANEL ════════════════════════════════════════════════════════
-     The page is dark, so the panel is dark: a light slab sliding in over
-     this hero read as a different product. Same navy, same azure, same
-     hairlines — it is a drawer of the page, not a widget on top of it. */
-  .chat-backdrop{position:fixed;inset:0;z-index:var(--z-scrim);
-    background:rgba(3,6,12,.68);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
-    opacity:0;pointer-events:none;transition:opacity .45s var(--ease);}
-  .chat-backdrop.open{opacity:1;pointer-events:auto;}
-  .chat{
-    position:fixed;top:14px;right:14px;bottom:14px;z-index:var(--z-panel);
-    width:min(420px,calc(100vw - 28px));
-    display:flex;flex-direction:column;overflow:hidden;
-    background:
-      radial-gradient(120% 60% at 50% 8%,rgba(60,130,235,.16),transparent 62%),
-      linear-gradient(180deg,#0E141F 0%,#0A0E17 58%,#080B12 100%);
-    color:var(--ink);
-    border:1px solid rgba(150,190,245,.16);border-radius:24px;
-    box-shadow:0 40px 100px -34px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06);
-    transform:translateX(calc(100% + 40px));
-    transition:transform .66s var(--ease-expo);
-  }
-  .chat.open{transform:translateX(0);}
-  /* header — the name of the thing, and what it is actually made of */
-  .chat-head{display:flex;align-items:flex-start;gap:12px;
-    padding:18px 16px 15px 20px;border-bottom:1px solid rgba(150,190,245,.12);}
-  @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
-  .chat-close{flex-shrink:0;width:34px;height:34px;padding:0;display:grid;place-items:center;
-    cursor:pointer;background:rgba(150,190,245,.08);border:1px solid rgba(150,190,245,.16);
-    color:var(--ink-2);border-radius:50%;
-    transition:background .25s,border-color .25s,color .25s;}
-  .chat-close:hover{background:rgba(150,190,245,.16);border-color:rgba(150,190,245,.34);color:var(--ink);}
-  .chat-close svg{width:15px;height:15px;}
-  .head-mid{flex:1;min-width:0;text-align:left;}
-  .chat-head .t{font-family:var(--sans);font-size:19px;font-weight:570;
-    letter-spacing:-0.018em;color:var(--ink);line-height:1.2;}
-  .chat-head .t .serif{font-size:1.1em;font-weight:400;}
-  /* the stack, not a label: this is genuinely what answers you */
-  .head-stack{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:7px;}
-  .head-stack span{display:inline-flex;align-items:center;
-    padding:3px 8px;border-radius:6px;
-    border:1px solid rgba(150,190,245,.18);background:rgba(150,190,245,.06);
-    font-family:var(--sans);font-size:10px;font-weight:550;letter-spacing:.045em;
-    text-transform:uppercase;color:var(--ink-3);white-space:nowrap;
-    transition:color .3s ease,border-color .3s ease,background .3s ease;}
-  .chat.live .head-stack span{color:var(--ember-2);border-color:rgba(92,169,255,.3);
-    background:rgba(92,169,255,.1);}
-  [hidden]{display:none !important;}
-
-  /* panel body — hosts the orb (centered in voice, parked top-right in chat) + thread */
-  .panel-body{position:relative;flex:1;overflow:hidden;}
-  .orb-hold{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%) scale(1);z-index:4;
-    line-height:0;cursor:default;
-    transition:top .55s var(--ease),left .55s var(--ease),transform .55s var(--ease);}
-  .chat[data-view="chat"] .orb-hold{top:44px;left:calc(100% - 44px);transform:translate(-50%,-50%) scale(.3);cursor:pointer;}
-  /* while the agent is speaking the orb breathes — a slow, shallow swell.
-     Voice view only: in chat view the same transform parks it top-right. */
-  @keyframes orbBreathe{
-    0%,100%{transform:translate(-50%,-50%) scale(1);}
-    50%    {transform:translate(-50%,-50%) scale(1.055);}
-  }
-  .chat[data-view="voice"].speaking .orb-hold{
-    animation:orbBreathe 1.9s cubic-bezier(0.37,0,0.63,1) infinite;}
-
-  /* the orbits — concentric hairlines that actually turn, each carrying one
-     dot around the orb. They pick up speed the moment the line goes live. */
-  .orb-rings{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);z-index:3;
-    display:grid;place-items:center;pointer-events:none;transition:opacity .4s var(--ease);}
-  .orb-rings i{grid-area:1/1;position:relative;border-radius:50%;
-    border:1px solid rgba(120,175,255,.14);
-    animation:geoSpin var(--spin,30s) linear infinite;
-    transition:border-color .5s ease;}
-  .orb-rings i:nth-child(1){width:236px;height:236px;--spin:24s;}
-  .orb-rings i:nth-child(2){width:292px;height:292px;--spin:38s;
-    border-color:rgba(120,175,255,.1);animation-direction:reverse;}
-  .orb-rings i:nth-child(3){width:348px;height:348px;--spin:54s;
-    border-color:rgba(120,175,255,.07);}
-  .orb-rings i b{position:absolute;top:-2.5px;left:50%;width:5px;height:5px;margin-left:-2.5px;
-    border-radius:50%;background:var(--ember);
-    box-shadow:0 0 10px rgba(92,169,255,.65);transition:box-shadow .5s ease;}
-  .chat.live .orb-rings i{animation-duration:calc(var(--spin) * .5);
-    border-color:rgba(120,175,255,.22);}
-  .chat.live .orb-rings i b{box-shadow:0 0 16px rgba(92,169,255,.9);}
-  .chat[data-view="chat"] .orb-rings{opacity:0;}
-  @media (prefers-reduced-motion:reduce){
-    .orb-rings i{animation:none;}
-    .chat[data-view="voice"].speaking .orb-hold{animation:none;}
-  }
-
-  /* ── the dock — the controls sit directly under the orb, riding over the
-        outer orbit rather than banished to the foot of the panel ── */
-  .voice-dock{position:absolute;left:0;right:0;top:calc(46% + 128px);z-index:5;
-    display:flex;flex-direction:column;align-items:center;gap:11px;padding:0 22px;
-    transition:opacity .35s var(--ease);}
-  /* short panels — pull the orbits and the dock in so nothing runs off the foot */
-  @media (max-height:760px){
-    .orb-rings i:nth-child(1){width:196px;height:196px;}
-    .orb-rings i:nth-child(2){width:242px;height:242px;}
-    .orb-rings i:nth-child(3){width:288px;height:288px;}
-    .voice-dock{top:calc(46% + 112px);}
-  }
-  @media (max-height:620px){
-    .orb-rings{opacity:.5;}
-    .orb-rings i:nth-child(3){display:none;}
-    .voice-dock{top:auto;bottom:20px;}
-    .orb-hold{top:40%;}
-    .orb-rings{top:40%;}
-  }
-  .chat[data-view="chat"] .voice-dock{opacity:0;pointer-events:none;}
-  /* the primary CTA carries the state itself — no separate tag underneath */
-  .talk-cta{min-width:236px;justify-content:center;padding:15px 24px;}
-  .talk-cta .talk-dot{width:7px;height:7px;border-radius:50%;flex:none;
-    background:rgba(255,255,255,.55);transition:background .3s,box-shadow .3s;}
-  .chat.live .talk-cta .talk-dot{background:#fff;
-    box-shadow:0 0 10px rgba(255,255,255,.9);animation:pulse 1.4s infinite;}
-  /* a refused mic is a real state, and it says so on the button you press */
-  .chat.denied .talk-cta{
-    background:radial-gradient(125% 125% at 0% 0%,
-      #FFFFFF 0%,#FFE7E4 10%,#F3A6A0 28%,#E5605A 56%,#C33B36 100%);}
-  .chat.denied .talk-cta .talk-dot{background:#fff;}
-  .talk-alt{min-width:236px;}
-  .chat.live .talk-alt{display:none;}
-  .btn-end{display:none;}
-  .chat.live .btn-end{display:inline-flex;}
-
-  .thread{position:absolute;inset:0;overflow-y:auto;padding:62px 18px 14px;
-    display:none;flex-direction:column;gap:11px;
-    scrollbar-width:thin;scrollbar-color:rgba(150,190,245,.24) transparent;}
-  .chat[data-view="chat"] .thread{display:flex;}
-  .m{max-width:86%;padding:11px 14px;border-radius:15px;font-size:14px;line-height:1.6;font-weight:450;}
-  .m.ai{align-self:flex-start;background:rgba(150,190,245,.07);
-    border:1px solid rgba(150,190,245,.14);
-    color:var(--ink);border-bottom-left-radius:6px;}
-  .m.me{align-self:flex-end;
-    background:linear-gradient(180deg,rgba(92,169,255,.26),rgba(53,118,222,.22));
-    border:1px solid rgba(120,175,255,.34);
-    color:#EAF3FF;border-bottom-right-radius:6px;}
-  .m.typing{display:flex;gap:5px;padding:14px 16px;}
-  .m.typing i{width:5px;height:5px;border-radius:50%;background:var(--ink-3);animation:tp 1.2s infinite;}
-  .m.typing i:nth-child(2){animation-delay:.15s}.m.typing i:nth-child(3){animation-delay:.3s}
-  @keyframes tp{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
-
-  /* the foot belongs to the chat view alone now — in voice view the controls
-     sit under the orb, so the strip has nothing to hold and gets out of the way */
-  .panel-foot{flex-shrink:0;padding:16px;border-top:1px solid rgba(150,190,245,.12);}
-  .chat[data-view="voice"] .panel-foot{display:none;}
-
-  .talk-cta:disabled{opacity:.72;cursor:default;transform:none;}
-  /* end call — the one place on the page that is deliberately not azure */
-  .btn-end{align-items:center;justify-content:center;min-width:236px;padding:13px 24px;
-    border:1px solid rgba(233,110,110,.42);border-radius:var(--cta-r);cursor:pointer;
-    background:rgba(210,70,70,.14);color:#FFC9C6;
-    font-family:var(--sans);font-size:14px;font-weight:570;box-shadow:none;
-    transition:background .25s,border-color .25s,transform .3s var(--ease);}
-  .btn-end:hover{background:rgba(214,64,64,.24);border-color:rgba(233,110,110,.7);
-    transform:translateY(-2px);}
-  /* chat composer — input + mic + send (rounded rects) */
-  .composer{display:flex;gap:10px;}
-  .composer input{flex:1;background:rgba(150,190,245,.07);border:1px solid rgba(150,190,245,.16);
-    border-radius:12px;padding:13px 15px;font-family:var(--body);font-size:14px;
-    color:var(--ink);outline:none;transition:border-color .25s,background .25s;}
-  .composer input::placeholder{color:var(--ink-3);}
-  .composer input:focus{border-color:rgba(120,175,255,.55);background:rgba(150,190,245,.1);}
-  .mic-btn{width:46px;flex-shrink:0;background:rgba(150,190,245,.07);
-    border:1px solid rgba(150,190,245,.16);
-    border-radius:12px;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;
-    transition:color .25s,border-color .25s,background .25s;}
-  .mic-btn:hover{color:var(--ink);border-color:rgba(120,175,255,.5);}
-  .mic-btn.rec{color:#fff;background:var(--ember);border-color:var(--ember);animation:pulse 1.2s infinite;}
-  .mic-btn.hide{display:none;}
-  .send-btn{width:52px;flex-shrink:0;border:none;border-radius:12px;cursor:pointer;color:#fff;
-    display:grid;place-items:center;
-    background:var(--cta-grad);box-shadow:none;
-    transition:background .35s var(--ease),transform .3s var(--ease);}
-  .send-btn:hover{background:var(--cta-grad-hover);transform:translateY(-1px);}
-  .send-btn:disabled{opacity:.5;cursor:default;transform:none;}
-  .send-btn svg{width:17px;height:17px;}
+    /* Display layer — the big statements switch to Bricolage Grotesque */
+    .hero-heading,
+    .s2-fw-header .fw-title,
+    .abt-title,
+    .tm-headline,
+    .dna2-heading,
+    .s2-bar-title,
+    .oh2-headline,
+    .fc-line {
+      font-family: var(--font-display);
+    }
+/* — Project bar title in the display face — */
+    .s2-bar-title { font-size: clamp(22px, 1.9vw, 30px); }
 
   /* ── 03 — ABOUT: THE T ──────────────────────────────────────────────────
        The T-shaped-designer diagram as a lit constellation: breadth runs
@@ -1671,248 +2549,329 @@
     <div class="trail" id="trail" aria-hidden="true"></div>
   </section>
 
-  <section class="work-pin gal" id="workPin">
+  <!-- ══ SECTION 2 — ported wholesale from index.html ══
+       Markup, CSS and behaviour are the shipping section, not a rebuild.
+       Its type and colour resolve through the alias tokens below, so it
+       adopts this page's system instead of importing Montserrat. -->
+      <section class="s2-section-wrap" id="s2Section">
 
-    <div class="work-sticky">
-      <!-- the ground: one flat colour per project, crossfaded on advance. It
-           replaces the rising stage image — a gallery wants a plain field
-           behind the work, not a lit surface competing with it. -->
-      <div class="gal-bg" aria-hidden="true"></div>
 
-      <!-- the section's own geometry — the same hairline vocabulary the hero
-           uses, arranged for a horizontal stage rather than a vertical one -->
-      <div class="geo geo-work" aria-hidden="true">
-        <span class="geo-arc" style="width:96vmax;height:96vmax;left:-34vmax;top:-30vmax;"></span>
-        <span class="geo-arc thin" style="width:132vmax;height:132vmax;left:-52vmax;top:-48vmax;"></span>
-        <span class="geo-orbit" style="width:58vmax;height:58vmax;right:-24vmax;bottom:-26vmax;--spin:150s;"><b></b></span>
-        <span class="geo-sq" style="right:7%;top:16%;"></span>
-        <span class="geo-cross" style="left:7%;bottom:22%;"></span>
-        <span class="geo-cross" style="right:14%;bottom:12%;"></span>
+<!-- Canvas covers full section — renders behind header and work container -->
+      <div class="s2-cards-zone" id="s2CardsZone">
+        <div id="spiral-root" style="width:100%;height:100%;position:relative;"></div>
       </div>
 
-      <header class="work-head"><span class="k">Featured <em class="serif">work</em></span></header>
+      <!-- ── Up / Down helix nav ── -->
+      <div class="s2-side-nav">
+        <button class="s2-side-nav-btn" id="s2NavUp" aria-label="Previous project">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+        <button class="s2-side-nav-btn" id="s2NavDown" aria-label="Next project">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
 
-      <!-- The helix. spiral.js mounts a Three.js scene in here and owns
-           everything inside it, including its own grid overlay. It is the
-           wide-screen path only: the inline script below strips the id on
-           narrow screens and under reduced motion so it never initialises,
-           and the stacked column beneath takes over. -->
-      <div id="spiral-root" class="spiral-root"></div>
+      <!-- ── Left / Right grid-view nav — hidden until grid view is active ── -->
+      <button class="s2-side-nav-btn s2-grid-nav-btn s2-grid-nav-prev" id="s2GridPrev" aria-label="Previous project" style="display:none;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="s2-side-nav-btn s2-grid-nav-btn s2-grid-nav-next" id="s2GridNext" aria-label="Next project" style="display:none;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
 
-      <!-- one screen per project: copy left, tilted media right -->
-      <div class="gal-stage" id="galStage">
+      <!-- ── Featured Work heading ── -->
+      <div class="s2-fw-header" id="s2FwHeader">
+        <div class="s2-fwh-row">
+          <h2 class="fw-title">Featured Work</h2>
+        </div>
+        <div class="s2-view-toggle">
+          <span class="s2-vt-thumb" aria-hidden="true"></span>
+          <button class="s2-vt-btn s2-vt-btn-text s2-vt-active" id="s2SpiralBtn" aria-label="Spiral view">spiral</button>
+          <button class="s2-vt-btn s2-vt-btn-text" id="s2ListBtn" aria-label="Grid view">grid</button>
+        </div>
+      </div>
 
-          <!-- the system itself, before its three tools: the green orb is the
-               EverTutor mark, and it opens the chapter the way a cover does -->
-          <article class="slide slide-system">
-            <div class="slide-media sys-media">
-              <div class="sys-orb">
-                <span class="sys-orb-glow" aria-hidden="true"></span>
-                <svg class="sys-wave" viewBox="0 0 340 340" aria-hidden="true">
-                  <g stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round">
-                    <line x1="170.00" y1="56.00" x2="170.00" y2="44.00"/>
-                    <line x1="178.94" y1="56.35" x2="179.89" y2="44.39"/>
-                    <line x1="187.83" y1="57.40" x2="189.71" y2="45.55"/>
-                    <line x1="196.61" y1="59.15" x2="199.41" y2="47.48"/>
-                    <line x1="205.23" y1="61.58" x2="208.94" y2="50.17"/>
-                    <line x1="213.63" y1="64.68" x2="218.22" y2="53.59"/>
-                    <line x1="221.75" y1="68.43" x2="227.20" y2="57.73"/>
-                    <line x1="229.56" y1="72.80" x2="235.83" y2="62.57"/>
-                    <line x1="237.01" y1="77.77" x2="244.06" y2="68.06"/>
-                    <line x1="244.04" y1="83.31" x2="251.83" y2="74.19"/>
-                    <line x1="250.61" y1="89.39" x2="259.10" y2="80.90"/>
-                    <line x1="256.69" y1="95.96" x2="265.81" y2="88.17"/>
-                    <line x1="262.23" y1="102.99" x2="271.94" y2="95.94"/>
-                    <line x1="267.20" y1="110.44" x2="277.43" y2="104.17"/>
-                    <line x1="271.57" y1="118.25" x2="282.27" y2="112.80"/>
-                    <line x1="275.32" y1="126.37" x2="286.41" y2="121.78"/>
-                    <line x1="278.42" y1="134.77" x2="289.83" y2="131.06"/>
-                    <line x1="280.85" y1="143.39" x2="292.52" y2="140.59"/>
-                    <line x1="282.60" y1="152.17" x2="294.45" y2="150.29"/>
-                    <line x1="283.65" y1="161.06" x2="295.61" y2="160.11"/>
-                    <line x1="284.00" y1="170.00" x2="296.00" y2="170.00"/>
-                    <line x1="283.65" y1="178.94" x2="295.61" y2="179.89"/>
-                    <line x1="282.60" y1="187.83" x2="294.45" y2="189.71"/>
-                    <line x1="280.85" y1="196.61" x2="292.52" y2="199.41"/>
-                    <line x1="278.42" y1="205.23" x2="289.83" y2="208.94"/>
-                    <line x1="275.32" y1="213.63" x2="286.41" y2="218.22"/>
-                    <line x1="271.57" y1="221.75" x2="282.27" y2="227.20"/>
-                    <line x1="267.20" y1="229.56" x2="277.43" y2="235.83"/>
-                    <line x1="262.23" y1="237.01" x2="271.94" y2="244.06"/>
-                    <line x1="256.69" y1="244.04" x2="265.81" y2="251.83"/>
-                    <line x1="250.61" y1="250.61" x2="259.10" y2="259.10"/>
-                    <line x1="244.04" y1="256.69" x2="251.83" y2="265.81"/>
-                    <line x1="237.01" y1="262.23" x2="244.06" y2="271.94"/>
-                    <line x1="229.56" y1="267.20" x2="235.83" y2="277.43"/>
-                    <line x1="221.75" y1="271.57" x2="227.20" y2="282.27"/>
-                    <line x1="213.63" y1="275.32" x2="218.22" y2="286.41"/>
-                    <line x1="205.23" y1="278.42" x2="208.94" y2="289.83"/>
-                    <line x1="196.61" y1="280.85" x2="199.41" y2="292.52"/>
-                    <line x1="187.83" y1="282.60" x2="189.71" y2="294.45"/>
-                    <line x1="178.94" y1="283.65" x2="179.89" y2="295.61"/>
-                    <line x1="170.00" y1="284.00" x2="170.00" y2="296.00"/>
-                    <line x1="161.06" y1="283.65" x2="160.11" y2="295.61"/>
-                    <line x1="152.17" y1="282.60" x2="150.29" y2="294.45"/>
-                    <line x1="143.39" y1="280.85" x2="140.59" y2="292.52"/>
-                    <line x1="134.77" y1="278.42" x2="131.06" y2="289.83"/>
-                    <line x1="126.37" y1="275.32" x2="121.78" y2="286.41"/>
-                    <line x1="118.25" y1="271.57" x2="112.80" y2="282.27"/>
-                    <line x1="110.44" y1="267.20" x2="104.17" y2="277.43"/>
-                    <line x1="102.99" y1="262.23" x2="95.94" y2="271.94"/>
-                    <line x1="95.96" y1="256.69" x2="88.17" y2="265.81"/>
-                    <line x1="89.39" y1="250.61" x2="80.90" y2="259.10"/>
-                    <line x1="83.31" y1="244.04" x2="74.19" y2="251.83"/>
-                    <line x1="77.77" y1="237.01" x2="68.06" y2="244.06"/>
-                    <line x1="72.80" y1="229.56" x2="62.57" y2="235.83"/>
-                    <line x1="68.43" y1="221.75" x2="57.73" y2="227.20"/>
-                    <line x1="64.68" y1="213.63" x2="53.59" y2="218.22"/>
-                    <line x1="61.58" y1="205.23" x2="50.17" y2="208.94"/>
-                    <line x1="59.15" y1="196.61" x2="47.48" y2="199.41"/>
-                    <line x1="57.40" y1="187.83" x2="45.55" y2="189.71"/>
-                    <line x1="56.35" y1="178.94" x2="44.39" y2="179.89"/>
-                    <line x1="56.00" y1="170.00" x2="44.00" y2="170.00"/>
-                    <line x1="56.35" y1="161.06" x2="44.39" y2="160.11"/>
-                    <line x1="57.40" y1="152.17" x2="45.55" y2="150.29"/>
-                    <line x1="59.15" y1="143.39" x2="47.48" y2="140.59"/>
-                    <line x1="61.58" y1="134.77" x2="50.17" y2="131.06"/>
-                    <line x1="64.68" y1="126.37" x2="53.59" y2="121.78"/>
-                    <line x1="68.43" y1="118.25" x2="57.73" y2="112.80"/>
-                    <line x1="72.80" y1="110.44" x2="62.57" y2="104.17"/>
-                    <line x1="77.77" y1="102.99" x2="68.06" y2="95.94"/>
-                    <line x1="83.31" y1="95.96" x2="74.19" y2="88.17"/>
-                    <line x1="89.39" y1="89.39" x2="80.90" y2="80.90"/>
-                    <line x1="95.96" y1="83.31" x2="88.17" y2="74.19"/>
-                    <line x1="102.99" y1="77.77" x2="95.94" y2="68.06"/>
-                    <line x1="110.44" y1="72.80" x2="104.17" y2="62.57"/>
-                    <line x1="118.25" y1="68.43" x2="112.80" y2="57.73"/>
-                    <line x1="126.37" y1="64.68" x2="121.78" y2="53.59"/>
-                    <line x1="134.77" y1="61.58" x2="131.06" y2="50.17"/>
-                    <line x1="143.39" y1="59.15" x2="140.59" y2="47.48"/>
-                    <line x1="152.17" y1="57.40" x2="150.29" y2="45.55"/>
-                    <line x1="161.06" y1="56.35" x2="160.11" y2="44.39"/>
-                  </g>
-                </svg>
-                <img src="images/blob-dark.png" alt="The EverTutor AI system" width="940" height="940">
+      <!-- ── SECTION 2: FEATURED WORK — full-viewport spiral ── -->
+      <div class="s2-work-container">
+
+      <!-- Project info bar — slides up from bottom when front card changes -->
+      <div id="s2ProjectBar" class="s2-project-bar">
+        <div class="s2-bar-top-row">
+          <div class="s2-bar-title-col">
+            <h3 class="s2-bar-title" id="s2BarTitle"></h3>
+            <p class="s2-bar-desc" id="s2BarDesc"></p>
+          </div>
+          <div class="s2-bar-tags-col" id="s2BarTagsCol">
+            <div class="s2-bar-tags" id="s2BarTags"></div>
+            <div class="s2-bar-icon-tags" id="s2BarIconTags"></div>
+          </div>
+        </div>
+        <div class="s2-bar-rule"></div>
+        <div class="s2-bar-bottom-row">
+          <div class="s2-bar-metrics" id="s2BarMetrics"></div>
+          <a class="s2-bar-cta" id="s2BarCta" href="#">View Case Study →</a>
+        </div>
+      </div>
+
+      <!-- Mobile accordion — built by JS below s2 spiral, hidden on desktop -->
+      <div class="s2-mobile-accordion" id="s2MobileAccordion" aria-label="Project list"></div>
+
+      <!-- C: Blob + left/right content (static ws-section removed; content now in spiral gallery panels) -->
+      <div class="s2-glimpse-full" id="s2GlimpseFull" style="display:none">
+
+        <section class="ws-section" id="wsSection" style="display:none">
+
+        <!-- EverTutor hero: left title+metrics | center blob | right tags+desc -->
+        <div class="ws-et-hero">
+
+          <div class="ws-et-left">
+            <h2 class="ws-et-title">EverTutor AI System</h2>
+            <div class="ws-et-metrics">
+              <div class="ws-et-metric-row">
+                <div class="ws-et-metric">
+                  <span class="ws-et-val" data-count="2000" data-suffix="+">2000+</span>
+                  <span class="ws-et-lbl">Active Learners</span>
+                </div>
+                <div class="ws-et-mdivider"></div>
+                <div class="ws-et-metric">
+                  <span class="ws-et-val" data-count="96" data-prefix="−" data-suffix="%">−96%</span>
+                  <span class="ws-et-lbl">Workflow time</span>
+                </div>
+              </div>
+              <div class="ws-et-metric">
+                <span class="ws-et-val" data-count="500" data-prefix="0→$" data-suffix="k+ ARR">0→$500k+ ARR</span>
+                <span class="ws-et-lbl">as Sole Product Designer</span>
               </div>
             </div>
-            <div class="slide-body">
-              <span class="slide-num">01</span>
-              <h3>EverTutor AI <span class="serif">System</span></h3>
-              <div class="role">Sole Product Designer · 0→1</div>
-              <p>The world&rsquo;s first multimodal, voice-first AI tutor — <em>three tools working
-                as one system</em> to put a tutor beside every learner.</p>
-              <div class="slide-metrics"><span>2,000+ active learners</span><span>−96% workflow time</span><span>0→$500k+ ARR</span></div>
-            </div>
-          </article>
-
-          <article class="slide">
-            <div class="slide-media">
-              <img src="images/card-et-live.webp" alt="EverTutor Live" width="760" height="507">
-              <video class="slide-vid" src="images/et-live.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-            </div>
-            <div class="slide-body">
-              <span class="slide-num">1.1</span>
-              <h3>EverTutor <span class="serif">Live</span></h3>
-              <div class="role">Product Design Lead</div>
-              <p>A voice-first AI tutor that gives every learner a fully adaptive 1:1 session —
-                taken from prototype to product-market fit.</p>
-              <div class="slide-metrics"><span>2,000+ daily sessions</span><span>2× performance gain</span><span>$250 → $5/hr</span></div>
-              <a class="btn-primary slide-cta" href="evertutor-live.html">View case study
-                <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5L12.5 4.5M6 4.5h6.5V11"/></svg></a>
-            </div>
-          </article>
-
-          <article class="slide">
-            <div class="slide-media">
-              <img src="images/card-et-studio.webp" alt="EverTutor Studio" width="760" height="507" loading="lazy">
-              <video class="slide-vid" src="images/et-studio.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-            </div>
-            <div class="slide-body">
-              <span class="slide-num">1.2</span>
-              <h3>EverTutor <span class="serif">Studio</span></h3>
-              <div class="role">Product Design Lead</div>
-              <p>The authoring environment behind Live — where educators shape, test and ship a
-                tutor&rsquo;s curriculum without ever writing a prompt.</p>
-              <div class="slide-metrics"><span>100+ hrs → 4 hrs</span><span>Lesson creation</span></div>
-              <a class="btn-primary slide-cta" href="evertutor-studio.html">View case study
-                <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5L12.5 4.5M6 4.5h6.5V11"/></svg></a>
-            </div>
-          </article>
-
-          <article class="slide">
-            <div class="slide-media">
-              <img src="images/card-et-analytics.webp" alt="EverTutor Analytics" width="760" height="507" loading="lazy">
-              <video class="slide-vid" src="images/et-analytics.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-            </div>
-            <div class="slide-body">
-              <span class="slide-num">1.3</span>
-              <h3>EverTutor <span class="serif">Analytics</span></h3>
-              <div class="role">Product Design</div>
-              <p>The measurement layer — how a team sees what a learner actually struggled with,
-                session by session, without drowning in transcripts.</p>
-              <div class="slide-metrics"><span>Real-time insight</span><span>For educators</span></div>
-            </div>
-          </article>
-
-        <article class="slide">
-          <div class="slide-media" data-bed="stressie">
-            <img src="images/card-stressie.webp" alt="Stressie" width="760" height="428" loading="lazy">
-            <video class="slide-vid" src="images/stressie.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
           </div>
-          <div class="slide-body">
-            <span class="slide-num">02</span>
-            <h3>Stressie</h3>
-            <div class="role">Founding Product Designer</div>
-            <p>From pilot research to a <em>Harvard-incubated product</em> — a full redesign of
-              workplace stress management, now live at Amazon and InKind.</p>
-            <div class="slide-metrics"><span>17.4% engagement</span><span>Harvard Innovation Labs</span><span>2 live pilots</span></div>
-            <a class="btn-primary slide-cta" href="stressie-studio.html">View case study
-              <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5L12.5 4.5M6 4.5h6.5V11"/></svg></a>
-          </div>
-        </article>
 
-        <article class="slide">
-          <div class="slide-media">
-            <img src="images/card-dearly.webp" alt="Dearly" width="760" height="428" loading="lazy">
-            <video class="slide-vid" src="images/dearly.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          <div class="ws-et-center">
+            <div class="ws-orb-wrap">
+              <div class="ws-orb-bg"></div>
+              <div class="ws-orb-glow"></div>
+              <svg class="ws-waveform" width="340" height="340" viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <g stroke="#E5F28D" stroke-width="2.5" stroke-linecap="round" opacity="0.75">
+                  <line x1="170.00" y1="61.42" x2="170.00" y2="38.58" />
+                  <line x1="178.48" y1="62.29" x2="180.35" y2="38.44" />
+                  <line x1="187.05" y1="62.35" x2="190.49" y2="40.60" />
+                  <line x1="195.72" y1="62.88" x2="200.31" y2="43.75" />
+                  <line x1="204.19" y1="64.78" x2="209.97" y2="46.97" />
+                  <line x1="212.23" y1="68.05" x2="219.62" y2="50.22" />
+                  <line x1="219.91" y1="72.06" x2="229.05" y2="54.10" />
+                  <line x1="227.51" y1="76.16" x2="237.89" y2="59.21" />
+                  <line x1="235.19" y1="80.28" x2="245.88" y2="65.56" />
+                  <line x1="242.75" y1="84.83" x2="253.12" y2="72.68" />
+                  <line x1="249.73" y1="90.27" x2="259.98" y2="80.02" />
+                  <line x1="255.84" y1="96.68" x2="266.65" y2="87.45" />
+                  <line x1="261.23" y1="103.72" x2="272.93" y2="95.21" />
+                  <line x1="266.34" y1="110.96" x2="278.29" y2="103.64" />
+                  <line x1="271.47" y1="118.30" x2="282.37" y2="112.74" />
+                  <line x1="276.37" y1="125.94" x2="285.36" y2="122.22" />
+                  <line x1="280.34" y1="134.15" x2="287.91" y2="131.69" />
+                  <line x1="282.83" y1="142.91" x2="290.53" y2="141.06" />
+                  <line x1="283.99" y1="151.95" x2="293.06" y2="150.51" />
+                  <line x1="284.69" y1="160.97" x2="294.57" y2="160.20" />
+                  <line x1="285.96" y1="170.00" x2="294.04" y2="170.00" />
+                  <line x1="288.03" y1="179.29" x2="291.23" y2="179.54" />
+                  <line x1="287.04" y1="188.54" x2="290.00" y2="189.01" />
+                  <line x1="285.23" y1="197.66" x2="288.14" y2="198.36" />
+                  <line x1="282.70" y1="206.62" x2="285.55" y2="207.55" />
+                  <line x1="279.48" y1="215.35" x2="282.25" y2="216.50" />
+                  <line x1="273.22" y1="222.59" x2="280.62" y2="226.37" />
+                  <line x1="264.95" y1="228.19" x2="279.68" y2="237.21" />
+                  <line x1="257.72" y1="233.73" x2="276.44" y2="247.33" />
+                  <line x1="252.12" y1="240.14" x2="270.37" y2="255.73" />
+                  <line x1="246.37" y1="246.37" x2="263.34" y2="263.34" />
+                  <line x1="240.40" y1="252.43" x2="255.47" y2="270.07" />
+                  <line x1="233.83" y1="257.85" x2="247.24" y2="276.31" />
+                  <line x1="226.68" y1="262.49" x2="238.72" y2="282.15" />
+                  <line x1="219.32" y1="266.81" x2="229.63" y2="287.04" />
+                  <line x1="211.94" y1="271.26" x2="219.90" y2="290.47" />
+                  <line x1="204.38" y1="275.80" x2="209.79" y2="292.45" />
+                  <line x1="196.37" y1="279.85" x2="199.65" y2="293.52" />
+                  <line x1="187.86" y1="282.76" x2="189.69" y2="294.29" />
+                  <line x1="179.00" y1="284.34" x2="179.83" y2="294.92" />
+                  <line x1="170.00" y1="284.99" x2="170.00" y2="295.01" />
+                  <line x1="160.93" y1="285.28" x2="160.24" y2="293.98" />
+                  <line x1="151.74" y1="285.31" x2="150.72" y2="291.74" />
+                  <line x1="142.50" y1="284.57" x2="141.48" y2="288.80" />
+                  <line x1="133.52" y1="282.27" x2="132.32" y2="285.98" />
+                  <line x1="125.21" y1="278.13" x2="122.94" y2="283.60" />
+                  <line x1="117.68" y1="272.69" x2="113.36" y2="281.16" />
+                  <line x1="110.49" y1="267.11" x2="104.11" y2="277.52" />
+                  <line x1="102.91" y1="262.35" x2="96.02" y2="271.82" />
+                  <line x1="94.48" y1="258.42" x2="89.65" y2="264.07" />
+                  <line x1="86.21" y1="253.79" x2="84.09" y2="255.91" />
+                  <line x1="79.89" y1="246.96" x2="77.61" y2="248.91" />
+                  <line x1="74.13" y1="239.65" x2="71.70" y2="241.42" />
+                  <line x1="68.96" y1="231.92" x2="66.40" y2="233.48" />
+                  <line x1="67.19" y1="222.39" x2="58.97" y2="226.57" />
+                  <line x1="67.07" y1="212.63" x2="51.20" y2="219.21" />
+                  <line x1="66.60" y1="203.60" x2="45.15" y2="210.57" />
+                  <line x1="64.98" y1="195.21" x2="41.65" y2="200.81" />
+                  <line x1="63.33" y1="186.89" x2="39.63" y2="190.65" />
+                  <line x1="62.33" y1="178.47" x2="38.41" y2="180.36" />
+                  <line x1="62.00" y1="170.00" x2="38.00" y2="170.00" />
+                  <line x1="62.33" y1="161.53" x2="38.41" y2="159.64" />
+                  <line x1="63.33" y1="153.11" x2="39.63" y2="149.35" />
+                  <line x1="63.55" y1="144.44" x2="43.08" y2="139.53" />
+                  <line x1="63.85" y1="135.51" x2="47.89" y2="130.32" />
+                  <line x1="64.97" y1="126.49" x2="53.30" y2="121.66" />
+                  <line x1="67.39" y1="117.72" x2="58.76" y2="113.32" />
+                  <line x1="71.08" y1="109.38" x2="64.29" y2="105.22" />
+                  <line x1="75.52" y1="101.35" x2="70.32" y2="97.58" />
+                  <line x1="80.31" y1="93.40" x2="77.19" y2="90.74" />
+                  <line x1="86.21" y1="86.21" x2="84.09" y2="84.09" />
+                  <line x1="93.04" y1="79.89" x2="91.09" y2="77.61" />
+                  <line x1="100.35" y1="74.13" x2="98.58" y2="71.70" />
+                  <line x1="108.25" y1="69.23" x2="106.35" y2="66.14" />
+                  <line x1="117.68" y1="67.31" x2="113.37" y2="58.85" />
+                  <line x1="126.82" y1="65.76" x2="121.33" y2="52.50" />
+                  <line x1="135.32" y1="63.26" x2="130.52" y2="48.49" />
+                  <line x1="143.43" y1="59.32" x2="140.55" y2="47.31" />
+                  <line x1="151.75" y1="54.79" x2="150.70" y2="48.16" />
+                  <line x1="160.70" y1="51.87" x2="160.47" y2="48.87" />
+                </g>
+              </svg>
+              <img class="ws-orb-img" src="Parallax cards/EverTutor Glimpse/Dark mode finalized.png" alt="EverTutor AI System" loading="lazy" />
+            </div>
           </div>
-          <div class="slide-body">
-            <span class="slide-num">03</span>
-            <h3>Dearly</h3>
-            <div class="role">Solo Designer &amp; Developer</div>
-            <p>Animated handwriting with your real voice and photos, sent as a unique link —
-              a quieter way to keep the people who matter close.</p>
-            <div class="slide-metrics"><span>Shipped in 48 hours</span><span>140 letters written</span></div>
-            <a class="btn-primary slide-cta" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">Visit the site
-              <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5L12.5 4.5M6 4.5h6.5V11"/></svg></a>
-          </div>
-        </article>
 
-        <article class="slide">
-          <div class="slide-media">
-            <img src="images/card-engine.webp" alt="The Engine" width="760" height="507" loading="lazy">
+          <div class="ws-et-right">
+            <div class="ws-et-tags">
+              <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Profile dark theme.svg" width="16" height="14" alt="" aria-hidden="true">Sole Product Designer</span>
+              <div class="ws-et-tag-row">
+                <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Thunder Dark Theme.svg" width="10" height="16" alt="" aria-hidden="true">0 to 1</span>
+                <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Desktop Icon.svg" width="16" height="13" alt="" aria-hidden="true">Desktop &middot; B2B &middot; B2C</span>
+              </div>
+            </div>
+            <p class="ws-et-desc">
+              World&rsquo;s first multimodal 1:1, voice-first AI tutor powered by <em>3 tools working as one system</em> to enable a billion tutors for a billion minds.
+            </p>
           </div>
-          <div class="slide-body">
-            <span class="slide-num">04</span>
-            <h3><span class="serif">The</span> Engine</h3>
-            <div class="role">Product Design · Landing Page</div>
-            <p>Designed the landing page for an AI growth platform that runs content, marketing
-              and sales autonomously — the whole pitch carried by one glowing funnel.</p>
-            <div class="slide-metrics"><span>Brand &amp; art direction</span><span>Marketing site</span></div>
-            <a class="btn-primary slide-cta" href="https://www.theengine.dev/" target="_blank" rel="noopener">Visit the site
-              <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5L12.5 4.5M6 4.5h6.5V11"/></svg></a>
-          </div>
-        </article>
 
+        </div>
+
+        <!-- (sub-case studies and Stressie section removed — now in proj-cards below) -->
+        <div class="ws-sub-section" style="display:none">
+          <div class="ws-sub-row">
+            <div class="ws-sub-card">
+              <div class="ws-sub-video">
+                <video autoplay muted loop playsinline preload="auto">
+                  <source src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="ws-sub-info">
+                <span class="ws-sub-num">1.1</span>
+                <p class="ws-sub-title">EverTutor Live</p>
+                <p class="ws-sub-desc">Voice-first AI tutor &middot; prototype to PMF</p>
+              </div>
+            </div>
+            <div class="ws-sub-card">
+              <div class="ws-sub-video">
+                <video autoplay muted loop playsinline preload="auto">
+                  <source src="Projects videos/ET Studio Case study.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="ws-sub-info">
+                <span class="ws-sub-num">1.2</span>
+                <p class="ws-sub-title">EverTutor Studio</p>
+                <p class="ws-sub-desc">100+ hrs &rarr; 4 hrs lesson creation</p>
+              </div>
+            </div>
+            <div class="ws-sub-card">
+              <div class="ws-sub-video">
+                <video autoplay muted loop playsinline preload="auto">
+                  <source src="Projects videos/Et Analytics.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="ws-sub-info">
+                <span class="ws-sub-num">1.3</span>
+                <p class="ws-sub-title">EverTutor Analytics</p>
+                <p class="ws-sub-desc">Real-time student insights for educators</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ws-project-divider" style="display:none"></div>
+
+        <!-- Project 2: Stressie — now in proj-cards below -->
+        <div class="ws-project ws-project--alt" style="display:none">
+          <div class="ws-project-inner">
+
+            <div class="ws-info">
+              <span class="ws-num">02</span>
+              <h2 class="ws-title">Stressie</h2>
+              <div class="ws-roles">
+                <span class="ws-role-tag">Sole Product Designer</span>
+                <span class="ws-role-tag">0 to 1</span>
+                <span class="ws-role-tag">Mobile &middot; B2B</span>
+              </div>
+              <p class="ws-desc">From pilot research to a <strong>Harvard-incubated product</strong>, a full redesign of workplace stress management, now live at Amazon and InKind.</p>
+              <div class="ws-metrics">
+                <div class="ws-metric">
+                  <span class="ws-metric-val">17.4%</span>
+                  <span class="ws-metric-lbl">vs ~2% industry avg</span>
+                </div>
+                <div class="ws-metric">
+                  <span class="ws-metric-val">Harvard</span>
+                  <span class="ws-metric-lbl">Innovation Labs</span>
+                </div>
+                <div class="ws-metric">
+                  <span class="ws-metric-val">2 Pilots</span>
+                  <span class="ws-metric-lbl">Amazon &amp; InKind</span>
+                </div>
+              </div>
+              <a class="ws-cta" href="stressie-studio.html">View Case Study &rarr;</a>
+            </div>
+
+            <div class="ws-visual ws-visual--phones">
+              <div class="ws-phones-row">
+                <img class="ws-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Summary%20of%20the%20project/Home%20Screen%20Image.png" alt="Stressie home screen" loading="lazy" />
+                <img class="ws-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%201.png" alt="Stressie onboarding" loading="lazy" />
+                <img class="ws-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%202.png" alt="Stressie onboarding 2" loading="lazy" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        </section>
+
+      </div><!-- /s2-glimpse-full -->
+
+      <!-- D: Video + content — EverTutor Live -->
+      <div class="s2-video-section" style="display:none">
+        <div class="s2-video-left">
+          <video autoplay muted loop playsinline preload="auto">
+            <source src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="s2-video-right">
+          <p class="fw-card-eyebrow">1.1 EverTutor Live</p>
+          <h3 class="s2-video-title">First of its kind: a voice-first AI that gives every learner a fully adaptive 1:1 experience, taken from prototype to PMF.</h3>
+          <div class="proj-metrics">
+            <div class="proj-metric">
+              <span class="proj-metric-val">2000+</span>
+              <span class="proj-metric-lbl">Everyday Sessions</span>
+            </div>
+            <div class="proj-metric">
+              <span class="proj-metric-val">Proven 2x</span>
+              <span class="proj-metric-lbl">Performance Gain</span>
+            </div>
+            <div class="proj-metric">
+              <span class="proj-metric-val">$250&nbsp;&rarr;&nbsp;$5/hr</span>
+              <span class="proj-metric-lbl">Cost of 1:1 Support</span>
+            </div>
+          </div>
+          <a class="proj-cta" href="evertutor-live.html">View Case Study &rarr;</a>
+        </div>
       </div>
 
-      <!-- the rail: one tick per project, the three EverTutor tools bracketed
-           together so the chapter is visible before you have read a word.
-           JS fills it from the slides so the two can never disagree. -->
-      <nav class="gal-ticks" id="galTicks" aria-label="Projects"></nav>
+      </div><!-- /s2-work-container -->
 
-    </div>
-  </section>
+      </section><!-- /s2-section-wrap -->
 
   <!-- ── 03 — ABOUT: the T ─────────────────────────────────────────────── -->
   <section class="tc-sec" id="aboutSection">
@@ -2636,219 +3595,6 @@ var topNav = document.getElementById('topNav');
   window.__lenis = lenis;                     /* verify/debug hook */
 })();
 
-/* ── the gallery ─────────────────────────────────────────────────────────
-   Retired. The pinned reel — its ScrollTrigger pin, the react-spring port
-   that carried it, the tick rail and the per-project paint — has been
-   replaced by the helix in spiral-gallery/spiral.js, which owns its own
-   scene, its own input and its own grid view. What is left of this section
-   in JS is the stacked column below, which is still the narrow-screen path. */
-
-/* ── the rail arrives ──
-   Narrow-screen path only: the cards lift in on first sight, staggered by
-   index. The gallery never uses this — it owns its own crossfade. */
-(function () {
-  var stage = document.getElementById('galStage');
-  if (!stage) return;
-  var items = [].slice.call(stage.querySelectorAll('.slide'));
-  items.forEach(function (el, i) { el.style.setProperty('--i', i); });
-
-  /* no observer, no reveal — and the cards were visible all along */
-  if (!('IntersectionObserver' in window)) return;
-  stage.classList.add('is-live');           /* only now is hiding them safe */
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      stage.classList.add('revealed');
-      io.disconnect();
-    });
-  }, { threshold: 0.08 });
-  io.observe(stage);
-})();
-
-/* ── a video only replaces its poster once it is genuinely running ──
-   Both paths (the reel's active plane, and the stacked column's on-screen
-   card) call play(); this is what decides when the frame is safe to show, so
-   a slow or refused decode leaves the designed thumbnail in place instead of
-   a black rectangle. */
-[].forEach.call(document.querySelectorAll('.slide-vid'), function (v) {
-  v.addEventListener('playing', function () { v.classList.add('is-playing'); });
-  v.addEventListener('pause',   function () { v.classList.remove('is-playing'); });
-  v.addEventListener('error',   function () { v.classList.remove('is-playing'); });
-});
-
-/* ── the system's ring ──
-   Eighty ticks around the EverTutor orb, each one breathing on its own phase
-   and speed so the ring reads as a voice rather than a spinner. Ported from
-   the earlier version of this section. It only runs while it is on screen,
-   it holds still when the talk panel has the page frozen, and under reduced
-   motion it never starts — the markup already has the ticks at an even
-   height, so the ring is simply a ring. */
-(function () {
-  var svg = document.querySelector('.sys-wave');
-  if (!svg) return;
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  var lines = [].slice.call(svg.querySelectorAll('line'));
-  var N = lines.length, cx = 170, cy = 170, r = 120;
-  var angles = lines.map(function (_, i) { return (i / N) * 2 * Math.PI - Math.PI / 2; });
-  var phases = lines.map(function () { return Math.random() * Math.PI * 2; });
-  var speeds = lines.map(function () { return 0.6 + Math.random() * 1.0; });
-  var running = false, t0 = null, raf = 0;
-
-  function height(i, t) {
-    var h = 9 * Math.sin(t * speeds[i]) * Math.cos(phases[i])
-          + 9 * Math.cos(t * speeds[i]) * Math.sin(phases[i])
-          + 4 * Math.sin(t * speeds[i] * 1.8 + phases[i] + 1.3)
-          + 2 * Math.sin(t * speeds[i] * 2.7 + phases[i] + 0.7);
-    return Math.max(3, Math.min(26, 12 + h));
-  }
-
-  function frame(ts) {
-    if (!running) return;
-    if (document.documentElement.classList.contains('talk-open')) { raf = requestAnimationFrame(frame); return; }
-    if (t0 === null) t0 = ts;
-    var t = (ts - t0) / 1000;
-    for (var i = 0; i < N; i++) {
-      var a = angles[i], half = height(i, t) / 2, ln = lines[i];
-      ln.setAttribute('x1', (cx + (r - half) * Math.cos(a)).toFixed(2));
-      ln.setAttribute('y1', (cy + (r - half) * Math.sin(a)).toFixed(2));
-      ln.setAttribute('x2', (cx + (r + half) * Math.cos(a)).toFixed(2));
-      ln.setAttribute('y2', (cy + (r + half) * Math.sin(a)).toFixed(2));
-    }
-    raf = requestAnimationFrame(frame);
-  }
-
-  function run(on) {
-    if (on === running) return;
-    running = on;
-    if (on) { t0 = null; raf = requestAnimationFrame(frame); }
-    else cancelAnimationFrame(raf);
-  }
-
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (es) {
-      es.forEach(function (e) { run(e.isIntersecting); });
-    }, { threshold: 0.05 }).observe(svg);
-  } else run(true);
-})();
-
-/* ── the stacked cards play themselves ──
-   The gallery owns playback for its own active plane (it runs earlier in this
-   file, so .gal-ready is already settled here). Everywhere else — the stacked
-   column on phones and tablets — a card plays while it is on screen and stops
-   when it leaves, so you never scroll past a still thumbnail and never leave
-   six decoders running behind you. */
-(function () {
-  if (document.querySelector('.spiral-root.is-live')) return;   /* the helix owns playback */
-  var vids = [].slice.call(document.querySelectorAll('.slide-vid'));
-  if (!vids.length) return;
-
-  if (!('IntersectionObserver' in window)) {
-    vids.forEach(function (v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); });
-    return;
-  }
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      var v = e.target;
-      if (e.isIntersecting) {
-        var p = v.play();
-        if (p && p.catch) p.catch(function () {});
-      } else if (!v.paused) {
-        v.pause(); v.currentTime = 0;
-      }
-    });
-  }, { threshold: 0.45 });
-  vids.forEach(function (v) { io.observe(v); });
-})();
-
-/* ── image trail — photos reveal one after another along the cursor path ── */
-(function () {
-  var layer = document.getElementById('trail');
-  if (!layer) return;
-  var SRCS = ['photos/pic-pitch-win.jpg', 'photos/pic-conference.jpg', 'photos/pic-pitch-self.jpg',
-              'photos/pic-future.jpg', 'photos/pic-check.jpg', 'photos/pic-evertutor.jpg',
-              'photos/pic-stressie.jpg'];
-  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var fine = matchMedia('(pointer:fine)').matches;
-
-  /* touch or reduced motion → four calm frames in the corners instead */
-  if (reduced || !fine) {
-    var SPOTS = [
-      { left: '5%',  top: '15%',    r: -5 }, { right: '6%',  top: '12%',    r: 4 },
-      { left: '13%', bottom: '14%', r: 5 },  { right: '12%', bottom: '12%', r: -3 }
-    ];
-    layer.classList.add('static');
-    SPOTS.forEach(function (spot, i) {
-      var d = document.createElement('div'); d.className = 'trail-img';
-      if (spot.left) d.style.left = spot.left; if (spot.right) d.style.right = spot.right;
-      if (spot.top) d.style.top = spot.top; if (spot.bottom) d.style.bottom = spot.bottom;
-      d.style.transform = 'rotate(' + spot.r + 'deg)';
-      var im = document.createElement('img'); im.src = SRCS[i]; im.alt = '';
-      d.appendChild(im); layer.appendChild(d);
-    });
-    return;
-  }
-
-  SRCS.forEach(function (s) { var im = new Image(); im.src = s; });   // warm the cache
-
-  var hero = document.querySelector('.hero');
-  var chatEl = document.getElementById('chat');
-  var idx = 0, lastX = -1e4, lastY = -1e4;
-  var GAP = 215;                                    // px of cursor travel between reveals
-  var MAX = 7;                                      // concurrent frames cap
-  var stackTop = 0;                                 // every frame lands above the one before it
-
-  hero.addEventListener('mousemove', function (e) {
-    if (chatEl.classList.contains('open')) return;
-    var dx = e.clientX - lastX, dy = e.clientY - lastY;
-    if (dx * dx + dy * dy < GAP * GAP) return;
-    lastX = e.clientX; lastY = e.clientY;
-    var rect = hero.getBoundingClientRect();
-    spawn(e.clientX - rect.left, e.clientY - rect.top, dx);
-  }, { passive: true });
-
-  /* Frames hold perfectly still — they only fade and sharpen in place. Two
-     things make the stack read correctly: every new frame is given a higher
-     z-index than the last, so the second photo is always over the first no
-     matter how the DOM churns underneath; and when the cap is reached the
-     oldest frame is retired with its own short fade instead of being cut
-     out of the document mid-animation, which is what made the trail snap. */
-  function retire(el) {
-    if (el.dataset.going) return;
-    el.dataset.going = '1';
-    var out = el.animate(
-      [{ opacity: getComputedStyle(el).opacity, filter: 'blur(0px)' },
-       { opacity: 0, filter: 'blur(5px)' }],
-      { duration: 260, fill: 'forwards', easing: 'cubic-bezier(0.5,0,0.85,0.4)' });
-    out.onfinish = function () { el.remove(); };
-  }
-
-  function spawn(x, y, dx) {
-    var el = document.createElement('div'); el.className = 'trail-img';
-    var im = document.createElement('img'); im.src = SRCS[idx]; im.alt = '';
-    idx = (idx + 1) % SRCS.length;
-    el.appendChild(im);
-    el.style.left = x + 'px'; el.style.top = y + 'px';
-    el.style.zIndex = ++stackTop;                   /* newest always on top */
-    var rot = Math.max(-7, Math.min(7, dx * 0.05));
-    el.style.transform = 'translate(-50%,-50%) rotate(' + rot + 'deg)';
-
-    /* over the cap: fade the oldest still-living frame out rather than
-       yanking it, so nothing ever disappears in a single frame */
-    var living = [].filter.call(layer.children, function (n) { return !n.dataset.going; });
-    while (living.length >= MAX) retire(living.shift());
-    layer.appendChild(el);
-
-    var anim = el.animate([
-      { opacity: 0, filter: 'blur(6px)' },
-      { opacity: 1, filter: 'blur(0px)', offset: .18 },
-      { opacity: 1, filter: 'blur(0px)', offset: .72 },
-      { opacity: 0, filter: 'blur(4px)' }
-    ], { duration: 1900, fill: 'forwards', easing: 'ease-in-out' });
-    anim.onfinish = function () { el.remove(); };
-  }
-})();
-
 /* ═══ SPEECH-TO-TEXT on the input ═══ */
 var micBtn = document.getElementById('micBtn');
 var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -3551,34 +4297,6 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
      way everything else on this page is. spiral.js reads window.S2_PROJECT_DATA
      for its grid copy and takes its media from its own internal list. -->
 <script>
-window.S2_PROJECT_DATA = [
-  { tab:'EverTutor', title:'EverTutor AI System',
-    desc:"The world's first multimodal, voice-first AI tutor — three tools working as one system to put a tutor beside every learner.",
-    metrics:[{val:'2,000+',lbl:'Active Learners'},{val:'3 Tools',lbl:'One System'},
-             {val:'$500k+',lbl:'ARR as Sole Designer'},{val:'−96%',lbl:'Workflow Time'}],
-    tags:['Shipped'], iconTags:[], href:'#' },
-  { tab:'ET Live', title:'EverTutor Live',
-    desc:'A voice-first AI tutor that gives every learner a fully adaptive 1:1 session — taken from prototype to product-market fit.',
-    metrics:[{val:'$250→$5/hr',lbl:'1:1 Tutor Cost'},{val:'2×',lbl:'Performance Gain'},
-             {val:'2,000+',lbl:'Daily Sessions'}],
-    tags:['Shipped','B2C','Voice'], iconTags:[], href:'evertutor-live.html' },
-  { tab:'ET Studio', title:'EverTutor Studio',
-    desc:'The authoring environment behind Live — where educators shape, test and ship a tutor’s curriculum without ever writing a prompt.',
-    metrics:[{val:'100+ hrs → 4',lbl:'Per Lesson'},{val:'12',lbl:'Schools'},{val:'8',lbl:'Districts'}],
-    tags:['Shipped','B2B · EdTech'], iconTags:[], href:'evertutor-studio.html' },
-  { tab:'ET Analytics', title:'EverTutor Analytics',
-    desc:'The measurement layer — how a team sees what a learner actually struggled with, session by session, without drowning in transcripts.',
-    metrics:[{val:'Real-time',lbl:'Insight'},{val:'For educators',lbl:'Built'}],
-    tags:['Shipped','Data'], iconTags:[], href:'#' },
-  { tab:'Stressie', title:'Stressie',
-    desc:'From pilot research to a Harvard-incubated product — a full redesign of workplace stress management, now live at Amazon and InKind.',
-    metrics:[{val:'17.4%',lbl:'Engagement'},{val:'2',lbl:'Live Pilots'},{val:'Harvard',lbl:'Innovation Labs'}],
-    tags:['Shipped','B2B'], iconTags:[], href:'stressie-studio.html' },
-  { tab:'Dearly', title:'Dearly',
-    desc:'Animated handwriting with your real voice and photos, sent as a unique link — a quieter way to keep the people who matter close.',
-    metrics:[{val:'140',lbl:'Letters Written'},{val:'48 hrs',lbl:'Built In'}],
-    tags:['Shipped','Consumer'], iconTags:[], href:'https://dearly-rho.vercel.app' },
-];
 
 /* The helix is the wide, pointer-driven, motion-ok path only. Stripping the
    id before spiral.js runs is what keeps it from ever initialising a WebGL
@@ -3606,7 +4324,7 @@ addEventListener('load', function () {
   var root = document.getElementById('spiral-root');
   if (!root || !root.hasAttribute('data-driven')) return;
   if (!(window.gsap && window.ScrollTrigger)) return;
-  var pin = document.getElementById('workPin');
+  var pin = document.getElementById('s2Section');   /* the ported section's own id */
   if (!pin) return;
 
   gsap.registerPlugin(ScrollTrigger);
@@ -3626,6 +4344,564 @@ addEventListener('load', function () {
   addEventListener('resize', function () { ScrollTrigger.refresh(); });
 });
 </script>
+<script>
+/* ── SECTION 2 — the shipping behaviour from index.html ────────────────
+   Scroll animations, the spiral/list toggle, the project bar and its
+   data, lifted unchanged. It defines window.S2_PROJECT_DATA, which
+   spiral.js reads for its grid copy. */
+  /* ── Section 2: Featured Work scroll animations ──────────────────────
+     A: "Featured Work" title fades in as it enters viewport
+     B: Full ET Glimpse scrolls in (normal flow), fades out as it exits
+     C: Compact strip (position:sticky) + fw-cards revealed sequentially
+  ──────────────────────────────────────────────────────────────────── */
+  (function () {
+    var fwHeader    = document.getElementById('s2FwHeader');
+    var glimpseFull = document.getElementById('s2GlimpseFull');
+    var cards       = Array.from(document.querySelectorAll('.fw-card'));
+
+    if (!fwHeader) return;
+
+    /* ── Initial card states ── */
+    cards.forEach(function (c) {
+      c.style.opacity   = '0';
+      c.style.transform = 'translateY(40px)';
+    });
+
+    var fwHDone   = false;
+    var revealed  = cards.map(function () { return false; });
+
+    function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+    function easeOut(t) { return 1 - (1 - t) * (1 - t); }
+
+    function update() {
+      var vpH = window.innerHeight;
+
+      /* A: FW title fade-in */
+      if (!fwHDone) {
+        var hr = fwHeader.getBoundingClientRect();
+        if (hr.top < vpH * 0.82) {
+          fwHDone = true;
+          fwHeader.classList.add('s2-fwh-in');
+        }
+      }
+
+      /* B: Full glimpse fades out as it exits viewport upward */
+      if (glimpseFull) {
+        var gr     = glimpseFull.getBoundingClientRect();
+        var fadeStart = vpH * 0.5;   /* start fading when top hits mid-screen */
+        var fadeEnd   = -80;          /* fully gone when 80px above viewport   */
+        if (gr.top < fadeStart) {
+          var p = clamp((fadeStart - gr.top) / (fadeStart - fadeEnd), 0, 1);
+          glimpseFull.style.opacity = easeOut(p) > 0.98 ? '0' : (1 - easeOut(p)).toFixed(3);
+        } else {
+          glimpseFull.style.opacity = '';
+        }
+      }
+
+      /* C: Cards reveal one-by-one as they enter viewport */
+      cards.forEach(function (card, i) {
+        if (revealed[i]) return;
+        var r = card.getBoundingClientRect();
+        if (r.top < vpH * 0.88) {
+          revealed[i] = true;
+          card.style.transition = 'opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1)';
+          /* stagger: each card a little after previous */
+          setTimeout(function () {
+            card.style.opacity   = '1';
+            card.style.transform = 'translateY(0)';
+          }, i * 120);
+        }
+      });
+    }
+
+    var raf = false;
+    function onScroll() {
+      if (!raf) { raf = true; requestAnimationFrame(function () { raf = false; update(); }); }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    update();
+  })();
+
+
+  /* ── Section 2: SPIRAL / LIST toggle wiring ──────────────────────────── */
+  (function () {
+    var spiralRoot = document.getElementById('spiral-root');
+    var spiralBtn  = document.getElementById('s2SpiralBtn');
+    var listBtn    = document.getElementById('s2ListBtn');
+    var thumb      = document.querySelector('.s2-vt-thumb');
+    if (!spiralRoot || !spiralBtn || !listBtn) return;
+
+    // Slide the highlight thumb onto whichever button is active.
+    function positionThumb(view) {
+      if (!thumb) return;
+      var active = view === 'spiral' ? spiralBtn : listBtn;
+      thumb.style.width = active.offsetWidth + 'px';
+      thumb.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+    }
+
+    function setView(view) {
+      spiralBtn.classList.toggle('s2-vt-active', view === 'spiral');
+      listBtn.classList.toggle('s2-vt-active',   view === 'list');
+      positionThumb(view);
+      spiralRoot.dispatchEvent(new CustomEvent('s2:setView', { detail: { view: view } }));
+      var isList = view === 'list';
+      ['s2ProjectBar', 's2ProjectTabs', 's2FrontLabel'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.style.visibility = isList ? 'hidden' : '';
+      });
+    }
+
+    spiralBtn.addEventListener('click', function () { setView('spiral'); });
+    listBtn.addEventListener('click',   function () { setView('list');   });
+
+    // Place the thumb under the initially-active button (spiral) without animating
+    // the very first paint, and keep it aligned on resize.
+    function initThumb() {
+      if (!thumb) return;
+      var prev = thumb.style.transition;
+      thumb.style.transition = 'none';
+      positionThumb(spiralBtn.classList.contains('s2-vt-active') ? 'spiral' : 'list');
+      void thumb.offsetWidth;            // flush so the next change animates
+      thumb.style.transition = prev || '';
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initThumb);
+    } else {
+      initThumb();
+    }
+    window.addEventListener('resize', function () {
+      var prev = thumb && thumb.style.transition;
+      if (thumb) thumb.style.transition = 'none';
+      positionThumb(listBtn.classList.contains('s2-vt-active') ? 'list' : 'spiral');
+      if (thumb) { void thumb.offsetWidth; thumb.style.transition = prev || ''; }
+    });
+  })();
+
+
+  /* ── Section 2: Project panels + bottom tab strip ────────────────────── */
+  (function () {
+    var S2_DATA = [
+      {
+        tab: 'EverTutor',
+        title: '1). EverTutor AI System',
+        badge: '(Next 3 Projects)',
+
+        metrics: [
+          { val: '2000+', lbl: 'Daily Active Users' },
+          { val: '3 Tools',  lbl: 'Working as One System' },
+          { val: '$500k+', lbl: 'As Sole Designer'   },
+          { val: '-96%',  lbl: 'Content Creation Time Cut' }
+        ],
+        tags: ['Shipped'],
+        iconTags: [
+          { icon: 'profile', label: 'Sole Product Designer' },
+          { icon: 'thunder', label: '0 to 1' },
+          { icon: 'mic',     label: 'Voice AI' }
+        ],
+        desc: "World's first multi modal voice 1st AI tutor powered by 3 tools working as one system.",
+        href: '#'
+      },
+      {
+        tab: 'ET Live',
+        title: '1.1 EverTutor Live',
+
+        metrics: [
+          { val: '$250→$5/hr', lbl: '1:1 Tutor Cost'   },
+          { val: '2×',  lbl: 'Proven Mastery'     },
+          { val: '85%', lbl: 'Session Completion' }
+        ],
+        tags: ['Shipped', 'B2C', 'Multi Model Interaction', 'Designing for Voice'],
+        iconTags: [
+          { icon: 'profile', label: 'Sole Product Designer' },
+          { icon: 'thunder', label: '0 to 1' },
+          { icon: 'mic',     label: 'Voice AI' }
+        ],
+        desc: 'Scaled one-to-one learning support by shaping a voice-native AI experience, from an early concept to product-market fit.',
+        href: 'evertutor-live.html'
+      },
+      {
+        tab: 'ET Studio',
+        title: 'EverTutor Studio',
+
+        metrics: [
+          { val: '104→4hrs', lbl: 'Per Lesson' },
+          { val: '12',       lbl: 'Schools'    },
+          { val: '8',        lbl: 'Districts'  }
+        ],
+        tags: ['Shipped', 'Content Creation', 'AI Tools', 'B2B · EdTech'],
+        iconTags: [
+          { icon: 'profile', label: 'Sole Product Designer' },
+          { icon: 'thunder', label: '0 to 1' }
+        ],
+        desc: 'Lesson creation tool designed overnight. Cut content production from 104 hours down to 4.',
+        href: 'evertutor-studio.html'
+      },
+      {
+        tab: 'ET Analytics',
+        title: 'EverTutor Analytics',
+
+        metrics: [
+          { val: 'Live',    lbl: 'In Production' },
+          { val: 'Dog-ear', lbl: 'System'        },
+          { val: '0',       lbl: 'Extra Clicks'  }
+        ],
+        tags: ['Shipped', 'Data Visualization', 'Real-time', 'B2B Dashboard'],
+        iconTags: [
+          { icon: 'profile', label: 'Sole Product Designer' },
+          { icon: 'thunder', label: '0 to 1' }
+        ],
+        desc: 'Real-time student insights. The dog-ear system: complexity on demand, clean by default.',
+        href: '#'
+      },
+      {
+        tab: 'Stressie',
+        title: 'Stressie',
+
+        metrics: [
+          { val: '17.4%', lbl: 'Engagement Rate'    },
+          { val: '$600k', lbl: 'Funding'             },
+          { val: 'Amazon', lbl: '& InKind Live'      }
+        ],
+        tags: ['Shipped', 'Wellness App', 'Harvard-incubated', 'B2B SaaS'],
+        iconTags: [
+          { icon: 'profile', label: 'Founding Designer' },
+          { icon: 'thunder', label: '0 to 1' }
+        ],
+        desc: 'Harvard-incubated workplace stress app. Full redesign: engagement hit 17.4% vs ~2% industry average.',
+        href: 'stressie-studio.html'
+      },
+      {
+        tab: 'Dearly',
+        title: 'Dearly',
+
+        metrics: [
+          { val: '140',  lbl: 'Letters Written' },
+          { val: '35★',  lbl: '5-Star Ratings'  },
+          { val: '48hrs', lbl: 'Built In'        }
+        ],
+        tags: ['Shipped', 'Animated Messages', 'Voice', 'Consumer App'],
+        iconTags: [
+          { icon: 'profile', label: 'Sole Product Designer' },
+          { icon: 'thunder', label: '0 to 1' },
+          { icon: 'mic',     label: 'Voice' }
+        ],
+        desc: 'Animated handwriting with your real voice and photos, sent as a unique link. Built in 48 hours.',
+        href: '#'
+      },
+      {
+        tab: 'The Engine',
+        title: 'The Engine',
+        metrics: [
+          { val: 'Brand', lbl: '& Art Direction' },
+          { val: 'Landing', lbl: 'Page' }
+        ],
+        tags: ['Shipped', 'Marketing Site'],
+        iconTags: [],
+        desc: 'Designed the landing page for an AI growth platform that runs content, marketing and sales autonomously.',
+        href: 'https://www.theengine.dev/'
+      }
+    ];
+    // Single source of truth for grid-view card content (spiral.js reads this
+    // to avoid duplicating title/desc/metrics/href data).
+    window.S2_PROJECT_DATA = S2_DATA;
+
+    /* Icon set for card.iconTags rows — reused from the EverTutor Glimpse icon pass */
+    var S2_ICON_BASE = 'Parallax cards/EverTutor Glimpse/Portfolio icons SVG/';
+    var S2_ICON_MAP = {
+      profile: { light: S2_ICON_BASE + 'Profile dark theme.svg', dark: S2_ICON_BASE + 'Profile dark theme.svg' },
+      thunder: { light: S2_ICON_BASE + 'Thunder Dark Theme.svg', dark: S2_ICON_BASE + 'Thunder Dark Theme.svg' },
+      mic:     { light: S2_ICON_BASE + 'Mic dark theme.svg',  dark: S2_ICON_BASE + 'Mic dark theme.svg'     }
+    };
+    window.S2_ICON_MAP = S2_ICON_MAP;
+
+    var spiralRoot  = document.getElementById('spiral-root');
+    var tabsList    = document.getElementById('s2TabsList');
+    var projectTabs = document.getElementById('s2ProjectTabs');
+    var projectBar  = document.getElementById('s2ProjectBar');
+    var barTitle    = document.getElementById('s2BarTitle');
+    var barTagsCol  = document.getElementById('s2BarTagsCol');
+    var barTags     = document.getElementById('s2BarTags');
+    var barIconTags = document.getElementById('s2BarIconTags');
+    var barDesc     = document.getElementById('s2BarDesc');
+    var barMetrics  = document.getElementById('s2BarMetrics');
+    var barCta      = document.getElementById('s2BarCta');
+
+    if (!spiralRoot) return;
+
+    /* Build tab buttons (only if tab strip still exists in DOM) */
+    var tabBtns = [];
+    if (tabsList) {
+      S2_DATA.forEach(function (card, i) {
+        if (i > 0) {
+          var sep = document.createElement('div');
+          sep.className = 's2-tabs-divider' + (i === 4 ? ' s2-group-sep' : '');
+          tabsList.appendChild(sep);
+        }
+        var btn = document.createElement('button');
+        btn.className = 's2-tab-btn' + (i === 0 ? ' s2-tab-active' : '');
+        btn.textContent = card.tab;
+        btn.addEventListener('click', function () {
+          spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', { detail: { idx: i } }));
+        });
+        tabsList.appendChild(btn);
+        tabBtns.push(btn);
+      });
+    }
+
+    var currentIdx = 0;
+    var updateTimer = null;
+
+    /* Up / Down nav — use s2:stepCard so the spiral always moves exactly ±1
+       position from wherever it is now, never the long way around the loop. */
+    var navUp = document.getElementById('s2NavUp');
+    var navDn = document.getElementById('s2NavDown');
+    if (navUp) navUp.addEventListener('click', function () {
+      spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: -1 } }));
+    });
+    if (navDn) navDn.addEventListener('click', function () {
+      spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: 1 } }));
+    });
+    var sideNavPrev = document.getElementById('s2SideNavPrev');
+    var sideNavNext = document.getElementById('s2SideNavNext');
+    if (sideNavPrev) sideNavPrev.addEventListener('click', function () {
+      spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: -1 } }));
+    });
+    if (sideNavNext) sideNavNext.addEventListener('click', function () {
+      spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: 1 } }));
+    });
+
+    /* Count a metric value from 0 up to its number, preserving prefix/suffix */
+    function countUpMetric(el, rawVal, delay) {
+      var m = rawVal.match(/^([^0-9]*)(\d+(?:\.\d+)?)(.*)/);
+      if (!m) { el.textContent = rawVal; return; }
+      var pre = m[1], numStr = m[2], suf = m[3];
+      var target = parseFloat(numStr);
+      var decimals = numStr.includes('.') ? numStr.split('.')[1].length : 0;
+      el.textContent = pre + (decimals ? (0).toFixed(decimals) : '0') + suf;
+      setTimeout(function () {
+        var t0 = null, dur = 1100;
+        function step(ts) {
+          if (!t0) t0 = ts;
+          var p = Math.min((ts - t0) / dur, 1);
+          var ease = 1 - Math.pow(1 - p, 3);
+          var cur = target * ease;
+          el.textContent = pre + (decimals ? cur.toFixed(decimals) : Math.round(cur)) + suf;
+          if (p < 1) requestAnimationFrame(step);
+          else el.textContent = pre + numStr + suf;
+        }
+        requestAnimationFrame(step);
+      }, delay);
+    }
+
+    /* Update bar when frontmost card changes */
+    function updatePanels(idx) {
+      var card = S2_DATA[idx];
+      currentIdx = idx;
+
+      tabBtns.forEach(function (b, i) { b.classList.toggle('s2-tab-active', i === idx); });
+
+      /* Slide bar out — removing class resets CSS animations for next entry */
+      if (projectBar) projectBar.classList.remove('s2-bar-in');
+
+      clearTimeout(updateTimer);
+      updateTimer = setTimeout(function () {
+        /* Populate bar content */
+        if (barTitle) {
+          if (card.badge) {
+            barTitle.innerHTML = card.title + '<span class="s2-bar-title-badge">' + card.badge + '</span>';
+          } else {
+            barTitle.textContent = card.title;
+          }
+        }
+
+        if (barTagsCol) {
+          barTagsCol.classList.toggle('s2-bar-tags-col--merged', !!(card.iconTags && card.iconTags.length));
+        }
+
+        if (barTags) {
+          barTags.innerHTML = '';
+          card.tags.forEach(function (t) {
+            var s = document.createElement('span');
+            s.className = 's2-bar-tag';
+            s.textContent = t;
+            barTags.appendChild(s);
+          });
+        }
+
+        if (barIconTags) {
+          barIconTags.innerHTML = '';
+          if (card.iconTags && card.iconTags.length) {
+            barIconTags.style.display = 'flex';
+            card.iconTags.forEach(function (it) {
+              var icons = S2_ICON_MAP[it.icon] || {};
+              var row = document.createElement('div');
+              row.className = 's2-bar-icon-tag';
+              row.innerHTML =
+                '<span class="s2-bar-icon-tag-ic">' +
+                  '<img class="s2-icon-light" src="' + (icons.light || '') + '" alt="" aria-hidden="true">' +
+                  '<img class="s2-icon-dark" src="' + (icons.dark || '') + '" alt="" aria-hidden="true">' +
+                '</span>' +
+                '<span class="s2-bar-icon-tag-lbl">' + it.label + '</span>';
+              barIconTags.appendChild(row);
+            });
+          } else {
+            barIconTags.style.display = 'none';
+          }
+        }
+
+        if (barDesc) barDesc.textContent = card.desc;
+
+        if (barMetrics) {
+          barMetrics.innerHTML = '';
+          card.metrics.forEach(function (m) {
+            var d = document.createElement('div');
+            d.className = 's2-bar-metric';
+            d.innerHTML = '<span class="s2-bar-metric-val"></span>'
+                        + '<span class="s2-bar-metric-lbl">' + m.lbl + '</span>';
+            barMetrics.appendChild(d);
+            /* store raw value for count-up */
+            d.querySelector('.s2-bar-metric-val').dataset.val = m.val;
+          });
+        }
+
+        if (barCta) {
+          barCta.href = card.href;
+          barCta.style.display = card.href === '#' ? 'none' : '';
+        }
+
+        /* Force reflow so animations restart, then slide bar in */
+        if (projectBar) {
+          void projectBar.offsetWidth;
+          projectBar.classList.add('s2-bar-in');
+        }
+
+        /* Count-up each metric value, staggered */
+        if (barMetrics) {
+          var valEls = barMetrics.querySelectorAll('.s2-bar-metric-val');
+          valEls.forEach(function (el, i) {
+            countUpMetric(el, el.dataset.val, 180 + i * 90);
+          });
+        }
+      }, 160);
+    }
+
+    /* Listen for spiral frontmost card changes */
+    window.addEventListener('s2:frontCard', function (e) {
+      updatePanels(e.detail.idx);
+    });
+
+
+    /* Shoot up tab strip when section scrolls into view */
+    var tabsShown = false;
+    var cardsZone = document.getElementById('s2CardsZone');
+    if (cardsZone && projectTabs) {
+      var obs = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting && !tabsShown) {
+          tabsShown = true;
+          obs.disconnect();
+          setTimeout(function () { projectTabs.classList.add('s2-tabs-in'); }, 450);
+        }
+      }, { threshold: 0.25 });
+      obs.observe(cardsZone);
+    }
+
+    /* ── Mobile accordion — always built; CSS shows it only ≤767px.
+       (A load-width guard here left the section empty when a tablet
+       rotated or a window was resized into phone width after load.) ── */
+    (function () {
+      var acc = document.getElementById('s2MobileAccordion');
+      if (!acc) return;
+
+      function buildAccordion() {
+        acc.innerHTML = '';
+        S2_DATA.forEach(function (card, i) {
+          var item = document.createElement('div');
+          item.className = 's2-acc-item' + (i === 0 ? ' s2-acc-open' : '');
+          item.dataset.idx = i;
+
+          /* Tags HTML */
+          var tagsHtml = card.tags.map(function (t) {
+            return '<span class="s2-acc-tag">' + t + '</span>';
+          }).join('');
+
+          /* Metrics HTML */
+          var metricsHtml = card.metrics.map(function (m) {
+            return '<div class="s2-acc-metric">' +
+              '<span class="s2-acc-metric-val">' + m.val + '</span>' +
+              '<span class="s2-acc-metric-lbl">' + m.lbl + '</span>' +
+              '</div>';
+          }).join('');
+
+          var ctaHref = card.href && card.href !== '#' ? card.href : null;
+          var ctaHtml = ctaHref
+            ? '<a class="s2-acc-cta" href="' + ctaHref + '">View Case Study →</a>'
+            : '';
+
+          item.innerHTML =
+            '<button class="s2-acc-header" aria-expanded="' + (i === 0 ? 'true' : 'false') + '">' +
+              '<span class="s2-acc-name">' + card.title + '</span>' +
+              '<svg class="s2-acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+                '<polyline points="6 9 12 15 18 9"/>' +
+              '</svg>' +
+            '</button>' +
+            '<div class="s2-acc-body">' +
+              '<p class="s2-acc-desc">' + card.desc + '</p>' +
+              '<div class="s2-acc-tags">' + tagsHtml + '</div>' +
+              '<div class="s2-acc-metrics">' + metricsHtml + '</div>' +
+              ctaHtml +
+            '</div>';
+
+          acc.appendChild(item);
+        });
+
+        /* Toggle + spiral nav on tap */
+        acc.addEventListener('click', function (e) {
+          var header = e.target.closest('.s2-acc-header');
+          if (!header) return;
+          var item = header.closest('.s2-acc-item');
+          var idx = parseInt(item.dataset.idx, 10);
+          var isOpen = item.classList.contains('s2-acc-open');
+
+          /* Close all */
+          acc.querySelectorAll('.s2-acc-item').forEach(function (el) {
+            el.classList.remove('s2-acc-open');
+            var h = el.querySelector('.s2-acc-header');
+            if (h) h.setAttribute('aria-expanded', 'false');
+          });
+
+          /* Open tapped item (toggle off if already open) */
+          if (!isOpen) {
+            item.classList.add('s2-acc-open');
+            header.setAttribute('aria-expanded', 'true');
+          }
+
+          /* Sync spiral to this card */
+          if (spiralRoot) {
+            spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', { detail: { idx: idx } }));
+          }
+        });
+      }
+
+      buildAccordion();
+
+      /* Keep accordion in sync when spiral fires frontCard events */
+      window.addEventListener('s2:frontCard', function (e) {
+        var idx = e.detail.idx;
+        acc.querySelectorAll('.s2-acc-item').forEach(function (el, i) {
+          var open = i === idx;
+          el.classList.toggle('s2-acc-open', open);
+          var h = el.querySelector('.s2-acc-header');
+          if (h) h.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+      });
+    })();
+
+    /* Init with card 0 */
+    setTimeout(function () { updatePanels(0); }, 900);
+  })();
+</script>
+
 <script src="vendor/three.min.js"></script>
 <!-- the ?v= is a cache-bust: this file is edited often and browsers hold on
      to it hard. Bump it whenever spiral.js changes. -->
