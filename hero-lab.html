@@ -513,6 +513,15 @@
   .slide-media::after{content:'';position:absolute;inset:0;pointer-events:none;
     background:rgba(8,8,7,.8);opacity:0;transition:opacity .5s ease;}
   .slide-media:has(.slide-vid.is-playing)::after{opacity:1;}
+  /* A portrait recording leaves most of a 16:9 frame empty, and a black scrim
+     behind it reads as a hole. Stressie gets its own bed instead — the
+     product's warm landscape, so the phone sits on something rather than in
+     front of nothing. */
+  .slide-media[data-bed="stressie"]:has(.slide-vid.is-playing)::after{
+    background:
+      radial-gradient(120% 85% at 50% 118%, #A8391A 0%, transparent 62%),
+      radial-gradient(90% 65% at 22% -8%, #F2AE72 0%, transparent 58%),
+      linear-gradient(180deg,#E4834C 0%,#CE6330 44%,#9E3A18 100%);}
   /* it swings up from below, tilted back on X and slightly small, then
      settles level and opaque over the darkened still */
   /* Sized to the video's own shape, not to a share of the frame. At a fixed
@@ -1812,7 +1821,7 @@
           </article>
 
         <article class="slide">
-          <div class="slide-media">
+          <div class="slide-media" data-bed="stressie">
             <img src="images/card-stressie.webp" alt="Stressie" width="760" height="428" loading="lazy">
             <video class="slide-vid" src="images/stressie.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
           </div>
