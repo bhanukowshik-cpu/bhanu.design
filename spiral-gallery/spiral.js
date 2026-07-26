@@ -19,18 +19,18 @@
 
     // ── Cards ─────────────────────────────────────────────────────────────
     var CARDS = [
-      { label: 'EverTutor',    img: '/images/blob.png',              video: null                       },
-      { label: 'ET Live',      img: '/images/card-et-live.png',      video: '/images/et-live.mp4'      },
-      { label: 'ET Studio',    img: '/images/card-et-studio.png',    video: '/images/et-studio.mp4'    },
-      { label: 'ET Analytics', img: '/images/card-et-analytics.png', video: '/images/et-analytics.mp4' },
-      { label: 'Stressie',     img: '/images/card-stressie.png',     video: '/images/stressie.mp4', portrait: true },
-      { label: 'Dearly',       img: '/images/card-dearly.png',       video: '/images/dearly.mp4'       },
+      { label: 'EverTutor',    img: 'images/blob.png',              video: null                       },
+      { label: 'ET Live',      img: 'images/card-et-live.png',      video: 'images/et-live.mp4'      },
+      { label: 'ET Studio',    img: 'images/card-et-studio.png',    video: 'images/et-studio.mp4'    },
+      { label: 'ET Analytics', img: 'images/card-et-analytics.png', video: 'images/et-analytics.mp4' },
+      { label: 'Stressie',     img: 'images/card-stressie.png',     video: 'images/stressie.mp4', portrait: true },
+      { label: 'Dearly',       img: 'images/card-dearly.png',       video: 'images/dearly.mp4'       },
+      { label: 'The Engine',   img: 'images/card-engine.png',       video: null                       },
     ];
-    // 3 copies instead of 2 — fills more of the frame and pushes the modulo
-    // wrap-around point (where a mesh's position resets) much farther from
-    // the visible front region, so the reset happens somewhere already faded
-    // out rather than in view.
-    var LOOP_COPIES = 3;
+    // One pass, not a loop. This used to run three concatenated copies so the
+    // modulo wrap happened off-screen; there is no wrap to hide now — seven
+    // projects with a first and a last, and the scroll stops at both.
+    var LOOP_COPIES = 1;
     var allCards = [];
     for (var lc = 0; lc < LOOP_COPIES; lc++) allCards = allCards.concat(CARDS);
 
@@ -38,7 +38,7 @@
     // exposed by the inline script in index.html) so title/desc/metrics/href have a
     // single source of truth shared with the spiral. Media (img/video) still comes
     // from CARDS above — both arrays share the same 6-item order.
-    var POSTERS = [null, '/images/et-live.png', '/images/et-studio.png', '/images/et-analytics.png', null, '/images/dearly.png'];
+    var POSTERS = [null, 'images/et-live.png', 'images/et-studio.png', 'images/et-analytics.png', null, 'images/dearly.png', null];
     var S2_SOURCE = window.S2_PROJECT_DATA || [];
     var GRID_CARDS = CARDS.map(function (c, i) {
       var d = S2_SOURCE[i] || {};
@@ -312,8 +312,10 @@ void main() {
             uniforms[idx].uImageSizes.value.set(w, h);
           });
         });
-      } else {
-        // EverTutor (no video): animated canvas — white bg + blob-light + waveform
+      } else if (ci === 0) {
+        // EverTutor only: animated canvas — blob + waveform, drawn per frame.
+        // This branch used to catch every card without a video, which meant
+        // The Engine was handed the blob canvas and its own art never loaded.
         videoEls.push(null);
 
         blobAnimCanvas        = document.createElement('canvas');
@@ -322,7 +324,7 @@ void main() {
         blobAnimCtx           = blobAnimCanvas.getContext('2d');
 
         blobAnimImg     = new Image();
-        blobAnimImg.src = '/images/blob-dark.png';
+        blobAnimImg.src = 'images/blob-dark.png';
 
         blobAnimTex           = new THREE.CanvasTexture(blobAnimCanvas);
         blobAnimTex.minFilter = THREE.LinearFilter;
@@ -331,6 +333,20 @@ void main() {
           uniforms[idx].uTexture.value = blobAnimTex;
           uniforms[idx].uImageSizes.value.set(800, 450);
         });
+      } else {
+        // No video, not the blob — just its own still, the way a card with a
+        // video shows its thumbnail.
+        videoEls.push(null);
+        loader.load(card.img, function (tex) {
+          tex.minFilter = THREE.LinearFilter;
+          tex.magFilter = THREE.LinearFilter;
+          var w = (tex.image && (tex.image.naturalWidth  || tex.image.width))  || 1280;
+          var h = (tex.image && (tex.image.naturalHeight || tex.image.height)) || 720;
+          copyIdxs.forEach(function (idx) {
+            uniforms[idx].uTexture.value = tex;
+            uniforms[idx].uImageSizes.value.set(w, h);
+          });
+        });
       }
     });
 
@@ -338,7 +354,15 @@ void main() {
     var wheelDeltaY       = 0;
     var targetWheelDeltaY = 0;
     var wheelDirection    = 1;
-    var scrollOffset      = totalCount - (centerIndex + 2);  // positions EverTutor (index 0) at the visually-forward B=2 slot
+    // The travel is bounded: SCROLL_MIN puts the first project at the front
+    // slot (B=2), SCROLL_MAX puts the last one there. Nothing past either end.
+    var SCROLL_MIN        = -(centerIndex + 2);
+    var SCROLL_MAX        = totalCount - 1 - centerIndex - 2;
+    var scrollOffset      = SCROLL_MIN;
+    function clampScroll() {
+      if (scrollOffset < SCROLL_MIN) { scrollOffset = SCROLL_MIN; wheelDeltaY = 0; targetWheelDeltaY = 0; }
+      if (scrollOffset > SCROLL_MAX) { scrollOffset = SCROLL_MAX; wheelDeltaY = 0; targetWheelDeltaY = 0; }
+    }
     var entryTriggered    = false;
     var ENTRY_SPEED       = 0.6;     // initial spin speed on section enter (one full card cycle)
     var SLOW_DRIFT        = 0.00025; // gentle continuous forward drift after entry settles — halved again, still felt too fast
@@ -347,6 +371,10 @@ void main() {
     // outer 20% on each side lets the wheel event pass through untouched so
     // the page scrolls normally (e.g. on to the next section).
     el.addEventListener('wheel', function (e) {
+      /* When the host pins the section and feeds progress in, it owns the
+         travel — and the wheel must NOT preventDefault, or the pin can never
+         advance and the page locks up inside the section. */
+      if (el.hasAttribute('data-driven')) return;
       var rect       = el.getBoundingClientRect();
       var xRatio     = (e.clientX - rect.left) / rect.width;
       var inHelixZone = xRatio >= 0.2 && xRatio <= 0.8;
@@ -573,6 +601,16 @@ void main() {
     var snapTarget       = 0;      // snap EverTutor to the front on load
     var snapRawTarget    = null;   // step-nav: snap to exact scrollOffset value
 
+    /* 0..1 from the host's pin, mapped onto the bounded travel. Stored as a
+       target rather than applied directly so the ticker can ease into it —
+       scroll progress arrives in steps and would otherwise read as stutter. */
+    var externalTarget = null;
+    el.addEventListener('s2:scrollTo', function (e) {
+      var t = Math.max(0, Math.min(1, e.detail.progress));
+      externalTarget = SCROLL_MIN + (SCROLL_MAX - SCROLL_MIN) * t;
+      snapTarget = null; snapRawTarget = null;
+    });
+
     el.addEventListener('s2:goToCard', function (e) {
       snapTarget    = e.detail.idx;
       snapRawTarget = null;
@@ -581,7 +619,7 @@ void main() {
     // Step ±1 from the current position — avoids the "long way around" bug
     // that occurs when s2:goToCard picks the nearest looped copy by abs distance.
     el.addEventListener('s2:stepCard', function (e) {
-      snapRawTarget = Math.round(scrollOffset) + e.detail.dir;
+      snapRawTarget = Math.max(SCROLL_MIN, Math.min(SCROLL_MAX, Math.round(scrollOffset) + e.detail.dir));
       snapTarget    = null;
     });
 
@@ -662,8 +700,7 @@ void main() {
         targetWheelDeltaY  = 0;
         if (Math.abs(diff) < 0.01) { scrollOffset = snapRawTarget; snapRawTarget = null; }
       } else if (snapTarget !== null) {
-        var base    = snapTarget - centerIndex - 2;
-        var desired = base + Math.round((scrollOffset - base) / totalCount) * totalCount;
+        var desired = Math.max(SCROLL_MIN, Math.min(SCROLL_MAX, snapTarget - centerIndex - 2));
         var diff    = desired - scrollOffset;
         scrollOffset      += diff * 0.1;
         wheelDeltaY        = 0;
@@ -671,10 +708,20 @@ void main() {
         if (Math.abs(diff) < 0.01) { scrollOffset = desired; snapTarget = null; }
       }
 
-      // Scroll physics
-      wheelDeltaY       += (targetWheelDeltaY - wheelDeltaY) * 0.1;
-      scrollOffset      += wheelDeltaY;
-      targetWheelDeltaY *= 0.9;
+      // Scroll physics — or the host's, when it is driving
+      if (externalTarget !== null) {
+        var prevOffset = scrollOffset;
+        scrollOffset  += (externalTarget - scrollOffset) * 0.12;
+        clampScroll();
+        // the shader's bend reads velocity, so hand it the real frame delta
+        wheelDeltaY       = scrollOffset - prevOffset;
+        targetWheelDeltaY = 0;
+      } else {
+        wheelDeltaY       += (targetWheelDeltaY - wheelDeltaY) * 0.1;
+        scrollOffset      += wheelDeltaY;
+        clampScroll();
+        targetWheelDeltaY *= 0.9;
+      }
       // Once entry animation has fired, floor the speed so the helix never
       // fully stops — it keeps a very slow continuous forward rotation once
       // scroll input has actually decayed to near-zero. Must check magnitude,
@@ -682,9 +729,9 @@ void main() {
       // directly was also true for any negative (upward-scroll) value,
       // snapping it back to positive every frame and fighting upward scroll
       // input almost immediately — that was the "scrolling up feels harder" bug.
-      if (entryTriggered && snapTarget === null && !isHovered && Math.abs(targetWheelDeltaY) < SLOW_DRIFT) {
-        targetWheelDeltaY = SLOW_DRIFT;
-      }
+      /* No perpetual drift any more: a bounded list that keeps creeping just
+         parks itself against the far end and sits there. It rests where the
+         reader left it. */
 
       // Hover raycast — front faces only
       raycaster.setFromCamera(mouse, camera);
@@ -704,7 +751,6 @@ void main() {
         hoverProgress[i] = lerp(hoverProgress[i], hoverTarget[i], hovEase);
 
         var N = i - scrollOffset;
-        N = ((N % totalCount) + totalCount) % totalCount;
         var B = N - centerIndex;
 
         var flyDir = (hiddenTarget[i] > 0 ? 1.5 : -1.5) * CARD_SCALE;
@@ -758,7 +804,6 @@ void main() {
       allCards.forEach(function (_, i) {
         if (hiddenTarget[i] > 0) return;
         var N = i - scrollOffset;
-        N = ((N % totalCount) + totalCount) % totalCount;
         var B = N - centerIndex;
         if (Math.abs(B - 2) < fcMinB) { fcMinB = Math.abs(B - 2); fcFront = i; }
       });

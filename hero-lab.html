@@ -3589,12 +3589,47 @@ window.S2_PROJECT_DATA = [
   var ok = innerWidth >= 901 &&
            matchMedia('(pointer:fine)').matches &&
            !matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (ok) root.classList.add('is-live');
-  else root.removeAttribute('id');
+  if (!ok) { root.removeAttribute('id'); return; }
+  root.classList.add('is-live');
+  /* data-driven tells spiral.js to leave the wheel alone: the pin below owns
+     the travel, and a preventDefault in there would stop the pin advancing
+     and trap the page inside the section. */
+  root.setAttribute('data-driven', '');
 })();
+
+/* ── the section holds while the tail plays ───────────────────────────────
+   Pin the work section and map the pin's progress onto the reel, so the page
+   only moves on to the T once the last of the seven has come through. Same
+   pairing the page already uses everywhere else: Lenis on the input,
+   ScrollTrigger on the output. */
+addEventListener('load', function () {
+  var root = document.getElementById('spiral-root');
+  if (!root || !root.hasAttribute('data-driven')) return;
+  if (!(window.gsap && window.ScrollTrigger)) return;
+  var pin = document.getElementById('workPin');
+  if (!pin) return;
+
+  gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.create({
+    trigger: pin,
+    start: 'top top',
+    /* one viewport of scroll per project, plus a beat at each end so the
+       first and last are readable rather than instantaneous */
+    end: function () { return '+=' + Math.round(innerHeight * 0.9 * 8); },
+    pin: true,
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
+    onUpdate: function (self) {
+      root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: self.progress } }));
+    }
+  });
+  addEventListener('resize', function () { ScrollTrigger.refresh(); });
+});
 </script>
 <script src="vendor/three.min.js"></script>
-<script src="spiral-gallery/spiral.js"></script>
+<!-- the ?v= is a cache-bust: this file is edited often and browsers hold on
+     to it hard. Bump it whenever spiral.js changes. -->
+<script src="spiral-gallery/spiral.js?v=20260726-pinned"></script>
 
 <script type="module" src="orb/bhanu-orb.js"></script>
 </body>
