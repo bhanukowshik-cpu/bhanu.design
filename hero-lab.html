@@ -253,19 +253,16 @@
   /* the reel arrives rather than simply being there: each item lifts from
      below as the section comes up, staggered by its index */
   .work-pin.is-pinned .sys-frame,
-  .work-pin.is-pinned .work-track>.slide,
-  .work-pin.is-pinned .work-head{
+  .work-pin.is-pinned .work-track>.slide{
     opacity:0;transform:translateY(54px);
     transition:opacity .7s var(--ease),transform .95s cubic-bezier(0.16,1,0.3,1);
     transition-delay:calc(var(--i,0) * 90ms);}
   .work-pin.is-pinned.revealed .sys-frame,
-  .work-pin.is-pinned.revealed .work-track>.slide,
-  .work-pin.is-pinned.revealed .work-head{opacity:1;transform:none;}
+  .work-pin.is-pinned.revealed .work-track>.slide{opacity:1;transform:none;}
 
   @media (prefers-reduced-motion: reduce){
     .work-pin.is-pinned .sys-frame,
-    .work-pin.is-pinned .work-track>.slide,
-    .work-pin.is-pinned .work-head{opacity:1;transform:none;transition:none;}
+    .work-pin.is-pinned .work-track>.slide{opacity:1;transform:none;transition:none;}
   }
 
   /* ── the expanding light behind the reel ──────────────────────────────── */
@@ -290,6 +287,13 @@
   .work-head{padding:0 var(--reel-pad);margin-bottom:clamp(22px,3.5vh,40px);}
   .work-head .k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
     text-transform:uppercase;color:var(--cream-ink-3);}
+  /* while the stage rises there is nothing else on screen, so the title takes
+     the space properly — centred and large — and hands over to the projects */
+  .work-pin.is-pinned .work-head{position:absolute;left:0;right:0;
+    top:clamp(76px,16vh,150px);z-index:2;margin:0;text-align:center;}
+  .work-pin.is-pinned .work-head .k{font-family:var(--sans);
+    font-size:clamp(30px,4vw,60px);font-weight:570;letter-spacing:-0.026em;
+    text-transform:none;color:var(--cream-ink);}
 
   /* ── 01 — the whole EverTutor system, bound inside one frame ──────────── */
   /* the frame is what makes the three tools read as one product rather than
@@ -328,7 +332,7 @@
   /* thumbnail at rest; the video rises over it from the bottom on hover */
   .slide-media{position:relative;display:grid;place-items:center;
     margin:20px 20px 0;border-radius:14px;overflow:hidden;
-    aspect-ratio:16/10;background:#0B0F16;border:1px solid var(--cream-line);}
+    aspect-ratio:16/9;background:#0B0F16;border:1px solid var(--cream-line);}
   .slide-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
   /* the still darkens behind the video so the inset panel reads as the lit thing.
      rgba(8,8,7,.8), as bymonolog's works_home_overlay uses. */
@@ -342,7 +346,7 @@
      below, rotateX(18deg), scale(.95), perspective ~0.9× the box width. */
   /* the video never fills the frame — it sits inset and rounded, floating over
      the darkened still. bymonolog's inset is 71.87%; this runs a little wider. */
-  .slide-vid{position:relative;z-index:1;width:83%;height:83%;object-fit:cover;display:block;
+  .slide-vid{position:relative;z-index:1;width:83%;height:83%;object-fit:contain;display:block;
     border-radius:10px;box-shadow:0 20px 44px -22px rgba(0,0,0,.6);
     transform-origin:50% 50%;
     transform:perspective(480px) translateY(72%) rotateX(18deg) scale(.95);
@@ -1024,7 +1028,7 @@
         <img src="images/section2-stage.webp" alt="" width="2400" height="1339" decoding="async">
       </div>
 
-      <header class="work-head"><span class="k">Selected work</span></header>
+      <header class="work-head"><span class="k">Featured work</span></header>
 
       <div class="work-track" id="workTrack">
 
@@ -1712,6 +1716,8 @@ addEventListener('scroll', function () {
   /* nothing of the reel is visible until beat C — autoAlpha 0 also sets
      visibility:hidden, so it cannot catch a hover through the stage either */
   gsap.set(track, { y: '58vh', autoAlpha: 0 });
+  var head = pin.querySelector('.work-head');
+  if (head) gsap.set(head, { autoAlpha: 0, y: 18 });
   drawLight();
   drawScrim();
 
@@ -1727,11 +1733,14 @@ addEventListener('scroll', function () {
   });
 
   /* Four beats, strictly in order — nothing overlaps.
-     A  the stage slides up and grows until it is exactly the viewport */
-  tl.to(light,  { v: 1, ease: 'power2.out', duration: 0.34, onUpdate: drawLight }, 0);
+     A  the title lands first, then the stage slides up and grows until it is
+        exactly the viewport; the title holds the empty screen while it rises */
+  if (head) tl.to(head, { autoAlpha: 1, y: 0, ease: 'power3.out', duration: 0.14 }, 0);
+  tl.to(light,  { v: 1, ease: 'power2.out', duration: 0.34, onUpdate: drawLight }, 0.04);
   /* B  only once it has filled does it darken */
   tl.to(scrim,  { v: 1, ease: 'none',       duration: 0.12, onUpdate: drawScrim }, 0.34);
-  /* C  and only onto the darkened stage do the projects arrive */
+  /* C  the title lifts away and the projects arrive onto the darkened stage */
+  if (head) tl.to(head, { autoAlpha: 0, y: -22, ease: 'power2.in', duration: 0.10 }, 0.44);
   tl.to(track,  { y: '0vh', autoAlpha: 1, ease: 'power3.out', duration: 0.16 }, 0.46);
   /* D  then the reel walks sideways for the rest of the pin */
   tl.to(track,  { x: function () { return -travel(); }, ease: 'none', duration: 0.38 }, 0.62);
