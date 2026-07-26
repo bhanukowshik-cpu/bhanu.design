@@ -3554,79 +3554,6 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .talk-cta .talk-dot,.mic-btn.rec{animation:none;}
     .top-nav,.eyebrow,h1,.facts,.trail-img,.cta-dock{animation:none;}
   }
-
-  /* ══ SECTION 2 — FEATURED WORK: the stage ═══════════════════════════════
-     The reel, decrowded. One project holds the room at a time: its footage
-     on a dark stage, its name beneath, one line and one link. The filmstrip
-     along the bottom is the whole map. Colours ride the --cream band tokens
-     so the section sits a shade under the page, and the only saturated
-     things in the frame are the work and its one azure link. */
-  .wk-section{position:relative;background:var(--cream);overflow:hidden;}
-  .wk-stage{position:relative;z-index:var(--z-content);display:flex;flex-direction:column;
-    align-items:center;justify-content:space-between;min-height:100vh;min-height:100svh;
-    /* the floating nav pill owns the first ~76px of every screen the pin
-       holds — the slate starts under it, never behind it */
-    padding:clamp(76px,11vh,100px) var(--gutter) clamp(16px,3vh,28px);
-    gap:clamp(12px,2.2vh,22px);}
-  /* the slate — section name left, position right, both quiet */
-  .wk-slate{width:100%;display:flex;align-items:baseline;justify-content:space-between;}
-  .wk-heading{font-size:clamp(1.15rem,1.6vw,1.45rem);font-weight:600;
-    letter-spacing:.005em;color:var(--cream-ink);}
-  .wk-heading .serif{font-size:1.12em;}
-  .wk-count{font-size:.85rem;font-weight:500;color:var(--cream-ink-3);
-    font-family:var(--sans);font-variant-numeric:tabular-nums lining-nums;}
-  /* the caption row — name, subline, metrics, one CTA; swaps as one block */
-  .wk-caption{display:flex;flex-direction:column;align-items:center;gap:13px;
-    text-align:center;max-width:min(84ch,100%);
-    transition:opacity .24s ease,transform .24s ease;}
-  .wk-caption.wk-swap{opacity:0;transform:translateY(10px);}
-  .wk-title{font-size:clamp(1.7rem,3vw,2.6rem);font-weight:600;
-    letter-spacing:-.015em;line-height:1.12;color:var(--cream-ink);text-wrap:balance;}
-  .wk-sub{font-size:clamp(.98rem,1.2vw,1.1rem);line-height:1.55;
-    color:var(--cream-ink-2);text-wrap:pretty;max-width:64ch;}
-  .wk-metrics{display:flex;justify-content:center;gap:clamp(22px,3.4vw,52px);}
-  .wk-metric{display:flex;flex-direction:column;align-items:center;gap:3px;}
-  .wk-m-val{font-family:var(--sans);font-weight:600;color:var(--cream-ink);
-    font-size:clamp(1.05rem,1.5vw,1.3rem);letter-spacing:-.01em;
-    font-variant-numeric:tabular-nums lining-nums;}
-  .wk-m-lbl{font-family:var(--sans);font-weight:500;font-size:.78rem;
-    color:var(--cream-ink-3);}
-  /* the one CTA — the site-wide gradient rounded rectangle */
-  .wk-cta{display:inline-flex;align-items:center;gap:.5em;margin-top:2px;
-    padding:11px 20px;border-radius:var(--cta-r-sm);background:var(--cta-grad);
-    color:#fff;font-family:var(--sans);font-weight:600;font-size:.95rem;
-    text-decoration:none;}
-  .wk-cta:hover{background:var(--cta-grad-hover);}
-  .wk-cta svg{width:.8em;height:.8em;transition:transform .3s var(--ease);}
-  .wk-cta:hover svg,.wk-cta:focus-visible svg{transform:translateX(3px);}
-  /* the tape — six cards riding the outside of a drum. The camera stands
-     outside it: the active card faces the room, its neighbours turn away
-     and shrink, the outermost angle off into the dark. JS computes the
-     drum (positions, angles, dimming); this transition owns the glide. */
-  .wk-tape{position:relative;flex:1 1 auto;min-height:0;width:100%;
-    perspective:1200px;perspective-origin:50% 32%;}
-  .wk-belt{position:absolute;inset:0;transform-style:preserve-3d;}
-  .wk-card{position:absolute;left:50%;top:50%;height:clamp(190px,32vh,380px);
-    aspect-ratio:16/9;padding:0;margin:0;cursor:pointer;
-    border:1px solid var(--cream-line);border-radius:18px;overflow:hidden;
-    background:var(--card);box-shadow:0 24px 60px -18px rgba(0,0,0,.65);
-    transform:translate(-50%,-50%);
-    transition:transform .75s var(--ease-expo),filter .55s var(--ease),
-      opacity .55s var(--ease);}
-  .wk-card video,.wk-card img{width:100%;height:100%;object-fit:cover;display:block;}
-  .wk-card.is-on{cursor:default;}
-  @media(max-width:900px){
-    /* unpinned on phones: the same two rows, sized down; tap a card to jump */
-    .wk-stage{min-height:0;gap:16px;padding-top:84px;padding-bottom:40px;}
-    .wk-title{font-size:clamp(1.5rem,6.4vw,2rem);}
-    .wk-sub{font-size:.95rem;}
-    .wk-metrics{gap:20px;flex-wrap:wrap;}
-    .wk-tape{min-height:250px;perspective:900px;}
-    .wk-card{height:clamp(150px,24vh,220px);}
-  }
-  @media(prefers-reduced-motion:reduce){
-    .wk-caption,.wk-card,.wk-cta svg{transition:none;}
-  }
 </style>
 </head>
 <body>
@@ -3692,73 +3619,326 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <div class="trail" id="trail" aria-hidden="true"></div>
   </section>
 
-  <!-- ══ SECTION 2 — FEATURED WORK: the stage ══════════════════════════
-       One project holds the room at a time. The pin walks the filmstrip in
-       order and lets go after the last; a click on a thumb jumps the scroll
-       to that stop so strip and scrollbar stay one truth. The metric grids,
-       tag chips and icon rows the old project bar carried are gone — the
-       case studies hold the numbers now. -->
-  <section class="wk-section" id="workPin" aria-label="Featured work">
-    <div class="geo" aria-hidden="true">
-      <span class="geo-mesh" style="inset:0;"></span>
-      <span class="geo-arc thin" style="width:120vmax;height:120vmax;left:50%;top:-96vmax;margin-left:-60vmax;"></span>
-    </div>
+  <!-- ══ SECTION 2 — ported wholesale from index.html ══
+       Markup, CSS and behaviour are the shipping section, not a rebuild.
+       Its type and colour resolve through the alias tokens below, so it
+       adopts this page's system instead of importing Montserrat. -->
+      <section class="s2-section-wrap" id="s2Section">
 
-    <div class="wk-stage">
-      <header class="wk-slate">
-        <h2 class="wk-heading">Featured <span class="serif">Work</span></h2>
-        <span class="wk-count" aria-hidden="true"><span id="wkCountNow">01</span>&thinsp;/&thinsp;06</span>
-      </header>
 
-      <!-- row one: the caption — name, subline, metrics, one CTA -->
-      <div class="wk-caption" id="wkCaption" aria-live="polite">
-        <h3 class="wk-title" id="wkTitle">EverTutor Live</h3>
-        <p class="wk-sub" id="wkSub"></p>
-        <div class="wk-metrics" id="wkMetrics"></div>
-        <a class="wk-cta" id="wkCta" href="evertutor-live.html">
-          <span id="wkCtaLabel">View case study</span>
-          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 6h10M7 2l4 4-4 4"/></svg>
-        </a>
+<!-- Canvas covers full section — renders behind header and work container -->
+      <div class="s2-cards-zone" id="s2CardsZone">
+        <div id="spiral-root" style="width:100%;height:100%;position:relative;"></div>
       </div>
 
-      <!-- row two: the tape — the product videos themselves ride the drum;
-           JS lights the front card and plays it, a click jumps the reel -->
-      <div class="wk-tape" id="wkTape">
-        <div class="wk-belt" id="wkBelt" aria-label="Projects">
-          <button class="wk-card" type="button" data-idx="0" aria-label="EverTutor Live">
-            <video muted loop playsinline preload="metadata" poster="images/card-et-live.webp">
-              <source src="images/et-live.mp4" type="video/mp4">
-            </video>
-          </button>
-          <button class="wk-card" type="button" data-idx="1" aria-label="EverTutor Studio">
-            <video muted loop playsinline preload="none" poster="images/card-et-studio.webp">
-              <source src="images/et-studio.mp4" type="video/mp4">
-            </video>
-          </button>
-          <button class="wk-card" type="button" data-idx="2" aria-label="EverTutor Analytics">
-            <video muted loop playsinline preload="none" poster="images/card-et-analytics.webp">
-              <source src="images/et-analytics.mp4" type="video/mp4">
-            </video>
-          </button>
-          <button class="wk-card" type="button" data-idx="3" aria-label="Stressie">
-            <video muted loop playsinline preload="none" poster="images/card-stressie.webp">
-              <source src="images/stressie.mp4" type="video/mp4">
-            </video>
-          </button>
-          <button class="wk-card" type="button" data-idx="4" aria-label="Dearly">
-            <video muted loop playsinline preload="none" poster="images/card-dearly.webp">
-              <source src="images/dearly.mp4" type="video/mp4">
-            </video>
-          </button>
-          <button class="wk-card" type="button" data-idx="5" aria-label="The Engine">
-            <img src="images/card-engine.webp" alt="" loading="lazy">
-          </button>
+      <!-- ── Up / Down helix nav ── -->
+      <div class="s2-side-nav">
+        <button class="s2-side-nav-btn" id="s2NavUp" aria-label="Previous project">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+        <button class="s2-side-nav-btn" id="s2NavDown" aria-label="Next project">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+
+      <!-- ── Left / Right grid-view nav — hidden until grid view is active ── -->
+      <button class="s2-side-nav-btn s2-grid-nav-btn s2-grid-nav-prev" id="s2GridPrev" aria-label="Previous project" style="display:none;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="s2-side-nav-btn s2-grid-nav-btn s2-grid-nav-next" id="s2GridNext" aria-label="Next project" style="display:none;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <!-- ── Featured Work heading ── -->
+      <div class="s2-fw-header" id="s2FwHeader">
+        <div class="s2-fwh-row">
+          <h2 class="fw-title">Featured Work</h2>
+        </div>
+        <!-- the spiral/grid toggle is gone: there is one view of the work now.
+             The JS that wired it is null-guarded, so it simply stands down. -->
+      </div>
+
+      <!-- ── SECTION 2: FEATURED WORK — full-viewport spiral ── -->
+      <div class="s2-work-container">
+
+      <!-- Project info bar — slides up from bottom when front card changes -->
+      <div id="s2ProjectBar" class="s2-project-bar">
+        <div class="s2-bar-top-row">
+          <div class="s2-bar-title-col">
+            <h3 class="s2-bar-title" id="s2BarTitle"></h3>
+            <p class="s2-bar-desc" id="s2BarDesc"></p>
+          </div>
+          <div class="s2-bar-tags-col" id="s2BarTagsCol">
+            <div class="s2-bar-tags" id="s2BarTags"></div>
+            <div class="s2-bar-icon-tags" id="s2BarIconTags"></div>
+          </div>
+        </div>
+        <div class="s2-bar-rule"></div>
+        <div class="s2-bar-bottom-row">
+          <div class="s2-bar-metrics" id="s2BarMetrics"></div>
+          <a class="s2-bar-cta" id="s2BarCta" href="#">View Case Study →</a>
         </div>
       </div>
-    </div>
-  </section>
 
+      <!-- Mobile accordion — built by JS below s2 spiral, hidden on desktop -->
+      <div class="s2-mobile-accordion" id="s2MobileAccordion" aria-label="Project list"></div>
 
+      <!-- C: Blob + left/right content (static ws-section removed; content now in spiral gallery panels) -->
+      <div class="s2-glimpse-full" id="s2GlimpseFull" style="display:none">
+
+        <section class="ws-section" id="wsSection" style="display:none">
+
+        <!-- EverTutor hero: left title+metrics | center blob | right tags+desc -->
+        <div class="ws-et-hero">
+
+          <div class="ws-et-left">
+            <h2 class="ws-et-title">EverTutor AI System</h2>
+            <div class="ws-et-metrics">
+              <div class="ws-et-metric-row">
+                <div class="ws-et-metric">
+                  <span class="ws-et-val" data-count="2000" data-suffix="+">2000+</span>
+                  <span class="ws-et-lbl">Active Learners</span>
+                </div>
+                <div class="ws-et-mdivider"></div>
+                <div class="ws-et-metric">
+                  <span class="ws-et-val" data-count="96" data-prefix="−" data-suffix="%">−96%</span>
+                  <span class="ws-et-lbl">Workflow time</span>
+                </div>
+              </div>
+              <div class="ws-et-metric">
+                <span class="ws-et-val" data-count="500" data-prefix="0→$" data-suffix="k+ ARR">0→$500k+ ARR</span>
+                <span class="ws-et-lbl">as Sole Product Designer</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ws-et-center">
+            <div class="ws-orb-wrap">
+              <div class="ws-orb-bg"></div>
+              <div class="ws-orb-glow"></div>
+              <svg class="ws-waveform" width="340" height="340" viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <g stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round" opacity="0.75">
+                  <line x1="170.00" y1="61.42" x2="170.00" y2="38.58" />
+                  <line x1="178.48" y1="62.29" x2="180.35" y2="38.44" />
+                  <line x1="187.05" y1="62.35" x2="190.49" y2="40.60" />
+                  <line x1="195.72" y1="62.88" x2="200.31" y2="43.75" />
+                  <line x1="204.19" y1="64.78" x2="209.97" y2="46.97" />
+                  <line x1="212.23" y1="68.05" x2="219.62" y2="50.22" />
+                  <line x1="219.91" y1="72.06" x2="229.05" y2="54.10" />
+                  <line x1="227.51" y1="76.16" x2="237.89" y2="59.21" />
+                  <line x1="235.19" y1="80.28" x2="245.88" y2="65.56" />
+                  <line x1="242.75" y1="84.83" x2="253.12" y2="72.68" />
+                  <line x1="249.73" y1="90.27" x2="259.98" y2="80.02" />
+                  <line x1="255.84" y1="96.68" x2="266.65" y2="87.45" />
+                  <line x1="261.23" y1="103.72" x2="272.93" y2="95.21" />
+                  <line x1="266.34" y1="110.96" x2="278.29" y2="103.64" />
+                  <line x1="271.47" y1="118.30" x2="282.37" y2="112.74" />
+                  <line x1="276.37" y1="125.94" x2="285.36" y2="122.22" />
+                  <line x1="280.34" y1="134.15" x2="287.91" y2="131.69" />
+                  <line x1="282.83" y1="142.91" x2="290.53" y2="141.06" />
+                  <line x1="283.99" y1="151.95" x2="293.06" y2="150.51" />
+                  <line x1="284.69" y1="160.97" x2="294.57" y2="160.20" />
+                  <line x1="285.96" y1="170.00" x2="294.04" y2="170.00" />
+                  <line x1="288.03" y1="179.29" x2="291.23" y2="179.54" />
+                  <line x1="287.04" y1="188.54" x2="290.00" y2="189.01" />
+                  <line x1="285.23" y1="197.66" x2="288.14" y2="198.36" />
+                  <line x1="282.70" y1="206.62" x2="285.55" y2="207.55" />
+                  <line x1="279.48" y1="215.35" x2="282.25" y2="216.50" />
+                  <line x1="273.22" y1="222.59" x2="280.62" y2="226.37" />
+                  <line x1="264.95" y1="228.19" x2="279.68" y2="237.21" />
+                  <line x1="257.72" y1="233.73" x2="276.44" y2="247.33" />
+                  <line x1="252.12" y1="240.14" x2="270.37" y2="255.73" />
+                  <line x1="246.37" y1="246.37" x2="263.34" y2="263.34" />
+                  <line x1="240.40" y1="252.43" x2="255.47" y2="270.07" />
+                  <line x1="233.83" y1="257.85" x2="247.24" y2="276.31" />
+                  <line x1="226.68" y1="262.49" x2="238.72" y2="282.15" />
+                  <line x1="219.32" y1="266.81" x2="229.63" y2="287.04" />
+                  <line x1="211.94" y1="271.26" x2="219.90" y2="290.47" />
+                  <line x1="204.38" y1="275.80" x2="209.79" y2="292.45" />
+                  <line x1="196.37" y1="279.85" x2="199.65" y2="293.52" />
+                  <line x1="187.86" y1="282.76" x2="189.69" y2="294.29" />
+                  <line x1="179.00" y1="284.34" x2="179.83" y2="294.92" />
+                  <line x1="170.00" y1="284.99" x2="170.00" y2="295.01" />
+                  <line x1="160.93" y1="285.28" x2="160.24" y2="293.98" />
+                  <line x1="151.74" y1="285.31" x2="150.72" y2="291.74" />
+                  <line x1="142.50" y1="284.57" x2="141.48" y2="288.80" />
+                  <line x1="133.52" y1="282.27" x2="132.32" y2="285.98" />
+                  <line x1="125.21" y1="278.13" x2="122.94" y2="283.60" />
+                  <line x1="117.68" y1="272.69" x2="113.36" y2="281.16" />
+                  <line x1="110.49" y1="267.11" x2="104.11" y2="277.52" />
+                  <line x1="102.91" y1="262.35" x2="96.02" y2="271.82" />
+                  <line x1="94.48" y1="258.42" x2="89.65" y2="264.07" />
+                  <line x1="86.21" y1="253.79" x2="84.09" y2="255.91" />
+                  <line x1="79.89" y1="246.96" x2="77.61" y2="248.91" />
+                  <line x1="74.13" y1="239.65" x2="71.70" y2="241.42" />
+                  <line x1="68.96" y1="231.92" x2="66.40" y2="233.48" />
+                  <line x1="67.19" y1="222.39" x2="58.97" y2="226.57" />
+                  <line x1="67.07" y1="212.63" x2="51.20" y2="219.21" />
+                  <line x1="66.60" y1="203.60" x2="45.15" y2="210.57" />
+                  <line x1="64.98" y1="195.21" x2="41.65" y2="200.81" />
+                  <line x1="63.33" y1="186.89" x2="39.63" y2="190.65" />
+                  <line x1="62.33" y1="178.47" x2="38.41" y2="180.36" />
+                  <line x1="62.00" y1="170.00" x2="38.00" y2="170.00" />
+                  <line x1="62.33" y1="161.53" x2="38.41" y2="159.64" />
+                  <line x1="63.33" y1="153.11" x2="39.63" y2="149.35" />
+                  <line x1="63.55" y1="144.44" x2="43.08" y2="139.53" />
+                  <line x1="63.85" y1="135.51" x2="47.89" y2="130.32" />
+                  <line x1="64.97" y1="126.49" x2="53.30" y2="121.66" />
+                  <line x1="67.39" y1="117.72" x2="58.76" y2="113.32" />
+                  <line x1="71.08" y1="109.38" x2="64.29" y2="105.22" />
+                  <line x1="75.52" y1="101.35" x2="70.32" y2="97.58" />
+                  <line x1="80.31" y1="93.40" x2="77.19" y2="90.74" />
+                  <line x1="86.21" y1="86.21" x2="84.09" y2="84.09" />
+                  <line x1="93.04" y1="79.89" x2="91.09" y2="77.61" />
+                  <line x1="100.35" y1="74.13" x2="98.58" y2="71.70" />
+                  <line x1="108.25" y1="69.23" x2="106.35" y2="66.14" />
+                  <line x1="117.68" y1="67.31" x2="113.37" y2="58.85" />
+                  <line x1="126.82" y1="65.76" x2="121.33" y2="52.50" />
+                  <line x1="135.32" y1="63.26" x2="130.52" y2="48.49" />
+                  <line x1="143.43" y1="59.32" x2="140.55" y2="47.31" />
+                  <line x1="151.75" y1="54.79" x2="150.70" y2="48.16" />
+                  <line x1="160.70" y1="51.87" x2="160.47" y2="48.87" />
+                </g>
+              </svg>
+              <img class="ws-orb-img" src="Parallax cards/EverTutor Glimpse/Dark mode finalized.png" alt="EverTutor AI System" loading="lazy" />
+            </div>
+          </div>
+
+          <div class="ws-et-right">
+            <div class="ws-et-tags">
+              <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Profile dark theme.svg" width="16" height="14" alt="" aria-hidden="true">Sole Product Designer</span>
+              <div class="ws-et-tag-row">
+                <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Thunder Dark Theme.svg" width="10" height="16" alt="" aria-hidden="true">0 to 1</span>
+                <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Desktop Icon.svg" width="16" height="13" alt="" aria-hidden="true">Desktop &middot; B2B &middot; B2C</span>
+              </div>
+            </div>
+            <p class="ws-et-desc">
+              World&rsquo;s first multimodal 1:1, voice-first AI tutor powered by <em>3 tools working as one system</em> to enable a billion tutors for a billion minds.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- (sub-case studies and Stressie section removed — now in proj-cards below) -->
+        <div class="ws-sub-section" style="display:none">
+          <div class="ws-sub-row">
+            <div class="ws-sub-card">
+              <div class="ws-sub-video">
+                <video autoplay muted loop playsinline preload="auto">
+                  <source src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="ws-sub-info">
+                <span class="ws-sub-num">1.1</span>
+                <p class="ws-sub-title">EverTutor Live</p>
+                <p class="ws-sub-desc">Voice-first AI tutor &middot; prototype to PMF</p>
+              </div>
+            </div>
+            <div class="ws-sub-card">
+              <div class="ws-sub-video">
+                <video autoplay muted loop playsinline preload="auto">
+                  <source src="Projects videos/ET Studio Case study.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="ws-sub-info">
+                <span class="ws-sub-num">1.2</span>
+                <p class="ws-sub-title">EverTutor Studio</p>
+                <p class="ws-sub-desc">100+ hrs &rarr; 4 hrs lesson creation</p>
+              </div>
+            </div>
+            <div class="ws-sub-card">
+              <div class="ws-sub-video">
+                <video autoplay muted loop playsinline preload="auto">
+                  <source src="Projects videos/Et Analytics.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="ws-sub-info">
+                <span class="ws-sub-num">1.3</span>
+                <p class="ws-sub-title">EverTutor Analytics</p>
+                <p class="ws-sub-desc">Real-time student insights for educators</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ws-project-divider" style="display:none"></div>
+
+        <!-- Project 2: Stressie — now in proj-cards below -->
+        <div class="ws-project ws-project--alt" style="display:none">
+          <div class="ws-project-inner">
+
+            <div class="ws-info">
+              <span class="ws-num">02</span>
+              <h2 class="ws-title">Stressie</h2>
+              <div class="ws-roles">
+                <span class="ws-role-tag">Sole Product Designer</span>
+                <span class="ws-role-tag">0 to 1</span>
+                <span class="ws-role-tag">Mobile &middot; B2B</span>
+              </div>
+              <p class="ws-desc">From pilot research to a <strong>Harvard-incubated product</strong>, a full redesign of workplace stress management, now live at Amazon and InKind.</p>
+              <div class="ws-metrics">
+                <div class="ws-metric">
+                  <span class="ws-metric-val">17.4%</span>
+                  <span class="ws-metric-lbl">vs ~2% industry avg</span>
+                </div>
+                <div class="ws-metric">
+                  <span class="ws-metric-val">Harvard</span>
+                  <span class="ws-metric-lbl">Innovation Labs</span>
+                </div>
+                <div class="ws-metric">
+                  <span class="ws-metric-val">2 Pilots</span>
+                  <span class="ws-metric-lbl">Amazon &amp; InKind</span>
+                </div>
+              </div>
+              <a class="ws-cta" href="stressie-studio.html">View Case Study &rarr;</a>
+            </div>
+
+            <div class="ws-visual ws-visual--phones">
+              <div class="ws-phones-row">
+                <img class="ws-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Summary%20of%20the%20project/Home%20Screen%20Image.png" alt="Stressie home screen" loading="lazy" />
+                <img class="ws-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%201.png" alt="Stressie onboarding" loading="lazy" />
+                <img class="ws-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%202.png" alt="Stressie onboarding 2" loading="lazy" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        </section>
+
+      </div><!-- /s2-glimpse-full -->
+
+      <!-- D: Video + content — EverTutor Live -->
+      <div class="s2-video-section" style="display:none">
+        <div class="s2-video-left">
+          <video autoplay muted loop playsinline preload="auto">
+            <source src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="s2-video-right">
+          <p class="fw-card-eyebrow">1.1 EverTutor Live</p>
+          <h3 class="s2-video-title">First of its kind: a voice-first AI that gives every learner a fully adaptive 1:1 experience, taken from prototype to PMF.</h3>
+          <div class="proj-metrics">
+            <div class="proj-metric">
+              <span class="proj-metric-val">2000+</span>
+              <span class="proj-metric-lbl">Everyday Sessions</span>
+            </div>
+            <div class="proj-metric">
+              <span class="proj-metric-val">Proven 2x</span>
+              <span class="proj-metric-lbl">Performance Gain</span>
+            </div>
+            <div class="proj-metric">
+              <span class="proj-metric-val">$250&nbsp;&rarr;&nbsp;$5/hr</span>
+              <span class="proj-metric-lbl">Cost of 1:1 Support</span>
+            </div>
+          </div>
+          <a class="proj-cta" href="evertutor-live.html">View Case Study &rarr;</a>
+        </div>
+      </div>
+
+      </div><!-- /s2-work-container -->
+
+      </section><!-- /s2-section-wrap -->
 
   <!-- ── 03 — ABOUT: the T ─────────────────────────────────────────────── -->
   <!-- ══ SECTION 3 — ported from index.html ══════════════════════════
@@ -5163,200 +5343,64 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
   }
 })();
 </script>
-<!-- ══ THE STAGE ═══════════════════════════════════════════════════════════
-     Featured Work's drive. The copy lives here; the media layers and thumbs
-     are static markup above. window.__wk.go(i) is the one entry point — the
-     pin drives it, the thumbs drive it, and it can be called directly. -->
+<!-- ══ THE HELIX ══════════════════════════════════════════════════════════
+     Three r134 is vendored alongside gsap rather than pulled from a CDN, the
+     way everything else on this page is. spiral.js reads window.S2_PROJECT_DATA
+     for its grid copy and takes its media from its own internal list. -->
 <script>
+
+/* The helix is the wide, pointer-driven, motion-ok path only. Stripping the
+   id before spiral.js runs is what keeps it from ever initialising a WebGL
+   context on a phone — cheaper and more certain than hiding it with CSS. */
 (function () {
-  var sec = document.getElementById('workPin');
-  if (!sec) return;
-  var DATA = [
-    { title: 'EverTutor Live',
-      sub: 'The world’s first voice-first AI tutor — shaped from early concept to product-market fit.',
-      metrics: [['$250→$5/hr', '1:1 tutor cost'], ['2×', 'proven mastery'], ['85%', 'session completion']],
-      href: 'evertutor-live.html', cta: 'View case study' },
-    { title: 'EverTutor Studio',
-      sub: 'Lesson creation for teachers — designed overnight, shipped to schools.',
-      metrics: [['104→4 hrs', 'per lesson'], ['12', 'schools'], ['8', 'districts']],
-      href: 'evertutor-studio.html', cta: 'View case study' },
-    { title: 'EverTutor Analytics',
-      sub: 'Real-time student insight for educators — complexity on demand, clean by default.',
-      metrics: [['Live', 'in production'], ['Dog-ear', 'disclosure system'], ['0', 'extra clicks']],
-      href: '', cta: '' },
-    { title: 'Stressie',
-      sub: 'Harvard-incubated workplace stress care, fully redesigned and live in the wild.',
-      metrics: [['17.4%', 'engagement rate'], ['$600k', 'funding'], ['Amazon', '& InKind pilots']],
-      href: 'stressie-studio.html', cta: 'View case study' },
-    { title: 'Dearly',
-      sub: 'Animated letters in your handwriting, your voice and your photos, sent as a link.',
-      metrics: [['140', 'letters written'], ['35', 'five-star ratings'], ['48 hrs', 'built in']],
-      href: 'https://dearly-rho.vercel.app', cta: 'Visit Dearly' },
-    { title: 'The Engine',
-      sub: 'Brand, art direction and the landing page for an AI growth platform that runs its own marketing.',
-      metrics: [['Brand', '& art direction'], ['Landing', 'page design']],
-      href: 'https://www.theengine.dev/', cta: 'Visit site' }
-  ];
-  var cards   = [].slice.call(sec.querySelectorAll('.wk-card'));
-  var caption = document.getElementById('wkCaption');
-  var titleEl = document.getElementById('wkTitle');
-  var subEl   = document.getElementById('wkSub');
-  var metEl   = document.getElementById('wkMetrics');
-  var ctaEl   = document.getElementById('wkCta');
-  var ctaLbl  = document.getElementById('wkCtaLabel');
-  var countEl = document.getElementById('wkCountNow');
-  var N = DATA.length, idx = -1, swapT = null;
-  var noMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  function applyCopy(d) {
-    titleEl.textContent = d.title;
-    subEl.textContent   = d.sub;
-    metEl.innerHTML = '';
-    d.metrics.forEach(function (m) {
-      var el = document.createElement('div');
-      el.className = 'wk-metric';
-      var v = document.createElement('span'); v.className = 'wk-m-val'; v.textContent = m[0];
-      var l = document.createElement('span'); l.className = 'wk-m-lbl'; l.textContent = m[1];
-      el.appendChild(v); el.appendChild(l);
-      metEl.appendChild(el);
-    });
-    if (d.href) {
-      ctaEl.href = d.href;
-      ctaLbl.textContent = d.cta;
-      ctaEl.style.display = '';
-      if (/^https?:/.test(d.href)) { ctaEl.target = '_blank'; ctaEl.rel = 'noopener'; }
-      else { ctaEl.removeAttribute('target'); ctaEl.removeAttribute('rel'); }
-    } else {
-      ctaEl.style.display = 'none';
-    }
-  }
-  /* the drum: each card sits at d stops from the front, on the outside of a
-     cylinder whose radius scales with the card. sin/cos place it, a capped
-     rotateY turns it away, scale and brightness fall off with distance —
-     the CSS transition on .wk-card glides every move between stops. */
-  function layoutTape() {
-    var cardW = cards[0].offsetWidth ||
-      (parseFloat(getComputedStyle(cards[0]).height) * 16 / 9) || 560;
-    var R = cardW * 1.85;
-    var STEP = 26 * Math.PI / 180;
-    cards.forEach(function (c, i) {
-      var d = i - idx;
-      var phi = d * STEP;
-      var x = Math.sin(phi) * R;
-      var z = (Math.cos(phi) - 1) * R;
-      var rot = Math.max(-58, Math.min(58, d * 24));
-      var s = Math.max(0.6, 1 - Math.abs(d) * 0.1);
-      var b = d === 0 ? 1 : Math.abs(d) === 1 ? 0.55 : 0.35;
-      c.style.transform = 'translate(-50%,-50%) translate3d(' + x.toFixed(1) + 'px,'
-        + (Math.abs(d) * 12) + 'px,' + z.toFixed(1) + 'px) rotateY(' + rot
-        + 'deg) scale(' + s.toFixed(3) + ')';
-      c.style.filter = 'brightness(' + b + ')';
-      c.style.zIndex = String(40 - Math.abs(d));
-      /* two stops per side are on camera; past that the drum's far side
-         would peek out from behind the front card — fade it to nothing */
-      var hidden = Math.abs(d) >= 3;
-      c.style.opacity = hidden ? '0' : '1';
-      c.style.pointerEvents = hidden ? 'none' : '';
-      c.tabIndex = hidden ? -1 : 0;
-    });
-  }
-  /* only the front card spends decode time */
-  function setMedia(i) {
-    cards.forEach(function (c, j) {
-      var on = j === i;
-      c.classList.toggle('is-on', on);
-      if (on) c.setAttribute('aria-current', 'true');
-      else c.removeAttribute('aria-current');
-      var v = c.querySelector('video');
-      if (!v) return;
-      if (on && !noMotion) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
-      else v.pause();
-    });
-  }
-  function go(i, instant) {
-    i = Math.max(0, Math.min(N - 1, i));
-    if (i === idx) return;
-    idx = i;
-    countEl.textContent = (i + 1 < 10 ? '0' : '') + (i + 1);
-    setMedia(i);
-    layoutTape();
-    if (instant || noMotion) { applyCopy(DATA[i]); return; }
-    clearTimeout(swapT);
-    caption.classList.add('wk-swap');
-    swapT = setTimeout(function () {
-      applyCopy(DATA[i]);
-      caption.classList.remove('wk-swap');
-    }, 240);
-  }
-  /* while the pin owns the section a card click scrolls to that stop, so
-     the tape and the scrollbar stay one truth; unpinned, it jumps direct */
-  cards.forEach(function (c) {
-    c.addEventListener('click', function () {
-      var i = parseInt(c.dataset.idx, 10);
-      if (i === idx) return;
-      var st = window.__wkPin;
-      if (st) {
-        var y = st.start + (st.end - st.start) * (i / (N - 1));
-        if (window.__lenis) window.__lenis.scrollTo(y, { duration: 0.9 });
-        else window.scrollTo(0, y);
-      } else {
-        go(i);
-      }
-    });
-  });
-  /* a swipe walks the tape where there is no pin (phones, coarse pointers) */
-  (function () {
-    var tape = document.getElementById('wkTape');
-    var x0 = null;
-    tape.addEventListener('pointerdown', function (e) { x0 = e.clientX; }, { passive: true });
-    tape.addEventListener('pointerup', function (e) {
-      if (x0 === null || window.__wkPin) { x0 = null; return; }
-      var dx = e.clientX - x0;
-      x0 = null;
-      if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
-    }, { passive: true });
-  })();
-  /* arrows walk the tape for anyone not using a pointer */
-  document.getElementById('wkBelt').addEventListener('keydown', function (e) {
-    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-    e.preventDefault();
-    var next = Math.max(0, Math.min(N - 1, idx + (e.key === 'ArrowRight' ? 1 : -1)));
-    cards[next].focus();
-    cards[next].click();
-  });
-  /* the drum radius rides the card size, so re-lay it out when that moves */
-  addEventListener('resize', layoutTape);
-  window.__wk = { go: go, count: N };
-  go(0, true);
-})();
-
-/* ── the pin: scroll walks the six, the section lets go after the last ────
-   Registered after load so ScrollTrigger measures a settled document, and
-   Lenis re-measures after every refresh — without that it caps the pin's
-   travel partway through the tail (see git history). Phones, coarse
-   pointers and reduced-motion readers get the unpinned section instead. */
-addEventListener('load', function () {
-  var sec = document.getElementById('workPin');
-  if (!sec || !window.__wk) return;
+  var root = document.getElementById('spiral-root');
+  if (!root) return;
   var ok = innerWidth >= 901 &&
            matchMedia('(pointer:fine)').matches &&
            !matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!ok) return;
+  if (!ok) { root.removeAttribute('id'); return; }
+  root.classList.add('is-live');
+  /* data-driven stands spiral.js's own wheel handler down: the pin below owns
+     the travel. That handler calls preventDefault, which would stop the pin
+     advancing and trap the page inside the section. */
+  root.setAttribute('data-driven', '');
+})();
+
+/* ── the section is locked until the tail has played ──────────────────────
+   Pin the section and map the pin's progress straight onto the reel, so the
+   projects come in their order — Glimpse, Live, Studio, Analytics, Stressie,
+   Dearly, The Engine — and the page only moves on to the T once the last of
+   them is through.
+
+   This failed the first time because the reel's own snap logic ran alongside
+   the pin's drive and fought it; the drive is exclusive now. The pin is
+   registered after load so ScrollTrigger measures a settled document, and
+   ScrollTrigger.normalizeScroll is left alone — Lenis is already feeding it. */
+addEventListener('load', function () {
+  var root = document.getElementById('spiral-root');
+  if (!root || !root.hasAttribute('data-driven')) return;
   if (!(window.gsap && window.ScrollTrigger)) return;
+  var sec = document.getElementById('s2Section');
+  if (!sec) return;
 
   gsap.registerPlugin(ScrollTrigger);
-  var N = window.__wk.count;
-  window.__wkPin = ScrollTrigger.create({
+  ScrollTrigger.create({
     trigger: sec,
     start: 'top top',
-    end: function () { return '+=' + Math.round(innerHeight * 0.72 * N); },
+    end: function () { return '+=' + Math.round(innerHeight * 1.1 * 7); },
     pin: true,
     pinSpacing: true,
     anticipatePin: 1,
     invalidateOnRefresh: true,
-    snap: { snapTo: 1 / (N - 1), duration: { min: 0.2, max: 0.45 }, delay: 0.06, ease: 'power2.out' },
-    onUpdate: function (self) { window.__wk.go(Math.round(self.progress * (N - 1))); }
+    onUpdate: function (self) {
+      root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: self.progress } }));
+    }
   });
+  /* Lenis measures the document once and caches the limit. The pin-spacer is
+     added by ScrollTrigger afterwards, so without re-measuring Lenis still
+     believes the page ends where it did before the pin — it simply refuses to
+     scroll past that point, which caps the pin's progress partway through the
+     tail and strands the reel mid-order. Re-measure after every refresh. */
   function syncLenis() {
     if (window.__lenis && typeof window.__lenis.resize === 'function') window.__lenis.resize();
   }
@@ -5924,8 +5968,11 @@ addEventListener('load', function () {
   })();
 </script>
 
-<!-- the helix is retired with its section: spiral.js and the global three
-     build it needed are gone; the orb bundle below carries its own three. -->
+<script src="vendor/three.min.js"></script>
+<!-- the ?v= is a cache-bust: this file is edited often and browsers hold on
+     to it hard. Bump it whenever spiral.js changes. -->
+<script src="spiral-gallery/spiral.js?v=20260726-s3"></script>
+
 <script type="module" src="orb/bhanu-orb.js"></script>
 </body>
 </html>
