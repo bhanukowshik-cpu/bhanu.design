@@ -760,6 +760,9 @@
       flex-direction: column;
       scroll-snap-align: start;
       position: relative;
+      /* a breath of dark page between the hero and the work — the sections
+         used to sit flush; the pause is the transition */
+      margin-top: 20vh;
     }
 /* ── Section 2 redesign — Featured Work ─────────────────── */
     .s2-fw-header {
@@ -2360,6 +2363,9 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     .am-section {
       padding: 40px 2% 40px;
       scroll-snap-align: start;
+      /* the same breath the work section gets — the reel lands, the page
+         pauses, and only then does the About begin */
+      margin-top: 20vh;
       /* At least one screen (snaps like tm-section), but grows rather than clipping if content is taller */
       min-height: calc(100vh - 80px);
       display: flex;
@@ -4765,7 +4771,7 @@ function mountTalkOrb() {
   if (!(window.BhanuOrb && window.BhanuOrb.mount)) { setTimeout(mountTalkOrb, 80); return; }
   if (!chat.classList.contains('open')) return;
   talkRoot = window.BhanuOrb.mount(document.getElementById('talkOrbMount'), {
-    palette: 'arctic', size: 200, ui: false,
+    palette: 'arctic', size: 200, ui: false, debug: ORB_DEBUG === 'talk',
     onState: updateVoiceState,
     controls: function (api) { voiceApi = api; },
   });
@@ -5001,12 +5007,16 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
   }
 });
 
+/* ?orbdebug opens the orb tuning panel on one instance: cta (default), fab, or talk */
+var ORB_DEBUG = new URLSearchParams(location.search).get('orbdebug');
+if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
+
 /* ═══ ORB in the CTAs — visual only. The hero opens on this button and the
    footer closes on it, so both carry the same orb. ═══ */
 (function waitOrb() {
   if (!(window.BhanuOrb && window.BhanuOrb.mountVisual)) { setTimeout(waitOrb, 60); return; }
   window.BhanuOrb.mountVisual(document.getElementById('ctaOrbMount'),
-    { palette: 'arctic', size: 55, state: 'idle' });
+    { palette: 'arctic', size: 55, state: 'idle', debug: ORB_DEBUG === 'cta' });
   document.getElementById('ctaOrb').classList.add('mounted');
 
   var ftMount = document.getElementById('ftOrbMount');
@@ -5038,7 +5048,7 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
   if (!fab) return;
   if (!(window.BhanuOrb && window.BhanuOrb.mountVisual)) { setTimeout(waitFab, 60); return; }
   window.BhanuOrb.mountVisual(document.getElementById('fabOrbMount'),
-    { palette: 'arctic', size: 62, state: 'idle' });
+    { palette: 'arctic', size: 62, state: 'idle', debug: ORB_DEBUG === 'fab' });
 
   fab.addEventListener('click', function () { openChat(); });
 
@@ -6392,6 +6402,6 @@ addEventListener('load', function () {
      to it hard. Bump it whenever spiral.js changes. -->
 <script src="spiral-gallery/spiral.js?v=20260726-bend2"></script>
 
-<script type="module" src="orb/bhanu-orb.js"></script>
+<script type="module" src="orb/bhanu-orb.js?v=2"></script>
 </body>
 </html>

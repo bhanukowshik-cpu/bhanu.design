@@ -25,11 +25,12 @@ interface LiveOrbProps {
   palette?: PaletteName;
   size?: number;
   ui?: boolean;
+  debug?: boolean;
   onState?: (state: UiState) => void;
   controls?: (api: { start: () => void; end: () => void }) => void;
 }
 
-function LiveOrb({ palette = 'ember', size = 188, ui = true, onState, controls }: LiveOrbProps) {
+function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onState, controls }: LiveOrbProps) {
   const [userSpeaking, setUserSpeaking] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [micDenied, setMicDenied] = useState(false);
@@ -154,6 +155,7 @@ function LiveOrb({ palette = 'ember', size = 188, ui = true, onState, controls }
       getFrequencyData={getFrequencyData}
       palette={PALETTES[palette]}
       size={size}
+      debug={debug}
       audioParams={{ gain: 2.6, noiseFloor: 0.02, attack: 0.05, release: 0.28 }}
     />
   );
@@ -213,6 +215,7 @@ function mountVisual(
     size?: number;
     state?: VoiceOrbState;
     simulate?: 'user' | 'assistant' | null;
+    debug?: boolean;
   } = {},
 ): Root {
   const root = createRoot(el);
@@ -222,6 +225,7 @@ function mountVisual(
       simulate={opts.simulate ?? null}
       palette={opts.palette ? PALETTES[opts.palette] : undefined}
       size={opts.size ?? 300}
+      debug={opts.debug ?? false}
     />,
   );
   return root;
