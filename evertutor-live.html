@@ -788,6 +788,12 @@
       .phase-item[data-phase="3"] .phase-pill::after { content: "03"; }
       .phase-item[data-phase="4"] .phase-pill::after { content: "04"; }
       .phase-item.active .phase-pill::after { color: rgba(255,255,255,0.9); }
+      /* dark mode inverts the chips (active = light, rest = dark) — the
+         pseudo-element ink must flip with them */
+      [data-theme="dark"] .phase-item .phase-pill::before { color: rgba(239,243,248,0.5); }
+      [data-theme="dark"] .phase-item .phase-pill::after  { color: rgba(239,243,248,0.85); }
+      [data-theme="dark"] .phase-item.active .phase-pill::before { color: rgba(19,26,37,0.55); }
+      [data-theme="dark"] .phase-item.active .phase-pill::after  { color: rgba(19,26,37,0.9); }
       .phase-plus-circle,
       .phase-tag          { display: none; }
       .phase-item .phase-expand-body { display: none !important; }
@@ -1074,9 +1080,9 @@
         rgba(10,14,21,0.86) 0%, rgba(10,14,21,0.62) 30%,
         rgba(10,14,21,0.18) 55%, rgba(10,14,21,0) 74%);
     }
-    /* Olive reads as its own accent for the stats row, but it needs dark text —
-       inheriting --secondary left it near-white at 2.79:1 */
-    [data-theme="dark"] .impact-stat-hl.hi { background: #789F04; color: #131A25; }
+    /* same lime as every other highlight — the stats row is not its own accent;
+       ink stays dark (inheriting --secondary left it near-white on the lime) */
+    [data-theme="dark"] .impact-stat-hl.hi { background: #E6F28D; color: #131A25; }
     /* Lime highlights keep dark text in dark mode — they inherit --secondary
        otherwise, which goes near-white and leaves 1.08:1 against the lime.
        .et-hl only flips once the lime has wiped in, so the pre-reveal text
@@ -1819,53 +1825,6 @@
 
         </div>
       </div>
-
-    <!-- ── Other Projects ──────────────────────────────────────── -->
-    <section class="other-projects">
-      <p class="other-projects-label">Other Projects</p>
-      <div class="other-projects-grid">
-
-        <a class="op-card" href="./evertutor-studio.html">
-          <div class="op-card-img op-card-img-studio">
-            <video autoplay muted loop playsinline>
-              <source src="./et-studio-recording.mov" type="video/mp4" />
-            </video>
-          </div>
-          <div class="op-card-body">
-            <div class="op-card-tags"><span class="op-card-tag">EverTutor</span><span class="op-card-tag">Authoring</span></div>
-            <p class="op-card-title">EverTutor Studio</p>
-            <p class="op-card-desc">The teacher-facing authoring tool that reduced lesson creation from 100+ hours to ~4 hours without sacrificing quality.</p>
-            <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
-        </a>
-
-        <a class="op-card" href="./stressie-studio.html">
-          <div class="op-card-img op-card-img-stressie">
-            <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%202.png" alt="Stressie screen 1" />
-            <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%203.png" alt="Stressie screen 2" />
-          </div>
-          <div class="op-card-body">
-            <div class="op-card-tags"><span class="op-card-tag">Wellness</span><span class="op-card-tag">Enterprise</span></div>
-            <p class="op-card-title">Stressie</p>
-            <p class="op-card-desc">Took workplace stress from a vague problem to a Harvard-incubated product, now live at Amazon and InKind.</p>
-            <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
-        </a>
-
-        <a class="op-card" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">
-          <div class="op-card-img">
-            <img src="dearly-full-visual.png" alt="Dearly — personal notes app" />
-          </div>
-          <div class="op-card-body">
-            <div class="op-card-tags"><span class="op-card-tag">Side Project</span><span class="op-card-tag">Consumer</span></div>
-            <p class="op-card-title">Dearly</p>
-            <p class="op-card-desc">A notes app designed to feel personal, shipped as an independent side project and live on Product Hunt.</p>
-            <span class="op-card-cta">Try it out <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
-        </a>
-
-      </div>
-    </section>
 
     <footer class="thankyou-footer">
       <span class="ty-text">✦ Thank_you</span>
