@@ -349,7 +349,7 @@
     display:flex;flex-direction:column;opacity:0;pointer-events:none;white-space:nowrap;
     transition:opacity .3s ease,transform .3s ease;}
   .top-nav.scrolled .nav-callme{opacity:1;pointer-events:auto;transform:translateY(-50%);}
-  .nav-callme-label{font-size:10px;font-weight:550;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);line-height:1.5;}
+  .nav-callme-label{font-size:clamp(10px,0.55vw,12px);font-weight:550;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);line-height:1.5;}
   .nav-callme-name{font-family:var(--sans);font-size:16px;font-weight:550;letter-spacing:-0.005em;color:var(--ink);line-height:1.15;}
   /* ── ORB FAB — bottom-right. No scale in any state: mountVisual reads the
         element's transformed rect, so a scaled mount would size the canvas wrong. ── */
@@ -516,7 +516,7 @@
   /* identity line — plain label row, deliberately chrome-less */
   .eyebrow{display:inline-flex;align-items:center;gap:16px;
     margin-bottom:clamp(18px,2.8vh,28px);
-    font-size:12.5px;font-weight:520;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);}
+    font-size:clamp(12.5px,0.72vw,15px);font-weight:520;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);}
   .eyebrow i{width:1px;height:11px;background:var(--line);}
   /* ── THE DISPLAY SCALE ────────────────────────────────────────────────
      Four steps, each 1.27× the one below it, and the vw coefficients sit in
@@ -1242,7 +1242,7 @@
       /* pills retired — four bordered boxes read as noise. Metadata is one
          quiet interpunct-joined mono line now. */
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: clamp(12px, 0.72vw, 14.5px);
       letter-spacing: 0.04em;
       color: rgba(239, 243, 248,0.52);
       white-space: nowrap;
@@ -2105,14 +2105,14 @@
     .s2-acc-desc{margin:0 0 14px;font-size:14px;line-height:1.62;color:var(--ink-2);}
     .s2-acc-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:15px;}
     .s2-acc-tag{padding:5px 11px;border:1px solid var(--line);border-radius:100px;
-      font-size:11px;font-weight:500;letter-spacing:.03em;color:var(--ink-3);
+      font-size:11.5px;font-weight:500;letter-spacing:.03em;color:var(--ink-3);
       background:rgba(239,243,248,.04);}
     .s2-acc-metrics{display:flex;flex-wrap:wrap;gap:22px;
       padding-top:14px;border-top:1px solid var(--line);}
     .s2-acc-metric{display:flex;flex-direction:column;gap:3px;}
     .s2-acc-metric-val{font-size:19px;font-weight:600;letter-spacing:-0.018em;color:var(--ink);
       font-variant-numeric:tabular-nums lining-nums;}
-    .s2-acc-metric-lbl{font-size:10.5px;font-weight:550;letter-spacing:.1em;
+    .s2-acc-metric-lbl{font-size:11px;font-weight:550;letter-spacing:.1em;
       text-transform:uppercase;color:var(--ink-3);}
     .s2-acc-cta{display:inline-flex;align-items:center;gap:7px;margin-top:16px;
       padding:11px 19px;border-radius:13px;border:1px solid rgba(92,169,255,.34);
@@ -4218,7 +4218,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       }
       .dna2-tile-ic { width: clamp(17px, 5.4vw, 26px); height: clamp(17px, 5.4vw, 26px); }
       .dna2-tile-nm {
-        font-size: clamp(7px, 2.3vw, 11px); line-height: 1.15; letter-spacing: -0.012em;
+        /* 10px legibility floor — 7px was decoration, not information */
+        font-size: clamp(10px, 2.6vw, 12px); line-height: 1.15; letter-spacing: -0.012em;
         /* "Engineering" alone is wider than a fifth of the screen —
            let it break instead of spilling out of the tile */
         overflow-wrap: anywhere; hyphens: auto;
@@ -4267,7 +4268,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* fixed inner padding — the page gutter must never apply INSIDE the
        880px cap (it was crushing the deck to ~300px on large screens) */
     padding:0 24px;text-align:center;}
-  .said-k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
+  .said-k{display:block;font-size:clamp(11.5px,0.68vw,14px);font-weight:550;letter-spacing:.18em;
     text-transform:uppercase;color:var(--ember);margin-bottom:clamp(16px,2.2vh,24px);}
   .said-h{font-family:var(--sans);font-weight:570;color:var(--ink);
     font-size:clamp(22px,2.13vw,35px);line-height:1.16;letter-spacing:-0.022em;
@@ -4347,7 +4348,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   .tm-who{display:flex;flex-direction:column;gap:2px;min-width:0;}
   .tm-name{font-family:var(--sans);font-size:14.5px;font-weight:600;color:var(--ink);
     letter-spacing:-0.008em;}
-  .tm-role{font-family:var(--sans);font-size:12px;font-weight:500;color:var(--ink-3);}
+  .tm-role{font-family:var(--sans);font-size:clamp(12px,0.72vw,14.5px);font-weight:500;color:var(--ink-3);}
 
   /* square, always (annotation #21) — stretch cropped it to the card */
   .tm-art{position:relative;align-self:center;aspect-ratio:1/1;height:auto;
@@ -4488,11 +4489,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
      plate's dark half — the hero's composition, mirrored */
   .ft-left{flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-start;gap:28px;}
 
-  .ft-k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
+  .ft-k{display:block;font-size:clamp(11.5px,0.68vw,14px);font-weight:550;letter-spacing:.18em;
     text-transform:uppercase;color:var(--ink-3);}
 
   .ft-status{display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:999px;
-    font-size:11.5px;font-weight:550;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);
+    font-size:clamp(11.5px,0.68vw,14px);font-weight:550;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);
     background:rgba(239,243,248,.05);border:1px solid var(--line);}
   .ft-dot{width:7px;height:7px;border-radius:50%;background:#3b8cff;flex-shrink:0;
     box-shadow:0 0 8px rgba(59,140,255,.8);animation:pulse 1.4s infinite;}
@@ -4641,7 +4642,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .nav-nametext{min-width:0;}
     .nav-name{font-size:15px;}
     .nav-callme-name{font-size:14px;}
-    .nav-callme-label{font-size:9px;letter-spacing:.12em;}
+    .nav-callme-label{font-size:10px;letter-spacing:.12em;}
     .nav-brand{gap:10px;min-height:32px;}
     /* let the hero grow if the stack outruns a short viewport */
     .hero{height:auto;min-height:100svh;}
@@ -4662,7 +4663,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        without it the last headline line sits on the rim light and vanishes. */
     .hero-scrim{background:linear-gradient(180deg,
       rgba(10,14,21,.70) 0%, rgba(10,14,21,.56) 44%, rgba(10,14,21,.82) 100%);}
-    .eyebrow{gap:10px;padding:8px 14px;font-size:10.5px;letter-spacing:.07em;}
+    .eyebrow{gap:10px;padding:8px 14px;font-size:11.5px;letter-spacing:.07em;}
     /* five lines of headline plus the stats band plus the button is the whole
        of a phone screen — the ceiling comes down so the fold can breathe */
     h1{font-size:clamp(30px,8.6vw,42px);}
@@ -5930,7 +5931,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <div class="ft-note" id="ftNote">
           <span class="ft-k">A small note for you</span>
           <div class="ft-paper">
-            <p class="ft-letter">Out of all the things you could&rsquo;ve done today, you spent a little of it right here, with my work. That genuinely means a lot. And if it stuck with you, you know what the heart&rsquo;s for.</p>
+            <p class="ft-letter">If you made it this far, you&rsquo;ve probably noticed the pattern.<br>I like messy problems, ambitious ideas, and products that don&rsquo;t have an obvious answer yet.<br>Give me something complex. I&rsquo;ll figure out what matters, make it simple, and help ship it.</p>
           </div>
           <button class="ft-love" id="ftLove" type="button" aria-pressed="false" aria-label="Leave some love">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.9-10-9.3C.2 8.3 1.7 4.7 5 4.1 7 3.7 9 4.6 12 7.5c3-2.9 5-3.8 7-3.4 3.3.6 4.8 4.2 3 7.6C19.5 16.1 12 21 12 21z"/></svg>
