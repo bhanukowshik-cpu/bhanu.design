@@ -56,6 +56,13 @@
     --body:'Urbanist','Instrument Sans',system-ui,sans-serif;
     --ease:cubic-bezier(0.16,1,0.3,1);
     --ease-expo:cubic-bezier(0.19,1,0.22,1);   /* ease-out-expo — luxe deceleration */
+    --ease-pop:cubic-bezier(0.34,1.56,0.64,1); /* the one sanctioned overshoot — FAB, hearts */
+    /* ── THE SEAMS — divider bands between sections ─────────────────────
+       --seam is the tone the section vignettes actually reach at their
+       edges; --seam-deep is the hero's near-black. Bands built from these
+       never read as their own strip of page. */
+    --seam:#0B0C0F;
+    --seam-deep:#05070B;
 
     /* ── THE CTA — one gradient, every button, every page ────────────────
        White burns out of the top-left corner and the azure takes the rest,
@@ -121,7 +128,7 @@
      input fall back to the system UI font and break the Instrument setting */
   button,input,textarea,select,optgroup{font-family:inherit;font-size:inherit;
     font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;}
-  ::selection{background:var(--ember);color:#071019;}
+  ::selection{background:var(--ember);color:#08111F;}
 
   /* film grain */
   body::after{
@@ -449,7 +456,7 @@
     border-radius:clamp(18px,1.2vw,22px);cursor:pointer;border:none;
     background:linear-gradient(135deg,#FFFFFF 0%,#F6F9FD 42%,#E7EEF8 100%);
     box-shadow:none;
-    color:#0B1220;
+    color:#08111F;
     font-family:var(--sans);
     transition:transform .4s var(--ease),background .45s var(--ease);
   }
@@ -466,7 +473,7 @@
     transition:width .55s var(--ease);}   /* width animates to hug each prompt */
   .cta-text span{
     grid-area:1/1;justify-self:start;width:max-content;
-    white-space:nowrap;font-size:clamp(15px,0.95vw,18px);font-weight:560;letter-spacing:-0.002em;color:#0B1220;
+    white-space:nowrap;font-size:clamp(15px,0.95vw,18px);font-weight:560;letter-spacing:-0.002em;color:#08111F;
     opacity:0;transform:translateY(11px);filter:blur(3px);
     transition:opacity .6s var(--ease),transform .6s var(--ease),filter .6s var(--ease);
   }
@@ -659,7 +666,7 @@
         rgba(255,255,255,0.50)  6.67px 6.67px 3.36px -6.21px inset;
       backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
       filter: brightness(1.05);
-      transition: filter 0.2s ease, transform 0.18s cubic-bezier(0.16,1,0.3,1), box-shadow 0.22s ease;
+      transition: filter 0.2s ease, transform 0.18s var(--ease), box-shadow 0.22s ease;
     }
 /* Videos in the work section are always visible — the JS observer-based
        fade-in system doesn't work inside overflow:hidden sticky containers */
@@ -787,7 +794,7 @@
          more than it gave.) */
       margin: 0;
       padding: 13vh 40px 9vh;
-      background: linear-gradient(180deg, #05070B 0%, #090C11 50%, #0B0C0F 100%);
+      background: linear-gradient(180deg, var(--seam-deep) 0%, #090C11 50%, var(--seam) 100%);
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -795,8 +802,8 @@
       gap: 0;
       opacity: 0;
       transform: translateY(24px);
-      transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1),
-                  transform 0.9s cubic-bezier(0.22,1,0.36,1);
+      transition: opacity 0.9s var(--ease),
+                  transform 0.9s var(--ease);
       position: relative;
       z-index: 20;
     }
@@ -812,7 +819,7 @@
    actually reach, so the band never reads as its own strip. */
     .sec-divider {
       padding: 13vh 40px 9vh;
-      background: #0B0C0F;
+      background: var(--seam);
       display: flex;
       justify-content: center;
       text-align: center;
@@ -855,7 +862,7 @@
 /* View toggle (SPIRAL / LIST) — same glass pill as testimonial .tm-tabs */
     .s2-view-toggle {
       display: flex; gap: 2px; flex-shrink: 0;
-      background: rgba(23,23,23,0.88);
+      background: rgba(18,24,34,0.88);
       backdrop-filter: blur(20px) saturate(160%);
       -webkit-backdrop-filter: blur(20px) saturate(160%);
       border-radius: 999px;
@@ -943,8 +950,8 @@
       pointer-events: none;
       opacity: 0;
       transform: translateX(-50%) translateY(28px);
-      transition: opacity 0.55s cubic-bezier(0.16,1,0.3,1),
-                  transform 0.55s cubic-bezier(0.16,1,0.3,1);
+      transition: opacity 0.55s var(--ease),
+                  transform 0.55s var(--ease);
     }
 .s2-project-bar::before {
       content: "";
@@ -994,7 +1001,7 @@
       opacity: 0;
     }
 .s2-bar-in .s2-bar-title {
-      animation: s2FadeUp 0.45s 0.05s cubic-bezier(0.16,1,0.3,1) forwards;
+      animation: s2FadeUp 0.45s 0.05s var(--ease) forwards;
     }
 .s2-bar-title-badge {
       /* Quiet parenthetical after the title — no chip frame, no caps.
@@ -1112,7 +1119,7 @@
     }
 .s2-bar-in .s2-bar-tags-col--merged .s2-bar-tag,
     .s2-bar-in .s2-bar-tags-col--merged .s2-bar-icon-tag {
-      animation: s2IconTagIn 0.45s cubic-bezier(0.16,1,0.3,1) forwards;
+      animation: s2IconTagIn 0.45s var(--ease) forwards;
     }
 .s2-bar-tags-col--merged .s2-bar-tag             { animation-delay: 0.12s; }
 .s2-bar-tags-col--merged .s2-bar-icon-tag:nth-child(1) { animation-delay: 0.18s; }
@@ -1218,7 +1225,7 @@
       filter: brightness(1.05);
       cursor: pointer;
       pointer-events: all;
-      transition: filter 0.2s ease, transform 0.18s cubic-bezier(0.16,1,0.3,1), box-shadow 0.22s ease;
+      transition: filter 0.2s ease, transform 0.18s var(--ease), box-shadow 0.22s ease;
       opacity: 0;
     }
 .s2-bar-cta:hover { filter: brightness(1.12); transform: scale(1.04); box-shadow: 0 0 14px 4px rgba(255,255,255,0.55), 0 0 32px 10px rgba(255,255,255,0.22); }
@@ -1233,8 +1240,8 @@
       gap: 10px;
       opacity: 0;
       transform: translateY(-10px);
-      transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1),
-                  transform 0.85s cubic-bezier(0.16,1,0.3,1);
+      transition: opacity 0.85s var(--ease),
+                  transform 0.85s var(--ease);
     }
 .s2-project-tabs.s2-tabs-in {
       opacity: 1;
@@ -1249,7 +1256,7 @@
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
       border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 100px;
+      border-radius: 999px;
       padding: 5px 6px;
     }
 .s2-tab-btn {
@@ -1257,7 +1264,7 @@
       font-size: var(--fs-label);
       letter-spacing: 0.02em;
       padding: 6px 11px;
-      border-radius: 100px;
+      border-radius: 999px;
       border: none;
       background: transparent;
       color: rgba(255,255,255,0.38);
@@ -2135,8 +2142,8 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     position:fixed;top:0;left:0;pointer-events:none;z-index:13000;
     width:12px;height:12px;border-radius:999px;background:rgba(239,243,248,.9);
     opacity:0;will-change:transform;
-    transition:width .32s cubic-bezier(.34,1.56,.64,1),height .32s cubic-bezier(.34,1.56,.64,1),
-      border-radius .3s cubic-bezier(.34,1.56,.64,1),background .26s ease,opacity .18s ease;
+    transition:width .32s var(--ease-pop),height .32s var(--ease-pop),
+      border-radius .3s var(--ease-pop),background .26s ease,opacity .18s ease;
   }
   /* over a project's imagery the dot speaks — a small white pill, an invitation */
   #ccDot.cc-say{width:auto !important;height:auto !important;padding:9px 15px;
@@ -2393,7 +2400,7 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
        runs — no JS, headless render, background tab — the section still shows.
        .cw-visible then plays it in.
 
-       cubic-bezier(0.16, 1, 0.3, 1) is an expo-out curve: very fast start,
+       var(--ease) is an expo-out curve: very fast start,
        extreme deceleration into the final position. This is what gives it
        the "heavy, expensive, settling" feel rather than a bounce or spring.
     ─────────────────────────────────────────────────────────────────────── */
@@ -2407,8 +2414,8 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     .am-section > .cinematic-wrap.cw-armed {
       opacity: 0;
       transform: translateY(80px) scale(1.05);
-      transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
-                  transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 1.2s var(--ease),
+                  transform 1.2s var(--ease);
     }
     .am-section > .cinematic-wrap.cw-armed.cw-visible {
       opacity: 1;
@@ -2607,7 +2614,7 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
       line-height: 1.75;
     }
 /* Dark mode pills */
-    [data-theme="dark"] .am-item-bg       { background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 2.45%, rgba(255,255,255,0) 126.14%), rgba(23,23,23,0.88); }
+    [data-theme="dark"] .am-item-bg       { background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 2.45%, rgba(255,255,255,0) 126.14%), rgba(18,24,34,0.88); }
 [data-theme="dark"] .am-item-label    { color: var(--secondary); }
 [data-theme="dark"] .am-item-inner-title { color: var(--secondary); }
 [data-theme="dark"] .am-item-inner-body  { color: rgba(240,237,232,0.45); }
@@ -2783,7 +2790,7 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
       color: rgba(29,29,31,0.6);
       background: rgba(29,29,31,0.04);
       border: 1px solid rgba(29,29,31,0.1);
-      border-radius: 100px;
+      border-radius: 999px;
       padding: 6px 16px;
     }
 /* Dark mode */
@@ -2879,7 +2886,7 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
       transform: translateY(var(--am-pane-y));
       transition:
         opacity   var(--am-pane-in-dur) ease                        var(--am-pane-in-delay),
-        transform var(--am-pane-y-dur)  cubic-bezier(0.16,1,0.3,1) var(--am-pane-in-delay);
+        transform var(--am-pane-y-dur)  var(--ease) var(--am-pane-in-delay);
     }
 .am-panel-pane.is-active { opacity: 1; pointer-events: auto; transform: translateY(0); }
 /* Exit — Apple: 300ms / 0ms delay */
@@ -2889,7 +2896,7 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
       transform: translateY(calc(var(--am-pane-y) * -1));
       transition:
         opacity   var(--am-pane-out-dur) ease                        var(--am-pane-out-delay),
-        transform var(--am-pane-y-dur)   cubic-bezier(0.16,1,0.3,1) var(--am-pane-out-delay);
+        transform var(--am-pane-y-dur)   var(--ease) var(--am-pane-out-delay);
     }
 .am-panel-placeholder {
       font-family: var(--font-mono);
@@ -2954,7 +2961,7 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
       color: rgba(29,29,31,0.55);
       background: rgba(29,29,31,0.06);
       border: 1px solid rgba(29,29,31,0.1);
-      border-radius: 100px;
+      border-radius: 999px;
       padding: 5px 12px;
     }
 .am-pane-list {
@@ -3034,7 +3041,7 @@ html:not([data-theme="dark"]) .abt-title { color: rgba(37,37,37,0.55); }
 /* Tab strip — exact testimonial .tm-tabs glass treatment */
     .abt-nav-pill {
       display: inline-flex; gap: 2px;
-      background: rgba(23,23,23,0.88);
+      background: rgba(18,24,34,0.88);
       backdrop-filter: blur(20px) saturate(160%);
       -webkit-backdrop-filter: blur(20px) saturate(160%);
       border-radius: 999px;
@@ -3108,7 +3115,7 @@ html:not([data-theme="dark"]) .abt-title { color: rgba(37,37,37,0.55); }
       flex-direction: column;
       flex: 1;
       justify-content: center;
-      animation: abt-fade-in 0.32s cubic-bezier(0.16,1,0.3,1);
+      animation: abt-fade-in 0.32s var(--ease);
     }
 /* Standard (Looking For / Why Me) pane wrapper */
     .abt-std-pane { max-width: 700px; margin: 0 auto; padding: 40px 0; }
@@ -3154,7 +3161,7 @@ html:not([data-theme="dark"]) .abt-title { color: rgba(37,37,37,0.55); }
       flex: 1;
       min-width: 0;
       transform-origin: center bottom;
-      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease;
+      transition: transform 0.3s var(--ease), box-shadow 0.3s ease;
       cursor: default;
     }
 .oh-polaroid:nth-child(1) { transform: rotate(-2.8deg); }
@@ -3244,11 +3251,11 @@ html:not([data-theme="dark"]) .abt-title { color: rgba(37,37,37,0.55); }
         rgba(255,255,255,0.50)  6.67px 6.67px 3.36px -6.21px inset;
       backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
       filter: brightness(1.05);
-      transition: filter 0.2s ease, transform 0.18s cubic-bezier(0.16,1,0.3,1), box-shadow 0.22s ease;
+      transition: filter 0.2s ease, transform 0.18s var(--ease), box-shadow 0.22s ease;
     }
 .dna2-cta:hover { filter: brightness(1.12); transform: scale(1.04); box-shadow: 0 0 14px 4px rgba(255,255,255,0.55), 0 0 32px 10px rgba(255,255,255,0.22); }
 .dna2-cta:active { transform: scale(0.97); }
-.dna2-cta-arrow { transition: transform 0.2s cubic-bezier(0.16,1,0.3,1); }
+.dna2-cta-arrow { transition: transform 0.2s var(--ease); }
 .dna2-cta:hover .dna2-cta-arrow { transform: translateX(3px); }
 .dna2-legend {
       position: absolute; right: 0; bottom: 0;
@@ -3361,7 +3368,7 @@ html:not([data-theme="dark"]) .dna2-tile,
       padding: 12px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
       cursor: pointer; overflow: hidden; text-align: center;
       border: 1px solid rgba(226,238,252,0.07);
-      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s ease, background 0.3s ease;
+      transition: transform 0.3s var(--ease), border-color 0.3s ease, background 0.3s ease;
     }
 .dna2-tile-ic {
       width: 40px; height: 40px; flex-shrink: 0;
@@ -3432,8 +3439,10 @@ html:not([data-theme="dark"]) .dna2-tile,
         linear-gradient(rgba(37,37,37,0.05) 1px, transparent 1px),
         linear-gradient(90deg, rgba(37,37,37,0.05) 1px, transparent 1px);
     }
-/* the work section carries the same grid, so it flips the same way */
-    html:not([data-theme="dark"]) .s2-section-wrap {
+/* the work and testimonial sections carry the same grid, so they flip
+   the same way */
+    html:not([data-theme="dark"]) .s2-section-wrap,
+    html:not([data-theme="dark"]) .said {
       background-color: var(--bg);
       background-image:
         radial-gradient(65% 60% at 50% 50%, transparent 0%, transparent 45%, rgba(239, 243, 248,0.7) 72%, var(--bg) 90%),
@@ -3506,8 +3515,17 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        One voice at a time, set like an epigraph: a serif quote on a still
        stage, the four names waiting quietly underneath. The dwell line under
        the active name is the only thing that moves on its own. */
-  .said{position:relative;background:var(--bg);overflow:clip;
-    padding:clamp(84px,12vh,150px) 0 clamp(92px,13vh,158px);}
+  .said{position:relative;overflow:clip;
+    padding:clamp(84px,12vh,150px) 0 clamp(92px,13vh,158px);
+    /* the ruled grid the About section documents as shared with this
+       section — restored here, so every inner section stands on the
+       same centre-bright ground */
+    background-color:var(--bg);
+    background-image:
+      radial-gradient(65% 60% at 50% 50%, transparent 0%, transparent 45%, rgba(13,13,13,0.6) 72%, rgba(13,13,13,0.96) 90%),
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size:100% 100%, 52px 52px, 52px 52px;}
   .said-pool{position:absolute;left:50%;top:52%;width:min(920px,86vw);height:70%;
     transform:translate(-50%,-50%);filter:blur(40px);pointer-events:none;
     background:radial-gradient(ellipse at center,rgba(92,169,255,.06) 0%,transparent 66%);}
@@ -3672,7 +3690,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   .ft-k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
     text-transform:uppercase;color:var(--ink-3);}
 
-  .ft-status{display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:100px;
+  .ft-status{display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:999px;
     font-size:11.5px;font-weight:550;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);
     background:rgba(239,243,248,.05);border:1px solid var(--line);}
   .ft-dot{width:7px;height:7px;border-radius:50%;background:#3b8cff;flex-shrink:0;
@@ -3749,10 +3767,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     background:none;border:0;padding:0;cursor:pointer;color:var(--ink-3);
     -webkit-tap-highlight-color:transparent;}
   .ft-love svg{width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:1.8;
-    transition:transform .25s cubic-bezier(0.34,1.56,0.64,1),fill .2s,stroke .2s,color .2s;}
+    transition:transform .25s var(--ease-pop),fill .2s,stroke .2s,color .2s;}
   .ft-love:hover svg{transform:scale(1.1);color:#FF6B8A;}
   .ft-love.loved svg{fill:#FF4D6D;stroke:#FF4D6D;color:#FF4D6D;}
-  .ft-love.pop svg{animation:lovePop .5s cubic-bezier(0.34,1.56,0.64,1);}
+  .ft-love.pop svg{animation:lovePop .5s var(--ease-pop);}
   @keyframes lovePop{0%{transform:scale(.85)}45%{transform:scale(1.35)}100%{transform:scale(1)}}
   .ft-love::after{content:'';position:absolute;inset:6px;border-radius:50%;
     border:2px solid #FF4D6D;opacity:0;transform:scale(.6);pointer-events:none;}
@@ -3776,7 +3794,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
     font-size:13px;font-weight:500;letter-spacing:.02em;color:var(--ink);
     opacity:0;pointer-events:none;
-    transition:transform .35s cubic-bezier(0.34,1.56,0.64,1),opacity .22s;}
+    transition:transform .35s var(--ease-pop),opacity .22s;}
   #ftToast.show{transform:translateX(-50%) translateY(0) scale(1);opacity:1;}
   .ft-toast-ic{width:18px;height:18px;border-radius:50%;flex-shrink:0;background:var(--ember);
     display:flex;align-items:center;justify-content:center;}
@@ -5291,7 +5309,7 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
   function releaseMagnet() {
     if (!magnetEl) return;
     var el = magnetEl; magnetEl = null;
-    el.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    el.style.transition = 'transform 0.5s var(--ease-pop)';
     el.style.transform = 'translate(0px, 0px)';
     setTimeout(function () { el.style.transition = ''; el.style.transform = ''; }, 520);
   }
@@ -5940,7 +5958,7 @@ addEventListener('load', function () {
         var r = card.getBoundingClientRect();
         if (r.top < vpH * 0.88) {
           revealed[i] = true;
-          card.style.transition = 'opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1)';
+          card.style.transition = 'opacity 0.8s var(--ease), transform 0.8s var(--ease)';
           /* stagger: each card a little after previous */
           setTimeout(function () {
             card.style.opacity   = '1';
