@@ -13,7 +13,7 @@
 <meta property="og:image" content="https://bhanu.design/images/og-image.jpg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="AI Native Product Designer in large type beside a cinematic black-and-white portrait of Bhanu, with credentials: 0 to 1, Conversational AI, Impact Driven, 5+ Years, Builder, San Francisco" />
+<meta property="og:image:alt" content="Bhanu Kowshik in large stacked type over a cinematic black-and-white portrait — AI Native Product Designer — with credentials: 0 to 1, Conversational AI, Impact Driven, 5+ Years, Builder, San Francisco" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://bhanu.design/images/og-image.jpg" />
 <link rel="icon" type="image/png" href="images/logo-bk-favicon.png" />
@@ -832,11 +832,11 @@
       z-index: 10;
       display: flex;
       flex-direction: column;
-      background: rgba(14,14,14,0.55);
+      background: rgba(10,14,21,0.62);   /* the page's navy, not generic black */
       border-radius: 20px;
       backdrop-filter: blur(32px);
       -webkit-backdrop-filter: blur(32px);
-      padding: 32px 40px;
+      padding: 34px 44px;
       pointer-events: none;
       opacity: 0;
       transform: translateX(-50%) translateY(28px);
@@ -849,7 +849,7 @@
       inset: 0;
       border-radius: inherit;
       padding: 1px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.10) 0%, rgba(140,197,255,0.35) 100%);
+      background: linear-gradient(90deg, rgba(255,255,255,0.07) 0%, rgba(140,197,255,0.22) 100%);
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
@@ -900,13 +900,15 @@
          full size and shouted). */
       display: inline-flex;
       align-items: center;
-      font-family: var(--font-mono);
-      font-size: 0.5em;
-      font-weight: 550;
-      letter-spacing: 0.06em;
-      color: var(--ink-3);
+      /* the page's serif-italic accent — an editorial aside, not a chip */
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 400;
+      font-size: 0.58em;
+      letter-spacing: 0;
+      color: var(--ink-2);
       vertical-align: middle;
-      margin-left: 10px;
+      margin-left: 12px;
       position: relative;
       top: -1px;
     }
@@ -918,7 +920,8 @@
       font-size: clamp(16px, 1.35vw, 19px);
       line-height: 1.7;
       max-width: 58ch;   /* stop the lead hugging the tags column */
-      color: rgba(239, 243, 248,0.62);
+      /* washed-out gray is the anti-premium tell — the lead reads at full voice */
+      color: rgba(239, 243, 248,0.78);
       margin: 0;
       opacity: 0;
       /* Always exactly 2 lines regardless of copy length or viewport width —
@@ -968,17 +971,18 @@
     }
 .s2-bar-in .s2-bar-tags { animation: s2FadeUp 0.35s 0.09s ease forwards; }
 .s2-bar-tag {
+      /* pills retired — four bordered boxes read as noise. Metadata is one
+         quiet interpunct-joined mono line now. */
       font-family: var(--font-mono);
-      /* Explicit caption size — var(--fs-sm) is undefined, so these pills
-         inherited a full 16px and crowded the bar. Quiet metadata now. */
       font-size: 12px;
       letter-spacing: 0.04em;
-      color: rgba(239, 243, 248,0.60);
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 6px;
-      padding: 4px 10px;
+      color: rgba(239, 243, 248,0.52);
       white-space: nowrap;
+    }
+.s2-bar-tag + .s2-bar-tag::before {
+      content: "·";
+      margin-right: 10px;
+      color: rgba(239, 243, 248,0.28);
     }
 .s2-bar-tag-shipped {
       /* Deliberately no accent color — Shipped reads as a normal, plain tag everywhere */
@@ -1012,24 +1016,18 @@
 .s2-bar-tags-col--merged .s2-bar-icon-tag:nth-child(2) { animation-delay: 0.24s; }
 .s2-bar-tags-col--merged .s2-bar-icon-tag:nth-child(3) { animation-delay: 0.30s; }
 .s2-bar-icon-tag-ic {
-      width: 26px;
-      height: 26px;
-      border-radius: 8px;
+      /* boxes retired — icon-in-rounded-square is badge grammar. The
+         Lucide stroke sits inline, azure, jewelry-small. */
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--ember-2);   /* Lucide strokes inherit via currentColor — azure, section 1's accent */
-      background: linear-gradient(145deg, rgba(92,169,255,0.14), rgba(92,169,255,0.03));
-      border: 1px solid rgba(92,169,255,0.22);
-      box-shadow: none;
-      transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+      color: var(--ember-2);
+      transition: transform 0.25s ease;
     }
-.s2-bar-icon-tag-ic svg { width: 13px; height: 13px; display: block; }
+.s2-bar-icon-tag-ic svg { width: 14px; height: 14px; display: block; }
 .s2-bar-icon-tag:hover .s2-bar-icon-tag-ic {
-      border-color: rgba(92,169,255,0.48);
-      background: linear-gradient(145deg, rgba(92,169,255,0.26), rgba(92,169,255,0.06));
-      transform: translateY(-1px) scale(1.05);
+      transform: translateY(-1px) scale(1.08);
     }
 .s2-bar-icon-tag-ic img { width: 14px; height: 14px; object-fit: contain; }
 .s2-bar-icon-tag-ic .s2-icon-light { display: none; }
@@ -1041,12 +1039,13 @@
       color: rgba(239, 243, 248,0.80);
       white-space: nowrap;
     }
-/* Spacer (was a visible hairline divider — kept invisible for spacing only) */
+/* A real editorial rule again — it anchors the composition and gives the
+   metrics strip a shelf to sit on */
     .s2-bar-rule {
       width: 100%;
       height: 1px;
-      background: transparent;
-      margin-bottom: 12px;
+      background: var(--line);
+      margin: 4px 0 20px;
     }
 /* Bottom row: metrics left, CTA right */
     .s2-bar-bottom-row {
@@ -1056,28 +1055,30 @@
     }
 .s2-bar-metrics {
       display: flex;
-      gap: 36px;
+      gap: 26px;
       opacity: 0;
     }
 .s2-bar-in .s2-bar-metrics { animation: s2FadeUp 0.38s 0.22s ease forwards; }
-.s2-bar-metric { display: flex; flex-direction: column; gap: 6px; }
+.s2-bar-metric { display: flex; flex-direction: column; gap: 7px; }
+/* hairline dividers turn the strip into a spec sheet — three floating
+   stat cards was the SaaS-template read */
+.s2-bar-metric + .s2-bar-metric { padding-left: 26px; border-left: 1px solid var(--line); }
 .s2-bar-metric-val {
       font-family: var(--font-mono);
-      font-size: clamp(22px,2.2vw,32px);
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(24px, 2.4vw, 30px);
       font-weight: 700;
-      /* the numbers are the proof — they carry the page's azure accent
-         (section 1's system; lime belongs to index.html) */
+      /* the numbers are the proof — they carry the page's azure accent */
       color: var(--ember-2);
       line-height: 1;
     }
 .s2-bar-metric-lbl {
-      font-family: var(--font-mono);
-      /* Explicit caption size: var(--fs-sm) was undefined and inherited a
-         full 16px, which outweighed the desc. Captions sit under the
-         numbers, two steps below the lead sentence. */
-      font-size: clamp(11.5px, 0.95vw, 13px);
-      letter-spacing: 0.06em;
-      color: rgba(239, 243, 248,0.65);
+      /* prose face at sentence weight — the tracked caps-mono caption was
+         the other half of the template tell */
+      font-family: var(--body);
+      font-size: 13px;
+      letter-spacing: 0;
+      color: rgba(239, 243, 248,0.58);
       white-space: nowrap;
     }
 /* Frosted glass CTA */
@@ -1824,7 +1825,7 @@ html:not([data-theme="dark"]) .s2-cs-title { color: var(--secondary); }
 html:not([data-theme="dark"]) .s2-cards-zone { background: transparent; }
 html:not([data-theme="dark"]) .s2-video-section { background: var(--surface-alt); }
 html:not([data-theme="dark"]) .s2-bar-title { color: var(--secondary); }
-html:not([data-theme="dark"]) .s2-bar-desc { color: rgba(37,37,37,0.55); }
+html:not([data-theme="dark"]) .s2-bar-desc { color: rgba(37,37,37,0.68); }
 html:not([data-theme="dark"]) .s2-bar-desc strong { color: var(--secondary); }
 html:not([data-theme="dark"]) .s2-vt-btn { color: rgba(37,37,37,0.50); }
 html:not([data-theme="dark"]) .s2-vt-btn:hover { color: var(--secondary); }
@@ -1888,25 +1889,17 @@ html:not([data-theme="dark"]) .fw-title {
     }
 html:not([data-theme="dark"]) .s2-bar-cta { color: var(--secondary); border-color: rgba(37,37,37,0.20); }
 html:not([data-theme="dark"]) .s2-bar-cta:hover { background: rgba(37,37,37,0.06); border-color: rgba(37,37,37,0.35); }
-html:not([data-theme="dark"]) .s2-bar-tag {
-      color: rgba(37,37,37,0.65);
-      background: rgba(37,37,37,0.06);
-      border-color: rgba(37,37,37,0.12);
-    }
-html:not([data-theme="dark"]) .s2-bar-icon-tag-ic {
-      background: linear-gradient(145deg, rgba(51,114,184,0.10), rgba(51,114,184,0.03));
-      border-color: rgba(51,114,184,0.22);
-      box-shadow: none;
-      color: #3372B8;   /* Lucide strokes via currentColor */
-    }
-html:not([data-theme="dark"]) .s2-bar-icon-tag-ic .s2-icon-light { display: block; }
-html:not([data-theme="dark"]) .s2-bar-icon-tag-ic .s2-icon-dark  { display: none; }
+html:not([data-theme="dark"]) .s2-bar-tag { color: rgba(37,37,37,0.60); }
+html:not([data-theme="dark"]) .s2-bar-tag + .s2-bar-tag::before { color: rgba(37,37,37,0.30); }
+html:not([data-theme="dark"]) .s2-bar-icon-tag-ic { color: #3372B8; }
 html:not([data-theme="dark"]) .s2-bar-icon-tag-lbl { color: rgba(37,37,37,0.72); }
 html:not([data-theme="dark"]) .s2-bar-title-badge {
       color: rgba(37,37,37,0.55);
     }
 html:not([data-theme="dark"]) .s2-bar-metric-val { color: #3372B8; }
-html:not([data-theme="dark"]) .s2-bar-metric-lbl { color: rgba(37,37,37,0.50); }
+html:not([data-theme="dark"]) .s2-bar-metric-lbl { color: rgba(37,37,37,0.58); }
+html:not([data-theme="dark"]) .s2-bar-metric + .s2-bar-metric { border-left-color: rgba(37,37,37,0.14); }
+html:not([data-theme="dark"]) .s2-bar-rule { background: rgba(37,37,37,0.12); }
 html:not([data-theme="dark"]) .s2-side-nav-btn {
       background: rgba(37,37,37,0.07);
       color: rgba(37,37,37,0.65);
