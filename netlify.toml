@@ -1,0 +1,16 @@
+# Netlify build + function config.
+#
+# The site is plain static files at the repo root — there is no build step,
+# so `publish = "."` only states what the dashboard was already doing.
+#
+# The functions in netlify/functions each declare their own URL through
+# `export const config = { path: ... }`, which is why there is no [[redirects]]
+# block mapping /api/*. Adding one would shadow those declarations.
+#
+# No [[headers]] caching rules on purpose: the image filenames carry no
+# content hash, so an `immutable` policy would pin a replaced image in every
+# visitor's browser until the max-age ran out.
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
