@@ -335,7 +335,10 @@
     border-color:var(--line);
     box-shadow:0 12px 40px -18px rgba(0,0,0,.65);
   }
-  .nav-brand{position:relative;display:flex;align-items:center;min-height:40px;text-decoration:none;color:var(--ink);}
+  .nav-brand{position:relative;display:flex;align-items:center;min-height:40px;text-decoration:none;color:var(--ink);gap:12px;}
+  .nav-avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:50% 18%;
+    border:1px solid var(--line);flex-shrink:0;}
+  @media (min-width:2000px){.nav-avatar{width:46px;height:46px;}}
   .nav-nametext{position:relative;display:flex;align-items:center;min-width:150px;}
   .nav-name{font-family:var(--sans);font-size:17px;font-weight:550;letter-spacing:-0.005em;white-space:nowrap;
     transition:opacity .3s ease,transform .3s ease;}
@@ -373,6 +376,14 @@
     .top-nav .nav-links{gap:38px;}
     .top-nav .nav-links a{font-size:15.5px;}
   }
+  @media (min-width: 2000px) {
+    .top-nav{height:88px;}
+    .top-nav.scrolled{height:96px;}
+    .top-nav .nav-name{font-size:22px;}
+    .top-nav .nav-callme-name{font-size:20px;}
+    .top-nav .nav-links{gap:46px;}
+    .top-nav .nav-links a{font-size:17.5px;}
+  }
   .nav-links{display:flex;align-items:center;gap:30px;}
   .nav-links a{position:relative;font-size:13.5px;font-weight:500;letter-spacing:.02em;color:var(--ink-2);
     text-decoration:none;transition:color .25s var(--ease);}
@@ -402,7 +413,9 @@
   .copy{position:relative;z-index:10;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;
     text-align:left;height:100%;
     max-width:min(1120px,76%);
-    padding:calc(88px + var(--anno-h)) 24px clamp(92px,13vh,150px) clamp(26px,5.4vw,92px);}
+    /* the copy obeys the page gutter — it was hard-capped at 92px and sat
+       far left of the 15% margin on wide screens */
+    padding:calc(88px + var(--anno-h)) var(--gutter) clamp(92px,13vh,150px) var(--gutter);}
   /* identity line — plain label row, deliberately chrome-less */
   .eyebrow{display:inline-flex;align-items:center;gap:16px;
     margin-bottom:clamp(18px,2.8vh,28px);
@@ -956,7 +969,7 @@
       position: absolute;
       bottom: 28px;
       left: 50%;
-      width: min(1250px, calc(100% - var(--gutter) * 2));
+      width: min(clamp(1250px, 62vw, 1500px), calc(100% - var(--gutter) * 2));
       z-index: 10;
       display: flex;
       flex-direction: column;
@@ -1162,7 +1175,7 @@
 .s2-bar-icon-tag-ic .s2-icon-dark  { display: block; }
 .s2-bar-icon-tag-lbl {
       font-family: var(--font-mono);
-      font-size: 13px;   /* explicit — var(--fs-sm) is undefined */
+      font-size: clamp(13px, 0.72vw, 17px);   /* grows with the glass */
       letter-spacing: 0.02em;
       color: rgba(239, 243, 248,0.80);
       white-space: nowrap;
@@ -1194,12 +1207,11 @@
 .s2-bar-metric-val {
       font-family: var(--font-mono);
       font-variant-numeric: tabular-nums;
-      font-size: clamp(24px, 2.4vw, 30px);
+      font-size: clamp(24px, 2.4vw, 34px);
       font-weight: 700;
-      /* monochrome: scale, weight and the mono face carry the emphasis.
-         Accent-colored numbers on dark is the stock dashboard move — the
-         structure does the hierarchy work now. */
-      color: var(--ink);
+      /* the page's one accent on the numbers — asked for by annotation;
+         azure is the only colour this page speaks */
+      color: var(--ember-2);
       line-height: 1;
     }
 .s2-bar-metric-lbl {
@@ -2028,7 +2040,7 @@ html:not([data-theme="dark"]) .s2-bar-icon-tag-lbl { color: rgba(37,37,37,0.72);
 html:not([data-theme="dark"]) .s2-bar-title-badge {
       color: rgba(37,37,37,0.55);
     }
-html:not([data-theme="dark"]) .s2-bar-metric-val { color: var(--secondary); }
+html:not([data-theme="dark"]) .s2-bar-metric-val { color: #2463DC; }
 html:not([data-theme="dark"]) .s2-bar-metric-lbl { color: rgba(37,37,37,0.58); }
 html:not([data-theme="dark"]) .s2-bar-metric + .s2-bar-metric { border-left-color: rgba(37,37,37,0.14); }
 html:not([data-theme="dark"]) .s2-bar-rule { background: rgba(37,37,37,0.12); }
@@ -3234,7 +3246,7 @@ html:not([data-theme="dark"]) .abt-title { color: rgba(37,37,37,0.55); }
 /* the two-line T-shaped-designer explainer under the statement */
     .dna2-lede {
       font-family: var(--body);
-      font-size: clamp(15px, 1.15vw, 18px);
+      font-size: clamp(15px, 1.05vw, 22px);
       line-height: 1.65;
       color: var(--ink-2);
       margin: 0;
@@ -3448,7 +3460,9 @@ html:not([data-theme="dark"]) .dna2-tile,
          corner), 20px under the tiles. The connector line does the
          pointing; the card never moves. Side-stripe accent retired —
          the ring and glow carry the colour. */
-      grid-column: 1 / 3; grid-row: 1; align-self: start; position: relative;
+      /* on the RIGHT of the stem now (annotation) — cols 4-5 of the
+         lower grid, the connector reaches it from the tile's right edge */
+      grid-column: 4 / 6; grid-row: 1; align-self: start; position: relative;
       /* navy glass one elevation ABOVE the tiles' --card ground — the
          focal surface reads lighter than the controls that drive it */
       background: rgba(24,34,48,0.85);
@@ -3456,7 +3470,7 @@ html:not([data-theme="dark"]) .dna2-tile,
       -webkit-backdrop-filter: blur(18px);
       border-radius: 18px;
       padding: 20px 22px 18px; display: flex; flex-direction: column; overflow: hidden;
-      margin-right: 20px;
+      margin-left: 20px;
       margin-top: 26px;   /* band gap is 24px; the card breathes 50px under the bar */
     }
 .dna2-panel::before {
@@ -3588,7 +3602,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   .said-pool{position:absolute;left:50%;top:52%;width:min(920px,86vw);height:70%;
     transform:translate(-50%,-50%);filter:blur(40px);pointer-events:none;
     background:radial-gradient(ellipse at center,rgba(92,169,255,.06) 0%,transparent 66%);}
-  .said-inner{position:relative;z-index:2;max-width:880px;margin:0 auto;
+  .said-inner{position:relative;z-index:2;max-width:1000px;margin:0 auto;
     /* width:100%: inside the section's flex column, the auto margins
        would otherwise shrink this to fit-content and crush the deck */
     width:100%;
@@ -3621,7 +3635,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   /* ── the deck ───────────────────────────────────────────────────────────
      A stack of framed cards. The one on top is draggable: throw it in any
      direction and it goes to the back, and whoever was behind it steps up. */
-  .tm-deck{position:relative;width:100%;max-width:720px;margin:0 auto;
+  .tm-deck{position:relative;width:100%;max-width:840px;margin:0 auto;
     /* headroom for the longer quotes — 430px clipped them on tall
        screens and the attributions spilled out under the card */
     height:clamp(430px,54vh,580px);perspective:1400px;}
@@ -3743,10 +3757,14 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
   /* the hero's own button, closing the page — so the invitation is in the
      copy where the reader already is, not only in a floating orb */
-  .ft-cta-dock{margin-top:4px;}
+  /* the closer's invitation floats bottom-centre (annotation) — same
+     button, same cycling prompts as the hero's */
+  .ft-cta-dock{position:absolute;left:50%;bottom:clamp(30px,6vh,64px);
+    transform:translateX(-50%);z-index:3;margin-top:0;}
   /* the hero's copy animates its width to hug each cycling prompt; this one
      carries a single line, so it simply sizes to it */
-  .ft-cta-dock .cta-text{width:auto !important;}
+  /* (width:auto override removed — the prompt cycler sizes this now,
+     exactly like the hero's) */
   .ft-cta-dock .cta{padding:8px 22px 8px 8px;}
   .ft-cta-dock .cta-orb{width:46px;height:46px;}
   .ft-cta-dock .cta-text span{font-size:14px;}
@@ -3756,7 +3774,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
   .ft-inner{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;
     padding:clamp(40px,6vh,72px) var(--gutter) clamp(80px,11vh,128px);}
-  .ft-spread{flex:1;width:100%;max-width:min(1240px, calc(100% - var(--gutter) * 2));margin:0 auto;display:flex;
+  /* full width WITHIN ft-inner — the inner already pads var(--gutter),
+     so any cap here double-subtracts the margins */
+  .ft-spread{flex:1;width:100%;margin:0 auto;display:flex;
     /* row-reverse: the plate's figure owns the left, so the copy takes
        the right and the note settles over the dark slope */
     flex-direction:row-reverse;
@@ -3805,7 +3825,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
   .ft-socials{display:flex;gap:12px;margin-top:6px;}
   /* proof there's a person on this end, right now */
-  .ft-clock{display:block;margin-top:20px;font-size:12.5px;letter-spacing:.02em;color:var(--ink-3);}
+  .ft-clock{display:block;margin-top:20px;font-size:clamp(13px,0.8vw,16px);letter-spacing:.02em;color:var(--ink-3);}
   .ft-clock time{color:var(--ink-2);font-variant-numeric:tabular-nums;}
   .ft-soc{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;
     border-radius:12px;color:var(--ink-2);background:rgba(239,243,248,.06);
@@ -4272,6 +4292,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
     <nav class="top-nav" id="topNav">
       <a class="nav-brand" href="#top">
+        <!-- the trained Higgsfield portrait — the same face the loader
+             raises, now standing at the door -->
+        <img class="nav-avatar" src="images/loader-portrait.webp" alt="" aria-hidden="true">
         <span class="nav-nametext">
           <span class="nav-name">Bhanu Kowshik</span>
           <span class="nav-callme" aria-hidden="true">
@@ -4722,8 +4745,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
                        and all — same call as the breadth tag) -->
                   <div class="dna2-panel" id="dnaPanel">
                     <!-- no cardhead: the connector line names the source tile;
-                         repeating its title here read as an echo -->
-                    <span class="dna2-qmark">&ldquo;</span>
+                         repeating its title here read as an echo. The big
+                         quotation mark is out too — annotation. -->
                     <p class="dna2-quote dna2-fade"></p>
                   </div>
                 </div>
@@ -4930,7 +4953,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
             <button class="cta" id="ftTalk" aria-label="Chat with Bhanu AI" aria-haspopup="dialog">
               <span class="cta-orb" id="ftCtaOrb"><div id="ftOrbMount"></div></span>
               <span class="cta-text" id="ftCtaText">
-                <span class="on">Ask me anything</span>
+                <span class="on" data-q="What should I know about you?">Ask me anything</span>
+                <span data-q="Tell me about your work">Ask me about my work</span>
+                <span data-q="What's a project you're proud of?">Ask me about a project I'm proud of</span>
+                <span data-q="Why should we hire you?">Ask me why you should hire me</span>
+                <span data-q="Can we schedule a meeting next week?">Ask me to schedule a meeting</span>
               </span>
             </button>
           </div>
@@ -5220,32 +5247,39 @@ if (ftSmoke) {
 }
 })();
 
-/* ═══ CTA — cycling "Ask me…" prompts (fixed width, directional crossfade) ═══ */
-var PROMPTS = document.querySelectorAll('#ctaText span');
-var ctaText = document.getElementById('ctaText');
-var activePrompt = 0;
-var ctaHover = false;
-var ctaEl = document.getElementById('cta');
-ctaEl.addEventListener('mouseenter', function () { ctaHover = true; });
-ctaEl.addEventListener('mouseleave', function () { ctaHover = false; });
-function sizeCtaText() {                         // hug the active prompt; width animates via CSS
-  ctaText.style.width = PROMPTS[activePrompt].offsetWidth + 'px';
+/* ═══ CTA — cycling "Ask me…" prompts (fixed width, directional crossfade)
+   One cycler, two homes: the hero's button and the footer's floating twin
+   run the same machinery, each with its own clock. ═══ */
+function initPromptCycler(btnId, textId) {
+  var btn = document.getElementById(btnId);
+  var textEl = document.getElementById(textId);
+  if (!btn || !textEl) return;
+  var prompts = textEl.querySelectorAll('span');
+  if (prompts.length < 2) return;
+  var active = 0, hover = false;
+  btn.addEventListener('mouseenter', function () { hover = true; });
+  btn.addEventListener('mouseleave', function () { hover = false; });
+  function size() {                       // hug the active prompt; width animates via CSS
+    textEl.style.width = prompts[active].offsetWidth + 'px';
+  }
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(size); }
+  size();
+  addEventListener('resize', size);
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setInterval(function () {
+      if (hover) return;                  // don't swap under the reader
+      if (document.documentElement.classList.contains('talk-open')) return;  // the page is held
+      var cur = prompts[active];
+      cur.classList.remove('on'); cur.classList.add('out');
+      setTimeout(function () { cur.classList.remove('out'); }, 650);
+      active = (active + 1) % prompts.length;
+      prompts[active].classList.add('on');
+      size();
+    }, 3600);
+  }
 }
-if (document.fonts && document.fonts.ready) { document.fonts.ready.then(sizeCtaText); }
-sizeCtaText();
-addEventListener('resize', sizeCtaText);
-if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  setInterval(function () {
-    if (ctaHover) return;                       // don't swap under the reader
-    if (document.documentElement.classList.contains('talk-open')) return;  // the page is held
-    var cur = PROMPTS[activePrompt];
-    cur.classList.remove('on'); cur.classList.add('out');
-    setTimeout(function () { cur.classList.remove('out'); }, 650);
-    activePrompt = (activePrompt + 1) % PROMPTS.length;
-    PROMPTS[activePrompt].classList.add('on');
-    sizeCtaText();
-  }, 3600);
-}
+initPromptCycler('cta', 'ctaText');
+initPromptCycler('ftTalk', 'ftCtaText');
 
 /* ═══ CHAT PANEL ═══ */
 var chat = document.getElementById('chat');
@@ -5895,10 +5929,15 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
             : 'M' + x1 + ' ' + y1 + ' V' + ((y1 + yTop) / 2) + ' H' + xC + ' V' + yTop;
           sx = x1; sy = y1; ex = xC; ey = yTop;
         } else if (tr.top < pr.bottom) {
-          /* stem tile beside the card: straight across into its right edge */
+          /* stem tile beside the card: straight across into its NEARER
+             edge — the card lives on the right of the stem now, but the
+             math stays side-agnostic */
           var yS = tr.top + tr.height / 2 - rr.top;
-          d = 'M' + (tr.left - rr.left) + ' ' + yS + ' H' + (pr.right - rr.left);
-          sx = tr.left - rr.left; sy = yS; ex = pr.right - rr.left; ey = yS;
+          var cardOnRight = (pr.left + pr.width / 2) > (tr.left + tr.width / 2);
+          var xFrom = (cardOnRight ? tr.right : tr.left) - rr.left;
+          var xTo   = (cardOnRight ? pr.left  : pr.right) - rr.left;
+          d = 'M' + xFrom + ' ' + yS + ' H' + xTo;
+          sx = xFrom; sy = yS; ex = xTo; ey = yS;
         } else {
           /* stem tile below the card: across, then up into its foot */
           var yB = tr.top + tr.height / 2 - rr.top;
