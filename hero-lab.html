@@ -3103,7 +3103,18 @@ html:not([data-theme="dark"]) .abt-title { color: var(--secondary); }
    card, drawn by JS in the tile's own accent colour. First child of
    .dna2-t so tiles and card paint above it. */
     .dna2-link { position: absolute; inset: 0; pointer-events: none; overflow: visible; transition: opacity 0.18s ease; }
-.dna2-link path { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.75; }
+.dna2-link path {
+      fill: none;
+      /* dotted, and ONE colour — the page's azure. Ten line colours was
+         the tile rainbow sneaking back in. */
+      stroke: var(--ember-2);
+      stroke-width: 2;
+      stroke-dasharray: 0.1 7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.8;
+    }
+html:not([data-theme="dark"]) .dna2-link path { stroke: #3372B8; }
 /* Axis labels — Caveat, flanked by arrows that expand outward from the centre */
     .dna2-axis { display: flex; align-items: center; gap: 12px; }
 .dna2-axis.breadth { justify-content: center; }
@@ -3160,7 +3171,7 @@ html:not([data-theme="dark"]) .abt-title { color: var(--secondary); }
       grid-column: 1 / 3; grid-row: 1; align-self: start; position: relative; background: #141418; border-radius: 18px;
       padding: 20px 22px 18px; display: flex; flex-direction: column; overflow: hidden;
       margin-right: 20px;
-      margin-top: -4px;   /* band gap is 24px; the ask is 20 */
+      margin-top: 26px;   /* band gap is 24px; the card breathes 50px under the bar */
     }
 .dna2-panel::before {
       content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit; padding: 1px;
@@ -5093,7 +5104,7 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
           d = 'M' + (tr.left - rr.left) + ' ' + yB + ' H' + xC2 + ' V' + (pr.bottom - rr.top);
         }
         linkPath.setAttribute('d', d);
-        linkPath.setAttribute('stroke', tile.style.getPropertyValue('--lc') || 'currentColor');
+        /* stroke lives in CSS — one standard azure for every tile */
       }
 
       var swapT;
