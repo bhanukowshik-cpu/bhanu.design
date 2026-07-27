@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Orb tuner</title>
+<script>
+  /* ?rafshim — the local preview tab is backgrounded, which suspends
+     requestAnimationFrame and freezes WebGL. Pump queued callbacks via timers
+     so the orb renders for screenshotting. Off in a real browser: native RAF
+     runs at full rate; the shim would cap it at ~30fps. */
+  if (new URLSearchParams(location.search).has('rafshim')) (function () {
+    var queue = [];
+    window.requestAnimationFrame = function (cb) { queue.push(cb); return queue.length; };
+    window.cancelAnimationFrame = function () {};
+    function pump() {
+      var now = performance.now();
+      var cbs = queue; queue = [];
+      for (var i = 0; i < cbs.length; i++) { try { cbs[i](now); } catch (e) {} }
+    }
+    setInterval(pump, 33);
+    var ch = new MessageChannel();
+    ch.port1.onmessage = pump;
+    setInterval(function () { ch.port2.postMessage(0); }, 33);
+  })();
+</script>
+<style>
+  *{margin:0;box-sizing:border-box;}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(120% 90% at 50% 115%, #131a28 0%, #0c111b 48%, #080b11 100%);
+    font-family:system-ui,sans-serif;}
+  h1{position:fixed;top:18px;left:0;right:0;text-align:center;font-weight:500;
+    color:#8a90a4;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+</style>
+</head>
+<body>
+  <h1>Orb tuner — copy config, paste into orbConfig.ts</h1>
+  <div id="orb-lab"></div>
+
+  <script type="module" src="orb/bhanu-orb.js?v=3"></script>
+  <script>
+    (function ready() {
+      if (!(window.BhanuOrb && window.BhanuOrb.mountLab)) { setTimeout(ready, 40); return; }
+      window.BhanuOrb.mountLab(document.getElementById('orb-lab'), { size: 320 });
+    })();
+  </script>
+</body>
+</html>

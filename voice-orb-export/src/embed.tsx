@@ -8,6 +8,9 @@
  *     'user-speaking'|'thinking'|'assistant-speaking'|'mic-denied'|'error') and hands the host
  *     {start, end} through the controls callback. The host renders its own CTA / tags / end-call.
  *   mountVisual(el, opts)  — decorative orb only, no conversation.
+ *   mountLab(el, opts)     — standalone tuning page: one orb with the debug
+ *     panel open plus a state/palette/simulate strip. The orb never remounts
+ *     on a switch, so slider tweaks survive while you flip states.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
@@ -231,7 +234,67 @@ function mountVisual(
   return root;
 }
 
-(window as unknown as { BhanuOrb: unknown }).BhanuOrb = { mount, mountVisual, PALETTES };
+/* ── standalone tuning lab — one orb, panel open, a strip to poke it ────── */
+const LAB_STATES: VoiceOrbState[] = [
+  'idle', 'listening', 'user-speaking', 'assistant-speaking', 'connecting', 'error',
+];
+
+function LabOrb({ size = 320 }: { size?: number }) {
+  const [state, setState] = useState<VoiceOrbState>('idle');
+  const [palette, setPalette] = useState<PaletteName>('arctic');
+  const [simulate, setSimulate] = useState<'user' | 'assistant' | null>(null);
+
+  const pill = (active: boolean): React.CSSProperties => ({
+    padding: '5px 10px', borderRadius: 999, cursor: 'pointer',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: active ? 'rgba(155,92,255,0.35)' : 'rgba(255,255,255,0.05)',
+    color: active ? '#fff' : '#a7abbd',
+    font: '11px/1 ui-monospace, SFMono-Regular, Menlo, monospace',
+  });
+  const row: React.CSSProperties = {
+    display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center',
+  };
+  const label: React.CSSProperties = {
+    font: '10px/1 ui-monospace, SFMono-Regular, Menlo, monospace', color: '#6f7386',
+    textTransform: 'uppercase', letterSpacing: '0.08em', marginRight: 2,
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}>
+      <VoiceOrb state={state} simulate={simulate} palette={PALETTES[palette]} size={size} debug />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={row}>
+          <span style={label}>state</span>
+          {LAB_STATES.map((s) => (
+            <button key={s} style={pill(state === s)} onClick={() => setState(s)}>{s}</button>
+          ))}
+        </div>
+        <div style={row}>
+          <span style={label}>palette</span>
+          {(Object.keys(PALETTES) as PaletteName[]).map((p) => (
+            <button key={p} style={pill(palette === p)} onClick={() => setPalette(p)}>{p}</button>
+          ))}
+          <span style={{ ...label, marginLeft: 14 }}>simulate</span>
+          {(['user', 'assistant'] as const).map((m) => (
+            <button
+              key={m}
+              style={pill(simulate === m)}
+              onClick={() => setSimulate((cur) => (cur === m ? null : m))}
+            >{m}</button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function mountLab(el: HTMLElement, opts: { size?: number } = {}): Root {
+  const root = createRoot(el);
+  root.render(<LabOrb size={opts.size} />);
+  return root;
+}
+
+(window as unknown as { BhanuOrb: unknown }).BhanuOrb = { mount, mountVisual, mountLab, PALETTES };
 
 const target = document.getElementById('bhanu-orb');
 if (target) {
