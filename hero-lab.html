@@ -990,7 +990,14 @@
       position: absolute;
       bottom: 28px;
       left: 50%;
-      width: min(clamp(1250px, 62vw, 1500px), calc(100% - var(--gutter) * 2));
+      /* VIEWPORT-relative, and no floor. The old
+         min(clamp(1250px,62vw,1500px), calc(100% - gutter*2)) broke twice:
+         the clamp could never go below 1250px however small the screen, and
+         the 100% resolved against GSAP's pin-spacer — which keeps the width
+         it was pinned at and does not re-measure on resize. A phone was
+         therefore handed a 1250px bar and the whole PAGE scrolled sideways.
+         100vw can't go stale and 6vw keeps the desktop width it had. */
+      width: min(1500px, calc(100vw - 2 * max(20px, 6vw)));
       z-index: 10;
       display: flex;
       flex-direction: column;
@@ -2072,31 +2079,63 @@ html:not([data-theme="dark"]) .s2-bar-metric-lbl { color: rgba(37,37,37,0.58); }
 html:not([data-theme="dark"]) .s2-bar-metric + .s2-bar-metric { border-left-color: rgba(37,37,37,0.14); }
 html:not([data-theme="dark"]) .s2-bar-rule { background: rgba(37,37,37,0.12); }
 
-/* ═══ THE PAPER BAR ══════════════════════════════════════════════════════
-   The project card steps OFF the dark. Mobbin's design-first pattern is
-   value inversion, not a second navy — Deel floats a white spec card on
-   its slate hero, Tailscale inverts its tiles, while FLORA's dark-on-dark
-   cards sink into the ground (our old symptom). The bar takes the footer
-   note's warm paper: the page's one complementary warmth against the
-   azure world, so the card reads first at every scroll position. These
-   rules sit AFTER the theme overrides and win in both themes. */
+/* ═══ THE PLATE BAR ══════════════════════════════════════════════════════
+   The paper card is retired. Cream was one fixed surface under seven
+   projects, so every card fought whatever colour was floating above it —
+   green orb on warm paper, amber engine on warm paper. The frame is an
+   IMAGE frame now: the project's own artwork fills it, a dark frosted
+   layer sits over that, and the type sits on the frost. Each card
+   therefore carries its own colour, and the bar can never clash with the
+   art above it because it IS the art above it.
+   Contrast is held by the scrim, not by luck — see .s2-bar-plate::after. */
 .s2-project-bar {
-      background: rgba(236,231,220,0.95);
-      border: 1px solid rgba(37,37,37,0.12);
+      background: #080B11;
+      border: 1px solid rgba(239,243,248,0.10);
+      overflow: hidden;             /* the plate is clipped to the radius */
     }
-.s2-project-bar::before { display: none; }   /* the dark ring is noise on paper */
-.s2-bar-title { color: #1D2229; }
-.s2-bar-title-badge { color: rgba(37,37,37,0.55); }
-.s2-bar-desc { color: rgba(29,34,41,0.74); }
-.s2-bar-desc strong { color: #1D2229; }
-.s2-bar-tag { color: rgba(37,37,37,0.62); }
-.s2-bar-tag + .s2-bar-tag::before { color: rgba(37,37,37,0.30); }
-.s2-bar-icon-tag-ic { color: rgba(37,37,37,0.62); }
-.s2-bar-icon-tag-lbl { color: rgba(37,37,37,0.74); }
-.s2-bar-metric-val { color: #2463DC; }        /* the azure survives, deepened for paper */
-.s2-bar-metric-lbl { color: rgba(37,37,37,0.66); }
-.s2-bar-metric + .s2-bar-metric { border-left-color: rgba(37,37,37,0.16); }
-.s2-bar-rule { background: rgba(37,37,37,0.14); }
+.s2-project-bar::before { display: none; }   /* the gradient ring fought the plate */
+
+/* the artwork itself — oversized a touch so the frost has no cold edge */
+.s2-bar-plate {
+      position: absolute; inset: 0; z-index: 0;
+      border-radius: inherit; overflow: hidden;
+      pointer-events: none;
+    }
+.s2-bar-plate img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transform: scale(1.08);
+      /* the swap between projects is a dissolve, not a cut */
+      transition: opacity .5s var(--ease);
+    }
+/* the dark frosted layer: an opacity floor for legibility PLUS a blur, so
+   the plate reads as colour and light rather than as a picture competing
+   with the words. Deepest on the left where the title and lead sit. */
+.s2-bar-plate::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(100deg,
+        rgba(8,11,17,0.90) 0%, rgba(8,11,17,0.84) 38%,
+        rgba(8,11,17,0.74) 72%, rgba(8,11,17,0.66) 100%);
+      backdrop-filter: blur(30px) saturate(1.25);
+      -webkit-backdrop-filter: blur(30px) saturate(1.25);
+    }
+/* every child of the bar rides above the plate */
+.s2-bar-top-row, .s2-bar-rule, .s2-bar-bottom-row { position: relative; z-index: 1; }
+
+/* the type goes back to light ink — measured against the scrim's own
+   floor (#080B11 at 0.90 over artwork), not against the raw image */
+.s2-bar-title { color: var(--ink); }
+.s2-bar-title-badge { color: rgba(239,243,248,0.62); }
+.s2-bar-desc { color: rgba(239,243,248,0.80); }
+.s2-bar-desc strong { color: var(--ink); }
+.s2-bar-tag { color: rgba(239,243,248,0.68); }
+.s2-bar-tag + .s2-bar-tag::before { color: rgba(239,243,248,0.32); }
+.s2-bar-icon-tag-ic { color: rgba(239,243,248,0.68); }
+.s2-bar-icon-tag-lbl { color: rgba(239,243,248,0.80); }
+.s2-bar-metric-val { color: #8CC5FF; }        /* azure lifted to carry on dark */
+.s2-bar-metric-lbl { color: rgba(239,243,248,0.68); }
+.s2-bar-metric + .s2-bar-metric { border-left-color: rgba(239,243,248,0.16); }
+.s2-bar-rule { background: rgba(239,243,248,0.14); }
+@media (prefers-reduced-motion: reduce) { .s2-bar-plate img { transition: none; } }
 /* (the CTA's flip lives in its own !important block further down) */
 html:not([data-theme="dark"]) .s2-side-nav-btn {
       background: rgba(37,37,37,0.07);
@@ -2138,10 +2177,10 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     height: auto;
     padding: 13px 24px;
     border-radius: var(--cta-r);
-    /* on the paper bar the pill flips to ink-on-paper */
-    background: rgba(37,37,37,0.05) !important;
-    color: #1D2229 !important;
-    border: 1px solid rgba(37,37,37,0.26);
+    /* on the plate bar the pill is glass over the frost, not ink on paper */
+    background: rgba(239,243,248,0.06) !important;
+    color: var(--ink) !important;
+    border: 1px solid rgba(239,243,248,0.28);
     font-family: var(--sans);
     font-size: 15px;
     font-weight: 600;
@@ -4716,6 +4755,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
       <!-- Project info bar — slides up from bottom when front card changes -->
       <div id="s2ProjectBar" class="s2-project-bar">
+        <!-- the plate: the project's own artwork, frosted back by the scrim
+             above it so the card carries that project's colour instead of
+             one generic surface. JS swaps the src per card. -->
+        <div class="s2-bar-plate" aria-hidden="true">
+          <img id="s2BarPlateImg" src="" alt="" decoding="async">
+        </div>
         <div class="s2-bar-top-row">
           <div class="s2-bar-title-col">
             <h3 class="s2-bar-title" id="s2BarTitle"></h3>
@@ -7224,6 +7269,7 @@ addEventListener('load', function () {
     var S2_DATA = [
       {
         tab: 'EverTutor',
+        plate: 'images/card-et-live.webp',
         title: 'EverTutor AI System',
         badge: '(Next 3 Projects)',
 
@@ -7243,6 +7289,7 @@ addEventListener('load', function () {
       },
       {
         tab: 'ET Live',
+        plate: 'images/card-et-live.webp',
         title: '1.1 EverTutor Live',
 
         metrics: [
@@ -7261,6 +7308,7 @@ addEventListener('load', function () {
       },
       {
         tab: 'ET Studio',
+        plate: 'images/card-et-studio.webp',
         title: 'EverTutor Studio',
 
         metrics: [
@@ -7278,6 +7326,7 @@ addEventListener('load', function () {
       },
       {
         tab: 'ET Analytics',
+        plate: 'images/card-et-analytics.webp',
         title: 'EverTutor Analytics',
 
         metrics: [
@@ -7297,6 +7346,7 @@ addEventListener('load', function () {
       },
       {
         tab: 'Stressie',
+        plate: 'images/card-stressie.webp',
         title: 'Stressie',
 
         metrics: [
@@ -7314,6 +7364,7 @@ addEventListener('load', function () {
       },
       {
         tab: 'Dearly',
+        plate: 'images/card-dearly.webp',
         title: 'Dearly',
 
         metrics: [
@@ -7333,6 +7384,7 @@ addEventListener('load', function () {
       },
       {
         tab: 'The Engine',
+        plate: 'images/card-engine.webp',
         title: 'The Engine',
         metrics: [
           { val: 'Brand', lbl: '& Art Direction' },
@@ -7369,6 +7421,7 @@ addEventListener('load', function () {
     var barDesc     = document.getElementById('s2BarDesc');
     var barMetrics  = document.getElementById('s2BarMetrics');
     var barCta      = document.getElementById('s2BarCta');
+    var barPlateImg = document.getElementById('s2BarPlateImg');
     /* Hash hrefs (Analytics → #contactSection) ride Lenis out of the pin
        instead of jumping — the pin-spacer keeps document flow, so a plain
        anchor jump would land without smoothing. */
@@ -7461,6 +7514,17 @@ addEventListener('load', function () {
 
       clearTimeout(updateTimer);
       updateTimer = setTimeout(function () {
+        /* Swap the plate to this project's artwork. Decode before showing so
+           the card never flashes the previous project's colour under the new
+           project's words. */
+        if (barPlateImg && card.plate && barPlateImg.getAttribute('src') !== card.plate) {
+          var next = new Image();
+          next.onload = function () { barPlateImg.src = card.plate; barPlateImg.style.opacity = 1; };
+          next.onerror = function () { barPlateImg.style.opacity = 0; };
+          barPlateImg.style.opacity = 0;
+          next.src = card.plate;
+        }
+
         /* Populate bar content */
         if (barTitle) {
           if (card.badge) {
@@ -7678,7 +7742,7 @@ addEventListener('load', function () {
      to it hard. Bump it whenever spiral.js changes. -->
 <script src="spiral-gallery/spiral.js?v=20260726-bend2"></script>
 
-<script type="module" src="orb/bhanu-orb.js?v=10"></script>
+<script type="module" src="orb/bhanu-orb.js?v=11"></script>
 
 <!-- ── AGENTATION — visual feedback for agents (agentation.com) ─────────
      Dev-only: loads ONLY on localhost, never in production. Click the
