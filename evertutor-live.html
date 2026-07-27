@@ -2405,6 +2405,32 @@
   window.addEventListener('load', tryPlayVideos);
   </script>
 
+  <!-- ── Back to where you came from ───────────────────────────────────────
+       The nav-home href is "/", which is a fresh navigation: the homepage
+       loader replays and you arrive in the hero, having lost the card you
+       clicked to get here. When the previous history entry is this site,
+       step back through history instead — the browser restores the exact
+       scroll offset and the bfcache skips the loader entirely.
+       The href stays as the fallback, and is what still runs for a direct
+       link, a new tab, or an arrival from another site. -->
+  <script>
+  (function () {
+    var home = document.querySelector('.nav-home');
+    if (!home) return;
+    home.addEventListener('click', function (e) {
+      /* let cmd/ctrl/shift/middle clicks open a tab the way they should */
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (history.length <= 1) return;
+      var ref = document.referrer;
+      if (!ref) return;                       /* typed in, or opened cold */
+      try {
+        if (new URL(ref).origin !== location.origin) return;
+      } catch (_) { return; }
+      e.preventDefault();
+      history.back();
+    });
+  })();
+  </script>
 
 </body>
 </html>
