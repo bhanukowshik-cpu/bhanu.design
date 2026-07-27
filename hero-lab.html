@@ -3958,13 +3958,17 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        carries anno-off so --anno-h collapses to 0 — restoring the strip is
        putting the <aside> back and dropping that class. -->
 
-  <!-- ══ LOADER — "Title sequence" ═══════════════════════════════════════
-       The page opens like the film it is: the portrait rises from the
-       bottom of the dark as the words of the practice — Ideate. Build.
-       Validate. Repeat. — take the stage one at a time, keyed to REAL
-       asset preloading. "Repeat." lands in the serif italic, the same
-       emphasis grammar as the hero headline. Then the whole frame lifts
-       away and the silhouette plate is already playing beneath it.
+  <!-- ══ LOADER — "Title sequence", three acts ════════════════════════════
+       Act I  — the portrait slides up from the bottom of the dark and
+                settles centre-frame the moment its file has decoded.
+       Act II — once it lands, the words of the practice — Ideate. Build.
+                Validate. Repeat. — appear beneath it ("Repeat." in the
+                serif italic, the hero headline's emphasis grammar), with
+                the loading bar right below.
+       Act III — the bar is HONEST: it tracks the page's real artifacts
+                (every image, every video poster, the hero plate's canplay,
+                the fonts) with no scripted minimum. At 100% the frame
+                lifts away onto the already-playing hero.
        Self-contained: this style block, the #v6Loader div and its script
        are the entire feature — remove all three and the page is as before.
        JS-off visitors never see it (it only activates via script). -->
@@ -3973,7 +3977,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     #v6Loader {
       /* z 120 — one step above --z-cursor:100; the loader is the only
          surface allowed to cover everything, and only until it lifts */
-      position: fixed; inset: 0; z-index: 120; --rise: 0;
+      position: fixed; inset: 0; z-index: 120;
       background: var(--seam-deep);
       overflow: hidden; cursor: default;
       transform: translateY(0);
@@ -3989,47 +3993,60 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       animation: grainshift 7s steps(6) infinite;
     }
 
-    /* faint azure atmosphere behind the portrait's rim-lit side */
+    /* faint azure atmosphere pooling behind the centred portrait */
     .v6l-glow {
-      position: absolute; z-index: 1; right: -8vmax; bottom: -10vmax;
-      width: 72vmax; height: 72vmax; pointer-events: none;
+      position: absolute; z-index: 1; left: 50%; bottom: -32vmax;
+      width: 84vmax; height: 84vmax; transform: translateX(-50%);
+      pointer-events: none;
       background: radial-gradient(closest-side,
-        rgba(92,169,255,.13), rgba(92,169,255,.05) 45%, transparent 72%);
-      opacity: var(--rise);
+        rgba(92,169,255,.12), rgba(92,169,255,.045) 45%, transparent 72%);
+      opacity: 0; transition: opacity 1.2s ease;
     }
+    #v6Loader.img-in .v6l-glow { opacity: 1; }
 
-    /* the portrait — anchored bottom-right, gazing left into the open
-       frame; edges feathered into the dark so it emerges, not "loads" */
+    /* Act I — the portrait: waits below the frame, slides up to centre
+       the moment its file has decoded. Every edge feathers into the dark
+       (vertical fade here, horizontal on the img: nested masks multiply,
+       no mask-composite needed — the photo's black is warmer than ours). */
     .v6l-portrait {
       position: absolute; z-index: 2; margin: 0;
-      right: clamp(-30px, 6vw, 10vw); bottom: -2vh;
-      height: min(82vh, 116vw); aspect-ratio: 3 / 4;
-      opacity: min(1, calc(var(--rise) * 2.4));
-      transform: translateY(calc((1 - var(--rise)) * 16%))
-                 scale(calc(1.045 - var(--rise) * 0.045));
+      left: 50%; top: 47%;
+      height: min(56vh, 84vw); aspect-ratio: 3 / 4;
+      opacity: 0;
+      transform: translate(-50%, -50%) translateY(60vh) scale(1.04);
+      transition: transform 1.05s var(--ease-expo), opacity .55s ease;
       will-change: transform, opacity;
-      /* the photo's black is a touch warmer than the page's, so every edge
-         must feather into the dark — vertical fade here, horizontal fade on
-         the img: nested masks multiply, no mask-composite needed */
-      -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 13%);
-              mask-image: linear-gradient(180deg, transparent 0, #000 13%);
+      -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 84%, transparent 100%);
+              mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 84%, transparent 100%);
+    }
+    #v6Loader.img-in .v6l-portrait {
+      opacity: 1;
+      transform: translate(-50%, -50%) translateY(0) scale(1);
     }
     .v6l-portrait img {
       width: 100%; height: 100%; object-fit: cover; display: block;
-      -webkit-mask-image: linear-gradient(90deg, transparent 1%, #000 26%, #000 80%, transparent 99%);
-              mask-image: linear-gradient(90deg, transparent 1%, #000 26%, #000 80%, transparent 99%);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+              mask-image: linear-gradient(90deg, transparent 0, #000 18%, #000 82%, transparent 100%);
       filter: brightness(.95) contrast(1.05);
     }
 
-    /* the words of the practice — one line, cycled upward */
-    .v6l-copy { position: absolute; z-index: 3; left: var(--gutter); top: 50%; transform: translateY(-58%); }
+    /* Act II — the copy: hidden until the portrait lands, then fades up
+       beneath it. Words centred, one at a time; the bar right below. */
+    .v6l-copy {
+      position: absolute; z-index: 3; left: 50%; top: 76%;
+      width: min(92vw, 760px); text-align: center;
+      opacity: 0; transform: translate(-50%, 14px);
+      transition: opacity .6s ease, transform .6s var(--ease-expo);
+    }
+    #v6Loader.copy-live .v6l-copy { opacity: 1; transform: translate(-50%, 0); }
     .v6l-words {
-      position: relative; height: 1.32em; overflow: hidden;
+      position: relative; width: 100%; height: 1.32em; overflow: hidden;
       font-family: var(--sans); font-weight: 600; letter-spacing: -0.022em;
-      font-size: clamp(40px, 6.2vw, 88px); line-height: 1.08; color: var(--ink);
+      font-size: clamp(32px, 4.8vw, 64px); line-height: 1.08; color: var(--ink);
     }
     .v6l-word {
-      position: absolute; left: 0; top: 0; white-space: nowrap;
+      position: absolute; left: 0; right: 0; top: 0; text-align: center;
+      white-space: nowrap;
       transform: translateY(135%); opacity: 0; filter: blur(10px);
       transition: transform .72s var(--ease-expo), opacity .5s ease, filter .6s ease;
     }
@@ -4039,13 +4056,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       font-family: var(--serif); font-style: italic; font-weight: 400;
       letter-spacing: 0; font-size: 1.06em;
     }
-    /* invisible in-flow sizers — the words are absolutely positioned, so
-       without these the line collapses to the meta row's width and clips */
-    .v6l-ghost { display: block; height: 0; overflow: hidden; visibility: hidden; pointer-events: none; }
 
-    /* hairline of azure light + the count — determinate, quiet */
-    .v6l-meta { display: flex; align-items: center; gap: 14px; margin-top: 26px; }
-    .v6l-track { width: 132px; height: 2px; border-radius: 2px; background: var(--line); overflow: hidden; }
+    /* hairline of azure light + the count — honest, quiet */
+    .v6l-meta { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 22px; }
+    .v6l-track { width: 168px; height: 2px; border-radius: 2px; background: var(--line); overflow: hidden; }
     .v6l-bar {
       height: 100%; width: 100%; transform-origin: 0 50%; transform: scaleX(0);
       background: linear-gradient(90deg, rgba(92,169,255,.35), var(--ember));
@@ -4065,9 +4079,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     }
 
     @media (max-width: 760px) {
-      .v6l-copy { top: 22%; transform: none; }
-      .v6l-words { font-size: clamp(36px, 10vw, 56px); }
-      .v6l-portrait { right: -14vw; height: min(58vh, 120vw); }
+      .v6l-portrait { height: min(46vh, 88vw); top: 42%; }
+      .v6l-copy { top: 68%; }
+      .v6l-words { font-size: clamp(28px, 8vw, 40px); }
       .v6l-brand { top: 22px; }
     }
 
@@ -4075,7 +4089,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       #v6Loader { transition: opacity .45s ease; }
       #v6Loader.is-up { transform: none; opacity: 0; }
       .v6l-grain { animation: none; }
-      .v6l-portrait { transform: none !important; opacity: 1 !important; }
+      .v6l-portrait {
+        transform: translate(-50%, -50%); transition: opacity .45s ease;
+      }
+      #v6Loader.img-in .v6l-portrait { transform: translate(-50%, -50%); }
+      .v6l-copy { transform: translate(-50%, 0); transition: opacity .45s ease; }
+      #v6Loader.copy-live .v6l-copy { transform: translate(-50%, 0); }
       .v6l-word { transform: none; filter: none; transition: opacity .45s ease; }
       .v6l-word.is-past { transform: none; }
     }
@@ -4089,8 +4108,6 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     </figure>
     <div class="v6l-copy" aria-hidden="true">
       <div class="v6l-words">
-        <span class="v6l-ghost">Validate.</span>
-        <span class="v6l-ghost serif">Repeat.</span>
         <span class="v6l-word">Ideate.</span>
         <span class="v6l-word">Build.</span>
         <span class="v6l-word">Validate.</span>
@@ -4115,12 +4132,6 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       var pctEl  = document.getElementById('v6lPct');
       var words  = loader.querySelectorAll('.v6l-word');
 
-      // decode the portrait up front so it's paint-ready before its
-      // opacity ramps in — avoids a blank first act on slow devices
-      var pimg = loader.querySelector('.v6l-portrait img');
-      if (pimg && pimg.decode) pimg.decode().catch(function () {});
-
-      var MIN_HOLD = 3000;   // floor: every word gets read
       var MAX_HOLD = 6500;   // ceiling: never trap the visitor on a stalled file
       var t0 = performance.now();
 
@@ -4134,7 +4145,25 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       }
       window.__hideV6Loader = hideLoader;
 
-      // ── real preloading: every image + video poster on the page ──
+      // ── Act I: the portrait slides in the moment its file has decoded ──
+      var copyT = 0;
+      function copyLive() {
+        if (copyT) return;
+        copyT = performance.now();
+        loader.classList.add('copy-live');
+      }
+      var imgShown = false;
+      function imgIn() {
+        if (imgShown) return; imgShown = true;
+        loader.classList.add('img-in');
+        setTimeout(copyLive, 900);   // Act II starts as the slide settles
+      }
+      var pimg = loader.querySelector('.v6l-portrait img');
+      if (pimg && pimg.decode) pimg.decode().then(imgIn, imgIn);
+      setTimeout(imgIn, 1400);       // slow network: enter anyway, fade covers it
+
+      // ── Act III: the bar tracks the page's REAL artifacts — every image,
+      // every video poster, the hero plate's canplay, and the fonts ──
       var assetTarget = 0, assetDone = 0, collected = false;
       function collect() {
         if (collected) return; collected = true;
@@ -4155,6 +4184,15 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           im.src = u;
           if (im.complete) done();
         });
+        // the hero plate video counts as one artifact: ready-to-play, not fully fetched
+        var hv = document.getElementById('heroPlate');
+        if (hv) {
+          assetTarget++;
+          var vDone = false;
+          var vOk = function () { if (vDone) return; vDone = true; assetDone++; };
+          if (hv.readyState >= 3) vOk();
+          else { hv.addEventListener('canplay', vOk, { once: true }); hv.addEventListener('error', vOk, { once: true }); }
+        }
       }
       var winLoaded = false, fontsReady = false;
       if (document.readyState !== 'loading') collect();
@@ -4164,47 +4202,49 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       else fontsReady = true;
       function assetFraction() { return assetTarget ? assetDone / assetTarget : (collected ? 1 : 0); }
 
-      // ── the four words are the loading stages ──
-      var WORD_AT = [0, 0.26, 0.52, 0.76], wordIdx = -1;
+      // words appear only once the copy is live, and never faster than one
+      // beat apiece — but their order is always progress-true
+      var WORD_AT = [0, 0.26, 0.52, 0.76], wordIdx = -1, WORD_BEAT = 340;
       function setWord(p) {
+        if (!copyT) return;
         var n = 0, j;
         for (j = 0; j < WORD_AT.length; j++) if (p >= WORD_AT[j]) n = j;
-        if (n === wordIdx) return;
+        var cap = Math.floor((performance.now() - copyT) / WORD_BEAT);
+        if (n > cap) n = cap;
+        if (n <= wordIdx) return;
         for (j = 0; j < words.length; j++) {
           words[j].classList.toggle('is-on', j === n);
           words[j].classList.toggle('is-past', j < n);
         }
         wordIdx = n;
       }
-      setWord(0);
 
-      var shown = 0;
+      var shown = 0, exiting = false;
       (function step() {
         var elapsed  = performance.now() - t0;
         var assetsIn = collected && assetDone >= assetTarget;
-        var loaded   = fontsReady && (assetsIn || winLoaded);
-        var finished = (loaded && elapsed >= MIN_HOLD) || elapsed >= MAX_HOLD;
+        var loaded   = (fontsReady && (assetsIn || winLoaded)) || elapsed >= MAX_HOLD;
 
-        // time paces a smooth walk through the words over MIN_HOLD, but the
-        // finish is gated: while assets are in flight we hold below 100%
-        var timeProg = Math.min(elapsed / MIN_HOLD, 1);
-        var ceil     = loaded ? 1 : (0.70 + assetFraction() * 0.24);
-        var target   = finished ? 1 : Math.min(timeProg, ceil);
+        // no scripted pace: the bar chases the true fraction, holding just
+        // under 100% until everything has actually arrived
+        var target = loaded ? 1 : Math.min(assetFraction(), 0.985);
+        shown += (target - shown) * 0.14;
+        if (loaded && shown > 0.995) shown = 1;
 
-        shown += (target - shown) * 0.11;
-        if (finished && shown > 0.995) shown = 1;
-
-        loader.style.setProperty('--rise', shown.toFixed(4));
         if (barEl) barEl.style.transform = 'scaleX(' + shown.toFixed(4) + ')';
         if (pctEl) pctEl.textContent = Math.round(shown * 100);
         setWord(shown);
 
-        if (shown >= 1) { setTimeout(hideLoader, 420); return; }   // let "Repeat." land
-        requestAnimationFrame(step);
+        // leave only when the bar is truly full AND "Repeat." has landed
+        if (shown >= 1 && wordIdx === 3 && !exiting) {
+          exiting = true;
+          setTimeout(hideLoader, 420);
+        }
+        if (!exiting) requestAnimationFrame(step);
       })();
 
       // hard safety net — never leave the loader stuck
-      setTimeout(hideLoader, MAX_HOLD + 1200);
+      setTimeout(hideLoader, MAX_HOLD + 2400);
     })();
   </script>
 
