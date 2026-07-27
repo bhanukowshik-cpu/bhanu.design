@@ -2491,12 +2491,17 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
   .chat[data-view="voice"] .composer,
   .chat[data-view="voice"] .chat-chips,
   .chat[data-view="voice"] .chat-credit{display:none;}
-  /* the door between the rooms — a quiet tertiary under the call buttons */
-  .talk-tertiary{appearance:none;background:none;border:none;padding:6px 2px;
+  /* the door between the rooms — anchored at the panel's very bottom,
+     with its own chat mark */
+  .talk-tertiary{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:6;
+    appearance:none;background:none;border:none;padding:8px 12px;
+    display:inline-flex;align-items:center;gap:7px;
     font-family:var(--sans);font-size:13px;font-weight:550;cursor:pointer;
-    color:rgba(22,24,29,.5);text-decoration:underline;text-underline-offset:3px;
-    text-decoration-color:rgba(22,24,29,.22);transition:color .2s,text-decoration-color .2s;}
-  .talk-tertiary:hover{color:#16181D;text-decoration-color:#3372B8;}
+    color:rgba(22,24,29,.5);border-radius:999px;
+    transition:color .2s,background .2s;}
+  .talk-tertiary svg{width:15px;height:15px;flex:none;}
+  .talk-tertiary:hover{color:#16181D;background:rgba(20,28,45,.06);}
+  .chat[data-view="chat"] .talk-tertiary{display:none;}
 
   /* ── the mid-call scheduler ── */
   .talk-sched{display:flex;flex-direction:column;align-items:center;gap:8px;
@@ -3876,7 +3881,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     max-width:min(840px, calc(100vw - var(--gutter) * 2));margin:0 auto;
     /* headroom for the longer quotes — 430px clipped them on tall
        screens and the attributions spilled out under the card */
-    height:clamp(430px,54vh,580px);perspective:1400px;}
+    /* the deck must be tall enough for the LONGEST quote, but 54vh left the
+       shorter ones floating in half a card of nothing — this hugs the copy
+       and the art (238px) instead of the viewport */
+    height:clamp(372px,46vh,470px);perspective:1400px;}
   .tm-card{position:absolute;inset:0;display:grid;
     grid-template-columns:minmax(0,1fr) minmax(0,238px);
     gap:clamp(18px,2.6vw,32px);align-items:center;
@@ -3897,14 +3905,19 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   /* the frame marks — four hairline corners, the "frame" of the frame */
   .tm-fh{position:absolute;width:15px;height:15px;pointer-events:none;
     border:1px solid rgba(140,197,255,.3);}
-  .tm-fh.tl{top:13px;left:13px;border-right:0;border-bottom:0;border-radius:5px 0 0 0;}
-  .tm-fh.tr{top:13px;right:13px;border-left:0;border-bottom:0;border-radius:0 5px 0 0;}
-  .tm-fh.bl{bottom:13px;left:13px;border-right:0;border-top:0;border-radius:0 0 0 5px;}
-  .tm-fh.br{bottom:13px;right:13px;border-left:0;border-top:0;border-radius:0 0 5px 0;}
+  /* 13px sat them inside the 24px corner radius, so each bracket cut across
+     the curve it was meant to echo — 17px clears it */
+  .tm-fh.tl{top:17px;left:17px;border-right:0;border-bottom:0;border-radius:5px 0 0 0;}
+  .tm-fh.tr{top:17px;right:17px;border-left:0;border-bottom:0;border-radius:0 5px 0 0;}
+  .tm-fh.bl{bottom:17px;left:17px;border-right:0;border-top:0;border-radius:0 0 0 5px;}
+  .tm-fh.br{bottom:17px;right:17px;border-left:0;border-top:0;border-radius:0 0 5px 0;}
 
   .tm-body{display:flex;flex-direction:column;min-width:0;}
+  /* the mark belongs to the quote's first line, not to a block of its own —
+     it used to float 10px clear of the copy with nothing tying them */
   .tm-qmark{display:block;font-family:var(--serif);font-style:italic;
-    font-size:52px;line-height:.6;color:rgba(120,175,255,.4);margin-bottom:10px;}
+    font-size:40px;line-height:.5;color:rgba(120,175,255,.34);
+    margin:0 0 -2px -2px;}
   /* readable at last (annotation #20) — it was capped at 16.5px */
   .tm-quote{font-family:var(--body);font-size:clamp(16px,1.15vw,21px);
     font-weight:400;line-height:1.68;color:var(--ink-2);text-wrap:pretty;}
@@ -3933,7 +3946,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     background:linear-gradient(150deg,rgba(92,169,255,.1),transparent 58%);}
 
   /* the deck's own control — how many, and which one you are on */
-  .tm-dots{display:flex;justify-content:center;gap:8px;margin-top:clamp(24px,3.4vh,36px);}
+  /* no margin-top: the dots sit INSIDE .tm-nav's centred flex row, and the
+     old clamp pushed them ~15px below the arrows' baseline */
+  .tm-dots{display:flex;align-items:center;justify-content:center;gap:8px;}
   .tm-dot{width:7px;height:7px;padding:0;border:0;border-radius:999px;cursor:pointer;
     background:rgba(239,243,248,.24);
     transition:width .55s var(--ease-expo),background .35s var(--ease);}
@@ -5155,10 +5170,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <span class="tm-fh bl"></span><span class="tm-fh br"></span>
           <div class="tm-body">
             <span class="tm-qmark" aria-hidden="true">&ldquo;</span>
-            <blockquote class="tm-quote">Bhanu became our <em>Founding Product Designer</em> at Stressie, where he led customer discovery, behavior analytics, and design of our first product &mdash; which pre-launched into the market and <em>became the foundation for our traction</em>. I thank my lucky stars everyday.</blockquote>
+            <blockquote class="tm-quote">Bhanu became our Founding Product Designer at Stressie, where he led customer discovery, behavior analytics, and design of our first product &mdash; which pre-launched into the market and <em>became the foundation for our traction</em>. I thank my lucky stars everyday.</blockquote>
             <div class="tm-attr">
+              <span class="tm-avatar" aria-hidden="true">LU</span>
               <span class="tm-who">
                 <span class="tm-name">Lupita</span>
+                <span class="tm-role">Co-Founder &amp; CEO &middot; Stressie</span>
               </span>
             </div>
           </div>
@@ -5170,10 +5187,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <span class="tm-fh bl"></span><span class="tm-fh br"></span>
           <div class="tm-body">
             <span class="tm-qmark" aria-hidden="true">&ldquo;</span>
-            <blockquote class="tm-quote">Bhanu stands apart. He wasn&rsquo;t just executing on design briefs &mdash; he was <em>shaping the product vision</em>, pushing back when something didn&rsquo;t serve the user, and <em>holding a ridiculously high bar for craft</em> even when timelines were brutal. What struck me most was his ability to <em>hold ambiguity without flinching</em>.</blockquote>
+            <blockquote class="tm-quote">Bhanu stands apart. He wasn&rsquo;t just executing on design briefs &mdash; he was <em>shaping the product vision</em>, pushing back when something didn&rsquo;t serve the user, and holding a ridiculously high bar for craft even when timelines were brutal. What struck me most was his ability to hold ambiguity without flinching.</blockquote>
             <div class="tm-attr">
+              <span class="tm-avatar" aria-hidden="true">SR</span>
               <span class="tm-who">
                 <span class="tm-name">Subash Rajaseelan</span>
+                <span class="tm-role">Chief of Staff &amp; PM &middot; EverTutor</span>
               </span>
             </div>
           </div>
@@ -5187,8 +5206,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
             <span class="tm-qmark" aria-hidden="true">&ldquo;</span>
             <blockquote class="tm-quote">Thank you Bhanu for being such a great mentor. The way you onboarded and guided me from the beginning made a huge difference. Your patience and ability to explain complex concepts clearly helped me <em>grow more in those few months than I had in years</em>.</blockquote>
             <div class="tm-attr">
+              <span class="tm-avatar" aria-hidden="true">SH</span>
               <span class="tm-who">
                 <span class="tm-name">Shaini</span>
+                <span class="tm-role">Content Designer &middot; EverTutor</span>
               </span>
             </div>
           </div>
@@ -5202,8 +5223,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
             <span class="tm-qmark" aria-hidden="true">&ldquo;</span>
             <blockquote class="tm-quote">It was a great experience working with you. Your design sensibility and the way you approached user problems always inspired me to <em>think deeper about the work</em>. Hope to collaborate again someday.</blockquote>
             <div class="tm-attr">
+              <span class="tm-avatar" aria-hidden="true">AS</span>
               <span class="tm-who">
                 <span class="tm-name">AnuShree</span>
+                <span class="tm-role">Content Designer &middot; EverTutor</span>
               </span>
             </div>
           </div>
@@ -5384,9 +5407,14 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           Meeting scheduled &mdash; check your inbox
         </div>
 
-        <!-- talk and chat are separate rooms again: this is the door -->
-        <button type="button" class="talk-tertiary" id="talkToChat">Chat instead</button>
       </div>
+
+      <!-- talk and chat are separate rooms: the door sits at the panel's
+           very bottom now, with its own icon -->
+      <button type="button" class="talk-tertiary" id="talkToChat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5 8.38 8.38 0 0 1 8.5 8.5z"/></svg>
+        Chat instead
+      </button>
       <div class="thread" id="thread">
         <div class="m ai">Hi — I&rsquo;m Bhanu&rsquo;s AI twin, running on his second brain. Ask about the work, the process, or why you&rsquo;d want him on your team.</div>
       </div>
@@ -7633,7 +7661,7 @@ addEventListener('load', function () {
      to it hard. Bump it whenever spiral.js changes. -->
 <script src="spiral-gallery/spiral.js?v=20260726-bend2"></script>
 
-<script type="module" src="orb/bhanu-orb.js?v=9"></script>
+<script type="module" src="orb/bhanu-orb.js?v=10"></script>
 
 <!-- ── AGENTATION — visual feedback for agents (agentation.com) ─────────
      Dev-only: loads ONLY on localhost, never in production. Click the

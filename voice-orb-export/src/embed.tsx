@@ -64,14 +64,14 @@ function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onSt
   const getFrequencyData = useCallback((): Uint8Array | null => {
     if (statusRef.current !== 'connected') return null;
     try {
-      if (isSpeakingRef.current) return getOutputByteFrequencyData();
-      // Quiet listening stays calm: mic data only flows once the user is
-      // actually speaking, so ambient noise never stirs the orb.
-      return userSpeakingRef.current ? getInputByteFrequencyData() : null;
+      // The orb reacts ONLY to the agent's own voice. The visitor's mic
+      // still drives the user-speaking STATE (labels, captions) via the
+      // volume loop below, but never stirs the visual.
+      return isSpeakingRef.current ? getOutputByteFrequencyData() : null;
     } catch {
       return null;
     }
-  }, [getOutputByteFrequencyData, getInputByteFrequencyData]);
+  }, [getOutputByteFrequencyData]);
 
   // Mic-level loop: derives user-speaking (hysteresis) and a "thinking" window
   // between the user finishing and the agent starting to speak.
@@ -132,7 +132,20 @@ function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onSt
       setMicDenied(true);
       return;
     }
-    startSession({ agentId: AGENT_ID, connectionType: 'webrtc' });
+    startSession({
+      agentId: AGENT_ID,
+      connectionType: 'webrtc',
+      // Client tools the agent can call mid-conversation. The host page
+      // exposes window.BhanuTalk; the agent config must declare a client
+      // tool with the same name for the model to invoke it.
+      clientTools: {
+        open_scheduler: () => {
+          const bt = (window as unknown as { BhanuTalk?: { showScheduler?: () => void } }).BhanuTalk;
+          bt?.showScheduler?.();
+          return 'Scheduler shown — ask the visitor to type their email in the field below the orb.';
+        },
+      },
+    });
   }, [startSession]);
 
   const controlsRef = useRef(controls);
@@ -150,7 +163,9 @@ function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onSt
     uiState === 'connecting' ? 'connecting'
     : uiState === 'error' || uiState === 'mic-denied' ? 'error'
     : uiState === 'assistant-speaking' ? 'assistant-speaking'
-    : uiState === 'user-speaking' ? 'user-speaking'
+    // the visitor's voice no longer stirs the visual — while they speak
+    // the orb simply keeps its calm listening pose
+    : uiState === 'user-speaking' ? 'listening'
     : uiState === 'thinking' ? 'connecting'
     : uiState === 'listening' ? 'listening'
     : 'idle';
