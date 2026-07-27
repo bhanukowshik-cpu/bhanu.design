@@ -10,8 +10,26 @@ Then open http://localhost:8080/chat-test.html
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
+import os
 import urllib.request
 import urllib.error
+
+
+def load_env_key(name):
+    """Key from the environment, else from a repo-root .env line (NAME=value)."""
+    val = os.environ.get(name, "")
+    if val:
+        return val
+    try:
+        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith(name + "="):
+                    return line.split("=", 1)[1].strip().strip('"').strip("'")
+    except OSError:
+        pass
+    return ""
 
 
 class ProxyHandler(BaseHTTPRequestHandler):
@@ -44,7 +62,17 @@ class ProxyHandler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length))
 
-        api_key = body.pop("apiKey", "")
+        # key lives server-side (env or .env); the page never sends one.
+        # body.apiKey kept for chat-test.html back-compat.
+        api_key = body.pop("apiKey", "") or load_env_key("ANTHROPIC_API_KEY")
+        if not api_key:
+            msg = json.dumps({"error": "No ANTHROPIC_API_KEY — add it to .env next to proxy.py and restart."}).encode()
+            self.send_response(500)
+            self.send_header("Content-Type", "application/json")
+            self.send_cors()
+            self.end_headers()
+            self.wfile.write(msg)
+            return
         payload = json.dumps(body).encode()
 
         req = urllib.request.Request(
