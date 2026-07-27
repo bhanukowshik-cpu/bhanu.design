@@ -27,9 +27,23 @@
   *{margin:0;box-sizing:border-box;}
   body{min-height:100vh;display:flex;align-items:center;justify-content:center;
     background:radial-gradient(120% 90% at 50% 115%, #131a28 0%, #0c111b 48%, #080b11 100%);}
+  body.light{background:#ffffff;}
+  /* bg switcher — same pill language as the lab strip */
+  .bgbar{position:fixed;top:14px;left:14px;display:flex;gap:6px;align-items:center;z-index:10;
+    font:10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6f7386;
+    text-transform:uppercase;letter-spacing:.08em;}
+  .bgbar button{padding:5px 10px;border-radius:999px;cursor:pointer;
+    border:1px solid rgba(128,134,150,0.35);background:rgba(128,134,150,0.08);
+    color:#7c8194;font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;}
+  .bgbar button.active{background:rgba(155,92,255,0.35);color:#fff;
+    border-color:rgba(155,92,255,0.5);}
 </style>
 </head>
 <body>
+  <div class="bgbar">bg
+    <button id="bgDark" class="active">dark</button>
+    <button id="bgWhite">white</button>
+  </div>
   <div id="orb"></div>
 
   <script type="module" src="orb/bhanu-orb.js?v=8"></script>
@@ -38,6 +52,8 @@
        state / palette / simulate strip. The slider panel is open by
        default — ?clean hides it; ?size=N overrides the orb size. */
     var VARIATIONS = [
+      { /* the shipped DEFAULT_PARAMS, untouched — what every live mount uses */
+        name: 'baseline', palette: 'arctic', params: {} },
       { /* the baseline read, softened a touch — glassy and unhurried */
         name: 'still water', palette: 'arctic',
         params: { noiseAmplitude: 0.10, noiseSpeed: 0.18, maskSoftness: 0.18,
@@ -70,6 +86,19 @@
         panel: !q.has('clean'),
       });
     })();
+
+    /* bg switcher — the canvas is transparent, so this shows how the orb's
+       own dark edge reads on light surfaces. ?bg=white starts light. */
+    var bgDark = document.getElementById('bgDark');
+    var bgWhite = document.getElementById('bgWhite');
+    function setBg(light) {
+      document.body.classList.toggle('light', light);
+      bgWhite.classList.toggle('active', light);
+      bgDark.classList.toggle('active', !light);
+    }
+    bgDark.addEventListener('click', function () { setBg(false); });
+    bgWhite.addEventListener('click', function () { setBg(true); });
+    if (q.get('bg') === 'white') setBg(true);
   </script>
 </body>
 </html>
