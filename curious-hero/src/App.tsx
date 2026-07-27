@@ -1,10 +1,10 @@
 import { useRef } from 'react'
 import { Globe, ArrowRight, Instagram, Twitter } from 'lucide-react'
 
-/* Generated on Higgsfield — Bhanu's Soul at the desk, azure light trails.
-   Swapped in place of the spec's stock cloudfront clip. */
+/* Generated on Higgsfield — Bhanu's Soul at the desk, azure light trails
+   (Soul V2 still → Seedance 2.0, 10s 1080p silent, static camera). */
 const VIDEO_SRC =
-  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_115001_bcdaa3b4-03de-47e7-ad63-ae3e392c32d4.mp4'
+  'https://d8j0ntlcm91z4.cloudfront.net/user_3GAGwBkL0VtA0WiPkezsEO5C71B/hf_20260727_032559_15b100ee-f3c3-49fc-80aa-4e9977092b78.mp4'
 
 /* How close to the end (seconds) the fade-out begins. */
 const FADE_LEAD = 0.55
@@ -70,7 +70,7 @@ function App() {
           where the subject sits — carries the composition */}
       <video
         ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover translate-y-[17%]"
+        className="absolute inset-0 w-full h-full object-cover translate-y-[6%]"
         style={{ opacity: 0 }}
         src={VIDEO_SRC}
         muted
