@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<!-- Source for images/og-image.png (social share card) — hero-lab theme, poster
-     composition: big split-face name left, cutout portrait right, fact chips.
+<!-- Source for images/og-image.jpg (social share card) — v6:
+     cinematic Soul portrait right (images/bhanu-cinematic.jpg), "AI Native
+     Product Designer" display type left, three grouped fact pills bottom.
      Re-render after edits:
      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
        --screenshot=og-2x.png --window-size=1200,630 --force-device-scale-factor=2 \
        --virtual-time-budget=10000 --hide-scrollbars "file://$PWD/og-image.html"
-     sips -z 630 1200 og-2x.png --out images/og-image.png -->
+     sips -z 630 1200 og-2x.png --out og-tmp.png && sips -s format jpeg -s formatOptions 85 og-tmp.png --out images/og-image.jpg -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -22,17 +23,17 @@
       color: #EFF3F8;
     }
 
-    /* azure bloom behind the portrait + a breath along the bottom */
+    /* azure bloom + a breath along the bottom */
     .bloom {
       position: absolute; inset: 0;
       background:
-        radial-gradient(ellipse 46% 62% at 78% 46%, rgba(92,169,255,.20) 0%, rgba(92,169,255,.07) 52%, transparent 76%),
-        radial-gradient(ellipse 80% 30% at 40% 108%, rgba(92,169,255,.10) 0%, transparent 70%);
+        radial-gradient(ellipse 44% 58% at 80% 40%, rgba(92,169,255,.16) 0%, rgba(92,169,255,.06) 52%, transparent 76%),
+        radial-gradient(ellipse 80% 30% at 38% 108%, rgba(92,169,255,.10) 0%, transparent 70%);
     }
 
-    /* rings centered on the portrait's head */
+    /* rings centered near the portrait's face */
     .ring {
-      position: absolute; left: 935px; top: 300px; transform: translate(-50%, -50%);
+      position: absolute; left: 960px; top: 250px; transform: translate(-50%, -50%);
       border: 1px solid rgba(239,243,248,.07); border-radius: 50%;
     }
     .r1 { width: 430px;  height: 430px; }
@@ -44,33 +45,31 @@
       background: rgba(140,197,255,.6); box-shadow: 0 0 9px rgba(92,169,255,.5);
     }
 
-    /* geometry ticks */
     .cross { position: absolute; width: 14px; height: 14px; opacity: .55; }
     .cross::before, .cross::after { content: ''; position: absolute; background: rgba(160,205,255,.16); }
     .cross::before { left: 0; right: 0; top: 50%; height: 1px; }
     .cross::after  { top: 0; bottom: 0; left: 50%; width: 1px; }
 
-    /* a four-point spark, azure */
     .spark { position: absolute; z-index: 4; }
     .spark svg { display: block; }
 
-    /* ── the cutout — B&W, azure rim light; the wrapper's mask melts the
-       photo's cropped left edge into shadow (mask on the img itself is
-       ignored once filters run, so it lives on the wrapper) ── */
-    .cutwrap {
-      position: absolute; left: 725px; top: -179px; z-index: 3;
-      width: 700px; height: 933px;
-      -webkit-mask-image: linear-gradient(to right, transparent 0px, transparent 10px, #000 135px);
-              mask-image: linear-gradient(to right, transparent 0px, transparent 10px, #000 135px);
+    /* ── the cinematic portrait — its studio black melts into the canvas ── */
+    .cine {
+      position: absolute; left: 668px; top: 0; z-index: 2;
+      width: 532px; height: 630px; overflow: hidden;
+      -webkit-mask-image: linear-gradient(to right, transparent 0px, #000 150px);
+              mask-image: linear-gradient(to right, transparent 0px, #000 150px);
     }
-    .cut {
-      display: block; width: 700px;
-      filter: grayscale(1) contrast(1.13) brightness(.95)
-              drop-shadow(2px 0 0 rgba(140,197,255,.9))
-              drop-shadow(-2px 0 0 rgba(140,197,255,.9))
-              drop-shadow(0 2px 0 rgba(140,197,255,.9))
-              drop-shadow(0 -2px 0 rgba(140,197,255,.9))
-              drop-shadow(0 0 42px rgba(92,169,255,.38));
+    .cine img {
+      position: absolute; width: 572px; left: -40px; top: -14px;
+      filter: contrast(1.04) brightness(1.02);
+    }
+    /* azure whisper over the haze so the photo sits on the palette */
+    .cine-tint {
+      position: absolute; left: 668px; top: 0; width: 532px; height: 630px; z-index: 3;
+      mix-blend-mode: overlay;
+      background: radial-gradient(ellipse 75% 60% at 55% 30%, rgba(92,169,255,.30) 0%, transparent 72%);
+      pointer-events: none;
     }
 
     /* ── left column ── */
@@ -95,22 +94,25 @@
       letter-spacing: -0.032em; color: #EFF3F8;
     }
 
-    .chips { position: absolute; left: 96px; top: 538px; display: flex; gap: 14px; z-index: 4; }
-    .chip {
-      display: inline-flex; align-items: center;
-      padding: 11px 20px; border: 1px solid rgba(239,243,248,0.13); border-radius: 18px;
-      background: rgba(13,18,27,.72);
-      font-size: 18px; font-weight: 500; letter-spacing: -0.012em;
+    /* ── grouped fact pills — the hero facts-strip, split in three ── */
+    .pills { position: absolute; left: 96px; top: 540px; display: flex; gap: 14px; z-index: 4; }
+    .pill {
+      display: inline-flex; align-items: stretch;
+      border: 1px solid rgba(239,243,248,0.13); border-radius: 18px;
+      background: rgba(13,18,27,.78);
+      font-size: 16.5px; font-weight: 500; letter-spacing: -0.012em;
       color: rgba(239,243,248,.85); white-space: nowrap;
       font-variant-numeric: tabular-nums lining-nums;
     }
+    .pill span { display: inline-flex; align-items: center; padding: 11px 18px; }
+    .pill span + span { border-left: 1px solid rgba(239,243,248,0.12); }
 
     .year {
-      position: absolute; right: 64px; top: 56px; z-index: 4;
-      font-size: 15px; font-weight: 520; letter-spacing: .08em; color: #7C8794;
+      position: absolute; right: 64px; bottom: 52px; z-index: 4;
+      font-size: 15px; font-weight: 520; letter-spacing: .08em; color: #9AA6B4;
+      text-shadow: 0 1px 12px rgba(3,6,12,.8);
     }
 
-    /* atmosphere on top */
     .vignette {
       position: absolute; inset: 0; z-index: 5; pointer-events: none;
       background: radial-gradient(135% 105% at 50% 46%, transparent 56%, rgba(3,6,12,0.55) 100%);
@@ -132,11 +134,13 @@
   <div class="dot" style="left: 719px; top: 302px;"></div>
   <div class="dot" style="left: 1146px; top: 155px;"></div>
   <div class="dot" style="left: 828px; top: 40px;"></div>
-  <div class="dot" style="left: 636px; top: 560px;"></div>
+  <div class="dot" style="left: 636px; top: 500px;"></div>
 
   <div class="cross" style="left: 638px; top: 96px;"></div>
-  <div class="cross" style="left: 1116px; top: 462px;"></div>
   <div class="cross" style="left: 60px; top: 556px;"></div>
+
+  <div class="cine"><img src="images/bhanu-cinematic.jpg" alt="" /></div>
+  <div class="cine-tint"></div>
 
   <div class="spark" style="left: 478px; top: 128px;">
     <svg width="34" height="34" viewBox="0 0 34 34">
@@ -149,19 +153,16 @@
     </svg>
   </div>
 
-  <div class="cutwrap"><img class="cut" src="images/bhanu-cutout.png" alt="" /></div>
-
   <div class="wordmark">Bhanu Kowshik</div>
 
   <div class="n0">AI Native</div>
   <div class="n1">Product</div>
   <div class="n2">Designer</div>
 
-  <div class="chips">
-    <span class="chip">0 → 1</span>
-    <span class="chip">Conversational AI</span>
-    <span class="chip">Builder</span>
-    <span class="chip">5+ Years</span>
+  <div class="pills">
+    <span class="pill"><span>0 → 1</span><span>Conversational AI</span><span>Impact Driven</span></span>
+    <span class="pill"><span>5+ Years</span><span>Builder</span></span>
+    <span class="pill"><span>San Francisco</span></span>
   </div>
 
   <div class="year">PORTFOLIO — 2026</div>
