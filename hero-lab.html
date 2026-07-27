@@ -3141,6 +3141,21 @@ html:not([data-theme="dark"]) .dna2-link path { stroke: #3372B8; }
 .dna2-stem { grid-column: 3 / 4; grid-row: 1; align-self: start; display: flex; flex-direction: column; gap: 14px; }
 .dna2-axis.depth { grid-column: 4 / 5; grid-row: 1; align-self: stretch; flex-direction: column; align-items: flex-start; justify-content: center; gap: 10px; }
 .dna2-axis.depth .dna2-axis-label { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; color: rgba(255,255,255,0.92); }
+/* One standard accent: every tile and the quote card speak the page's
+   azure. The per-tile palettes still sit in the markup as inline custom
+   properties, but the system overrides them — hover, selection, ring,
+   glow and quote emphasis all inherit these. */
+    .dna2-tile, .dna2-panel {
+      --lc: var(--ember-2) !important;
+      --c1: var(--ember-2) !important;
+      --c2: var(--ember) !important;
+    }
+html:not([data-theme="dark"]) .dna2-tile,
+    html:not([data-theme="dark"]) .dna2-panel {
+      --lc: #3372B8 !important;
+      --c1: #3372B8 !important;
+      --c2: #3372B8 !important;
+    }
 /* Tile — calm dark glass, accent only on hover/select */
     /* Every block — breadth and depth — is the SAME size for a groomed T */
     .dna2-tile {
