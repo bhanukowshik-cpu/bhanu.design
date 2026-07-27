@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- Source for images/og-image.jpg (social share card) — v15:
-     the whole scene is a Soul Cinema plate (images/og-plate.jpg — Bhanu with
-     the orb horizon and eclipse glow photographed in); HTML adds only type.
+<!-- Source for images/og-image.jpg (social share card) — v19, per the user's two references:
+     metallic-sheen "Bhanu" + fashion-serif "Kowshik", mono letterspaced chrome,
+     three outlined pills, ghost "B", cross tick, grain, beam; relit portrait right.
      Re-render after edits:
      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
        --screenshot=og-2x.png --window-size=1200,630 --force-device-scale-factor=2 \
@@ -12,18 +12,18 @@
   <meta charset="UTF-8" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:wght@400..700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 1200px; height: 630px; overflow: hidden; }
     body {
       position: relative;
-      background: #05070c;
+      background: #060809;
       font-family: 'Instrument Sans', system-ui, sans-serif;
       color: #EFF3F8;
     }
 
-    /* the portrait — the chosen car-bokeh frame, B&W, blended at its left edge */
+    /* ── the portrait — B&W, big on the right, left edge dissolving ── */
     .cine {
       position: absolute; left: 620px; top: 0; width: 580px; height: 630px;
       overflow: hidden; z-index: 1;
@@ -35,68 +35,91 @@
       filter: grayscale(1) contrast(1.08) brightness(1.02);
     }
 
-    /* a breath of darkness behind the type column */
-    .scrim {
-      position: absolute; inset: 0; z-index: 2;
-      background: linear-gradient(to right, rgba(4,6,11,.62) 0%, rgba(4,6,11,.34) 26%, transparent 46%);
+    /* ── the shapes — reference 2's furniture ── */
+    /* giant ghost letter, hairline outline, parked half off the top-left */
+    .ghost {
+      position: absolute; left: -70px; top: -150px; z-index: 0;
+      font-weight: 700; font-size: 620px; line-height: 1;
+      color: transparent; -webkit-text-stroke: 1.5px rgba(239,243,248,.055);
+      letter-spacing: -0.03em;
+    }
+    /* coordinate cross, bottom-left */
+    .cross { position: absolute; left: 46px; bottom: 40px; width: 20px; height: 20px; opacity: .55; z-index: 2; }
+    .cross::before, .cross::after { content: ''; position: absolute; background: rgba(239,243,248,.3); }
+    .cross::before { left: 0; right: 0; top: 50%; height: 1px; }
+    .cross::after  { top: 0; bottom: 0; left: 50%; width: 1px; }
+    /* a soft beam grazing down from the upper left, echoing the portrait's light */
+    .beam {
+      position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      background: linear-gradient(115deg, rgba(240,246,255,.075) 0%, rgba(240,246,255,.03) 22%, transparent 44%);
     }
 
-    /* ── type ── */
-    .n0 {
-      position: absolute; left: 96px; top: 126px; z-index: 4;
-      font-family: 'Urbanist', sans-serif; font-weight: 550;
-      font-size: 34px; line-height: 1; letter-spacing: .01em; color: #EFF3F8;
-      text-shadow: 0 3px 26px rgba(2,4,8,.8);
+    /* ── type — mono chrome, sheened display ── */
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    .eyebrow {
+      position: absolute; left: 98px; top: 150px; z-index: 4;
+      font-family: 'JetBrains Mono', monospace; font-weight: 500;
+      font-size: 17px; letter-spacing: .34em; text-transform: uppercase;
+      color: #9AA6B4; white-space: nowrap;
     }
     .n1 {
-      position: absolute; left: 92px; top: 188px; z-index: 4;
-      font-weight: 600; font-size: 118px; line-height: 1.0;
-      letter-spacing: -0.032em; color: #EFF3F8;
-      text-shadow: 0 6px 44px rgba(2,4,8,.75);
+      position: absolute; left: 92px; top: 192px; z-index: 4;
+      font-weight: 700; font-size: 148px; line-height: 1.0; letter-spacing: -0.03em;
+      background: linear-gradient(178deg, #FFFFFF 8%, #EDF1F6 52%, #9AA5B2 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
     }
     .n2 {
-      position: absolute; left: 96px; top: 302px; z-index: 4;
+      position: absolute; left: 96px; top: 342px; z-index: 4;
       font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400;
-      font-size: 128px; line-height: 1.0; letter-spacing: -0.01em; color: #EFF3F8;
-      text-shadow: 0 6px 44px rgba(2,4,8,.75);
+      font-size: 158px; line-height: 1.0; letter-spacing: -0.005em;
+      background: linear-gradient(178deg, #FFFFFF 10%, #E9EDF3 55%, #AEB8C4 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
     }
 
-    /* ── grouped fact pills on the orb horizon ── */
-    .pills { position: absolute; left: 96px; top: 540px; display: flex; gap: 13px; z-index: 4; }
+    /* ── three outlined pills, mono letterspaced ── */
+    .pills { position: absolute; left: 98px; top: 548px; display: flex; gap: 18px; z-index: 4; }
     .pill {
-      display: inline-flex; align-items: stretch;
-      border: 1px solid rgba(239,243,248,0.14); border-radius: 17px;
-      background: rgba(8,12,19,.66);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      font-size: 16px; font-weight: 500; letter-spacing: -0.012em;
-      color: rgba(239,243,248,.9); white-space: nowrap;
-      font-variant-numeric: tabular-nums lining-nums;
+      display: inline-flex; align-items: center;
+      padding: 13px 26px; border: 1px solid rgba(239,243,248,.26); border-radius: 999px;
+      background: rgba(6,8,9,.4);
+      font-family: 'JetBrains Mono', monospace; font-weight: 500;
+      font-size: 13px; letter-spacing: .26em; text-transform: uppercase;
+      color: rgba(239,243,248,.92); white-space: nowrap;
     }
-    .pill span { display: inline-flex; align-items: center; padding: 11px 18px; }
-    .pill span + span { border-left: 1px solid rgba(239,243,248,0.1); }
 
     .year {
-      position: absolute; right: 60px; top: 54px; z-index: 4;
-      font-size: 14px; font-weight: 520; letter-spacing: .08em; color: #A9B4C2;
+      position: absolute; right: 62px; top: 56px; z-index: 4;
+      font-family: 'JetBrains Mono', monospace; font-weight: 500;
+      font-size: 14px; letter-spacing: .3em; text-transform: uppercase; color: #9AA6B4;
       text-shadow: 0 2px 16px rgba(2,4,8,.8);
+    }
+
+    /* noise — in focus, over everything */
+    .grain {
+      position: absolute; inset: 0; z-index: 6; opacity: .06; mix-blend-mode: overlay; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
   </style>
 </head>
 <body>
+  <div class="ghost">B</div>
   <div class="cine"><img src="images/bhanu-cinematic.jpg" alt="" /></div>
-  <div class="scrim"></div>
+  <div class="beam"></div>
+  <div class="cross"></div>
 
-  <div class="n0">AI Native Product Designer</div>
+  <div class="eyebrow">AI-Native Product Designer</div>
   <div class="n1">Bhanu</div>
   <div class="n2">Kowshik</div>
 
   <div class="pills">
-    <span class="pill"><span>0 → 1</span><span>Conversational AI</span><span>Impact Driven</span></span>
-    <span class="pill"><span>5+ Years</span><span>Builder</span></span>
-    <span class="pill"><span>San Francisco</span></span>
+    <span class="pill">0 → 1</span>
+    <span class="pill">AI Systems</span>
+    <span class="pill">San Francisco</span>
   </div>
 
-  <div class="year">PORTFOLIO — 2026</div>
+  <div class="year">Portfolio / 2026</div>
+
+  <div class="grain"></div>
 </body>
 </html>
