@@ -19,6 +19,10 @@
   <meta name="twitter:title" content="EverTutor Studio — Bhanu Kowshik" />
   <meta name="twitter:image" content="https://bhanukowshik.netlify.app/images/og-image.jpg" />
 
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192.png" />
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&display=swap" rel="stylesheet" />
@@ -57,6 +61,8 @@
 
     /* ─── BODY ───────────────────────────────────────────────── */
     body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       background-color: var(--bg);
       min-height: 100vh;
       font-family: var(--font-heading);
@@ -994,7 +1000,7 @@
     }
     .tc-tool.visible { opacity: 1; transform: translateY(0); }
     .tc-tool-studio { background: #E6F28D; border-color: #E6F28D; font-weight: 600; }
-    .tc-tool-plus { font-family: var(--font-mono); color: #999; font-size: 13px; }
+    .tc-tool-plus { font-family: var(--font-mono); color: #6E6E6E; font-size: 13px; }
     .tc-counter-row {
       font-family: var(--font-heading);
       font-weight: 700;
@@ -1015,7 +1021,7 @@
       align-items: center;
       justify-content: center;
       font-size: 22px;
-      color: #999;
+      color: #6E6E6E;
       flex-shrink: 0;
     }
     [data-theme="dark"] .tc-panel { background: #222222; border-color: #222C3D; }
@@ -1673,6 +1679,28 @@
     html.color-transitioning .tt-hill-back, html.color-transitioning .tt-hill-front { transition: background 0.5s ease !important; }
     html.color-transitioning .tt-star, html.color-transitioning .tt-cloud { transition: opacity 0.4s ease !important; }
     html.color-transitioning .tt-thumb { transition: transform 0.44s cubic-bezier(0.34,1.56,0.64,1), background 0.5s ease !important; }
+
+    /* ─── KEYBOARD FOCUS ─────────────────────────────────────── */
+    /* the custom cursor hides the pointer, so keyboard focus must be
+       unmistakable — --secondary flips with the theme on its own */
+    .nav-home:focus-visible, .nav-btn:focus-visible,
+    .theme-toggle:focus-visible, .nav-hamburger:focus-visible,
+    .mobile-menu a:focus-visible {
+      outline: 2px solid var(--secondary); outline-offset: 3px;
+    }
+    .nav-btn:focus-visible, .theme-toggle:focus-visible,
+    .nav-hamburger:focus-visible { border-radius: 6px; }
+
+    /* ─── REDUCED MOTION ─────────────────────────────────────── */
+    /* Reveals land instantly on their end state ("both" keeps them visible);
+       looping ambience (dot breathe, arrow bob, twinkle) runs once and stops. */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
@@ -1719,7 +1747,7 @@
         <span class="tt-thumb"></span>
       </span>
     </button>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </nav>
@@ -2431,6 +2459,7 @@
   function toggleMenu(force) {
     const open = force !== undefined ? force : !hamburger.classList.contains('open');
     hamburger.classList.toggle('open', open);
+    hamburger.setAttribute('aria-expanded', open);
     mobileMenu.classList.toggle('open', open);
     backdrop.classList.toggle('open', open);
   }
@@ -2456,6 +2485,7 @@
     return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
   }
   function smoothScrollTo(targetY, duration) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, targetY); return; }
     const startY = window.scrollY;
     const dist   = targetY - startY;
     const start  = performance.now();
@@ -2467,7 +2497,9 @@
     requestAnimationFrame(step);
   }
 
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
+  /* mobile-menu links already scroll via their own close-then-scroll handler
+     above — binding them here too fired two competing scroll animations */
+  document.querySelectorAll('a[href^="#"]:not(.mobile-menu a)').forEach(a => {
     a.addEventListener('click', e => {
       const target = document.querySelector(a.getAttribute('href'));
       if (!target) return;
@@ -2533,6 +2565,8 @@
     tTrack.innerHTML = tHtml;
 
     requestAnimationFrame(() => {
+      /* reduced motion: leave the strip static — the cards are still readable */
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const halfW     = tTrack.scrollWidth / 2;
       const DURATION  = 66;   // seconds per full cycle
       const BASE_SPD  = halfW / DURATION;   // px per SECOND — independent of display refresh rate
