@@ -8499,5 +8499,19 @@ addEventListener('load', function () {
     } catch (e) { console.warn('Agentation failed to load:', e); }
   }
 </script>
+
+<!-- ── Meeting-request capture ───────────────────────────────────────────────
+     Netlify only accepts a form submission for a form it found in the HTML at
+     deploy time, so this declaration has to exist even though no visitor ever
+     sees or submits it. netlify/functions/schedule.mjs is what actually posts
+     here, on behalf of the two email captures in the chat and voice panels.
+     Remove this and /api/schedule starts returning 502. -->
+<form name="meeting-requests" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="email" name="email" />
+  <input type="text" name="source" />
+  <input type="text" name="at" />
+  <input type="text" name="ua" />
+  <input type="text" name="bot-field" />
+</form>
 </body>
 </html>
