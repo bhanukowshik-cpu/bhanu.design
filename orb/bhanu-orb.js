@@ -32846,7 +32846,7 @@ function Ux({ palette: i = "ember", size: e = 188, ui: t = !0, debug: a = !1, on
     onMessage: ({ message: j, source: ae }) => {
       var Pe;
       if (ae !== "ai" || !j) return;
-      const se = j.toLowerCase(), he = /\b(e-?mail|inbox)\b/.test(se), ve = /\b(schedul\w*|book\w*|set (that|it|this) up|calendar|meeting|call)\b/.test(se), ye = /\b(below|field|box|type|enter|drop|pop)\b/.test(se);
+      const se = j.toLowerCase(), he = /\byour e-?mail( address)?\b/.test(se), ve = /\b(schedul\w*|book\w*|set (that|it|this) up|calendar|meeting|call)\b/.test(se), ye = /\b(below|field|box|card|type|enter|drop|pop)\b/.test(se);
       if (he && (ve || ye)) {
         const we = window.BhanuTalk;
         (Pe = we == null ? void 0 : we.showScheduler) == null || Pe.call(we);

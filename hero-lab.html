@@ -6197,9 +6197,11 @@ var chatSchedOffered = false;
 function maybeOfferSchedule(reply) {
   if (chatSchedOffered) return;
   var t = (reply || '').toLowerCase();
-  var asksForEmail = /\b(e-?mail|inbox)\b/.test(t);
+  /* the possessive is the gate: "YOUR email" = the model is asking the
+     visitor for their address; offering Bhanu's address stays quiet */
+  var asksForYourEmail = /\byour e-?mail( address)?\b/.test(t);
   var aboutBooking = /\b(schedul\w*|book\w*|set (that|it|this) up|calendar|meeting|call)\b/.test(t);
-  if (!(asksForEmail && aboutBooking)) return;
+  if (!(asksForYourEmail && aboutBooking)) return;
   chatSchedOffered = true;
   var card = document.createElement('div');
   card.className = 'm ai chat-recs chat-sched';
@@ -7836,7 +7838,7 @@ addEventListener('load', function () {
      to it hard. Bump it whenever spiral.js changes. -->
 <script src="spiral-gallery/spiral.js?v=20260726-bend2"></script>
 
-<script type="module" src="orb/bhanu-orb.js?v=12"></script>
+<script type="module" src="orb/bhanu-orb.js?v=13"></script>
 
 <!-- ── AGENTATION — visual feedback for agents (agentation.com) ─────────
      Dev-only: loads ONLY on localhost, never in production. Click the

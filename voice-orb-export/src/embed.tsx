@@ -54,11 +54,14 @@ function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onSt
     onMessage: ({ message, source }: { message: string; source: 'user' | 'ai' }) => {
       if (source !== 'ai' || !message) return;
       const t = message.toLowerCase();
-      const asksForEmail = /\b(e-?mail|inbox)\b/.test(t);
+      // The possessive is the gate: "YOUR email" means the agent is asking
+      // the visitor for their address. Merely OFFERING contact info
+      // ("you can email Bhanu at …") must never raise the field.
+      const asksForYourEmail = /\byour e-?mail( address)?\b/.test(t);
       // \w* on the stems: a trailing \b would reject "scheduled"/"booking"
       const aboutBooking = /\b(schedul\w*|book\w*|set (that|it|this) up|calendar|meeting|call)\b/.test(t);
-      const pointsAtField = /\b(below|field|box|type|enter|drop|pop)\b/.test(t);
-      if (asksForEmail && (aboutBooking || pointsAtField)) {
+      const pointsAtField = /\b(below|field|box|card|type|enter|drop|pop)\b/.test(t);
+      if (asksForYourEmail && (aboutBooking || pointsAtField)) {
         const bt = (window as unknown as { BhanuTalk?: { showScheduler?: () => void } }).BhanuTalk;
         bt?.showScheduler?.();
       }
