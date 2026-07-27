@@ -70,34 +70,36 @@ export const DEFAULT_PALETTE: OrbPalette = PALETTES.arctic;
  * not targets.
  */
 export const DEFAULT_PARAMS: OrbParams = {
-  sphereScale: 1.19,
-  spherePower: 0.2,
+  // Bhanu's tuned baseline (panel "copy config", 2026-07-26) — a smaller,
+  // brighter sphere riding a strong fluid displacement instead of FBM churn.
+  sphereScale: 0.4,
+  spherePower: 0.33,
 
   fbmScale: 3.8,
   fbmPower: 2.7,
   fbmAmplitude: 0.0,
-  fbmSpeed: 5.65,
+  fbmSpeed: 0.0,
 
-  noiseScale: 0.41,
-  noiseAmplitude: 0.15,
-  noiseSpeed: 0.25,
+  noiseScale: 3.0,
+  noiseAmplitude: 0.0,
+  noiseSpeed: 0.18,
 
-  fluidForce: 0.2,
-  fluidDissipation: 0.933,
-  fluidDisplacement: 0.0,
-  fluidColorOpacity: 0.1,
+  fluidForce: 0.06,
+  fluidDissipation: 0.8,
+  fluidDisplacement: 3.0,
+  fluidColorOpacity: 0.0,
 
-  ringColorOpacity: 0.6,
+  ringColorOpacity: 0.38,
 
-  exposure: 0.7,
-  contrast: 0.29,
+  exposure: 1.0,
+  contrast: 0.08,
   saturation: 2.0,
   grainOpacity: 0.0,
 
-  maskRadius: 0.9,
-  maskSoftness: 0.14,
+  maskRadius: 0.97,
+  maskSoftness: 0.05,
 
-  driftSpeed: 0.115,
+  driftSpeed: 0.145,
 
   // State-driven behaviours — moved by STATE_PRESETS, 0 at baseline.
   innerLightShift: 0.0,
