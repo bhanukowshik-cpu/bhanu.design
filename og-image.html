@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- Source for images/og-image.jpg (social share card) — v7:
-     full-bleed cinematic Soul portrait, centered PORT/FOLIO-style stacked
-     lockup over it (PRODUCT white / DESIGNER azure), pills centered bottom.
+<!-- Source for images/og-image.jpg (social share card) — v6:
+     cinematic Soul portrait right (images/bhanu-cinematic.jpg), "AI Native
+     Product Designer" display type left, three grouped fact pills bottom.
      Re-render after edits:
      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
        --screenshot=og-2x.png --window-size=1200,630 --force-device-scale-factor=2 \
@@ -23,81 +23,99 @@
       color: #EFF3F8;
     }
 
-    /* ── the portrait, full-bleed backdrop; edges dissolve into navy ── */
-    .bg {
-      position: absolute; inset: 0; z-index: 1; overflow: hidden;
-      -webkit-mask-image: linear-gradient(to right, transparent 24.5%, #000 36%, #000 66%, transparent 78%);
-              mask-image: linear-gradient(to right, transparent 24.5%, #000 36%, #000 66%, transparent 78%);
-    }
-    .bg img {
-      position: absolute; width: 640px; left: 300px; top: -102px;
-      filter: brightness(.9) contrast(1.05);
-    }
-    /* a quiet dark pool behind the lockup so the type owns the lower half —
-       the face above stays clear */
-    .scrim {
-      position: absolute; inset: 0; z-index: 2;
-      background: radial-gradient(ellipse 58% 42% at 50% 70%, rgba(3,6,12,.46) 0%, rgba(3,6,12,.16) 55%, transparent 78%);
+    /* azure bloom + a breath along the bottom */
+    .bloom {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 44% 58% at 80% 40%, rgba(92,169,255,.16) 0%, rgba(92,169,255,.06) 52%, transparent 76%),
+        radial-gradient(ellipse 80% 30% at 38% 108%, rgba(92,169,255,.10) 0%, transparent 70%);
     }
 
-    /* ── the lockup — stacked, staggered, two-tone ── */
-    .eyebrow {
-      position: absolute; left: 50%; top: 44px; transform: translateX(-50%); z-index: 4;
-      font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400;
-      font-size: 36px; color: #EFF3F8; white-space: nowrap;
-      text-shadow: 0 4px 34px rgba(3,6,12,.85);
+    /* rings centered near the portrait's face */
+    .ring {
+      position: absolute; left: 960px; top: 250px; transform: translate(-50%, -50%);
+      border: 1px solid rgba(239,243,248,.07); border-radius: 50%;
     }
-    .t1 {
-      position: absolute; left: 50%; top: 272px; transform: translateX(calc(-50% + 46px)); z-index: 4;
-      font-weight: 700; font-size: 138px; line-height: 1; letter-spacing: -0.022em;
-      text-transform: uppercase; color: #EFF3F8; white-space: nowrap;
-      text-shadow: 0 8px 60px rgba(3,6,12,.85);
-    }
-    .t2 {
-      position: absolute; left: 50%; top: 404px; transform: translateX(calc(-50% - 34px)); z-index: 4;
-      font-weight: 700; font-size: 138px; line-height: 1; letter-spacing: -0.022em;
-      text-transform: uppercase; color: #EFF3F8; white-space: nowrap;
-      text-shadow: 0 8px 60px rgba(3,6,12,.85);
+    .r1 { width: 430px;  height: 430px; }
+    .r2 { width: 660px;  height: 660px;  border-color: rgba(239,243,248,.055); }
+    .r3 { width: 920px;  height: 920px;  border-color: rgba(239,243,248,.04); }
+    .r4 { width: 1220px; height: 1220px; border-color: rgba(239,243,248,.03); }
+    .dot {
+      position: absolute; width: 5px; height: 5px; border-radius: 50%;
+      background: rgba(140,197,255,.6); box-shadow: 0 0 9px rgba(92,169,255,.5);
     }
 
-    /* four-point spark, azure — the reference's twinkle */
+    .cross { position: absolute; width: 14px; height: 14px; opacity: .55; }
+    .cross::before, .cross::after { content: ''; position: absolute; background: rgba(160,205,255,.16); }
+    .cross::before { left: 0; right: 0; top: 50%; height: 1px; }
+    .cross::after  { top: 0; bottom: 0; left: 50%; width: 1px; }
+
     .spark { position: absolute; z-index: 4; }
     .spark svg { display: block; }
 
-    /* ── grouped fact pills, centered along the bottom ── */
-    .pills {
-      position: absolute; left: 50%; bottom: 42px; transform: translateX(-50%);
-      display: flex; gap: 12px; z-index: 4;
+    /* ── the cinematic portrait — its studio black melts into the canvas ── */
+    .cine {
+      position: absolute; left: 668px; top: 0; z-index: 2;
+      width: 532px; height: 630px; overflow: hidden;
+      -webkit-mask-image: linear-gradient(to right, transparent 0px, #000 150px);
+              mask-image: linear-gradient(to right, transparent 0px, #000 150px);
     }
+    .cine img {
+      position: absolute; width: 572px; left: -40px; top: -14px;
+      filter: contrast(1.04) brightness(1.02);
+    }
+    /* azure whisper on the background haze corner only — never on the skin */
+    .cine-tint {
+      position: absolute; left: 668px; top: 0; width: 532px; height: 630px; z-index: 3;
+      mix-blend-mode: overlay;
+      background: radial-gradient(ellipse 42% 34% at 10% 12%, rgba(92,169,255,.16) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── left column ── */
+    .wordmark {
+      position: absolute; left: 96px; top: 54px; z-index: 4;
+      font-size: 22px; font-weight: 600; letter-spacing: -0.01em; color: #EFF3F8;
+    }
+
+    .n0 {
+      position: absolute; left: 96px; top: 122px; z-index: 4;
+      font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400;
+      font-size: 86px; line-height: 1; letter-spacing: -0.008em; color: #8CC5FF;
+    }
+    .n1 {
+      position: absolute; left: 92px; top: 218px; z-index: 4;
+      font-weight: 600; font-size: 120px; line-height: 1.0;
+      letter-spacing: -0.032em; color: #EFF3F8;
+    }
+    .n2 {
+      position: absolute; left: 92px; top: 342px; z-index: 4;
+      font-weight: 600; font-size: 120px; line-height: 1.0;
+      letter-spacing: -0.032em; color: #EFF3F8;
+    }
+
+    /* ── grouped fact pills — the hero facts-strip, split in three ── */
+    .pills { position: absolute; left: 96px; top: 540px; display: flex; gap: 14px; z-index: 4; }
     .pill {
       display: inline-flex; align-items: stretch;
-      border: 1px solid rgba(239,243,248,0.15); border-radius: 16px;
+      border: 1px solid rgba(239,243,248,0.13); border-radius: 18px;
       background: rgba(13,18,27,.78);
-      font-size: 15px; font-weight: 500; letter-spacing: -0.012em;
-      color: rgba(239,243,248,.88); white-space: nowrap;
+      font-size: 16.5px; font-weight: 500; letter-spacing: -0.012em;
+      color: rgba(239,243,248,.85); white-space: nowrap;
       font-variant-numeric: tabular-nums lining-nums;
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
     }
-    .pill span { display: inline-flex; align-items: center; padding: 9px 16px; }
-    .pill span + span { border-left: 1px solid rgba(239,243,248,0.13); }
+    .pill span { display: inline-flex; align-items: center; padding: 11px 18px; }
+    .pill span + span { border-left: 1px solid rgba(239,243,248,0.12); }
 
-    .wordmark {
-      position: absolute; left: 64px; top: 50px; z-index: 4;
-      font-size: 20px; font-weight: 600; letter-spacing: -0.01em; color: #EFF3F8;
-      text-shadow: 0 2px 18px rgba(3,6,12,.8);
-    }
     .year {
-      position: absolute; right: 64px; top: 54px; z-index: 4;
-      font-size: 14px; font-weight: 520; letter-spacing: .08em; color: #9AA6B4;
-      text-shadow: 0 2px 18px rgba(3,6,12,.8);
+      position: absolute; right: 64px; bottom: 52px; z-index: 4;
+      font-size: 15px; font-weight: 520; letter-spacing: .08em; color: #9AA6B4;
+      text-shadow: 0 1px 12px rgba(3,6,12,.8);
     }
 
-    /* atmosphere on top — the reference's heavy edge vignette */
     .vignette {
-      position: absolute; inset: 0; z-index: 3; pointer-events: none;
-      background:
-        radial-gradient(135% 110% at 50% 44%, transparent 48%, rgba(3,6,12,.62) 100%),
-        radial-gradient(ellipse 80% 26% at 50% 106%, rgba(92,169,255,.10) 0%, transparent 68%);
+      position: absolute; inset: 0; z-index: 5; pointer-events: none;
+      background: radial-gradient(135% 105% at 50% 46%, transparent 56%, rgba(3,6,12,0.55) 100%);
     }
     .grain {
       position: absolute; inset: 0; z-index: 6; opacity: .05; mix-blend-mode: overlay; pointer-events: none;
@@ -106,15 +124,29 @@
   </style>
 </head>
 <body>
-  <div class="bg"><img src="images/bhanu-cinematic.jpg" alt="" /></div>
-  <div class="scrim"></div>
-  <div class="vignette"></div>
+  <div class="bloom"></div>
 
-  <div class="eyebrow">AI Native Product Designer</div>
-  <div class="t1">Bhanu</div>
-  <div class="t2">Kowshik</div>
+  <div class="ring r1"></div>
+  <div class="ring r2"></div>
+  <div class="ring r3"></div>
+  <div class="ring r4"></div>
 
-  <div class="year" style="right: auto; left: 64px;">PORTFOLIO — 2026</div>
+  <div class="dot" style="left: 719px; top: 302px;"></div>
+  <div class="dot" style="left: 1146px; top: 155px;"></div>
+  <div class="dot" style="left: 828px; top: 40px;"></div>
+  <div class="dot" style="left: 636px; top: 500px;"></div>
+
+  <div class="cross" style="left: 638px; top: 96px;"></div>
+  <div class="cross" style="left: 60px; top: 556px;"></div>
+
+  <div class="cine"><img src="images/bhanu-cinematic.jpg" alt="" /></div>
+  <div class="cine-tint"></div>
+
+  <div class="wordmark">Bhanu Kowshik</div>
+
+  <div class="n0">AI Native</div>
+  <div class="n1">Product</div>
+  <div class="n2">Designer</div>
 
   <div class="pills">
     <span class="pill"><span>0 → 1</span><span>Conversational AI</span><span>Impact Driven</span></span>
@@ -122,6 +154,9 @@
     <span class="pill"><span>San Francisco</span></span>
   </div>
 
+  <div class="year">PORTFOLIO — 2026</div>
+
+  <div class="vignette"></div>
   <div class="grain"></div>
 </body>
 </html>
