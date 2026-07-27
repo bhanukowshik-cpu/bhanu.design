@@ -4087,15 +4087,31 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         rgba(240,246,255,.075) 0%, rgba(240,246,255,.03) 22%, transparent 46%);
       opacity: 0; transition: opacity 1.2s ease;
     }
-    /* giant hairline monogram, parked half off the frame */
-    .v6l-monogram {
-      position: absolute; z-index: 0; left: -4vw; top: 50%;
-      transform: translateY(-54%);
-      font-family: var(--sans); font-weight: 700;
-      font-size: min(72vh, 46vw); line-height: 1; letter-spacing: -0.03em;
-      color: transparent;
-      -webkit-text-stroke: 1.5px rgba(239,243,248,.055);
-      pointer-events: none; user-select: none;
+    /* hairline geometry, parked half off the frame where the monogram was —
+       a drawn construction, not a letter: two concentric rings, a slow
+       orbit and a tilted square, all in the card's monochrome ink */
+    .v6l-geo {
+      position: absolute; z-index: 0; inset: 0;
+      pointer-events: none; overflow: hidden;
+    }
+    .v6l-geo > * { position: absolute; }
+    .v6l-ring {
+      border: 1.5px solid rgba(239,243,248,.055); border-radius: 50%;
+    }
+    .v6l-ring--inner { border-color: rgba(239,243,248,.035); }
+    .v6l-orbit {
+      border: 1px solid rgba(239,243,248,.03); border-radius: 50%;
+      animation: geoSpin 190s linear infinite;
+    }
+    .v6l-orbit b {
+      position: absolute; top: -2px; left: 50%; width: 4px; height: 4px;
+      margin-left: -2px; border-radius: 50%;
+      background: rgba(239,243,248,.42);
+    }
+    .v6l-quad {
+      width: clamp(64px, 9vw, 132px); aspect-ratio: 1;
+      border: 1.5px solid rgba(239,243,248,.05);
+      border-radius: 12px; transform: rotate(14deg);
     }
     /* coordinate crosses — the card's tick marks */
     .v6l-tick {
@@ -4215,10 +4231,15 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   </style>
 
   <div id="v6Loader" hidden role="status" aria-label="Loading portfolio">
-    <!-- the share card's furniture, not the page's orbits: a giant ghost
-         monogram parked off-frame and two hairline coordinate crosses.
-         The circles and the blue bloom are out. -->
-    <div class="v6l-monogram" aria-hidden="true">B</div>
+    <!-- the card's furniture: hairline geometry parked off-frame plus two
+         coordinate crosses. Monochrome — the blue bloom stays out. -->
+    <div class="v6l-geo" aria-hidden="true">
+      <span class="v6l-ring" style="width:76vh;height:76vh;left:-26vh;top:50%;margin-top:-38vh;"></span>
+      <span class="v6l-ring v6l-ring--inner" style="width:52vh;height:52vh;left:-14vh;top:50%;margin-top:-26vh;"></span>
+      <span class="v6l-orbit" style="width:104vh;height:104vh;left:-40vh;top:50%;margin-top:-52vh;"><b></b></span>
+      <span class="v6l-quad" style="right:9%;top:17%;"></span>
+      <span class="v6l-quad" style="left:12%;bottom:12%;transform:rotate(-9deg);"></span>
+    </div>
     <span class="v6l-tick v6l-tick--tl" aria-hidden="true"></span>
     <span class="v6l-tick v6l-tick--br" aria-hidden="true"></span>
     <div class="v6l-glow" aria-hidden="true"></div>
