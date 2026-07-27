@@ -1,12 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EverTutor Studio — Bhanu Kowshik</title>
+
+  <!-- ── Social share meta (image source: og-image.html → images/og-image.jpg) ── -->
+  <meta name="description" content="EverTutor Studio case study — designing an AI-powered course creation studio. By Bhanu Kowshik, AI Native Product Designer." />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Bhanu Kowshik" />
+  <meta property="og:title" content="EverTutor Studio — Bhanu Kowshik" />
+  <meta property="og:description" content="Case study: designing an AI-powered course creation studio." />
+  <meta property="og:url" content="https://bhanu.build/evertutor-studio.html" />
+  <meta property="og:image" content="https://bhanu.build/images/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="EverTutor Studio — Bhanu Kowshik" />
+  <meta name="twitter:image" content="https://bhanu.build/images/og-image.jpg" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192.png" />
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&display=swap" rel="stylesheet" />
 
   <style>
     /* ─── RESET ─────────────────────────────────────────────── */
@@ -21,22 +40,47 @@
       --white:        #FFFFFF;
       --grey:         #515151;
       --border:       #EFEFEF;
-      --font-heading: 'Montserrat', sans-serif;
-      --font-mono:    'JetBrains Mono', monospace;
+      /* ── TYPE — the portfolio's system, carried into the case study ──
+         Instrument Sans for every display line and every label, Urbanist for
+         the prose, Instrument Serif in italic for emphasis. The token names
+         are kept so the rules below need no edit; only what they resolve to
+         has changed. */
+      --font-heading: 'Instrument Sans', system-ui, sans-serif;
+      --font-mono:    'Urbanist', 'Instrument Sans', system-ui, sans-serif;
+      --font-serif:   'Instrument Serif', Georgia, serif;
+      /* one button, every page: white out of the top-left, azure across the rest */
+      --cta-grad: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #E4EFFF 9%, #93BEFF 26%, #4B8AF0 50%, #2463DC 76%, #1A4CB8 100%);
+      --cta-grad-hover: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #EDF4FF 11%, #A6CBFF 29%, #5A96F5 53%, #2C6FE8 79%, #1F57CA 100%);
     }
+    /* the serif only ever appears in italic, exactly as it does on the home page */
+    .serif { font-family: var(--font-serif); font-style: italic; font-weight: 400; }
 
     /* smooth scroll handled by JS for proper easing */
 
-    /* ─── BODY — dot-grid fixed (doesn't scroll) ────────────── */
+    /* ─── BODY ───────────────────────────────────────────────── */
     body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       background-color: var(--bg);
-      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
-      background-size: 19px 19px;
-      background-attachment: fixed;   /* ← grid stays put */
       min-height: 100vh;
       font-family: var(--font-heading);
+      /* clip, not hidden — the off-canvas mobile menu otherwise leaves the
+         page horizontally pannable; hidden stays as the older-browser fallback */
       overflow-x: hidden;
+      overflow-x: clip;
       cursor: none;
+    }
+
+    /* Film grain — the ground hero-lab uses. Replaces the page-wide dot mesh,
+       which stamped one pattern across every section instead of letting each
+       section carry its own texture. Sits above content but under the nav
+       and the custom cursor. */
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
     /* ─── CUSTOM CURSOR ──────────────────────────────────────── */
@@ -58,31 +102,6 @@
         background    0.26s ease,
         opacity       0.18s ease;
     }
-
-    /* "Hold & Drag" label — positioned independently */
-    #dragLabel {
-      position: fixed;
-      top: 0; left: 0;
-      pointer-events: none;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 500; /* JetBrains Mono only loads 300/400/500 — 700 was synthesized */
-      color: #FFFCF8;
-      text-align: center;
-      line-height: 1.3;
-      white-space: nowrap;
-      padding: 8px;
-      opacity: 0;
-      transition: opacity 0.18s ease;
-      background: #252525;
-      border-radius: 50%;
-      width: 64px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #dragLabel.visible { opacity: 1; }
 
     /* ─── NAV — Figma 191:14841 ──────────────────────────────── */
     .nav {
@@ -129,9 +148,14 @@
       color: var(--secondary);
       white-space: nowrap;
     }
+    /* flex:1 + centre keeps the links visually centred now that the theme
+       toggle no longer sits on the right — space-between alone would shove
+       them against the edge */
     .nav-sections {
       display: flex;
       align-items: center;
+      justify-content: center;
+      flex: 1;
       gap: 4px;
     }
     .nav-btn {
@@ -160,20 +184,18 @@
       color: var(--white);
     }
 
-    /* ─── PAGE — same structure as portfolio ─────────────────── */
+    /* ─── PAGE ───────────────────────────────────────────────── */
     .page {
       display: flex;
       justify-content: center;
-      padding: 94px 10% 90px;
+      padding: 74px 0 0;
     }
 
-    /* ─── CARD — same as portfolio ───────────────────────────── */
+    /* ─── CONTENT COLUMN — frame retired, hero-lab 1400px width ── */
     .card {
-      background: var(--white);
+      background: none;
       width: 100%;
-      max-width: 1920px;
-      border-radius: 30px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      max-width: 1400px;
       overflow: hidden;
       overflow-x: hidden;
       display: flex;
@@ -181,11 +203,63 @@
     }
 
     /* ─── HERO — Figma 191:14423 ─────────────────────────────── */
+    /* ─── HERO — two-column panel, matching evertutor-live ───── */
     .cs-hero {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      padding: 36px 30px 48px;
+      display: block;
+      padding: clamp(34px, 4.2vw, 64px) clamp(28px, 3.6vw, 52px) clamp(34px, 4.2vw, 60px);
+      /* .cs-section-wrap insets its cards 40px a side; match it so the hero
+         panel lines up with every section below */
+      margin: 0 40px;
+      position: relative; isolation: isolate;
+      border-radius: 16px; overflow: hidden;
+    }
+    /* the generated plate is dark-mode art — over cream it can only wash out
+       to grey, so light mode hides it and tints the panel instead */
+    .cs-hero > .et-bg-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: 50% 86%;
+      display: none; pointer-events: none; z-index: 0;
+    }
+    [data-theme="dark"] .cs-hero > .et-bg-img { display: block; }
+    .hero-scrim {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(100deg, #FFFCF8 0%, #F8FCF6 58%, #E4F5E6 100%);
+    }
+    .hero-grid {
+      position: relative; z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(28px, 4vw, 60px);
+      align-items: center;
+    }
+    /* the column is the container the headline sizes against */
+    .hero-copy {
+      display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+      container-type: inline-size;
+    }
+    .hero-pills {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      width: 100%; margin-top: 34px; padding-top: 22px;
+      border-top: 1px solid rgba(37,37,37,0.12);
+      opacity: 0;
+    }
+    .hero-pills.visible { animation: fade-in 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
+
+    /* the product on a slight 3D tilt */
+    .hero-visual { perspective: 1500px; }
+    .hero-tilt { transform: rotateY(-8deg) rotateX(2deg); transform-style: preserve-3d; }
+    /* the frame was absolutely centred inside the old full-bleed band; in a
+       column it sits static, and its .visible transform must not fight the tilt */
+    .hero-visual .chv-video-frame {
+      position: static; width: 100%; max-width: none;
+      transform: none; box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+    }
+    .hero-visual .chv-video-frame.visible { transform: none; }
+
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+      .hero-visual { perspective: none; }
+      .hero-tilt { transform: none; }
     }
 
     /* Designation pills — Figma 191:14424 */
@@ -212,11 +286,14 @@
     /* Main heading — Figma: Montserrat Bold 40px, lh 55px */
     .cs-heading {
       font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 30px;
-      line-height: 1.5;
-      letter-spacing: -0.8px;
+      font-weight: 600;
+      /* cqi, not a fixed px — sized off the copy column so the wrap holds
+         at any panel width */
+      font-size: clamp(28px, 8.6cqi, 46px);
+      line-height: 1.14;
+      letter-spacing: -0.028em;
       color: var(--secondary);
+      max-width: 15ch;
     }
     /* Italic part — "104 hours to 4." */
     .cs-heading em {
@@ -235,13 +312,15 @@
     }
 
     /* Subtitle — Figma: Montserrat Bold 25px, lh 55px */
+    /* body-scale now — 25px/55px was sized for the old full-width block */
     .cs-subtitle {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 25px;
-      line-height: 55px;
-      margin-top: -8px;
-      color: var(--secondary);
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 1.6;
+      margin-top: 20px;
+      max-width: 42ch;
+      color: #515151;
       opacity: 0;
     }
     .cs-subtitle.visible {
@@ -317,68 +396,6 @@
     @media (max-width: 767px) {
       .cs-hero-visual { height: 260px; }
       .chv-video-frame { width: 88%; border-radius: 12px; }
-    }
-
-    /* ─── CAROUSEL SECTION ───────────────────────────────────── */
-    .cs-carousel-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      padding: 0 0 56px;
-      opacity: 0;
-      transform: translateY(40px);
-    }
-    .cs-carousel-section.visible {
-      animation: section-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    /* Carousel viewport — overflow:visible lets card shadow bleed out without being clipped */
-    .carousel-viewport {
-      width: 100%;
-      position: relative;
-      height: 387px;
-      overflow: visible;
-      cursor: none;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    /*
-      Card sized to Studio Core Features master image ratio:
-      534.57 ÷ 347 = 1.541
-      560 ÷ 1.541 = 363px height
-      object-fit:contain → master image fills card perfectly, no cropping.
-      Lesson images (different ratio) get a subtle white BG fill — acceptable.
-    */
-    .fan-card {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 560px;
-      height: 363px;
-      border-radius: 17px;
-      overflow: hidden;
-      background: #FFFFFF;
-      box-shadow: 0px 4px 14px rgba(37,37,37,0.08);
-      will-change: transform, opacity, filter;
-    }
-    .fan-card img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;   /* no cropping on any image */
-      background: #FFFFFF;
-      display: block;
-      pointer-events: none;
-    }
-
-    /* Caption */
-    .carousel-caption {
-      font-family: var(--font-mono);
-      font-weight: 400;
-      font-size: 12px;
-      color: #515151;
-      text-align: center;
     }
 
     /* ─── SECTION SEPARATOR WRAPPER ─────────────────────────── */
@@ -576,8 +593,8 @@
     .tr-item-desc {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 15px;
-      line-height: 25px;
+      font-size: 16px;
+      line-height: 27px;
       color: #515151;
     }
     /* Label part: Montserrat SemiBold */
@@ -625,10 +642,9 @@
 
     /* Hide custom cursor on touch devices */
     @media (hover: none) {
-      #ccDot, #dragLabel { display: none; }
+      #ccDot { display: none; }
       body { cursor: auto; }
       a, button { cursor: pointer; }
-      .carousel-viewport { cursor: grab; }
     }
 
     /* ─── HAMBURGER + MOBILE MENU ───────────────────────────── */
@@ -674,10 +690,16 @@
       gap: 4px;
       display: flex;
       transform: translateX(100%);
-      transition: transform 0.38s cubic-bezier(0.22, 0.61, 0.36, 1);
+      /* hidden while closed so keyboard focus can't land on off-screen links;
+         the delay holds visibility until the slide-out finishes */
+      visibility: hidden;
+      transition: transform 0.38s cubic-bezier(0.22, 0.61, 0.36, 1),
+                  visibility 0s linear 0.38s;
     }
     .mobile-menu.open {
       transform: translateX(0);
+      visibility: visible;
+      transition: transform 0.38s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s;
     }
     /* Dim overlay behind the panel */
     .mobile-menu-backdrop {
@@ -724,17 +746,19 @@
 
 
 
+    /* ── Nav collapse ────────────────────────────────────────── */
+    /* the seven long section labels need ~1180px to sit beside the logo and
+       toggle — collapse to the hamburger below that, not at the tablet line */
+    @media (max-width: 1180px) {
+      .nav-sections         { display: none; }
+      .nav-hamburger        { display: flex; }
+    }
+
     /* ── Tablet: 768px – 1023px ──────────────────────────────── */
     @media (max-width: 1023px) {
       .nav                  { padding: 8px 24px; }
       .page                 { padding: 74px 10% 70px; }
-      .cs-hero              { padding: 28px 24px 36px; gap: 16px; }
-      .cs-heading           { font-size: 26px; }
-      .cs-subtitle          { font-size: 20px; line-height: 40px; }
-
-      /* Fan carousel — scale cards for tablet */
-      .carousel-viewport    { height: 300px; }
-      .fan-card             { width: 420px; height: 272px; }
+      /* .cs-hero padding and .cs-heading size are fluid now — see the base rules */
 
       /* Team & Role */
       .tr-card              { padding: 18px; gap: 24px; }
@@ -765,17 +789,9 @@
       .card                 { border-radius: 16px; }
 
       /* Hero */
-      .cs-hero              { padding: 24px 18px 20px; gap: 12px; }
-      .cs-heading           { font-size: 22px; }
-      .cs-subtitle          { font-size: 15px; line-height: 28px; }
+      .cs-hero              { margin: 0 10px; }   /* stay level with the cards */
       .designation-row      { flex-wrap: wrap; gap: 8px; }
       .desig-pill { font-size: 10px; padding: 4px 10px; }
-
-      /* Carousel */
-      .cs-carousel-section { padding: 0 0 32px; }
-      .carousel-viewport    { height: 210px; }
-      .fan-card             { width: 260px; height: 169px; border-radius: 12px; }
-      .carousel-caption     { font-size: 11px; padding: 0 16px; }
 
       /* Section wrapper */
       .cs-section-wrap { padding: 0 10px 20px; }
@@ -790,8 +806,8 @@
       .tr-bullet-wrap { padding: 6px 0 0; }
       .tr-highlight         { font-size: 16px; }
       .tr-body              { font-size: 13px; line-height: 24px; }
-      .tr-item-desc { font-size: 13px; line-height: 20px; }
-      .tr-mixed { font-size: 13px; line-height: 20px; }
+      .tr-item-desc { font-size: 14px; line-height: 21px; }
+      .tr-mixed { font-size: 14px; line-height: 21px; }
       .tr-mixed-mono { font-size: 13px; line-height: 20px; }
 
       /* Impact */
@@ -825,10 +841,6 @@
 
     /* ── Small mobile: up to 480px ───────────────────────────── */
     @media (max-width: 480px) {
-      .cs-heading           { font-size: 20px; }
-      .cs-subtitle          { font-size: 13px; line-height: 24px; }
-      .fan-card             { width: calc(100vw - 60px); height: auto; aspect-ratio: 560 / 363; }
-      .carousel-viewport    { height: auto; min-height: 180px; }
       .section-heading      { font-size: 18px; line-height: 28px; }
       .oc-testimonial       { width: calc(100vw - 44px); }
     }
@@ -958,8 +970,8 @@
     .imp-body {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 15px;
-      line-height: 25px;
+      font-size: 16px;
+      line-height: 27px;
       color: #515151;
     }
     .imp-footnote {
@@ -968,7 +980,7 @@
       font-style: italic;
       font-size: 12px;
       line-height: 25px;
-      color: rgba(147,147,147,0.6);
+      color: #6E6E6E;
     }
 
     /* ─── OLD vs NEW WORKFLOW COMPARISON ─────────────────────── */
@@ -1010,7 +1022,9 @@
     }
     .tc-tool.visible { opacity: 1; transform: translateY(0); }
     .tc-tool-studio { background: #E6F28D; border-color: #E6F28D; font-weight: 600; }
-    .tc-tool-plus { font-family: var(--font-mono); color: #999; font-size: 13px; }
+    /* the muted ink of this component — #6E6E6E was a light-mode value and
+       sat at 3.1:1 on the dark panel once light mode was retired */
+    .tc-tool-plus { font-family: var(--font-mono); color: #A9B4C2; font-size: 13px; }
     .tc-counter-row {
       font-family: var(--font-heading);
       font-weight: 700;
@@ -1022,8 +1036,8 @@
     .tc-unit { font-size: 18px; font-weight: 600; color: #515151; }
     .tc-sub {
       font-family: var(--font-mono);
-      font-size: 13px;
-      line-height: 20px;
+      font-size: 14px;
+      line-height: 22px;
       color: #515151;
     }
     .tc-arrow {
@@ -1031,16 +1045,16 @@
       align-items: center;
       justify-content: center;
       font-size: 22px;
-      color: #999;
+      color: #A9B4C2;
       flex-shrink: 0;
     }
-    [data-theme="dark"] .tc-panel { background: #222222; border-color: #3A3A3A; }
+    [data-theme="dark"] .tc-panel { background: #222222; border-color: #222C3D; }
     [data-theme="dark"] .tc-new { background: rgba(230,242,141,0.06); border-color: rgba(230,242,141,0.25); }
-    [data-theme="dark"] .tc-tool { background: #1A1A1A; border-color: #3A3A3A; color: #F0EDE8; }
-    [data-theme="dark"] .tc-tool-studio { background: #E6F28D; border-color: #E6F28D; color: #252525; }
+    [data-theme="dark"] .tc-tool { background: #0A0E15; border-color: #222C3D; color: #EFF3F8; }
+    [data-theme="dark"] .tc-tool-studio { background: #E6F28D; border-color: #E6F28D; color: #131A25; }
     [data-theme="dark"] .tc-panel-label,
     [data-theme="dark"] .tc-sub,
-    [data-theme="dark"] .tc-unit { color: #999999; }
+    [data-theme="dark"] .tc-unit { color: #A9B4C2; }
     @media (max-width: 767px) {
       .tools-compare { flex-direction: column; }
       .tc-arrow { transform: rotate(90deg); padding: 4px 0; }
@@ -1061,7 +1075,7 @@
       .imp-desc { font-size: 14px; line-height: 22px; }
       .imp-num { font-size: 15px; }
       .imp-title-plain, .imp-hl { font-size: 16px; white-space: normal; }
-      .imp-body { font-size: 13px; line-height: 22px; }
+      .imp-body { font-size: 14px; line-height: 23px; }
     }
 
     /* ─── USERS & GOALS SECTION ──────────────────────────────── */
@@ -1175,8 +1189,8 @@
     .ug-body {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 15px;
-      line-height: 25px;
+      font-size: 16px;
+      line-height: 27px;
       color: #515151;
     }
 
@@ -1220,7 +1234,7 @@
       .ug-role-goal { font-size: 15px; line-height: 22px; }
       .ug-role-label { font-size: 11px; }
       .ug-tag { font-size: 14px; }
-      .ug-body { font-size: 13px; line-height: 20px; }
+      .ug-body { font-size: 14px; line-height: 21px; }
     }
     /* ─── CONSTRAINTS & DESIGN APPROACH ─────────────────────── */
     .cd-image-frame {
@@ -1254,8 +1268,8 @@
     .cd-insight {
       font-family: var(--font-mono);
       font-weight: 500;
-      font-size: 15px;
-      line-height: 25px;
+      font-size: 16px;
+      line-height: 27px;
       color: #515151;
     }
     .cd-hl {
@@ -1276,16 +1290,18 @@
       padding: 16px 20px;
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 15px;
-      line-height: 25px;
+      font-size: 16px;
+      line-height: 27px;
       color: #515151;
       font-style: italic;
     }
 
     @media (max-width: 767px) {
-      .cd-image-frame { width: 72px; height: 90px; }
-      .cd-blockquote { font-size: 13px; line-height: 22px; padding: 12px 14px; }
-      .cd-insight { font-size: 13px; }
+      /* .tr-top stacks at this width, which would strand the accent above the
+         label — the same reason .tr-image-frame and .ug-image-frame drop out */
+      .cd-image-frame { display: none; }
+      .cd-blockquote { font-size: 14px; line-height: 23px; padding: 12px 14px; }
+      .cd-insight { font-size: 14px; }
     }
 
     /* ─── OUTCOMES SECTION ───────────────────────────────────── */
@@ -1373,8 +1389,8 @@
     .oc-metric-body {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 15px;
-      line-height: 25px;
+      font-size: 16px;
+      line-height: 27px;
       color: #515151;
     }
 
@@ -1426,8 +1442,8 @@
     .oc-quote {
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: 13px;
-      line-height: 22px;
+      font-size: 14px;
+      line-height: 23px;
       color: #515151;
       font-style: italic;
     }
@@ -1443,7 +1459,7 @@
       .oc-testimonial { width: 300px; }
       .oc-desc { font-size: 14px; line-height: 22px; }
       .oc-metric-value { font-size: 16px; }
-      .oc-metric-label, .oc-metric-body { font-size: 13px; }
+      .oc-metric-label, .oc-metric-body { font-size: 14px; }
     }
 
     /* ─── THANK YOU BAR ─────────────────────────────────────── */
@@ -1529,12 +1545,14 @@
     .op-card-desc { font-family: var(--font-mono); font-size: 15px; color: #515151; line-height: 1.6; flex: 1; }
     .op-card-cta {
       display: flex; align-items: center; justify-content: center; gap: 7px;
-      background: #252525; color: #fff;
-      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-      letter-spacing: 0.04em; padding: 11px 14px; border-radius: 8px; margin-top: 4px;
+      /* the site's one button: white out of the top-left corner, azure across
+         the rest, a rounded rectangle, and no shadow */
+      background: var(--cta-grad); color: #fff; border: 0; box-shadow: none;
+      font-family: var(--font-heading); font-size: 12px; font-weight: 600;
+      letter-spacing: -0.002em; padding: 12px 18px; border-radius: 12px; margin-top: 4px;
       cursor: pointer; transition: transform 0.18s ease;
     }
-    .op-card-cta:hover { transform: translateY(-3px); }
+    .op-card-cta:hover { background: var(--cta-grad-hover); transform: translateY(-3px); }
     @media (max-width: 900px) {
       .other-projects { padding: 48px 24px 64px; }
       .other-projects-grid { grid-template-columns: 1fr; }
@@ -1542,145 +1560,112 @@
     }
     /* ─── DARK MODE TOKENS ───────────────────────────────────── */
     [data-theme="dark"] {
-      --secondary:  #F0EDE8;
-      --bg:         #1A1A1A;
-      --white:      #0C0C0C;
-      --grey:       #999999;
-      --border:     #3A3A3A;
-    }
-    [data-theme="dark"] body {
-      background-image: radial-gradient(circle, rgba(255,255,255,0.15) 0.8px, transparent 0.8px);
+      --secondary:  #EFF3F8;
+      --bg:         #0A0E15;
+      --white:      #0E141D;
+      --grey:       #A9B4C2;
+      --border:     #222C3D;
     }
     [data-theme="dark"] .nav-home img { filter: invert(1); }
     [data-theme="dark"] .nav {
       background: rgba(26,26,26,0.92);
       box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.06);
     }
-    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #2C2C2C; }
-    [data-theme="dark"] .desig-pill { background: rgba(44,44,44,0.95); }
-    [data-theme="dark"] #dragLabel { background: #F0EDE8; color: #252525; }
-    /* ── carousel ── */
-    [data-theme="dark"] .fan-card { background: #1E1E1E; }
-    [data-theme="dark"] .fan-card img { background: #1E1E1E; }
-    [data-theme="dark"] .carousel-caption { color: #999999; }
+    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #182130; }
+    [data-theme="dark"] .desig-pill { background: rgba(24,33,48,0.95); }
     /* ── all main card containers ── */
     [data-theme="dark"] .tr-card,
     [data-theme="dark"] .imp-card,
     [data-theme="dark"] .ug-card,
-    [data-theme="dark"] .oc-card { background: #1A1A1A; border-color: #3A3A3A; box-shadow: none; }
-    /* ── sweep highlights — keep text dark so lime/pink bg stays readable ── */
-    [data-theme="dark"] .tr-highlight,
-    [data-theme="dark"] .imp-hl,
-    [data-theme="dark"] .cd-hl,
-    [data-theme="dark"] .oc-metric-value,
-    [data-theme="dark"] .ug-tag-pain,
-    [data-theme="dark"] .ug-tag-gain { color: #252525; }
+    [data-theme="dark"] .oc-card { background: #0A0E15; border-color: #222C3D; box-shadow: none; }
+    /* ── sweep highlights — the ink flips only once the lime/pink has wiped
+       in. Scoping this to .revealed matters now that light mode is gone: an
+       unrevealed span would otherwise be dark ink on a dark card, i.e. the
+       phrase is invisible until (and unless) the observer fires. ── */
+    [data-theme="dark"] .tr-highlight.revealed,
+    [data-theme="dark"] .imp-hl.revealed,
+    [data-theme="dark"] .cd-hl.revealed,
+    [data-theme="dark"] .oc-metric-value.revealed,
+    [data-theme="dark"] .ug-tag-pain.revealed,
+    [data-theme="dark"] .ug-tag-gain.revealed { color: #131A25; }
     /* ── team & role section ── */
-    [data-theme="dark"] .tr-image-frame { background: #2C2C2C; }
-    [data-theme="dark"] .tr-bullet { background: #F0EDE8; }
+    [data-theme="dark"] .tr-image-frame { background: #182130; }
+    [data-theme="dark"] .tr-bullet { background: #EFF3F8; }
     [data-theme="dark"] .tr-items-connected::before { background: rgba(240,237,232,0.14); }
     [data-theme="dark"] .tr-label,
     [data-theme="dark"] .tr-item-desc,
     [data-theme="dark"] .tr-mixed,
-    [data-theme="dark"] .tr-mixed-mono { color: #999999; }
-    [data-theme="dark"] .tr-next .tr-next-text { color: #999999; }
+    [data-theme="dark"] .tr-mixed-mono { color: #A9B4C2; }
+    [data-theme="dark"] .tr-next .tr-next-text { color: #A9B4C2; }
     /* ── impact section ── */
-    [data-theme="dark"] .imp-image-frame { background: #2C2C2C; }
+    [data-theme="dark"] .imp-image-frame { background: #182130; }
     [data-theme="dark"] .imp-label,
     [data-theme="dark"] .imp-num,
     [data-theme="dark"] .imp-body,
-    [data-theme="dark"] .imp-footnote { color: #999999; }
+    [data-theme="dark"] .imp-footnote { color: #A9B4C2; }
     /* ── users & goals section ── */
-    [data-theme="dark"] .ug-image-frame { background: #2C2C2C; }
+    [data-theme="dark"] .ug-image-frame { background: #182130; }
     [data-theme="dark"] .ug-label,
     [data-theme="dark"] .ug-role-label,
-    [data-theme="dark"] .ug-body { color: #999999; }
+    [data-theme="dark"] .ug-body { color: #A9B4C2; }
     /* ── constraints & design section ── */
-    [data-theme="dark"] .cd-image-frame { background: #2C2C2C; }
-    [data-theme="dark"] .cd-blockquote { background: #252525; color: #999999; }
-    [data-theme="dark"] .cd-insight { color: #999999; }
+    [data-theme="dark"] .cd-image-frame { background: #182130; }
+    [data-theme="dark"] .cd-blockquote { background: #131A25; color: #A9B4C2; }
+    [data-theme="dark"] .cd-insight { color: #A9B4C2; }
     /* ── outcomes section ── */
-    [data-theme="dark"] .oc-image-frame { background: #2C2C2C; }
+    [data-theme="dark"] .oc-image-frame { background: #182130; }
     [data-theme="dark"] .oc-label,
     [data-theme="dark"] .oc-metric-label,
     [data-theme="dark"] .oc-metric-body,
     [data-theme="dark"] .oc-section-title,
     [data-theme="dark"] .oc-author-role,
-    [data-theme="dark"] .oc-quote { color: #999999; }
-    [data-theme="dark"] .oc-testimonial { background: #222222; border-color: #3A3A3A; }
+    [data-theme="dark"] .oc-quote { color: #A9B4C2; }
+    [data-theme="dark"] .oc-testimonial { background: #222222; border-color: #222C3D; }
     /* ── section labels shared ── */
-    [data-theme="dark"] .section-label { color: #999999; }
+    [data-theme="dark"] .section-label { color: #A9B4C2; }
     [data-theme="dark"] .other-projects { border-top-color: rgba(240,237,232,0.08); }
-    [data-theme="dark"] .other-projects-label { color: #666; }
+    [data-theme="dark"] .other-projects-label { color: #A9B4C2; }
     /* ── other projects cards ── */
     [data-theme="dark"] .op-card { background: #1E1E1E; border-color: rgba(240,237,232,0.1); }
-    [data-theme="dark"] .op-card-img { background: #2C2C2C; }
-    [data-theme="dark"] .op-card-tag { background: #2C2C2C; color: #888; }
-    [data-theme="dark"] .op-card-title { color: #F0EDE8; }
-    [data-theme="dark"] .op-card-desc { color: #999999; }
-    [data-theme="dark"] .op-card-cta { background: #F0EDE8; color: #252525; }
-    /* ─── THEME TOGGLE BUTTON ────────────────────────────────── */
-    .theme-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer !important; flex-shrink: 0; border-radius: 100px; transition: transform 0.15s ease; }
-    .theme-toggle:active { transform: scale(0.93); }
-    .tt-track { position: relative; width: 58px; height: 30px; border-radius: 100px; background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border: 1.5px solid rgba(255,255,255,0.40); flex-shrink: 0; overflow: hidden; transition: background 0.5s ease, border-color 0.4s ease; }
-    .tt-track::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 50%; border-radius: 100px 100px 50% 50%; background: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 100%); pointer-events: none; z-index: 10; }
-    .tt-hill-back { position: absolute; bottom: 0; left: -5%; width: 75%; height: 13px; background: #72B87A; border-radius: 50% 60% 0 0; z-index: 1; transition: background 0.5s ease; }
-    .tt-hill-front { position: absolute; bottom: 0; right: -8%; width: 62%; height: 11px; background: #5DA066; border-radius: 60% 50% 0 0; z-index: 2; transition: background 0.5s ease; }
-    .tt-star { position: absolute; background: rgba(255,255,255,0.90); border-radius: 50%; opacity: 0; transition: opacity 0.4s ease; z-index: 1; }
-    .tt-star-1 { width: 2.5px; height: 2.5px; top: 5px; left: 8px; }
-    .tt-star-2 { width: 2px; height: 2px; top: 11px; left: 18px; }
-    .tt-star-3 { width: 2px; height: 2px; top: 6px; left: 27px; }
-    .tt-star-4 { width: 1.5px; height: 1.5px; top: 13px; left: 11px; }
-    [data-theme="dark"] .tt-star { opacity: 1; }
-    @keyframes tt-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.12; } }
-    [data-theme="dark"] .tt-star-1 { animation: tt-twinkle 2.1s ease-in-out infinite; }
-    [data-theme="dark"] .tt-star-2 { animation: tt-twinkle 1.7s ease-in-out 0.8s infinite; }
-    [data-theme="dark"] .tt-star-3 { animation: tt-twinkle 2.5s ease-in-out 1.5s infinite; }
-    [data-theme="dark"] .tt-star-4 { animation: tt-twinkle 1.9s ease-in-out 0.4s infinite; }
-    .tt-shoot { position: absolute; top: 3px; left: 4px; width: 9px; height: 1px; background: linear-gradient(to right, transparent, #FFE87A); border-radius: 1px; opacity: 0; transform: rotate(35deg); z-index: 2; pointer-events: none; }
-    @keyframes tt-shooting-star { 0% { opacity: 0; transform: translate(0,0) rotate(35deg); } 3% { opacity: 0.85; } 15% { opacity: 0; transform: translate(20px,8px) rotate(35deg); } 100% { opacity: 0; transform: translate(20px,8px) rotate(35deg); } }
-    [data-theme="dark"] .tt-shoot { animation: tt-shooting-star 5s ease-in 2s infinite; }
-    .tt-cloud { position: absolute; right: 9px; top: 6px; width: 15px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 10px; opacity: 1; transition: opacity 0.4s ease; z-index: 1; }
-    .tt-cloud::before { content: ''; position: absolute; width: 9px; height: 9px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -5px; left: 2px; }
-    .tt-cloud::after { content: ''; position: absolute; width: 7px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -4px; left: 7px; }
-    [data-theme="dark"] .tt-cloud { opacity: 0; }
-    @keyframes tt-cloud-drift { from { transform: translateX(30px); } to { transform: translateX(-85px); } }
-    [data-theme="light"] .tt-cloud { animation: tt-cloud-drift 26s linear 0s infinite backwards; }
-    .tt-cloud-b { position: absolute; right: 3px; top: 11px; width: 9px; height: 4px; background: rgba(255,255,255,0.95); border-radius: 8px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
-    .tt-cloud-b::before { content: ''; position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 1px; }
-    .tt-cloud-b::after { content: ''; position: absolute; width: 5px; height: 5px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 4px; }
-    [data-theme="dark"] .tt-cloud-b { opacity: 0; }
-    [data-theme="light"] .tt-cloud-b { opacity: 0.65; animation: tt-cloud-drift 18s linear 4s infinite backwards; }
-    .tt-cloud-c { position: absolute; right: 18px; top: 4px; width: 11px; height: 5px; background: rgba(255,255,255,0.95); border-radius: 8px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
-    .tt-cloud-c::before { content: ''; position: absolute; width: 7px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -4px; left: 1px; }
-    .tt-cloud-c::after { content: ''; position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 5px; }
-    [data-theme="dark"] .tt-cloud-c { opacity: 0; }
-    [data-theme="light"] .tt-cloud-c { opacity: 0.45; animation: tt-cloud-drift 22s linear 10s infinite backwards; }
-    .tt-thumb { position: absolute; top: 50%; left: 3px; width: 22px; height: 22px; border-radius: 50%; z-index: 3; transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); box-shadow: 0 2px 4px rgba(0,0,0,0.28); }
-    .tt-thumb::before, .tt-thumb::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.75); opacity: 0; transition: opacity 0.4s ease; }
-    .tt-thumb::before { width: 7px; height: 7px; top: 4px; left: 5px; }
-    .tt-thumb::after  { width: 5px; height: 5px; top: 13px; left: 14px; }
-    [data-theme="dark"] .tt-thumb::before, [data-theme="dark"] .tt-thumb::after { opacity: 1; }
-    [data-theme="light"] .tt-track { background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border-color: rgba(255,255,255,0.40); }
-    [data-theme="light"] .tt-hill-back { background: #72B87A; }
-    [data-theme="light"] .tt-hill-front { background: #5DA066; }
-    [data-theme="light"] .tt-thumb { transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); }
-    [data-theme="light"] .tt-star { opacity: 0; }
-    [data-theme="light"] .tt-cloud { opacity: 1; }
-    [data-theme="light"] .tt-thumb::before, [data-theme="light"] .tt-thumb::after { opacity: 0; }
-    [data-theme="dark"] .tt-track { background: linear-gradient(180deg, #0B1829 0%, #152238 100%); border-color: rgba(255,255,255,0.10); }
-    [data-theme="dark"] .tt-track::after { background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%); }
-    [data-theme="dark"] .tt-hill-back { background: #1D3D25; }
-    [data-theme="dark"] .tt-hill-front { background: #152C1A; }
-    [data-theme="dark"] .tt-thumb { transform: translateX(28px) translateY(-50%); background: #EEF0F5; }
-    [data-theme="dark"] .tt-star { opacity: 1; }
-    [data-theme="dark"] .tt-cloud { opacity: 0; }
-    /* ─── SMOOTH THEME TRANSITION ────────────────────────────── */
-    html.color-transitioning * { transition-property: background, background-color, color, border-color, opacity !important; transition-duration: 0.5s !important; transition-timing-function: ease !important; }
-    html.color-transitioning .tt-track { transition: background 0.5s ease, border-color 0.4s ease !important; }
-    html.color-transitioning .tt-hill-back, html.color-transitioning .tt-hill-front { transition: background 0.5s ease !important; }
-    html.color-transitioning .tt-star, html.color-transitioning .tt-cloud { transition: opacity 0.4s ease !important; }
-    html.color-transitioning .tt-thumb { transition: transform 0.44s cubic-bezier(0.34,1.56,0.64,1), background 0.5s ease !important; }
+    [data-theme="dark"] .op-card-img { background: #182130; }
+    [data-theme="dark"] .op-card-tag { background: #182130; color: #A9B4C2; }
+    [data-theme="dark"] .op-card-title { color: #EFF3F8; }
+    /* lifted from #7C8794 — that value fell below AA on the lighter cards */
+    [data-theme="dark"] .op-card-desc { color: #A9B4C2; }
+
+    /* hero panel — dark counterparts */
+    [data-theme="dark"] .hero-scrim {
+      background: linear-gradient(100deg,
+        rgba(10,14,21,0.86) 0%, rgba(10,14,21,0.62) 30%,
+        rgba(10,14,21,0.18) 55%, rgba(10,14,21,0) 74%);
+    }
+    [data-theme="dark"] .hero-pills { border-color: rgba(240,237,232,0.14); }
+    [data-theme="dark"] .cs-subtitle { color: #A9B4C2; }
+    [data-theme="dark"] .ug-subtitle { color: var(--secondary); }
+    /* lime band keeps its light ground in dark mode — ink must stay dark */
+    [data-theme="dark"] .cs-thankyou-text { color: #131A25; }
+
+    /* ─── KEYBOARD FOCUS ─────────────────────────────────────── */
+    /* the custom cursor hides the pointer, so keyboard focus must be
+       unmistakable — --secondary is the page's light ink on the dark ground */
+    .nav-home:focus-visible, .nav-btn:focus-visible,
+    .nav-hamburger:focus-visible,
+    .mobile-menu a:focus-visible {
+      outline: 2px solid var(--secondary); outline-offset: 3px;
+    }
+    .nav-btn:focus-visible,
+    .nav-hamburger:focus-visible { border-radius: 6px; }
+
+    /* ─── REDUCED MOTION ─────────────────────────────────────── */
+    /* Reveals land instantly on their end state ("both" keeps them visible);
+       looping ambience (dot breathe, arrow bob, twinkle) runs once and stops. */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
@@ -1696,11 +1681,10 @@
 
   <!-- ── CURSOR ────────────────────────────────────────────── -->
   <div id="ccDot" aria-hidden="true"></div>
-  <div id="dragLabel">Hold &amp;<br>Drag</div>
 
   <!-- ── NAV — 191:14841 ───────────────────────────────────── -->
   <nav class="nav">
-    <a href="index.html" class="nav-home" onclick="sessionStorage.setItem('skipLoader','1')">
+    <a href="/" class="nav-home">
       <img src="cs-nav-logo.svg" alt="" />
       <span>EverTutor Studio</span>
     </a>
@@ -1713,22 +1697,7 @@
       <a href="#design"      class="nav-btn"         data-section="design">Design Approach</a>
       <a href="#outcomes"    class="nav-btn"         data-section="outcomes">OUTCOMES</a>
     </div>
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-      <span class="tt-track">
-        <span class="tt-star tt-star-1"></span>
-        <span class="tt-star tt-star-2"></span>
-        <span class="tt-star tt-star-3"></span>
-        <span class="tt-star tt-star-4"></span>
-        <span class="tt-shoot"></span>
-        <span class="tt-cloud"></span>
-        <span class="tt-cloud-b"></span>
-        <span class="tt-cloud-c"></span>
-        <span class="tt-hill-back"></span>
-        <span class="tt-hill-front"></span>
-        <span class="tt-thumb"></span>
-      </span>
-    </button>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </nav>
@@ -1751,42 +1720,36 @@
 
       <section id="overview">
 
-        <!-- ── Full-bleed hero visual: card graphic backdrop + video ── -->
-        <div class="cs-hero-visual" id="csHeroVisual">
-          <div class="chv-bg-pan"></div>
-          <div class="chv-scrim"></div>
-          <div class="chv-video-frame" id="chvVideoFrame">
-            <video autoplay muted loop playsinline preload="auto">
-              <source src="Projects videos/ET Studio Case study.mp4" type="video/mp4">
-            </video>
-          </div>
-        </div>
-
-        <!-- ── Frame 1: Hero Section and Designation Frame ── -->
+        <!-- ── Hero: copy left, product right, generated backdrop behind ── -->
         <div class="cs-hero">
-          <div class="designation-row" id="desigRow">
-            <span class="desig-pill">Lead Product Designer</span>
-            <span class="desig-pill">Lead Curriculum Designer</span>
-            <span class="desig-pill"><span class="status-dot"></span>2025 - Mid 2026</span>
-          </div>
+          <img id="etBgImg" class="et-bg-img" alt="" />
+          <div class="hero-scrim" aria-hidden="true"></div>
 
-          <!-- Word-by-word animated heading -->
-          <div class="cs-heading" id="csHeading">
-            Built the content creation tool that cut lesson production from <em>104 hours to 4</em>
-          </div>
+          <div class="hero-grid">
+            <div class="hero-copy">
+              <!-- Word-by-word animated heading -->
+              <div class="cs-heading" id="csHeading">Built the content creation tool that cut lesson production from <em>104 hours to 4</em></div>
 
-          <!-- Subtitle (Montserrat Bold 25px per Figma) -->
-          <p class="cs-subtitle" id="csSubtitle">
-            Enabling non-technical educators to build structured AI Tutor experiences at scale.
-          </p>
-        </div>
+              <p class="cs-subtitle" id="csSubtitle">Enabling non-technical educators to build structured AI Tutor experiences at scale.</p>
 
-        <!-- ── Frame 2: Carousel Frame — drag fan carousel ── -->
-        <div class="cs-carousel-section" id="csCarouselSection">
-          <div class="carousel-viewport" id="carouselViewport">
-            <!-- fan cards injected by JS -->
+              <!-- keeps #desigRow so the existing fade-in timing still finds it -->
+              <div class="hero-pills" id="desigRow">
+                <span class="desig-pill">Lead Product Designer</span>
+                <span class="desig-pill">Lead Curriculum Designer</span>
+                <span class="desig-pill"><span class="status-dot"></span>2025 – Mid 2026</span>
+              </div>
+            </div>
+
+            <div class="hero-visual">
+              <div class="hero-tilt">
+                <div class="chv-video-frame" id="chvVideoFrame">
+                  <video autoplay muted loop playsinline preload="auto">
+                    <source src="images/et-studio.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </div>
           </div>
-          <p class="carousel-caption">Images of Core Studio Experience &amp; Lessons created on studio</p>
         </div>
 
       </section>
@@ -1815,7 +1778,7 @@
                   <span class="tr-highlight" id="trHighlight">Lead Product &amp; Curriculum Designer (Me)</span>
                   <img class="tr-avatar" src="photo.jpg" alt="Bhanu" />
                 </div>
-                <p class="tr-mixed-mono">Defined the core system architecture and end-to-end product experience, and validated it by creating real lessons used in production. Designed the full V0 system solo, overnight, in ~6 hours—then spent the rest of the runway to developer handoff incorporating feedback and documenting flows.</p>
+                <p class="tr-mixed-mono">Defined the core system architecture and end-to-end product experience, and validated it by creating real lessons used in production. Designed the full V0 system solo, overnight, in ~6 hours, then spent the rest of the runway to developer handoff incorporating feedback and documenting flows.</p>
               </div>
             </div>
 
@@ -1823,7 +1786,7 @@
             <div class="tr-item tr-anim">
               <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
               <div class="tr-item-content">
-                <p class="tr-mixed">Engineers (2–3) - <span class="tr-mixed-mono">Built the Studio platform and AI Tutor system enabling real-time lesson delivery</span></p>
+                <p class="tr-mixed">Engineers (2–3): <span class="tr-mixed-mono">Built the Studio platform and AI Tutor system enabling real-time lesson delivery</span></p>
               </div>
             </div>
 
@@ -1831,7 +1794,7 @@
             <div class="tr-item tr-anim">
               <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
               <div class="tr-item-content">
-                <p class="tr-mixed">Product Manager / Founder - <span class="tr-mixed-mono">Drove product direction and pilot rollout with schools</span></p>
+                <p class="tr-mixed">Product Manager / Founder: <span class="tr-mixed-mono">Drove product direction and pilot rollout with schools</span></p>
               </div>
             </div>
 
@@ -1862,7 +1825,7 @@
               <!-- Old workflow vs new workflow comparison -->
               <div class="tools-compare tr-anim" id="toolsCompare">
                 <div class="tc-panel tc-old">
-                  <p class="tc-panel-label">Old workflow — 3 disconnected tools</p>
+                  <p class="tc-panel-label">Old workflow: 3 disconnected tools</p>
                   <div class="tc-tools">
                     <span class="tc-tool">Slides.com</span>
                     <span class="tc-tool-plus">+</span>
@@ -1871,11 +1834,11 @@
                     <span class="tc-tool">Canva</span>
                   </div>
                   <p class="tc-counter-row"><span class="tc-counter" data-target="104">0</span><span class="tc-unit"> hrs</span></p>
-                  <p class="tc-sub">per lesson—switching tools, rebuilding by hand, no shared source of truth</p>
+                  <p class="tc-sub">per lesson: switching tools, rebuilding by hand, no shared source of truth</p>
                 </div>
                 <div class="tc-arrow">→</div>
                 <div class="tc-panel tc-new">
-                  <p class="tc-panel-label">New workflow — one unified tool</p>
+                  <p class="tc-panel-label">New workflow: one unified tool</p>
                   <div class="tc-tools">
                     <span class="tc-tool tc-tool-studio">Studio</span>
                   </div>
@@ -1902,7 +1865,7 @@
                       <span class="imp-hl">&lt;2 hours</span>
                       <span class="imp-title-plain">to onboard</span>
                     </div>
-                    <p class="imp-body">Content designers ramped in under 2 hours vs 40–50 hours, enabled by familiar, low-friction interactions.</p>
+                    <p class="imp-body">Content designers ramped in under 2 hours vs. 40–50 hours, enabled by familiar, low-friction interactions.</p>
                     <p class="imp-footnote">Calculated first creation to publish time</p>
                   </div>
                   <div class="imp-metric">
@@ -1922,7 +1885,7 @@
                       <span class="imp-title-plain">Gave control</span>
                       <span class="imp-hl">back to educators</span>
                     </div>
-                    <p class="imp-body">Teachers could define how the AI Tutor teaches—controlling pacing, explanations, and scaffolding.</p>
+                    <p class="imp-body">Teachers could define how the AI Tutor teaches, controlling pacing, explanations, and scaffolding.</p>
                   </div>
                   <div class="imp-metric">
                     <p class="imp-num">05</p>
@@ -1945,7 +1908,7 @@
             </div>
 
             <!-- Next footer -->
-            <p class="tr-next tr-anim"><span class="tr-arrow">↓</span> Next <span class="tr-next-text">These outcomes came from "understanding what educators are trying to achieve". Here's how we defined those goals.</span></p>
+            <p class="tr-next tr-anim"><span class="tr-arrow">↓</span> Next <span class="tr-next-text">These outcomes came from understanding what educators are trying to achieve. Here's how we defined those goals.</span></p>
 
           </div>
         </div>
@@ -1989,7 +1952,7 @@
                 </div>
                 <div class="ug-block">
                   <span class="ug-tag ug-tag-pain">Fragmented tooling &amp; costly iteration</span>
-                  <p class="ug-body">Creating and updating lessons required switching across tools—where even small changes meant reworking multiple touch points, with limited support for math-specific content.</p>
+                  <p class="ug-body">Creating and updating lessons required switching across tools, where even small changes meant reworking multiple touch points, with limited support for math-specific content.</p>
                 </div>
 
                 <!-- Row 3: Arrows -->
@@ -1999,7 +1962,7 @@
                 <!-- Row 4: Gain blocks -->
                 <div class="ug-block">
                   <span class="ug-tag ug-tag-gain">Granular control over teaching</span>
-                  <p class="ug-body">Educators can define how the AI Tutor teaches—personalizing instruction, pacing, and support to meet each student where they are.</p>
+                  <p class="ug-body">Educators can define how the AI Tutor teaches, personalizing instruction, pacing, and support to meet each student where they are.</p>
                 </div>
                 <div class="ug-block">
                   <span class="ug-tag ug-tag-gain">Unified creation system</span>
@@ -2031,13 +1994,13 @@
               </div>
             </div>
 
-            <div class="cd-blockquote tr-anim">"My first instinct was to design for full lesson complexity—every branching path, every edge case a teacher might want. With a 12-hour runway to developer handoff and 104 hours per lesson to fix, that scope was unbuildable. I cut it back to a structured, step-by-step flow system instead—less flexible on paper, but the only version that could actually ship and scale."</div>
+            <div class="cd-blockquote tr-anim">"My first instinct was to design for full lesson complexity: every branching path, every edge case a teacher might want. With a 12-hour runway to developer handoff and 104 hours per lesson to fix, that scope was unbuildable. I cut it back to a structured, step-by-step flow system instead: less flexible on paper, but the only version that could actually ship and scale."</div>
 
             <div class="tr-item tr-anim">
               <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
               <div class="tr-item-content">
                 <p class="tr-mixed">Extreme production time vs need for scale</p>
-                <p class="tr-item-desc">Creating a single lesson took 104 hours end-to-end—making it impossible to scale. To support real classrooms, this needed to be reduced to &lt;5 hours per lesson—without compromising pedagogy.</p>
+                <p class="tr-item-desc">Creating a single lesson took 104 hours end-to-end, making it impossible to scale. To support real classrooms, this needed to be reduced to &lt;5 hours per lesson without compromising pedagogy.</p>
                 <p class="cd-insight">→ <span class="cd-hl">Design for speed</span> without breaking instructional quality</p>
               </div>
             </div>
@@ -2064,7 +2027,7 @@
               <div class="tr-bullet-wrap"><div class="tr-bullet"></div></div>
               <div class="tr-item-content">
                 <p class="tr-mixed">Gap between lesson creation and how it is taught</p>
-                <p class="tr-item-desc">Designing lessons wasn&apos;t enough—the system also needed to ensure the AI Tutor delivers instruction as intended.</p>
+                <p class="tr-item-desc">Designing lessons wasn&apos;t enough: the system also needed to ensure the AI Tutor delivers instruction as intended.</p>
                 <p class="cd-insight">→ <span class="cd-hl">Align how lessons are created</span> with how they are taught</p>
               </div>
             </div>
@@ -2124,7 +2087,7 @@
                 <div class="tr-item-content">
                   <p class="tr-mixed">Design a flow-based lesson system</p>
                   <p class="tr-item-desc">Designed a structured flow system where each step controls how the AI Tutor behaves and progresses.</p>
-                  <div class="cd-blockquote">"Instead of static slides, lessons were structured using an "appearance order" system, allowing educators to control what the AI Tutor says, how it behaves, and how content unfolds step-by-step during instruction."</div>
+                  <div class="cd-blockquote">"Instead of static slides, lessons were structured using an 'appearance order' system, allowing educators to control what the AI Tutor says, how it behaves, and how content unfolds step-by-step during instruction."</div>
                   <p class="cd-insight">→ <span class="cd-hl">Turned lessons into structured,</span> controllable systems</p>
                 </div>
               </div>
@@ -2174,22 +2137,22 @@
               <div class="oc-metric">
                 <p class="oc-metric-label">Lesson creation time</p>
                 <span class="oc-metric-value">104 hrs → 4 hrs</span>
-                <p class="oc-metric-body">Most of the time previously spent building lessons was eliminated—shifting effort from manual creation to refining instruction.</p>
+                <p class="oc-metric-body">Most of the time previously spent building lessons was eliminated, shifting effort from manual creation to refining instruction.</p>
               </div>
               <div class="oc-metric">
                 <p class="oc-metric-label">Content production at scale</p>
                 <span class="oc-metric-value">~700 lessons, ~4.5 hrs avg</span>
-                <p class="oc-metric-body">~3,128 hours across ~700 lessons—what was previously infeasible became repeatable, validating the system&apos;s ability to scale content creation in real conditions.</p>
+                <p class="oc-metric-body">~3,128 hours across ~700 lessons: what was previously infeasible became repeatable, validating the system&apos;s ability to scale content creation in real conditions.</p>
               </div>
               <div class="oc-metric">
                 <p class="oc-metric-label">Control over pedagogy</p>
                 <span class="oc-metric-value">Restored control to educators</span>
-                <p class="oc-metric-body">Teachers can now define how the AI Tutor teaches—controlling explanation, pacing, and scaffolding in real time.</p>
+                <p class="oc-metric-body">Teachers can now define how the AI Tutor teaches, controlling explanation, pacing, and scaffolding in real time.</p>
               </div>
               <div class="oc-metric">
                 <p class="oc-metric-label">System flexibility</p>
                 <span class="oc-metric-value">Subject-agnostic by design</span>
-                <p class="oc-metric-body">Validated across pilots in English and Physics—proving the system can scale beyond math without redesigning workflows.</p>
+                <p class="oc-metric-body">Validated across pilots in English and Physics, proving the system can scale beyond math without redesigning workflows.</p>
               </div>
               <div class="oc-metric">
                 <p class="oc-metric-label">Time to onboard</p>
@@ -2206,51 +2169,6 @@
             </div>
 
           </div>
-        </div>
-      </section>
-
-      <!-- ── Other Projects ──────────────────────────────────────── -->
-      <section class="other-projects">
-        <p class="other-projects-label">Other Projects</p>
-        <div class="other-projects-grid">
-
-          <a class="op-card" href="./evertutor-live.html">
-            <div class="op-card-img op-card-img-live">
-              <img src="Student home page Updated.png" alt="EverTutor Live UI" />
-            </div>
-            <div class="op-card-body">
-              <div class="op-card-tags"><span class="op-card-tag">EverTutor</span><span class="op-card-tag">AI Tutor</span></div>
-              <p class="op-card-title">EverTutor Live</p>
-              <p class="op-card-desc">The real-time AI tutor experience that brought Bloom's 2 Sigma to life, scaling across 8+ schools and ~2,000 students.</p>
-              <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
-          </a>
-
-          <a class="op-card" href="./stressie-studio.html">
-            <div class="op-card-img op-card-img-stressie">
-              <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%202.png" alt="Stressie screen 1" />
-              <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%203.png" alt="Stressie screen 2" />
-            </div>
-            <div class="op-card-body">
-              <div class="op-card-tags"><span class="op-card-tag">Wellness</span><span class="op-card-tag">Enterprise</span></div>
-              <p class="op-card-title">Stressie</p>
-              <p class="op-card-desc">Took workplace stress from a vague problem to a Harvard-incubated product, now live at Amazon and InKind.</p>
-              <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
-          </a>
-
-          <a class="op-card" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">
-            <div class="op-card-img">
-              <img src="dearly-full-visual.png" alt="Dearly — personal notes app" />
-            </div>
-            <div class="op-card-body">
-              <div class="op-card-tags"><span class="op-card-tag">Side Project</span><span class="op-card-tag">Consumer</span></div>
-              <p class="op-card-title">Dearly</p>
-              <p class="op-card-desc">A notes app designed to feel personal, shipped as an independent side project and live on Product Hunt.</p>
-              <span class="op-card-cta">Try it out <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
-          </a>
-
         </div>
       </section>
 
@@ -2360,28 +2278,6 @@
     (function tick() { dot.style.transform = `translate3d(${mx}px,${my}px,0) translate(-50%,-50%)`; requestAnimationFrame(tick); })();
   })();
 
-  /* ── DRAG LABEL FOLLOW ── */
-  (function() {
-    const label = document.getElementById('dragLabel');
-    if (!label) return;
-    document.addEventListener('mousemove', e => {
-      if (label.classList.contains('visible')) {
-        label.style.transform = `translate3d(${e.clientX}px,${e.clientY}px,0) translate(-50%,-50%)`;
-      }
-    });
-  })();
-
-  const dragLabel = document.getElementById('dragLabel');
-  const carouselViewport = document.getElementById('carouselViewport');
-  carouselViewport.addEventListener('mouseenter', () => {
-    dragLabel.classList.add('visible');
-  });
-  carouselViewport.addEventListener('mouseleave', () => {
-    if (!isDragging) {
-      dragLabel.classList.remove('visible');
-    }
-  });
-
   /* ═══════════════════════════════════════════════════════════
      WORD-BY-WORD ANIMATION
      Splits heading text nodes into .word spans, preserving <em>
@@ -2414,200 +2310,22 @@
     });
   }
 
+  document.getElementById('etBgImg').src = 'images/hero-bg-studio.png';
+
   const csHeading  = document.getElementById('csHeading');
   const csSubtitle = document.getElementById('csSubtitle');
   const desigRow   = document.getElementById('desigRow');
   const heroVisual = document.getElementById('chvVideoFrame');
-  const carouselSec = document.getElementById('csCarouselSection');
 
   splitWords(csHeading);
   const allWords = csHeading.querySelectorAll('.word');
 
-  // Stagger: hero visual → pills → words → subtitle → carousel
+  // Stagger: hero visual → pills → words → subtitle
   setTimeout(() => heroVisual.classList.add('visible'), 80);
   setTimeout(() => desigRow.classList.add('visible'), 420);
   allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 600 + i * 52));
   const afterWords = 600 + allWords.length * 52 + 60;
   setTimeout(() => csSubtitle.classList.add('visible'),  afterWords);
-  setTimeout(() => carouselSec.classList.add('visible'), afterWords + 280);
-
-  /* ═══════════════════════════════════════════════════════════
-     FAN CAROUSEL — infinite loop, one image per drag gesture
-     ─────────────────────────────────────────────────────────
-     Infinite-loop trick: animate floatOffset to ±1, then after
-     the transition silently rotate the images[] array and reset
-     floatOffset to 0. The "hidden" outer slots (±3) absorb the
-     jump invisibly because they're fully transparent.
-  ═══════════════════════════════════════════════════════════ */
-
-  // Mutable circular buffer — rotate on each snap so center is always slot HALF
-  // Center image must be at index HALF (= 3) — that is the slot render() maps to position 0
-  let images = [
-    'cs-slide-04.jpg',        // slot 0  (−3 from center, nearly transparent)
-    'cs-slide-05.jpg',        // slot 1  (−2)
-    'cs-slide-06.jpg',        // slot 2  (−1)
-    'cs-overlay-center.jpg',  // slot 3  (CENTER = HALF)
-    'cs-slide-01.jpg',        // slot 4  (+1)
-    'cs-slide-02.jpg',        // slot 5  (+2)
-    'cs-slide-03.jpg',        // slot 6  (+3, nearly transparent)
-  ];
-
-  const N           = images.length; // 7
-  const HALF        = Math.floor(N / 2); // 3 — center slot index
-  const isMobile    = window.innerWidth < 768;
-  const GAP         = isMobile ? 155 : 210;   // center-to-center px
-  const SCALE_STEP  = 0.165;
-  const MIN_SCALE   = 0.55;
-  const DRAG_THR    = 55;    // min px to commit a snap
-
-  function levelOpacity(absRel) {
-    if (absRel < 0.01) return 1;
-    if (absRel <= 1)   return 1 - absRel * 0.5;
-    if (absRel <= 2)   return 0.5 - (absRel - 1) * 0.2;
-    return Math.max(0, 0.3 - (absRel - 2) * 0.3);
-  }
-  function levelBlur(absRel) {
-    if (absRel < 0.01) return 0;
-    if (absRel <= 1)   return absRel * 4;
-    return 4 + (absRel - 1) * 5;
-  }
-
-  // Build N DOM card elements (slot i always shows images[i])
-  const viewport  = document.getElementById('carouselViewport');
-  const fanCards  = images.map((src, i) => {
-    const div = document.createElement('div');
-    div.className = 'fan-card';
-    const img = document.createElement('img');
-    img.src = src; img.alt = ''; img.draggable = false;
-    div.appendChild(img);
-    viewport.appendChild(div);
-    return div;
-  });
-
-  let floatOffset = 0;    // visual offset in slot-units (0 = no drag)
-  let isDragging  = false;
-  let isAnimating = false;
-  let pointerStartX = 0;
-  let lastDragX   = 0;
-  const ANIM_MS   = 400;  // must match CSS transition duration
-
-  function refreshImages() {
-    fanCards.forEach((card, i) => {
-      card.querySelector('img').src = images[i];
-    });
-  }
-
-  function render(animated) {
-    fanCards.forEach((card, slot) => {
-      const rel    = (slot - HALF) - floatOffset;
-      const absRel = Math.abs(rel);
-      const scale  = Math.max(MIN_SCALE, 1 - absRel * SCALE_STEP);
-      const tx     = rel * GAP;
-      const op     = levelOpacity(absRel);
-      const blur   = levelBlur(absRel);
-      const z      = 10 - Math.round(absRel);
-
-      card.style.transition = animated
-        ? `transform ${ANIM_MS}ms cubic-bezier(0.22,0.61,0.36,1), opacity ${ANIM_MS}ms ease, filter ${ANIM_MS}ms ease`
-        : 'none';
-      card.style.transform = `translateX(calc(-50% + ${tx}px)) translateY(-50%) scale(${scale})`;
-      card.style.opacity   = String(op);
-      card.style.filter    = blur > 0 ? `blur(${blur.toFixed(1)}px)` : '';
-      card.style.zIndex    = String(Math.max(0, z));
-    });
-  }
-
-  /*
-    snapBy(delta): advance +1 or -1 image
-    Phase 1 — animate cards sliding by delta units
-    Phase 2 — after transition: rotate images[], reset offset, re-render instantly
-  */
-  function snapBy(delta) {
-    if (isAnimating) return;
-    isAnimating = true;
-
-    floatOffset = delta;   // e.g. +1: cards slide left by 1 GAP
-    render(true);          // CSS transition kicks in
-
-    setTimeout(() => {
-      // Rotate the images circular buffer (so slot HALF always = center)
-      if (delta > 0) {
-        // advanced forward: push front image to back
-        images.push(images.shift());
-      } else {
-        // went backward: bring back image to front
-        images.unshift(images.pop());
-      }
-      floatOffset = 0;   // reset offset — instant, same visual positions
-      refreshImages();   // update srcs on newly-positioned slots
-      render(false);     // apply positions instantly (no transition)
-      isAnimating = false;
-    }, ANIM_MS + 10);
-  }
-
-  function snapBack() {
-    floatOffset = 0;
-    render(true);
-  }
-
-  /* ── Pointer / Touch events ─────────────────────────────── */
-  function onDragStart(px) {
-    if (isAnimating) return;
-    isDragging    = true;
-    pointerStartX = px;
-    lastDragX     = px;
-  }
-
-  function onDragMove(px) {
-    if (!isDragging) return;
-    lastDragX   = px;
-    floatOffset = -(px - pointerStartX) / GAP; // neg drag = positive offset = advance
-    render(false);
-  }
-
-  function onDragEnd() {
-    if (!isDragging) return;
-    isDragging = false;
-    const dragPx = lastDragX - pointerStartX;
-
-    if (dragPx < -DRAG_THR) {
-      snapBy(+1);  // dragged left → next image
-    } else if (dragPx > DRAG_THR) {
-      snapBy(-1);  // dragged right → previous image
-    } else {
-      snapBack();  // small drag → snap back
-    }
-
-    if (!viewport.matches(':hover')) {
-      dragLabel.classList.remove('visible');
-    }
-  }
-
-  /* Mouse */
-  viewport.addEventListener('mousedown', e => { onDragStart(e.clientX); e.preventDefault(); });
-  document.addEventListener('mousemove', e => { if (isDragging) onDragMove(e.clientX); });
-  document.addEventListener('mouseup',   () => onDragEnd());
-
-  /* Touch */
-  viewport.addEventListener('touchstart', e => onDragStart(e.touches[0].clientX), { passive: true });
-  viewport.addEventListener('touchmove',  e => { if (isDragging) onDragMove(e.touches[0].clientX); }, { passive: true });
-  viewport.addEventListener('touchend',   () => onDragEnd());
-
-  /* Mobile auto-play — advances one image every 3s, pauses on touch, resumes after */
-  if (isMobile) {
-    let autoPlay;
-    const startAuto = () => {
-      autoPlay = setInterval(() => {
-        if (!isDragging && !isAnimating) snapBy(+1);
-      }, 3000);
-    };
-    startAuto();
-    viewport.addEventListener('touchstart', () => clearInterval(autoPlay), { passive: true });
-    viewport.addEventListener('touchend',   () => { setTimeout(startAuto, 1500); });
-  }
-
-  /* Initial render */
-  render(false);
 
   /* Counts a .tc-counter element up from 0 to its data-target over ~900ms */
   function animateCounter(el) {
@@ -2691,6 +2409,7 @@
   function toggleMenu(force) {
     const open = force !== undefined ? force : !hamburger.classList.contains('open');
     hamburger.classList.toggle('open', open);
+    hamburger.setAttribute('aria-expanded', open);
     mobileMenu.classList.toggle('open', open);
     backdrop.classList.toggle('open', open);
   }
@@ -2716,6 +2435,7 @@
     return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
   }
   function smoothScrollTo(targetY, duration) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, targetY); return; }
     const startY = window.scrollY;
     const dist   = targetY - startY;
     const start  = performance.now();
@@ -2727,7 +2447,9 @@
     requestAnimationFrame(step);
   }
 
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
+  /* mobile-menu links already scroll via their own close-then-scroll handler
+     above — binding them here too fired two competing scroll animations */
+  document.querySelectorAll('a[href^="#"]:not(.mobile-menu a)').forEach(a => {
     a.addEventListener('click', e => {
       const target = document.querySelector(a.getAttribute('href'));
       if (!target) return;
@@ -2764,12 +2486,12 @@
     {
       name: 'AnuShree',
       role: 'Content Designer at SigIQ.ai',
-      quote: '"What stood out to me was how clearly I can define how the AI Tutor behaves. Instead of writing static content, I can control how each step unfolds — what the tutor says, how it responds, and how the lesson progresses. It feels much closer to designing an actual teaching experience rather than just creating slides."'
+      quote: '"What stood out to me was how clearly I can define how the AI Tutor behaves. Instead of writing static content, I can control how each step unfolds: what the tutor says, how it responds, and how the lesson progresses. It feels much closer to designing an actual teaching experience rather than just creating slides."'
     },
     {
       name: 'Shaini',
       role: 'Content Designer at SigIQ.ai',
-      quote: '"The biggest shift for me is iteration speed. If something doesn\'t work, I don\'t have to rebuild the lesson — I can quickly update the flow and test it again. That makes it much easier to improve lessons based on real student feedback."'
+      quote: '"The biggest shift for me is iteration speed. If something doesn\'t work, I don\'t have to rebuild the lesson. I can quickly update the flow and test it again. That makes it much easier to improve lessons based on real student feedback."'
     },
   ];
 
@@ -2793,10 +2515,11 @@
     tTrack.innerHTML = tHtml;
 
     requestAnimationFrame(() => {
+      /* reduced motion: leave the strip static — the cards are still readable */
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const halfW     = tTrack.scrollWidth / 2;
-      const DURATION  = 66;   // seconds per full cycle (another 25% slower)
-      const FPS       = 60;
-      const BASE_SPD  = halfW / (DURATION * FPS);
+      const DURATION  = 66;   // seconds per full cycle
+      const BASE_SPD  = halfW / DURATION;   // px per SECOND — independent of display refresh rate
       const SLOW_SPD  = BASE_SPD / 12;
       let tPos  = 0;
       let tSpd  = BASE_SPD;
@@ -2814,16 +2537,20 @@
         }, 16);
       });
 
-      let tRaf;
-      function animateT() {
-        tPos -= tSpd;
-        if (tPos <= -halfW) tPos += halfW;
-        tTrack.style.transform = `translateX(${tPos}px)`;
+      let tRaf, tPrev = null;
+      function animateT(ts) {
+        if (tPrev !== null) {
+          const dt = Math.min((ts - tPrev) / 1000, 0.1);
+          tPos -= tSpd * dt;
+          if (tPos <= -halfW) tPos += halfW;
+          tTrack.style.transform = `translateX(${tPos}px)`;
+        }
+        tPrev = ts;
         tRaf = requestAnimationFrame(animateT);
       }
       tRaf = requestAnimationFrame(animateT);
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) cancelAnimationFrame(tRaf);
+        if (document.hidden) { cancelAnimationFrame(tRaf); tPrev = null; }
         else tRaf = requestAnimationFrame(animateT);
       });
     });
@@ -2839,73 +2566,6 @@
   document.querySelectorAll('section[id]').forEach(s => spyObs.observe(s));
   </script>
 
-  <script>
-  /* ── Dark / Light mode toggle ──────────────────────────────── */
-  (function() {
-    var root = document.documentElement;
-    var btn  = document.getElementById('themeToggle');
-    var KEY  = 'portfolio-theme';
-
-    function animateToggleScene(toDark) {
-      var track     = document.querySelector('.tt-track');
-      var thumb     = document.querySelector('.tt-thumb');
-      var hillBack  = document.querySelector('.tt-hill-back');
-      var hillFront = document.querySelector('.tt-hill-front');
-      var stars     = document.querySelectorAll('.tt-star');
-      var cloud     = document.querySelector('.tt-cloud');
-      var cloudB    = document.querySelector('.tt-cloud-b');
-      var cloudC    = document.querySelector('.tt-cloud-c');
-      if (!track) return;
-      [track, thumb, hillBack, hillFront, cloud, cloudB, cloudC].forEach(function(el) {
-        if (el) el.getAnimations().forEach(function(a) { a.cancel(); });
-      });
-      stars.forEach(function(el) { el.getAnimations().forEach(function(a) { a.cancel(); }); });
-      var ease   = { easing: 'ease', fill: 'none' };
-      var spring = { easing: 'cubic-bezier(0.34,1.56,0.64,1)', fill: 'none' };
-      track.animate([{ background: toDark ? 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' : 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' }, { background: toDark ? 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' : 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      track.animate([{ borderColor: toDark ? 'rgba(255,255,255,0.40)' : 'rgba(255,255,255,0.10)' }, { borderColor: toDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.40)' }], { duration: 400, easing: ease.easing, fill: ease.fill });
-      thumb.animate([{ transform: toDark ? 'translateX(0) translateY(-50%)' : 'translateX(28px) translateY(-50%)' }, { transform: toDark ? 'translateX(28px) translateY(-50%)' : 'translateX(0) translateY(-50%)' }], { duration: 440, easing: spring.easing, fill: spring.fill });
-      thumb.animate([{ background: toDark ? 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' : '#EEF0F5' }, { background: toDark ? '#EEF0F5' : 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      hillBack.animate([{ background: toDark ? '#72B87A' : '#1D3D25' }, { background: toDark ? '#1D3D25' : '#72B87A' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      hillFront.animate([{ background: toDark ? '#5DA066' : '#152C1A' }, { background: toDark ? '#152C1A' : '#5DA066' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      stars.forEach(function(s) { s.animate([{ opacity: toDark ? 0 : 1 }, { opacity: toDark ? 1 : 0 }], { duration: 400, easing: ease.easing, fill: ease.fill }); });
-      cloud.animate([{ opacity: toDark ? 1 : 0 }, { opacity: toDark ? 0 : 1 }], { duration: 400, easing: ease.easing, fill: ease.fill });
-      if (cloudB) cloudB.animate([{ opacity: toDark ? 0.65 : 0 }, { opacity: toDark ? 0 : 0.65 }], { duration: 400, easing: ease.easing, fill: ease.fill });
-      if (cloudC) cloudC.animate([{ opacity: toDark ? 0.45 : 0 }, { opacity: toDark ? 0 : 0.45 }], { duration: 400, easing: ease.easing, fill: ease.fill });
-    }
-
-    function apply(theme, animate) {
-      if (animate) {
-        var toDark = theme === 'dark';
-        animateToggleScene(toDark);
-        root.classList.add('color-transitioning');
-        void root.offsetHeight;
-        root.setAttribute('data-theme', theme);
-        try { localStorage.setItem(KEY, theme); } catch(e) {}
-        setTimeout(function() { root.classList.remove('color-transitioning'); }, 600);
-      } else {
-        root.setAttribute('data-theme', theme);
-        try { localStorage.setItem(KEY, theme); } catch(e) {}
-      }
-    }
-
-    var saved = null;
-    try { saved = localStorage.getItem(KEY); } catch(e) {}
-    if (saved === 'dark' || saved === 'light') {
-      apply(saved, false);
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      apply('dark', false);
-    } else {
-      apply('light', false);
-    }
-
-    if (btn) {
-      btn.addEventListener('click', function() {
-        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
-      });
-    }
-  })();
-  </script>
 
 
 

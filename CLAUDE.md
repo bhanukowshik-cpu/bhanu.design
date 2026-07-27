@@ -67,7 +67,7 @@ Always confirm the current state of the file before making changes. Read the rel
 A single-file static portfolio. All HTML + CSS + JS lives in one file. Changes are live at `http://localhost:8080` (served from the repo root).
 
 Key files (all in the repo root):
-- `index.html` — the homepage (primary file)
+- `index.html` — the homepage (primary file; this IS the v6 redesign — renamed from hero-lab.html on 27 Jul 2026)
 - `evertutor-live.html` — EverTutor case study
 - `evertutor-studio.html` — EverTutor Studio case study
 - `stressie-studio.html` — Stressie case study

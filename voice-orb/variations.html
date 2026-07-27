@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Voice Orb — Variant Lab</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0D0D0D;
+    color: #F0EDE8;
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    min-height: 100vh;
+    padding: 40px 32px 64px;
+  }
+  h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.02em; }
+  .sub { font-size: 12px; color: rgba(240,237,232,0.5); margin-top: 6px; line-height: 1.6; }
+  .controls {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin: 26px 0 34px;
+  }
+  .controls span {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(240,237,232,0.4); margin-right: 6px;
+  }
+  .st-btn {
+    background: rgba(240,237,232,0.04);
+    border: 1px solid rgba(240,237,232,0.12);
+    color: rgba(240,237,232,0.7);
+    font-family: inherit; font-size: 12px;
+    border-radius: 10px; padding: 8px 16px; cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
+  }
+  .st-btn:hover { border-color: rgba(230,242,141,0.4); color: #F0EDE8; }
+  .st-btn.on {
+    background: rgba(230,242,141,0.10);
+    border-color: rgba(230,242,141,0.55);
+    color: #E6F28D;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 28px;
+    max-width: 1560px;
+  }
+  .tile {
+    background: radial-gradient(120% 80% at 50% -8%, rgba(240,237,232,0.04) 0%, transparent 46%), #131313;
+    border: 1px solid rgba(240,237,232,0.08);
+    border-radius: 20px;
+    padding: 26px 20px 22px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    text-align: center;
+  }
+  .mount { width: 230px; height: 230px; position: relative; }
+  .mount canvas { position: absolute; inset: 0; border-radius: 50%; }
+  .t-name { font-size: 14px; font-weight: 600; letter-spacing: 0.01em; }
+  .t-blurb { font-size: 11px; color: rgba(240,237,232,0.48); line-height: 1.6; max-width: 260px; }
+  .t-tag {
+    font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(230,242,141,0.75); border: 1px solid rgba(230,242,141,0.25);
+    border-radius: 999px; padding: 3px 9px;
+  }
+  .err { color: #ff9d9d; font-size: 12px; margin-top: 20px; display: none; }
+</style>
+</head>
+<body>
+  <h1>Voice Orb — Variant Lab</h1>
+  <p class="sub">Five personalities for the “Speak with me” orb. Flip states below — Listening and Speaking
+  are driven by simulated syllable pulses here, so no mic is needed. Pick a favourite and it becomes the production orb.</p>
+
+  <div class="controls">
+    <span>State</span>
+    <button class="st-btn on" data-state="idle">Idle</button>
+    <button class="st-btn" data-state="listening">Listening</button>
+    <button class="st-btn" data-state="thinking">Thinking</button>
+    <button class="st-btn" data-state="speaking">Speaking</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <p class="err" id="err">Couldn’t load Three.js from the CDN — check your connection and reload.</p>
+
+<script>
+  /* module scripts can't load over file:// — catch the mistake loudly */
+  if (location.protocol === 'file:') {
+    var e = document.getElementById('err');
+    e.textContent = 'This page must be served over http — open http://localhost:8080/voice-orb/variations.html (with the portfolio server running) instead of the file directly.';
+    e.style.display = 'block';
+  }
+</script>
+<script type="module">
+  import { VARIANTS, createVariant } from './variants.js?v=1';
+
+  const grid = document.getElementById('grid');
+  const orbs = [];
+
+  try {
+    for (const v of VARIANTS) {
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.innerHTML =
+        (v.id === 'original' ? '<span class="t-tag">Shipped</span>' : '<span class="t-tag">Variant</span>') +
+        '<div class="mount"></div>' +
+        '<div class="t-name">' + v.name + '</div>' +
+        '<div class="t-blurb">' + v.blurb + '</div>';
+      grid.appendChild(tile);
+      orbs.push(createVariant(tile.querySelector('.mount'), v.id));
+    }
+  } catch (e) {
+    document.getElementById('err').style.display = 'block';
+    console.error(e);
+  }
+
+  /* state switcher — applies to every orb at once */
+  let simTimer = null;
+  function setAll(state) {
+    orbs.forEach(o => o.setState(state));
+    clearInterval(simTimer);
+    simTimer = null;
+    /* listening + speaking get fake syllable energy so motion previews without a mic */
+    if (state === 'listening' || state === 'speaking') {
+      simTimer = setInterval(() => {
+        if (Math.random() < 0.72) orbs.forEach(o => o.pulse());
+      }, 150);
+    }
+  }
+  document.querySelectorAll('.st-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.st-btn').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      setAll(btn.dataset.state);
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Orb Lab — Liquid Glass · Phase 1A</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    overflow: hidden;
+    /* near-black with a very subtle blue-violet ambient gradient (matches the R3F lab) */
+    background:
+      radial-gradient(85% 70% at 50% 34%, rgba(58, 48, 120, 0.16) 0%, transparent 62%),
+      radial-gradient(120% 90% at 50% 110%, rgba(28, 22, 64, 0.22) 0%, transparent 55%),
+      #050508;
+    color: #F0EDE8;
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  }
+  #stage { position: fixed; inset: 0; }
+  #stage canvas { display: block; }
+
+  .hud {
+    position: fixed; top: 22px; left: 26px; z-index: 5;
+    pointer-events: none;
+  }
+  .hud h1 { font-size: 14px; font-weight: 600; letter-spacing: 0.02em; }
+  .hud .sub {
+    font-size: 10.5px; color: rgba(240,237,232,0.45); margin-top: 5px; line-height: 1.7;
+  }
+  .hud a {
+    pointer-events: auto; color: rgba(230,242,141,0.75); text-decoration: none;
+    border-bottom: 1px solid rgba(230,242,141,0.25);
+  }
+  .hud a:hover { color: #E6F28D; border-bottom-color: rgba(230,242,141,0.6); }
+
+  #panelToggle {
+    position: fixed; top: 20px; right: 20px; z-index: 7;
+    background: rgba(240,237,232,0.04);
+    border: 1px solid rgba(240,237,232,0.12);
+    color: rgba(240,237,232,0.7);
+    font-family: inherit; font-size: 11px;
+    border-radius: 10px; padding: 8px 14px; cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
+  }
+  #panelToggle:hover { border-color: rgba(230,242,141,0.4); color: #F0EDE8; }
+  #panelToggle.on {
+    background: rgba(230,242,141,0.10);
+    border-color: rgba(230,242,141,0.55);
+    color: #E6F28D;
+  }
+
+  .panel {
+    position: fixed; top: 62px; right: 20px; z-index: 6;
+    width: 256px; max-height: calc(100vh - 84px);
+    overflow-y: auto; overscroll-behavior: contain;
+    background: rgba(13,13,16,0.82);
+    border: 1px solid rgba(240,237,232,0.10);
+    border-radius: 16px;
+    padding: 14px 16px 18px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .panel.hidden { display: none; }
+  .panel h2 {
+    font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(230,242,141,0.7); margin: 14px 0 8px;
+  }
+  .panel h2:first-child { margin-top: 0; }
+  .row { display: flex; align-items: center; gap: 8px; margin: 7px 0; }
+  .row label { font-size: 10px; color: rgba(240,237,232,0.6); flex: 0 0 92px; }
+  .row input[type="range"] { flex: 1; accent-color: #E6F28D; height: 3px; cursor: pointer; }
+  .row input[type="checkbox"] { accent-color: #E6F28D; cursor: pointer; }
+  .row input[type="color"] {
+    width: 26px; height: 18px; border: 1px solid rgba(240,237,232,0.18);
+    border-radius: 5px; background: none; padding: 0; cursor: pointer;
+  }
+  .row .val {
+    font-size: 9.5px; color: rgba(240,237,232,0.42);
+    flex: 0 0 34px; text-align: right; font-variant-numeric: tabular-nums;
+  }
+  .err {
+    position: fixed; left: 26px; bottom: 24px; z-index: 8;
+    color: #ff9d9d; font-size: 12px; max-width: 480px; line-height: 1.6; display: none;
+  }
+  @media (max-width: 767px) {
+    .panel { width: calc(100vw - 40px); }
+    .hud .sub .links { display: block; margin-top: 2px; }
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+  <div id="stage"></div>
+
+  <header class="hud">
+    <h1>Orb Lab — Liquid Glass · Phase 1A</h1>
+    <p class="sub">Vanilla Three.js port of <code>voice-orb-lab</code> (R3F) — transmission glass, softbox studio, bloom.<br>
+    <span class="links"><a href="voice-orb/variations.html">Variant lab ↗</a> &nbsp;·&nbsp; <a href="voice-orb-lab/dist/index.html">R3F original ↗</a> &nbsp;·&nbsp; append <code>?clean</code> to hide controls</span></p>
+  </header>
+
+  <button id="panelToggle" class="on">Controls</button>
+  <aside class="panel" id="panel"></aside>
+  <p class="err" id="err"></p>
+
+<script>
+  /* module scripts can't load over file:// — catch the mistake loudly */
+  if (location.protocol === 'file:') {
+    var e0 = document.getElementById('err');
+    e0.textContent = 'This page must be served over http — open http://localhost:8080/orb-lab.html (with the portfolio server running) instead of the file directly.';
+    e0.style.display = 'block';
+  }
+  /* Dev-only: ?rafshim drives requestAnimationFrame from setTimeout so the
+     scene renders in headless/hidden tabs where RAF is suspended (used by
+     the local preview tooling to screenshot the orb). Harmless otherwise. */
+  if (new URLSearchParams(location.search).has('rafshim')) {
+    window.requestAnimationFrame = function (cb) { return window.setTimeout(function () { cb(performance.now()); }, 16); };
+    window.cancelAnimationFrame = function (id) { window.clearTimeout(id); };
+  }
+  /* surface load/runtime failures on the page, not just the console */
+  window.addEventListener('error', function (ev) {
+    var e1 = document.getElementById('err');
+    if (e1.style.display !== 'block') {
+      e1.textContent = 'Something failed to load (likely the Three.js CDN) — check the console and your connection. ' + (ev.message || '');
+      e1.style.display = 'block';
+    }
+  });
+</script>
+
+<script type="module">
+/* ═══════════════════════════════════════════════════════════════════════
+   ORB LAB — Phase 1A "luxury liquid-glass" · single-file vanilla port
+   Source of truth: voice-orb-lab/src (React Three Fiber + drei), commits
+   9f3c5a6 + 930ab53. Same recipe, no build step, no framework:
+
+   · Glass    — MeshPhysicalMaterial transmission (thickness, IOR 1.5,
+                navy attenuation, clearcoat) + the additive Fresnel rim
+                shader copied verbatim from GlassShell.tsx.
+   · Studio   — softboxes, not lights: emissive rect panels (key / strip /
+                rim / warm accent / fill) in an env scene rendered by a
+                CubeCamera every frame — the drei <Environment frames=∞>
+                trick — so the key can drift like a slow studio dolly.
+   · Set      — in-scene navy backdrop (so the glass refracts *something*),
+                elliptical contact glow, ≤1% breathing. Nothing else moves.
+   · Post     — bloom + a touch of contrast, ACES filmic. The material
+                carries the frame.
+
+   Not portable from drei's MeshTransmissionMaterial: backside double
+   refraction, chromatic aberration, anisotropic blur, distortion drift.
+   Closest physical equivalents are kept; the read is ~95% the same.
+
+   Controls mirror the lab's leva panels. ?clean hides them (as in App.tsx).
+   Honors prefers-reduced-motion: breathing, drift and distortion stop.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { BrightnessContrastShader } from 'three/addons/shaders/BrightnessContrastShader.js';
+
+/* ── params — defaults identical to the leva panels in voice-orb-lab ── */
+const P = {
+  /* Glass */
+  thickness: 1.35, roughness: 0.09, ior: 1.5, reflection: 1.0,
+  attenuationColor: '#232c5c', attenuationDistance: 3.0, clearcoat: 0.55,
+  fresnelStrength: 0.22, fresnelColor: '#8189ff',
+  /* Set */
+  orbScale: 1.0, breathingStrength: 0.008, breathingPeriod: 8.0,
+  backgroundBrightness: 1.0, groundGlow: 0.16,
+  /* Studio */
+  keyIntensity: 1.7, rimIntensity: 0.55, warmIntensity: 0.5, fillIntensity: 0.32,
+  /* Post */
+  bloomEnabled: true, bloomStrength: 0.35, bloomThreshold: 0.8, contrast: 0.04,
+};
+
+let reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let envDirty = true; /* re-render the studio cubemap on the next frame */
+
+/* ── renderer / scene / camera ───────────────────────────────────────── */
+/* hidden/headless tabs (local preview) report a 0×0 viewport — fall back
+   to screen dimensions so the scene still frames and renders there */
+function viewSize() {
+  const w = window.innerWidth || document.documentElement.clientWidth || screen.width || 1280;
+  const h = window.innerHeight || document.documentElement.clientHeight || screen.height || 800;
+  return [w, h];
+}
+const [vw0, vh0] = viewSize();
+const mount = document.getElementById('stage');
+/* preserveDrawingBuffer: frames can be saved / read back — it's a lab */
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(vw0, vh0);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+mount.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+/* medium focal length (fov 35 ≈ 65mm), pulled back for negative space —
+   the sphere sits at ~49% of viewport height */
+const camera = new THREE.PerspectiveCamera(35, vw0 / vh0, 0.1, 60);
+camera.position.set(0, 0, 6.4);
+
+/* ── the set: navy radial backdrop, in-scene so the glass refracts it ── */
+function radialCanvas(size, paint) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  paint(c.getContext('2d'));
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+/* OutputPass ACES-maps the whole frame (since three r152 materials can't
+   opt out under a composer — toneMapped:false only works direct-to-screen).
+   The backdrop + glow were authored as FINAL colors in the R3F lab, so
+   pre-apply the inverse ACES curve: after tone mapping they land exactly
+   on the authored values instead of sinking into the filmic toe. */
+function acesInverse(y) {
+  const a = 2.51 - 2.43 * y, b = 0.03 - 0.59 * y;
+  return (-b + Math.sqrt(b * b + 4 * a * 0.14 * y)) / (2 * a);
+}
+const s2l = (s) => (s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4));
+const l2s = (l) => (l <= 0.0031308 ? l * 12.92 : 1.055 * Math.pow(l, 1 / 2.4) - 0.055);
+function preTone(r, g, b) {
+  const f = (c) => Math.round(255 * Math.min(1, l2s(acesInverse(s2l(c / 255)))));
+  return [f(r), f(g), f(b)];
+}
+const preToneRgb = (r, g, b, a) => {
+  const [pr, pg, pb] = preTone(r, g, b);
+  return a === undefined ? `rgb(${pr},${pg},${pb})` : `rgba(${pr},${pg},${pb},${a})`;
+};
+const backdropTex = radialCanvas(512, (x) => {
+  const g = x.createRadialGradient(256, 210, 20, 256, 230, 400);
+  g.addColorStop(0, preToneRgb(0x0b, 0x0d, 0x22));   /* #0b0d22 */
+  g.addColorStop(0.5, preToneRgb(0x05, 0x06, 0x0f)); /* #05060f */
+  g.addColorStop(1, preToneRgb(0x02, 0x02, 0x06));   /* #020206 */
+  x.fillStyle = g;
+  x.fillRect(0, 0, 512, 512);
+});
+const backdropMat = new THREE.MeshBasicMaterial({ map: backdropTex, toneMapped: false });
+const backdrop = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), backdropMat);
+backdrop.position.set(0, 0, -9);
+backdrop.scale.set(30, 14, 1);
+scene.add(backdrop);
+
+/* soft elliptical contact glow — barely there, grounds the float */
+const glowTex = radialCanvas(256, (x) => {
+  const g = x.createRadialGradient(128, 128, 2, 128, 128, 122);
+  g.addColorStop(0, preToneRgb(80, 76, 190, 0.18));
+  g.addColorStop(0.35, preToneRgb(60, 54, 150, 0.07));
+  g.addColorStop(0.7, preToneRgb(45, 38, 120, 0.02));
+  g.addColorStop(1, preToneRgb(45, 38, 120, 0));
+  x.fillStyle = g;
+  x.fillRect(0, 0, 256, 256);
+});
+const glowMat = new THREE.SpriteMaterial({
+  map: glowTex, transparent: true, opacity: P.groundGlow,
+  blending: THREE.AdditiveBlending, depthWrite: false,
+});
+const glow = new THREE.Sprite(glowMat);
+glow.position.set(0, -1.6, 0);
+glow.scale.set(3.6, 0.7, 1);
+scene.add(glow);
+
+/* ── the studio: softbox env scene → CubeCamera → scene.environment ──── */
+const envScene = new THREE.Scene();
+envScene.background = new THREE.Color('#020208'); /* black set walls */
+
+function softbox(color, intensity, pos, rot, size) {
+  const m = new THREE.Mesh(
+    new THREE.PlaneGeometry(size[0], size[1]),
+    new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, toneMapped: false })
+  );
+  m.material.color.set(color).multiplyScalar(intensity);
+  m.userData.base = new THREE.Color(color);
+  m.position.set(...pos);
+  m.rotation.set(...rot);
+  return m;
+}
+/* KEY — large vertical softbox, upper left front (grouped: it drifts) */
+const keyGroup = new THREE.Group();
+keyGroup.position.set(-2.6, 2.4, 3.2);
+keyGroup.rotation.set(0, 0.55, 0);
+const keyBox = softbox('#dfe6ff', P.keyIntensity, [0, 0, 0], [0, 0, 0], [3.2, 6.5]);
+keyGroup.add(keyBox);
+envScene.add(keyGroup);
+/* STRIP — long horizontal line, camera right, grazes the equator */
+const stripBox = softbox('#cdd6ff', P.keyIntensity * 0.32, [4.2, 0.4, 1.8], [0, -0.9, 0], [7, 1.1]);
+envScene.add(stripBox);
+/* RIM — cool indigo panel behind the object */
+const rimBox = softbox('#5f68c8', P.rimIntensity, [0.6, 1.2, -4.5], [0, Math.PI, 0], [6, 3.4]);
+envScene.add(rimBox);
+/* ACCENT — small warm peach card, low right */
+const warmBox = softbox('#ffc9a8', P.warmIntensity, [2.6, -1.9, 2.2], [0.5, -0.6, 0], [1.6, 1.0]);
+envScene.add(warmBox);
+/* FILL — vast dim ceiling, keeps shadows from going dead */
+const fillBox = softbox('#9aa3d8', P.fillIntensity, [0, 5.5, 0], [-Math.PI / 2, 0, 0], [12, 12]);
+envScene.add(fillBox);
+
+const cubeRT = new THREE.WebGLCubeRenderTarget(256, {
+  type: THREE.HalfFloatType,
+  generateMipmaps: true,
+  minFilter: THREE.LinearMipmapLinearFilter,
+});
+const cubeCam = new THREE.CubeCamera(0.1, 100, cubeRT);
+envScene.add(cubeCam);
+scene.environment = cubeRT.texture;
+
+/* ── the product: transmission glass shell + additive Fresnel rim ────── */
+const orbGroup = new THREE.Group();
+orbGroup.position.set(0, 0.12, 0);
+scene.add(orbGroup);
+
+const glassMat = new THREE.MeshPhysicalMaterial({
+  color: '#e8ebf7',
+  transmission: 1.0,           /* it IS glass — lower reads as tinted plastic */
+  thickness: P.thickness,      /* light bends through the full volume */
+  roughness: P.roughness,      /* polished, not mirror — long soft reflections */
+  ior: P.ior,                  /* real optical glass; Fresnel falls out of this */
+  attenuationColor: new THREE.Color(P.attenuationColor),
+  attenuationDistance: P.attenuationDistance, /* core darkens with depth */
+  clearcoat: P.clearcoat,      /* precision-polished outer skin */
+  clearcoatRoughness: 0.16,
+  envMapIntensity: P.reflection,
+  specularIntensity: 1.0,
+});
+const glassMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 128, 128), glassMat);
+orbGroup.add(glassMesh);
+
+/* Fresnel edge response — additive, faint, never a painted color
+   (GLSL copied verbatim from GlassShell.tsx) */
+const rimUniforms = {
+  uIntensity: { value: P.fresnelStrength },
+  uColor: { value: new THREE.Color(P.fresnelColor) },
+};
+const rimMat = new THREE.ShaderMaterial({
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  uniforms: rimUniforms,
+  vertexShader: /* glsl */ `
+    varying vec3 vN;
+    varying vec3 vV;
+    void main() {
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      vN = normalize(normalMatrix * normal);
+      vV = normalize(-mv.xyz);
+      gl_Position = projectionMatrix * mv;
+    }
+  `,
+  fragmentShader: /* glsl */ `
+    precision highp float;
+    uniform float uIntensity;
+    uniform vec3 uColor;
+    varying vec3 vN;
+    varying vec3 vV;
+    void main() {
+      float f = pow(1.0 - clamp(dot(normalize(vN), normalize(vV)), 0.0, 1.0), 3.6);
+      gl_FragColor = vec4(uColor * f * uIntensity, f * uIntensity);
+    }
+  `,
+});
+const rimMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 96), rimMat);
+rimMesh.scale.setScalar(1.002);
+orbGroup.add(rimMesh);
+
+/* ── post: subtle bloom + a touch of contrast, nothing else ──────────── */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(vw0, vh0),
+  P.bloomStrength, 0.4, P.bloomThreshold
+);
+bloomPass.enabled = P.bloomEnabled;
+composer.addPass(bloomPass);
+composer.addPass(new OutputPass());
+/* contrast AFTER tone mapping, in sRGB space — matching the pmndrs
+   postprocessing behavior in the R3F lab. In linear HDR the ±0.5-pivot
+   formula crushes near-black navy to zero (kills the blue channel). */
+const contrastPass = new ShaderPass(BrightnessContrastShader);
+contrastPass.uniforms.contrast.value = P.contrast;
+composer.addPass(contrastPass);
+
+/* ── motion: breathing + slow studio dolly. The object never "animates" ─ */
+const clock = new THREE.Clock();
+function animate() {
+  const t = clock.getElapsedTime();
+
+  if (!reduced) {
+    /* slow studio drift — reflections travel across the glass */
+    keyGroup.position.x = -2.6 + Math.sin(t * 0.05) * 0.5;
+    keyGroup.position.y = 2.4 + Math.sin(t * 0.033) * 0.3;
+    envDirty = true;
+  }
+  if (envDirty) {
+    cubeCam.update(renderer, envScene);
+    envDirty = false;
+  }
+
+  /* fit: never clip the sphere on narrow viewports */
+  const vh = 2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z;
+  const vw = vh * camera.aspect;
+  const fit = Math.min(1, (vw * 0.72) / 2.3);
+  const breath = reduced
+    ? 0
+    : Math.sin((t * Math.PI * 2) / P.breathingPeriod) * P.breathingStrength;
+  orbGroup.scale.setScalar(P.orbScale * fit * (1 + breath));
+
+  composer.render();
+}
+renderer.setAnimationLoop(animate);
+
+window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
+  reduced = e.matches;
+  envDirty = true;
+});
+window.addEventListener('resize', () => {
+  const [w, h] = viewSize();
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+  composer.setSize(w, h);
+});
+
+/* ── controls — mirrors the leva panels; ?clean hides them ───────────── */
+const APPLY = {
+  thickness:           (v) => { glassMat.thickness = v; },
+  roughness:           (v) => { glassMat.roughness = v; },
+  ior:                 (v) => { glassMat.ior = v; },
+  reflection:          (v) => { glassMat.envMapIntensity = v; },
+  attenuationColor:    (v) => { glassMat.attenuationColor.set(v); },
+  attenuationDistance: (v) => { glassMat.attenuationDistance = v; },
+  clearcoat:           (v) => { glassMat.clearcoat = v; },
+  fresnelStrength:     (v) => { rimUniforms.uIntensity.value = v; },
+  fresnelColor:        (v) => { rimUniforms.uColor.value.set(v); },
+  backgroundBrightness:(v) => { backdropMat.color.setScalar(v); },
+  groundGlow:          (v) => { glowMat.opacity = v; },
+  keyIntensity:        (v) => {
+    keyBox.material.color.copy(keyBox.userData.base).multiplyScalar(v);
+    stripBox.material.color.copy(stripBox.userData.base).multiplyScalar(v * 0.32);
+    envDirty = true;
+  },
+  rimIntensity:  (v) => { rimBox.material.color.copy(rimBox.userData.base).multiplyScalar(v); envDirty = true; },
+  warmIntensity: (v) => { warmBox.material.color.copy(warmBox.userData.base).multiplyScalar(v); envDirty = true; },
+  fillIntensity: (v) => { fillBox.material.color.copy(fillBox.userData.base).multiplyScalar(v); envDirty = true; },
+  bloomEnabled:   (v) => { bloomPass.enabled = v; },
+  bloomStrength:  (v) => { bloomPass.strength = v; },
+  bloomThreshold: (v) => { bloomPass.threshold = v; },
+  contrast:       (v) => { contrastPass.uniforms.contrast.value = v; },
+};
+
+const SECTIONS = [
+  { name: 'Glass', rows: [
+    { key: 'thickness',           label: 'thickness',    min: 0,    max: 3,    step: 0.01 },
+    { key: 'roughness',           label: 'roughness',    min: 0,    max: 0.6,  step: 0.005 },
+    { key: 'ior',                 label: 'ior',          min: 1,    max: 2.33, step: 0.01 },
+    { key: 'reflection',          label: 'reflection',   min: 0,    max: 3,    step: 0.01 },
+    { key: 'attenuationColor',    label: 'atten color',  type: 'color' },
+    { key: 'attenuationDistance', label: 'atten dist',   min: 0.2,  max: 5,    step: 0.05 },
+    { key: 'clearcoat',           label: 'clearcoat',    min: 0,    max: 1,    step: 0.01 },
+    { key: 'fresnelStrength',     label: 'fresnel',      min: 0,    max: 1.5,  step: 0.01 },
+    { key: 'fresnelColor',        label: 'fresnel color',type: 'color' },
+  ]},
+  { name: 'Set', rows: [
+    { key: 'orbScale',            label: 'orb scale',    min: 0.5,  max: 1.4,  step: 0.01 },
+    { key: 'breathingStrength',   label: 'breathing',    min: 0,    max: 0.01, step: 0.001 },
+    { key: 'breathingPeriod',     label: 'period',       min: 5,    max: 12,   step: 0.5 },
+    { key: 'backgroundBrightness',label: 'backdrop',     min: 0,    max: 2,    step: 0.01 },
+    { key: 'groundGlow',          label: 'ground glow',  min: 0,    max: 1,    step: 0.01 },
+  ]},
+  { name: 'Studio', rows: [
+    { key: 'keyIntensity',        label: 'key',          min: 0,    max: 5,    step: 0.05 },
+    { key: 'rimIntensity',        label: 'rim',          min: 0,    max: 4,    step: 0.05 },
+    { key: 'warmIntensity',       label: 'warm accent',  min: 0,    max: 2,    step: 0.05 },
+    { key: 'fillIntensity',       label: 'fill',         min: 0,    max: 1,    step: 0.01 },
+  ]},
+  { name: 'Post', rows: [
+    { key: 'bloomEnabled',        label: 'bloom',        type: 'check' },
+    { key: 'bloomStrength',       label: 'strength',     min: 0,    max: 2,    step: 0.01 },
+    { key: 'bloomThreshold',      label: 'threshold',    min: 0,    max: 1,    step: 0.01 },
+    { key: 'contrast',            label: 'contrast',     min: -0.2, max: 0.2,  step: 0.005 },
+  ]},
+];
+
+const panel = document.getElementById('panel');
+const fmt = (v, step) => Number(v).toFixed(step < 0.01 ? 3 : 2);
+for (const sec of SECTIONS) {
+  const h = document.createElement('h2');
+  h.textContent = sec.name;
+  panel.appendChild(h);
+  for (const r of sec.rows) {
+    const row = document.createElement('div');
+    row.className = 'row';
+    const label = document.createElement('label');
+    label.textContent = r.label;
+    row.appendChild(label);
+    if (r.type === 'color') {
+      const inp = document.createElement('input');
+      inp.type = 'color';
+      inp.value = P[r.key];
+      inp.addEventListener('input', () => { P[r.key] = inp.value; APPLY[r.key](inp.value); });
+      row.appendChild(inp);
+    } else if (r.type === 'check') {
+      const inp = document.createElement('input');
+      inp.type = 'checkbox';
+      inp.checked = P[r.key];
+      inp.addEventListener('input', () => { P[r.key] = inp.checked; APPLY[r.key](inp.checked); });
+      row.appendChild(inp);
+    } else {
+      const inp = document.createElement('input');
+      inp.type = 'range';
+      inp.min = r.min; inp.max = r.max; inp.step = r.step;
+      inp.value = P[r.key];
+      const val = document.createElement('span');
+      val.className = 'val';
+      val.textContent = fmt(P[r.key], r.step);
+      inp.addEventListener('input', () => {
+        const v = parseFloat(inp.value);
+        P[r.key] = v;
+        val.textContent = fmt(v, r.step);
+        if (APPLY[r.key]) APPLY[r.key](v);
+      });
+      row.appendChild(inp);
+      row.appendChild(val);
+    }
+    panel.appendChild(row);
+  }
+}
+
+const toggle = document.getElementById('panelToggle');
+toggle.addEventListener('click', () => {
+  panel.classList.toggle('hidden');
+  toggle.classList.toggle('on', !panel.classList.contains('hidden'));
+});
+if (new URLSearchParams(location.search).has('clean') || window.innerWidth < 768) {
+  panel.classList.add('hidden');
+  toggle.classList.remove('on');
+}
+if (new URLSearchParams(location.search).has('clean')) toggle.style.display = 'none';
+
+/* console handles for poking the scene while tuning — it's a lab */
+window.orbLab = { renderer, scene, camera, composer, glassMat, rimUniforms, backdropMat, glowMat, envScene, cubeCam, P, APPLY };
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!-- Source for the favicon set — the site's own ElevenLabs orb (arctic palette),
+     mounted at 512 and screenshotted with a transparent background:
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
+       --screenshot=orb-512.png --window-size=512,512 --force-device-scale-factor=1 \
+       --default-background-color=00000000 --virtual-time-budget=9000 --hide-scrollbars \
+       "http://localhost:8080/orb-favicon.html"
+     then the PIL crop in the repo memory cuts favicon-32/192/512 + apple-touch. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { margin: 0; padding: 0; }
+    html, body { width: 512px; height: 512px; background: transparent; overflow: hidden; }
+    #m { width: 512px; height: 512px; }
+  </style>
+</head>
+<body>
+  <div id="m"></div>
+  <script>
+    /* capture rig: keep rAF alive in hidden panes, spoof visibility so the
+       bundle never pauses, and force readable WebGL buffers for toDataURL */
+    (function () {
+      var raf = window.requestAnimationFrame.bind(window);
+      window.requestAnimationFrame = function (fn) {
+        return setTimeout(function () { fn(performance.now()); }, 16);
+      };
+      try {
+        Object.defineProperty(document, 'hidden', { get: function () { return false; } });
+        Object.defineProperty(document, 'visibilityState', { get: function () { return 'visible'; } });
+      } catch (e) {}
+      var orig = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function (type, attrs) {
+        if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {
+          attrs = Object.assign({}, attrs || {}, { preserveDrawingBuffer: true });
+        }
+        return orig.call(this, type, attrs);
+      };
+    })();
+  </script>
+  <script type="module" src="orb/bhanu-orb.js"></script>
+  <script>
+    (function wait() {
+      if (!(window.BhanuOrb && window.BhanuOrb.mountVisual)) { setTimeout(wait, 50); return; }
+      window.BhanuOrb.mountVisual(document.getElementById('m'),
+        { palette: 'arctic', size: 512, state: 'listening',
+          getInputVolume: function () { return 0.75; },
+          getOutputVolume: function () { return 0.75; } });
+    })();
+  </script>
+</body>
+</html>

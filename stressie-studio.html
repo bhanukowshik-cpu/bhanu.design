@@ -1,12 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Stressie — Bhanu Kowshik</title>
+
+  <!-- ── Social share meta (image source: og-image.html → images/og-image.jpg) ── -->
+  <meta name="description" content="Stressie case study — designing a stress-management companion. By Bhanu Kowshik, AI Native Product Designer." />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Bhanu Kowshik" />
+  <meta property="og:title" content="Stressie — Bhanu Kowshik" />
+  <meta property="og:description" content="Case study: designing a stress-management companion." />
+  <meta property="og:url" content="https://bhanu.build/stressie-studio.html" />
+  <meta property="og:image" content="https://bhanu.build/images/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Stressie — Bhanu Kowshik" />
+  <meta name="twitter:image" content="https://bhanu.build/images/og-image.jpg" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192.png" />
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&display=swap" rel="stylesheet" />
 
   <style>
     /* ─── RESET ─────────────────────────────────────────────── */
@@ -24,28 +43,54 @@
       --orange-light: #FFF7E9;
       --orange-badge: #8C4A0D;
       --orange-rgb:   191,98,18;
-      --font-display: 'Playfair Display', serif;
-      --font-heading: 'Poppins', sans-serif;
-      --font-mono:    'JetBrains Mono', monospace;
+      /* small-text orange: --orange only clears AA at display sizes, so the
+         11–13px labels use this deeper cut (flips to the bright orange in dark) */
+      --orange-ink:   #8C4A0D;
+      /* ── TYPE — the portfolio's system, carried into the case study ──
+         Playfair and Poppins were this page's own pair; the site now has one.
+         The token names stay so the rules below need no edit — only what they
+         resolve to has changed. The display face is the serif, and it is
+         italic wherever it lands, exactly as on the home page. */
+      --font-display: 'Instrument Serif', Georgia, serif;
+      --font-heading: 'Instrument Sans', system-ui, sans-serif;
+      --font-mono:    'Urbanist', 'Instrument Sans', system-ui, sans-serif;
+      --font-serif:   'Instrument Serif', Georgia, serif;
+      /* one button, every page: white out of the top-left, azure across the rest */
+      --cta-grad: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #E4EFFF 9%, #93BEFF 26%, #4B8AF0 50%, #2463DC 76%, #1A4CB8 100%);
+      --cta-grad-hover: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #EDF4FF 11%, #A6CBFF 29%, #5A96F5 53%, #2C6FE8 79%, #1F57CA 100%);
 
       /* ── Font scale ── */
       --fs-xs:   11px;   /* eyebrow labels */
       --fs-sm:   13px;   /* tags, small meta */
-      --fs-base: 15px;   /* body copy */
+      --fs-base: 16px;   /* body copy */
       --fs-md:   18px;   /* subtitle, card sub-labels */
       --fs-lg:   22px;   /* section titles, card headings */
     }
 
-    /* ─── BODY — dot-grid fixed ──────────────────────────────── */
+    /* ─── BODY ───────────────────────────────────────────────── */
     body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       background-color: var(--bg);
-      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
-      background-size: 19px 19px;
-      background-attachment: fixed;
       min-height: 100vh;
       font-family: var(--font-heading);
+      /* clip, not hidden — the off-canvas mobile menu otherwise leaves the
+         page horizontally pannable; hidden stays as the older-browser fallback */
       overflow-x: hidden;
+      overflow-x: clip;
       cursor: none;
+    }
+
+    /* Film grain — the ground hero-lab uses. Replaces the page-wide dot mesh,
+       which stamped one pattern across every section instead of letting each
+       section carry its own texture. Sits above content but under the nav
+       and the custom cursor. */
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
     /* ─── CUSTOM CURSOR ──────────────────────────────────────── */
@@ -103,7 +148,10 @@
       color: var(--secondary); white-space: nowrap;
     }
 
-    .nav-sections { display: flex; align-items: center; gap: 2px; }
+    /* flex:1 + centre keeps the links visually centred now that the theme
+       toggle no longer sits on the right — space-between alone would shove
+       them against the edge */
+    .nav-sections { display: flex; align-items: center; justify-content: center; flex: 1; gap: 2px; }
     .nav-btn {
       display: flex; align-items: center; justify-content: center;
       padding: 5px 10px;
@@ -153,9 +201,17 @@
       justify-content: center; align-items: flex-start;
       padding: 80px 32px 48px; gap: 4px;
       transform: translateX(100%);
-      transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1);
+      /* hidden while closed so keyboard focus can't land on off-screen links;
+         the delay holds visibility until the slide-out finishes */
+      visibility: hidden;
+      transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1),
+                  visibility 0s linear 0.38s;
     }
-    .mobile-menu.open { transform: translateX(0); }
+    .mobile-menu.open {
+      transform: translateX(0);
+      visibility: visible;
+      transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1), visibility 0s;
+    }
 
     .mobile-menu a {
       font-family: var(--font-mono);
@@ -179,26 +235,45 @@
     .mobile-menu a:nth-child(8) { transition-delay: 0.35s; }
     .mobile-menu a.active { font-weight: 700; color: var(--orange); }
 
-    /* ─── PAGE + CARD ────────────────────────────────────────── */
+    /* ─── PAGE + CONTENT COLUMN ──────────────────────────────── */
+    /* frame retired — the column follows hero-lab's 1400px width system */
     .page {
       display: flex; justify-content: center;
-      padding: 94px 10% 90px;
+      padding: 74px 0 0;
     }
     .card {
-      background: var(--white);
+      background: none;
       width: 100%;
-      max-width: 1920px;
-      border-radius: 30px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      max-width: 1400px;
       overflow: hidden;
       display: flex; flex-direction: column;
     }
 
     /* ─── HERO ───────────────────────────────────────────────── */
+    /* ─── HERO — backdrop panel, aligned with the section cards ───── */
     .cs-hero {
       display: flex; flex-direction: column;
-      gap: 24px; padding: 44px 48px 56px;
+      gap: 24px;
+      padding: clamp(34px, 4.2vw, 64px) clamp(28px, 3.6vw, 52px) clamp(34px, 4.2vw, 60px);
+      /* .cs-section-wrap insets its cards 48px a side — match it */
+      margin: 0 48px;
+      position: relative; isolation: isolate;
+      border-radius: 16px; overflow: hidden;
     }
+    /* the generated plate is dark-mode art — over cream it can only wash out
+       to grey, so light mode hides it and tints the panel instead */
+    .cs-hero > .et-bg-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: 50% 86%;
+      display: none; pointer-events: none; z-index: 0;
+    }
+    [data-theme="dark"] .cs-hero > .et-bg-img { display: block; }
+    .hero-scrim {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(100deg, #FFFCF8 0%, #FEF9F2 58%, #FBEEDD 100%);
+    }
+    /* lift the existing column above the backdrop without restructuring it */
+    .cs-hero > *:not(.et-bg-img):not(.hero-scrim) { position: relative; z-index: 2; }
 
     /* ── Pills + date row ── */
     .hero-top-row {
@@ -226,7 +301,7 @@
     .hero-link-plain {
       display: inline-flex; align-items: center; gap: 5px;
       font-family: var(--font-heading); font-weight: 500; font-size: var(--fs-sm);
-      color: var(--orange); text-decoration: none; white-space: nowrap;
+      color: var(--orange-ink); text-decoration: none; white-space: nowrap;
       flex-shrink: 0;
     }
     .hero-link-plain:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -253,10 +328,14 @@
     }
     .cs-heading .word.visible { animation: word-rise 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
 
-    /* Orange stat portion — Playfair Display */
+    /* the emphasised half of the heading — Instrument Serif, italic, and at
+       its own single weight: it has no bold, and asking for one would make
+       the browser smear a fake 700 across it */
     .heading-orange {
       font-family: var(--font-display);
-      font-weight: 700;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 1.06em;
       color: var(--orange);
     }
     /* Dark continuation — Poppins SemiBold */
@@ -326,7 +405,7 @@
     .hero-card-pitch {
       font-family: var(--font-heading); font-weight: 500;
       font-size: var(--fs-lg); line-height: 1.58;
-      color: rgba(255,250,240,0.40);
+      color: rgba(255,250,240,0.48);
     }
     .hero-card-pitch strong {
       color: rgba(255,250,240,0.95); font-weight: 700;
@@ -380,7 +459,7 @@
       font-family: var(--font-heading);
       font-weight: 400; font-size: var(--fs-xs);
       text-transform: uppercase; letter-spacing: 0.1em;
-      color: #9C8B70;
+      color: #7A6C52;
     }
 
     .summary-value {
@@ -476,7 +555,8 @@
       .nav               { padding: 8px 24px; }
       .nav-sections      { display: none; }
       .nav-hamburger     { display: flex; }
-      .cs-hero           { padding: 28px 28px 40px; gap: 20px; }
+      /* padding is fluid now — only the alignment margin changes here */
+      .cs-hero           { margin: 0 28px; gap: 20px; }
       .cs-heading        { font-size: 44px; line-height: 62px; }
       .hero-dark-card    { padding: 32px 28px; gap: 32px; }
       .overview-summary  { padding-left: 28px; padding-right: 28px; }
@@ -493,7 +573,7 @@
     /* ── Mobile ── */
     @media (max-width: 767px) {
       .page              { padding: 60px 5% 56px; }
-      .cs-hero           { padding: 22px 18px 28px; gap: 16px; }
+      .cs-hero           { gap: 16px; }
       .cs-heading        { font-size: 30px; line-height: 48px; }
       .cs-subtitle       { font-size: 15px; }
       .hero-pill         { font-size: 12px; padding: 8px 16px; }
@@ -507,7 +587,7 @@
       .summary-cell:last-child { grid-column: auto; }
       .summary-cell      { padding: 22px 22px; border-radius: 16px; }
       .summary-value     { font-size: 17px; }
-      .section-badge     { padding: 12px 16px; }
+      .section-badge     { padding: 12px 16px; white-space: normal; flex-shrink: 1; min-width: 0; }
       .section-num, .section-title-text { font-size: 18px; }
     }
 
@@ -559,7 +639,7 @@
     .skill-group-label {
       font-family: var(--font-heading); font-weight: 600;
       font-size: var(--fs-xs); text-transform: uppercase;
-      letter-spacing: 0.1em; color: var(--orange);
+      letter-spacing: 0.1em; color: var(--orange-ink);
     }
 
     .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -591,7 +671,7 @@
 
     .timeline-val {
       font-family: var(--font-heading);
-      font-weight: 400; font-size: var(--fs-sm); color: #9C8B70;
+      font-weight: 400; font-size: var(--fs-sm); color: #7A6C52;
     }
     .timeline-val strong {
       font-weight: 800; font-size: 28px;
@@ -620,7 +700,7 @@
       font-family: var(--font-heading); font-weight: 700;
       font-size: var(--fs-base); color: var(--secondary);
     }
-    .team-name.nda-badge { color: #9C8B70; }
+    .team-name.nda-badge { color: #7A6C52; }
 
     .team-role {
       font-family: var(--font-heading); font-weight: 400;
@@ -751,7 +831,7 @@
 
     .pf-footnote {
       font-family: var(--font-display); font-style: italic; font-weight: 400;
-      font-size: var(--fs-sm); color: rgba(var(--orange-rgb), 0.85); margin-top: 4px;
+      font-size: var(--fs-sm); color: var(--orange-ink); margin-top: 4px;
     }
 
     /* ── Responsive ── */
@@ -788,9 +868,12 @@
     }
     .st-orange-italic {
       font-family: var(--font-display);
-      font-style: italic; font-weight: 800;
+      font-style: italic; font-weight: 400;
+      font-size: 1.06em;
       color: var(--orange);
     }
+    /* the serif only ever appears in italic, exactly as it does on the home page */
+    .serif { font-family: var(--font-serif); font-style: italic; font-weight: 400; }
 
     /* Equal-height two-column grid — same pattern as pf-grid */
     .st-grid {
@@ -1014,7 +1097,7 @@
       display: flex; align-items: center; justify-content: center;
       background: rgba(191,98,18,0.12);
       border: 1px solid rgba(191,98,18,0.25);
-      color: var(--orange);
+      color: var(--orange-ink);
       font-family: var(--font-heading); font-weight: 700; font-size: 13px;
       flex-shrink: 0;
     }
@@ -1165,12 +1248,14 @@
     .op-card-desc { font-family: var(--font-mono); font-size: 15px; color: #515151; line-height: 1.6; flex: 1; }
     .op-card-cta {
       display: flex; align-items: center; justify-content: center; gap: 7px;
-      background: #252525; color: #fff;
-      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-      letter-spacing: 0.04em; padding: 11px 14px; border-radius: 8px; margin-top: 4px;
+      /* the site's one button: white out of the top-left corner, azure across
+         the rest, a rounded rectangle, and no shadow */
+      background: var(--cta-grad); color: #fff; border: 0; box-shadow: none;
+      font-family: var(--font-heading); font-size: 12px; font-weight: 600;
+      letter-spacing: -0.002em; padding: 12px 18px; border-radius: 12px; margin-top: 4px;
       cursor: pointer; transition: transform 0.18s ease;
     }
-    .op-card-cta:hover { transform: translateY(-3px); }
+    .op-card-cta:hover { background: var(--cta-grad-hover); transform: translateY(-3px); }
     @media (max-width: 900px) {
       .other-projects { padding: 48px 24px 64px; }
       .other-projects-grid { grid-template-columns: 1fr; }
@@ -1178,31 +1263,29 @@
     }
     /* ─── DARK MODE TOKENS ───────────────────────────────────── */
     [data-theme="dark"] {
-      --secondary:    #F0EDE8;
-      --bg:           #1A1A1A;
-      --white:        #0C0C0C;
-      --grey:         #999999;
-      --border:       #3A3A3A;
+      --secondary:    #EFF3F8;
+      --bg:           #0A0E15;
+      --white:        #0E141D;
+      --grey:         #A9B4C2;
+      --border:       #222C3D;
       --orange:       #FF8A3D;
       --orange-light: #2A1A08;
       --orange-rgb:   255,138,61;
-    }
-    [data-theme="dark"] body {
-      background-image: radial-gradient(circle, rgba(255,255,255,0.15) 0.8px, transparent 0.8px);
+      --orange-ink:   #FF8A3D;
     }
     [data-theme="dark"] .nav-home img { filter: invert(1); }
     [data-theme="dark"] .nav {
       background: rgba(26,26,26,0.92);
       box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.06);
     }
-    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #2C2C2C; }
+    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #182130; }
     [data-theme="dark"] .mobile-menu { box-shadow: -8px 0 32px rgba(0,0,0,0.40); }
     [data-theme="dark"] .hero-pill { border-color: rgba(191,98,18,0.45); }
     [data-theme="dark"] .hero-pill:hover { background: rgba(191,98,18,0.12); }
-    [data-theme="dark"] .hero-date { color: #9C8B70; }
+    [data-theme="dark"] .hero-date { color: #B8AA8E; }
     [data-theme="dark"] .cs-subtitle { color: rgba(240,237,232,0.65); }
-    [data-theme="dark"] .summary-label { color: #9C8B70; }
-    [data-theme="dark"] .summary-desc { color: #9C8B70; }
+    [data-theme="dark"] .summary-label { color: #B8AA8E; }
+    [data-theme="dark"] .summary-desc { color: #B8AA8E; }
     [data-theme="dark"] .section-line { background: rgba(240,237,232,0.12); }
     /* ── overview section ── */
     [data-theme="dark"] .skill-tag {
@@ -1210,9 +1293,9 @@
       border-color: rgba(255,138,61,0.35);
       border-radius: 999px;
     }
-    [data-theme="dark"] .timeline-val { color: #9C8B70; }
-    [data-theme="dark"] .team-role { color: #9C8B70; }
-    [data-theme="dark"] .team-name.nda-badge { color: #9C8B70; }
+    [data-theme="dark"] .timeline-val { color: #B8AA8E; }
+    [data-theme="dark"] .team-role { color: #B8AA8E; }
+    [data-theme="dark"] .team-name.nda-badge { color: #B8AA8E; }
     [data-theme="dark"] .team-divider { background: rgba(240,237,232,0.08); }
     /* ── pilot findings section ── */
     [data-theme="dark"] .pf-stat-chip {
@@ -1223,73 +1306,40 @@
     [data-theme="dark"] .pf-arc-track { stroke: rgba(240,237,232,0.14); }
     /* ── other projects ── */
     [data-theme="dark"] .op-card { background: #1E1E1E; border-color: rgba(240,237,232,0.1); }
-    [data-theme="dark"] .op-card-img { background: #2C2C2C; }
-    [data-theme="dark"] .op-card-tag { background: #2C2C2C; color: #A0A0A0; }
-    [data-theme="dark"] .op-card-title { color: #F0EDE8; }
-    [data-theme="dark"] .op-card-desc { color: #999999; }
-    [data-theme="dark"] .op-card-cta { background: #F0EDE8; color: #252525; }
-    /* ─── THEME TOGGLE BUTTON ────────────────────────────────── */
-    .theme-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer !important; flex-shrink: 0; border-radius: 100px; transition: transform 0.15s ease; }
-    .theme-toggle:active { transform: scale(0.93); }
-    .tt-track { position: relative; width: 58px; height: 30px; border-radius: 100px; background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border: 1.5px solid rgba(255,255,255,0.40); flex-shrink: 0; overflow: hidden; transition: background 0.5s ease, border-color 0.4s ease; }
-    .tt-track::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 50%; border-radius: 100px 100px 50% 50%; background: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 100%); pointer-events: none; z-index: 10; }
-    .tt-hill-back { position: absolute; bottom: 0; left: -5%; width: 75%; height: 13px; background: #72B87A; border-radius: 50% 60% 0 0; z-index: 1; transition: background 0.5s ease; }
-    .tt-hill-front { position: absolute; bottom: 0; right: -8%; width: 62%; height: 11px; background: #5DA066; border-radius: 60% 50% 0 0; z-index: 2; transition: background 0.5s ease; }
-    .tt-star { position: absolute; background: rgba(255,255,255,0.90); border-radius: 50%; opacity: 0; transition: opacity 0.4s ease; z-index: 1; }
-    .tt-star-1 { width: 2.5px; height: 2.5px; top: 5px; left: 8px; }
-    .tt-star-2 { width: 2px; height: 2px; top: 11px; left: 18px; }
-    .tt-star-3 { width: 2px; height: 2px; top: 6px; left: 27px; }
-    .tt-star-4 { width: 1.5px; height: 1.5px; top: 13px; left: 11px; }
-    [data-theme="dark"] .tt-star { opacity: 1; }
-    @keyframes tt-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.12; } }
-    [data-theme="dark"] .tt-star-1 { animation: tt-twinkle 2.1s ease-in-out infinite; }
-    [data-theme="dark"] .tt-star-2 { animation: tt-twinkle 1.7s ease-in-out 0.8s infinite; }
-    [data-theme="dark"] .tt-star-3 { animation: tt-twinkle 2.5s ease-in-out 1.5s infinite; }
-    [data-theme="dark"] .tt-star-4 { animation: tt-twinkle 1.9s ease-in-out 0.4s infinite; }
-    .tt-shoot { position: absolute; top: 3px; left: 4px; width: 9px; height: 1px; background: linear-gradient(to right, transparent, #FFE87A); border-radius: 1px; opacity: 0; transform: rotate(35deg); z-index: 2; pointer-events: none; }
-    @keyframes tt-shooting-star { 0% { opacity: 0; transform: translate(0,0) rotate(35deg); } 3% { opacity: 0.85; } 15% { opacity: 0; transform: translate(20px,8px) rotate(35deg); } 100% { opacity: 0; transform: translate(20px,8px) rotate(35deg); } }
-    [data-theme="dark"] .tt-shoot { animation: tt-shooting-star 5s ease-in 2s infinite; }
-    .tt-cloud { position: absolute; right: 9px; top: 6px; width: 15px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 10px; opacity: 1; transition: opacity 0.4s ease; z-index: 1; }
-    .tt-cloud::before { content: ''; position: absolute; width: 9px; height: 9px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -5px; left: 2px; }
-    .tt-cloud::after { content: ''; position: absolute; width: 7px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -4px; left: 7px; }
-    [data-theme="dark"] .tt-cloud { opacity: 0; }
-    @keyframes tt-cloud-drift { from { transform: translateX(30px); } to { transform: translateX(-85px); } }
-    [data-theme="light"] .tt-cloud { animation: tt-cloud-drift 26s linear 0s infinite backwards; }
-    .tt-cloud-b { position: absolute; right: 3px; top: 11px; width: 9px; height: 4px; background: rgba(255,255,255,0.95); border-radius: 8px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
-    .tt-cloud-b::before { content: ''; position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 1px; }
-    .tt-cloud-b::after { content: ''; position: absolute; width: 5px; height: 5px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 4px; }
-    [data-theme="dark"] .tt-cloud-b { opacity: 0; }
-    [data-theme="light"] .tt-cloud-b { opacity: 0.65; animation: tt-cloud-drift 18s linear 4s infinite backwards; }
-    .tt-cloud-c { position: absolute; right: 18px; top: 4px; width: 11px; height: 5px; background: rgba(255,255,255,0.95); border-radius: 8px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
-    .tt-cloud-c::before { content: ''; position: absolute; width: 7px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -4px; left: 1px; }
-    .tt-cloud-c::after { content: ''; position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 5px; }
-    [data-theme="dark"] .tt-cloud-c { opacity: 0; }
-    [data-theme="light"] .tt-cloud-c { opacity: 0.45; animation: tt-cloud-drift 22s linear 10s infinite backwards; }
-    .tt-thumb { position: absolute; top: 50%; left: 3px; width: 22px; height: 22px; border-radius: 50%; z-index: 3; transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); box-shadow: 0 2px 4px rgba(0,0,0,0.28); }
-    .tt-thumb::before, .tt-thumb::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.75); opacity: 0; transition: opacity 0.4s ease; }
-    .tt-thumb::before { width: 7px; height: 7px; top: 4px; left: 5px; }
-    .tt-thumb::after  { width: 5px; height: 5px; top: 13px; left: 14px; }
-    [data-theme="dark"] .tt-thumb::before, [data-theme="dark"] .tt-thumb::after { opacity: 1; }
-    [data-theme="light"] .tt-track { background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border-color: rgba(255,255,255,0.40); }
-    [data-theme="light"] .tt-hill-back { background: #72B87A; }
-    [data-theme="light"] .tt-hill-front { background: #5DA066; }
-    [data-theme="light"] .tt-thumb { transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); }
-    [data-theme="light"] .tt-star { opacity: 0; }
-    [data-theme="light"] .tt-cloud { opacity: 1; }
-    [data-theme="light"] .tt-thumb::before, [data-theme="light"] .tt-thumb::after { opacity: 0; }
-    [data-theme="dark"] .tt-track { background: linear-gradient(180deg, #0B1829 0%, #152238 100%); border-color: rgba(255,255,255,0.10); }
-    [data-theme="dark"] .tt-track::after { background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%); }
-    [data-theme="dark"] .tt-hill-back { background: #1D3D25; }
-    [data-theme="dark"] .tt-hill-front { background: #152C1A; }
-    [data-theme="dark"] .tt-thumb { transform: translateX(28px) translateY(-50%); background: #EEF0F5; }
-    [data-theme="dark"] .tt-star { opacity: 1; }
-    [data-theme="dark"] .tt-cloud { opacity: 0; }
-    /* ─── SMOOTH THEME TRANSITION ────────────────────────────── */
-    html.color-transitioning * { transition-property: background, background-color, color, border-color, opacity !important; transition-duration: 0.5s !important; transition-timing-function: ease !important; }
-    html.color-transitioning .tt-track { transition: background 0.5s ease, border-color 0.4s ease !important; }
-    html.color-transitioning .tt-hill-back, html.color-transitioning .tt-hill-front { transition: background 0.5s ease !important; }
-    html.color-transitioning .tt-star, html.color-transitioning .tt-cloud { transition: opacity 0.4s ease !important; }
-    html.color-transitioning .tt-thumb { transition: transform 0.44s cubic-bezier(0.34,1.56,0.64,1), background 0.5s ease !important; }
+    [data-theme="dark"] .op-card-img { background: #182130; }
+    [data-theme="dark"] .op-card-tag { background: #182130; color: #B4B4B4; }
+    [data-theme="dark"] .op-card-title { color: #EFF3F8; }
+    /* muted ink must clear AA on both the page ground and the lighter cards */
+    [data-theme="dark"] .op-card-desc { color: #A9B4C2; }
+    [data-theme="dark"] .hero-scrim {
+      background: linear-gradient(100deg,
+        rgba(10,14,21,0.88) 0%, rgba(10,14,21,0.68) 38%,
+        rgba(10,14,21,0.30) 64%, rgba(10,14,21,0.05) 88%);
+    }
+
+    /* ─── KEYBOARD FOCUS ─────────────────────────────────────── */
+    /* the custom cursor hides the pointer, so keyboard focus must be
+       unmistakable — --secondary is the page's light ink on the dark ground */
+    .nav-home:focus-visible, .nav-btn:focus-visible,
+    .nav-hamburger:focus-visible,
+    .mobile-menu a:focus-visible, .hero-pill:focus-visible,
+    .hero-link-plain:focus-visible, .citation-pill:focus-visible,
+    .team-linkedin:focus-visible {
+      outline: 2px solid var(--secondary); outline-offset: 3px;
+    }
+    .nav-btn:focus-visible,
+    .nav-hamburger:focus-visible { border-radius: 6px; }
+
+    /* ─── REDUCED MOTION ─────────────────────────────────────── */
+    /* Reveals land instantly on their end state ("both" keeps them visible);
+       looping ambience (star twinkle, cloud drift) runs once and stops. */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
@@ -1307,7 +1357,7 @@
 
   <!-- ── NAV ───────────────────────────────────────────────── -->
   <nav class="nav">
-    <a href="index.html" class="nav-home" onclick="sessionStorage.setItem('skipLoader','1')">
+    <a href="/" class="nav-home">
       <img src="cs-nav-logo.svg" alt="" />
       <span>Stressie</span>
     </a>
@@ -1322,22 +1372,7 @@
       <a href="#frustrations"   class="nav-btn"        data-section="frustrations">Frustrations</a>
       <a href="#current-work"   class="nav-btn"        data-section="current-work">Outcome</a>
     </div>
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-      <span class="tt-track">
-        <span class="tt-star tt-star-1"></span>
-        <span class="tt-star tt-star-2"></span>
-        <span class="tt-star tt-star-3"></span>
-        <span class="tt-star tt-star-4"></span>
-        <span class="tt-shoot"></span>
-        <span class="tt-cloud"></span>
-        <span class="tt-cloud-b"></span>
-        <span class="tt-cloud-c"></span>
-        <span class="tt-hill-back"></span>
-        <span class="tt-hill-front"></span>
-        <span class="tt-thumb"></span>
-      </span>
-    </button>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </nav>
@@ -1364,6 +1399,9 @@
       <section id="summary" data-has-content="true">
 
         <div class="cs-hero">
+
+          <img id="etBgImg" class="et-bg-img" alt="" />
+          <div class="hero-scrim" aria-hidden="true"></div>
 
           <!-- Pills + site link row -->
           <div class="hero-top-row" id="heroTopRow">
@@ -1414,7 +1452,7 @@
             <div class="hero-card-right">
               <p class="hero-card-pitch">
                 That's exactly the problem <span class="pitch-orange">Stressie</span> is
-                <strong>solving—helping organizations uncover real employee stressors and deliver personalized, actionable solutions</strong>
+                <strong>solving: helping organizations uncover real employee stressors and deliver personalized, actionable solutions</strong>
                 that foster healthier, more productive workplaces.
               </p>
 
@@ -1452,7 +1490,7 @@
             <div class="ov-left">
               <span class="ov-card-label">My Role</span>
               <p class="ov-card-body">
-                As the Founding Product Designer, I <strong>shaped Stressie from the ground up</strong>—
+                As the Founding Product Designer, I <strong>shaped Stressie from the ground up</strong>,
                 leading design strategy, defining the product vision, and translating research insights
                 into high-fidelity experiences ready for engineering handoff.
               </p>
@@ -1632,7 +1670,7 @@
 
               <div class="pf-card">
                 <span class="pf-card-title">Primary Uplifters</span>
-                <p class="pf-card-body">We analyzed the <strong>key uplifters that support officers'</strong> well-being and identified the most significant ones.</p>
+                <p class="pf-card-body">We analyzed the <strong>key uplifters that support officers'</strong> well-being and identified the most significant ones:</p>
                 <div class="pf-stat-row">
                   <div class="pf-stat-chip">
                     <div class="pf-arc-wrap">
@@ -1676,8 +1714,8 @@
                 <span class="pf-card-title">Users found these delightful</span>
                 <ul class="pf-bullets">
                   <li>After doing one exercise, most of the users <strong>felt calm and de-stressed</strong>.</li>
-                  <li>The <strong>AI feature</strong> where the model personalizes stress management strategy is loved.</li>
-                  <li>Most of the users loved <strong>less than a minute quick resets</strong>.</li>
+                  <li>Users loved the <strong>AI feature</strong> that personalizes their stress-management strategy.</li>
+                  <li>Most users loved the <strong>quick resets that take less than a minute</strong>.</li>
                 </ul>
                 <p class="pf-footnote">*Data collected through a feedback form</p>
               </div>
@@ -1730,11 +1768,11 @@
               <div class="st-card">
                 <span class="st-card-title">Key Decisions</span>
                 <ul class="pf-bullets">
-                  <li><strong>Committed to a full redesign, not patch fixes</strong> — color, hierarchy, and signifiers were inconsistent enough that surface-level changes wouldn't fix the "immature" feeling users reported.</li>
-                  <li><strong>Rebuilt around visual hierarchy and a calmer palette</strong> — replaced the cluttered, text-heavy layout with clearer IA and a warm, muted cream palette so the app itself felt less stressful to use.</li>
-                  <li><strong>Owned QA personally to kill the crashes</strong> — stress-tested and load-tested the app myself ahead of re-pilot, since reliability is non-negotiable for a tool people reach for under stress.</li>
-                  <li><strong>Shipped notifications as a new retention lever</strong> — introduced as a net-new feature (not a V1 carryover) specifically to bring users back, and got it working reliably this time.</li>
-                  <li><strong>Validated with a focus group before shipping</strong> — tested the redesign with a small group prior to re-pilot launch.</li>
+                  <li><strong>Committed to a full redesign, not patch fixes</strong>: color, hierarchy, and signifiers were inconsistent enough that surface-level changes wouldn't fix the "immature" feeling users reported.</li>
+                  <li><strong>Rebuilt around visual hierarchy and a calmer palette</strong>: replaced the cluttered, text-heavy layout with clearer IA and a warm, muted cream palette so the app itself felt less stressful to use.</li>
+                  <li><strong>Owned QA personally to kill the crashes</strong>: stress-tested and load-tested the app myself ahead of re-pilot, since reliability is non-negotiable for a tool people reach for under stress.</li>
+                  <li><strong>Shipped notifications as a new retention lever</strong>: introduced as a net-new feature (not a V1 carryover) specifically to bring users back, and got it working reliably this time.</li>
+                  <li><strong>Validated with a focus group before shipping</strong>: tested the redesign with a small group prior to re-pilot launch.</li>
                 </ul>
               </div><!-- /st-card -->
             </div><!-- /st-col left -->
@@ -1760,7 +1798,7 @@
                     <img class="principle-icon" src="Stressie%20Case%20Study%20Updated%20Materials/My%20Strategy/My%20Approach/Seamless%20and%20Stunning.png" alt="Seamless and Stunning" />
                     <div class="principle-body">
                       <span class="principle-title">Seamless and Stunning</span>
-                      <p class="principle-text"><strong>I aimed for more than usability</strong>—I wanted seamless interactions where every transition felt meaningful, creating a wow-worthy experience. To ensure this, I tested it with a small focus group.</p>
+                      <p class="principle-text"><strong>I aimed for more than usability</strong>. I wanted seamless interactions where every transition felt meaningful, creating a wow-worthy experience. To ensure this, I tested it with a small focus group.</p>
                     </div>
                   </div>
 
@@ -1789,7 +1827,7 @@
           <div class="ob-card">
             <span class="ob-label">Onboarding Experience 01</span>
             <p class="ob-desc">
-              We start by personalizing the experience—understanding what uplifts users to better identify their stressors.
+              We start by personalizing the experience, understanding what uplifts users to better identify their stressors.
               <strong>Each step adapts in real time, tailoring the next screen</strong>
               based on their input to keep them engaged and supported.
             </p>
@@ -1866,8 +1904,8 @@
             <span class="ob-label">Core Experience</span>
             <p class="ob-desc">
               Once onboarding is complete, users step into their personalized daily wellness hub.
-              <strong>The core experience delivers intelligent, real-time stress interventions</strong>—from
-              AI-guided coping strategies and quick micro-resets to daily mood check-ins—all
+              <strong>The core experience delivers intelligent, real-time stress interventions</strong>, from
+              AI-guided coping strategies and quick micro-resets to daily mood check-ins, all
               tailored to each user's unique stress landscape and continuously updated as they grow.
             </p>
             <div class="exp-phones-outer">
@@ -1918,22 +1956,22 @@
             <div class="pf-col">
               <div class="pf-card">
                 <span class="pf-card-title">Retention</span>
-                <p class="pf-card-body">Retention climbed from the <strong>~2% industry baseline</strong> for health &amp; wellness apps to <strong>17.4%</strong> after the redesign — driven by cleaner information architecture and a calmer visual language.</p>
+                <p class="pf-card-body">Retention climbed from the <strong>~2% industry baseline</strong> for health &amp; wellness apps to <strong>17.4%</strong> after the redesign, driven by cleaner information architecture and a calmer visual language.</p>
               </div>
               <div class="pf-card">
                 <span class="pf-card-title">Completion</span>
-                <p class="pf-card-body">Meaningfully <strong>more users completed the full stress-check journey</strong> end-to-end — from flagging they were stressed to reaching a resolution — once the IA overhaul removed friction from the flow.</p>
+                <p class="pf-card-body">Meaningfully <strong>more users completed the full stress-check journey</strong> end-to-end, from flagging they were stressed to reaching a resolution, once the IA overhaul removed friction from the flow.</p>
               </div>
             </div><!-- /pf-col left -->
 
             <div class="pf-col">
               <div class="pf-card">
                 <span class="pf-card-title">Reliability</span>
-                <p class="pf-card-body">I led stress- and load-testing ahead of re-pilot, and the <strong>crashes reported in V1 were no longer an issue</strong> — non-negotiable for a tool people reach for under stress.</p>
+                <p class="pf-card-body">I led stress- and load-testing ahead of re-pilot, and the <strong>crashes reported in V1 were no longer an issue</strong>, which is non-negotiable for a tool people reach for under stress.</p>
               </div>
               <div class="pf-card">
                 <span class="pf-card-title">What InKind Told Us</span>
-                <p class="pf-card-body">Per InKind's pilot feedback, staff <strong>reported earning more in tips</strong>, <strong>clocking in and out more consistently</strong>, and <strong>lower turnover</strong> — while managers gained visibility into team stress they could act on.</p>
+                <p class="pf-card-body">Per InKind's pilot feedback, staff <strong>reported higher tips</strong>, <strong>more consistent clock-ins</strong>, and <strong>lower turnover</strong>, while managers gained visibility into team stress they could act on.</p>
                 <p class="pf-footnote">*Self-reported via pilot feedback, not measured analytics</p>
               </div>
             </div><!-- /pf-col right -->
@@ -2020,7 +2058,7 @@
 
             <!-- Card 2 -->
             <div class="test-card">
-              <p class="test-quote">" The interventions are simple yet effective— <strong>I don't need anything extra</strong>, just my chair and a little space. "</p>
+              <p class="test-quote">" The interventions are simple yet effective. <strong>I don't need anything extra</strong>, just my chair and a little space. "</p>
               <span class="test-avatar test-avatar-initial">P5</span>
             </div>
 
@@ -2032,7 +2070,7 @@
 
             <!-- Card 4 (wider) -->
             <div class="test-card">
-              <p class="test-quote">" What surprised me most was how <strong>the app actually learns my patterns</strong> — it checks in at exactly the right moment and the advice never feels generic. "</p>
+              <p class="test-quote">" What surprised me most was how <strong>the app actually learns my patterns</strong>: it checks in at exactly the right moment and the advice never feels generic. "</p>
               <span class="test-avatar test-avatar-initial">P7</span>
             </div>
 
@@ -2087,52 +2125,6 @@
           </div>
         </div>
 
-      </section>
-
-      <!-- ── Other Projects ──────────────────────────────────────── -->
-      <section class="other-projects">
-        <p class="other-projects-label">Other Projects</p>
-        <div class="other-projects-grid">
-
-          <a class="op-card" href="./evertutor-live.html">
-            <div class="op-card-img op-card-img-live">
-              <img src="Student home page Updated.png" alt="EverTutor Live UI" />
-            </div>
-            <div class="op-card-body">
-              <div class="op-card-tags"><span class="op-card-tag">EverTutor</span><span class="op-card-tag">AI Tutor</span></div>
-              <p class="op-card-title">EverTutor Live</p>
-              <p class="op-card-desc">The real-time AI tutor experience that brought Bloom's 2 Sigma to life, scaling across 8+ schools and ~2,000 students.</p>
-              <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
-          </a>
-
-          <a class="op-card" href="./evertutor-studio.html">
-            <div class="op-card-img op-card-img-studio">
-              <video autoplay muted loop playsinline>
-                <source src="./et-studio-recording.mov" type="video/mp4" />
-              </video>
-            </div>
-            <div class="op-card-body">
-              <div class="op-card-tags"><span class="op-card-tag">EverTutor</span><span class="op-card-tag">Authoring</span></div>
-              <p class="op-card-title">EverTutor Studio</p>
-              <p class="op-card-desc">The teacher-facing authoring tool that reduced lesson creation from 100+ hours to ~4 hours without sacrificing quality.</p>
-              <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
-          </a>
-
-          <a class="op-card" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">
-            <div class="op-card-img">
-              <img src="dearly-full-visual.png" alt="Dearly — personal notes app" />
-            </div>
-            <div class="op-card-body">
-              <div class="op-card-tags"><span class="op-card-tag">Side Project</span><span class="op-card-tag">Consumer</span></div>
-              <p class="op-card-title">Dearly</p>
-              <p class="op-card-desc">A notes app designed to feel personal, shipped as an independent side project and live on Product Hunt.</p>
-              <span class="op-card-cta">Try it out <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </div>
-          </a>
-
-        </div>
       </section>
 
       <!-- ── Thank You bar ──────────────────────────────────── -->
@@ -2275,6 +2267,8 @@
     });
   }
 
+  document.getElementById('etBgImg').src = 'images/hero-bg-stressie.png';
+
   const csHeading     = document.getElementById('csHeading');
   const csSubtitle    = document.getElementById('csSubtitle');
   const heroTopRow    = document.getElementById('heroTopRow');
@@ -2301,6 +2295,7 @@
   function toggleMenu(force) {
     const open = force !== undefined ? force : !hamburger.classList.contains('open');
     hamburger.classList.toggle('open', open);
+    hamburger.setAttribute('aria-expanded', open);
     mobileMenu.classList.toggle('open', open);
     backdrop.classList.toggle('open', open);
   }
@@ -2322,6 +2317,7 @@
   ═══════════════════════════════════════════════════════════ */
   function easeOutExpo(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
   function smoothScrollTo(targetY, duration) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, targetY); return; }
     const startY = window.scrollY, dist = targetY - startY, start = performance.now();
     function step(now) {
       const t = Math.min((now - start) / duration, 1);
@@ -2332,7 +2328,9 @@
   }
 
   const nav = document.querySelector('.nav');
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
+  /* mobile-menu links already scroll via their own close-then-scroll handler
+     above — binding them here too fired two competing scroll animations */
+  document.querySelectorAll('a[href^="#"]:not(.mobile-menu a)').forEach(a => {
     a.addEventListener('click', e => {
       const target = document.querySelector(a.getAttribute('href'));
       if (!target) return;
@@ -2436,73 +2434,6 @@
   animGroups.forEach((_, parentEl) => elObs.observe(parentEl));
   </script>
 
-  <script>
-  /* ── Dark / Light mode toggle ──────────────────────────────── */
-  (function() {
-    var root = document.documentElement;
-    var btn  = document.getElementById('themeToggle');
-    var KEY  = 'portfolio-theme';
-
-    function animateToggleScene(toDark) {
-      var track     = document.querySelector('.tt-track');
-      var thumb     = document.querySelector('.tt-thumb');
-      var hillBack  = document.querySelector('.tt-hill-back');
-      var hillFront = document.querySelector('.tt-hill-front');
-      var stars     = document.querySelectorAll('.tt-star');
-      var cloud     = document.querySelector('.tt-cloud');
-      var cloudB    = document.querySelector('.tt-cloud-b');
-      var cloudC    = document.querySelector('.tt-cloud-c');
-      if (!track) return;
-      [track, thumb, hillBack, hillFront, cloud, cloudB, cloudC].forEach(function(el) {
-        if (el) el.getAnimations().forEach(function(a) { a.cancel(); });
-      });
-      stars.forEach(function(el) { el.getAnimations().forEach(function(a) { a.cancel(); }); });
-      var ease   = { easing: 'ease', fill: 'none' };
-      var spring = { easing: 'cubic-bezier(0.34,1.56,0.64,1)', fill: 'none' };
-      track.animate([{ background: toDark ? 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' : 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' }, { background: toDark ? 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' : 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      track.animate([{ borderColor: toDark ? 'rgba(255,255,255,0.40)' : 'rgba(255,255,255,0.10)' }, { borderColor: toDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.40)' }], { duration: 400, easing: ease.easing, fill: ease.fill });
-      thumb.animate([{ transform: toDark ? 'translateX(0) translateY(-50%)' : 'translateX(28px) translateY(-50%)' }, { transform: toDark ? 'translateX(28px) translateY(-50%)' : 'translateX(0) translateY(-50%)' }], { duration: 440, easing: spring.easing, fill: spring.fill });
-      thumb.animate([{ background: toDark ? 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' : '#EEF0F5' }, { background: toDark ? '#EEF0F5' : 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      hillBack.animate([{ background: toDark ? '#72B87A' : '#1D3D25' }, { background: toDark ? '#1D3D25' : '#72B87A' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      hillFront.animate([{ background: toDark ? '#5DA066' : '#152C1A' }, { background: toDark ? '#152C1A' : '#5DA066' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      stars.forEach(function(s) { s.animate([{ opacity: toDark ? 0 : 1 }, { opacity: toDark ? 1 : 0 }], { duration: 400, easing: ease.easing, fill: ease.fill }); });
-      cloud.animate([{ opacity: toDark ? 1 : 0 }, { opacity: toDark ? 0 : 1 }], { duration: 400, easing: ease.easing, fill: ease.fill });
-      if (cloudB) cloudB.animate([{ opacity: toDark ? 0.65 : 0 }, { opacity: toDark ? 0 : 0.65 }], { duration: 400, easing: ease.easing, fill: ease.fill });
-      if (cloudC) cloudC.animate([{ opacity: toDark ? 0.45 : 0 }, { opacity: toDark ? 0 : 0.45 }], { duration: 400, easing: ease.easing, fill: ease.fill });
-    }
-
-    function apply(theme, animate) {
-      if (animate) {
-        var toDark = theme === 'dark';
-        animateToggleScene(toDark);
-        root.classList.add('color-transitioning');
-        void root.offsetHeight;
-        root.setAttribute('data-theme', theme);
-        try { localStorage.setItem(KEY, theme); } catch(e) {}
-        setTimeout(function() { root.classList.remove('color-transitioning'); }, 600);
-      } else {
-        root.setAttribute('data-theme', theme);
-        try { localStorage.setItem(KEY, theme); } catch(e) {}
-      }
-    }
-
-    var saved = null;
-    try { saved = localStorage.getItem(KEY); } catch(e) {}
-    if (saved === 'dark' || saved === 'light') {
-      apply(saved, false);
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      apply('dark', false);
-    } else {
-      apply('light', false);
-    }
-
-    if (btn) {
-      btn.addEventListener('click', function() {
-        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
-      });
-    }
-  })();
-  </script>
 
 
 </body>

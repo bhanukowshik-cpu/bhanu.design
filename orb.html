@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Orb</title>
+<script>
+  /* ?rafshim — the local preview tab is backgrounded, which suspends
+     requestAnimationFrame and freezes WebGL. Pump queued callbacks via timers
+     so the orb renders for screenshotting. Off in a real browser. */
+  if (new URLSearchParams(location.search).has('rafshim')) (function () {
+    var queue = [];
+    window.requestAnimationFrame = function (cb) { queue.push(cb); return queue.length; };
+    window.cancelAnimationFrame = function () {};
+    function pump() {
+      var now = performance.now();
+      var cbs = queue; queue = [];
+      for (var i = 0; i < cbs.length; i++) { try { cbs[i](now); } catch (e) {} }
+    }
+    setInterval(pump, 33);
+    var ch = new MessageChannel();
+    ch.port1.onmessage = pump;
+    setInterval(function () { ch.port2.postMessage(0); }, 33);
+  })();
+</script>
+<style>
+  *{margin:0;box-sizing:border-box;}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(120% 90% at 50% 115%, #131a28 0%, #0c111b 48%, #080b11 100%);}
+  body.light{background:#ffffff;}
+  /* bg switcher — same pill language as the lab strip */
+  .bgbar{position:fixed;top:14px;left:14px;display:flex;gap:6px;align-items:center;z-index:10;
+    font:10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6f7386;
+    text-transform:uppercase;letter-spacing:.08em;}
+  .bgbar button{padding:5px 10px;border-radius:999px;cursor:pointer;
+    border:1px solid rgba(128,134,150,0.35);background:rgba(128,134,150,0.08);
+    color:#7c8194;font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;}
+  .bgbar button.active{background:rgba(155,92,255,0.35);color:#fff;
+    border-color:rgba(155,92,255,0.5);}
+</style>
+</head>
+<body>
+  <div class="bgbar">bg
+    <button id="bgDark" class="active">dark</button>
+    <button id="bgWhite">white</button>
+  </div>
+  <div id="orb"></div>
+
+  <script type="module" src="orb/bhanu-orb.js?v=9"></script>
+  <script>
+    /* The orb with its controls: four designed variations, plus the
+       state / palette / simulate strip. The slider panel is open by
+       default — ?clean hides it; ?size=N overrides the orb size. */
+    var VARIATIONS = [
+      { /* the shipped DEFAULT_PARAMS, untouched — what every live mount uses */
+        name: 'baseline', palette: 'arctic', params: {} },
+      { /* the baseline read, softened a touch — glassy and unhurried */
+        name: 'still water', palette: 'arctic',
+        params: { noiseAmplitude: 0.10, noiseSpeed: 0.18, maskSoftness: 0.18,
+                  saturation: 1.7, contrast: 0.24 } },
+      { /* slow churning lava — bigger, harder-edged, ember-lit */
+        name: 'molten core', palette: 'ember',
+        params: { fbmScale: 2.6, fbmPower: 2.2, fbmAmplitude: 0.22, fbmSpeed: 1.8,
+                  noiseScale: 0.62, noiseAmplitude: 0.24, fluidDisplacement: 0.6,
+                  fluidColorOpacity: 0.35, contrast: 0.45, saturation: 2.2,
+                  grainOpacity: 0.05, maskSoftness: 0.10 } },
+      { /* billowy violet gas — soft edge, fine grain, luminous streaks */
+        name: 'deep nebula', palette: 'nebula',
+        params: { fbmScale: 5.5, fbmPower: 3.6, fbmAmplitude: 0.30, fbmSpeed: 1.1,
+                  noiseAmplitude: 0.28, noiseSpeed: 0.5, fluidColorOpacity: 0.5,
+                  saturation: 2.4, maskRadius: 0.96, maskSoftness: 0.30,
+                  grainOpacity: 0.08, exposure: 0.75 } },
+      { /* a slow breathing organism — teal, soft currents, gentle */
+        name: 'aurora breath', palette: 'aurora',
+        params: { sphereScale: 1.08, spherePower: 0.5, fbmAmplitude: 0.04,
+                  fbmSpeed: 0.7, noiseAmplitude: 0.09, noiseSpeed: 0.08,
+                  fluidForce: 0.15, fluidDissipation: 0.93, fluidColorOpacity: 0.3,
+                  contrast: 0.20, saturation: 1.8, maskSoftness: 0.22 } },
+    ];
+    var q = new URLSearchParams(location.search);
+    (function ready() {
+      if (!(window.BhanuOrb && window.BhanuOrb.mountLab)) { setTimeout(ready, 40); return; }
+      window.BhanuOrb.mountLab(document.getElementById('orb'), {
+        size: Number(q.get('size')) || 360,
+        presets: VARIATIONS,
+        panel: !q.has('clean'),
+      });
+    })();
+
+    /* bg switcher — the canvas is transparent, so this shows how the orb's
+       own dark edge reads on light surfaces. ?bg=white starts light. */
+    var bgDark = document.getElementById('bgDark');
+    var bgWhite = document.getElementById('bgWhite');
+    function setBg(light) {
+      document.body.classList.toggle('light', light);
+      bgWhite.classList.toggle('active', light);
+      bgDark.classList.toggle('active', !light);
+    }
+    bgDark.addEventListener('click', function () { setBg(false); });
+    bgWhite.addEventListener('click', function () { setBg(true); });
+    if (q.get('bg') === 'white') setBg(true);
+  </script>
+</body>
+</html>

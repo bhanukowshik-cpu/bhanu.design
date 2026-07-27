@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Silhouette — background lab</title>
+<meta name="theme-color" content="#05080D" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700&display=swap" rel="stylesheet" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --bg:#05080D;
+    --ink:#EFF3F8;
+    --ink-2:#B9C4D1;
+    --ink-3:#7C8794;
+    --line:rgba(239,243,248,0.12);
+    --ember:#5CA9FF;
+    --serif:'Instrument Serif',Georgia,serif;
+    --sans:'Instrument Sans',system-ui,sans-serif;
+    --body:'Urbanist','Instrument Sans',system-ui,sans-serif;
+    --ease:cubic-bezier(0.16,1,0.3,1);
+
+    /* ── the tuned knobs. every control below writes one of these, so the
+         whole treatment is portable as a block of custom properties. ── */
+    --focal-x:72%;      /* which part of the frame survives the crop     */
+    --focal-y:50%;
+    --exposure:100%;
+    --saturate:100%;
+    --hue:0deg;
+    --scale:1;
+    --scrim:0.55;       /* left-to-right wash that buys the type legibility */
+    --vignette:0.5;
+    --grain:0.35;
+  }
+
+  html,body{height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--body);
+    overflow:hidden;-webkit-font-smoothing:antialiased;}
+
+  /* ═══ THE STAGE ═══════════════════════════════════════════════════════
+     Footage sits at the bottom of the stack. Everything above it is a
+     correction layer — scrim, vignette, grain — so the source file is
+     never re-encoded to change the look, only re-graded in CSS. */
+  .stage{position:fixed;inset:0;overflow:hidden;background:var(--bg);}
+
+  .plate{position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;object-position:var(--focal-x) var(--focal-y);
+    transform:scale(var(--scale));transform-origin:var(--focal-x) var(--focal-y);
+    filter:brightness(var(--exposure)) saturate(var(--saturate)) hue-rotate(var(--hue));
+    transition:filter .35s var(--ease), transform .5s var(--ease), object-position .5s var(--ease);}
+  .plate[hidden]{display:none;}
+
+  /* the scrim runs left-heavy: the composition's empty half is where the
+     type lives, so that is the half that gets darkened. */
+  .scrim{position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(100deg,
+      rgba(5,8,13,calc(var(--scrim) * 1.05)) 0%,
+      rgba(5,8,13,calc(var(--scrim) * 0.72)) 34%,
+      rgba(5,8,13,0) 68%);}
+
+  .vig{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(120% 92% at 62% 46%,
+      rgba(5,8,13,0) 42%, rgba(5,8,13,calc(var(--vignette) * .55)) 76%,
+      rgba(5,8,13,calc(var(--vignette) * .95)) 100%);}
+
+  /* grain as an SVG turbulence tile — no image request, and it survives
+     any scale because it is resolution-independent. */
+  .grain{position:absolute;inset:-120%;pointer-events:none;
+    opacity:var(--grain);mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation:grainshift 7s steps(6) infinite;}
+  @keyframes grainshift{
+    0%{transform:translate(0,0)}      16%{transform:translate(-4%,-3%)}
+    33%{transform:translate(3%,-5%)}  50%{transform:translate(-5%,4%)}
+    66%{transform:translate(5%,3%)}   83%{transform:translate(-3%,5%)}
+    100%{transform:translate(0,0)}}
+
+  /* ═══ THE TYPE TEST ═══════════════════════════════════════════════════
+     Not decoration — this is the whole reason the scrim exists. If the
+     headline is not comfortable here, the grade is wrong. */
+  /* ═══ THE NAV — hero-lab's, minus the scrolled state this page cannot
+     reach. Same type sizes, same hairline underline on hover. ═══ */
+  .top-nav{position:absolute;top:0;left:0;right:0;z-index:12;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px clamp(26px,5.4vw,92px);height:62px;}
+  .nav-brand{display:flex;align-items:center;min-height:40px;
+    text-decoration:none;color:var(--ink);}
+  .nav-name{font-family:var(--sans);font-size:17px;font-weight:550;
+    letter-spacing:-0.005em;white-space:nowrap;}
+  .nav-links{display:flex;align-items:center;gap:30px;}
+  .nav-links a{position:relative;font-family:var(--sans);font-size:13.5px;
+    font-weight:500;letter-spacing:.02em;color:var(--ink-2);
+    text-decoration:none;transition:color .25s var(--ease);}
+  .nav-links a::after{content:'';position:absolute;left:0;right:0;bottom:-5px;
+    height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;
+    opacity:.6;transition:transform .38s cubic-bezier(0.19,1,0.22,1);}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links a:hover::after{transform:scaleX(1);transform-origin:left;}
+
+  /* the column stops just past the halfway mark and the bottom strip is
+     reserved for the desk, so the test never claims space the controls need. */
+  /* Anchored bottom-left. Width in px, never ch — a ch here resolves against
+     this container's 16px body font, not the headline's, and silently
+     collapses the column. The width is what holds the headline to three
+     lines, so it is sized to the longest of them, not guessed. */
+  .copy{position:absolute;inset:62px 0 88px 0;display:flex;flex-direction:column;
+    justify-content:flex-end;padding:0 clamp(26px,5.4vw,92px);
+    max-width:min(1120px,76%);pointer-events:none;}
+  .copy[hidden]{display:none;}
+  .eyebrow{font-family:var(--sans);font-size:12px;font-weight:500;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3);
+    margin-bottom:20px;}
+  .copy h1{font-family:var(--sans);font-weight:500;
+    font-size:clamp(34px,4.1vw,62px);line-height:1.06;letter-spacing:-0.03em;
+    color:var(--ink);text-wrap:balance;}
+  .copy h1 em{font-family:var(--serif);font-style:italic;font-weight:400;
+    letter-spacing:-0.01em;}
+
+  /* ═══ THE CTA — the page's white pill. The orb here is the CSS fallback
+     gradient, not the WebGL mount: this lab has no bundle to mount. ═══ */
+  .cta-dock{margin-top:clamp(26px,2.4vw,40px);pointer-events:auto;}
+  .cta{display:flex;align-items:center;gap:clamp(13px,0.9vw,17px);
+    width:auto;max-width:92vw;
+    padding:clamp(9px,0.6vw,11px) clamp(24px,1.6vw,31px) clamp(9px,0.6vw,11px) clamp(9px,0.6vw,11px);
+    border-radius:clamp(18px,1.2vw,22px);cursor:pointer;border:none;
+    background:linear-gradient(135deg,#FFFFFF 0%,#F6F9FD 42%,#E7EEF8 100%);
+    color:#0B1220;font-family:var(--sans);
+    transition:transform .4s var(--ease),background .45s var(--ease);}
+  .cta:hover{transform:translateY(-2px);
+    background:linear-gradient(135deg,#FFFFFF 0%,#FBFDFF 46%,#EFF4FB 100%);}
+  .cta:focus-visible{outline:2px solid #A6CBFF;outline-offset:3px;}
+  .cta-orb{position:relative;width:clamp(55px,3.6vw,70px);height:clamp(55px,3.6vw,70px);
+    flex-shrink:0;line-height:0;}
+  .cta-orb::before{content:'';position:absolute;inset:4px;border-radius:50%;
+    background:radial-gradient(circle at 36% 30%, #D9F0FF, var(--ember) 46%, #17456F 80%, #081B2E);}
+  .cta-text{display:grid;overflow:hidden;flex:none;text-align:left;
+    transition:width .55s var(--ease);}
+  .cta-text span{grid-area:1/1;justify-self:start;width:max-content;white-space:nowrap;
+    font-size:clamp(15px,0.95vw,18px);font-weight:560;letter-spacing:-0.002em;color:#0B1220;
+    opacity:0;transform:translateY(11px);filter:blur(3px);
+    transition:opacity .6s var(--ease),transform .6s var(--ease),filter .6s var(--ease);}
+  .cta-text span.on{opacity:1;transform:translateY(0);filter:none;}
+  .cta-text span.out{opacity:0;transform:translateY(-11px);filter:blur(3px);}
+
+  /* ═══ THE DESK ════════════════════════════════════════════════════════
+     Docked along the bottom edge on purpose. The composition puts its
+     subject in the right third and its type in the left half — the only
+     region the controls can occupy without covering the thing being
+     judged is the strip underneath, which is empty dune. */
+  .desk{position:fixed;left:50%;bottom:16px;z-index:20;
+    width:min(1140px,calc(100% - 32px));
+    transform:translateX(-50%);
+    background:rgba(10,14,21,.82);backdrop-filter:blur(22px) saturate(150%);
+    -webkit-backdrop-filter:blur(22px) saturate(150%);
+    border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 30px 70px -30px rgba(0,0,0,.9);
+    font-family:var(--sans);overflow:hidden;
+    transition:transform .45s var(--ease);}
+  .desk.min{transform:translateX(-50%) translateY(calc(100% - 42px));}
+
+  .desk-top{display:flex;align-items:center;justify-content:space-between;
+    padding:11px 16px;border-bottom:1px solid var(--line);cursor:pointer;
+    user-select:none;}
+  .desk-top b{font-size:11.5px;font-weight:600;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--ink-2);}
+  .chev{width:14px;height:14px;color:var(--ink-3);transition:transform .45s var(--ease);}
+  .desk.min .chev{transform:rotate(180deg);}
+
+  .desk-body{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 18px;
+    padding:14px 16px 16px;}
+
+  .seg{display:flex;gap:5px;padding:4px;flex:0 0 auto;
+    background:rgba(255,255,255,.045);border-radius:10px;}
+  .seg button{flex:1;padding:7px 4px;font:inherit;font-size:11.5px;font-weight:500;
+    color:var(--ink-3);background:none;border:0;border-radius:7px;cursor:pointer;
+    transition:.22s var(--ease);}
+  .seg button[aria-pressed="true"]{background:rgba(92,169,255,.16);color:var(--ember);}
+
+  .row{flex:1 1 118px;min-width:100px;}
+  .row label{display:flex;justify-content:space-between;align-items:baseline;
+    font-size:11.5px;color:var(--ink-3);margin-bottom:7px;letter-spacing:.02em;}
+  .row label i{font-style:normal;color:var(--ink-2);font-variant-numeric:tabular-nums;}
+  input[type=range]{width:100%;height:3px;appearance:none;border-radius:3px;
+    background:rgba(255,255,255,.15);outline:none;cursor:pointer;}
+  input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;
+    border-radius:50%;background:var(--ember);cursor:pointer;
+    box-shadow:0 0 0 4px rgba(92,169,255,.16);}
+
+  .desk-foot{display:flex;gap:7px;flex:0 0 auto;margin-left:auto;}
+  .desk-foot button{padding:9px 14px;font:inherit;font-size:11.5px;font-weight:500;
+    border-radius:9px;border:1px solid var(--line);cursor:pointer;
+    background:rgba(255,255,255,.05);color:var(--ink-2);transition:.22s var(--ease);}
+  .desk-foot button:hover{background:rgba(255,255,255,.1);color:var(--ink);}
+  .desk-foot button.key{background:var(--ember);border-color:var(--ember);color:#05080D;font-weight:600;}
+
+  .note{flex:1 1 100%;font-size:10.5px;line-height:1.5;color:var(--ink-3);
+    font-family:var(--body);}
+  .note b{color:var(--ink-2);font-weight:600;}
+
+  #toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);
+    padding:10px 18px;border-radius:999px;background:rgba(10,14,21,.94);
+    border:1px solid var(--line);color:var(--ink);font-family:var(--sans);
+    font-size:12.5px;opacity:0;pointer-events:none;transition:.3s var(--ease);z-index:40;}
+  #toast.on{opacity:1;transform:translate(-50%,0);}
+
+  @media(max-width:720px){
+    .desk{left:14px;right:14px;width:auto;}
+    .copy{max-width:none;padding:0 26px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <video class="plate" id="plate" autoplay muted loop playsinline
+         poster="images/silhouette-poster.webp"></video>
+  <img class="plate" id="still" src="images/silhouette-poster.webp" alt="" hidden />
+  <div class="scrim"></div>
+  <div class="vig"></div>
+  <div class="grain"></div>
+
+  <nav class="top-nav" id="topNav">
+    <a class="nav-brand" href="#"><span class="nav-name">Bhanu Kowshik</span></a>
+    <div class="nav-links">
+      <a href="#">Work</a><a href="#">About</a><a href="#">Testimonials</a>
+      <a href="#">Résumé</a><a href="#">Contact</a>
+    </div>
+  </nav>
+
+  <div class="copy" id="copy">
+    <div class="eyebrow">Product Designer · Builder · Explorer</div>
+    <h1>Designing products that scale, convert &amp; connect through first principles and <em>obsessive detail to craft.</em></h1>
+    <div class="cta-dock">
+      <button class="cta" id="cta" type="button" aria-label="Chat with Bhanu AI">
+        <span class="cta-orb"></span>
+        <span class="cta-text" id="ctaText">
+          <span class="on">Ask me anything</span>
+          <span>Ask me about my work</span>
+          <span>Ask me about a project I'm proud of</span>
+          <span>Ask me why you should hire me</span>
+          <span>Ask me to schedule a meeting</span>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<aside class="desk min" id="desk">
+  <div class="desk-top" id="deskTop">
+    <b>Silhouette · grade</b>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+         stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+  <div class="desk-body">
+    <div class="seg" role="group" aria-label="Source">
+      <button id="srcVideo" aria-pressed="true">Video</button>
+      <button id="srcStill" aria-pressed="false">Poster</button>
+      <button id="tglCopy" aria-pressed="true">Type</button>
+    </div>
+
+    <div class="row"><label for="kSpeed">Speed <i id="vSpeed">0.50×</i></label>
+      <input type="range" id="kSpeed" min="15" max="100" value="50" /></div>
+    <div class="row"><label for="kFocal">Focal X <i id="vFocal">72%</i></label>
+      <input type="range" id="kFocal" min="0" max="100" value="72" /></div>
+    <div class="row"><label for="kScale">Scale <i id="vScale">1.00</i></label>
+      <input type="range" id="kScale" min="100" max="140" value="100" /></div>
+    <div class="row"><label for="kExp">Exposure <i id="vExp">100%</i></label>
+      <input type="range" id="kExp" min="40" max="150" value="100" /></div>
+    <div class="row"><label for="kSat">Saturation <i id="vSat">100%</i></label>
+      <input type="range" id="kSat" min="0" max="200" value="100" /></div>
+    <div class="row"><label for="kHue">Hue shift <i id="vHue">0°</i></label>
+      <input type="range" id="kHue" min="-40" max="40" value="0" /></div>
+    <div class="row"><label for="kScrim">Scrim <i id="vScrim">0.55</i></label>
+      <input type="range" id="kScrim" min="0" max="100" value="55" /></div>
+    <div class="row"><label for="kVig">Vignette <i id="vVig">0.50</i></label>
+      <input type="range" id="kVig" min="0" max="100" value="50" /></div>
+    <div class="row"><label for="kGrain">Grain <i id="vGrain">0.35</i></label>
+      <input type="range" id="kGrain" min="0" max="100" value="35" /></div>
+
+    <div class="desk-foot">
+      <button id="reset">Reset</button>
+      <button id="copyCss" class="key">Copy CSS</button>
+    </div>
+    <p class="note">Drop <b>images/silhouette.mp4</b> beside the poster and the plate goes live.
+      <b>Copy CSS</b> emits the tuned block, ready to paste into the hero.</p>
+  </div>
+</aside>
+
+<div id="toast">Copied</div>
+
+<script>
+/* Every knob writes one custom property on :root. Nothing here touches the
+   footage — the grade is entirely a CSS correction stack, so the same mp4
+   can be re-graded for a different section without a re-encode. */
+(function () {
+  var root = document.documentElement;
+  var DEFAULTS = { kSpeed:50, kFocal:72, kScale:100, kExp:100, kSat:100, kHue:0,
+                   kScrim:55, kVig:50, kGrain:35 };
+
+  var MAP = {
+    /* the one knob that is not a custom property — playback rate lives on
+       the element, so it carries a setter instead of a prop name. */
+    kSpeed: { out:'vSpeed', txt:function(v){return (v/100).toFixed(2)+'×';},
+              set:function(v){ document.getElementById('plate').playbackRate = v/100; } },
+    kFocal: { prop:'--focal-x', fmt:function(v){return v+'%';},        out:'vFocal', txt:function(v){return v+'%';} },
+    kScale: { prop:'--scale',   fmt:function(v){return (v/100).toFixed(2);}, out:'vScale', txt:function(v){return (v/100).toFixed(2);} },
+    kExp:   { prop:'--exposure',fmt:function(v){return v+'%';},        out:'vExp',   txt:function(v){return v+'%';} },
+    kSat:   { prop:'--saturate',fmt:function(v){return v+'%';},        out:'vSat',   txt:function(v){return v+'%';} },
+    kHue:   { prop:'--hue',     fmt:function(v){return v+'deg';},      out:'vHue',   txt:function(v){return v+'°';} },
+    kScrim: { prop:'--scrim',   fmt:function(v){return (v/100).toFixed(2);}, out:'vScrim', txt:function(v){return (v/100).toFixed(2);} },
+    kVig:   { prop:'--vignette',fmt:function(v){return (v/100).toFixed(2);}, out:'vVig',   txt:function(v){return (v/100).toFixed(2);} },
+    kGrain: { prop:'--grain',   fmt:function(v){return (v/100).toFixed(2);}, out:'vGrain', txt:function(v){return (v/100).toFixed(2);} }
+  };
+
+  function apply(id, v) {
+    var m = MAP[id];
+    if (m.prop) root.style.setProperty(m.prop, m.fmt(v));
+    else m.set(v);
+    document.getElementById(m.out).textContent = m.txt(v);
+  }
+  Object.keys(MAP).forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener('input', function () { apply(id, +el.value); });
+  });
+
+  document.getElementById('reset').addEventListener('click', function () {
+    Object.keys(DEFAULTS).forEach(function (id) {
+      document.getElementById(id).value = DEFAULTS[id];
+      apply(id, DEFAULTS[id]);
+    });
+  });
+
+  /* ── source + type toggles ── */
+  var plate = document.getElementById('plate'), still = document.getElementById('still');
+  var bV = document.getElementById('srcVideo'), bS = document.getElementById('srcStill');
+  function source(video) {
+    plate.hidden = !video; still.hidden = video;
+    bV.setAttribute('aria-pressed', String(video));
+    bS.setAttribute('aria-pressed', String(!video));
+    if (video) { var p = plate.play(); if (p && p.catch) p.catch(function(){}); }
+    else plate.pause();
+  }
+  bV.addEventListener('click', function () { source(true); });
+  bS.addEventListener('click', function () { source(false); });
+
+  var copy = document.getElementById('copy'), bC = document.getElementById('tglCopy');
+  bC.addEventListener('click', function () {
+    var on = copy.hasAttribute('hidden');
+    copy.toggleAttribute('hidden', !on);
+    bC.setAttribute('aria-pressed', String(on));
+  });
+
+  /* the mp4 may not be on disk yet — fall back to the poster rather than
+     showing a dead black rectangle, and say so once. */
+  plate.addEventListener('error', function () { source(false); }, true);
+  /* playbackRate is reset by the browser every time a source is attached,
+     so it is re-applied on metadata rather than set once up front. */
+  plate.addEventListener('loadedmetadata', function () {
+    plate.playbackRate = +document.getElementById('kSpeed').value / 100;
+  });
+  fetch('images/silhouette.mp4', { method:'HEAD' })
+    .then(function (r) { if (r.ok) plate.src = 'images/silhouette.mp4'; else source(false); })
+    .catch(function () { source(false); });
+
+  /* ── the CTA cycles its prompts, and the pill hugs each one ──
+     Width is measured off the laid-out span rather than guessed: every
+     prompt sits in the same grid cell at width:max-content, so it has a
+     real box even at opacity 0. Measured after fonts settle, because a
+     fallback-face measurement would size the pill to the wrong string. */
+  (function () {
+    var wrap = document.getElementById('ctaText');
+    var spans = [].slice.call(wrap.children);
+    if (spans.length < 2) return;
+    var i = 0;
+    function fit(el) { wrap.style.width = el.getBoundingClientRect().width + 'px'; }
+    function settle() { fit(spans[i]); }
+
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
+      .then(settle);
+    addEventListener('resize', settle);
+
+    setInterval(function () {
+      var cur = spans[i];
+      cur.classList.remove('on'); cur.classList.add('out');
+      i = (i + 1) % spans.length;
+      var nxt = spans[i];
+      nxt.classList.remove('out');
+      fit(nxt);
+      /* a timeout, not rAF: rAF is suspended while the tab is hidden, which
+         would strand the incoming prompt at opacity 0 until you looked back. */
+      setTimeout(function () { nxt.classList.add('on'); }, 20);
+      setTimeout(function () { cur.classList.remove('out'); }, 700);
+    }, 3800);
+  })();
+
+  /* ── the desk folds away ── */
+  var desk = document.getElementById('desk');
+  document.getElementById('deskTop').addEventListener('click', function () {
+    desk.classList.toggle('min');
+  });
+
+  /* ── emit the grade ── */
+  var toast = document.getElementById('toast');
+  function say(msg) {
+    toast.textContent = msg; toast.classList.add('on');
+    setTimeout(function () { toast.classList.remove('on'); }, 1600);
+  }
+  document.getElementById('copyCss').addEventListener('click', function () {
+    var lines = Object.keys(MAP).filter(function (id) { return MAP[id].prop; })
+      .map(function (id) {
+        var m = MAP[id];
+        return '  ' + m.prop + ':' + m.fmt(+document.getElementById(id).value) + ';';
+      });
+    /* speed is not CSS — it rides along as the one line you have to wire up. */
+    var rate = (+document.getElementById('kSpeed').value / 100).toFixed(2);
+    var css = ':root{\n' + lines.join('\n') + '\n}\n'
+            + '/* video.playbackRate = ' + rate + ' */';
+    navigator.clipboard.writeText(css)
+      .then(function () { say('Grade copied'); })
+      .catch(function () { say('Clipboard blocked'); });
+  });
+})();
+</script>
+</body>
+</html>

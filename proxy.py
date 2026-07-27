@@ -10,8 +10,26 @@ Then open http://localhost:8080/chat-test.html
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
+import os
 import urllib.request
 import urllib.error
+
+
+def load_env_key(name):
+    """Key from the environment, else from a repo-root .env line (NAME=value)."""
+    val = os.environ.get(name, "")
+    if val:
+        return val
+    try:
+        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith(name + "="):
+                    return line.split("=", 1)[1].strip().strip('"').strip("'")
+    except OSError:
+        pass
+    return ""
 
 
 class ProxyHandler(BaseHTTPRequestHandler):
@@ -34,9 +52,52 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.handle_chat()
         elif self.path == "/api/transcribe":
             self.handle_transcribe()
+        elif self.path == "/api/schedule":
+            self.handle_schedule()
         else:
             self.send_response(404)
             self.end_headers()
+
+    # ── meeting requests: capture the lead ─────────────────────────────────────
+
+    def handle_schedule(self):
+        """Append a meeting request to leads.jsonl next to this file.
+
+        Deliberately dumb and dependency-free: a real calendar integration can
+        replace the body later, but until then the address must never be lost
+        — the panel tells the visitor Bhanu will be in touch, so something has
+        to actually hold the address."""
+        length = int(self.headers.get("Content-Length", 0))
+        try:
+            body = json.loads(self.rfile.read(length)) if length else {}
+        except ValueError:
+            body = {}
+        email = (body.get("email") or "").strip()
+        if "@" not in email or "." not in email.split("@")[-1]:
+            self.send_response(400)
+            self.send_cors()
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": "Invalid email"}).encode())
+            return
+
+        import datetime
+        row = {
+            "email": email,
+            "at": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
+            "source": body.get("source") or "voice-panel",
+            "ua": self.headers.get("User-Agent", "")[:200],
+        }
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "leads.jsonl")
+        with open(path, "a") as f:
+            f.write(json.dumps(row) + "\n")
+        print("\n  ★ MEETING REQUEST — %s  (%s)\n" % (email, row["at"]), flush=True)
+
+        self.send_response(200)
+        self.send_cors()
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps({"ok": True}).encode())
 
     # ── Anthropic chat (streaming) ─────────────────────────────────────────────
 
@@ -44,7 +105,17 @@ class ProxyHandler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length))
 
-        api_key = body.pop("apiKey", "")
+        # key lives server-side (env or .env); the page never sends one.
+        # body.apiKey kept for chat-test.html back-compat.
+        api_key = body.pop("apiKey", "") or load_env_key("ANTHROPIC_API_KEY")
+        if not api_key:
+            msg = json.dumps({"error": "No ANTHROPIC_API_KEY — add it to .env next to proxy.py and restart."}).encode()
+            self.send_response(500)
+            self.send_header("Content-Type", "application/json")
+            self.send_cors()
+            self.end_headers()
+            self.wfile.write(msg)
+            return
         payload = json.dumps(body).encode()
 
         req = urllib.request.Request(

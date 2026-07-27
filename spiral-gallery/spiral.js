@@ -19,18 +19,18 @@
 
     // ── Cards ─────────────────────────────────────────────────────────────
     var CARDS = [
-      { label: 'EverTutor',    img: '/images/blob.png',              video: null                       },
-      { label: 'ET Live',      img: '/images/card-et-live.png',      video: '/images/et-live.mp4'      },
-      { label: 'ET Studio',    img: '/images/card-et-studio.png',    video: '/images/et-studio.mp4'    },
-      { label: 'ET Analytics', img: '/images/card-et-analytics.png', video: '/images/et-analytics.mp4' },
-      { label: 'Stressie',     img: '/images/card-stressie.png',     video: '/images/stressie.mp4', portrait: true },
-      { label: 'Dearly',       img: '/images/card-dearly.png',       video: '/images/dearly.mp4'       },
+      { label: 'EverTutor',    img: 'images/blob.png',              video: null                       },
+      { label: 'ET Live',      img: 'images/card-et-live.png',      video: 'images/et-live.mp4'      },
+      { label: 'ET Studio',    img: 'images/card-et-studio.png',    video: 'images/et-studio.mp4'    },
+      { label: 'ET Analytics', img: 'images/card-et-analytics.png', video: 'images/et-analytics.mp4' },
+      { label: 'Stressie',     img: 'images/card-stressie.png',     video: 'images/stressie.mp4', portrait: true },
+      { label: 'Dearly',       img: 'images/card-dearly.png',       video: 'images/dearly.mp4'       },
+      { label: 'The Engine',   img: 'images/card-engine.png',       video: null                       },
     ];
-    // 3 copies instead of 2 — fills more of the frame and pushes the modulo
-    // wrap-around point (where a mesh's position resets) much farther from
-    // the visible front region, so the reset happens somewhere already faded
-    // out rather than in view.
-    var LOOP_COPIES = 3;
+    // One pass, not a loop. This used to run three concatenated copies so the
+    // modulo wrap happened off-screen; there is no wrap to hide now — seven
+    // projects with a first and a last, and the scroll stops at both.
+    var LOOP_COPIES = 1;
     var allCards = [];
     for (var lc = 0; lc < LOOP_COPIES; lc++) allCards = allCards.concat(CARDS);
 
@@ -38,7 +38,7 @@
     // exposed by the inline script in index.html) so title/desc/metrics/href have a
     // single source of truth shared with the spiral. Media (img/video) still comes
     // from CARDS above — both arrays share the same 6-item order.
-    var POSTERS = [null, '/images/et-live.png', '/images/et-studio.png', '/images/et-analytics.png', null, '/images/dearly.png'];
+    var POSTERS = [null, 'images/et-live.png', 'images/et-studio.png', 'images/et-analytics.png', null, 'images/dearly.png', null];
     var S2_SOURCE = window.S2_PROJECT_DATA || [];
     var GRID_CARDS = CARDS.map(function (c, i) {
       var d = S2_SOURCE[i] || {};
@@ -65,17 +65,32 @@ varying vec3 vWorldPosition;
 
 uniform float uScrollSpeed;
 uniform float uVideoReveal;
+uniform float uBend;
 
 void main() {
   vec3 worldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
   vec3 newPosition   = position;
 
-  newPosition.z = sin(uv.x * PI) * 0.04;
+  /* Two standing deformations — a horizontal bow (sin(uv.x)*0.04 on z) and
+     a view-space shear that grows with height — give the resting cards
+     their wrapped, sculptural read. uBend gates both per card: 0 on the
+     active (front) card so it sits flat and crisp, ramping to 1 over one
+     slot of travel as a card leaves the front. The ticker drives it from
+     distFromFront. The scroll-speed bend below stays unconditional and
+     decays to zero the moment the reel rests. */
+  newPosition.z = sin(uv.x * PI) * 0.04 * uBend;
 
   vec4 modelPosition = modelMatrix * vec4(newPosition, 1.0);
   vec4 viewPosition  = viewMatrix  * modelPosition;
 
-  viewPosition.x += pow(worldPosition.y, 2.0) * 0.1;
+  /* The shear is centre-relative: pow(vertex.y) minus pow(centre.y) keeps
+     the skew shape (top edge leads, more so the higher the card rides)
+     while the card's centre stays planted on its helix lane. The absolute
+     form — pow(worldPosition.y,2)*0.1 alone — displaced whole cards
+     sideways, quadratically more with height, and the top cards slid into
+     each other. */
+  vec3 centerWorld = (modelMatrix * vec4(vec3(0.0), 1.0)).xyz;
+  viewPosition.x += (pow(worldPosition.y, 2.0) - pow(centerWorld.y, 2.0)) * 0.1 * uBend;
   viewPosition.x += sin(uv.y * PI) * uScrollSpeed * 2.0;
 
   gl_Position = projectionMatrix * viewPosition;
@@ -223,11 +238,12 @@ void main() {
     var BASE_RADIUS  = 2 * CARD_SCALE;
     var totalCount   = allCards.length;
     var centerIndex  = Math.floor(totalCount / 2);
-    // B's two wrap edges (where a mesh's position resets as scrollOffset
-    // advances) — used below to fade cards out before they reach either edge.
-    var B_MIN        = -centerIndex;
-    var B_MAX        = totalCount - 1 - centerIndex;
-    var EDGE_FADE_MARGIN = 2.5;
+    // There is no wrap any more — B runs linearly across a finite tail, so the
+    // old B_MIN/B_MAX edges are meaningless here. What the fade is for now is
+    // simply the far ends of that tail: full opacity within FADE_FULL slots of
+    // the front, gone by FADE_OUT.
+    var FADE_FULL = 4.0;
+    var FADE_OUT  = 6.0;
 
     var uniforms       = [];
     var hiddenProgress = [];
@@ -252,6 +268,7 @@ void main() {
         uRevealProgress: { value: 0 },
         uVideoReveal:    { value: 0 },
         uScrollSpeed:    { value: 0 },
+        uBend:           { value: 1 },
         uFogOpacity:      { value: 1 },
         uAuroraStrength:  { value: 0 },
         uTime:            { value: 0 },
@@ -312,8 +329,10 @@ void main() {
             uniforms[idx].uImageSizes.value.set(w, h);
           });
         });
-      } else {
-        // EverTutor (no video): animated canvas — white bg + blob-light + waveform
+      } else if (ci === 0) {
+        // EverTutor only: animated canvas — blob + waveform, drawn per frame.
+        // This branch used to catch every card without a video, which meant
+        // The Engine was handed the blob canvas and its own art never loaded.
         videoEls.push(null);
 
         blobAnimCanvas        = document.createElement('canvas');
@@ -322,7 +341,7 @@ void main() {
         blobAnimCtx           = blobAnimCanvas.getContext('2d');
 
         blobAnimImg     = new Image();
-        blobAnimImg.src = '/images/blob-dark.png';
+        blobAnimImg.src = 'images/blob-dark.png';
 
         blobAnimTex           = new THREE.CanvasTexture(blobAnimCanvas);
         blobAnimTex.minFilter = THREE.LinearFilter;
@@ -331,6 +350,20 @@ void main() {
           uniforms[idx].uTexture.value = blobAnimTex;
           uniforms[idx].uImageSizes.value.set(800, 450);
         });
+      } else {
+        // No video, not the blob — just its own still, the way a card with a
+        // video shows its thumbnail.
+        videoEls.push(null);
+        loader.load(card.img, function (tex) {
+          tex.minFilter = THREE.LinearFilter;
+          tex.magFilter = THREE.LinearFilter;
+          var w = (tex.image && (tex.image.naturalWidth  || tex.image.width))  || 1280;
+          var h = (tex.image && (tex.image.naturalHeight || tex.image.height)) || 720;
+          copyIdxs.forEach(function (idx) {
+            uniforms[idx].uTexture.value = tex;
+            uniforms[idx].uImageSizes.value.set(w, h);
+          });
+        });
       }
     });
 
@@ -338,15 +371,25 @@ void main() {
     var wheelDeltaY       = 0;
     var targetWheelDeltaY = 0;
     var wheelDirection    = 1;
-    var scrollOffset      = totalCount - (centerIndex + 2);  // positions EverTutor (index 0) at the visually-forward B=2 slot
+    // The travel is bounded: SCROLL_MIN puts the first project at the front
+    // slot (B=2), SCROLL_MAX puts the last one there. Nothing past either end.
+    var SCROLL_MIN        = -(centerIndex + 2);
+    var SCROLL_MAX        = totalCount - 1 - centerIndex - 2;
+    var scrollOffset      = SCROLL_MIN;
+    function clampScroll() {
+      if (scrollOffset < SCROLL_MIN) { scrollOffset = SCROLL_MIN; wheelDeltaY = 0; targetWheelDeltaY = 0; }
+      if (scrollOffset > SCROLL_MAX) { scrollOffset = SCROLL_MAX; wheelDeltaY = 0; targetWheelDeltaY = 0; }
+    }
     var entryTriggered    = false;
-    var ENTRY_SPEED       = 0.6;     // initial spin speed on section enter (one full card cycle)
-    var SLOW_DRIFT        = 0.00025; // gentle continuous forward drift after entry settles — halved again, still felt too fast
 
     // Only the center 60% of the section's width drives the helix — the
     // outer 20% on each side lets the wheel event pass through untouched so
     // the page scrolls normally (e.g. on to the next section).
     el.addEventListener('wheel', function (e) {
+      /* When the host pins the section and feeds progress in, it owns the
+         travel — and the wheel must NOT preventDefault, or the pin can never
+         advance and the page locks up inside the section. */
+      if (el.hasAttribute('data-driven')) return;
       var rect       = el.getBoundingClientRect();
       var xRatio     = (e.clientX - rect.left) / rect.width;
       var inHelixZone = xRatio >= 0.2 && xRatio <= 0.8;
@@ -376,282 +419,130 @@ void main() {
       mouse.set(-9999, -9999);
     });
 
-    // ── Nav buttons ───────────────────────────────────────────────────────
-    // ── Grid overlay — single row, horizontal scroll, full-bleed media ───
+    // ── List overlay — editorial title list ───────────────────────────
     var listOverlay = document.createElement('div');
-    listOverlay.style.cssText = 'position:absolute;inset:0;z-index:15;overflow:hidden;padding:104px 0 0 80px;box-sizing:border-box;display:none;opacity:0;transition:opacity 0.3s;';
+    listOverlay.style.cssText = 'position:absolute;inset:0;z-index:15;display:none;opacity:0;transition:opacity 0.3s;flex-direction:column;overflow:hidden;';
 
-    var lvTrack = document.createElement('div');
-    lvTrack.className = 's2-grid-track';
-    lvTrack.style.cssText = 'display:flex;align-items:center;gap:24px;height:100%;padding:0 0 32px;box-sizing:border-box;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;cursor:grab;';
-
-    // Hide the native scrollbar + define the swipe-hint animation (can't
-    // reach index.html's <style> block from here, so inject a small one).
     var gridStyleTag = document.createElement('style');
     gridStyleTag.textContent =
-      '.s2-grid-track::-webkit-scrollbar{display:none}' +
-      '@keyframes s2SwipeHint{0%,100%{transform:translateY(-50%) translateX(0);opacity:.9}50%{transform:translateY(-50%) translateX(-10px);opacity:.4}}' +
-      '@keyframes s2ScrollArrow{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(7px);opacity:0.45}}';
+      '.s2-list-wrap{display:flex;flex-direction:column;justify-content:center;}' +
+      '.s2-list-row{display:flex;align-items:baseline;gap:20px;cursor:pointer;padding:10px 0;transition:color 0.28s;}' +
+      '.s2-list-row-title{font-family:"Montserrat",sans-serif;font-weight:800;letter-spacing:-0.03em;line-height:1.1;color:rgba(255,255,255,0.55);transition:color 0.28s,transform 0.32s cubic-bezier(0.16,1,0.3,1);}' +
+      '.s2-list-row-num{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:500;color:rgba(255,255,255,0.18);letter-spacing:0.08em;transition:color 0.28s;flex-shrink:0;align-self:center;}' +
+      '.s2-list-row-arrow{font-family:"JetBrains Mono",monospace;font-size:14px;color:rgba(255,255,255,0);transition:color 0.28s,transform 0.28s;flex-shrink:0;align-self:center;}' +
+      '.s2-list-wrap:hover .s2-list-row-title{color:rgba(255,255,255,0.13);}' +
+      '.s2-list-wrap:hover .s2-list-row-num{color:rgba(255,255,255,0.07);}' +
+      '.s2-list-row:hover .s2-list-row-title{color:#fff !important;transform:translateX(6px);}' +
+      '.s2-list-row:hover .s2-list-row-num{color:rgba(255,255,255,0.3) !important;}' +
+      '.s2-list-row:hover .s2-list-row-arrow{color:rgba(255,255,255,0.5);transform:translateX(4px);}';
     document.head.appendChild(gridStyleTag);
 
-    // Live blob canvas for grid card 01 (driven in the GSAP ticker)
     var listBlobCanvas = null, listBlobCtx = null;
-    var gridCardEls    = [];
-    var swipeHintEl    = null;
+    var gridCardEls    = []; // compat
+    var gridCurrentIdx = 0;
+    var gridVisible    = false;
+    var gridPrevBtn    = null;
+    var gridNextBtn    = null;
+    var gridNavPrev    = null;
+    var gridNavNext    = null;
+
+    // ── Shared builder (kept for compat) ──────────────────────────────
+    function buildIconRow(iconTags) {
+      var iconMap = window.S2_ICON_MAP || {};
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
+      iconTags.forEach(function (it) {
+        var icons = iconMap[it.icon] || {};
+        var pill = document.createElement('div');
+        pill.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:999px;padding:4px 11px 4px 8px;';
+        var img = document.createElement('img');
+        img.src = icons.dark || '';
+        img.style.cssText = 'width:13px;height:13px;object-fit:contain;flex-shrink:0;';
+        var lbl = document.createElement('span');
+        lbl.textContent = it.label;
+        lbl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:12.5px;font-weight:500;color:rgba(255,255,255,0.72);white-space:nowrap;';
+        pill.appendChild(img); pill.appendChild(lbl); row.appendChild(pill);
+      });
+      return row;
+    }
+
+    // ── Floating video preview (top-right, follows hovered row) ───────
+    var previewBox = document.createElement('div');
+    previewBox.style.cssText = 'position:absolute;right:72px;width:300px;border-radius:18px;overflow:hidden;opacity:0;transition:opacity 0.25s,transform 0.3s cubic-bezier(0.16,1,0.3,1);transform:translateY(12px) scale(0.95);pointer-events:none;box-shadow:0 40px 100px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.08);z-index:20;aspect-ratio:16/9;';
+    var previewBg = document.createElement('div');
+    previewBg.style.cssText = 'position:absolute;inset:0;background-size:cover;background-position:center;';
+    var previewVid = document.createElement('video');
+    previewVid.autoplay = true; previewVid.muted = true; previewVid.loop = true; previewVid.playsInline = true;
+    previewVid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;';
+    previewBox.appendChild(previewBg);
+    previewBox.appendChild(previewVid);
+    listOverlay.appendChild(previewBox);
+
+    // ── Header label ──────────────────────────────────────────────────
+    var listHeader = document.createElement('div');
+    listHeader.style.cssText = 'flex-shrink:0;padding:40px 10vw 0;display:flex;align-items:center;justify-content:space-between;';
+    var listLabel = document.createElement('span');
+    listLabel.textContent = 'FEATURED WORK';
+    listLabel.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.22);letter-spacing:0.22em;';
+    var listCountEl = document.createElement('span');
+    listCountEl.textContent = GRID_CARDS.length + ' PROJECTS';
+    listCountEl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,0.13);letter-spacing:0.14em;';
+    listHeader.appendChild(listLabel);
+    listHeader.appendChild(listCountEl);
+    listOverlay.appendChild(listHeader);
+
+    // ── Rows ──────────────────────────────────────────────────────────
+    var rowsContainer = document.createElement('div');
+    rowsContainer.className = 's2-list-wrap';
+    rowsContainer.style.cssText += ';flex:1;padding:0 10vw;';
+
+    function runCountAnimations() {} // no-op (no per-row metrics in this design)
 
     GRID_CARDS.forEach(function (card, ci) {
-      var cardEl = document.createElement('div');
-      cardEl.className = 's2-grid-card';
+      var row = document.createElement('div');
+      row.className = 's2-list-row';
 
-      if (ci === 0) {
-        // ── Hero slot: transparent, blob canvas + content, no media frame ─
-        cardEl.style.cssText = 'position:relative;flex:0 0 auto;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:transparent;cursor:default;scroll-snap-align:start;';
+      var numEl = document.createElement('span');
+      numEl.className = 's2-list-row-num';
+      numEl.textContent = (ci < 9 ? '0' : '') + (ci + 1);
+      row.appendChild(numEl);
 
-        // Blob canvas fills top ~52% of the card
-        var blobArea = document.createElement('div');
-        blobArea.style.cssText = 'flex:0 0 45%;position:relative;display:flex;align-items:center;justify-content:center;';
-        var lc = document.createElement('canvas');
-        lc.width = 800; lc.height = 450;
-        lc.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;';
-        blobArea.appendChild(lc);
-        cardEl.appendChild(blobArea);
-        listBlobCanvas = lc;
-        listBlobCtx    = lc.getContext('2d');
+      var titleEl = document.createElement('span');
+      titleEl.className = 's2-list-row-title';
+      titleEl.style.fontSize = 'clamp(28px,3.8vw,58px)';
+      titleEl.textContent = card.title.replace(/^\d+([.)]\d*)*\s*/, ''); // strips "1). " and "1.1 " style prefixes
+      row.appendChild(titleEl);
 
-        // Info section
-        var info = document.createElement('div');
-        info.style.cssText = 'flex:1;min-height:0;display:flex;flex-direction:column;padding:14px 20px 16px;gap:8px;';
+      var arrowEl = document.createElement('span');
+      arrowEl.className = 's2-list-row-arrow';
+      arrowEl.textContent = '→';
+      row.appendChild(arrowEl);
 
-        var name = document.createElement('h3');
-        name.textContent = card.title;
-        name.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:20px;font-weight:700;color:#fff;margin:0;line-height:1.25;letter-spacing:-0.3px;';
+      // Hover: show video preview centered on row
+      row.addEventListener('mouseenter', function () {
+        if (card.video) { previewVid.src = card.video; previewVid.play().catch(function(){}); }
+        if (card.img) previewBg.style.backgroundImage = 'url(' + card.img + ')';
+        else previewBg.style.backgroundImage = 'none';
+        var rowRect = row.getBoundingClientRect();
+        var overlayRect = listOverlay.getBoundingClientRect();
+        var topPos = rowRect.top - overlayRect.top + rowRect.height / 2 - 84;
+        previewBox.style.top = Math.max(20, Math.min(overlayRect.height - 200, topPos)) + 'px';
+        previewBox.style.opacity = '1';
+        previewBox.style.transform = 'translateY(0) scale(1)';
+      });
+      row.addEventListener('mouseleave', function () {
+        previewBox.style.opacity = '0';
+        previewBox.style.transform = 'translateY(12px) scale(0.95)';
+      });
+      row.addEventListener('click', function () {
+        if (card.href && card.href !== '#') window.location.href = card.href;
+      });
 
-        var descEl = document.createElement('p');
-        descEl.textContent = card.desc;
-        descEl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:14px;line-height:1.6;color:rgba(255,255,255,0.58);margin:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
-
-        info.appendChild(name);
-        info.appendChild(descEl);
-
-        // Icon meta-tags
-        if (card.iconTags && card.iconTags.length) {
-          var iconMap0 = window.S2_ICON_MAP || {};
-          var iconRow0 = document.createElement('div');
-          iconRow0.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
-          card.iconTags.forEach(function (it) {
-            var icons = iconMap0[it.icon] || {};
-            var tagEl = document.createElement('div');
-            tagEl.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:4px 10px 4px 7px;';
-            var ic = document.createElement('img');
-            ic.src = icons.dark || '';
-            ic.style.cssText = 'width:13px;height:13px;object-fit:contain;flex-shrink:0;';
-            var itLbl = document.createElement('span');
-            itLbl.textContent = it.label;
-            itLbl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:500;color:rgba(255,255,255,0.8);white-space:nowrap;';
-            tagEl.appendChild(ic); tagEl.appendChild(itLbl); iconRow0.appendChild(tagEl);
-          });
-          info.appendChild(iconRow0);
-        }
-
-        // Metrics grid
-        var heroMetCols = 2;
-        var heroChips = document.createElement('div');
-        heroChips.style.cssText = 'display:grid;grid-template-columns:repeat(' + heroMetCols + ',1fr);gap:8px;';
-        card.metrics.forEach(function (m) {
-          var cell = document.createElement('div');
-          cell.style.cssText = 'min-width:0;';
-          var val = document.createElement('span');
-          val.textContent = m.val;
-          val.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:clamp(16px,1.4vw,22px);font-weight:700;color:#E6F28D;display:block;letter-spacing:-0.3px;line-height:1.1;';
-          var mLbl = document.createElement('span');
-          mLbl.textContent = m.lbl;
-          mLbl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-top:3px;line-height:1.3;';
-          cell.appendChild(val); cell.appendChild(mLbl); heroChips.appendChild(cell);
-        });
-        info.appendChild(heroChips);
-
-        // Animated scroll-right hint
-        var scrollHint = document.createElement('div');
-        scrollHint.style.cssText = 'margin-top:auto;padding-top:14px;display:flex;align-items:center;transition:opacity 0.4s;';
-        var scrollArr = document.createElement('div');
-        scrollArr.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.55);animation:s2ScrollArrow 1.4s ease-in-out infinite;flex-shrink:0;';
-        scrollArr.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-        scrollHint.appendChild(scrollArr);
-        info.appendChild(scrollHint);
-        swipeHintEl = scrollHint;
-
-        cardEl.appendChild(info);
-
-      } else {
-        // ── Standard card: dark bg, 16:9 media, info ─────────────────────
-        cardEl.style.cssText = 'position:relative;flex:0 0 auto;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:#14161a;cursor:pointer;scroll-snap-align:start;';
-
-        var videoRow = document.createElement('div');
-        var bgImg = card.img ? 'url(' + card.img + ')' : 'none';
-        videoRow.style.cssText = 'position:relative;flex:0 0 58%;overflow:hidden;background-color:#060606;background-image:' + bgImg + ';background-size:cover;background-position:center;margin:10px 10px 0;border-radius:14px;';
-
-        var mediaWrap = document.createElement('div');
-        mediaWrap.style.cssText = 'position:absolute;inset:0;padding:15px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;';
-
-        if (card.video) {
-          var vid = document.createElement('video');
-          vid.src = card.video;
-          if (card.poster) vid.poster = card.poster;
-          vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true;
-          vid.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;';
-          mediaWrap.appendChild(vid);
-        }
-        videoRow.appendChild(mediaWrap);
-        cardEl.appendChild(videoRow);
-
-        // Info section
-        var info = document.createElement('div');
-        info.style.cssText = 'flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-between;padding:20px 22px;gap:12px;';
-
-        var name = document.createElement('h3');
-        name.textContent = card.title;
-        name.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:20px;font-weight:700;color:#fff;margin:0;line-height:1.25;letter-spacing:-0.3px;';
-
-        var descEl = document.createElement('p');
-        descEl.textContent = card.desc;
-        descEl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:14px;line-height:1.6;color:rgba(255,255,255,0.58);margin:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
-
-        var cols = card.metrics.length > 3 ? card.metrics.length : 3;
-        var chipsRow = document.createElement('div');
-        chipsRow.style.cssText = 'display:grid;grid-template-columns:repeat(' + cols + ',1fr);gap:8px;';
-
-        card.metrics.forEach(function (m) {
-          var cell = document.createElement('div');
-          cell.style.cssText = 'min-width:0;';
-          var val = document.createElement('span');
-          val.textContent = m.val;
-          val.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:clamp(16px,1.4vw,22px);font-weight:700;color:#E6F28D;display:block;letter-spacing:-0.3px;line-height:1.1;';
-          var mLbl = document.createElement('span');
-          mLbl.textContent = m.lbl;
-          mLbl.style.cssText = 'font-family:"Montserrat",sans-serif;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-top:3px;line-height:1.3;';
-          cell.appendChild(val); cell.appendChild(mLbl); chipsRow.appendChild(cell);
-        });
-
-        info.appendChild(name);
-        info.appendChild(descEl);
-
-        // Icon meta-tags
-        if (card.iconTags && card.iconTags.length) {
-          var iconMap = window.S2_ICON_MAP || {};
-          var iconRow = document.createElement('div');
-          iconRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
-          card.iconTags.forEach(function (it) {
-            var icons = iconMap[it.icon] || {};
-            var tag = document.createElement('div');
-            tag.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:4px 10px 4px 7px;';
-            var ic = document.createElement('img');
-            ic.src = icons.dark || '';
-            ic.style.cssText = 'width:13px;height:13px;object-fit:contain;flex-shrink:0;';
-            var lbl = document.createElement('span');
-            lbl.textContent = it.label;
-            lbl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:500;color:rgba(255,255,255,0.8);white-space:nowrap;';
-            tag.appendChild(ic); tag.appendChild(lbl); iconRow.appendChild(tag);
-          });
-          info.appendChild(iconRow);
-        }
-
-        info.appendChild(chipsRow);
-
-        if (card.href && card.href !== '#') {
-          var ctaPill = document.createElement('div');
-          ctaPill.style.cssText = 'align-self:flex-start;margin-top:4px;background:rgba(23,23,23,0.88);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border-radius:999px;padding:4px;';
-          var cta = document.createElement('a');
-          cta.href = card.href;
-          cta.textContent = 'View Case Study →';
-          cta.style.cssText = 'display:block;font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:600;letter-spacing:0.02em;border-radius:999px;padding:12px 26px;color:#fff;text-decoration:none;background:linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 2.45%, rgba(255,255,255,0) 126.14%);box-shadow:1.1px 2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset,-1.0px -2.2px 0.5px -1.8px rgba(255,255,255,0.9) inset;transition:background 0.2s;';
-          cta.addEventListener('mouseenter', function() { cta.style.background = 'rgba(255,255,255,0.14)'; });
-          cta.addEventListener('mouseleave', function() { cta.style.background = 'linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 2.45%, rgba(255,255,255,0) 126.14%)'; });
-          ctaPill.appendChild(cta);
-          info.appendChild(ctaPill);
-        }
-
-        cardEl.appendChild(info);
-
-        cardEl.addEventListener('click', function () {
-          if (card.href && card.href !== '#') window.location.href = card.href;
-        });
-      }
-
-      lvTrack.appendChild(cardEl);
-      gridCardEls.push(cardEl);
+      rowsContainer.appendChild(row);
     });
 
-    listOverlay.appendChild(lvTrack);
+    listOverlay.appendChild(rowsContainer);
     el.appendChild(listOverlay);
-
-    // Fit exactly ~2.5 cards in the viewport, recomputed on resize.
-    function sizeGridCards() {
-      var gap = 24, sidePad = 80, visible = 1.75;
-      var avail = el.clientWidth - sidePad;
-      var cardW = Math.max(200, (avail - gap * 0.75) / visible);
-      var cardH = Math.min(560, Math.max(380, el.clientHeight - 150));
-      gridCardEls.forEach(function (c) { c.style.width = cardW + 'px'; c.style.height = cardH + 'px'; });
-    }
-    sizeGridCards();
-    window.addEventListener('resize', sizeGridCards);
-
-    // Dismiss the first-card swipe hint on first interaction with the track.
-    function dismissSwipeHint() {
-      if (!swipeHintEl) return;
-      swipeHintEl.style.animation = 'none';
-      swipeHintEl.style.opacity = '0';
-      swipeHintEl.style.transition = 'opacity 0.4s';
-    }
-    lvTrack.addEventListener('scroll', dismissSwipeHint, { once: true, passive: true });
-    lvTrack.addEventListener('pointerdown', dismissSwipeHint, { once: true });
-
-    // Vertical wheel/trackpad input pans the row horizontally — same idea as
-    // the spiral's wheel-to-rotation mapping. Passes through to page scroll
-    // once the track has hit either end so the section doesn't trap scroll.
-    lvTrack.addEventListener('wheel', function (e) {
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; // native horizontal wheel — let it through
-      var atStart = lvTrack.scrollLeft <= 0;
-      var atEnd   = lvTrack.scrollLeft >= lvTrack.scrollWidth - lvTrack.clientWidth - 1;
-      if ((e.deltaY < 0 && atStart) || (e.deltaY > 0 && atEnd)) return;
-      e.preventDefault();
-      lvTrack.scrollLeft += e.deltaY;
-    }, { passive: false });
-
-    // Mouse drag-to-scroll (touch already scrolls natively via overflow-x).
-    var gridDrag = null;
-    lvTrack.addEventListener('pointerdown', function (e) {
-      if (e.pointerType === 'touch') return;
-      gridDrag = { startX: e.clientX, startScroll: lvTrack.scrollLeft, moved: false };
-      lvTrack.setPointerCapture(e.pointerId);
-      lvTrack.style.cursor = 'grabbing';
-    });
-    lvTrack.addEventListener('pointermove', function (e) {
-      if (!gridDrag) return;
-      var dx = e.clientX - gridDrag.startX;
-      if (Math.abs(dx) > 4) gridDrag.moved = true;
-      lvTrack.scrollLeft = gridDrag.startScroll - dx;
-    });
-    function endGridDrag() {
-      if (!gridDrag) return;
-      lvTrack.style.cursor = 'grab';
-      if (gridDrag.moved) {
-        var suppressClick = function (ev) { ev.stopPropagation(); ev.preventDefault(); };
-        lvTrack.addEventListener('click', suppressClick, { capture: true, once: true });
-      }
-      gridDrag = null;
-    }
-    lvTrack.addEventListener('pointerup', endGridDrag);
-    lvTrack.addEventListener('pointerleave', endGridDrag);
-
-    // Left / right nav buttons (mirrors the spiral's up/down side-nav).
-    var gridPrevBtn = document.getElementById('s2GridPrev');
-    var gridNextBtn = document.getElementById('s2GridNext');
-    function scrollGridByCard(dir) {
-      var step = (gridCardEls[0] ? gridCardEls[0].getBoundingClientRect().width : 400) + 24;
-      lvTrack.scrollBy({ left: dir * step, behavior: 'smooth' });
-    }
-    if (gridPrevBtn) gridPrevBtn.addEventListener('click', function () { scrollGridByCard(-1); });
-    if (gridNextBtn) gridNextBtn.addEventListener('click', function () { scrollGridByCard(1); });
 
     // ── View toggle (driven by DOM buttons in s2-fw-header) ──────────────
     var frontLabelWrap = document.getElementById('s2FrontLabel');
@@ -661,13 +552,14 @@ void main() {
       if (e.detail.view === 'spiral') {
         listOverlay.style.opacity = '0';
         el.style.height = '100vh';
+        gridVisible = false;
         setTimeout(function () { listOverlay.style.display = 'none'; }, 300);
         renderer.domElement.style.transition = 'opacity 0.3s';
         renderer.domElement.style.opacity = '1';
         if (frontLabelWrap) frontLabelWrap.style.visibility = '';
         if (sideNavWrap) sideNavWrap.style.display = '';
-        if (gridPrevBtn) gridPrevBtn.style.display = 'none';
-        if (gridNextBtn) gridNextBtn.style.display = 'none';
+        if (gridNavPrev) gridNavPrev.style.display = 'none';
+        if (gridNavNext) gridNavNext.style.display = 'none';
         allCards.forEach(function (_, i) {
           setTimeout(function () { hiddenTarget[i] = 0; }, (i % 4) * 50);
         });
@@ -678,43 +570,61 @@ void main() {
         renderer.domElement.style.opacity = '0';
         if (frontLabelWrap) frontLabelWrap.style.visibility = 'hidden';
         if (sideNavWrap) sideNavWrap.style.display = 'none';
-        // Match the cards-zone's actual flexed height (not 100vh) — the
-        // section header above it already eats into the viewport, so 100vh
-        // here would push each card's bottom-anchored info panel off-screen.
+        if (gridNavPrev) gridNavPrev.style.display = '';
+        if (gridNavNext) gridNavNext.style.display = '';
         el.style.height = '100%';
         setTimeout(function () {
-          listOverlay.style.display = 'block';
-          sizeGridCards();
-          if (gridPrevBtn) gridPrevBtn.style.display = 'flex';
-          if (gridNextBtn) gridNextBtn.style.display = 'flex';
-          requestAnimationFrame(function () { listOverlay.style.opacity = '1'; });
+          listOverlay.style.display = 'flex';
+          requestAnimationFrame(function () {
+            listOverlay.style.opacity = '1';
+            runCountAnimations();
+            gridVisible = true;
+          });
         }, 300);
       }
     });
 
     // ── Initial reveal ────────────────────────────────────────────────────
-    // Gated on the glass loader lifting (same pattern used for the hero
-    // entrance) — otherwise this fires on a flat timer from script-parse
-    // time, finishes revealing while still hidden behind the loader (which
-    // holds the screen ~2.8s+), and the fly-in animation is never actually
-    // seen.
-    function revealCards() {
+    // Cards fly in only once BOTH conditions are met:
+    //   1. The glass loader has lifted
+    //   2. Section 2 has scrolled into view
+    // This gives the same staggered fly-in as toggling back to spiral —
+    // cards aren't revealed on page load if the section is off-screen.
+    var _loaderReady  = !document.documentElement.classList.contains('glass-loading');
+    var _sectionReady = false;
+    var _revealed     = false;
+
+    function tryRevealCards() {
+      if (_revealed || !_loaderReady || !_sectionReady) return;
+      _revealed = true;
       setTimeout(function () {
         allCards.forEach(function (_, i) {
           setTimeout(function () { hiddenTarget[i] = 0; }, (i % 4) * 50);
         });
-      }, 600);
+      }, 200);
     }
-    if (document.documentElement.classList.contains('glass-loading')) {
-      window.addEventListener('glassloaderhidden', revealCards, { once: true });
-    } else {
-      revealCards();
+
+    if (!_loaderReady) {
+      window.addEventListener('glassloaderhidden', function () {
+        _loaderReady = true;
+        tryRevealCards();
+      }, { once: true });
     }
 
     // ── Front card tracking + snap-to-card ───────────────────────────────
     var lastFrontCardIdx = -1;
     var snapTarget       = 0;      // snap EverTutor to the front on load
     var snapRawTarget    = null;   // step-nav: snap to exact scrollOffset value
+
+    /* 0..1 from the host's pin, mapped onto the bounded travel. Stored as a
+       target rather than applied directly so the ticker can ease into it —
+       scroll progress arrives in steps and would otherwise read as stutter. */
+    var externalTarget = null;
+    el.addEventListener('s2:scrollTo', function (e) {
+      var t = Math.max(0, Math.min(1, e.detail.progress));
+      externalTarget = SCROLL_MIN + (SCROLL_MAX - SCROLL_MIN) * t;
+      snapTarget = null; snapRawTarget = null;
+    });
 
     el.addEventListener('s2:goToCard', function (e) {
       snapTarget    = e.detail.idx;
@@ -724,7 +634,7 @@ void main() {
     // Step ±1 from the current position — avoids the "long way around" bug
     // that occurs when s2:goToCard picks the nearest looped copy by abs distance.
     el.addEventListener('s2:stepCard', function (e) {
-      snapRawTarget = Math.round(scrollOffset) + e.detail.dir;
+      snapRawTarget = Math.max(SCROLL_MIN, Math.min(SCROLL_MAX, Math.round(scrollOffset) + e.detail.dir));
       snapTarget    = null;
     });
 
@@ -796,28 +706,41 @@ void main() {
     gsap.ticker.lagSmoothing(0);
 
     gsap.ticker.add(function (time, deltaTime) {
-      // Snap-to-card (overrides free scroll while active)
-      // Target the B=2 slot (visually closest to camera) rather than B=0
-      if (snapRawTarget !== null) {
+      /* When the host is driving, it owns the travel outright. This used to be
+         two sequential blocks — snap first, then physics — so a live snap and
+         the host's target pulled scrollOffset in opposite directions every
+         frame and the reel parked wherever the two balanced. Exclusive now. */
+      if (externalTarget !== null) {
+        snapTarget = null; snapRawTarget = null;
+        var prevOffset = scrollOffset;
+        scrollOffset  += (externalTarget - scrollOffset) * 0.14;
+        clampScroll();
+        /* The shader bends the plane by this. On the wheel path it is a
+           smoothed value in the 0.001-0.01 range; a raw frame delta is an
+           order of magnitude bigger and folds the card in half. Clamp it to
+           the range the shader was tuned against. */
+        var dv = scrollOffset - prevOffset;
+        wheelDeltaY       = Math.max(-0.02, Math.min(0.02, dv));
+        targetWheelDeltaY = 0;
+      } else if (snapRawTarget !== null) {
         var diff = snapRawTarget - scrollOffset;
         scrollOffset      += diff * 0.1;
         wheelDeltaY        = 0;
         targetWheelDeltaY  = 0;
         if (Math.abs(diff) < 0.01) { scrollOffset = snapRawTarget; snapRawTarget = null; }
       } else if (snapTarget !== null) {
-        var base    = snapTarget - centerIndex - 2;
-        var desired = base + Math.round((scrollOffset - base) / totalCount) * totalCount;
-        var diff    = desired - scrollOffset;
-        scrollOffset      += diff * 0.1;
+        var desired = Math.max(SCROLL_MIN, Math.min(SCROLL_MAX, snapTarget - centerIndex - 2));
+        var diff2   = desired - scrollOffset;
+        scrollOffset      += diff2 * 0.1;
         wheelDeltaY        = 0;
         targetWheelDeltaY  = 0;
-        if (Math.abs(diff) < 0.01) { scrollOffset = desired; snapTarget = null; }
+        if (Math.abs(diff2) < 0.01) { scrollOffset = desired; snapTarget = null; }
+      } else {
+        wheelDeltaY       += (targetWheelDeltaY - wheelDeltaY) * 0.1;
+        scrollOffset      += wheelDeltaY;
+        clampScroll();
+        targetWheelDeltaY *= 0.9;
       }
-
-      // Scroll physics
-      wheelDeltaY       += (targetWheelDeltaY - wheelDeltaY) * 0.1;
-      scrollOffset      += wheelDeltaY;
-      targetWheelDeltaY *= 0.9;
       // Once entry animation has fired, floor the speed so the helix never
       // fully stops — it keeps a very slow continuous forward rotation once
       // scroll input has actually decayed to near-zero. Must check magnitude,
@@ -825,9 +748,9 @@ void main() {
       // directly was also true for any negative (upward-scroll) value,
       // snapping it back to positive every frame and fighting upward scroll
       // input almost immediately — that was the "scrolling up feels harder" bug.
-      if (entryTriggered && snapTarget === null && !isHovered && Math.abs(targetWheelDeltaY) < SLOW_DRIFT) {
-        targetWheelDeltaY = SLOW_DRIFT;
-      }
+      /* No perpetual drift any more: a bounded list that keeps creeping just
+         parks itself against the far end and sits there. It rests where the
+         reader left it. */
 
       // Hover raycast — front faces only
       raycaster.setFromCamera(mouse, camera);
@@ -847,7 +770,6 @@ void main() {
         hoverProgress[i] = lerp(hoverProgress[i], hoverTarget[i], hovEase);
 
         var N = i - scrollOffset;
-        N = ((N % totalCount) + totalCount) % totalCount;
         var B = N - centerIndex;
 
         var flyDir = (hiddenTarget[i] > 0 ? 1.5 : -1.5) * CARD_SCALE;
@@ -878,14 +800,16 @@ void main() {
         var distFromFront = Math.abs(B - 2);
         uniforms[i].uFogOpacity.value = Math.max(0.15, 1.0 - distFromFront * 0.25);
 
-        // Edge fade: each mesh's B wraps (modulo) as scrollOffset advances —
-        // that wrap is an instant jump from B_MIN to B_MAX (or vice versa).
-        // Fade alpha to 0 near EITHER edge (signed distance, not distance-
-        // from-front — those aren't the same thing and using distFromFront
-        // here would incorrectly fade out cards mid-spiral on one side).
-        var edgeFadeLow  = Math.max(0, Math.min(1, (B - B_MIN) / EDGE_FADE_MARGIN));
-        var edgeFadeHigh = Math.max(0, Math.min(1, (B_MAX - B) / EDGE_FADE_MARGIN));
-        var edgeFade     = edgeFadeLow * edgeFadeHigh;
+        // Standing bend: flat on the active (front) card, full wrap on the
+        // rest. distFromFront is continuous, so a card straightens as it
+        // glides into the front slot and re-bends as it leaves.
+        uniforms[i].uBend.value = Math.min(1, distFromFront);
+
+        // Tail fade: symmetric around the front slot, because the tail has two
+        // far ends and no seam. Keying this off the old wrap edges left every
+        // card but the first at alpha 0 once the modulo was removed.
+        var edgeFade = Math.max(0, Math.min(1,
+          (FADE_OUT - distFromFront) / (FADE_OUT - FADE_FULL)));
 
         uniforms[i].uZoom.value           = 1 + 0.05 * hoverProgress[i];
         uniforms[i].uRevealProgress.value = (1 - hoverProgress[i] * 0.05) * (1 - hiddenProgress[i]) * edgeFade;
@@ -901,7 +825,6 @@ void main() {
       allCards.forEach(function (_, i) {
         if (hiddenTarget[i] > 0) return;
         var N = i - scrollOffset;
-        N = ((N % totalCount) + totalCount) % totalCount;
         var B = N - centerIndex;
         if (Math.abs(B - 2) < fcMinB) { fcMinB = Math.abs(B - 2); fcFront = i; }
       });
@@ -933,23 +856,33 @@ void main() {
       renderer.render(scene, camera);
     });
 
-    // ── Entry animation: fast spin → slow drift on section enter ─────────
-    // Observes the spiral root element. On first intersect, waits until
-    // the card-reveal animation (600ms) has started, then kicks off a fast
-    // forward spin (ENTRY_SPEED) that naturally decays into SLOW_DRIFT.
+    // ── Entry: reveal the cards, and stay on the first one ───────────────
+    // There used to be a fast forward spin here (ENTRY_SPEED, "one full card
+    // cycle"). That belonged to the looping reel, where it whirled through and
+    // settled harmlessly anywhere. On a bounded tail it integrates straight
+    // from SCROLL_MIN to SCROLL_MAX and clampScroll parks it on the LAST card —
+    // which is why the section was opening on The Engine. The reel now opens
+    // where the tail starts and waits to be scrolled.
     var spiralEntryObs = new IntersectionObserver(function (entries) {
       if (entries[0].isIntersecting && !entryTriggered) {
         entryTriggered = true;
         spiralEntryObs.disconnect();
-        // Videos play only on the active card now (handled in the front-card
-        // detection above), so we no longer start them all on entry.
-        setTimeout(function () {
-          snapTarget        = null;
-          targetWheelDeltaY = ENTRY_SPEED;
-        }, 800);
+        _sectionReady = true;
+        tryRevealCards();
       }
     }, { threshold: 0.1 });
     spiralEntryObs.observe(el);
+
+    /* Diagnostics. This preview cannot reproduce the scroll path faithfully,
+       so expose the numbers for a real browser to report. */
+    window.__spiralState = function () {
+      return { scrollOffset: +scrollOffset.toFixed(3),
+               SCROLL_MIN: SCROLL_MIN, SCROLL_MAX: SCROLL_MAX,
+               externalTarget: externalTarget,
+               snapTarget: snapTarget, snapRawTarget: snapRawTarget,
+               totalCount: totalCount, centerIndex: centerIndex,
+               frontIdx: lastFrontCardIdx, wheelDeltaY: +wheelDeltaY.toFixed(4) };
+    };
 
     // ── Resize ────────────────────────────────────────────────────────────
     window.addEventListener('resize', function () {

@@ -1,12 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EverTutor Live — Bhanu Kowshik</title>
+
+  <!-- ── Social share meta (image source: og-image.html → images/og-image.jpg) ── -->
+  <meta name="description" content="EverTutor Live case study — designing a real-time AI tutoring experience. By Bhanu Kowshik, AI Native Product Designer." />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Bhanu Kowshik" />
+  <meta property="og:title" content="EverTutor Live — Bhanu Kowshik" />
+  <meta property="og:description" content="Case study: designing a real-time AI tutoring experience." />
+  <meta property="og:url" content="https://bhanu.build/evertutor-live.html" />
+  <meta property="og:image" content="https://bhanu.build/images/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="EverTutor Live — Bhanu Kowshik" />
+  <meta name="twitter:image" content="https://bhanu.build/images/og-image.jpg" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192.png" />
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=JetBrains+Mono:wght@300;400;500&family=Shantell+Sans:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&family=Shantell+Sans:wght@400;700&display=swap" rel="stylesheet" />
 
   <style>
     /* ─── RESET ─────────────────────────────────────────────── */
@@ -21,22 +40,45 @@
       --grey:         #515151;
       --border:       #EFEFEF;
       --green:        #1C9C6D;
-      --font-heading: 'Montserrat', sans-serif;
-      --font-mono:    'JetBrains Mono', monospace;
+      /* ── TYPE — the portfolio's system, carried into the case study ──
+         Instrument Sans for every display line and every label, Urbanist for
+         the prose, Instrument Serif in italic for emphasis. The token names
+         are kept so the several hundred rules below need no edit; only what
+         they resolve to has changed. */
+      --font-heading: 'Instrument Sans', system-ui, sans-serif;
+      --font-mono:    'Urbanist', 'Instrument Sans', system-ui, sans-serif;
+      --font-serif:   'Instrument Serif', Georgia, serif;
+      /* one button, every page: white out of the top-left, azure across the rest */
+      --cta-grad: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #E4EFFF 9%, #93BEFF 26%, #4B8AF0 50%, #2463DC 76%, #1A4CB8 100%);
+      --cta-grad-hover: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #EDF4FF 11%, #A6CBFF 29%, #5A96F5 53%, #2C6FE8 79%, #1F57CA 100%);
     }
+    /* the serif only ever appears in italic, exactly as it does on the home page */
+    .serif { font-family: var(--font-serif); font-style: italic; font-weight: 400; }
 
     /* ─── BODY ───────────────────────────────────────────────── */
     body {
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       background-color: var(--bg);
-      background-image: radial-gradient(circle, #b8b4a8 0.8px, transparent 0.8px);
-      background-size: 19px 19px;
-      background-attachment: fixed;
       min-height: 100vh;
       font-family: var(--font-heading);
+      /* clip, not hidden — the off-canvas mobile menu otherwise leaves the
+         page horizontally pannable; hidden stays as the older-browser fallback */
       overflow-x: hidden;
+      overflow-x: clip;
       cursor: none;
+    }
+
+    /* Film grain — the ground hero-lab uses. Replaces the page-wide dot mesh,
+       which stamped one pattern across every section instead of letting each
+       section carry its own texture. Sits above content but under the nav (10+)
+       and the custom cursor (13000). */
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
     /* ─── CUSTOM CURSOR ──────────────────────────────────────── */
@@ -78,7 +120,10 @@
     .nav-home img { width: 38px; height: 38px; display: block; transform: rotate(200deg); transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1); }
     .nav-home:hover img { transform: rotate(180deg); }
     .nav-home span { font-family: var(--font-heading); font-weight: 600; font-size: 15px; color: var(--secondary); white-space: nowrap; }
-    .nav-sections { display: flex; align-items: center; gap: 4px; }
+    /* flex:1 + centre keeps the links visually centred now that the theme
+       toggle no longer sits on the right — space-between alone would shove
+       them against the edge */
+    .nav-sections { display: flex; align-items: center; justify-content: center; flex: 1; gap: 4px; }
     .nav-btn {
       display: flex; align-items: center; justify-content: center;
       padding: 5px 15px; border-radius: 5px; border: none; background: transparent;
@@ -90,19 +135,98 @@
     .nav-btn:hover:not(.active) { background: #F2F2F2; }
     .nav-btn.active { background: var(--secondary); color: var(--white); }
 
-    /* ─── PAGE / CARD ────────────────────────────────────────── */
-    .page { display: flex; justify-content: center; padding: 94px 10% 90px; }
+    /* ─── PAGE / CONTENT COLUMN ──────────────────────────────── */
+    /* frame retired — the column follows hero-lab's 1400px width system */
+    .page { display: flex; justify-content: center; padding: 74px 0 0; }
     .card {
-      background: var(--white); width: 100%; max-width: 1920px;
-      border-radius: 30px; box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      background: none; width: 100%; max-width: 1400px;
       overflow: clip; display: flex; flex-direction: column;
     }
 
     /* ─── HERO SECTION ───────────────────────────────────────── */
-    .cs-hero { display: flex; flex-direction: column; gap: 24px; padding: 36px 40px 0; }
+    /* Two-column hero — copy left, product right. The scale facts the headline
+       used to carry as prose now sit in a divided strip under the body line,
+       where they read as proof instead of grammar. */
+    .cs-hero {
+      display: block;
+      /* one fluid rule instead of per-breakpoint values — the hero is a panel
+         now, so it needs real inset on every side at every width */
+      padding: clamp(34px, 4.2vw, 64px) clamp(28px, 3.6vw, 52px) clamp(34px, 4.2vw, 60px);
+      /* every other section is a .cs-section-wrap inset 40px a side; the hero
+         is its own panel, so it needs that inset as margin to line up with them */
+      margin: 0 40px;
+      position: relative; isolation: isolate;
+      border-radius: 16px; overflow: hidden;
+    }
+    /* the panorama fills the hero and keeps its own proportions */
+    /* the bloom sits low in the generated plate — anchoring near the bottom
+       keeps it in frame when the hero crops vertically on narrower viewports */
+    /* the generated plate is dark-mode art (its brightest point is luminance
+       ~0.05) — over cream it can only wash out to grey, so light mode hides it
+       and tints the panel instead */
+    .cs-hero > .et-bg-img { z-index: 0; object-position: 50% 86%; display: none; }
+    [data-theme="dark"] .cs-hero > .et-bg-img { display: block; }
+    /* copy sits over the image's darkest side; without this the light-mode ink
+       would land on the dark green and disappear */
+    .hero-scrim {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(100deg, #FFFCF8 0%, #FCFCF0 58%, #F3F7D8 100%);
+    }
+    .hero-grid {
+      position: relative; z-index: 2;
+      display: grid;
+      /* even split — the copy needs the width to keep the headline to two
+         lines; weighting it toward the visual orphans the last word */
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(28px, 4vw, 60px);
+      align-items: center;
+    }
+    /* the column is the container the headline sizes against, so its wrap
+       stays put no matter how the panel's width changes */
+    .hero-copy {
+      display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+      container-type: inline-size;
+    }
+
+    .cs-hero .cs-heading {
+      /* cqi, not vw — sized off the column so it holds two lines at any width */
+      font-size: clamp(28px, 8.6cqi, 46px); line-height: 1.14;
+      letter-spacing: -0.028em; max-width: 15ch;
+    }
+    .cs-hero #heroSubtext { max-width: 42ch; margin-top: 20px; }
+
+    .hero-pills {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      width: 100%; margin-top: 34px; padding-top: 22px;
+      border-top: 1px solid rgba(37,37,37,0.12);
+    }
+
+    /* the product sits on a slight 3D tilt, as in the reference */
+    .hero-visual { perspective: 1500px; }
+    .hero-tilt { transform: rotateY(-8deg) rotateX(2deg); transform-style: preserve-3d; }
+    /* the frame now only carries the product — the green ground is the
+       section backdrop, so this is just the screen and its shadow */
+    .hero-visual .et-live-frame {
+      height: auto; width: 100%; display: block;
+      border-radius: 12px;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+    }
+    .hero-visual .et-screen-img {
+      width: 100%; border-radius: 12px; display: block; box-shadow: none;
+    }
+
+    /* stack only once the columns genuinely get cramped — at 1023px the split
+       still holds comfortably, and collapsing there loses the side-by-side on
+       ordinary laptop widths */
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+      .hero-visual { perspective: none; }
+      .hero-tilt { transform: none; }
+      .hero-visual .et-live-frame { aspect-ratio: 16 / 10; box-shadow: none; }
+    }
 
     /* Designation pills */
-    .designation-row { display: flex; align-items: center; gap: 10px; opacity: 0; }
+    .designation-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; opacity: 0; }
     .designation-row.visible { animation: fade-in 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
     #heroSubtext { opacity: 0; transform: translateY(20px); margin-top: -8px; }
     #heroSubtext.visible { animation: section-rise 0.45s cubic-bezier(0.16,1,0.3,1) both; }
@@ -119,7 +243,7 @@
     @keyframes pulse-subtle { 0% { transform: scale(1); opacity: 0.45; } 100% { transform: scale(1.9); opacity: 0; } }
 
     /* Main heading */
-    .cs-heading { font-family: var(--font-heading); font-weight: 700; font-size: 30px; line-height: 1.5; letter-spacing: -0.8px; color: var(--secondary); }
+    .cs-heading { font-family: var(--font-heading); font-weight: 600; font-size: 30px; line-height: 1.5; letter-spacing: -0.8px; color: var(--secondary); }
     .cs-heading .word { display: inline-block; opacity: 0; transform: translateY(22px); will-change: opacity, transform; }
     .cs-heading .word.visible { animation: word-rise 0.28s cubic-bezier(0.22,0.61,0.36,1) both; }
 
@@ -129,7 +253,7 @@
 
     /* ─── HERO FRAME — uses actual background + screen images ── */
     .et-live-frame {
-      width: 100%; height: 520px;
+      width: 100%; height: 500px;
       position: relative; overflow: hidden; border-radius: 10px;
       display: flex; justify-content: center; align-items: flex-end;
       opacity: 0; transform: translateY(40px);
@@ -142,7 +266,7 @@
     }
     .et-screen-img {
       position: relative; z-index: 1;
-      width: 68%;
+      width: 78%;
       height: auto; display: block;
       border-radius: 10px 10px 0 0;
       box-shadow: 0 -14px 60px rgba(0,0,0,0.45);
@@ -184,10 +308,10 @@
     .prob-dot { width: 10px; height: 10px; background: var(--secondary); flex-shrink: 0; margin-top: 9px; }
     .prob-bullet-content { flex: 1; display: flex; flex-direction: column; gap: 10px; }
     .prob-title { font-family: var(--font-heading); font-weight: 700; font-size: 18px; line-height: 27px; color: var(--secondary); }
-    .prob-body { font-family: var(--font-mono); font-weight: 500; font-size: 14px; line-height: 25px; color: #515151; }
+    .prob-body { font-family: var(--font-mono); font-weight: 500; font-size: 16px; line-height: 27px; color: #515151; }
 
     .insight-box { background: #F9F9F9; border-radius: 10px; padding: 20px; }
-    .insight-box p { font-family: var(--font-mono); font-weight: 500; font-style: italic; font-size: 14px; line-height: 25px; color: #515151; }
+    .insight-box p { font-family: var(--font-mono); font-weight: 500; font-style: italic; font-size: 16px; line-height: 27px; color: #515151; }
 
     /* Bottom — "What if" */
     .problem-bottom { display: flex; flex-direction: column; gap: 15px; }
@@ -197,11 +321,12 @@
     .what-if-title { font-family: var(--font-mono); font-weight: 700; font-size: 14px; line-height: 25px; color: var(--secondary); }
     .et-hl {
       background: linear-gradient(#E6F28D, #E6F28D) no-repeat left center / 0% 100%;
-      transition: background-size 0.55s cubic-bezier(0.22,0.61,0.36,1);
+      transition: background-size 0.55s cubic-bezier(0.22,0.61,0.36,1),
+                  color 0.3s ease 0.15s;
       border-radius: 3px; padding: 1px 3px;
     }
     .et-hl.revealed { background-size: 100% 100%; }
-    .what-if-body { font-family: var(--font-mono); font-weight: 500; font-size: 14px; line-height: 25px; color: #515151; }
+    .what-if-body { font-family: var(--font-mono); font-weight: 500; font-size: 16px; line-height: 27px; color: #515151; }
 
     /* ─── CHALLENGES CARD ──────────────────────────────────── */
     .challenges-card {
@@ -221,7 +346,7 @@
     .chal-item-content .chal-body { margin-top: 15px; }
     .chal-title { font-family: var(--font-heading); font-weight: 600; font-size: 20px; line-height: 28px; color: var(--secondary); }
     .chal-statement { font-family: var(--font-mono); font-weight: 500; font-size: 18px; line-height: 28px; color: var(--secondary); }
-    .chal-body { font-family: var(--font-mono); font-weight: 400; font-size: 15px; line-height: 25px; color: #515151; }
+    .chal-body { font-family: var(--font-mono); font-weight: 400; font-size: 16px; line-height: 27px; color: #515151; }
     .chal-next { font-family: var(--font-mono); font-size: 12px; line-height: 20px; }
     .chal-next strong { font-weight: 700; color: #252525; }
     .chal-next span { font-weight: 400; color: #515151; }
@@ -284,7 +409,7 @@
       text-transform: uppercase; letter-spacing: 0.08em; color: #515151;
       transition: color 0.42s cubic-bezier(0.16,1,0.3,1);
     }
-    .phase-item.active .phase-num { color: rgba(255,255,255,0.45); }
+    .phase-item.active .phase-num { color: rgba(255,255,255,0.6); }
 
     /* Category tag — always on right */
     .phase-tag {
@@ -298,7 +423,7 @@
         background 0.42s cubic-bezier(0.16,1,0.3,1),
         color      0.42s cubic-bezier(0.16,1,0.3,1);
     }
-    .phase-item.active .phase-tag { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.55); }
+    .phase-item.active .phase-tag { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.72); }
 
     /* Expand body — height driven by JS spring */
     .phase-expand-body { overflow: hidden; height: 0; display: none; }
@@ -325,7 +450,7 @@
     }
     .phase-expand-desc {
       font-family: var(--font-mono); font-size: 15px; line-height: 1.4;
-      color: rgba(255,255,255,0.48);
+      color: rgba(255,255,255,0.62);
     }
 
     /* Mobile phase detail panel (hidden on desktop) */
@@ -368,7 +493,7 @@
       animation: hintFloat 2.2s ease-in-out infinite;
     }
     #phaseScrollHint .hint-label {
-      font-family: var(--font-mono); font-size: 11px; color: #888;
+      font-family: var(--font-mono); font-size: 11px; color: #666;
       letter-spacing: 0.06em; text-transform: uppercase;
     }
     .hint-chip svg { animation: hintBounce 1s ease-in-out infinite; flex-shrink: 0; }
@@ -388,7 +513,7 @@
     .nudge-btn {
       background: none; border: none; padding: 0; cursor: pointer;
       display: inline-flex; align-items: center; gap: 7px;
-      font-family: var(--font-mono); font-size: 12px; color: #888;
+      font-family: var(--font-mono); font-size: 12px; color: #666;
       transition: color 0.2s, gap 0.2s;
       letter-spacing: 0.02em;
     }
@@ -433,7 +558,7 @@
     [data-phase="4"] .sys-card { flex: 0 0 calc((100% - 20px) / 2); }
     .sys-card-body { display: flex; flex-direction: column; gap: 8px; }
     .sys-card-title { font-family: var(--font-mono); font-weight: 700; font-size: 15px; line-height: 23px; color: var(--secondary); }
-    .sys-card-desc { font-family: var(--font-mono); font-weight: 400; font-size: 15px; line-height: 24px; color: #515151; }
+    .sys-card-desc { font-family: var(--font-mono); font-weight: 400; font-size: 16px; line-height: 26px; color: #515151; }
     /* Carousel controls */
     .sys-carousel-footer { display: flex; flex-direction: column; gap: 20px; }
     .sys-carousel-controls { display: flex; justify-content: flex-end; }
@@ -498,7 +623,7 @@
     .impact-stat-headline { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
     .impact-stat-hl    { font-family: var(--font-heading); font-weight: 600; font-size: 20px; line-height: 27px; color: var(--secondary); }
     .impact-stat-hl.hi { background: #E6F28D; }
-    .impact-stat-desc  { font-family: var(--font-mono); font-weight: 400; font-size: 15px; line-height: 25px; color: #515151; }
+    .impact-stat-desc  { font-family: var(--font-mono); font-weight: 400; font-size: 16px; line-height: 27px; color: #515151; }
 
     /* ─── GROWTH SECTION ────────────────────────────────── */
     .growth-card { gap: 20px; }
@@ -510,8 +635,8 @@
     .growth-axis-label { font-family: var(--font-mono); font-weight: 500; font-size: 12.5px; fill: #666; }
     .growth-point-label { font-family: var(--font-mono); font-weight: 700; font-size: 14px; }
     .growth-callout-badge-label { font-family: var(--font-mono); font-weight: 700; font-size: 12.5px; fill: #252525; }
-    [data-theme="dark"] .growth-legend-item { color: #F0EDE8; }
-    [data-theme="dark"] .growth-axis-label { fill: #AAAAAA; }
+    [data-theme="dark"] .growth-legend-item { color: #EFF3F8; }
+    [data-theme="dark"] .growth-axis-label { fill: #8A96A5; }
 
     /* ─── TEAM & ROLE SECTION ────────────────────────────── */
     .team-card {
@@ -524,7 +649,7 @@
     .team-item-dot { width: 10px; height: 10px; background: var(--secondary); flex-shrink: 0; margin-top: 10px; }
     .team-item-content { flex: 1; display: flex; flex-direction: column; gap: 10px; }
     .team-role-hl   { display: inline-block; align-self: flex-start; background: #E6F28D; font-family: var(--font-heading); font-weight: 600; font-size: 20px; line-height: 27px; color: var(--secondary); }
-    .team-role-body { font-family: var(--font-mono); font-weight: 500; font-size: 15px; line-height: 25px; color: var(--secondary); }
+    .team-role-body { font-family: var(--font-mono); font-weight: 500; font-size: 16px; line-height: 27px; color: var(--secondary); }
     .team-role-body .dim { color: #515151; font-weight: 500; }
 
     /* ─── THANK YOU FOOTER ───────────────────────────────── */
@@ -535,7 +660,7 @@
       width: 100%; background: #E6F28D;
       display: flex; align-items: center; justify-content: center; gap: 6px;
       padding: 14px 0;
-      border-radius: 0 0 20px 20px;
+      border-radius: 0;
     }
     .thankyou-footer .ty-text {
       font-family: var(--font-mono); font-weight: 500; font-size: 15px;
@@ -568,9 +693,17 @@
       display: flex; flex-direction: column; justify-content: center;
       align-items: flex-start; padding: 80px 32px 48px; gap: 4px;
       transform: translateX(100%);
-      transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1);
+      /* hidden while closed so keyboard focus can't land on off-screen links;
+         the delay holds visibility until the slide-out finishes */
+      visibility: hidden;
+      transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1),
+                  visibility 0s linear 0.38s;
     }
-    .mobile-menu.open { transform: translateX(0); }
+    .mobile-menu.open {
+      transform: translateX(0);
+      visibility: visible;
+      transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1), visibility 0s;
+    }
     .mobile-menu-backdrop {
       position: fixed; inset: 0; z-index: 489;
       background: rgba(37,37,37,0.35);
@@ -604,7 +737,7 @@
       .nav-hamburger  { display: flex; }
       .nav                { padding: 8px 24px; }
       .page               { padding: 74px 10% 70px; }
-      .cs-hero            { padding: 28px 28px 0; gap: 20px; }
+      /* .cs-hero padding is fluid now — see the clamp() on the base rule */
       .cs-heading         { font-size: 26px; }
       .et-live-frame      { height: 300px; }
       .et-screen-img      { width: 72%; }
@@ -619,15 +752,28 @@
       .sys-split          { position: static !important; height: auto !important; }
     }
 
+    /* ── iPad-portrait window: 768px – 900px ─────────────────── */
+    /* two columns leave the pills wrapping and the cards one word wide —
+       stack the accordion above the panels instead (below 768 the mobile
+       tab strip takes over, so this window is gated on both sides) */
+    @media (max-width: 900px) and (min-width: 768px) {
+      .sys-split          { grid-template-columns: 1fr; }
+      .phase-left         { position: static; height: auto; padding-right: 0; }
+      .phase-right        { padding-left: 0; padding-top: 24px; }
+      #phaseScrollHint,
+      #phaseNudge         { display: none; }
+    }
+
     /* ── Mobile: up to 767px ─────────────────────────────────── */
     @media (max-width: 767px) {
       .nav                { padding: 8px 16px; }
       .page               { padding: 60px 5% 56px; }
       .card               { border-radius: 16px; }
       .cs-section-wrap    { padding-left: 18px; padding-right: 18px; }
+      .cs-hero            { margin: 0 18px; }   /* stay level with the cards */
 
       /* Hero */
-      .cs-hero            { padding: 22px 18px 0; gap: 14px; }
+      /* .cs-hero padding is fluid now — see the clamp() on the base rule */
       .designation-row    { flex-wrap: wrap; gap: 8px; }
       .cs-heading         { font-size: 22px; }
       .et-live-frame      { height: 220px; padding-top: 8px; }
@@ -672,6 +818,12 @@
       .phase-item[data-phase="3"] .phase-pill::after { content: "03"; }
       .phase-item[data-phase="4"] .phase-pill::after { content: "04"; }
       .phase-item.active .phase-pill::after { color: rgba(255,255,255,0.9); }
+      /* dark mode inverts the chips (active = light, rest = dark) — the
+         pseudo-element ink must flip with them */
+      [data-theme="dark"] .phase-item .phase-pill::before { color: rgba(239,243,248,0.5); }
+      [data-theme="dark"] .phase-item .phase-pill::after  { color: rgba(239,243,248,0.85); }
+      [data-theme="dark"] .phase-item.active .phase-pill::before { color: rgba(19,26,37,0.55); }
+      [data-theme="dark"] .phase-item.active .phase-pill::after  { color: rgba(19,26,37,0.9); }
       .phase-plus-circle,
       .phase-tag          { display: none; }
       .phase-item .phase-expand-body { display: none !important; }
@@ -749,7 +901,18 @@
       border: 1px solid rgba(37,37,37,0.1);
       display: flex; flex-direction: column;
       text-decoration: none; color: inherit;
-      cursor: default;
+      /* the whole card is the affordance — no button inside it */
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(0.16,1,0.3,1),
+                  border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .op-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(37,37,37,0.22);
+      box-shadow: 0 12px 32px rgba(37,37,37,0.10);
+    }
+    .op-card:focus-visible {
+      outline: 2px solid #252525; outline-offset: 3px;
     }
     .op-card-img {
       width: 100%; height: 190px; overflow: hidden;
@@ -816,14 +979,17 @@
       padding: 20px 22px 22px;
       display: flex; flex-direction: column; gap: 10px; flex: 1;
     }
+    /* Eyebrow, not chips — the category sits quietly above the title */
     .op-card-tags {
-      display: flex; flex-wrap: wrap; gap: 6px;
+      display: flex; flex-wrap: wrap; gap: 0; align-items: baseline;
     }
     .op-card-tag {
-      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em;
-      text-transform: uppercase; color: #666;
-      background: #F0EDE8; border-radius: 100px;
-      padding: 4px 10px;
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.09em;
+      text-transform: uppercase; color: #8A8A8A;
+      background: none; border-radius: 0; padding: 0;
+    }
+    .op-card-tag + .op-card-tag::before {
+      content: '·'; margin: 0 7px; color: #C4C4C4;
     }
     .op-card-title {
       font-family: var(--font-heading); font-size: 20px; font-weight: 700;
@@ -833,18 +999,20 @@
       font-family: var(--font-mono); font-size: 15px; color: #515151;
       line-height: 1.6; flex: 1;
     }
+    /* Not a button — a quiet text cue. The card carries the click, so a filled
+       CTA here would compete with the page's real one and repeat the affordance. */
     .op-card-cta {
-      display: flex; align-items: center; justify-content: center; gap: 7px;
-      background: #252525; color: #fff;
-      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-      letter-spacing: 0.04em; padding: 11px 14px; border-radius: 8px;
-      margin-top: 4px;
-      cursor: pointer;
-      transition: transform 0.18s ease;
+      display: inline-flex; align-items: center; gap: 6px;
+      align-self: flex-start;
+      background: none; color: #252525; border: 0; box-shadow: none;
+      font-family: var(--font-heading); font-size: 13px; font-weight: 600;
+      letter-spacing: -0.002em; padding: 0; border-radius: 0;
+      margin-top: 6px;
     }
-    .op-card-cta:hover {
-      transform: translateY(-3px);
+    .op-card-cta svg {
+      transition: transform 0.22s cubic-bezier(0.16,1,0.3,1);
     }
+    .op-card:hover .op-card-cta svg { transform: translate(3px, -3px); }
     @media (max-width: 900px) {
       .other-projects { padding: 48px 24px 64px; }
       .other-projects-grid { grid-template-columns: 1fr; }
@@ -853,30 +1021,27 @@
 
     /* ─── DARK MODE TOKENS ───────────────────────────────────── */
     [data-theme="dark"] {
-      --secondary:  #F0EDE8;
-      --bg:         #1A1A1A;
-      --white:      #0C0C0C;
-      --grey:       #999999;
-      --border:     #3A3A3A;
+      --secondary:  #EFF3F8;
+      --bg:         #0A0E15;
+      --white:      #0E141D;
+      --grey:       #A9B4C2;
+      --border:     #222C3D;
       --green:      #2ABD86;
-    }
-    [data-theme="dark"] body {
-      background-image: radial-gradient(circle, rgba(255,255,255,0.15) 0.8px, transparent 0.8px);
     }
     [data-theme="dark"] .nav-home img { filter: invert(1); }
     [data-theme="dark"] .nav {
       background: rgba(26,26,26,0.92);
       box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.06);
     }
-    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #2C2C2C; }
-    [data-theme="dark"] .desig-pill { background: rgba(44,44,44,0.95); }
+    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #182130; }
+    [data-theme="dark"] .desig-pill { background: rgba(24,33,48,0.95); }
     [data-theme="dark"] .problem-card,
     [data-theme="dark"] .challenges-card,
     [data-theme="dark"] .system-card,
     [data-theme="dark"] .impact-card,
     [data-theme="dark"] .growth-card,
-    [data-theme="dark"] .team-card { background: #1A1A1A; border-color: #3A3A3A; }
-    [data-theme="dark"] .insight-box { background: #252525; }
+    [data-theme="dark"] .team-card { background: #0A0E15; border-color: #222C3D; }
+    [data-theme="dark"] .insight-box { background: #131A25; }
     [data-theme="dark"] .insight-box p,
     [data-theme="dark"] .section-label,
     [data-theme="dark"] .prob-body,
@@ -889,118 +1054,110 @@
     [data-theme="dark"] .impact-stat-desc,
     [data-theme="dark"] .team-role-body .dim,
     [data-theme="dark"] .other-projects-label,
-    [data-theme="dark"] .op-card-desc { color: #999999; }
-    [data-theme="dark"] .what-if-card { background: #222222; border-color: #3A3A3A; }
-    [data-theme="dark"] .phase-item { background: #252525; border-color: #3A3A3A; }
-    [data-theme="dark"] .phase-item.active { background: #F0EDE8; border-color: transparent; }
-    [data-theme="dark"] .phase-item.active .phase-num { color: rgba(37,37,37,0.45); }
-    [data-theme="dark"] .phase-item.active .phase-tag { background: rgba(37,37,37,0.12); color: rgba(37,37,37,0.55); }
-    [data-theme="dark"] .phase-item.active .phase-expand-title { color: #252525; }
-    [data-theme="dark"] .phase-item.active .phase-expand-desc { color: rgba(37,37,37,0.55); }
-    [data-theme="dark"] .phase-plus-circle { border-color: rgba(240,237,232,0.25); color: #999999; }
-    [data-theme="dark"] .phase-num { color: #999999; }
-    [data-theme="dark"] .phase-tag { background: rgba(240,237,232,0.08); color: #999999; }
+    /* muted ink must clear AA on both the page ground and the lighter #222222 cards */
+    [data-theme="dark"] .op-card-desc { color: #A9B4C2; }
+    [data-theme="dark"] .what-if-card { background: #222222; border-color: #222C3D; }
+    [data-theme="dark"] .phase-item { background: #131A25; border-color: #222C3D; }
+    [data-theme="dark"] .phase-item.active { background: #EFF3F8; border-color: transparent; }
+    [data-theme="dark"] .phase-item.active .phase-num { color: rgba(19,26,37,0.6); }
+    [data-theme="dark"] .phase-item.active .phase-tag { background: rgba(19,26,37,0.12); color: rgba(19,26,37,0.72); }
+    [data-theme="dark"] .phase-item.active .phase-expand-title { color: #131A25; }
+    [data-theme="dark"] .phase-item.active .phase-expand-desc { color: rgba(19,26,37,0.72); }
+    [data-theme="dark"] .phase-plus-circle { border-color: rgba(240,237,232,0.25); color: #A9B4C2; }
+    [data-theme="dark"] .phase-num { color: #A9B4C2; }
+    [data-theme="dark"] .phase-tag { background: rgba(240,237,232,0.08); color: #A9B4C2; }
     [data-theme="dark"] .sys-card { background: #222222; }
-    [data-theme="dark"] .sys-card-img { background: #2C2C2C; border-color: rgba(240,237,232,0.04); }
+    [data-theme="dark"] .sys-card-img { background: #182130; border-color: rgba(240,237,232,0.04); }
     [data-theme="dark"] .sys-nav { background: #222222; box-shadow: inset 0 0 5px rgba(240,237,232,0.08); border-color: rgba(240,237,232,0.05); }
-    [data-theme="dark"] .sys-progress { background: #3A3A3A; }
+    [data-theme="dark"] .sys-progress { background: #222C3D; }
     [data-theme="dark"] .sys-progress-fill { background: #555; }
-    [data-theme="dark"] .chal-next strong { color: #F0EDE8; }
-    [data-theme="dark"] .nudge-btn { color: #888; }
-    [data-theme="dark"] .nudge-btn:hover { color: #F0EDE8; }
-    [data-theme="dark"] .nudge-thanks { color: #999; }
+    [data-theme="dark"] .chal-next strong { color: #EFF3F8; }
+    [data-theme="dark"] .nudge-btn { color: #A9B4C2; }
+    [data-theme="dark"] .nudge-btn:hover { color: #EFF3F8; }
+    [data-theme="dark"] .nudge-thanks { color: #A9B4C2; }
     [data-theme="dark"] .bloom-curve { stroke: rgba(240,237,232,0.7); }
     [data-theme="dark"] #phaseScrollHint,
     [data-theme="dark"] #phaseNudge { border-top-color: rgba(240,237,232,0.08); }
     [data-theme="dark"] .hint-chip { background: rgba(240,237,232,0.04); border-color: rgba(240,237,232,0.10); }
-    [data-theme="dark"] .hint-label { color: #888; }
+    [data-theme="dark"] .hint-label,
+    [data-theme="dark"] #phaseScrollHint .hint-label { color: #A9B4C2; }
     [data-theme="dark"] .out-divider { background: rgba(240,237,232,0.08); }
+    /* lime band keeps its light ground in dark mode — ink must stay dark */
+    [data-theme="dark"] .thankyou-footer .ty-text { color: #131A25; }
     [data-theme="dark"] .card-cta { border-color: rgba(240,237,232,0.2); }
     [data-theme="dark"] .card-cta:hover { background: rgba(240,237,232,0.05); border-color: rgba(240,237,232,0.4); }
-    [data-theme="dark"] .prob-dot { background: #F0EDE8; }
-    [data-theme="dark"] .out-title-row .prob-dot { background: #F0EDE8; }
+    [data-theme="dark"] .prob-dot { background: #EFF3F8; }
+    [data-theme="dark"] .out-title-row .prob-dot { background: #EFF3F8; }
     [data-theme="dark"] .cs-link { text-decoration-color: rgba(240,237,232,0.35); }
     [data-theme="dark"] .other-projects { border-top-color: rgba(240,237,232,0.08); }
     [data-theme="dark"] .op-card { background: #1E1E1E; border-color: rgba(240,237,232,0.1); }
-    [data-theme="dark"] .op-card-img { background: #2C2C2C; }
-    [data-theme="dark"] .op-card-tag { background: #2C2C2C; color: #888; }
-    [data-theme="dark"] .op-card-title { color: #F0EDE8; }
-    [data-theme="dark"] .op-card-cta { background: #F0EDE8; color: #252525; }
-    [data-theme="dark"] .impact-stat-hl.hi { background: #789F04; }
+    [data-theme="dark"] .op-card-img { background: #182130; }
+    [data-theme="dark"] .op-card-tag { background: none; color: #A9B4C2; }
+    [data-theme="dark"] .op-card-tag + .op-card-tag::before { color: #4A5563; }
+    [data-theme="dark"] .op-card-title { color: #EFF3F8; }
+    [data-theme="dark"] .op-card-cta { color: #EFF3F8; }
+    [data-theme="dark"] .op-card:hover {
+      border-color: rgba(240,237,232,0.28);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+    }
+    [data-theme="dark"] .op-card:focus-visible { outline-color: #EFF3F8; }
+    /* hero strip hairlines — the light-mode ink disappears on the dark ground */
+    [data-theme="dark"] .hero-pills { border-color: rgba(240,237,232,0.14); }
+    /* the generated backdrop is already dark where the copy sits, so this only
+       needs to steady the left edge — not blanket the image */
+    [data-theme="dark"] .hero-scrim {
+      background: linear-gradient(100deg,
+        rgba(10,14,21,0.86) 0%, rgba(10,14,21,0.62) 30%,
+        rgba(10,14,21,0.18) 55%, rgba(10,14,21,0) 74%);
+    }
+    /* same lime as every other highlight — the stats row is not its own accent;
+       ink stays dark (inheriting --secondary left it near-white on the lime) */
+    [data-theme="dark"] .impact-stat-hl.hi { background: #E6F28D; color: #131A25; }
+    /* Lime highlights keep dark text in dark mode — they inherit --secondary
+       otherwise, which goes near-white and leaves 1.08:1 against the lime.
+       .et-hl only flips once the lime has wiped in, so the pre-reveal text
+       stays light against the dark card instead of going dark-on-dark. */
+    [data-theme="dark"] .et-hl.revealed,
+    [data-theme="dark"] .team-role-hl { color: #131A25; }
+    /* <mark> carries the UA's black ink, which is invisible on the dark card
+       until the lime wipes in — light before the reveal, dark once it lands */
+    [data-theme="dark"] .hl { color: var(--secondary); }
+    [data-theme="dark"] .hl.revealed { color: #131A25; }
     /* SVG chart — override hardcoded fill/stroke presentation attributes */
     [data-theme="dark"] #bloomsGraph line { stroke: #555; }
     [data-theme="dark"] #bloomsGraph polygon { stroke: #555; fill: #555; }
-    [data-theme="dark"] #bloomsGraph .bloom-label text:first-child { fill: #F0EDE8; }
+    [data-theme="dark"] #bloomsGraph .bloom-label text:first-child { fill: #EFF3F8; }
     [data-theme="dark"] #bloomsGraph .bloom-label text:last-child { fill: #999; }
     [data-theme="dark"] #bloomsGraph > text { fill: #999; }
-    [data-theme="dark"] .phase-left { background: #252525 !important; }
-    [data-theme="dark"] .phase-mobile-detail { background: #252525; }
-    [data-theme="dark"] .phase-mobile-tag { color: rgba(240,237,232,0.45); }
-    [data-theme="dark"] .phase-mobile-title { color: #F0EDE8; }
+    [data-theme="dark"] .phase-left { background: #131A25 !important; }
+    [data-theme="dark"] .phase-mobile-detail { background: #131A25; }
+    [data-theme="dark"] .phase-mobile-tag { color: rgba(240,237,232,0.6); }
+    [data-theme="dark"] .phase-mobile-title { color: #EFF3F8; }
     [data-theme="dark"] .phase-mobile-desc { color: rgba(240,237,232,0.6); }
 
-    /* ─── THEME TOGGLE BUTTON ────────────────────────────────── */
-    .theme-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer !important; flex-shrink: 0; border-radius: 100px; transition: transform 0.15s ease; }
-    .theme-toggle:active { transform: scale(0.93); }
-    .tt-track { position: relative; width: 58px; height: 30px; border-radius: 100px; background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border: 1.5px solid rgba(255,255,255,0.40); flex-shrink: 0; overflow: hidden; transition: background 0.5s ease, border-color 0.4s ease; }
-    .tt-track::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 50%; border-radius: 100px 100px 50% 50%; background: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 100%); pointer-events: none; z-index: 10; }
-    .tt-hill-back { position: absolute; bottom: 0; left: -5%; width: 75%; height: 13px; background: #72B87A; border-radius: 50% 60% 0 0; z-index: 1; transition: background 0.5s ease; }
-    .tt-hill-front { position: absolute; bottom: 0; right: -8%; width: 62%; height: 11px; background: #5DA066; border-radius: 60% 50% 0 0; z-index: 2; transition: background 0.5s ease; }
-    .tt-star { position: absolute; background: rgba(255,255,255,0.90); border-radius: 50%; opacity: 0; transition: opacity 0.4s ease; z-index: 1; }
-    .tt-star-1 { width: 2.5px; height: 2.5px; top: 5px; left: 8px; }
-    .tt-star-2 { width: 2px; height: 2px; top: 11px; left: 18px; }
-    .tt-star-3 { width: 2px; height: 2px; top: 6px; left: 27px; }
-    .tt-star-4 { width: 1.5px; height: 1.5px; top: 13px; left: 11px; }
-    [data-theme="dark"] .tt-star { opacity: 1; }
-    @keyframes tt-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.12; } }
-    [data-theme="dark"] .tt-star-1 { animation: tt-twinkle 2.1s ease-in-out infinite; }
-    [data-theme="dark"] .tt-star-2 { animation: tt-twinkle 1.7s ease-in-out 0.8s infinite; }
-    [data-theme="dark"] .tt-star-3 { animation: tt-twinkle 2.5s ease-in-out 1.5s infinite; }
-    [data-theme="dark"] .tt-star-4 { animation: tt-twinkle 1.9s ease-in-out 0.4s infinite; }
-    .tt-shoot { position: absolute; top: 3px; left: 4px; width: 9px; height: 1px; background: linear-gradient(to right, transparent, #FFE87A); border-radius: 1px; opacity: 0; transform: rotate(35deg); z-index: 2; pointer-events: none; }
-    @keyframes tt-shooting-star { 0% { opacity: 0; transform: translate(0,0) rotate(35deg); } 3% { opacity: 0.85; } 15% { opacity: 0; transform: translate(20px,8px) rotate(35deg); } 100% { opacity: 0; transform: translate(20px,8px) rotate(35deg); } }
-    [data-theme="dark"] .tt-shoot { animation: tt-shooting-star 5s ease-in 2s infinite; }
-    .tt-cloud { position: absolute; right: 9px; top: 6px; width: 15px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 10px; opacity: 1; transition: opacity 0.4s ease; z-index: 1; }
-    .tt-cloud::before { content: ''; position: absolute; width: 9px; height: 9px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -5px; left: 2px; }
-    .tt-cloud::after { content: ''; position: absolute; width: 7px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -4px; left: 7px; }
-    [data-theme="dark"] .tt-cloud { opacity: 0; }
-    @keyframes tt-cloud-drift { from { transform: translateX(30px); } to { transform: translateX(-85px); } }
-    [data-theme="light"] .tt-cloud { animation: tt-cloud-drift 26s linear 0s infinite backwards; }
-    .tt-cloud-b { position: absolute; right: 3px; top: 11px; width: 9px; height: 4px; background: rgba(255,255,255,0.95); border-radius: 8px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
-    .tt-cloud-b::before { content: ''; position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 1px; }
-    .tt-cloud-b::after { content: ''; position: absolute; width: 5px; height: 5px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 4px; }
-    [data-theme="dark"] .tt-cloud-b { opacity: 0; }
-    [data-theme="light"] .tt-cloud-b { opacity: 0.65; animation: tt-cloud-drift 18s linear 4s infinite backwards; }
-    .tt-cloud-c { position: absolute; right: 18px; top: 4px; width: 11px; height: 5px; background: rgba(255,255,255,0.95); border-radius: 8px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
-    .tt-cloud-c::before { content: ''; position: absolute; width: 7px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -4px; left: 1px; }
-    .tt-cloud-c::after { content: ''; position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 5px; }
-    [data-theme="dark"] .tt-cloud-c { opacity: 0; }
-    [data-theme="light"] .tt-cloud-c { opacity: 0.45; animation: tt-cloud-drift 22s linear 10s infinite backwards; }
-    .tt-thumb { position: absolute; top: 50%; left: 3px; width: 22px; height: 22px; border-radius: 50%; z-index: 3; transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); box-shadow: 0 2px 4px rgba(0,0,0,0.28); }
-    .tt-thumb::before, .tt-thumb::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.75); opacity: 0; transition: opacity 0.4s ease; }
-    .tt-thumb::before { width: 7px; height: 7px; top: 4px; left: 5px; }
-    .tt-thumb::after  { width: 5px; height: 5px; top: 13px; left: 14px; }
-    [data-theme="dark"] .tt-thumb::before, [data-theme="dark"] .tt-thumb::after { opacity: 1; }
-    [data-theme="light"] .tt-track { background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border-color: rgba(255,255,255,0.40); }
-    [data-theme="light"] .tt-hill-back { background: #72B87A; }
-    [data-theme="light"] .tt-hill-front { background: #5DA066; }
-    [data-theme="light"] .tt-thumb { transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); }
-    [data-theme="light"] .tt-star { opacity: 0; }
-    [data-theme="light"] .tt-cloud { opacity: 1; }
-    [data-theme="light"] .tt-thumb::before, [data-theme="light"] .tt-thumb::after { opacity: 0; }
-    [data-theme="dark"] .tt-track { background: linear-gradient(180deg, #0B1829 0%, #152238 100%); border-color: rgba(255,255,255,0.10); }
-    [data-theme="dark"] .tt-track::after { background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%); }
-    [data-theme="dark"] .tt-hill-back { background: #1D3D25; }
-    [data-theme="dark"] .tt-hill-front { background: #152C1A; }
-    [data-theme="dark"] .tt-thumb { transform: translateX(28px) translateY(-50%); background: #EEF0F5; }
-    [data-theme="dark"] .tt-star { opacity: 1; }
-    [data-theme="dark"] .tt-cloud { opacity: 0; }
-    /* ─── SMOOTH THEME TRANSITION ────────────────────────────── */
-    html.color-transitioning * { transition-property: background, background-color, color, border-color, opacity !important; transition-duration: 0.5s !important; transition-timing-function: ease !important; }
-    html.color-transitioning .tt-track { transition: background 0.5s ease, border-color 0.4s ease !important; }
-    html.color-transitioning .tt-hill-back, html.color-transitioning .tt-hill-front { transition: background 0.5s ease !important; }
-    html.color-transitioning .tt-star, html.color-transitioning .tt-cloud { transition: opacity 0.4s ease !important; }
-    html.color-transitioning .tt-thumb { transition: transform 0.44s cubic-bezier(0.34,1.56,0.64,1), background 0.5s ease !important; }
+
+    /* ─── KEYBOARD FOCUS ─────────────────────────────────────── */
+    /* the custom cursor hides the pointer, so keyboard focus must be
+       unmistakable — --secondary is the page's light ink on the dark ground */
+    .nav-home:focus-visible, .nav-btn:focus-visible,
+    .nav-hamburger:focus-visible,
+    .mobile-menu a:focus-visible, .phase-item:focus-visible,
+    .card-cta:focus-visible, .cs-link:focus-visible, .nudge-btn:focus-visible {
+      outline: 2px solid var(--secondary); outline-offset: 3px;
+    }
+    .nav-btn:focus-visible,
+    .nav-hamburger:focus-visible { border-radius: 6px; }
+
+    /* ─── REDUCED MOTION ─────────────────────────────────────── */
+    /* Reveals land instantly on their end state ("both" keeps them visible);
+       looping ambience (pulse, hint float, star twinkle) runs once and stops. */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
 
   </style>
   <!-- Microsoft Clarity -->
@@ -1017,7 +1174,7 @@
   <div id="ccDot" aria-hidden="true"></div>
 
   <nav class="nav" id="mainNav">
-    <a href="index.html" class="nav-home" onclick="sessionStorage.setItem('skipLoader','1')">
+    <a href="/" class="nav-home">
       <img src="cs-nav-logo.svg" alt="" />
       <span>EverTutor Live</span>
     </a>
@@ -1029,22 +1186,7 @@
       <a href="#impact"      class="nav-btn"        data-section="impact">IMPACT</a>
       <a href="#team"        class="nav-btn"        data-section="team">TEAM</a>
     </div>
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-      <span class="tt-track">
-        <span class="tt-star tt-star-1"></span>
-        <span class="tt-star tt-star-2"></span>
-        <span class="tt-star tt-star-3"></span>
-        <span class="tt-star tt-star-4"></span>
-        <span class="tt-shoot"></span>
-        <span class="tt-cloud"></span>
-        <span class="tt-cloud-b"></span>
-        <span class="tt-cloud-c"></span>
-        <span class="tt-hill-back"></span>
-        <span class="tt-hill-front"></span>
-        <span class="tt-thumb"></span>
-      </span>
-    </button>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </nav>
@@ -1065,19 +1207,41 @@
       <!-- ══ OVERVIEW ══════════════════════════════════════════ -->
       <section class="cs-hero" id="overview">
 
-        <div class="designation-row" id="desigRow">
-          <div class="desig-pill">Sole Product Designer</div>
-          <div class="desig-pill">$9.5M Seed-Funded Startup</div>
-          <div class="desig-pill">March 2025 - May 2026</div>
-        </div>
+        <!-- the 2240×800 panorama is the hero's own backdrop, uncropped -->
+        <img id="etBgImg" class="et-bg-img" alt="" />
+        <div class="hero-scrim" aria-hidden="true"></div>
 
-        <h1 class="cs-heading" id="csHeading">Designed a 0→1 AI Tutor experience, from prototypes to live classrooms across 8+ schools, serving ~2,000+ learners in real time</h1>
-        <p class="chal-body" id="heroSubtext">I owned interaction design, voice UX, and the curriculum tooling system, end to end, from the first prototype to live classroom deployment.</p>
+        <div class="hero-grid">
+          <div class="hero-copy">
 
-        <!-- Hero frame: real background + real screen UI image -->
-        <div class="et-live-frame" id="liveFrame">
-          <img id="etBgImg"     class="et-bg-img"    alt="" />
-          <img id="etScreenImg" class="et-screen-img" alt="" />
+            <h1 class="cs-heading" id="csHeading">Designed a 0→1 AI Tutor that <span class="serif">actually scales.</span></h1>
+            <p class="chal-body" id="heroSubtext">I owned interaction design, voice UX, and the curriculum tooling system, end to end.</p>
+
+            <!-- the facts the headline used to carry as prose, as pill tags.
+                 Reuses .desig-pill so they match the pill language already in
+                 the file rather than introducing a second one. -->
+            <!-- keeps #desigRow so the existing reveal timing still finds it -->
+            <div class="hero-pills" id="desigRow">
+              <span class="desig-pill">Sole Product Designer</span>
+              <span class="desig-pill">Mar 2025 – May 2026</span>
+              <span class="desig-pill">$9.5M seed-funded</span>
+              <span class="desig-pill">8+ schools</span>
+              <span class="desig-pill">~2,000 learners</span>
+            </div>
+
+          </div>
+
+          <!-- Just the product now — the backdrop moved up to the section.
+               The tilt lives on its own wrapper because #liveFrame's reveal
+               animation ends on transform:translateY(0), which would otherwise
+               overwrite a rotate set on the frame itself. -->
+          <div class="hero-visual">
+            <div class="hero-tilt">
+              <div class="et-live-frame" id="liveFrame">
+                <video id="etScreenImg" class="et-screen-img" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+          </div>
         </div>
 
       </section>
@@ -1130,7 +1294,7 @@
                 </g>
                 <!-- X-axis label -->
                 <text x="310" y="390" text-anchor="middle"
-                      font-family="Shantell Sans, cursive" font-size="10.5" fill="#515151">Summative Achievement Scores (Teacher student ratio)</text>
+                      font-family="Shantell Sans, cursive" font-size="10.5" fill="#515151">Summative Achievement Scores (teacher-to-student ratio)</text>
 
                 <!-- Gradient fill for 1:1 tutoring -->
                 <path id="bloomFill" class="bloom-fill" fill="url(#tutorGrad)" d=""/>
@@ -1142,16 +1306,16 @@
 
                 <!-- Labels: top-left of each peak -->
                 <g id="lblConventional" class="bloom-label">
-                  <text x="270" y="178" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="12" font-weight="500" fill="#252525">Conventional</text>
-                  <text x="270" y="191" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#515151">(1:30)</text>
+                  <text x="270" y="178" text-anchor="start" font-family="Urbanist, sans-serif" font-size="12" font-weight="500" fill="#252525">Conventional</text>
+                  <text x="270" y="191" text-anchor="start" font-family="Urbanist, sans-serif" font-size="10" fill="#515151">(1:30)</text>
                 </g>
                 <g id="lblMastery" class="bloom-label">
-                  <text x="350" y="138" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="12" font-weight="500" fill="#252525">Mastery Learning</text>
-                  <text x="350" y="151" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#515151">(1:30)</text>
+                  <text x="350" y="138" text-anchor="start" font-family="Urbanist, sans-serif" font-size="12" font-weight="500" fill="#252525">Mastery Learning</text>
+                  <text x="350" y="151" text-anchor="start" font-family="Urbanist, sans-serif" font-size="10" fill="#515151">(1:30)</text>
                 </g>
                 <g id="lblTutor" class="bloom-label">
-                  <text x="452" y="98" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="12" font-weight="500" fill="#252525">1:1 Tutoring</text>
-                  <text x="452" y="111" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#515151">(1:1)</text>
+                  <text x="452" y="98" text-anchor="start" font-family="Urbanist, sans-serif" font-size="12" font-weight="500" fill="#252525">1:1 Tutoring</text>
+                  <text x="452" y="111" text-anchor="start" font-family="Urbanist, sans-serif" font-size="10" fill="#515151">(1:1)</text>
                 </g>
               </svg>
             </div>
@@ -1183,7 +1347,7 @@
             <div class="what-if-grid">
               <div class="what-if-card">
                 <div class="what-if-title"><span class="et-hl">Voice-first,</span> conversational interaction</div>
-                <p class="what-if-body">Enabling real-time, back-and-forth learning—mirroring how students learn with human tutors.</p>
+                <p class="what-if-body">Enabling real-time, back-and-forth learning, mirroring how students learn with human tutors.</p>
               </div>
               <div class="what-if-card">
                 <div class="what-if-title"><span class="et-hl">Real-time adaptive instruction</span> to student's responses</div>
@@ -1191,11 +1355,11 @@
               </div>
               <div class="what-if-card">
                 <div class="what-if-title"><span class="et-hl">Continuous, per-step mastery</span> tracking and adaptation</div>
-                <p class="what-if-body">At a per-step level—rather than evaluated only at the end.</p>
+                <p class="what-if-body">At a per-step level, rather than evaluated only at the end.</p>
               </div>
               <div class="what-if-card">
                 <div class="what-if-title"><span class="et-hl">The outcomes of 1:1 tutoring</span> (~2σ improvement)</div>
-                <p class="what-if-body">Are made scalable—without the cost constraints of human tutors.</p>
+                <p class="what-if-body">Are made scalable, without the cost constraints of human tutors.</p>
               </div>
             </div>
           </div>
@@ -1222,7 +1386,7 @@
               <div class="chal-item-content">
                 <div class="chal-title">Earning student trust</div>
                 <div class="chal-statement"><span class="et-hl">Students don't naturally engage</span> with a new interface as they would with a tutor.</div>
-                <p class="chal-body">The experience had to quickly feel approachable and responsive, especially in classrooms where hesitation, awkwardness, or lack of confidence can break engagement within seconds. During early classroom testing, a student said within 10 seconds: <em>"It doesn't feel like it's actually listening to me"</em>. That single line drove every voice UX decision that followed.</p>
+                <p class="chal-body">The experience had to quickly feel approachable and responsive, especially in classrooms where hesitation, awkwardness, or lack of confidence can break engagement within seconds. During early classroom testing, a student said within 10 seconds: <em>"It doesn't feel like it's actually listening to me."</em> That single line drove every voice UX decision that followed.</p>
               </div>
             </div>
 
@@ -1231,7 +1395,7 @@
               <div class="chal-item-content">
                 <div class="chal-title">Designing voice-first interaction from first principles</div>
                 <div class="chal-statement"><span class="et-hl">There were no well-established patterns</span> for designing real-time, conversational AI Tutors.</div>
-                <p class="chal-body">I had to define how students speak, listen, interrupt, recover from mistakes, and stay oriented—all while keeping the interaction natural and low-friction.</p>
+                <p class="chal-body">I had to define how students speak, listen, interrupt, recover from mistakes, and stay oriented, all while keeping the interaction natural and low-friction.</p>
               </div>
             </div>
 
@@ -1240,7 +1404,7 @@
               <div class="chal-item-content">
                 <div class="chal-title">From linear content to dynamic teaching behavior</div>
                 <div class="chal-statement">Traditional content design is <span class="et-hl">built for rigid, linear instruction.</span></div>
-                <p class="chal-body">Designing for a voice-first AI Tutor required rethinking how content is created—so it can drive real-time, conversational teaching instead of static delivery.</p>
+                <p class="chal-body">Designing for a voice-first AI Tutor required rethinking how content is created, so it can drive real-time, conversational teaching instead of static delivery.</p>
               </div>
             </div>
 
@@ -1286,11 +1450,11 @@
                 <div class="phase-pill">
                   <span class="phase-plus-circle">+</span>
                   <span class="phase-num">Phase 2</span>
-                  <span class="phase-tag">Support Multi language & voice</span>
+                  <span class="phase-tag">Multi-language & voice support</span>
                 </div>
                 <div class="phase-expand-body"><div class="phase-expand-inner"><div class="phase-expand-content">
                   <div class="phase-expand-title">Scaling Voice Personalisation &amp; Content Production</div>
-                  <p class="phase-expand-desc">With the core experience validated, the focus shifted to making the AI tutor feel more personal—and making content creation fast enough to scale across subjects.</p>
+                  <p class="phase-expand-desc">With the core experience validated, the focus shifted to making the AI tutor feel more personal, and making content creation fast enough to scale across subjects.</p>
                 </div></div></div>
                 <div class="phase-progress-track"><div class="phase-progress-fill"></div></div>
               </div>
@@ -1312,11 +1476,11 @@
                 <div class="phase-pill">
                   <span class="phase-plus-circle">+</span>
                   <span class="phase-num">Phase 4</span>
-                  <span class="phase-tag">In the moment adaptability</span>
+                  <span class="phase-tag">In-the-moment adaptability</span>
                 </div>
                 <div class="phase-expand-body"><div class="phase-expand-inner"><div class="phase-expand-content">
                   <div class="phase-expand-title">Operational Scale &amp; Classroom Automation</div>
-                  <p class="phase-expand-desc">With the experience deeply validated, the final phase focused on removing operational friction—automating classroom flow and introducing a flexible spatial canvas for complex content.</p>
+                  <p class="phase-expand-desc">With the experience deeply validated, the final phase focused on removing operational friction: automating classroom flow and introducing a flexible spatial canvas for complex content.</p>
                 </div></div></div>
                 <div class="phase-progress-track"><div class="phase-progress-fill"></div></div>
               </div>
@@ -1349,7 +1513,7 @@
               <!-- Panel 1 -->
               <div class="phase-panel active" data-phase="1">
                 <div class="phase-cards">
-                  <div class="sys-card"><div class="sys-card-img"><img id="p1c1" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">1). Designing for Human-Like Tutoring</div><p class="sys-card-desc">I replaced text-heavy static slides with this — a whiteboard-style interface using handwritten visuals that mimic exactly how a human tutor explains concepts step-by-step.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p1c1" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">1). Designing for Human-Like Tutoring</div><p class="sys-card-desc">I replaced text-heavy static slides with this: a whiteboard-style interface using handwritten visuals that mimic exactly how a human tutor explains concepts step-by-step.</p></div></div>
                   <div class="sys-card"><div class="sys-card-img"><img id="p1c2" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">2). Driving Engagement Through Progress</div><p class="sys-card-desc">Added a simple progress-based interaction layer that advances on correct responses to reinforce momentum and participation.</p></div></div>
                   <div class="sys-card"><div class="sys-card-img"><img id="p1c3" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">3). Enabling Natural, Low-Friction Interaction</div><p class="sys-card-desc">Refined voice interaction with a "hold to speak" mechanism, making it easier and more natural for students to talk to the tutor.</p></div></div>
                 </div>
@@ -1361,9 +1525,9 @@
                 </div>
                 <div class="out-section">
                   <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Trade-offs &amp; Learnings:</div></div>
-                  <div class="out-item"><span class="out-item-arrow">→</span><p><strong>I bet on a gamified progress layer first — it didn't move engagement,</strong><span class="dim"> so I cut it rather than iterate on it, and redirected the budget into interaction quality instead.</span></p></div>
-                  <div class="out-item"><span class="out-item-arrow">→</span><p><strong>I deliberately left out mastery guardrails in this phase</strong><span class="dim"> to validate free-form interaction first — the right call early on, but it meant students could skip ahead without demonstrating understanding, a gap I had to close in Phase 3.</span></p></div>
-                  <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Content creation was highly time-intensive (<mark class="hl">~104 hours for 30 minutes</mark>),</strong><span class="dim"> exposing a scalability gap and leading to the creation of Studio.</span> <a href="evertutor-studio.html" class="cs-link">Case-study here<span class="cs-link-arrow"> ↗</span></a></p></div>
+                  <div class="out-item"><span class="out-item-arrow">→</span><p><strong>I bet on a gamified progress layer first. It didn't move engagement,</strong><span class="dim"> so I cut it rather than iterate on it, and redirected the budget into interaction quality instead.</span></p></div>
+                  <div class="out-item"><span class="out-item-arrow">→</span><p><strong>I deliberately left out mastery guardrails in this phase</strong><span class="dim"> to validate free-form interaction first. It was the right call early on, but it meant students could skip ahead without demonstrating understanding, a gap I had to close in Phase 3.</span></p></div>
+                  <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Content creation was highly time-intensive (<mark class="hl">~104 hours for 30 minutes</mark>),</strong><span class="dim"> exposing a scalability gap and leading to the creation of Studio.</span> <a href="evertutor-studio.html" class="cs-link">Case study here<span class="cs-link-arrow"> ↗</span></a></p></div>
                   <div class="out-item"><span class="out-item-arrow">→</span><p><strong>Increased flexibility introduced complexity,</strong><span class="dim"> making it harder for content designers and highlighting the need for better tooling.</span></p></div>
                 </div>
               </div>
@@ -1392,9 +1556,9 @@
               <!-- Panel 3 -->
               <div class="phase-panel" data-phase="3">
                 <div class="phase-cards">
-                  <div class="sys-card"><div class="sys-card-img"><img id="p3c1" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">1). Introducing Guardrail-Controlled Progression</div><p class="sys-card-desc">Added mastery-gated progression that prevents students from advancing without demonstrated understanding—enforcing mastery step-by-step.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p3c1" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">1). Introducing Guardrail-Controlled Progression</div><p class="sys-card-desc">Added mastery-gated progression that prevents students from advancing without demonstrated understanding, enforcing mastery step-by-step.</p></div></div>
                   <div class="sys-card"><div class="sys-card-img"><img id="p3c2" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">2). Strengthening AI Response Quality</div><p class="sys-card-desc">Improved the consistency and quality of AI tutor responses through tighter curriculum alignment and iterative refinement based on live classroom feedback.</p></div></div>
-                  <div class="sys-card"><div class="sys-card-img"><img id="p3c3" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">3). Aligning with Familiar Learning Behaviors</div><p class="sys-card-desc">Introduced patterns students already recognize from classrooms—pacing cues, structured prompts—to lower cognitive friction and ease the transition.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p3c3" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">3). Aligning with Familiar Learning Behaviors</div><p class="sys-card-desc">Introduced patterns students already recognize from classrooms (pacing cues, structured prompts) to lower cognitive friction and ease the transition.</p></div></div>
                   <div class="sys-card"><div class="sys-card-img"><img id="p3c4" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">4). Making Learning Progress Visible</div><p class="sys-card-desc">Built real-time progress indicators into the student experience, helping learners track mastery trajectory and reducing anxiety about performance.</p></div></div>
                   <div class="sys-card"><div class="sys-card-img"><img id="p3c5" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">5). Evolving Pedagogy with Teacher Collaboration</div><p class="sys-card-desc">Co-developed instructional sequences with teachers in the loop, incorporating direct classroom observations into the AI tutor's pedagogical approach.</p></div></div>
                 </div>
@@ -1474,7 +1638,7 @@
                   <span class="impact-stat-hl">Scaled to</span>
                   <span class="impact-stat-hl hi">2,000+ learners</span>
                 </div>
-                <p class="impact-stat-desc">Expanded across multiple schools, grade levels, and subjects maintaining consistent learning outcomes and engagement patterns.</p>
+                <p class="impact-stat-desc">Expanded across multiple schools, grade levels, and subjects while maintaining consistent learning outcomes and engagement patterns.</p>
               </div>
             </div>
             <div class="impact-stats-row">
@@ -1492,7 +1656,7 @@
                   <span class="impact-stat-hl hi">Enabled</span>
                   <span class="impact-stat-hl">AI-Native Tutoring</span>
                 </div>
-                <p class="impact-stat-desc">Transitioned from static content delivery to adaptive, real-time tutoring—differentiating the product in a competitive EdTech landscape.</p>
+                <p class="impact-stat-desc">Transitioned from static content delivery to adaptive, real-time tutoring, differentiating the product in a competitive EdTech landscape.</p>
               </div>
               <div class="impact-stat">
                 <div class="impact-stat-num">06</div>
@@ -1524,7 +1688,7 @@
             </div>
             <div class="chal-header">
               <div class="section-label">Growth</div>
-              <div class="problem-statement">Revenue and learner growth weren't a straight line — a real dip from cohort churn in December, then sustained school-by-school compounding from January on.</div>
+              <div class="problem-statement">Revenue and learner growth weren't a straight line: a real dip from cohort churn in December, then sustained school-by-school compounding from January on.</div>
             </div>
           </div>
 
@@ -1604,7 +1768,7 @@
             <div class="chal-img"><img id="etTeamImg" alt="Team" /></div>
             <div class="chal-header">
               <div class="section-label">Team &amp; Role</div>
-              <div class="problem-statement">Led the design and curriculum strengthening of the AI Tutor (Live) system in a lean team partnering closely with the founder and PM, directing content designers through the tooling I built to deliver a real-time, voice-first tutoring experience in classrooms.</div>
+              <div class="problem-statement">Led the design and curriculum strengthening of the AI Tutor (Live) system in a lean team, partnering closely with the founder and PM, directing content designers through the tooling I built to deliver a real-time, voice-first tutoring experience in classrooms.</div>
             </div>
           </div>
 
@@ -1616,78 +1780,31 @@
                   <span class="team-role-hl">Sole Product &amp; Curriculum Designer (Me)</span>
                   <img class="team-avatar" src="photo.jpg" alt="Bhanu" />
                 </div>
-                <p class="team-role-body">Owned the end-to-end learner experience—defining interaction patterns and instructional flow, setting direction for content designers, and validating improvements through live classroom pilots.</p>
+                <p class="team-role-body">Owned the end-to-end learner experience: defining interaction patterns and instructional flow, setting direction for content designers, and validating improvements through live classroom pilots.</p>
               </div>
             </div>
             <div class="team-item">
               <div class="team-item-dot"></div>
               <div class="team-item-content">
-                <p class="team-role-body"><strong>Engineers (2–3)</strong><span class="dim"> Built the AI Tutor system, enabling real-time voice interaction, adaptive tutoring, and scalable classroom deployment.</span></p>
+                <p class="team-role-body"><strong>Engineers (2–3):</strong><span class="dim"> Built the AI Tutor system, enabling real-time voice interaction, adaptive tutoring, and scalable classroom deployment.</span></p>
               </div>
             </div>
             <div class="team-item">
               <div class="team-item-dot"></div>
               <div class="team-item-content">
-                <p class="team-role-body"><strong>Product Manager / Founder</strong><span class="dim"> Drove product direction and led pilot rollout with partner schools.</span></p>
+                <p class="team-role-body"><strong>Product Manager / Founder:</strong><span class="dim"> Drove product direction and led pilot rollout with partner schools.</span></p>
               </div>
             </div>
             <div class="team-item">
               <div class="team-item-dot"></div>
               <div class="team-item-content">
-                <p class="team-role-body"><strong>Content Designers (contract, rotating)</strong><span class="dim"> Produced curriculum content using the authoring system I designed; I set the pedagogical guidelines and reviewed output for quality.</span></p>
+                <p class="team-role-body"><strong>Content Designers (contract, rotating):</strong><span class="dim"> Produced curriculum content using the authoring system I designed; I set the pedagogical guidelines and reviewed output for quality.</span></p>
               </div>
             </div>
           </div>
 
         </div>
       </div>
-
-    <!-- ── Other Projects ──────────────────────────────────────── -->
-    <section class="other-projects">
-      <p class="other-projects-label">Other Projects</p>
-      <div class="other-projects-grid">
-
-        <a class="op-card" href="./evertutor-studio.html">
-          <div class="op-card-img op-card-img-studio">
-            <video autoplay muted loop playsinline>
-              <source src="./et-studio-recording.mov" type="video/mp4" />
-            </video>
-          </div>
-          <div class="op-card-body">
-            <div class="op-card-tags"><span class="op-card-tag">EverTutor</span><span class="op-card-tag">Authoring</span></div>
-            <p class="op-card-title">EverTutor Studio</p>
-            <p class="op-card-desc">The teacher-facing authoring tool that reduced lesson creation from 100+ hours to ~4 hours without sacrificing quality.</p>
-            <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
-        </a>
-
-        <a class="op-card" href="./stressie-studio.html">
-          <div class="op-card-img op-card-img-stressie">
-            <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%202.png" alt="Stressie screen 1" />
-            <img src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Mockup%203.png" alt="Stressie screen 2" />
-          </div>
-          <div class="op-card-body">
-            <div class="op-card-tags"><span class="op-card-tag">Wellness</span><span class="op-card-tag">Enterprise</span></div>
-            <p class="op-card-title">Stressie</p>
-            <p class="op-card-desc">Took workplace stress from a vague problem to a Harvard-incubated product, now live at Amazon and InKind.</p>
-            <span class="op-card-cta">Explore case study <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
-        </a>
-
-        <a class="op-card" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">
-          <div class="op-card-img">
-            <img src="dearly-full-visual.png" alt="Dearly — personal notes app" />
-          </div>
-          <div class="op-card-body">
-            <div class="op-card-tags"><span class="op-card-tag">Side Project</span><span class="op-card-tag">Consumer</span></div>
-            <p class="op-card-title">Dearly</p>
-            <p class="op-card-desc">A notes app designed to feel personal, shipped as an independent side project and live on Product Hunt.</p>
-            <span class="op-card-cta">Try it out <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
-        </a>
-
-      </div>
-    </section>
 
     <footer class="thankyou-footer">
       <span class="ty-text">✦ Thank_you</span>
@@ -1698,8 +1815,16 @@
 
   <script>
     /* ── IMAGES — set src via JS to handle spaces in filenames ── */
-    document.getElementById('etBgImg').src     = 'ET Live Case Study/Section 1 Images/Backgorund.png';
-    document.getElementById('etScreenImg').src = 'ET Live Case Study/Section 1 Images/New Student home page.png';
+    document.getElementById('etBgImg').src     = 'images/hero-bg-a.png';
+    /* Hero screen is a video; the old still stays as the poster so nothing flashes empty */
+    const etScreenVid = document.getElementById('etScreenImg');
+    etScreenVid.poster = 'ET Live Case Study/Section 1 Images/New Student home page.png';
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      etScreenVid.removeAttribute('autoplay');
+    } else {
+      etScreenVid.src = 'images/et-live.mp4';
+      etScreenVid.play().catch(() => {});
+    }
     document.getElementById('etChalImg').src   = 'ET Live Case Study/Section 3 Images/Section hero image.png';
     document.getElementById('etSysImg').src    = 'ET Live Case Study/Section 4 Images/Section Heading.png';
     document.getElementById('etImpactImg').src = 'ET Live Case Study/Section 5 (Impact)/Section Image.png';
@@ -1768,6 +1893,9 @@
         for (const [px, py] of [[x,y],[x+PAD,y],[x-PAD,y],[x,y+PAD],[x,y-PAD]]) {
           const h = document.elementFromPoint(px, py);
           if (!h || h.closest(CTA_SEL)) continue;
+          /* the whole card is the link now — an I-beam over its copy would
+             read as "selectable text" rather than "clickable" */
+          if (h.closest('.op-card')) continue;
           if (!h.closest(TEXT_SEL)) continue;
           const cr = document.caretRangeFromPoint ? document.caretRangeFromPoint(px, py) : null;
           if (!cr || cr.startContainer.nodeType !== Node.TEXT_NODE) continue;
@@ -1829,6 +1957,7 @@
     function toggleMenu(force) {
       const open = force !== undefined ? force : !hamburger.classList.contains('open');
       hamburger.classList.toggle('open', open);
+      hamburger.setAttribute('aria-expanded', open);
       mobileMenu.classList.toggle('open', open);
       backdrop.classList.toggle('open', open);
     }
@@ -1852,6 +1981,7 @@
     /* ── SMOOTH SCROLL ───────────────────────────────────────── */
     function easeOutExpo(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
     function smoothScrollTo(y, dur) {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, y); return; }
       const startY = window.scrollY, dist = y - startY, t0 = performance.now();
       (function step(now) {
         const t = Math.min((now - t0) / dur, 1);
@@ -1878,12 +2008,25 @@
     document.querySelectorAll('#overview, #problem, #challenges, #system, #impact, #team').forEach(el => navObs.observe(el));
 
     /* ── WORD-BY-WORD HEADING ────────────────────────────────── */
+    /* Walks text nodes instead of innerHTML so inline markup inside the
+       heading — the serif italic emphasis — survives the split. Splitting the
+       HTML string would tear the tags apart on their internal whitespace. */
     function splitWords(el) {
-      el.innerHTML = el.innerHTML.split(/(\s+)/).map(chunk => {
-        if (/^\s+$/.test(chunk)) return chunk;
-        if (!chunk) return '';
-        return `<span class="word">${chunk}</span>`;
-      }).join('');
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      const texts = [];
+      while (walker.nextNode()) texts.push(walker.currentNode);
+      texts.forEach(node => {
+        const frag = document.createDocumentFragment();
+        node.textContent.split(/(\s+)/).forEach(chunk => {
+          if (!chunk) return;
+          if (/^\s+$/.test(chunk)) { frag.appendChild(document.createTextNode(chunk)); return; }
+          const s = document.createElement('span');
+          s.className = 'word';
+          s.textContent = chunk;
+          frag.appendChild(s);
+        });
+        node.parentNode.replaceChild(frag, node);
+      });
     }
     const heading = document.getElementById('csHeading');
     splitWords(heading);
@@ -2060,6 +2203,7 @@
         body.style.height   = '0px';
         const target = inner.scrollHeight;
         item.classList.add('active');
+        item.setAttribute('aria-expanded', 'true');
         const setter = h => { body.style.height = Math.max(0, h) + 'px'; };
         springTo(0, target, setter, () => { body.style.height = 'auto'; });
       }
@@ -2070,6 +2214,7 @@
         const from = body.offsetHeight || item.querySelector('.phase-expand-inner').scrollHeight;
         body.style.height = from + 'px';
         item.classList.remove('active');
+        item.setAttribute('aria-expanded', 'false');
         const setter = h => { body.style.height = Math.max(0, h) + 'px'; };
         springTo(from, 0, setter, () => { body.style.display = 'none'; });
       }
@@ -2097,6 +2242,16 @@
         }
       });
       syncMobileDetail(1);
+
+      /* keyboard: the pills are div-based, so they need button semantics */
+      items.forEach(item => {
+        item.setAttribute('tabindex', '0');
+        item.setAttribute('role', 'button');
+        item.setAttribute('aria-expanded', item.classList.contains('active'));
+        item.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }
+        });
+      });
 
       items.forEach(item => {
         item.addEventListener('click', () => {
@@ -2173,6 +2328,9 @@
       const prev     = document.querySelector(`.sys-arrow-prev[data-phase="${phase}"]`);
       const next     = document.querySelector(`.sys-arrow-next[data-phase="${phase}"]`);
       const progFill = document.getElementById(`prog-p${phase}`);
+      /* phase cards are stacked now — no carousel in the DOM; bail before the
+         null lookups above throw and kill the rest of this block */
+      if (!track || !prev || !next) return;
       let idx = 0;
       let maxIdx = 0;
 
@@ -2247,73 +2405,6 @@
   window.addEventListener('load', tryPlayVideos);
   </script>
 
-  <script>
-  /* ── Dark / Light mode toggle ──────────────────────────────── */
-  (function() {
-    var root = document.documentElement;
-    var btn  = document.getElementById('themeToggle');
-    var KEY  = 'portfolio-theme';
-
-    function animateToggleScene(toDark) {
-      var track     = document.querySelector('.tt-track');
-      var thumb     = document.querySelector('.tt-thumb');
-      var hillBack  = document.querySelector('.tt-hill-back');
-      var hillFront = document.querySelector('.tt-hill-front');
-      var stars     = document.querySelectorAll('.tt-star');
-      var cloud     = document.querySelector('.tt-cloud');
-      var cloudB    = document.querySelector('.tt-cloud-b');
-      var cloudC    = document.querySelector('.tt-cloud-c');
-      if (!track) return;
-      [track, thumb, hillBack, hillFront, cloud, cloudB, cloudC].forEach(function(el) {
-        if (el) el.getAnimations().forEach(function(a) { a.cancel(); });
-      });
-      stars.forEach(function(el) { el.getAnimations().forEach(function(a) { a.cancel(); }); });
-      var ease   = { easing: 'ease', fill: 'none' };
-      var spring = { easing: 'cubic-bezier(0.34,1.56,0.64,1)', fill: 'none' };
-      track.animate([{ background: toDark ? 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' : 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' }, { background: toDark ? 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' : 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      track.animate([{ borderColor: toDark ? 'rgba(255,255,255,0.40)' : 'rgba(255,255,255,0.10)' }, { borderColor: toDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.40)' }], { duration: 400, easing: ease.easing, fill: ease.fill });
-      thumb.animate([{ transform: toDark ? 'translateX(0) translateY(-50%)' : 'translateX(28px) translateY(-50%)' }, { transform: toDark ? 'translateX(28px) translateY(-50%)' : 'translateX(0) translateY(-50%)' }], { duration: 440, easing: spring.easing, fill: spring.fill });
-      thumb.animate([{ background: toDark ? 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' : '#EEF0F5' }, { background: toDark ? '#EEF0F5' : 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      hillBack.animate([{ background: toDark ? '#72B87A' : '#1D3D25' }, { background: toDark ? '#1D3D25' : '#72B87A' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      hillFront.animate([{ background: toDark ? '#5DA066' : '#152C1A' }, { background: toDark ? '#152C1A' : '#5DA066' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      stars.forEach(function(s) { s.animate([{ opacity: toDark ? 0 : 1 }, { opacity: toDark ? 1 : 0 }], { duration: 400, easing: ease.easing, fill: ease.fill }); });
-      cloud.animate([{ opacity: toDark ? 1 : 0 }, { opacity: toDark ? 0 : 1 }], { duration: 400, easing: ease.easing, fill: ease.fill });
-      if (cloudB) cloudB.animate([{ opacity: toDark ? 0.65 : 0 }, { opacity: toDark ? 0 : 0.65 }], { duration: 400, easing: ease.easing, fill: ease.fill });
-      if (cloudC) cloudC.animate([{ opacity: toDark ? 0.45 : 0 }, { opacity: toDark ? 0 : 0.45 }], { duration: 400, easing: ease.easing, fill: ease.fill });
-    }
-
-    function apply(theme, animate) {
-      if (animate) {
-        var toDark = theme === 'dark';
-        animateToggleScene(toDark);
-        root.classList.add('color-transitioning');
-        void root.offsetHeight;
-        root.setAttribute('data-theme', theme);
-        try { localStorage.setItem(KEY, theme); } catch(e) {}
-        setTimeout(function() { root.classList.remove('color-transitioning'); }, 600);
-      } else {
-        root.setAttribute('data-theme', theme);
-        try { localStorage.setItem(KEY, theme); } catch(e) {}
-      }
-    }
-
-    var saved = null;
-    try { saved = localStorage.getItem(KEY); } catch(e) {}
-    if (saved === 'dark' || saved === 'light') {
-      apply(saved, false);
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      apply('dark', false);
-    } else {
-      apply('light', false);
-    }
-
-    if (btn) {
-      btn.addEventListener('click', function() {
-        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
-      });
-    }
-  })();
-  </script>
 
 </body>
 </html>
