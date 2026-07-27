@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- Source for the favicon set (BK monogram, card-brand treatment).
+     Render at 512, then downsample:
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
+       --screenshot=fav-512.png --window-size=512,512 --force-device-scale-factor=1 \
+       --virtual-time-budget=6000 --hide-scrollbars "file://$PWD/favicon.html"
+     sips -z 180 180 fav-512.png --out images/apple-touch-icon.png
+     sips -z 192 192 fav-512.png --out images/favicon-192.png
+     sips -z 32 32   fav-512.png --out images/favicon-32.png -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 512px; height: 512px; overflow: hidden; }
+    body {
+      position: relative;
+      background: #060809;
+    }
+    /* the card's key light, breathing from the upper left */
+    .keylight {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 90% 70% at 18% 8%, rgba(240,246,255,.10) 0%, rgba(240,246,255,.03) 45%, transparent 70%),
+        radial-gradient(ellipse 80% 40% at 50% 108%, rgba(92,169,255,.08) 0%, transparent 70%);
+    }
+    /* the BK ligature, poured full of the metallic sheen */
+    .mark {
+      position: absolute; left: 50%; top: 50%;
+      width: 340px; height: 340px;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(178deg, #FFFFFF 8%, #EDF1F6 52%, #9AA5B2 100%);
+      -webkit-mask-image: url("images/logo-bk-ember.png");
+              mask-image: url("images/logo-bk-ember.png");
+      -webkit-mask-size: contain; mask-size: contain;
+      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+      -webkit-mask-position: center; mask-position: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="keylight"></div>
+  <div class="mark"></div>
+</body>
+</html>
