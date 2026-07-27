@@ -1916,7 +1916,6 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     /* Display layer — the big statements switch to Bricolage Grotesque */
     .hero-heading,
     .s2-fw-header .fw-title,
-    .abt-title,
     .tm-headline,
     .dna2-heading,
     .s2-bar-title,
@@ -2840,14 +2839,21 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
 [data-theme="dark"] .am-pane-item-sub   { color: rgba(240,237,232,0.4); }
 /* ── About section: horizontal tab layout ─────────────────── */
     /* Section title */
-    .abt-header { text-align: center; margin-bottom: 12px; }
+    .abt-header { text-align: center; margin-bottom: 18px; }
 .abt-title {
-      /* the section-heading step of the display scale, same as .s2-fw-header .fw-title */
-      font-family: var(--font-display); font-weight: 570;
-      font-size: clamp(22px, 2.13vw, 35px); letter-spacing: -0.022em; line-height: 1.2;
-      color: var(--ink); opacity: 1; margin: 0;
+      /* a quiet serif-italic aside above the statement heading — the page's
+         established aside voice. Two stacked bold headings read as a bug;
+         premium sections carry ONE statement and one whisper. */
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(17px, 1.5vw, 21px);
+      letter-spacing: 0;
+      line-height: 1.2;
+      color: var(--ink-3);
+      opacity: 1; margin: 0;
     }
-html:not([data-theme="dark"]) .abt-title { color: var(--secondary); }
+html:not([data-theme="dark"]) .abt-title { color: rgba(37,37,37,0.55); }
 .abt-title-sub {
       display: block; margin-top: 8px;
       font-family: var(--font-mono); font-size: var(--fs-label); font-weight: 600;
@@ -3283,7 +3289,6 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* Display layer — the big statements switch to Bricolage Grotesque */
     .hero-heading,
     .s2-fw-header .fw-title,
-    .abt-title,
     .tm-headline,
     .dna2-heading,
     .s2-bar-title,
@@ -5491,21 +5496,79 @@ addEventListener('load', function () {
 
   gsap.registerPlugin(ScrollTrigger);
 
-  /* The image-grow intro is gone — it read as cheap however it was
-     tuned. The section arrives clean: pin the section, map the pin's
-     progress straight onto the reel. The stage stays transparent and
-     the cards fly in via their own entrance choreography. */
-  ScrollTrigger.create({
+  /* ── the title leads the section in ────────────────────────────────────
+     Premium-portfolio grammar (Koto's NEXT-UP frames, MOUTHWASH's lone
+     floating line): the section opens on "Featured Work" alone at display
+     scale, and as the pin advances the SAME element docks into its header
+     slot — FLIP on the real node, so it lands pixel-perfect — while the
+     content rises from below. Type-only: transform and opacity, nothing
+     repaints, and the scrub is smoothed so it glides. */
+  var TITLE = 0.9, REEL = 1.1 * 7, TOTAL = TITLE + REEL;
+  var DOCK_SCALE = 2.6;
+  var fwHeader = document.getElementById('s2FwHeader');
+  var fwTitle  = fwHeader ? fwHeader.querySelector('.fw-title') : null;
+  var slideEls = [
+    document.getElementById('s2CardsZone'),
+    document.querySelector('.s2-work-container')
+  ].filter(Boolean);
+  if (fwHeader) fwHeader.classList.add('s2-fwh-in');   /* the title acts from frame one */
+  if (fwTitle) fwTitle.style.transformOrigin = '50% 50%';
+
+  var dockDeltaY = 0;
+  function measureDock() {
+    if (!fwTitle) return;
+    var prev = fwTitle.style.transform;
+    fwTitle.style.transform = 'none';
+    var r = fwTitle.getBoundingClientRect();
+    var secTop = sec.getBoundingClientRect().top;
+    dockDeltaY = innerHeight * 0.44 - ((r.top - secTop) + r.height / 2);
+    fwTitle.style.transform = prev;
+  }
+
+  function lerpN(a, b, t) { return a + (b - a) * t; }
+  function clamp01(t) { return t < 0 ? 0 : t > 1 ? 1 : t; }
+  function easeInOut(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+  function easeOutC(t) { return 1 - Math.pow(1 - t, 3); }
+
+  function drive(vh) {
+    var t = easeInOut(clamp01(vh / TITLE));
+    /* content rises while the title is still docking — overlapped, no gate */
+    var c = easeOutC(clamp01((vh - TITLE * 0.45) / (TITLE * 0.8)));
+    var reelP = clamp01((vh - TITLE) / REEL);
+    if (fwTitle) {
+      fwTitle.style.transform =
+        'translateY(' + (dockDeltaY * (1 - t)).toFixed(1) + 'px) scale(' + lerpN(DOCK_SCALE, 1, t).toFixed(4) + ')';
+    }
+    for (var i = 0; i < slideEls.length; i++) {
+      slideEls[i].style.transform = c >= 1 ? '' : 'translateY(' + lerpN(100, 0, c).toFixed(2) + 'vh)';
+    }
+    root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: reelP } }));
+  }
+
+  /* scrub smoothing — glide, not twitch; the ticker detaches on landing */
+  var driveTarget = 0, driveState = 0, driveTicking = false;
+  function driveTick() {
+    var k = 1 - Math.pow(1 - 0.16, gsap.ticker.deltaRatio());
+    driveState += (driveTarget - driveState) * k;
+    if (Math.abs(driveTarget - driveState) < 0.0004) driveState = driveTarget;
+    drive(driveState);
+    if (driveState === driveTarget) { gsap.ticker.remove(driveTick); driveTicking = false; }
+  }
+  function requestDrive(vh) {
+    driveTarget = vh;
+    if (!driveTicking) { driveTicking = true; gsap.ticker.add(driveTick); }
+  }
+
+  var st = ScrollTrigger.create({
     trigger: sec,
     start: 'top top',
-    end: function () { return '+=' + Math.round(innerHeight * 1.1 * 7); },
+    end: function () { return '+=' + Math.round(innerHeight * TOTAL); },
     pin: true,
     pinSpacing: true,
     anticipatePin: 1,
     invalidateOnRefresh: true,
-    onUpdate: function (self) {
-      root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: self.progress } }));
-    }
+    onRefresh: measureDock,
+    onUpdate: function (self) { requestDrive(self.progress * TOTAL); }
   });
   /* Lenis measures the document once and caches the limit. The pin-spacer is
      added by ScrollTrigger afterwards, so without re-measuring Lenis still
@@ -5518,6 +5581,11 @@ addEventListener('load', function () {
   ScrollTrigger.addEventListener('refresh', syncLenis);
   ScrollTrigger.refresh();
   syncLenis();
+  /* seed the resting pose — big lone title, content parked — so arriving
+     at the section never flashes the docked layout */
+  measureDock();
+  driveState = driveTarget = st.progress * TOTAL;
+  drive(driveState);
   addEventListener('resize', function () { ScrollTrigger.refresh(); });
 });
 </script>
