@@ -2329,6 +2329,39 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
   .voice-dock{position:absolute;left:0;right:0;top:calc(46% + 128px);z-index:5;
     display:flex;flex-direction:column;align-items:center;gap:11px;padding:0 22px;
     transition:opacity .35s var(--ease);}
+
+  /* ── the premium call room: pill on the orb, caption below, round
+     controls, a clock — the ElevenLabs + ChatGPT voice grammars ── */
+  .talk-pill{display:inline-flex;align-items:center;gap:9px;margin-top:-58px;
+    padding:11px 20px;border-radius:999px;border:1px solid rgba(20,28,45,.16);
+    background:rgba(255,255,255,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    color:#16181D;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;
+    box-shadow:0 12px 30px -18px rgba(20,28,45,.45);
+    transition:transform .25s var(--ease),box-shadow .25s var(--ease);}
+  .talk-pill:hover{transform:translateY(-1px);box-shadow:0 16px 34px -18px rgba(20,28,45,.5);}
+  .chat.live .talk-pill{cursor:default;pointer-events:none;}
+  .tp-dot{width:8px;height:8px;border-radius:50%;background:#2FA24E;flex:none;
+    box-shadow:0 0 0 3px rgba(47,162,78,.16);transition:background .3s,box-shadow .3s;}
+  .chat.live .tp-dot{background:#3372B8;box-shadow:0 0 0 3px rgba(51,114,184,.16);
+    animation:tp-pulse 1.6s ease infinite;}
+  .chat.denied .tp-dot{background:#D9534F;box-shadow:0 0 0 3px rgba(217,83,79,.16);animation:none;}
+  @keyframes tp-pulse{50%{box-shadow:0 0 0 7px rgba(51,114,184,.07)}}
+  .talk-caption{margin:0;font-family:var(--sans);font-size:12.5px;font-weight:500;
+    color:rgba(22,24,29,.55);min-height:18px;text-align:center;transition:opacity .3s;}
+  .talk-controls{display:none;align-items:center;gap:14px;margin-top:2px;}
+  .chat.live .talk-controls{display:inline-flex;}
+  .tc-btn{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;
+    border:1px solid rgba(20,28,45,.16);background:#fff;color:#16181D;cursor:pointer;padding:0;
+    transition:transform .2s var(--ease),background .2s,color .2s,border-color .2s;}
+  .tc-btn:hover{transform:translateY(-1px);}
+  .tc-btn svg{width:18px;height:18px;}
+  .tc-end{background:#E5484D;border-color:#E5484D;color:#fff;}
+  .tc-end:hover{background:#D93F44;}
+  .tc-end svg{width:20px;height:20px;}
+  .tc-mute.muted{background:#16181D;border-color:#16181D;color:#fff;}
+  .talk-timer{font-family:var(--font-mono,monospace);font-size:12px;
+    font-variant-numeric:tabular-nums;color:rgba(22,24,29,.5);}
+  @media (prefers-reduced-motion: reduce){.tp-dot{animation:none !important;}}
   /* short panels — pull the orbits and the dock in so nothing runs off the foot */
   @media (max-height:760px){
     .orb-rings i:nth-child(1){width:196px;height:196px;}
@@ -5312,10 +5345,25 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="orb-hold" id="orbHold" title="Back to voice"><div id="talkOrbMount"></div></div>
       <!-- the controls live under the orb, over the outer orbit -->
       <div class="voice-dock">
-        <button type="button" class="btn-primary talk-cta" id="talkStart">
-          <span id="talkStartLabel" aria-live="polite">Start talking</span>
+        <!-- the state pill rides the orb itself (the ElevenLabs grammar) —
+             idle it is the start button, live it narrates the call -->
+        <button type="button" class="talk-pill" id="talkStart">
+          <i class="tp-dot" aria-hidden="true"></i>
+          <span id="talkStartLabel" aria-live="polite">Start a call</span>
         </button>
-        <button type="button" class="btn-end" id="talkEnd">End call</button>
+        <!-- one quiet caption under the orb (the ChatGPT grammar) -->
+        <p class="talk-caption" id="talkCaption">Talks like me &mdash; you can speak over it, anytime.</p>
+        <!-- circular controls while live: mute (appears when the orb bundle
+             exports one) + red end, and the call clock -->
+        <div class="talk-controls">
+          <button type="button" class="tc-btn tc-mute" id="talkMute" aria-label="Mute microphone" hidden>
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="6" y="1.5" width="4" height="8" rx="2" fill="currentColor"/><path d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </button>
+          <button type="button" class="tc-btn tc-end" id="talkEnd" aria-label="End call">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11z" transform="rotate(135 12 12)"/></svg>
+          </button>
+          <span class="talk-timer" id="talkTimer" hidden>0:00</span>
+        </div>
 
         <!-- ── mid-call email capture: appears when the agent moves to
              schedule ("enter your email below"), walks loading → done,
@@ -5608,19 +5656,61 @@ var STATE_LABELS = {
   thinking: 'Thinking…',
   'assistant-speaking': 'Talking',
   scheduling: 'Scheduling meeting',
-  'mic-denied': 'Mic blocked — enable access',
-  error: 'Something went wrong — try again',
+  'mic-denied': 'Mic blocked',
+  error: 'Line dropped',
 };
+/* one quiet caption under the orb narrates each state — the ChatGPT
+   voice-mode grammar. The pill carries the state name; this carries
+   what to DO about it. */
+var STATE_CAPTIONS = {
+  idle: 'Talks like me — you can speak over it, anytime.',
+  connecting: 'One moment — waking the second brain…',
+  listening: 'Just speak. I’m with you.',
+  'user-speaking': 'Hearing you…',
+  thinking: '…',
+  'assistant-speaking': 'Speak anytime to interrupt.',
+  scheduling: 'Booking — drop your email below.',
+  'mic-denied': 'Enable the mic in your browser bar, then try again.',
+  error: 'Something dropped — tap the pill to start again.',
+};
+var talkCaption = document.getElementById('talkCaption');
+var talkTimer = document.getElementById('talkTimer');
+var timerIv = null, callT0 = 0, wasLive = false;
+function fmtClock(ms) {
+  var s = Math.floor(ms / 1000);
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+function startClock() {
+  callT0 = performance.now();
+  talkTimer.hidden = false; talkTimer.textContent = '0:00';
+  timerIv = setInterval(function () { talkTimer.textContent = fmtClock(performance.now() - callT0); }, 1000);
+}
+function stopClock() {
+  if (timerIv) { clearInterval(timerIv); timerIv = null; }
+  talkTimer.hidden = true;
+}
 function updateVoiceState(s) {
   var live = s === 'connecting' || s === 'listening' || s === 'user-speaking' ||
              s === 'thinking' || s === 'assistant-speaking' || s === 'scheduling';
   chat.classList.toggle('live', live);
   /* the orb swells only while the agent itself is talking */
   chat.classList.toggle('speaking', s === 'assistant-speaking');
-  /* a refused mic turns the button itself, so the fix is where the press is */
+  /* a refused mic turns the pill itself, so the fix is where the press is */
   chat.classList.toggle('denied', s === 'mic-denied' || s === 'error');
   talkStart.disabled = s === 'connecting';
-  talkStartLabel.textContent = STATE_LABELS[s] || 'Start talking';
+  talkStartLabel.textContent = STATE_LABELS[s] || 'Start a call';
+  if (talkCaption) talkCaption.textContent = STATE_CAPTIONS[s] || STATE_CAPTIONS.idle;
+  /* the call clock runs while the line is open; the goodbye shows how
+     long you talked */
+  if (live && !wasLive) startClock();
+  if (!live && wasLive) {
+    var took = fmtClock(performance.now() - callT0);
+    stopClock();
+    if (talkCaption && s !== 'mic-denied' && s !== 'error') {
+      talkCaption.textContent = 'Call ended · ' + took + ' — thanks for talking.';
+    }
+  }
+  wasLive = live;
   /* the agent moved to book a meeting — surface the email capture */
   if (s === 'scheduling') showScheduler();
 }
@@ -5685,7 +5775,22 @@ function mountTalkOrb() {
   talkRoot = window.BhanuOrb.mount(document.getElementById('talkOrbMount'), {
     palette: 'arctic', size: 200, ui: false, debug: ORB_DEBUG === 'talk',
     onState: updateVoiceState,
-    controls: function (api) { voiceApi = api; },
+    controls: function (api) {
+      voiceApi = api;
+      /* the mute control surfaces itself the day the bundle exports one */
+      var muteBtn = document.getElementById('talkMute');
+      var muteFn = api.setMicMuted || api.mute || api.toggleMute;
+      if (muteBtn && typeof muteFn === 'function') {
+        muteBtn.hidden = false;
+        var muted = false;
+        muteBtn.addEventListener('click', function () {
+          muted = !muted;
+          try { muteFn.call(api, muted); } catch (e) {}
+          muteBtn.classList.toggle('muted', muted);
+          muteBtn.setAttribute('aria-label', muted ? 'Unmute microphone' : 'Mute microphone');
+        });
+      }
+    },
   });
 }
 function unmountTalkOrb() {
