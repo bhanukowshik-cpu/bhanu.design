@@ -42,6 +42,8 @@ function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onSt
   const [thinking, setThinking] = useState(false);
   const [micDenied, setMicDenied] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  // when did the VISITOR last express booking intent (their transcript)
+  const bookingIntentAtRef = useRef(0);
 
   const conversation = useConversation({
     onConnect: () => setErrorMsg(null),
@@ -52,8 +54,17 @@ function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onSt
     // anyway. showScheduler() no-ops when it's already up, so this and a
     // real tool call can both fire — whichever lands first wins.
     onMessage: ({ message, source }: { message: string; source: 'user' | 'ai' }) => {
-      if (source !== 'ai' || !message) return;
+      if (!message) return;
       const t = message.toLowerCase();
+      // Remember when the VISITOR expresses booking intent — the tool
+      // handler below refuses to open the field without it.
+      if (source === 'user') {
+        if (/\b(schedul\w*|book\w*|meeting|meet\b|calendar|(set|hop) (something |it |that )?up|call with)\b/.test(t) ||
+            /\b(talk|call|chat) (to|with) (bhanu|him|the real)/.test(t)) {
+          bookingIntentAtRef.current = Date.now();
+        }
+        return;
+      }
       // The possessive is the gate: "YOUR email" means the agent is asking
       // the visitor for their address. Merely OFFERING contact info
       // ("you can email Bhanu at …") must never raise the field.
@@ -164,6 +175,15 @@ function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onSt
       // tool with the same name for the model to invoke it.
       clientTools: {
         open_scheduler: () => {
+          // Trigger-happy small models call tools out of context. The field
+          // only rises if the visitor asked to book within the last two
+          // minutes; otherwise the tool talks the agent back down.
+          const fresh = Date.now() - bookingIntentAtRef.current < 120000;
+          if (!fresh) {
+            return 'Do NOT schedule yet — the visitor has not asked to book a meeting. ' +
+              'Continue the conversation normally, and only call open_scheduler after ' +
+              'they explicitly ask to schedule a call or meeting.';
+          }
           const bt = (window as unknown as { BhanuTalk?: { showScheduler?: () => void } }).BhanuTalk;
           bt?.showScheduler?.();
           return 'Scheduler shown — ask the visitor to type their email in the field below the orb.';
