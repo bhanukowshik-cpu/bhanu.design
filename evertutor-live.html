@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -120,7 +120,10 @@
     .nav-home img { width: 38px; height: 38px; display: block; transform: rotate(200deg); transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1); }
     .nav-home:hover img { transform: rotate(180deg); }
     .nav-home span { font-family: var(--font-heading); font-weight: 600; font-size: 15px; color: var(--secondary); white-space: nowrap; }
-    .nav-sections { display: flex; align-items: center; gap: 4px; }
+    /* flex:1 + centre keeps the links visually centred now that the theme
+       toggle no longer sits on the right — space-between alone would shove
+       them against the edge */
+    .nav-sections { display: flex; align-items: center; justify-content: center; flex: 1; gap: 4px; }
     .nav-btn {
       display: flex; align-items: center; justify-content: center;
       padding: 5px 15px; border-radius: 5px; border: none; background: transparent;
@@ -1116,6 +1119,10 @@
        stays light against the dark card instead of going dark-on-dark. */
     [data-theme="dark"] .et-hl.revealed,
     [data-theme="dark"] .team-role-hl { color: #131A25; }
+    /* <mark> carries the UA's black ink, which is invisible on the dark card
+       until the lime wipes in — light before the reveal, dark once it lands */
+    [data-theme="dark"] .hl { color: var(--secondary); }
+    [data-theme="dark"] .hl.revealed { color: #131A25; }
     /* SVG chart — override hardcoded fill/stroke presentation attributes */
     [data-theme="dark"] #bloomsGraph line { stroke: #555; }
     [data-theme="dark"] #bloomsGraph polygon { stroke: #555; fill: #555; }
@@ -1128,79 +1135,17 @@
     [data-theme="dark"] .phase-mobile-title { color: #EFF3F8; }
     [data-theme="dark"] .phase-mobile-desc { color: rgba(240,237,232,0.6); }
 
-    /* ─── THEME TOGGLE BUTTON ────────────────────────────────── */
-    .theme-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer !important; flex-shrink: 0; border-radius: 100px; transition: transform 0.15s ease; }
-    .theme-toggle:active { transform: scale(0.93); }
-    .tt-track { position: relative; width: 58px; height: 30px; border-radius: 100px; background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border: 1.5px solid rgba(255,255,255,0.40); flex-shrink: 0; overflow: hidden; transition: background 0.5s ease, border-color 0.4s ease; }
-    .tt-track::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 50%; border-radius: 100px 100px 50% 50%; background: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 100%); pointer-events: none; z-index: 10; }
-    .tt-hill-back { position: absolute; bottom: 0; left: -5%; width: 75%; height: 13px; background: #72B87A; border-radius: 50% 60% 0 0; z-index: 1; transition: background 0.5s ease; }
-    .tt-hill-front { position: absolute; bottom: 0; right: -8%; width: 62%; height: 11px; background: #5DA066; border-radius: 60% 50% 0 0; z-index: 2; transition: background 0.5s ease; }
-    .tt-star { position: absolute; background: rgba(255,255,255,0.90); border-radius: 50%; opacity: 0; transition: opacity 0.4s ease; z-index: 1; }
-    .tt-star-1 { width: 2.5px; height: 2.5px; top: 5px; left: 8px; }
-    .tt-star-2 { width: 2px; height: 2px; top: 11px; left: 18px; }
-    .tt-star-3 { width: 2px; height: 2px; top: 6px; left: 27px; }
-    .tt-star-4 { width: 1.5px; height: 1.5px; top: 13px; left: 11px; }
-    [data-theme="dark"] .tt-star { opacity: 1; }
-    @keyframes tt-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.12; } }
-    [data-theme="dark"] .tt-star-1 { animation: tt-twinkle 2.1s ease-in-out infinite; }
-    [data-theme="dark"] .tt-star-2 { animation: tt-twinkle 1.7s ease-in-out 0.8s infinite; }
-    [data-theme="dark"] .tt-star-3 { animation: tt-twinkle 2.5s ease-in-out 1.5s infinite; }
-    [data-theme="dark"] .tt-star-4 { animation: tt-twinkle 1.9s ease-in-out 0.4s infinite; }
-    .tt-shoot { position: absolute; top: 3px; left: 4px; width: 9px; height: 1px; background: linear-gradient(to right, transparent, #FFE87A); border-radius: 1px; opacity: 0; transform: rotate(35deg); z-index: 2; pointer-events: none; }
-    @keyframes tt-shooting-star { 0% { opacity: 0; transform: translate(0,0) rotate(35deg); } 3% { opacity: 0.85; } 15% { opacity: 0; transform: translate(20px,8px) rotate(35deg); } 100% { opacity: 0; transform: translate(20px,8px) rotate(35deg); } }
-    [data-theme="dark"] .tt-shoot { animation: tt-shooting-star 5s ease-in 2s infinite; }
-    .tt-cloud { position: absolute; right: 9px; top: 6px; width: 15px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 10px; opacity: 1; transition: opacity 0.4s ease; z-index: 1; }
-    .tt-cloud::before { content: ''; position: absolute; width: 9px; height: 9px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -5px; left: 2px; }
-    .tt-cloud::after { content: ''; position: absolute; width: 7px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -4px; left: 7px; }
-    [data-theme="dark"] .tt-cloud { opacity: 0; }
-    @keyframes tt-cloud-drift { from { transform: translateX(30px); } to { transform: translateX(-85px); } }
-    [data-theme="light"] .tt-cloud { animation: tt-cloud-drift 26s linear 0s infinite backwards; }
-    .tt-cloud-b { position: absolute; right: 3px; top: 11px; width: 9px; height: 4px; background: rgba(255,255,255,0.95); border-radius: 8px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
-    .tt-cloud-b::before { content: ''; position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 1px; }
-    .tt-cloud-b::after { content: ''; position: absolute; width: 5px; height: 5px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 4px; }
-    [data-theme="dark"] .tt-cloud-b { opacity: 0; }
-    [data-theme="light"] .tt-cloud-b { opacity: 0.65; animation: tt-cloud-drift 18s linear 4s infinite backwards; }
-    .tt-cloud-c { position: absolute; right: 18px; top: 4px; width: 11px; height: 5px; background: rgba(255,255,255,0.95); border-radius: 8px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
-    .tt-cloud-c::before { content: ''; position: absolute; width: 7px; height: 7px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -4px; left: 1px; }
-    .tt-cloud-c::after { content: ''; position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -3px; left: 5px; }
-    [data-theme="dark"] .tt-cloud-c { opacity: 0; }
-    [data-theme="light"] .tt-cloud-c { opacity: 0.45; animation: tt-cloud-drift 22s linear 10s infinite backwards; }
-    .tt-thumb { position: absolute; top: 50%; left: 3px; width: 22px; height: 22px; border-radius: 50%; z-index: 3; transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); box-shadow: 0 2px 4px rgba(0,0,0,0.28); }
-    .tt-thumb::before, .tt-thumb::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.75); opacity: 0; transition: opacity 0.4s ease; }
-    .tt-thumb::before { width: 7px; height: 7px; top: 4px; left: 5px; }
-    .tt-thumb::after  { width: 5px; height: 5px; top: 13px; left: 14px; }
-    [data-theme="dark"] .tt-thumb::before, [data-theme="dark"] .tt-thumb::after { opacity: 1; }
-    [data-theme="light"] .tt-track { background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border-color: rgba(255,255,255,0.40); }
-    [data-theme="light"] .tt-hill-back { background: #72B87A; }
-    [data-theme="light"] .tt-hill-front { background: #5DA066; }
-    [data-theme="light"] .tt-thumb { transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); }
-    [data-theme="light"] .tt-star { opacity: 0; }
-    [data-theme="light"] .tt-cloud { opacity: 1; }
-    [data-theme="light"] .tt-thumb::before, [data-theme="light"] .tt-thumb::after { opacity: 0; }
-    [data-theme="dark"] .tt-track { background: linear-gradient(180deg, #0B1829 0%, #152238 100%); border-color: rgba(255,255,255,0.10); }
-    [data-theme="dark"] .tt-track::after { background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%); }
-    [data-theme="dark"] .tt-hill-back { background: #1D3D25; }
-    [data-theme="dark"] .tt-hill-front { background: #152C1A; }
-    [data-theme="dark"] .tt-thumb { transform: translateX(28px) translateY(-50%); background: #EEF0F5; }
-    [data-theme="dark"] .tt-star { opacity: 1; }
-    [data-theme="dark"] .tt-cloud { opacity: 0; }
-    /* ─── SMOOTH THEME TRANSITION ────────────────────────────── */
-    html.color-transitioning * { transition-property: background, background-color, color, border-color, opacity !important; transition-duration: 0.5s !important; transition-timing-function: ease !important; }
-    html.color-transitioning .tt-track { transition: background 0.5s ease, border-color 0.4s ease !important; }
-    html.color-transitioning .tt-hill-back, html.color-transitioning .tt-hill-front { transition: background 0.5s ease !important; }
-    html.color-transitioning .tt-star, html.color-transitioning .tt-cloud { transition: opacity 0.4s ease !important; }
-    html.color-transitioning .tt-thumb { transition: transform 0.44s cubic-bezier(0.34,1.56,0.64,1), background 0.5s ease !important; }
 
     /* ─── KEYBOARD FOCUS ─────────────────────────────────────── */
     /* the custom cursor hides the pointer, so keyboard focus must be
-       unmistakable — --secondary flips with the theme on its own */
+       unmistakable — --secondary is the page's light ink on the dark ground */
     .nav-home:focus-visible, .nav-btn:focus-visible,
-    .theme-toggle:focus-visible, .nav-hamburger:focus-visible,
+    .nav-hamburger:focus-visible,
     .mobile-menu a:focus-visible, .phase-item:focus-visible,
     .card-cta:focus-visible, .cs-link:focus-visible, .nudge-btn:focus-visible {
       outline: 2px solid var(--secondary); outline-offset: 3px;
     }
-    .nav-btn:focus-visible, .theme-toggle:focus-visible,
+    .nav-btn:focus-visible,
     .nav-hamburger:focus-visible { border-radius: 6px; }
 
     /* ─── REDUCED MOTION ─────────────────────────────────────── */
@@ -1241,21 +1186,6 @@
       <a href="#impact"      class="nav-btn"        data-section="impact">IMPACT</a>
       <a href="#team"        class="nav-btn"        data-section="team">TEAM</a>
     </div>
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-      <span class="tt-track">
-        <span class="tt-star tt-star-1"></span>
-        <span class="tt-star tt-star-2"></span>
-        <span class="tt-star tt-star-3"></span>
-        <span class="tt-star tt-star-4"></span>
-        <span class="tt-shoot"></span>
-        <span class="tt-cloud"></span>
-        <span class="tt-cloud-b"></span>
-        <span class="tt-cloud-c"></span>
-        <span class="tt-hill-back"></span>
-        <span class="tt-hill-front"></span>
-        <span class="tt-thumb"></span>
-      </span>
-    </button>
     <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
@@ -2475,73 +2405,6 @@
   window.addEventListener('load', tryPlayVideos);
   </script>
 
-  <script>
-  /* ── Dark / Light mode toggle ──────────────────────────────── */
-  (function() {
-    var root = document.documentElement;
-    var btn  = document.getElementById('themeToggle');
-    var KEY  = 'portfolio-theme';
-
-    function animateToggleScene(toDark) {
-      var track     = document.querySelector('.tt-track');
-      var thumb     = document.querySelector('.tt-thumb');
-      var hillBack  = document.querySelector('.tt-hill-back');
-      var hillFront = document.querySelector('.tt-hill-front');
-      var stars     = document.querySelectorAll('.tt-star');
-      var cloud     = document.querySelector('.tt-cloud');
-      var cloudB    = document.querySelector('.tt-cloud-b');
-      var cloudC    = document.querySelector('.tt-cloud-c');
-      if (!track) return;
-      [track, thumb, hillBack, hillFront, cloud, cloudB, cloudC].forEach(function(el) {
-        if (el) el.getAnimations().forEach(function(a) { a.cancel(); });
-      });
-      stars.forEach(function(el) { el.getAnimations().forEach(function(a) { a.cancel(); }); });
-      var ease   = { easing: 'ease', fill: 'none' };
-      var spring = { easing: 'cubic-bezier(0.34,1.56,0.64,1)', fill: 'none' };
-      track.animate([{ background: toDark ? 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' : 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' }, { background: toDark ? 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' : 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      track.animate([{ borderColor: toDark ? 'rgba(255,255,255,0.40)' : 'rgba(255,255,255,0.10)' }, { borderColor: toDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.40)' }], { duration: 400, easing: ease.easing, fill: ease.fill });
-      thumb.animate([{ transform: toDark ? 'translateX(0) translateY(-50%)' : 'translateX(28px) translateY(-50%)' }, { transform: toDark ? 'translateX(28px) translateY(-50%)' : 'translateX(0) translateY(-50%)' }], { duration: 440, easing: spring.easing, fill: spring.fill });
-      thumb.animate([{ background: toDark ? 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' : '#EEF0F5' }, { background: toDark ? '#EEF0F5' : 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      hillBack.animate([{ background: toDark ? '#72B87A' : '#1D3D25' }, { background: toDark ? '#1D3D25' : '#72B87A' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      hillFront.animate([{ background: toDark ? '#5DA066' : '#152C1A' }, { background: toDark ? '#152C1A' : '#5DA066' }], { duration: 500, easing: ease.easing, fill: ease.fill });
-      stars.forEach(function(s) { s.animate([{ opacity: toDark ? 0 : 1 }, { opacity: toDark ? 1 : 0 }], { duration: 400, easing: ease.easing, fill: ease.fill }); });
-      cloud.animate([{ opacity: toDark ? 1 : 0 }, { opacity: toDark ? 0 : 1 }], { duration: 400, easing: ease.easing, fill: ease.fill });
-      if (cloudB) cloudB.animate([{ opacity: toDark ? 0.65 : 0 }, { opacity: toDark ? 0 : 0.65 }], { duration: 400, easing: ease.easing, fill: ease.fill });
-      if (cloudC) cloudC.animate([{ opacity: toDark ? 0.45 : 0 }, { opacity: toDark ? 0 : 0.45 }], { duration: 400, easing: ease.easing, fill: ease.fill });
-    }
-
-    function apply(theme, animate) {
-      if (animate) {
-        var toDark = theme === 'dark';
-        animateToggleScene(toDark);
-        root.classList.add('color-transitioning');
-        void root.offsetHeight;
-        root.setAttribute('data-theme', theme);
-        try { localStorage.setItem(KEY, theme); } catch(e) {}
-        setTimeout(function() { root.classList.remove('color-transitioning'); }, 600);
-      } else {
-        root.setAttribute('data-theme', theme);
-        try { localStorage.setItem(KEY, theme); } catch(e) {}
-      }
-    }
-
-    var saved = null;
-    try { saved = localStorage.getItem(KEY); } catch(e) {}
-    if (saved === 'dark' || saved === 'light') {
-      apply(saved, false);
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      apply('dark', false);
-    } else {
-      apply('light', false);
-    }
-
-    if (btn) {
-      btn.addEventListener('click', function() {
-        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
-      });
-    }
-  })();
-  </script>
 
 </body>
 </html>
