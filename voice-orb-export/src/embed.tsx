@@ -64,7 +64,10 @@ function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onSt
   const getFrequencyData = useCallback((): Uint8Array | null => {
     if (statusRef.current !== 'connected') return null;
     try {
-      return isSpeakingRef.current ? getOutputByteFrequencyData() : getInputByteFrequencyData();
+      if (isSpeakingRef.current) return getOutputByteFrequencyData();
+      // Quiet listening stays calm: mic data only flows once the user is
+      // actually speaking, so ambient noise never stirs the orb.
+      return userSpeakingRef.current ? getInputByteFrequencyData() : null;
     } catch {
       return null;
     }

@@ -32843,7 +32843,7 @@ function Ux({ palette: i = "ember", size: e = 188, ui: t = !0, debug: a = !1, on
   const X = K.useRef(!1), H = K.useRef(!1), G = K.useRef(0), $ = K.useCallback(() => {
     if (B.current !== "connected") return null;
     try {
-      return N.current ? E() : O();
+      return N.current ? E() : X.current ? O() : null;
     } catch {
       return null;
     }
