@@ -2071,6 +2071,33 @@ html:not([data-theme="dark"]) .s2-bar-metric-val { color: #2463DC; }
 html:not([data-theme="dark"]) .s2-bar-metric-lbl { color: rgba(37,37,37,0.58); }
 html:not([data-theme="dark"]) .s2-bar-metric + .s2-bar-metric { border-left-color: rgba(37,37,37,0.14); }
 html:not([data-theme="dark"]) .s2-bar-rule { background: rgba(37,37,37,0.12); }
+
+/* ═══ THE PAPER BAR ══════════════════════════════════════════════════════
+   The project card steps OFF the dark. Mobbin's design-first pattern is
+   value inversion, not a second navy — Deel floats a white spec card on
+   its slate hero, Tailscale inverts its tiles, while FLORA's dark-on-dark
+   cards sink into the ground (our old symptom). The bar takes the footer
+   note's warm paper: the page's one complementary warmth against the
+   azure world, so the card reads first at every scroll position. These
+   rules sit AFTER the theme overrides and win in both themes. */
+.s2-project-bar {
+      background: rgba(236,231,220,0.95);
+      border: 1px solid rgba(37,37,37,0.12);
+    }
+.s2-project-bar::before { display: none; }   /* the dark ring is noise on paper */
+.s2-bar-title { color: #1D2229; }
+.s2-bar-title-badge { color: rgba(37,37,37,0.55); }
+.s2-bar-desc { color: rgba(29,34,41,0.74); }
+.s2-bar-desc strong { color: #1D2229; }
+.s2-bar-tag { color: rgba(37,37,37,0.62); }
+.s2-bar-tag + .s2-bar-tag::before { color: rgba(37,37,37,0.30); }
+.s2-bar-icon-tag-ic { color: rgba(37,37,37,0.62); }
+.s2-bar-icon-tag-lbl { color: rgba(37,37,37,0.74); }
+.s2-bar-metric-val { color: #2463DC; }        /* the azure survives, deepened for paper */
+.s2-bar-metric-lbl { color: rgba(37,37,37,0.66); }
+.s2-bar-metric + .s2-bar-metric { border-left-color: rgba(37,37,37,0.16); }
+.s2-bar-rule { background: rgba(37,37,37,0.14); }
+/* (the CTA's flip lives in its own !important block further down) */
 html:not([data-theme="dark"]) .s2-side-nav-btn {
       background: rgba(37,37,37,0.07);
       color: rgba(37,37,37,0.65);
@@ -2111,9 +2138,10 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     height: auto;
     padding: 13px 24px;
     border-radius: var(--cta-r);
-    background: rgba(255,255,255,0.045) !important;
-    color: var(--ink) !important;
-    border: 1px solid rgba(239,243,248,0.16);
+    /* on the paper bar the pill flips to ink-on-paper */
+    background: rgba(37,37,37,0.05) !important;
+    color: #1D2229 !important;
+    border: 1px solid rgba(37,37,37,0.26);
     font-family: var(--sans);
     font-size: 15px;
     font-weight: 600;
