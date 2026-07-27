@@ -6596,13 +6596,25 @@ var topNav = document.getElementById('topNav');
   var spyLinks = [].filter.call(document.querySelectorAll('.nav-links a[href^="#"]'),
     function (a) { return document.querySelector(a.getAttribute('href')); });
   var spyTick = false;
+  /* Ranges, not rects. The old test asked whether a target straddled the
+     viewport middle, which quietly assumed every section is at least half a
+     screen tall and occupies its own scroll. Work is neither: its anchor is
+     the 258px "Featured Work" band, and the reel behind it is PINNED — the
+     spacer carries ~7000px of scroll while that band sits at 900. So Work
+     lit for a few hundred pixels and went dark for the rest of its section.
+
+     Each link instead owns the span from its own target down to the next
+     one's, and the one containing the viewport middle wins. Short anchors
+     and pinned sections both fall out of it for free. */
   function spy() {
     spyTick = false;
-    var mid = innerHeight * 0.5, current = null;
-    spyLinks.forEach(function (a) {
-      var r = document.querySelector(a.getAttribute('href')).getBoundingClientRect();
-      if (r.top <= mid && r.bottom > mid) current = a;
-    });
+    var probe = scrollY + innerHeight * 0.5;
+    var marks = spyLinks.map(function (a) {
+      var el = document.querySelector(a.getAttribute('href'));
+      return { a: a, top: el.getBoundingClientRect().top + scrollY };
+    }).sort(function (x, y) { return x.top - y.top; });
+    var current = null;
+    marks.forEach(function (m) { if (m.top <= probe) current = m.a; });
     spyLinks.forEach(function (a) { a.classList.toggle('is-here', a === current); });
   }
   addEventListener('scroll', function () {
