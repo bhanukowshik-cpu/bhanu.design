@@ -19,6 +19,10 @@
   <meta name="twitter:title" content="EverTutor Live — Bhanu Kowshik" />
   <meta name="twitter:image" content="https://bhanukowshik.netlify.app/images/og-image.jpg" />
 
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192.png" />
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&family=Shantell+Sans:wght@400;700&display=swap" rel="stylesheet" />
@@ -399,7 +403,7 @@
       text-transform: uppercase; letter-spacing: 0.08em; color: #515151;
       transition: color 0.42s cubic-bezier(0.16,1,0.3,1);
     }
-    .phase-item.active .phase-num { color: rgba(255,255,255,0.45); }
+    .phase-item.active .phase-num { color: rgba(255,255,255,0.6); }
 
     /* Category tag — always on right */
     .phase-tag {
@@ -413,7 +417,7 @@
         background 0.42s cubic-bezier(0.16,1,0.3,1),
         color      0.42s cubic-bezier(0.16,1,0.3,1);
     }
-    .phase-item.active .phase-tag { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.55); }
+    .phase-item.active .phase-tag { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.72); }
 
     /* Expand body — height driven by JS spring */
     .phase-expand-body { overflow: hidden; height: 0; display: none; }
@@ -440,7 +444,7 @@
     }
     .phase-expand-desc {
       font-family: var(--font-mono); font-size: 15px; line-height: 1.4;
-      color: rgba(255,255,255,0.48);
+      color: rgba(255,255,255,0.62);
     }
 
     /* Mobile phase detail panel (hidden on desktop) */
@@ -1029,10 +1033,10 @@
     [data-theme="dark"] .what-if-card { background: #222222; border-color: #222C3D; }
     [data-theme="dark"] .phase-item { background: #131A25; border-color: #222C3D; }
     [data-theme="dark"] .phase-item.active { background: #EFF3F8; border-color: transparent; }
-    [data-theme="dark"] .phase-item.active .phase-num { color: rgba(19,26,37,0.45); }
-    [data-theme="dark"] .phase-item.active .phase-tag { background: rgba(19,26,37,0.12); color: rgba(19,26,37,0.55); }
+    [data-theme="dark"] .phase-item.active .phase-num { color: rgba(19,26,37,0.6); }
+    [data-theme="dark"] .phase-item.active .phase-tag { background: rgba(19,26,37,0.12); color: rgba(19,26,37,0.72); }
     [data-theme="dark"] .phase-item.active .phase-expand-title { color: #131A25; }
-    [data-theme="dark"] .phase-item.active .phase-expand-desc { color: rgba(19,26,37,0.55); }
+    [data-theme="dark"] .phase-item.active .phase-expand-desc { color: rgba(19,26,37,0.72); }
     [data-theme="dark"] .phase-plus-circle { border-color: rgba(240,237,232,0.25); color: #A9B4C2; }
     [data-theme="dark"] .phase-num { color: #A9B4C2; }
     [data-theme="dark"] .phase-tag { background: rgba(240,237,232,0.08); color: #A9B4C2; }
@@ -1097,7 +1101,7 @@
     [data-theme="dark"] #bloomsGraph > text { fill: #999; }
     [data-theme="dark"] .phase-left { background: #131A25 !important; }
     [data-theme="dark"] .phase-mobile-detail { background: #131A25; }
-    [data-theme="dark"] .phase-mobile-tag { color: rgba(240,237,232,0.45); }
+    [data-theme="dark"] .phase-mobile-tag { color: rgba(240,237,232,0.6); }
     [data-theme="dark"] .phase-mobile-title { color: #EFF3F8; }
     [data-theme="dark"] .phase-mobile-desc { color: rgba(240,237,232,0.6); }
 
@@ -1164,6 +1168,29 @@
     html.color-transitioning .tt-star, html.color-transitioning .tt-cloud { transition: opacity 0.4s ease !important; }
     html.color-transitioning .tt-thumb { transition: transform 0.44s cubic-bezier(0.34,1.56,0.64,1), background 0.5s ease !important; }
 
+    /* ─── KEYBOARD FOCUS ─────────────────────────────────────── */
+    /* the custom cursor hides the pointer, so keyboard focus must be
+       unmistakable — --secondary flips with the theme on its own */
+    .nav-home:focus-visible, .nav-btn:focus-visible,
+    .theme-toggle:focus-visible, .nav-hamburger:focus-visible,
+    .mobile-menu a:focus-visible, .phase-item:focus-visible,
+    .card-cta:focus-visible, .cs-link:focus-visible, .nudge-btn:focus-visible {
+      outline: 2px solid var(--secondary); outline-offset: 3px;
+    }
+    .nav-btn:focus-visible, .theme-toggle:focus-visible,
+    .nav-hamburger:focus-visible { border-radius: 6px; }
+
+    /* ─── REDUCED MOTION ─────────────────────────────────────── */
+    /* Reveals land instantly on their end state ("both" keeps them visible);
+       looping ambience (pulse, hint float, star twinkle) runs once and stops. */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
@@ -1206,7 +1233,7 @@
         <span class="tt-thumb"></span>
       </span>
     </button>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </nav>
@@ -1326,16 +1353,16 @@
 
                 <!-- Labels: top-left of each peak -->
                 <g id="lblConventional" class="bloom-label">
-                  <text x="270" y="178" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="12" font-weight="500" fill="#252525">Conventional</text>
-                  <text x="270" y="191" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#515151">(1:30)</text>
+                  <text x="270" y="178" text-anchor="start" font-family="Urbanist, sans-serif" font-size="12" font-weight="500" fill="#252525">Conventional</text>
+                  <text x="270" y="191" text-anchor="start" font-family="Urbanist, sans-serif" font-size="10" fill="#515151">(1:30)</text>
                 </g>
                 <g id="lblMastery" class="bloom-label">
-                  <text x="350" y="138" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="12" font-weight="500" fill="#252525">Mastery Learning</text>
-                  <text x="350" y="151" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#515151">(1:30)</text>
+                  <text x="350" y="138" text-anchor="start" font-family="Urbanist, sans-serif" font-size="12" font-weight="500" fill="#252525">Mastery Learning</text>
+                  <text x="350" y="151" text-anchor="start" font-family="Urbanist, sans-serif" font-size="10" fill="#515151">(1:30)</text>
                 </g>
                 <g id="lblTutor" class="bloom-label">
-                  <text x="452" y="98" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="12" font-weight="500" fill="#252525">1:1 Tutoring</text>
-                  <text x="452" y="111" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#515151">(1:1)</text>
+                  <text x="452" y="98" text-anchor="start" font-family="Urbanist, sans-serif" font-size="12" font-weight="500" fill="#252525">1:1 Tutoring</text>
+                  <text x="452" y="111" text-anchor="start" font-family="Urbanist, sans-serif" font-size="10" fill="#515151">(1:1)</text>
                 </g>
               </svg>
             </div>
@@ -1977,6 +2004,7 @@
     function toggleMenu(force) {
       const open = force !== undefined ? force : !hamburger.classList.contains('open');
       hamburger.classList.toggle('open', open);
+      hamburger.setAttribute('aria-expanded', open);
       mobileMenu.classList.toggle('open', open);
       backdrop.classList.toggle('open', open);
     }
@@ -2000,6 +2028,7 @@
     /* ── SMOOTH SCROLL ───────────────────────────────────────── */
     function easeOutExpo(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
     function smoothScrollTo(y, dur) {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, y); return; }
       const startY = window.scrollY, dist = y - startY, t0 = performance.now();
       (function step(now) {
         const t = Math.min((now - t0) / dur, 1);
@@ -2221,6 +2250,7 @@
         body.style.height   = '0px';
         const target = inner.scrollHeight;
         item.classList.add('active');
+        item.setAttribute('aria-expanded', 'true');
         const setter = h => { body.style.height = Math.max(0, h) + 'px'; };
         springTo(0, target, setter, () => { body.style.height = 'auto'; });
       }
@@ -2231,6 +2261,7 @@
         const from = body.offsetHeight || item.querySelector('.phase-expand-inner').scrollHeight;
         body.style.height = from + 'px';
         item.classList.remove('active');
+        item.setAttribute('aria-expanded', 'false');
         const setter = h => { body.style.height = Math.max(0, h) + 'px'; };
         springTo(from, 0, setter, () => { body.style.display = 'none'; });
       }
@@ -2258,6 +2289,16 @@
         }
       });
       syncMobileDetail(1);
+
+      /* keyboard: the pills are div-based, so they need button semantics */
+      items.forEach(item => {
+        item.setAttribute('tabindex', '0');
+        item.setAttribute('role', 'button');
+        item.setAttribute('aria-expanded', item.classList.contains('active'));
+        item.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }
+        });
+      });
 
       items.forEach(item => {
         item.addEventListener('click', () => {
@@ -2334,6 +2375,9 @@
       const prev     = document.querySelector(`.sys-arrow-prev[data-phase="${phase}"]`);
       const next     = document.querySelector(`.sys-arrow-next[data-phase="${phase}"]`);
       const progFill = document.getElementById(`prog-p${phase}`);
+      /* phase cards are stacked now — no carousel in the DOM; bail before the
+         null lookups above throw and kill the rest of this block */
+      if (!track || !prev || !next) return;
       let idx = 0;
       let maxIdx = 0;
 
