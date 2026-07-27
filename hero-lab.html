@@ -597,6 +597,11 @@
      well grows past it and the orb sat small and off-centre in the pill.
      Stretch the canvas to the well — a hair soft beats visibly adrift. */
   .cta-orb canvas,.orb-fab-mount canvas{width:100% !important;height:100% !important;display:block;}
+  /* the orb's container div carries an inline size read ONCE at mount —
+     resize the window and it keeps the load-width size, overflowing the
+     well. Belt it to the well; the bundle's ResizeObserver re-renders the
+     canvas from this layout box, so it stays crisp at every width. */
+  .cta-orb div[data-orb-state],.orb-fab-mount div[data-orb-state]{width:100% !important;height:100% !important;}
   .cta-text{display:grid;overflow:hidden;flex:none;text-align:left;
     transition:width .55s var(--ease);}   /* width animates to hug each prompt */
   .cta-text span{
@@ -4413,13 +4418,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .tm-qmark{font-size:36px;margin-bottom:4px;}
     .tm-attr{padding-top:16px;}
   }
-  /* under 480 the decorative plate costs more than it gives: it pushed the
-     testimonial itself below the fold on a 320px phone. The words are the
-     content here — the art stands down and the quote gets the card. */
+  /* under 480 the art once stood down entirely — the visitor asked for
+     the faces back. A 112px portrait row keeps the quote above the fold
+     that the old full square used to push it past. */
   @media (max-width:480px){
-    .tm-deck{height:clamp(430px,60vh,510px);}
-    .tm-card{grid-template-rows:minmax(0,1fr);}
-    .tm-art{display:none;}
+    .tm-deck{height:clamp(470px,64vh,560px);}
+    .tm-card{grid-template-rows:112px minmax(0,1fr);}
   }
   @media (max-width:420px){
     .tm-tabs{width:100%;}
@@ -7685,6 +7689,28 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
      the travel. That handler calls preventDefault, which would stop the pin
      advancing and trap the page inside the section. */
   root.setAttribute('data-driven', '');
+})();
+
+/* The gate decides ONCE. A resize that crosses it (DevTools, a tablet
+   rotation over 901px) leaves the page wearing the wrong furniture —
+   desktop bar + empty helix zone at phone width, or no helix on desktop.
+   The helix can't half-initialise, so the only honest re-decision is a
+   fresh load, taken after the resize settles. Never mid-call. */
+(function () {
+  var wasNoHelix = document.documentElement.classList.contains('s2-no-helix');
+  var t;
+  addEventListener('resize', function () {
+    clearTimeout(t);
+    t = setTimeout(function () {
+      var noHelixNow = !(innerWidth >= 901 &&
+        matchMedia('(pointer:fine)').matches &&
+        !matchMedia('(prefers-reduced-motion: reduce)').matches);
+      var chatEl = document.getElementById('chat');
+      if (noHelixNow !== wasNoHelix && !(chatEl && chatEl.classList.contains('open'))) {
+        location.reload();
+      }
+    }, 700);
+  });
 })();
 
 /* ── the section is locked until the tail has played ──────────────────────
