@@ -30,7 +30,11 @@ interface LiveOrbProps {
   ui?: boolean;
   debug?: boolean;
   onState?: (state: UiState) => void;
-  controls?: (api: { start: () => void; end: () => void }) => void;
+  controls?: (api: {
+    start: () => void;
+    end: () => void;
+    sendContext?: (text: string) => void;
+  }) => void;
 }
 
 function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onState, controls }: LiveOrbProps) {
@@ -65,7 +69,7 @@ function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onSt
     isSpeaking,
     startSession,
     endSession,
-    getInputByteFrequencyData,
+    sendContextualUpdate,
     getOutputByteFrequencyData,
     getInputVolume,
   } = conversation;
@@ -171,8 +175,12 @@ function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onSt
     controlsRef.current?.({
       start: () => { void start(); },
       end: () => { try { void endSession(); } catch { /* noop */ } },
+      // Lets the host whisper facts to the agent mid-call without taking a
+      // turn — e.g. "the visitor just submitted their email", so the agent
+      // acknowledges instead of asking again.
+      sendContext: (text: string) => { try { sendContextualUpdate(text); } catch { /* noop */ } },
     });
-  }, [start, endSession]);
+  }, [start, endSession, sendContextualUpdate]);
 
   // Orb visual: "thinking" borrows the connecting preset's faster autonomous
   // drift so processing reads as motion; everything else maps 1:1.

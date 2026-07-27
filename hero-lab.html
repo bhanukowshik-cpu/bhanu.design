@@ -2593,6 +2593,33 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     font-family:var(--sans);font-size:10.5px;font-weight:650;letter-spacing:.08em;
     text-transform:uppercase;color:rgba(22,24,29,.42);margin-bottom:3px;}
 
+  /* ── the chat room's inline scheduler card ── */
+  .chat-sched-row{display:flex;align-items:center;gap:8px;}
+  .chat-sched-row input{width:min(240px,52vw);padding:10px 15px;border-radius:999px;
+    border:1px solid rgba(20,28,45,.2);background:#fff;color:#16181D;
+    font-family:var(--sans);font-size:13.5px;outline:none;
+    transition:border-color .2s,box-shadow .2s;}
+  .chat-sched-row input:focus{border-color:#3372B8;box-shadow:0 0 0 3px rgba(51,114,184,.14);}
+  .chat-sched-row input.err{border-color:#D9534F;box-shadow:0 0 0 3px rgba(217,83,79,.14);}
+  .chat-sched-row button{display:grid;place-items:center;width:38px;height:38px;flex:none;
+    border-radius:50%;border:1px solid rgba(20,28,45,.2);background:#16181D;color:#fff;
+    cursor:pointer;padding:0;transition:transform .2s,opacity .2s;}
+  .chat-sched-row button:hover{transform:translateY(-1px);}
+  .chat-sched-row .sched-arrow{width:15px;height:15px;}
+  .chat-sched-row .sched-spin{display:none;width:15px;height:15px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.35);border-top-color:#fff;
+    animation:sched-spin .7s linear infinite;}
+  .chat-sched-row.busy .sched-arrow{display:none;}
+  .chat-sched-row.busy .sched-spin{display:block;}
+  .chat-sched-err{display:block;margin-top:6px;font-family:var(--sans);font-size:12px;
+    font-weight:550;color:#D9534F;}
+  .chat-sched-done{display:inline-flex;align-items:center;gap:8px;
+    padding:10px 16px;border-radius:999px;
+    background:rgba(47,162,78,.12);border:1px solid rgba(47,162,78,.32);color:#1D7A38;
+    font-family:var(--sans);font-size:13px;font-weight:600;}
+  .chat-sched-done svg{width:14px;height:14px;flex:none;}
+  .chat-sched-done b{font-weight:700;}
+
   @media (prefers-reduced-motion: reduce){
     .m,.chip,.ch-w{animation:none;}
     .think-status{animation:none;-webkit-text-fill-color:rgba(22,24,29,.6);}
@@ -5825,7 +5852,11 @@ var schedEmail = document.getElementById('schedEmail');
 var schedGo    = document.getElementById('schedGo');
 var talkToast  = document.getElementById('talkToast');
 function showScheduler() {
-  if (!talkSched || !talkSched.hidden) return;
+  if (!talkSched) return;
+  /* the scheduler lives in the voice room — if the visitor wandered to
+     chat mid-call, bring them back so the field is actually visible */
+  if (chat.dataset.view === 'chat') setView('voice');
+  if (!talkSched.hidden) return;
   talkSched.hidden = false;
   requestAnimationFrame(function () { requestAnimationFrame(function () {
     talkSched.classList.add('on');
@@ -5866,6 +5897,13 @@ talkSched.addEventListener('submit', async function (e) {
   }
 
   hideScheduler();
+  /* close the loop BY VOICE: whisper the fact to the agent so it
+     acknowledges out loud instead of asking for the email again */
+  if (voiceApi && typeof voiceApi.sendContext === 'function') {
+    voiceApi.sendContext('The visitor just submitted their email (' + email +
+      ') through the on-screen scheduler. It is saved. Acknowledge warmly, say ' +
+      'Bhanu will email them to lock a time, and do NOT ask for their email again.');
+  }
   talkToast.hidden = false;
   requestAnimationFrame(function () { requestAnimationFrame(function () { talkToast.classList.add('on'); }); });
   setTimeout(function () {
@@ -6086,7 +6124,7 @@ micBtn.addEventListener('click', function () {
 
 /* ═══ TEXT CHAT — same proxy contract as index.html ═══ */
 var API_BASE = location.hostname === 'localhost' ? 'http://localhost:3001' : '';
-var SYSTEM = "You are Bhanu AI — the portfolio assistant for Bhanu Kowshik, a product designer in San Francisco (EverTutor Live, EverTutor Studio, Stressie, Dearly; conversational AI, agent systems, 0→1). Answer recruiters and visitors concisely and warmly, in first person as Bhanu's AI.";
+var SYSTEM = "You are Bhanu AI — the portfolio assistant for Bhanu Kowshik, a product designer in San Francisco (EverTutor Live, EverTutor Studio, Stressie, Dearly; conversational AI, agent systems, 0→1). Answer recruiters and visitors concisely and warmly, in first person as Bhanu's AI. If someone wants to schedule a meeting or call, ask for their email and tell them an input card will appear right below your message — when they submit it, Bhanu emails them to lock a time.";
 var messages = [];
 
 function bubble(cls, text) {
@@ -6150,6 +6188,64 @@ function injectRecs(reply) {
     row.appendChild(a);
   });
   thread.appendChild(row); thread.scrollTop = thread.scrollHeight;
+}
+
+/* ── the chat room schedules too: when the answer asks for an email in a
+   booking context, an inline card follows it — same matcher as the voice
+   side, same /api/schedule capture, one per conversation ─────────────── */
+var chatSchedOffered = false;
+function maybeOfferSchedule(reply) {
+  if (chatSchedOffered) return;
+  var t = (reply || '').toLowerCase();
+  var asksForEmail = /\b(e-?mail|inbox)\b/.test(t);
+  var aboutBooking = /\b(schedul\w*|book\w*|set (that|it|this) up|calendar|meeting|call)\b/.test(t);
+  if (!(asksForEmail && aboutBooking)) return;
+  chatSchedOffered = true;
+  var card = document.createElement('div');
+  card.className = 'm ai chat-recs chat-sched';
+  card.innerHTML =
+    '<form class="chat-sched-row">' +
+      '<input type="email" required placeholder="you@company.com" autocomplete="email" inputmode="email" aria-label="Your email">' +
+      '<button type="submit" aria-label="Send email address">' +
+        '<svg class="sched-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '<span class="sched-spin" aria-hidden="true"></span>' +
+      '</button>' +
+    '</form>';
+  thread.appendChild(card); thread.scrollTop = thread.scrollHeight;
+  var form = card.querySelector('form');
+  var inp = card.querySelector('input');
+  inp.focus();
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var email = inp.value.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { inp.classList.add('err'); inp.focus(); return; }
+    form.classList.add('busy');
+    inp.disabled = true;
+    var ok = false;
+    try {
+      var r = await fetch(API_BASE + '/api/schedule', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: email, source: 'chat-panel' })
+      });
+      ok = r.ok;
+    } catch (_) {}
+    form.classList.remove('busy');
+    if (!ok) {
+      inp.disabled = false; inp.classList.add('err');
+      chatSchedOffered = false;
+      card.insertAdjacentHTML('beforeend',
+        '<span class="chat-sched-err">That didn&rsquo;t send &mdash; email kowshikbhanu1000@gmail.com instead.</span>');
+      return;
+    }
+    /* the card becomes the confirmation, and the model learns it happened */
+    card.innerHTML = '<span class="chat-sched-done">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 12 9 17 20 7"/></svg>' +
+      'Got it &mdash; Bhanu will email <b></b> to lock a time.</span>';
+    card.querySelector('b').textContent = email;
+    messages.push({ role: 'user', content: '[The visitor submitted their email ' + email +
+      ' through the scheduling card. It is saved — do not ask for it again.]' });
+    thread.scrollTop = thread.scrollHeight;
+  });
 }
 
 /* ── visible thinking — the shipping page's staged phases, verbatim ──── */
@@ -6256,6 +6352,7 @@ async function sendMessage(text) {
     setTimeout(function () { caret.remove(); }, 350);
     messages.push({ role: 'assistant', content: full });
     injectRecs(full);
+    maybeOfferSchedule(full);
     renderChips(routeChips(full));
   } catch (err) {
     stopThinking(); shell.remove();
@@ -7739,7 +7836,7 @@ addEventListener('load', function () {
      to it hard. Bump it whenever spiral.js changes. -->
 <script src="spiral-gallery/spiral.js?v=20260726-bend2"></script>
 
-<script type="module" src="orb/bhanu-orb.js?v=11"></script>
+<script type="module" src="orb/bhanu-orb.js?v=12"></script>
 
 <!-- ── AGENTATION — visual feedback for agents (agentation.com) ─────────
      Dev-only: loads ONLY on localhost, never in production. Click the
