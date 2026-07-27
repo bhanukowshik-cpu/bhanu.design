@@ -2861,6 +2861,11 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     transition:color .25s,border-color .25s,background .25s;}
   .mic-btn:hover{color:var(--ink);border-color:rgba(120,175,255,.5);}
   .mic-btn.rec{color:#fff;background:var(--ember);border-color:var(--ember);animation:pulse 1.2s infinite;}
+  /* the two glyphs occupy the same grid cell; only one is ever shown */
+  .mic-btn .mic-ico,.mic-btn .mic-stop{grid-area:1/1;}
+  .mic-btn .mic-stop{display:none;}
+  .mic-btn.rec .mic-ico{display:none;}
+  .mic-btn.rec .mic-stop{display:block;}
   .mic-btn.hide{display:none;}
   .send-btn{width:52px;flex-shrink:0;border:none;border-radius:12px;cursor:pointer;
     display:grid;place-items:center;
@@ -6093,8 +6098,13 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="chat-chips" id="chatChips" aria-label="Suggested questions"></div>
       <form class="composer" id="chatForm">
         <input id="chatInput" type="text" placeholder="Ask anything…" autocomplete="off" />
+        <!-- Two glyphs, one button. A microphone reads as "start", so while
+             recording it becomes a stop square. Before this the only cue that
+             anything was live was a colour change, and nothing on screen said
+             how to end the dictation. -->
         <button type="button" class="mic-btn" id="micBtn" aria-label="Dictate your question">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="6" y="1.5" width="4" height="8" rx="2" fill="currentColor"/><path d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <svg class="mic-ico" width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="6" y="1.5" width="4" height="8" rx="2" fill="currentColor"/><path d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <svg class="mic-stop" width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="4.25" y="4.25" width="7.5" height="7.5" rx="1.8" fill="currentColor"/></svg>
         </button>
         <button type="submit" id="chatSend" class="send-btn" aria-label="Send">
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -6706,6 +6716,19 @@ if (!SR) { micBtn.classList.add('hide'); }
    recogniser whenever the engine quit but the visitor did not. Only a press
    of the button, or a fatal permission error, actually stops it. */
 var rec = null, recOn = false, wantRec = false, dictBase = '', dictFinal = '';
+var micPrevPlaceholder = null;
+
+/* One way to end a dictation, wherever it is called from: the button, the
+   Escape key, or sending the message. Sending in particular used to leave the
+   mic running — the composer cleared, but dictFinal still held the sentence
+   just sent, so the next word spoken pasted the whole sent message back into
+   the empty box. */
+function stopDictation() {
+  if (!wantRec) return;
+  wantRec = false;
+  dictBase = ''; dictFinal = '';
+  try { rec && rec.stop(); } catch (e) {}
+}
 
 function startDictation() {
   rec = new SR();
@@ -6739,6 +6762,7 @@ function startDictation() {
     recOn = false;
     micBtn.classList.remove('rec');
     micBtn.setAttribute('aria-label', 'Dictate your question');
+    if (micPrevPlaceholder !== null) { input.placeholder = micPrevPlaceholder; micPrevPlaceholder = null; }
     input.focus();
   };
 
@@ -6759,15 +6783,21 @@ function startDictation() {
 
 micBtn.addEventListener('click', function () {
   if (!SR) return;
-  if (wantRec) {                     /* the visitor is asking it to stop */
-    wantRec = false;
-    try { rec && rec.stop(); } catch (e) {}
-    return;
-  }
+  if (wantRec) { stopDictation(); return; }
   wantRec = true;
   dictBase = input.value ? input.value.replace(/\s+$/, '') + ' ' : '';
   dictFinal = '';
+  /* say it is listening before a single word lands, so silence still reads as
+     working rather than broken */
+  micPrevPlaceholder = input.placeholder;
+  input.placeholder = 'Listening…';
   startDictation();
+});
+
+/* Escape stops the mic without discarding what was already transcribed —
+   the expected way out of a live recording, and it keeps the words. */
+input.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && wantRec) { e.preventDefault(); stopDictation(); }
 });
 
 /* ═══ TEXT CHAT — same proxy contract as index.html ═══ */
@@ -6941,6 +6971,7 @@ async function sendMessage(text) {
   /* sending from the voice landing flips the panel into chat — the message
      is the mode switch */
   if (chat.dataset.view === 'voice') setView('chat');
+  stopDictation();   /* a live mic would paste this same message back on the next word */
   input.value = ''; sendBtn.disabled = true; syncSendState();
   hideChips();
   bubble('me', text);
