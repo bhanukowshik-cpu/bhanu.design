@@ -320,7 +320,9 @@
   .top-nav{
     position:fixed;top:var(--anno-h);left:0;right:0;z-index:var(--z-nav);
     display:flex;align-items:center;justify-content:space-between;
-    padding:10px var(--gutter);height:62px;
+    /* at rest the nav breathes WIDER than the content (10% insets);
+       scrolled, the pill collapses IN to the 15% content margin */
+    padding:10px 10%;height:62px;
     background:transparent;             /* frameless at rest — just text on the page */
     border:1px solid transparent;
     transition:top .45s cubic-bezier(.22,.61,.36,1),left .45s cubic-bezier(.22,.61,.36,1),
@@ -328,7 +330,7 @@
       padding .45s ease,height .45s ease,border-color .45s ease,box-shadow .45s ease;
   }
   .top-nav.scrolled{
-    top:12px;left:calc(10% + 12px);right:calc(10% + 12px);
+    top:12px;left:15%;right:15%;
     height:74px;padding:10px 28px;border-radius:20px;
     background:rgba(13,18,27,0.82);
     backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
@@ -357,14 +359,16 @@
         rect, so a scaled mount would size the canvas wrong. ── */
   .orb-fab{position:fixed;right:clamp(16px,2.4vw,32px);bottom:clamp(16px,2.4vw,32px);
     z-index:var(--z-fab);
-    width:62px;height:62px;display:grid;place-items:center;padding:0;
+    /* bigger from section 2 on (annotation #16), and it arrives by
+       sliding in from the RIGHT edge */
+    width:78px;height:78px;display:grid;place-items:center;padding:0;
     border:0;background:none;box-shadow:none;cursor:pointer;
-    opacity:0;transform:translateY(14px);pointer-events:none;
-    transition:opacity .45s var(--ease),transform .45s var(--ease),filter .3s ease;}
+    opacity:0;transform:translateX(130px);pointer-events:none;
+    transition:opacity .6s var(--ease),transform .6s var(--ease),filter .3s ease;}
   .orb-fab.show{opacity:1;transform:none;pointer-events:auto;}
   .orb-fab.show:hover{transform:translateY(-3px);filter:brightness(1.08);}
   .orb-fab:focus-visible{outline:2px solid var(--ember);outline-offset:6px;border-radius:50%;}
-  .orb-fab-mount{display:block;width:62px;height:62px;line-height:0;}
+  .orb-fab-mount{display:block;width:78px;height:78px;line-height:0;}
 
   /* the nav grows with the glass it floats over — 62px chrome reads
      like a toy on a 1920 screen */
@@ -501,7 +505,7 @@
   /* the WebGL canvas keeps its mount-time pixel size; on wide screens the
      well grows past it and the orb sat small and off-centre in the pill.
      Stretch the canvas to the well — a hair soft beats visibly adrift. */
-  .cta-orb canvas{width:100% !important;height:100% !important;display:block;}
+  .cta-orb canvas,.orb-fab-mount canvas{width:100% !important;height:100% !important;display:block;}
   .cta-text{display:grid;overflow:hidden;flex:none;text-align:left;
     transition:width .55s var(--ease);}   /* width animates to hug each prompt */
   .cta-text span{
@@ -1208,9 +1212,14 @@
 /* Bottom row: metrics left, CTA right */
     .s2-bar-bottom-row {
       display: flex;
-      justify-content: space-between;
+      /* the metrics and the CTA keep company instead of fleeing to the
+         far edges of a 1500px bar (annotation #17) */
+      justify-content: flex-start;
+      gap: clamp(28px, 4vw, 72px);
       align-items: center;
     }
+.s2-bar-bottom-row .s2-bar-cta { margin-left: auto; max-width: 340px; }
+@media (min-width: 1600px) { .s2-bar-bottom-row .s2-bar-cta { margin-left: 0; } }
 .s2-bar-metrics {
       display: flex;
       gap: 26px;
@@ -1233,11 +1242,12 @@
     }
 .s2-bar-metric-lbl {
       /* prose face at sentence weight — the tracked caps-mono caption was
-         the other half of the template tell */
+         the other half of the template tell. Readable: it was 13px at
+         58% and vanished on the glass (annotation #17). */
       font-family: var(--body);
-      font-size: 13px;
+      font-size: clamp(14px, 0.82vw, 17px);
       letter-spacing: 0;
-      color: rgba(239, 243, 248,0.58);
+      color: rgba(239, 243, 248,0.82);
       white-space: nowrap;
     }
 /* Frosted glass CTA */
@@ -3249,9 +3259,11 @@ html:not([data-theme="dark"]) .abt-title { color: rgba(37,37,37,0.55); }
       /* the statement stands on the left, the T on the right — two
          columns on wide screens, stacking back to centred under 1100px */
       display: grid;
-      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      /* the T takes more of the frame (annotation #19) — the statement
+         column tightens, the diagram grows into the viewport it owns */
+      grid-template-columns: minmax(0, 3.2fr) minmax(0, 8.8fr);
       align-items: center;
-      gap: clamp(28px, 4vw, 72px);
+      gap: clamp(28px, 3vw, 56px);
       position: relative; padding-bottom: 0;
     }
 .dna2-aside {
@@ -3271,6 +3283,19 @@ html:not([data-theme="dark"]) .abt-title { color: rgba(37,37,37,0.55); }
     }
 /* the columns hold down to ~1000px (the layout's reference viewport is
    1014); the tiles compact first, and only under 980 does it stack */
+    /* the T scales up with the frame it owns (annotation #19) */
+    @media (min-width: 1440px) {
+      .dna2-tile { min-height: 132px; }
+      .dna2-tile-ic { width: 48px; height: 48px; }
+      .dna2-tile-nm { font-size: 15px; }
+      .dna2-bar, .dna2-lower { gap: 24px; }
+    }
+    @media (min-width: 1920px) {
+      .dna2-tile { min-height: 152px; }
+      .dna2-tile-ic { width: 56px; height: 56px; }
+      .dna2-tile-nm { font-size: 16.5px; }
+      .dna2-bar, .dna2-lower { gap: 28px; }
+    }
     @media (max-width: 1280px) {
       .dna2-bar { gap: 12px; }
       .dna2-tile { min-height: 92px; padding: 10px 6px; }
@@ -3346,8 +3371,10 @@ html:not([data-theme="dark"]) .abt-title { color: rgba(37,37,37,0.55); }
       width: 34px; height: 34px; flex-shrink: 0; position: relative;
       border: 1.5px solid rgba(255,255,255,0.18); border-radius: 9px;
     }
-.dna2-legend-icon .lt-top  { position: absolute; top: 10px; left: 8px; right: 8px; height: 3px; border-radius: 2px; background: var(--ember-2); }
-.dna2-legend-icon .lt-stem { position: absolute; top: 10px; bottom: 7px; left: 50%; transform: translateX(-50%); width: 3px; border-radius: 2px; background: #fff; }
+/* the crossbar sits ON TOP of the stem (annotation #18) — z-order, and
+   the stem starts at the bar's own line so no white pokes above it */
+.dna2-legend-icon .lt-top  { position: absolute; top: 10px; left: 8px; right: 8px; height: 3px; border-radius: 2px; background: var(--ember-2); z-index: 2; }
+.dna2-legend-icon .lt-stem { position: absolute; top: 11px; bottom: 7px; left: 50%; transform: translateX(-50%); width: 3px; border-radius: 2px; background: #fff; z-index: 1; }
 .dna2-legend-rows { display: flex; flex-direction: column; gap: 12px; }
 .dna2-legend-row {
       display: flex; align-items: center; gap: 13px;
@@ -3686,7 +3713,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   .tm-body{display:flex;flex-direction:column;min-width:0;}
   .tm-qmark{display:block;font-family:var(--serif);font-style:italic;
     font-size:52px;line-height:.6;color:rgba(120,175,255,.4);margin-bottom:10px;}
-  .tm-quote{font-family:var(--body);font-size:clamp(14.5px,1.25vw,16.5px);
+  /* readable at last (annotation #20) — it was capped at 16.5px */
+  .tm-quote{font-family:var(--body);font-size:clamp(16px,1.15vw,21px);
     font-weight:400;line-height:1.68;color:var(--ink-2);text-wrap:pretty;}
   .tm-quote em{font-style:normal;font-weight:600;color:var(--ink);}
   .tm-attr{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:22px;}
@@ -3699,7 +3727,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     letter-spacing:-0.008em;}
   .tm-role{font-family:var(--sans);font-size:12px;font-weight:500;color:var(--ink-3);}
 
-  .tm-art{position:relative;align-self:stretch;border-radius:18px;overflow:hidden;
+  /* square, always (annotation #21) — stretch cropped it to the card */
+  .tm-art{position:relative;align-self:center;aspect-ratio:1/1;height:auto;
+    border-radius:18px;overflow:hidden;
     border:1px solid var(--line);background:#070A10;}
   /* the illustrations are painted on the same near-black as the page, so a
      cropped column of one is darker than the plate it sits in — the lift is
@@ -3717,7 +3747,18 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     transition:width .55s var(--ease-expo),background .35s var(--ease);}
   .tm-dot:hover{background:rgba(239,243,248,.5);}
   .tm-dot.is-on{width:26px;background:var(--ember);}
-  .tm-hint{display:block;margin-top:14px;font-size:12px;font-weight:500;
+  /* arrows flank the dots; the deck advances on click and on a timer */
+  .tm-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:26px;}
+  .tm-arrow{display:grid;place-items:center;width:44px;height:44px;flex:none;
+    border-radius:50%;border:1px solid var(--line);background:rgba(18,24,34,0.72);
+    color:var(--ink-2);cursor:pointer;padding:0;
+    transition:color .25s var(--ease),border-color .25s var(--ease),
+      background .25s var(--ease),transform .25s var(--ease);}
+  .tm-arrow svg{width:20px;height:20px;}
+  .tm-arrow:hover{color:var(--ink);border-color:rgba(140,197,255,.45);
+    background:rgba(24,34,48,0.9);transform:translateY(-1px);}
+  html:not([data-theme="dark"]) .tm-arrow{background:rgba(255,255,255,.8);color:var(--secondary);}
+  .tm-hint{display:none;margin-top:14px;font-size:12px;font-weight:500;
     letter-spacing:.03em;color:var(--ink-3);}
 
   /* arrival — same grammar as the T: only if JS is there to lift it */
@@ -3799,10 +3840,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* row-reverse: the plate's figure owns the left, so the copy takes
        the right and the note settles over the dark slope */
     flex-direction:row-reverse;
-    /* the note and the copy keep company on the dark half instead of
-       fleeing to opposite edges — the void between them was the complaint.
-       (row-reverse: flex-START is the RIGHT edge) */
-    align-items:center;justify-content:flex-start;gap:clamp(56px,7vw,150px);}
+    /* centred as a pair (annotation #14) — the note and the copy hold
+       the middle of the band together */
+    align-items:center;justify-content:center;gap:clamp(56px,7vw,150px);}
   /* no stretch: space-between rides this to the right gutter, over the
      plate's dark half — the hero's composition, mirrored */
   .ft-left{flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-start;gap:28px;}
@@ -4116,17 +4156,24 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     }
 
     /* wordmark — same voice as .nav-name, so the lift hands off cleanly */
+    /* the name crowns the portrait instead of hugging the corner: centred
+       on the frame, sitting just above the picture's top edge (the
+       portrait is centred at 47% and is min(56vh,84vw) tall, so its top
+       edge is at 47% − half that) */
     .v6l-brand {
-      position: absolute; z-index: 3; left: var(--gutter); top: 30px;
-      font-family: var(--sans); font-size: 17px; font-weight: 550;
-      letter-spacing: -0.005em; color: var(--ink);
+      position: absolute; z-index: 3;
+      left: 50%; top: calc(47% - min(28vh, 42vw) - 42px);
+      transform: translateX(-50%);
+      font-family: var(--sans); font-size: 19px; font-weight: 550;
+      letter-spacing: -0.005em; color: var(--ink); white-space: nowrap;
     }
 
     @media (max-width: 760px) {
       .v6l-portrait { height: min(46vh, 88vw); top: 42%; }
       .v6l-copy { top: 68%; }
       .v6l-words { font-size: clamp(28px, 8vw, 40px); }
-      .v6l-brand { top: 22px; }
+      /* phone: the portrait is shorter and sits at 42% — crown it there */
+      .v6l-brand { top: calc(42% - min(23vh, 44vw) - 34px); font-size: 17px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -4857,7 +4904,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <section class="said" id="saidSection" aria-label="Testimonials">
     <div class="said-pool" aria-hidden="true"></div>
 
-    <div class="geo geo-said" aria-hidden="true">
+    <!-- (the arcs/orbit rings are out of this section — annotation #24) -->
+    <div class="geo geo-said" aria-hidden="true" hidden>
       <span class="geo-arc" style="width:88vmax;height:88vmax;left:50%;top:36%;margin-left:-44vmax;margin-top:-44vmax;"></span>
       <span class="geo-arc thin" style="width:120vmax;height:120vmax;left:50%;top:36%;margin-left:-60vmax;margin-top:-60vmax;"></span>
       <span class="geo-orbit" style="width:64vmax;height:64vmax;left:50%;top:36%;margin-left:-32vmax;margin-top:-32vmax;--spin:165s;"><b></b></span>
@@ -4931,8 +4979,16 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </article>
       </div>
 
-      <div class="tm-dots" id="tmDots" role="group" aria-label="Choose a testimonial"></div>
-      <span class="tm-hint">Drag a card away to read the next one</span>
+      <!-- arrows + dots; the drag hint is out (annotations #22, #23) -->
+      <div class="tm-nav">
+        <button class="tm-arrow" id="tmPrev" type="button" aria-label="Previous testimonial">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="tm-dots" id="tmDots" role="group" aria-label="Choose a testimonial"></div>
+        <button class="tm-arrow" id="tmNext" type="button" aria-label="Next testimonial">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
     </div>
   </section>
 
@@ -5653,8 +5709,12 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
   var fab = document.getElementById('orbFab');
   if (!fab) return;
   if (!(window.BhanuOrb && window.BhanuOrb.mountVisual)) { setTimeout(waitFab, 60); return; }
-  window.BhanuOrb.mountVisual(document.getElementById('fabOrbMount'),
-    { palette: 'arctic', size: 62, state: 'idle', debug: ORB_DEBUG === 'fab' });
+  /* size from the well, like the CTA orbs — a hard number leaves the
+     canvas small inside a bigger button */
+  var fabMount = document.getElementById('fabOrbMount');
+  var fabSize = Math.round(parseFloat(getComputedStyle(fabMount).width)) || 78;
+  window.BhanuOrb.mountVisual(fabMount,
+    { palette: 'arctic', size: fabSize, state: 'idle', debug: ORB_DEBUG === 'fab' });
 
   fab.addEventListener('click', function () { openChat(); });
 
@@ -5917,7 +5977,7 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
         '.sec-divider .said-h',
         '.ft-left > *',
         '.ft-note',
-        '.ft-cta-dock'
+        '.ft-cta-dock'   /* the closer's CTA rises too (annotation #25) */
       ].join(','));
       if (!els.length) return;
       var io = new IntersectionObserver(function (entries) {
@@ -6109,7 +6169,7 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
       b.type = 'button'; b.className = 'tm-dot';
       var nm = c.querySelector('.tm-name');
       b.setAttribute('aria-label', nm ? nm.textContent.trim() : 'Testimonial ' + (i + 1));
-      b.addEventListener('click', function () { bringUp(c); });
+      b.addEventListener('click', function () { bringUp(c); startAuto(); });
       dotsWrap.appendChild(b);
       return b;
     });
@@ -6120,6 +6180,40 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
     while (cards[0] !== c && guard++ < cards.length) cards.push(cards.shift());
     layout();
   }
+
+  /* ── arrows + auto-advance (annotation #22) ───────────────────────────
+     Dragging still works, but it is no longer the only way through: the
+     arrows step the deck, and it advances on its own every 7s. Any
+     manual move resets the clock, and the timer stands down while the
+     pointer is over the deck or the tab is hidden. */
+  function step(dir) {
+    if (dir < 0) cards.unshift(cards.pop());
+    else cards.push(cards.shift());
+    layout();
+  }
+  var autoTimer = null;
+  function stopAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
+  function startAuto() {
+    stopAuto();
+    if (calm.matches) return;                 /* reduced motion: no drift */
+    autoTimer = setInterval(function () {
+      if (document.hidden) return;
+      step(1);
+    }, 7000);
+  }
+  function nudge(dir) { step(dir); startAuto(); }
+  var prevBtn = document.getElementById('tmPrev');
+  var nextBtn = document.getElementById('tmNext');
+  if (prevBtn) prevBtn.addEventListener('click', function () { nudge(-1); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { nudge(1); });
+  deck.addEventListener('pointerenter', stopAuto);
+  deck.addEventListener('pointerleave', startAuto);
+  /* only run the clock while the section is actually on screen */
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) { e.isIntersecting ? startAuto() : stopAuto(); });
+    }, { threshold: 0.35 }).observe(sec);
+  } else startAuto();
 
   /* The cards are absolutely positioned, so none of them can push the deck
      open — which means a fixed height is a promise that the longest quote at
@@ -6405,7 +6499,11 @@ addEventListener('load', function () {
     anticipatePin: 1,
     invalidateOnRefresh: true,
     onUpdate: function (self) {
-      reelTarget = self.progress;
+      /* the reel holds its opening pose through the first half of the pin
+         and plays across the second (annotation): the section is read
+         before the cards start moving. */
+      var HOLD = 0.5;
+      reelTarget = self.progress <= HOLD ? 0 : (self.progress - HOLD) / (1 - HOLD);
       if (!reelTicking) { reelTicking = true; gsap.ticker.add(reelTick); }
     }
   });
