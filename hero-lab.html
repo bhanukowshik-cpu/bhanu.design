@@ -2199,11 +2199,14 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
   .mic-btn:hover{color:var(--ink);border-color:rgba(120,175,255,.5);}
   .mic-btn.rec{color:#fff;background:var(--ember);border-color:var(--ember);animation:pulse 1.2s infinite;}
   .mic-btn.hide{display:none;}
-  .send-btn{width:52px;flex-shrink:0;border:none;border-radius:12px;cursor:pointer;color:#fff;
+  .send-btn{width:52px;flex-shrink:0;border:none;border-radius:12px;cursor:pointer;
     display:grid;place-items:center;
-    background:var(--cta-grad);box-shadow:none;
-    transition:background .35s var(--ease),transform .3s var(--ease);}
-  .send-btn:hover{background:var(--cta-grad-hover);transform:translateY(-1px);}
+    /* resting: a quiet ghost — the blue is earned by typing */
+    color:rgba(239,243,248,.5);
+    background:rgba(255,255,255,.06);box-shadow:none;
+    transition:background .35s var(--ease),color .35s var(--ease),transform .3s var(--ease);}
+  .send-btn.is-ready{color:#fff;background:var(--cta-grad);}
+  .send-btn.is-ready:hover{background:var(--cta-grad-hover);transform:translateY(-1px);}
   .send-btn:disabled{opacity:.5;cursor:default;transform:none;}
   .send-btn svg{width:17px;height:17px;}
 
@@ -4582,6 +4585,9 @@ var backdrop = document.getElementById('chatBackdrop');
 var input = document.getElementById('chatInput');
 var thread = document.getElementById('thread');
 var sendBtn = document.getElementById('chatSend');
+/* the send arrow earns its primary blue only when there's something to send */
+function syncSendState() { sendBtn.classList.toggle('is-ready', !!input.value.trim()); }
+input.addEventListener('input', syncSendState);
 var talkRoot = null, voiceApi = null;
 
 /* ── voice states → they now live INSIDE the primary CTA. There is no tag
@@ -4654,6 +4660,7 @@ function openChat() {
   chat.classList.add('open'); backdrop.classList.add('open');
   var act = document.querySelector('#ctaText span.on');
   input.value = act ? (act.dataset.q || act.textContent) : '';
+  syncSendState();
   setView('voice');                              // voice-first by default
   freezeHome(true);
   mountTalkOrb();
@@ -4781,6 +4788,7 @@ micBtn.addEventListener('click', function () {
     var t = '';
     for (var i = 0; i < ev.results.length; i++) t += ev.results[i][0].transcript;
     input.value = dictBase + t;
+    syncSendState();
   };
   rec.onstart = function () { recOn = true; micBtn.classList.add('rec'); };
   rec.onend = function () { recOn = false; micBtn.classList.remove('rec'); input.focus(); };
@@ -4807,7 +4815,7 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
   /* sending from the voice landing flips the panel into chat — the message
      is the mode switch */
   if (chat.dataset.view === 'voice') setView('chat');
-  input.value = ''; sendBtn.disabled = true;
+  input.value = ''; sendBtn.disabled = true; syncSendState();
   bubble('me', text);
   messages.push({ role: 'user', content: text });
 
