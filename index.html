@@ -5910,12 +5910,15 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
     <!-- ── the closer mirrors the opener: the hero's world again, the
          figure on the LEFT this time, an ambient loop under the copy ── -->
-    <!-- src is withheld until the footer is near: this clip sits at the very
-         bottom of a long page, and eagerly it cost 2.6MB of the initial load
-         for something most visitors reach late or never. The poster carries
-         the frame until then, so nothing looks empty. -->
+    <!-- preload="none" asks the browser to defer this until it decides to
+         autoplay, which for an offscreen clip is when you approach it. An
+         earlier attempt withheld the src behind an IntersectionObserver and
+         that was worse than the problem: the observer never fired here, so
+         the src was never attached and the footer video simply never played.
+         Keep the src on the element — the browser's own deferral is the part
+         that can be trusted. -->
     <video class="ft-plate" id="ftPlate" autoplay muted loop playsinline preload="none"
-           poster="images/footer-silhouette-poster.webp" data-src="images/footer-silhouette.mp4"
+           poster="images/footer-silhouette-poster.webp" src="images/footer-silhouette.mp4"
            aria-hidden="true"></video>
     <div class="ft-vig" aria-hidden="true"></div>
 
@@ -8544,28 +8547,7 @@ addEventListener('load', function () {
   }
 </script>
 
-<script>
-/* Attach the footer clip's source only once the footer is within a screen of
-   the viewport. Paired with the data-src + preload="none" on #ftPlate: eagerly
-   it cost 2.6MB of every first load, spent on a video at the bottom of a very
-   long page that many visitors never reach. Falls back to loading immediately
-   where IntersectionObserver is unavailable, so the footer is never left
-   without its plate. */
-(function () {
-  var v = document.getElementById('ftPlate');
-  if (!v || !v.dataset.src) return;
-  function load() {
-    if (v.src) return;
-    v.src = v.dataset.src;
-    v.play().catch(function () {});   /* autoplay may still decline — poster stays */
-  }
-  if (!('IntersectionObserver' in window)) { load(); return; }
-  var io = new IntersectionObserver(function (entries) {
-    if (entries.some(function (e) { return e.isIntersecting; })) { load(); io.disconnect(); }
-  }, { rootMargin: '100% 0px' });   /* one screen of warning, so it is ready on arrival */
-  io.observe(v);
-})();
-</script>
+
 
 <!-- ── Meeting-request capture ───────────────────────────────────────────────
      Netlify only accepts a form submission for a form it found in the HTML at
