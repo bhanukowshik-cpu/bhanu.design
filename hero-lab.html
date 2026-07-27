@@ -806,6 +806,23 @@
 @media (prefers-reduced-motion: reduce) {
       .s2-fw-header { transition: none; }
     }
+/* ── the sibling dividers (work→about, about→testimonials) — the same
+   grammar as the hero→work band: the section's statement alone in a
+   near-black breath. #0B0C0F is the tone the flanking vignette edges
+   actually reach, so the band never reads as its own strip. */
+    .sec-divider {
+      padding: 13vh 40px 9vh;
+      background: #0B0C0F;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+    }
+    .sec-divider .dna2-heading,
+    .sec-divider .said-h {
+      margin: 0;
+      font-size: clamp(40px, 5vw, 72px);
+    }
+    html:not([data-theme="dark"]) .sec-divider { background: var(--bg); }
 .s2-fwh-row {
       display: flex;
       align-items: center;
@@ -2397,14 +2414,10 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
 /* ─── ABOUT ME TAB PANEL ────────────────────────────────── */
     /* Full-viewport snap section — exactly one screen, same as .tm-section / .s2-section-wrap */
     .am-section {
-      /* 110px top: with the "About Me" whisper gone, the DNA statement is
-         the section's first line — it clears the floating nav (12+74) the
-         way the work heading's band does */
-      padding: 110px 2% 40px;
+      padding: 40px 2% 40px;
       scroll-snap-align: start;
-      /* the same breath the work section gets — the reel lands, the page
-         pauses, and only then does the About begin */
-      margin-top: 20vh;
+      /* the sec-divider band above carries the breath (and the statement)
+         now — no margin of bare page needed */
       /* At least one screen (snaps like tm-section), but grows rather than clipping if content is taller */
       min-height: calc(100vh - 80px);
       display: flex;
@@ -4190,6 +4203,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
       </section><!-- /s2-section-wrap -->
 
+      <!-- ── work→about divider — the statement alone in the breath,
+           same grammar as the hero→work band ── -->
+      <div class="sec-divider">
+        <h2 class="dna2-heading">The shape of how I <span class="circled">work.</span></h2>
+      </div>
+
   <!-- ── 03 — ABOUT: the T ─────────────────────────────────────────────── -->
   <!-- ══ SECTION 3 — ported from index.html ══════════════════════════
        The DNA T-shape as it ships on the reference, not a rebuild. -->
@@ -4210,9 +4229,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <div class="abt-pane is-active" id="abt-dna">
             <div class="dna2">
               <div class="dna2-aside">
-                <h3 class="dna2-heading">The shape of how I <span class="circled">work.</span></h3>
-                <!-- (the "Strategy, design, and technology" intro line is out —
-                     the heading carries the section alone) -->
+                <!-- (the DNA statement moved up into the work→about
+                     sec-divider band; the intro line is out entirely) -->
               </div>
               <div class="dna2-legend">
                 <span class="dna2-legend-icon"><span class="lt-top"></span><span class="lt-stem"></span></span>
@@ -4352,6 +4370,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </div><!-- /cinematic-wrap -->
       </section>
 
+  <!-- ── about→testimonials divider — same grammar ── -->
+  <div class="sec-divider">
+    <h2 class="said-h">From people who <span class="serif">know my work</span></h2>
+  </div>
+
   <!-- ── 04 — SAID: word of mouth ──────────────────────────────────────── -->
   <section class="said" id="saidSection" aria-label="Testimonials">
     <div class="said-pool" aria-hidden="true"></div>
@@ -4366,7 +4389,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     </div>
 
     <div class="said-inner">
-      <h2 class="said-h">From people who <span class="serif">know my work</span></h2>
+      <!-- (the heading moved up into the about→testimonials sec-divider band) -->
 
       <div class="tm-deck" id="tmDeck">
         <article class="tm-card" data-group="reported">
