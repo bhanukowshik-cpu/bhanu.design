@@ -595,7 +595,7 @@
     }
 /* CTA — light frosted-glass pill, same treatment as the "View Case Study" bar button (.s2-bar-cta) */
     .dna2-cta {
-      margin-top: 8px; align-self: flex-start;
+      margin-top: 8px; align-self: center;
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
       padding: 13px 26px; cursor: pointer; border: none; border-radius: 999px;
       font-family: var(--font-mono); font-size: clamp(14px, 1.1vw, 16px); font-weight: 500; letter-spacing: 0.03em;
@@ -3018,13 +3018,16 @@ html:not([data-theme="dark"]) .abt-title { color: var(--secondary); }
     /* ═══ DESIGN DNA — heading on the left, the T on the right ═══ */
     .dna2 {
       width: 100%; max-width: 1440px; margin: 0 auto;
-      display: flex; align-items: stretch; gap: clamp(80px, 9vw, 160px);
+      /* stacked and centred — the T is the section's focal object,
+         not a sidebar's neighbour */
+      display: flex; flex-direction: column; align-items: center;
+      gap: clamp(34px, 4vh, 50px);
       position: relative; padding-bottom: 0;
     }
-.dna2-aside { width: 360px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; }
+.dna2-aside { width: auto; max-width: 640px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .dna2-eyebrow {
       display: block; font-family: var(--font-mono); font-size: var(--fs-label); font-weight: 600;
-      letter-spacing: 0.18em; text-transform: uppercase; color: rgba(230,242,141,0.85);
+      letter-spacing: 0.18em; text-transform: uppercase; color: rgba(140,197,255,0.85);
       margin-bottom: 22px;
     }
 .dna2-heading {
@@ -3044,7 +3047,7 @@ html:not([data-theme="dark"]) .abt-title { color: var(--secondary); }
     }
 /* CTA — light frosted-glass pill, same treatment as the "View Case Study" bar button (.s2-bar-cta) */
     .dna2-cta {
-      margin-top: 8px; align-self: flex-start;
+      margin-top: 8px; align-self: center;
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
       padding: 13px 26px; cursor: pointer; border: none; border-radius: 999px;
       font-family: var(--font-mono); font-size: clamp(14px, 1.1vw, 16px); font-weight: 500; letter-spacing: 0.03em;
@@ -3095,7 +3098,7 @@ html:not([data-theme="dark"]) .abt-title { color: var(--secondary); }
 .dna2-sig-name { font-family: var(--font-heading); font-size: var(--fs-sm); font-weight: 700; color: var(--ink); letter-spacing: -0.005em; }
 .dna2-sig-role { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.65); }
 /* The T: breadth bar on top, then quote panel (left) + depth stem (right column) */
-    .dna2-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+    .dna2-t { width: min(100%, 1060px); min-width: 0; display: flex; flex-direction: column; gap: 24px; }
 /* Axis labels — Caveat, flanked by arrows that expand outward from the centre */
     .dna2-axis { display: flex; align-items: center; gap: 12px; }
 .dna2-axis.breadth { justify-content: center; }
@@ -3103,10 +3106,10 @@ html:not([data-theme="dark"]) .abt-title { color: var(--secondary); }
 .dna2-axis-label { font-family: 'Caveat', cursive; font-size: 24px; font-weight: 600; line-height: 1; letter-spacing: 0.01em; color: rgba(255,255,255,0.72); white-space: nowrap; }
 /* Arrow arms: a fading line tipped with an outward arrowhead */
     .dna2-arm.left, .dna2-arm.right { flex: 1; height: 1.5px; max-width: 230px; position: relative; }
-.dna2-arm.left  { background: linear-gradient(90deg, rgba(230,242,141,0.60), transparent); }
-.dna2-arm.right { background: linear-gradient(90deg, transparent, rgba(230,242,141,0.60)); }
-.dna2-arm.left::before  { content: ""; position: absolute; left: 0;  top: 50%; transform: translateY(-50%); border: 4px solid transparent; border-right: 7px solid rgba(230,242,141,0.85); border-left: 0; }
-.dna2-arm.right::after  { content: ""; position: absolute; right: 0; top: 50%; transform: translateY(-50%); border: 4px solid transparent; border-left: 7px solid rgba(230,242,141,0.85); border-right: 0; }
+.dna2-arm.left  { background: linear-gradient(90deg, rgba(140,197,255,0.55), transparent); }
+.dna2-arm.right { background: linear-gradient(90deg, transparent, rgba(140,197,255,0.55)); }
+.dna2-arm.left::before  { content: ""; position: absolute; left: 0;  top: 50%; transform: translateY(-50%); border: 4px solid transparent; border-right: 7px solid rgba(140,197,255,0.85); border-left: 0; }
+.dna2-arm.right::after  { content: ""; position: absolute; right: 0; top: 50%; transform: translateY(-50%); border: 4px solid transparent; border-left: 7px solid rgba(140,197,255,0.85); border-right: 0; }
 .dna2-arm.up, .dna2-arm.down { flex: 1; width: 1.5px; min-height: 22px; position: relative; }
 .dna2-arm.up    { background: linear-gradient(180deg, rgba(255,255,255,0.55), transparent); }
 .dna2-arm.down  { background: linear-gradient(180deg, transparent, rgba(255,255,255,0.55)); }
@@ -3129,16 +3132,19 @@ html:not([data-theme="dark"]) .abt-title { color: var(--secondary); }
     }
 .dna2-tile-ic {
       width: 40px; height: 40px; flex-shrink: 0;
-      background: linear-gradient(150deg, var(--c1), var(--c2));
+      /* ink at rest — ten simultaneous hues read as a toy box. Each
+         tile's own colour returns on hover/selection, where it means
+         something. background-color so the swap animates. */
+      background-color: rgba(239,243,248,0.55);
       -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
-      opacity: 1; transition: opacity 0.3s ease;
+      opacity: 1; transition: opacity 0.3s ease, background-color 0.3s ease;
     }
 .dna2-tile-nm { font-family: var(--font-heading); font-size: var(--fs-body); font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: rgba(255,255,255,0.7); transition: color 0.3s ease; }
 .dna2-tile::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 0; height: 2px; border-radius: 2px; background: linear-gradient(90deg, transparent, var(--lc), transparent); opacity: 0; transition: opacity 0.3s ease; }
 .dna2-tile:hover, .dna2-tile.is-sel { transform: translateY(-2px); border-color: color-mix(in srgb, var(--lc) 52%, transparent); }
 .dna2-tile.is-sel { background: color-mix(in srgb, var(--lc) 14%, #0c0c10); }
 .dna2-tile:hover .dna2-tile-nm, .dna2-tile.is-sel .dna2-tile-nm { color: var(--lc); }
-.dna2-tile:hover .dna2-tile-ic, .dna2-tile.is-sel .dna2-tile-ic { opacity: 1; }
+.dna2-tile:hover .dna2-tile-ic, .dna2-tile.is-sel .dna2-tile-ic { opacity: 1; background-color: var(--lc); }
 .dna2-tile.is-sel::after { opacity: 1; }
 /* Quote panel — the big glass card in the open corner, drives off the selected tile */
     .dna2-panel {
@@ -3189,14 +3195,17 @@ html:not([data-theme="dark"]) .abt-title { color: var(--secondary); }
     }
 /* ── T-shape / DNA section ───────────────────────────────── */
     html:not([data-theme="dark"]) .dna2-tile { background: var(--surface); }
+html:not([data-theme="dark"]) .dna2-tile-ic { background-color: rgba(37,37,37,0.55); }
+html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-ic,
+    html:not([data-theme="dark"]) .dna2-tile.is-sel .dna2-tile-ic { background-color: var(--lc); }
 html:not([data-theme="dark"]) .dna2-tile.is-sel { background: color-mix(in srgb, var(--lc) 12%, var(--surface-warm)); }
 html:not([data-theme="dark"]) .dna2-heading { color: var(--secondary); }
 html:not([data-theme="dark"]) .dna2-intro { color: rgba(37,37,37,0.58); }
 html:not([data-theme="dark"]) .dna2-sig-name { color: var(--secondary); }
 html:not([data-theme="dark"]) .dna2-quote { color: var(--secondary); }
 html:not([data-theme="dark"]) .dna2-axis.breadth .dna2-axis-label { color: var(--ink-3); }
-html:not([data-theme="dark"]) .dna2-arm.left  { background: linear-gradient(90deg, rgba(111,126,21,0.35), transparent); }
-html:not([data-theme="dark"]) .dna2-arm.right { background: linear-gradient(90deg, transparent, rgba(111,126,21,0.35)); }
+html:not([data-theme="dark"]) .dna2-arm.left  { background: linear-gradient(90deg, rgba(51,114,184,0.35), transparent); }
+html:not([data-theme="dark"]) .dna2-arm.right { background: linear-gradient(90deg, transparent, rgba(51,114,184,0.35)); }
 html:not([data-theme="dark"]) .dna2-arm.up    { background: linear-gradient(180deg, rgba(37,37,37,0.25), transparent); }
 html:not([data-theme="dark"]) .dna2-arm.down  { background: linear-gradient(180deg, transparent, rgba(37,37,37,0.25)); }
 html:not([data-theme="dark"]) .dna2-legend-icon .lt-stem { background: var(--secondary); }
