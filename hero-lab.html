@@ -754,15 +754,16 @@
     }
 /* ── Section 2 wrapper — contains header + spiral + list ── */
     .s2-section-wrap {
-      height: calc(100vh - 80px);
+      /* a true screen: the ported height kept the retired 80px anno gap,
+         which held the helix and the project bar 80px off the bottom */
+      height: 100vh;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       scroll-snap-align: start;
       position: relative;
-      /* a breath of dark page between the hero and the work — the sections
-         used to sit flush; the pause is the transition */
-      margin-top: 20vh;
+      /* the breath between the hero and the work is carried by the
+         s2-fw-header band above — its margins are the section gap */
       /* the About section's ruled grid, adopted here — one ground for the
          work and the T: bright in the centre, fading to dark at the edges.
          The helix canvas and cards zone are transparent, so the reel flies
@@ -776,9 +777,10 @@
     }
 /* ── Section 2 redesign — Featured Work ─────────────────── */
     .s2-fw-header {
-      /* clears the floating nav pill (top 12 + height 74) so the heading
-         reads below it, the way a regular section header would */
-      padding: 100px 40px 10px;
+      /* the heading IS the section gap now: a band of bare page between
+         the hero and the pinned work, the title centred in the breath */
+      margin: 12vh 0 8vh;
+      padding: 0 40px;
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -2052,6 +2054,12 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     font-size: clamp(22px, 2.13vw, 35px);
     font-weight: 570;
     letter-spacing: -0.022em;
+  }
+  /* "Work" carries the serif — the hero h1's exact emphasis treatment */
+  .s2-fw-header .fw-title .serif {
+    font-weight: 400;
+    font-size: 1.08em;
+    letter-spacing: -0.004em;
   }
   /* the project title is the step below that — but it leads the bar, so it
      sits just under the section header's scale */
@@ -3841,6 +3849,17 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        Markup, CSS and behaviour are the shipping section, not a rebuild.
        Its type and colour resolve through the alias tokens below, so it
        adopts this page's system instead of importing Montserrat. -->
+      <!-- ── Featured Work heading — lives in the breath between the hero
+           and the work section: a band of bare page, the title alone in
+           it, serif on "Work" the way the hero emphasises. ── -->
+      <div class="s2-fw-header" id="s2FwHeader">
+        <div class="s2-fwh-row">
+          <h2 class="fw-title">Featured <span class="serif">Work</span></h2>
+        </div>
+        <!-- the spiral/grid toggle is gone: there is one view of the work now.
+             The JS that wired it is null-guarded, so it simply stands down. -->
+      </div>
+
       <section class="s2-section-wrap" id="s2Section">
 
 <!-- Canvas covers full section — renders behind header and work container -->
@@ -3859,14 +3878,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
 
-      <!-- ── Featured Work heading ── -->
-      <div class="s2-fw-header" id="s2FwHeader">
-        <div class="s2-fwh-row">
-          <h2 class="fw-title">Featured Work</h2>
-        </div>
-        <!-- the spiral/grid toggle is gone: there is one view of the work now.
-             The JS that wired it is null-guarded, so it simply stands down. -->
-      </div>
+      <!-- (the Featured Work heading now lives ABOVE this section, in the
+           gap between the hero and the pin — see s2FwHeader up there) -->
 
       <!-- ── SECTION 2: FEATURED WORK — full-viewport spiral ── -->
       <div class="s2-work-container">
