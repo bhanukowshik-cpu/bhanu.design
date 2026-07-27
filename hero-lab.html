@@ -3294,7 +3294,11 @@ html:not([data-theme="dark"]) .abt-title { color: rgba(37,37,37,0.55); }
       stroke-linejoin: round;
       opacity: 0.8;
     }
+/* terminal dots — a filled circle where the line leaves the tile and
+   where it meets the card, same azure as the dotted run */
+    .dna2-link circle { fill: var(--ember-2); opacity: 0.9; }
 html:not([data-theme="dark"]) .dna2-link path { stroke: #3372B8; }
+html:not([data-theme="dark"]) .dna2-link circle { fill: #3372B8; }
 /* Axis labels — Caveat, flanked by arrows that expand outward from the centre */
     .dna2-axis { display: flex; align-items: center; gap: 12px; }
 .dna2-axis.breadth { justify-content: center; }
@@ -3335,10 +3339,12 @@ html:not([data-theme="dark"]) .dna2-tile,
 /* Tile — calm dark glass, accent only on hover/select */
     /* Every block — breadth and depth — is the SAME size for a groomed T */
     .dna2-tile {
-      position: relative; min-height: 110px; background: #121212; border-radius: 14px;
+      /* the page's navy card ground, not the foreign #121212 grey, with
+         a resting hairline — the tile belongs to this page's family */
+      position: relative; min-height: 110px; background: var(--card); border-radius: 14px;
       padding: 12px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
       cursor: pointer; overflow: hidden; text-align: center;
-      border: 1px solid transparent;
+      border: 1px solid rgba(226,238,252,0.07);
       transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s ease, background 0.3s ease;
     }
 .dna2-tile-ic {
@@ -3353,7 +3359,7 @@ html:not([data-theme="dark"]) .dna2-tile,
 .dna2-tile-nm { font-family: var(--font-heading); font-size: var(--fs-body); font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: rgba(255,255,255,0.7); transition: color 0.3s ease; }
 .dna2-tile::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 0; height: 2px; border-radius: 2px; background: linear-gradient(90deg, transparent, var(--lc), transparent); opacity: 0; transition: opacity 0.3s ease; }
 .dna2-tile:hover, .dna2-tile.is-sel { transform: translateY(-2px); border-color: color-mix(in srgb, var(--lc) 52%, transparent); }
-.dna2-tile.is-sel { background: color-mix(in srgb, var(--lc) 14%, #0c0c10); }
+.dna2-tile.is-sel { background: color-mix(in srgb, var(--lc) 14%, #0B0F16); }
 .dna2-tile:hover .dna2-tile-nm, .dna2-tile.is-sel .dna2-tile-nm { color: var(--lc); }
 .dna2-tile:hover .dna2-tile-ic, .dna2-tile.is-sel .dna2-tile-ic { opacity: 1; background-color: var(--lc); }
 .dna2-tile.is-sel::after { opacity: 1; }
@@ -3363,7 +3369,12 @@ html:not([data-theme="dark"]) .dna2-tile,
          corner), 20px under the tiles. The connector line does the
          pointing; the card never moves. Side-stripe accent retired —
          the ring and glow carry the colour. */
-      grid-column: 1 / 3; grid-row: 1; align-self: start; position: relative; background: #141418; border-radius: 18px;
+      grid-column: 1 / 3; grid-row: 1; align-self: start; position: relative;
+      /* the project bar's navy glass, not the foreign #141418 grey */
+      background: rgba(14,20,29,0.80);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 18px;
       padding: 20px 22px 18px; display: flex; flex-direction: column; overflow: hidden;
       margin-right: 20px;
       margin-top: 26px;   /* band gap is 24px; the card breathes 50px under the bar */
@@ -3375,12 +3386,8 @@ html:not([data-theme="dark"]) .dna2-tile,
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
     }
-.dna2-panel::after {
-      content: ""; position: absolute; right: -16%; bottom: -28%; width: 56%; height: 80%;
-      z-index: 0; pointer-events: none;
-      background: radial-gradient(circle, color-mix(in srgb, var(--lc) 22%, transparent) 0%, transparent 66%);
-      transition: background 0.4s ease;
-    }
+/* (the corner glow smear is out — it read as a grey stain on the glass;
+   the ::before ring alone carries the tile's colour) */
 .dna2-panel > * { position: relative; z-index: 1; }
 .dna2-cardhead { display: flex; align-items: center; gap: 11px; margin-bottom: 10px; }
 .dna2-ic {
@@ -5406,13 +5413,21 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
          are the element's own pixels. First child so everything paints
          over it. */
       var tRoot = dna.querySelector('.dna2-t');
-      var link = null, linkPath = null;
+      var link = null, linkPath = null, linkDotA = null, linkDotB = null;
       if (tRoot) {
         link = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         link.setAttribute('class', 'dna2-link');
         link.setAttribute('aria-hidden', 'true');
         linkPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         link.appendChild(linkPath);
+        /* terminal dots — one where the line leaves the tile, one where
+           it meets the card */
+        linkDotA = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        linkDotB = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        linkDotA.setAttribute('r', '3.5');
+        linkDotB.setAttribute('r', '3.5');
+        link.appendChild(linkDotA);
+        link.appendChild(linkDotB);
         tRoot.insertBefore(link, tRoot.firstChild);
       }
       function drawLink(tile) {
@@ -5420,7 +5435,7 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
         var rr = tRoot.getBoundingClientRect();
         var tr = tile.getBoundingClientRect();
         var pr = panel.getBoundingClientRect();
-        var d;
+        var d, sx, sy, ex, ey;
         if (tr.bottom <= pr.top + 1) {
           /* bar tile: drop from its foot, walk to the card's centre, drop in */
           var x1 = tr.left + tr.width / 2 - rr.left;
@@ -5430,17 +5445,23 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
           d = Math.abs(x1 - xC) < 1
             ? 'M' + x1 + ' ' + y1 + ' V' + yTop
             : 'M' + x1 + ' ' + y1 + ' V' + ((y1 + yTop) / 2) + ' H' + xC + ' V' + yTop;
+          sx = x1; sy = y1; ex = xC; ey = yTop;
         } else if (tr.top < pr.bottom) {
           /* stem tile beside the card: straight across into its right edge */
           var yS = tr.top + tr.height / 2 - rr.top;
           d = 'M' + (tr.left - rr.left) + ' ' + yS + ' H' + (pr.right - rr.left);
+          sx = tr.left - rr.left; sy = yS; ex = pr.right - rr.left; ey = yS;
         } else {
           /* stem tile below the card: across, then up into its foot */
           var yB = tr.top + tr.height / 2 - rr.top;
           var xC2 = pr.left + pr.width / 2 - rr.left;
           d = 'M' + (tr.left - rr.left) + ' ' + yB + ' H' + xC2 + ' V' + (pr.bottom - rr.top);
+          sx = tr.left - rr.left; sy = yB; ex = xC2; ey = pr.bottom - rr.top;
         }
         linkPath.setAttribute('d', d);
+        /* the terminal dots sit on the line's first and last points */
+        if (linkDotA) { linkDotA.setAttribute('cx', sx); linkDotA.setAttribute('cy', sy); }
+        if (linkDotB) { linkDotB.setAttribute('cx', ex); linkDotB.setAttribute('cy', ey); }
         /* stroke lives in CSS — one standard azure for every tile */
       }
 
@@ -6436,6 +6457,6 @@ addEventListener('load', function () {
      to it hard. Bump it whenever spiral.js changes. -->
 <script src="spiral-gallery/spiral.js?v=20260726-bend2"></script>
 
-<script type="module" src="orb/bhanu-orb.js?v=7"></script>
+<script type="module" src="orb/bhanu-orb.js?v=8"></script>
 </body>
 </html>
