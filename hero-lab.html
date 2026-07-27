@@ -2173,7 +2173,8 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
   /* the foot belongs to the chat view alone now — in voice view the controls
      sit under the orb, so the strip has nothing to hold and gets out of the way */
   .panel-foot{flex-shrink:0;padding:16px;border-top:1px solid rgba(150,190,245,.12);}
-  .chat[data-view="voice"] .panel-foot{display:none;}
+  /* the composer shows in BOTH views now — typing in voice view is the
+     invitation; sending flips the panel into chat */
 
   .talk-cta:disabled{opacity:.72;cursor:default;transform:none;}
   /* end call — the one place on the page that is deliberately not azure */
@@ -4358,13 +4359,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <span id="talkStartLabel" aria-live="polite">Start talking</span>
         </button>
         <button type="button" class="btn-end" id="talkEnd">End call</button>
-        <button type="button" class="btn-secondary talk-alt" id="toChat">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-            <rect x="1.6" y="4.2" width="12.8" height="7.6" rx="1.8"/>
-            <path d="M4.3 6.8h.01M6.7 6.8h.01M9.1 6.8h.01M11.5 6.8h.01M5 9.6h6"/>
-          </svg>
-          <span>Chat instead</span>
-        </button>
+        <!-- "Chat instead" removed — the composer sits below by default;
+             the first sent message flips the panel into chat view. -->
       </div>
       <div class="thread" id="thread">
         <div class="m ai">Hey — ask me about my work, a project I'm proud of, or why you should hire me.</div>
@@ -4642,7 +4638,6 @@ function setView(view) {
   chat.dataset.view = view;
   if (view === 'chat') setTimeout(function () { input.focus(); }, 320);
 }
-document.getElementById('toChat').addEventListener('click', function () { setView('chat'); });
 document.getElementById('orbHold').addEventListener('click', function () {
   if (chat.dataset.view === 'chat') setView('voice');   // tap the parked orb → back to voice
 });
@@ -4809,6 +4804,9 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
   e.preventDefault();
   var text = input.value.trim();
   if (!text || sendBtn.disabled) return;
+  /* sending from the voice landing flips the panel into chat — the message
+     is the mode switch */
+  if (chat.dataset.view === 'voice') setView('chat');
   input.value = ''; sendBtn.disabled = true;
   bubble('me', text);
   messages.push({ role: 'user', content: text });
