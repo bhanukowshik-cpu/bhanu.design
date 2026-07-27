@@ -412,7 +412,9 @@
      here would resolve against this container's font, not the headline's. */
   .copy{position:relative;z-index:10;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;
     text-align:left;height:100%;
-    max-width:min(1120px,76%);
+    /* cap the CONTENT at 1120 — the gutters live inside this box, so the
+       cap must carry them or the headline collapses to one word a line */
+    max-width:min(calc(1120px + var(--gutter) * 2), 100%);
     /* the copy obeys the page gutter — it was hard-capped at 92px and sat
        far left of the 15% margin on wide screens */
     padding:calc(88px + var(--anno-h)) var(--gutter) clamp(92px,13vh,150px) var(--gutter);}
@@ -843,6 +845,21 @@
    it gave; the title now stands alone in the breath) */
 @media (prefers-reduced-motion: reduce) {
       .s2-fw-header { transition: none; }
+    }
+/* ── THE RISE — armed by JS, played on entry; visible by default ────── */
+    .rise-armed {
+      opacity: 0;
+      transform: translateY(46px);
+      transition: opacity 0.95s var(--ease), transform 0.95s var(--ease);
+      transition-delay: var(--rise-delay, 0s);
+    }
+    .rise-armed.rise-in { opacity: 1; transform: none; }
+    /* the floating dock centres with translateX — its rise must carry it */
+    .ft-cta-dock.rise-armed { transform: translate(-50%, 46px); }
+    .ft-cta-dock.rise-armed.rise-in { transform: translateX(-50%); }
+    @media (prefers-reduced-motion: reduce) {
+      .rise-armed { opacity: 1; transform: none; transition: none; }
+      .ft-cta-dock.rise-armed { transform: translateX(-50%); }
     }
 /* ── the sibling dividers (work→about, about→testimonials) — the same
    grammar as the hero→work band: the section's statement alone in a
@@ -3635,7 +3652,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   /* ── the deck ───────────────────────────────────────────────────────────
      A stack of framed cards. The one on top is draggable: throw it in any
      direction and it goes to the back, and whoever was behind it steps up. */
-  .tm-deck{position:relative;width:100%;max-width:840px;margin:0 auto;
+  .tm-deck{position:relative;width:100%;
+    /* 840 wide, but never past the page's 70% content band */
+    max-width:min(840px, calc(100vw - var(--gutter) * 2));margin:0 auto;
     /* headroom for the longer quotes — 430px clipped them on tall
        screens and the attributions spilled out under the card */
     height:clamp(430px,54vh,580px);perspective:1400px;}
@@ -3780,8 +3799,13 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* row-reverse: the plate's figure owns the left, so the copy takes
        the right and the note settles over the dark slope */
     flex-direction:row-reverse;
-    align-items:center;justify-content:space-between;gap:clamp(40px,5vw,72px);}
-  .ft-left{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:28px;}
+    /* the note and the copy keep company on the dark half instead of
+       fleeing to opposite edges — the void between them was the complaint.
+       (row-reverse: flex-START is the RIGHT edge) */
+    align-items:center;justify-content:flex-start;gap:clamp(56px,7vw,150px);}
+  /* no stretch: space-between rides this to the right gutter, over the
+     plate's dark half — the hero's composition, mirrored */
+  .ft-left{flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-start;gap:28px;}
 
   .ft-k{display:block;font-size:11.5px;font-weight:550;letter-spacing:.18em;
     text-transform:uppercase;color:var(--ink-3);}
@@ -3835,13 +3859,13 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   .ft-soc:hover{color:#08111F;background:var(--ember);border-color:var(--ember);transform:translateY(-2px);}
 
   /* ── the paper note — its own visual world on purpose ── */
-  .ft-note{display:flex;flex-direction:column;align-items:center;max-width:560px;flex:0 1 auto;}
+  .ft-note{display:flex;flex-direction:column;align-items:center;max-width:680px;flex:0 1 auto;}
   .ft-note .ft-k{margin-bottom:14px;}
   /* min() keeps the note inside a 320px screen without needing a width
      override at the phone breakpoint — an override there made it jump from
      352px to 725px across a single pixel of viewport */
-  .ft-paper{--rl:clamp(36px,3.2vw,46px);position:relative;
-    width:min(100%,clamp(340px,38vw,520px));max-width:100%;
+  .ft-paper{--rl:clamp(38px,3.4vw,54px);position:relative;
+    width:min(100%,clamp(340px,42vw,640px));max-width:100%;
     padding:calc(var(--rl) * .58) 40px calc(var(--rl) * .58) 64px;
     background-color:#E9E4D8;
     background-image:
@@ -5876,6 +5900,42 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
         });
       }, { threshold: 0.12 });
       observer.observe(el);
+    })();
+
+/* ── THE RISE — every block slides up into place as it enters ──────────
+   The page's sections already rise (About's cinematic wrap, the said
+   deck's stagger, the reel's card entrances); this arms the blocks that
+   still popped: the divider statements and the footer's furniture.
+   Additive over a visible default — no-JS and reduced-motion visitors
+   see everything standing. Siblings stagger 80ms via --rise-delay. */
+    (function () {
+      if (!('IntersectionObserver' in window)) return;
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var els = document.querySelectorAll([
+        '.s2-fw-header .fw-title',
+        '.sec-divider .said-h',
+        '.ft-left > *',
+        '.ft-note',
+        '.ft-cta-dock'
+      ].join(','));
+      if (!els.length) return;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) {
+            en.target.classList.add('rise-in');
+            io.unobserve(en.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      var perParent = new Map();
+      els.forEach(function (el) {
+        var p = el.parentElement;
+        var n = perParent.get(p) || 0;
+        perParent.set(p, n + 1);
+        el.style.setProperty('--rise-delay', (n * 0.08).toFixed(2) + 's');
+        el.classList.add('rise-armed');
+        io.observe(el);
+      });
     })();
 
 /* ── SECTION 3 — the DNA tiles, behaviour from index.html ──────────────
