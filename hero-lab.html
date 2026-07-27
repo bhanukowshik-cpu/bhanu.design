@@ -974,6 +974,12 @@
     }
     /* an empty seam — just the breath, no statement in it */
     .sec-divider--empty { padding: 7vh var(--gutter); }
+    /* phones: the breath shrinks and the section stops centring itself in
+       a full viewport — the statement and its content sit together */
+    @media (max-width:767px){
+      .sec-divider { padding: 8vh var(--gutter) 4vh; }
+      .sec-divider--empty { padding: 5vh var(--gutter); }
+    }
     /* the emphasis word carries the serif, the hero h1's exact treatment */
     .dna2-heading .serif {
       font-weight: 400;
@@ -1088,7 +1094,9 @@
          it was pinned at and does not re-measure on resize. A phone was
          therefore handed a 1250px bar and the whole PAGE scrolled sideways.
          100vw can't go stale and 6vw keeps the desktop width it had. */
-      width: min(1500px, calc(100vw - 2 * max(20px, 6vw)));
+      /* tighter cap: 1500px read as a chasm on big screens — the content
+         wants company, not acreage */
+      width: min(1160px, calc(100vw - 2 * max(20px, 6vw)));
       z-index: 10;
       display: flex;
       flex-direction: column;
@@ -1317,7 +1325,6 @@
       align-items: center;
     }
 .s2-bar-bottom-row .s2-bar-cta { margin-left: auto; max-width: 340px; }
-@media (min-width: 1600px) { .s2-bar-bottom-row .s2-bar-cta { margin-left: 0; } }
 .s2-bar-metrics {
       display: flex;
       gap: 26px;
@@ -2062,7 +2069,11 @@
 
     html.s2-no-helix .s2-mobile-accordion{
       display:flex;flex-direction:column;gap:12px;
-      padding:0 var(--gutter) clamp(56px,9vh,88px);}
+      padding:0 var(--gutter) clamp(56px,9vh,88px);
+      /* the work container is pointer-events:none for the helix overlay —
+         the accordion must switch its own hit-testing back on, exactly as
+         the project bar does, or every phone tap falls through it */
+      pointer-events:auto;}
     /* the helix never builds here, so its zone is an empty 100vh hole and
        the project bar is its furniture */
     html.s2-no-helix .s2-cards-zone,
@@ -2090,7 +2101,7 @@
        grid-template-rows:0fr would only ever collapse the first of them */
     .s2-acc-body{max-height:0;opacity:0;overflow:hidden;padding:0 18px;
       transition:max-height .55s var(--ease-expo),opacity .3s ease,padding .55s var(--ease-expo);}
-    .s2-acc-open .s2-acc-body{max-height:760px;opacity:1;padding:0 18px 18px;}
+    .s2-acc-open .s2-acc-body{max-height:1100px;opacity:1;padding:0 18px 18px;}
     .s2-acc-desc{margin:0 0 14px;font-size:14px;line-height:1.62;color:var(--ink-2);}
     .s2-acc-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:15px;}
     .s2-acc-tag{padding:5px 11px;border:1px solid var(--line);border-radius:100px;
@@ -2108,6 +2119,12 @@
       font-size:13.5px;font-weight:550;letter-spacing:.01em;
       color:var(--ember);text-decoration:none;background:rgba(92,169,255,.07);}
     .s2-acc-cta:active{background:rgba(92,169,255,.15);}
+    /* the project's own picture leads the expanded body — the same media
+       the desktop helix carries, framed for a thumb */
+    .s2-acc-media{margin:2px 0 14px;border-radius:13px;overflow:hidden;
+      border:1px solid var(--line);background:#0A0E15;aspect-ratio:16/10;}
+    .s2-acc-media video,.s2-acc-media img{width:100%;height:100%;object-fit:cover;display:block;}
+    .s2-acc-media--tall{aspect-ratio:4/5;max-width:320px;margin-inline:auto;}
     @media (prefers-reduced-motion:reduce){
       .s2-acc-body,.s2-acc-chevron,.s2-acc-item{transition:none;}
     }
@@ -2955,10 +2972,13 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     .chat{
       top:0;left:0;right:0;bottom:auto;width:100%;height:100dvh;
       border-radius:0;border:none;
-      transform:translateY(8%);opacity:0;
-      transition:transform .55s var(--ease-expo),opacity .4s var(--ease);
+      /* visibility, not just opacity: an invisible on-screen sheet still
+         swallows every tap on the page under it (it ate the accordion) */
+      transform:translateY(8%);opacity:0;visibility:hidden;
+      transition:transform .55s var(--ease-expo),opacity .4s var(--ease),visibility 0s .55s;
     }
-    .chat.open{transform:none;opacity:1;}
+    .chat.open{transform:none;opacity:1;visibility:visible;
+      transition:transform .55s var(--ease-expo),opacity .4s var(--ease),visibility 0s 0s;}
     .chat-head{padding:14px 12px 12px 16px;}
     .chat-head .t{font-size:17px;}
     .voice-dock{top:calc(46% + 108px);padding:0 16px;}
@@ -4230,6 +4250,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
     background-size:100% 100%, 52px 52px, 52px 52px;}
+  /* phones: content-led, not viewport-centred — the deck follows the
+     divider statement instead of drifting to the middle of a 100vh void */
+  @media (max-width:767px){
+    .said{min-height:auto;justify-content:flex-start;
+      padding:28px 0 clamp(64px,9vh,92px);}
+  }
   .said-pool{position:absolute;left:50%;top:52%;width:min(920px,86vw);height:70%;
     transform:translate(-50%,-50%);filter:blur(40px);pointer-events:none;
     background:radial-gradient(ellipse at center,rgba(92,169,255,.06) 0%,transparent 66%);}
@@ -8239,6 +8265,30 @@ addEventListener('load', function () {
       var acc = document.getElementById('s2MobileAccordion');
       if (!acc) return;
 
+      /* the same media the desktop helix carries (spiral.js), indexed to
+         S2_DATA — video where one exists, the card plate otherwise */
+      var ACC_MEDIA = [
+        { img: 'Parallax cards/EverTutor Glimpse/Dark mode finalized.png' },
+        { img: 'images/card-et-live.png',      video: 'images/et-live.mp4' },
+        { img: 'images/card-et-studio.png',    video: 'images/et-studio.mp4' },
+        { img: 'images/card-et-analytics.png', video: 'images/et-analytics.mp4' },
+        { img: 'images/card-stressie.png',     video: 'images/stressie.mp4', portrait: true },
+        { img: 'images/card-dearly.png',       video: 'images/dearly.mp4' },
+        { img: 'images/card-engine.png' }
+      ];
+      /* open item's video plays, everything else pauses; src attaches on
+         first open so seven phones' worth of mp4 never preloads at once */
+      function syncAccMedia() {
+        acc.querySelectorAll('.s2-acc-item').forEach(function (el) {
+          var v = el.querySelector('video');
+          if (!v) return;
+          if (el.classList.contains('s2-acc-open')) {
+            if (!v.getAttribute('src')) v.setAttribute('src', v.dataset.src);
+            var p = v.play(); if (p && p.catch) p.catch(function () {});
+          } else if (!v.paused) { v.pause(); }
+        });
+      }
+
       function buildAccordion() {
         acc.innerHTML = '';
         S2_DATA.forEach(function (card, i) {
@@ -8261,8 +8311,17 @@ addEventListener('load', function () {
 
           var ctaHref = card.href && card.href !== '#' ? card.href : null;
           var ctaHtml = ctaHref
-            ? '<a class="s2-acc-cta" href="' + ctaHref + '">View Case Study →</a>'
+            ? '<a class="s2-acc-cta" href="' + ctaHref + '">' + (card.ctaLabel || 'View Case Study →') + '</a>'
             : '';
+
+          var media = ACC_MEDIA[i];
+          var mediaHtml = '';
+          if (media && media.video) {
+            mediaHtml = '<div class="s2-acc-media' + (media.portrait ? ' s2-acc-media--tall' : '') + '">' +
+              '<video muted loop playsinline preload="none" poster="' + media.img + '" data-src="' + media.video + '"></video></div>';
+          } else if (media && media.img) {
+            mediaHtml = '<div class="s2-acc-media"><img src="' + media.img + '" alt="" loading="lazy"></div>';
+          }
 
           item.innerHTML =
             '<button class="s2-acc-header" aria-expanded="' + (i === 0 ? 'true' : 'false') + '">' +
@@ -8272,6 +8331,7 @@ addEventListener('load', function () {
               '</svg>' +
             '</button>' +
             '<div class="s2-acc-body">' +
+              mediaHtml +
               '<p class="s2-acc-desc">' + card.desc + '</p>' +
               '<div class="s2-acc-tags">' + tagsHtml + '</div>' +
               '<div class="s2-acc-metrics">' + metricsHtml + '</div>' +
@@ -8306,10 +8366,12 @@ addEventListener('load', function () {
           if (spiralRoot) {
             spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', { detail: { idx: idx } }));
           }
+          syncAccMedia();
         });
       }
 
       buildAccordion();
+      syncAccMedia();
 
       /* Keep accordion in sync when spiral fires frontCard events */
       window.addEventListener('s2:frontCard', function (e) {
@@ -8320,6 +8382,7 @@ addEventListener('load', function () {
           var h = el.querySelector('.s2-acc-header');
           if (h) h.setAttribute('aria-expanded', open ? 'true' : 'false');
         });
+        syncAccMedia();
       });
     })();
 
