@@ -4353,12 +4353,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     </header>
 
     <div class="panel-body" id="panelBody">
-      <div class="orb-rings" aria-hidden="true"><i><b></b></i><i><b></b></i><i><b></b></i></div>
+      <!-- orbit rings retired — the orb stands alone -->
       <div class="orb-hold" id="orbHold" title="Back to voice"><div id="talkOrbMount"></div></div>
       <!-- the controls live under the orb, over the outer orbit -->
       <div class="voice-dock">
         <button type="button" class="btn-primary talk-cta" id="talkStart">
-          <i class="talk-dot" aria-hidden="true"></i>
           <span id="talkStartLabel" aria-live="polite">Start talking</span>
         </button>
         <button type="button" class="btn-end" id="talkEnd">End call</button>
@@ -4658,8 +4657,9 @@ function freezeHome(on) {
 }
 function openChat() {
   chat.classList.add('open'); backdrop.classList.add('open');
-  var act = document.querySelector('#ctaText span.on');
-  input.value = act ? (act.dataset.q || act.textContent) : '';
+  /* the composer opens EMPTY — pre-filling the cycling prompt read as
+     someone else's words already in your mouth */
+  input.value = '';
   syncSendState();
   setView('voice');                              // voice-first by default
   freezeHome(true);
