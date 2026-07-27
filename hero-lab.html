@@ -2092,7 +2092,9 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     /* the port had this on --font-display, i.e. upright serif. Display lines
        are Instrument Sans here, and the serif only ever appears in italic. */
     font-family: var(--sans);
-    font-size: clamp(40px, 5vw, 72px);
+    /* ONE size for every divider statement — same clamp as the about and
+       testimonial bands (.sec-divider rule); change them together */
+    font-size: clamp(30px, 3.2vw, 48px);
     font-weight: 570;
     letter-spacing: -0.022em;
   }
@@ -3315,7 +3317,21 @@ html:not([data-theme="dark"]) .dna2-link circle { fill: #3372B8; }
 .dna2-arm.down  { background: linear-gradient(180deg, transparent, rgba(255,255,255,0.55)); }
 .dna2-arm.up::before   { content: ""; position: absolute; top: 0;    left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-bottom: 7px solid rgba(255,255,255,0.8); border-top: 0; }
 .dna2-arm.down::after  { content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-top: 7px solid rgba(255,255,255,0.8); border-bottom: 0; }
-.dna2-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+.dna2-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; position: relative; }
+/* the T made visible — one rail above the crossbar and one below it,
+   running the full width of the five blocks */
+    .dna2-bar::before, .dna2-bar::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0;
+      height: 1px;
+      background: rgba(140,197,255,0.22);
+      pointer-events: none;
+    }
+.dna2-bar::before { top: -16px; }
+.dna2-bar::after { bottom: -16px; }
+html:not([data-theme="dark"]) .dna2-bar::before,
+    html:not([data-theme="dark"]) .dna2-bar::after { background: rgba(37,37,37,0.16); }
 /* Lower band shares the bar's 5-col rhythm: quote sits bottom-left, stem drops from centre (col 3), depth axis runs down col 4 */
     .dna2-lower { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; align-items: stretch; }
 .dna2-stem { grid-column: 3 / 4; grid-row: 1; align-self: start; display: flex; flex-direction: column; gap: 14px; }
