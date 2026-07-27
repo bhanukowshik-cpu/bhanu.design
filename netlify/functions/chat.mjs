@@ -25,10 +25,14 @@ export default async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
 
-  const key = process.env.ANTHROPIC_API_KEY;
+  /* ANTHROPIC_API_KEY is the name every Anthropic tool looks for, including
+     proxy.py locally — so it wins when present. Anthropic_Bhanu_Chat is the
+     name the Netlify variable was actually created under; Netlify locks a
+     secret variable's key after creation, so the code bends instead. */
+  const key = process.env.ANTHROPIC_API_KEY || process.env.Anthropic_Bhanu_Chat;
   if (!key) {
     /* The panel prints this verbatim, so it has to say what to actually do. */
-    return json({ error: 'Server is missing ANTHROPIC_API_KEY — add it in Netlify → Site configuration → Environment variables, then redeploy.' }, 500);
+    return json({ error: 'Server is missing the Anthropic key — set ANTHROPIC_API_KEY (or Anthropic_Bhanu_Chat) in Netlify → Project configuration → Environment variables, scoped to Functions, then redeploy.' }, 500);
   }
 
   let body;
