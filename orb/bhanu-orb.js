@@ -32180,9 +32180,11 @@ const Ps = {
   maskRadius: 0.965,
   maskSoftness: 0.01,
   driftSpeed: 0,
-  // State-driven behaviours — moved by STATE_PRESETS, 0 at baseline.
+  // State-driven behaviours. The calm rotating ring is the resting look, so
+  // idleRingSpin lives at 1 in the baseline (visible in the tuner too, where
+  // state presets are bypassed); active states explicitly dial it back down.
   innerLightShift: 0,
-  idleRingSpin: 0,
+  idleRingSpin: 1,
   alpha: 1
 }, ac = {
   attack: 0.06,
@@ -32209,7 +32211,8 @@ const Ps = {
     ringColorOpacity: 0.5,
     exposure: 0.72,
     driftSpeed: 0.11,
-    innerLightShift: 1
+    innerLightShift: 1,
+    idleRingSpin: 0
   },
   // A little FBM + fluid reintroduced so speech visibly moves the surface.
   "user-speaking": {
@@ -32218,7 +32221,8 @@ const Ps = {
     fluidDisplacement: 0.45,
     ringColorOpacity: 0.72,
     exposure: 0.8,
-    driftSpeed: 0.16
+    driftSpeed: 0.16,
+    idleRingSpin: 0
   },
   "assistant-speaking": {
     fbmAmplitude: 0.12,
@@ -32228,7 +32232,8 @@ const Ps = {
     ringColorOpacity: 0.85,
     // more luminous highlights
     exposure: 0.82,
-    driftSpeed: 0.13
+    driftSpeed: 0.13,
+    idleRingSpin: 0
   },
   // Waiting — a faster autonomous drift plus a slow ring keep it feeling alive.
   connecting: {
@@ -32242,7 +32247,8 @@ const Ps = {
     exposure: 0.38,
     saturation: 0.7,
     // desaturated, subdued
-    driftSpeed: 0.04
+    driftSpeed: 0.04,
+    idleRingSpin: 0
   }
 }, yx = 0.22;
 function oy() {
