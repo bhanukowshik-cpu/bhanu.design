@@ -4101,6 +4101,16 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   </style>
 
   <div id="v6Loader" hidden role="status" aria-label="Loading portfolio">
+    <!-- the page's geometry vocabulary, staged around the centred portrait —
+         same hairline furniture as the thumbnails and sections -->
+    <div class="geo" aria-hidden="true">
+      <span class="geo-arc" style="width:88vmax;height:88vmax;left:50%;top:47%;margin-left:-44vmax;margin-top:-44vmax;"></span>
+      <span class="geo-arc thin" style="width:124vmax;height:124vmax;left:50%;top:47%;margin-left:-62vmax;margin-top:-62vmax;"></span>
+      <span class="geo-orbit" style="width:64vmax;height:64vmax;left:50%;top:47%;margin-left:-32vmax;margin-top:-32vmax;--spin:150s;"><b></b></span>
+      <span class="geo-cross" style="left:11%;top:26%;"></span>
+      <span class="geo-cross" style="right:13%;bottom:22%;"></span>
+      <span class="geo-sq" style="right:7%;top:15%;"></span>
+    </div>
     <div class="v6l-glow" aria-hidden="true"></div>
     <figure class="v6l-portrait" aria-hidden="true">
       <img src="images/loader-portrait.webp" alt="" width="1050" height="1400"
@@ -4204,7 +4214,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
       // words appear only once the copy is live, and never faster than one
       // beat apiece — but their order is always progress-true
-      var WORD_AT = [0, 0.26, 0.52, 0.76], wordIdx = -1, WORD_BEAT = 340;
+      var WORD_AT = [0, 0.26, 0.52, 0.76], wordIdx = -1, WORD_BEAT = 700;
       function setWord(p) {
         if (!copyT) return;
         var n = 0, j;
@@ -4219,17 +4229,21 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         wordIdx = n;
       }
 
-      var shown = 0, exiting = false;
+      var shown = 0, exiting = false, RAMP = 2200;
       (function step() {
         var elapsed  = performance.now() - t0;
         var assetsIn = collected && assetDone >= assetTarget;
         var loaded   = (fontsReady && (assetsIn || winLoaded)) || elapsed >= MAX_HOLD;
 
-        // no scripted pace: the bar chases the true fraction, holding just
-        // under 100% until everything has actually arrived
-        var target = loaded ? 1 : Math.min(assetFraction(), 0.985);
+        // honest, but visibly travelled: the bar starts at 0 when the copy
+        // appears and sweeps up over ~2.2s in step with the words — yet it
+        // can never run ahead of the true fraction, so a slow network still
+        // holds it under 100% until everything has actually arrived
+        var ramp   = copyT ? Math.min((performance.now() - copyT) / RAMP, 1) : 0;
+        var real   = loaded ? 1 : Math.min(assetFraction(), 0.985);
+        var target = Math.min(ramp, real);
         shown += (target - shown) * 0.14;
-        if (loaded && shown > 0.995) shown = 1;
+        if (loaded && ramp >= 1 && shown > 0.995) shown = 1;
 
         if (barEl) barEl.style.transform = 'scaleX(' + shown.toFixed(4) + ')';
         if (pctEl) pctEl.textContent = Math.round(shown * 100);
@@ -4238,7 +4252,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         // leave only when the bar is truly full AND "Repeat." has landed
         if (shown >= 1 && wordIdx === 3 && !exiting) {
           exiting = true;
-          setTimeout(hideLoader, 420);
+          setTimeout(hideLoader, 600);
         }
         if (!exiting) requestAnimationFrame(step);
       })();
@@ -5426,6 +5440,19 @@ var topNav = document.getElementById('topNav');
   /* 1.35 over the Engine's 1.1 — the longer glide is the plushness; the
      easing stays Lenis's own expo-out */
   var lenis = new Lenis({ duration: 1.35 });
+  /* THE LOADER TRAP: while the title sequence holds html at
+     overflow:hidden, scrollHeight collapses to one viewport — any limit
+     measured under the lock reads 0 and every wheel afterwards clamps to
+     the hero ("can't scroll past section 1"). Re-measure the moment the
+     loader lifts, and once more shortly after as a belt-and-braces. */
+  function remeasure() {
+    lenis.resize();
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
+  }
+  window.addEventListener('v6loaderhidden', function () {
+    remeasure();
+    setTimeout(remeasure, 1400);   /* after the lift transition settles */
+  });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
   gsap.ticker.lagSmoothing(0);
