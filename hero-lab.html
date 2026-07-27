@@ -395,9 +395,11 @@
         no shadow — just in a white palette. ── */
   .cta-dock{margin-top:44px;}
   .cta{
-    display:flex;align-items:center;gap:13px;
+    display:flex;align-items:center;gap:clamp(13px,0.9vw,17px);
     width:auto;max-width:92vw;
-    padding:9px 24px 9px 9px;border-radius:18px;cursor:pointer;border:none;
+    /* scales with the viewport — a fixed 55px pill read small at 1920+ */
+    padding:clamp(9px,0.6vw,11px) clamp(24px,1.6vw,31px) clamp(9px,0.6vw,11px) clamp(9px,0.6vw,11px);
+    border-radius:clamp(18px,1.2vw,22px);cursor:pointer;border:none;
     background:linear-gradient(135deg,#FFFFFF 0%,#F6F9FD 42%,#E7EEF8 100%);
     box-shadow:none;
     color:#0B1220;
@@ -407,7 +409,7 @@
   .cta:hover{transform:translateY(-2px);
     background:linear-gradient(135deg,#FFFFFF 0%,#FBFDFF 46%,#EFF4FB 100%);}
   .cta:focus-visible{outline:2px solid #A6CBFF;outline-offset:3px;}
-  .cta-orb{position:relative;width:55px;height:55px;flex-shrink:0;line-height:0;}
+  .cta-orb{position:relative;width:clamp(55px,3.6vw,70px);height:clamp(55px,3.6vw,70px);flex-shrink:0;line-height:0;}
   .cta-orb::before{content:'';position:absolute;inset:4px;border-radius:50%;
     background:radial-gradient(circle at 36% 30%, #D9F0FF, var(--ember) 46%, #17456F 80%, #081B2E);
     opacity:1;transition:opacity .4s;}
@@ -417,7 +419,7 @@
     transition:width .55s var(--ease);}   /* width animates to hug each prompt */
   .cta-text span{
     grid-area:1/1;justify-self:start;width:max-content;
-    white-space:nowrap;font-size:15px;font-weight:560;letter-spacing:-0.002em;color:#0B1220;
+    white-space:nowrap;font-size:clamp(15px,0.95vw,18px);font-weight:560;letter-spacing:-0.002em;color:#0B1220;
     opacity:0;transform:translateY(11px);filter:blur(3px);
     transition:opacity .6s var(--ease),transform .6s var(--ease),filter .6s var(--ease);
   }
@@ -2029,16 +2031,17 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     color:#0A0E15;font:600 12px/1 var(--sans);letter-spacing:.05em;white-space:nowrap;}
 
   /* ══ TALK PANEL ════════════════════════════════════════════════════════
-     The page is dark, so the panel is dark: a light slab sliding in over
-     this hero read as a different product. Same navy, same azure, same
-     hairlines — it is a drawer of the page, not a widget on top of it. */
+     Ported dark; re-skinned LIGHT by the override block at the end of this
+     section ("LIGHT SLAB") — the panel is a paper drawer over the dark
+     page now. Dark declarations kept beneath so the port stays diffable. */
   .chat-backdrop{position:fixed;inset:0;z-index:var(--z-scrim);
     background:rgba(3,6,12,.68);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
     opacity:0;pointer-events:none;transition:opacity .45s var(--ease);}
   .chat-backdrop.open{opacity:1;pointer-events:auto;}
   .chat{
     position:fixed;top:14px;right:14px;bottom:14px;z-index:var(--z-panel);
-    width:min(420px,calc(100vw - 28px));
+    /* grows with the screen — a fixed 420px drawer read skinny at 1920+ */
+    width:min(clamp(420px,26vw,600px),calc(100vw - 28px));
     display:flex;flex-direction:column;overflow:hidden;
     background:
       radial-gradient(120% 60% at 50% 8%,rgba(60,130,235,.16),transparent 62%),
@@ -2218,6 +2221,42 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
   .send-btn.is-ready:hover{background:var(--cta-grad-hover);transform:translateY(-1px);}
   .send-btn:disabled{opacity:.5;cursor:default;transform:none;}
   .send-btn svg{width:17px;height:17px;}
+
+  /* ══ LIGHT SLAB ═══════════════════════════════════════════════════════
+     By request the panel is a LIGHT slab over the dark page — a paper
+     drawer. Same-specificity overrides, later in the sheet, so the dark
+     port above stays diffable. Azure stays the accent; End call stays
+     the one non-azure thing. */
+  .chat{
+    background:
+      radial-gradient(120% 60% at 50% 8%,rgba(60,130,235,.07),transparent 62%),
+      linear-gradient(180deg,#FBFAF6 0%,#F5F2EC 58%,#EFEBE3 100%);
+    color:#16181D;
+    border:1px solid rgba(20,28,45,.10);
+    box-shadow:0 40px 100px -34px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.85);
+  }
+  .chat-head{border-bottom:1px solid rgba(20,28,45,.08);}
+  .chat-head .t{color:#16181D;}
+  .chat-close{background:rgba(20,28,45,.05);border-color:rgba(20,28,45,.12);color:rgba(22,24,29,.55);}
+  .chat-close:hover{background:rgba(20,28,45,.09);border-color:rgba(20,28,45,.24);color:#16181D;}
+  .head-stack span{border-color:rgba(20,28,45,.14);background:rgba(20,28,45,.035);color:rgba(22,24,29,.52);}
+  .chat.live .head-stack span{color:#3372B8;border-color:rgba(51,114,184,.36);background:rgba(51,114,184,.08);}
+  .chat.live .talk-cta{border-color:rgba(20,28,45,.16);color:rgba(22,24,29,.62);}
+  .thread{scrollbar-color:rgba(20,28,45,.24) transparent;}
+  .m.ai{background:rgba(20,28,45,.05);border-color:rgba(20,28,45,.09);color:#1A1D24;}
+  .m.me{background:linear-gradient(180deg,rgba(92,169,255,.20),rgba(53,118,222,.16));
+    border-color:rgba(53,118,222,.30);color:#12263F;}
+  .m.typing i{background:rgba(22,24,29,.4);}
+  .panel-foot{border-top:1px solid rgba(20,28,45,.08);}
+  .composer input{background:#FFFFFF;border-color:rgba(20,28,45,.13);color:#16181D;}
+  .composer input::placeholder{color:rgba(22,24,29,.38);}
+  .composer input:focus{border-color:rgba(51,114,184,.5);background:#FFFFFF;}
+  .mic-btn{background:rgba(20,28,45,.045);border-color:rgba(20,28,45,.13);color:rgba(22,24,29,.55);}
+  .mic-btn:hover{color:#16181D;border-color:rgba(51,114,184,.5);}
+  .send-btn{color:rgba(22,24,29,.45);background:rgba(20,28,45,.06);}
+  .send-btn.is-ready{color:#fff;background:var(--cta-grad);}
+  .btn-end{border-color:rgba(195,59,54,.38);background:rgba(214,64,64,.08);color:#B03A34;}
+  .btn-end:hover{background:rgba(214,64,64,.14);border-color:rgba(195,59,54,.6);}
 
 
 /* ══ SECTION 3 — ported from index.html ════════════════════════════════
