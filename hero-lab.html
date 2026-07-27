@@ -2385,6 +2385,77 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
   .m.typing{display:flex;gap:5px;padding:14px 16px;}
   .m.typing i{width:5px;height:5px;border-radius:50%;background:var(--ink-3);animation:tp 1.2s infinite;}
   .m.typing i:nth-child(2){animation-delay:.15s}.m.typing i:nth-child(3){animation-delay:.3s}
+
+  /* ═══ THE CHAT GRAMMAR — ported from the shipping page's nailed pass,
+     composed with the reference flow (chips → instant bubble → attributed
+     visible thinking → word-by-word answer) ═══ */
+  /* message entrance — a quiet rise, no bounce */
+  @keyframes ch-rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .m{animation:ch-rise .32s cubic-bezier(0.22,1,0.36,1) both;}
+  /* thinking shell — avatar + shimmer status + three pulsing squares,
+     on the bare panel (no bubble chrome) */
+  .m.think-shell{display:inline-flex;align-items:center;gap:10px;
+    background:transparent;border:none;box-shadow:none;padding:2px 0;}
+  .think-ava{width:22px;height:22px;border-radius:50%;object-fit:cover;display:block;
+    border:1px solid rgba(20,28,45,.18);flex-shrink:0;}
+  .think-status{font-family:var(--font-mono, monospace);font-size:13px;letter-spacing:.01em;white-space:nowrap;
+    background:linear-gradient(90deg,rgba(22,24,29,.45) 0%,rgba(22,24,29,.45) 38%,
+      #3372B8 50%,rgba(22,24,29,.45) 62%,rgba(22,24,29,.45) 100%);
+    background-size:220% 100%;
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    animation:ch-shine 2.4s linear infinite;}
+  @keyframes ch-shine{from{background-position:120% 0}to{background-position:-20% 0}}
+  .think-status.swap{animation:ch-shine 2.4s linear infinite,ch-swap .26s cubic-bezier(0.22,1,0.36,1);}
+  @keyframes ch-swap{from{opacity:.35;transform:translateY(3px)}to{opacity:1;transform:none}}
+  .think-squares{display:inline-flex;align-items:flex-end;gap:5px;height:13px;}
+  .think-squares i{width:9px;height:9px;border-radius:3px;display:block;background:#3372B8;
+    box-shadow:0 0 9px rgba(51,114,184,.45);
+    animation:ch-sq 1.05s cubic-bezier(0.4,0,0.2,1) infinite;will-change:transform,opacity;}
+  .think-squares i:nth-child(2){animation-delay:.15s}
+  .think-squares i:nth-child(3){animation-delay:.3s}
+  @keyframes ch-sq{0%,70%,100%{transform:translateY(0) scale(.66);opacity:.45}
+    35%{transform:translateY(-4px) scale(1);opacity:1}}
+  /* word-by-word reveal + a live caret that retracts on completion */
+  .ch-w{display:inline;animation:ch-word .22s cubic-bezier(0.22,1,0.36,1) both;}
+  @keyframes ch-word{from{opacity:0;transform:translateY(1px)}to{opacity:1;transform:none}}
+  .ch-caret{display:inline-block;vertical-align:-0.12em;width:2px;height:1.05em;margin-left:2px;
+    background:#3372B8;border-radius:1px;box-shadow:0 0 6px rgba(51,114,184,.5);
+    animation:ch-blink .85s step-end infinite;}
+  @keyframes ch-blink{50%{opacity:0}}
+  .ch-caret.retract{animation:ch-caret-out .3s cubic-bezier(0.22,1,0.36,1) forwards;}
+  @keyframes ch-caret-out{from{opacity:1;transform:scaleY(1)}to{opacity:0;transform:scaleY(.4)}}
+  /* suggestion chips — collapse while the answer is coming, return after */
+  .chat-chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 18px 10px;
+    opacity:0;transform:translateY(6px);pointer-events:none;
+    transition:opacity .4s var(--ease),transform .4s var(--ease);}
+  .chat-chips.on{opacity:1;transform:none;pointer-events:auto;}
+  .chip{appearance:none;border:1px solid rgba(20,28,45,.16);background:#fff;color:#16181D;
+    border-radius:999px;padding:8px 14px;font-family:var(--sans);font-size:12.5px;font-weight:550;
+    cursor:pointer;animation:ch-rise .45s var(--ease) both;animation-delay:var(--chip-delay,0s);
+    transition:border-color .2s,background .2s,transform .2s;}
+  .chip:hover{border-color:#3372B8;background:rgba(51,114,184,.07);transform:translateY(-1px);}
+  /* project recommendation cards inside the thread */
+  .m.chat-recs{display:flex;flex-wrap:wrap;gap:10px;background:transparent;border:none;
+    box-shadow:none;padding:2px 0;}
+  .chat-rec{display:flex;align-items:center;gap:10px;border:1px solid rgba(20,28,45,.14);
+    border-radius:14px;padding:8px 12px 8px 8px;background:#fff;text-decoration:none;color:#16181D;
+    font-family:var(--sans);font-size:13px;font-weight:600;
+    transition:border-color .2s,transform .2s,box-shadow .2s;}
+  .chat-rec:hover{border-color:#3372B8;transform:translateY(-2px);
+    box-shadow:0 10px 24px -14px rgba(20,28,45,.35);}
+  .chat-rec img{width:44px;height:44px;border-radius:10px;object-fit:cover;display:block;}
+  .chat-rec-go{color:#3372B8;font-weight:600;font-size:12px;white-space:nowrap;}
+  /* header truth-line + composer credit */
+  .head-live{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:550;
+    color:rgba(22,24,29,.55);}
+  .head-live i{width:7px;height:7px;border-radius:50%;background:#2FA24E;
+    box-shadow:0 0 0 3px rgba(47,162,78,.15);flex-shrink:0;}
+  .chat-credit{display:block;text-align:center;padding:8px 0 2px;
+    font-size:11px;font-weight:550;letter-spacing:.02em;color:rgba(22,24,29,.42);}
+  @media (prefers-reduced-motion: reduce){
+    .m,.chip,.ch-w{animation:none;}
+    .think-status{animation:none;-webkit-text-fill-color:rgba(22,24,29,.6);}
+  }
   @keyframes tp{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
 
   /* the foot belongs to the chat view alone now — in voice view the controls
@@ -5164,11 +5235,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <aside class="chat" id="chat" data-view="voice" role="dialog" aria-label="Ask me anything" aria-modal="true">
     <header class="chat-head">
       <div class="head-mid">
-        <div class="t">Talk with <span class="serif">me</span></div>
-        <!-- not a label — this is genuinely what answers you -->
-        <div class="head-stack" aria-label="Built with">
-          <span>Second&nbsp;Brain</span><span>Voice&nbsp;Clone</span><span>ElevenLabs&nbsp;SDK</span>
-        </div>
+        <div class="t">Ask <span class="serif">Bhanu AI</span></div>
+        <!-- one quiet truth instead of the badge stack — the header was
+             carrying three labels' worth of text -->
+        <span class="head-live"><i aria-hidden="true"></i>Second brain, voice-cloned &mdash; ask anything</span>
       </div>
       <button class="chat-close" id="chatClose" aria-label="Close">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
@@ -5190,11 +5260,15 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
              the first sent message flips the panel into chat view. -->
       </div>
       <div class="thread" id="thread">
-        <div class="m ai">Hey — ask me about my work, a project I'm proud of, or why you should hire me.</div>
+        <div class="m ai">Hi — I&rsquo;m Bhanu&rsquo;s AI twin, running on his second brain. Ask about the work, the process, or why you&rsquo;d want him on your team.</div>
       </div>
     </div>
 
     <div class="panel-foot">
+      <!-- the reference grammar: tappable prompt chips ride above the
+           composer, collapse while the answer is coming, and return with
+           contextual follow-ups after it lands -->
+      <div class="chat-chips" id="chatChips" aria-label="Suggested questions"></div>
       <form class="composer" id="chatForm">
         <input id="chatInput" type="text" placeholder="Ask anything…" autocomplete="off" />
         <button type="button" class="mic-btn" id="micBtn" aria-label="Dictate your question">
@@ -5204,6 +5278,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </form>
+      <span class="chat-credit">Powered by Claude &middot; voice-cloned with ElevenLabs</span>
     </div>
   </aside>
 
@@ -5677,21 +5752,124 @@ function bubble(cls, text) {
   return el;
 }
 
-document.getElementById('chatForm').addEventListener('submit', async function (e) {
-  e.preventDefault();
-  var text = input.value.trim();
+/* ── suggestion chips — the reference's recommendation flow ──────────── */
+var chipsWrap = document.getElementById('chatChips');
+var CHIP_POOLS = {
+  seed:    ["What should I know about you?", "Show me your best work", "Why should we hire you?", "How do you design with AI?"],
+  work:    ["Tell me about EverTutor Live", "What's Stressie?", "What did you build on Dearly?", "What results did you drive?"],
+  project: ["What was the hardest problem there?", "What was your exact role?", "Show me another project", "What did you learn?"],
+  hire:    ["What roles are you open to?", "How do you work with engineers?", "Can we schedule a call?"],
+  contact: ["Can we schedule a meeting?", "What's the best way to reach you?"]
+};
+function routeChips(reply) {
+  var r = (reply || '').toLowerCase();
+  if (/hire|role|team|recruit|strength/.test(r)) return CHIP_POOLS.hire;
+  if (/email|meeting|schedule|call|reach/.test(r)) return CHIP_POOLS.contact;
+  if (/evertutor|stressie|dearly|engine|project|case study/.test(r)) return CHIP_POOLS.project;
+  return CHIP_POOLS.work;
+}
+function renderChips(list) {
+  if (!chipsWrap) return;
+  chipsWrap.innerHTML = '';
+  list.slice(0, 4).forEach(function (q, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip';
+    b.style.setProperty('--chip-delay', (i * 0.06).toFixed(2) + 's');
+    b.textContent = q;
+    b.addEventListener('click', function () { sendMessage(q); });
+    chipsWrap.appendChild(b);
+  });
+  chipsWrap.classList.add('on');
+}
+function hideChips() { if (chipsWrap) chipsWrap.classList.remove('on'); }
+renderChips(CHIP_POOLS.seed);
+
+/* ── project recommendations — cards the answer can point at ─────────── */
+var REC_MAP = [
+  { re: /evertutor live/i,    name: 'EverTutor Live',      href: 'evertutor-live.html',   img: 'images/card-et-live.png' },
+  { re: /evertutor studio/i,  name: 'EverTutor Studio',    href: 'evertutor-studio.html', img: 'images/card-et-studio.png' },
+  { re: /stressie/i,          name: 'Stressie',            href: 'stressie-studio.html',  img: 'images/card-stressie.png' },
+  { re: /dearly/i,            name: 'Dearly',              href: 'https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal', img: 'images/card-dearly.png' },
+  { re: /the engine/i,        name: 'The Engine',          href: 'https://www.theengine.dev/', img: 'images/card-engine.png' }
+];
+function injectRecs(reply) {
+  var hits = REC_MAP.filter(function (r) { return r.re.test(reply); }).slice(0, 2);
+  if (!hits.length) return;
+  var row = document.createElement('div');
+  row.className = 'm ai chat-recs';
+  hits.forEach(function (r) {
+    var a = document.createElement('a');
+    a.className = 'chat-rec'; a.href = r.href;
+    if (/^https?:/.test(r.href)) { a.target = '_blank'; a.rel = 'noopener'; }
+    a.innerHTML = '<img src="' + r.img + '" alt="" loading="lazy"><span>' + r.name +
+      '</span><span class="chat-rec-go">Open &rarr;</span>';
+    row.appendChild(a);
+  });
+  thread.appendChild(row); thread.scrollTop = thread.scrollHeight;
+}
+
+/* ── visible thinking — the shipping page's staged phases, verbatim ──── */
+var THINK_PHASES = [
+  'Reading the question',
+  'Looking through Bhanu’s work',
+  'Checking the second brain',
+  'Analyzing',
+  'Drafting'
+];
+var THINK_DWELL = [700, 850, 650, 800, 900];
+var thinkTimer = null;
+function startThinking(statusEl) {
+  var idx = 0;
+  statusEl.textContent = THINK_PHASES[0];
+  function advance() {
+    if (idx >= THINK_PHASES.length - 1) return;   /* hold on the last phrase */
+    idx++;
+    statusEl.textContent = THINK_PHASES[idx];
+    statusEl.classList.remove('swap');
+    void statusEl.offsetWidth;                    /* restart the crossfade */
+    statusEl.classList.add('swap');
+    if (idx < THINK_PHASES.length - 1) thinkTimer = setTimeout(advance, THINK_DWELL[idx]);
+  }
+  thinkTimer = setTimeout(advance, THINK_DWELL[0]);
+}
+function stopThinking() { if (thinkTimer) { clearTimeout(thinkTimer); thinkTimer = null; } }
+function makeThinkShell() {
+  var el = document.createElement('div');
+  el.className = 'm ai think-shell';
+  el.innerHTML = '<img class="think-ava" src="images/loader-portrait.webp" alt="">' +
+    '<span class="think-status"></span>' +
+    '<span class="think-squares" aria-hidden="true"><i></i><i></i><i></i></span>';
+  thread.appendChild(el); thread.scrollTop = thread.scrollHeight;
+  startThinking(el.querySelector('.think-status'));
+  return el;
+}
+
+/* ── the send — word-by-word answer with a live caret ────────────────── */
+async function sendMessage(text) {
+  text = (text || '').trim();
   if (!text || sendBtn.disabled) return;
   /* sending from the voice landing flips the panel into chat — the message
      is the mode switch */
   if (chat.dataset.view === 'voice') setView('chat');
   input.value = ''; sendBtn.disabled = true; syncSendState();
+  hideChips();
   bubble('me', text);
   messages.push({ role: 'user', content: text });
 
-  var tp = document.createElement('div');
-  tp.className = 'm ai typing'; tp.innerHTML = '<i></i><i></i><i></i>';
-  thread.appendChild(tp); thread.scrollTop = thread.scrollHeight;
-
+  var shell = makeThinkShell();
+  var el = null, caret = null, wordBuf = '', full = '';
+  function pushWords(t, flushAll) {
+    wordBuf += t;
+    var parts = wordBuf.split(/(\s+)/);
+    if (!flushAll) wordBuf = parts.pop(); else wordBuf = '';
+    parts.forEach(function (w) {
+      if (!w) return;
+      var s = document.createElement('span');
+      s.className = 'ch-w'; s.textContent = w;
+      el.insertBefore(s, caret);
+    });
+    thread.scrollTop = thread.scrollHeight;
+  }
   try {
     var res = await fetch(API_BASE + '/api/chat', {
       method: 'POST',
@@ -5699,7 +5877,6 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
       body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1024, system: SYSTEM, messages: messages, stream: true }),
     });
     if (!res.ok) throw new Error('API ' + res.status);
-    var el = null, full = '';
     var reader = res.body.getReader(), dec = new TextDecoder(), buf = '';
     while (true) {
       var c = await reader.read();
@@ -5712,21 +5889,38 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
         try {
           var j = JSON.parse(L.slice(6));
           if (j.type === 'content_block_delta' && j.delta && j.delta.text) {
-            if (!el) { tp.remove(); el = bubble('ai', ''); }
-            full += j.delta.text; el.textContent = full; thread.scrollTop = thread.scrollHeight;
+            if (!el) {
+              stopThinking(); shell.remove();
+              el = bubble('ai', '');
+              caret = document.createElement('span');
+              caret.className = 'ch-caret'; el.appendChild(caret);
+            }
+            full += j.delta.text;
+            pushWords(j.delta.text, false);
           }
         } catch (_) {}
       }
     }
     if (!el) throw new Error('empty stream');
+    pushWords('', true);
+    caret.classList.add('retract');
+    setTimeout(function () { caret.remove(); }, 350);
     messages.push({ role: 'assistant', content: full });
+    injectRecs(full);
+    renderChips(routeChips(full));
   } catch (err) {
-    tp.remove();
+    stopThinking(); shell.remove();
     bubble('ai', "I'm offline right now (the chat backend isn't running). Start proxy.py on :3001 and try again — or email kowshikbhanu1000@gmail.com.");
     messages.pop();
+    renderChips(CHIP_POOLS.seed);
   } finally {
     sendBtn.disabled = false; input.focus();
   }
+}
+
+document.getElementById('chatForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  sendMessage(input.value);
 });
 
 /* ?orbdebug opens the orb tuning panel on one instance: cta (default), fab, or talk */
