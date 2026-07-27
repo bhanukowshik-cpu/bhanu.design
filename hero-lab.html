@@ -2685,14 +2685,17 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
   .chat[data-view="voice"] .chat-credit{display:none;}
   /* the door between the rooms — anchored at the panel's very bottom,
      with its own chat mark */
-  .talk-tertiary{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:6;
+  /* inset centering, not translateX — a transform-based centre means any
+     hover transform (ours or an injected stylesheet's) replaces it and
+     throws the button sideways. margin:auto can't be clobbered. */
+  .talk-tertiary{position:absolute;left:0;right:0;margin:0 auto;width:max-content;bottom:16px;z-index:6;
     appearance:none;background:none;border:none;padding:8px 12px;
     display:inline-flex;align-items:center;gap:7px;
     font-family:var(--sans);font-size:13px;font-weight:550;cursor:pointer;
     color:rgba(22,24,29,.5);border-radius:999px;
-    transition:color .2s,background .2s;}
+    transition:color .2s,background .2s,transform .2s var(--ease);}
   .talk-tertiary svg{width:15px;height:15px;flex:none;}
-  .talk-tertiary:hover{color:#16181D;background:rgba(20,28,45,.06);}
+  .talk-tertiary:hover{color:#16181D;background:rgba(20,28,45,.06);transform:translateY(-1px);}
   .chat[data-view="chat"] .talk-tertiary{display:none;}
 
   /* ── the mid-call scheduler ── */
@@ -7872,6 +7875,8 @@ addEventListener('load', function () {
 
   /* ── Section 2: Project panels + bottom tab strip ────────────────────── */
   (function () {
+    /* Copy source of record: portfolio-featured-work-updated-copy.md —
+       outcome statement first, three proof points, compact scope meta. */
     var S2_DATA = [
       {
         tab: 'EverTutor',
@@ -7879,35 +7884,35 @@ addEventListener('load', function () {
         badge: '(Next 3 Projects)',
 
         metrics: [
-          { val: '2000+',   lbl: 'Daily Active Users' },
-          { val: '3 Tools', lbl: 'Working as One System' },
-          { val: '-96%',    lbl: 'Content Creation Time Cut' }
+          { val: '2,000+',       lbl: 'Daily Students' },
+          { val: '300+ hrs/day', lbl: 'AI Tutoring Delivered' },
+          { val: '3,000+',       lbl: 'Lessons Created' }
         ],
-        tags: [],
+        tags: ['B2B2C EdTech'],
         iconTags: [
           { icon: 'profile', label: 'Sole Product Designer' },
-          { icon: 'thunder', label: '0 to 1' },
-          { icon: 'mic',     label: 'Conversational AI' }
+          { icon: 'thunder', label: '0→1' },
+          { icon: 'mic',     label: 'Multimodal AI' }
         ],
-        desc: "World's first multimodal, voice-first AI tutor powered by 3 tools to create, serve & measure student proficiency.",
+        desc: 'Designed the end-to-end tutoring system across Live, Studio, and Analytics — helping educators create lessons, deliver 1:1 AI tutoring, and measure learning at district scale.',
         href: '#'
       },
       {
         tab: 'ET Live',
-        title: '1.1 EverTutor Live',
+        title: 'EverTutor Live',
 
         metrics: [
-          { val: '$250→$5/hr', lbl: '1:1 Tutor Cost'   },
-          { val: '2×',  lbl: 'Proven Mastery'     },
-          { val: '85%', lbl: 'Session Completion' }
+          { val: '$250→$5/hr',   lbl: '1:1 Tutoring Cost' },
+          { val: '300+ hrs/day', lbl: 'Tutoring Delivered' },
+          { val: '85%',          lbl: 'Session Completion' }
         ],
-        tags: ['Shipped', 'B2C', 'Multi Model Interaction', 'Designing for Voice'],
+        tags: ['Shipped', 'B2B2C EdTech'],
         iconTags: [
           { icon: 'profile', label: 'Sole Product Designer' },
-          { icon: 'thunder', label: '0 to 1' },
+          { icon: 'thunder', label: '0→1' },
           { icon: 'mic',     label: 'Voice AI' }
         ],
-        desc: 'Scaled one-to-one learning support by shaping a voice-native AI experience, from an early concept to product-market fit.',
+        desc: 'Designed the voice-first tutoring experience from early prototype to scaled classroom use — making personalized 1:1 support dramatically more accessible.',
         href: 'evertutor-live.html'
       },
       {
@@ -7915,16 +7920,16 @@ addEventListener('load', function () {
         title: 'EverTutor Studio',
 
         metrics: [
-          { val: '104→4hrs', lbl: 'Per Lesson' },
-          { val: '12',       lbl: 'Schools'    },
-          { val: '8',        lbl: 'Districts'  }
+          { val: '104→4 hrs', lbl: 'Creation Time / Lesson' },
+          { val: '3,000+',    lbl: 'Lessons Created' },
+          { val: '~25×',      lbl: 'Faster Production' }
         ],
-        tags: ['Shipped', 'Content Creation', 'AI Tools', 'B2B · EdTech'],
+        tags: ['Shipped', 'AI Authoring', 'B2B EdTech'],
         iconTags: [
           { icon: 'profile', label: 'Sole Product Designer' },
-          { icon: 'thunder', label: '0 to 1' }
+          { icon: 'thunder', label: '0→1' }
         ],
-        desc: 'Lesson creation tool designed overnight. Cut content production from 104 hours down to 4.',
+        desc: 'Turned a fragmented, 104-hour lesson-production workflow into a 4-hour authoring experience — helping the team create thousands of classroom-ready lessons at scale.',
         href: 'evertutor-studio.html'
       },
       {
@@ -7932,18 +7937,17 @@ addEventListener('load', function () {
         title: 'EverTutor Analytics',
 
         metrics: [
-          { val: 'Live',    lbl: 'In Production' },
-          { val: 'Dog-ear', lbl: 'System'        },
-          { val: '0',       lbl: 'Extra Clicks'  }
+          { val: 'Real-time', lbl: 'Student Insights' },
+          { val: '0',         lbl: 'Extra Navigation for Detail' },
+          { val: 'Live',      lbl: 'In Production' }
         ],
-        tags: ['Shipped', 'Data Visualization', 'Real-time', 'B2B Dashboard'],
+        tags: ['Data Visualization', 'Real-time Analytics', 'B2B SaaS'],
         iconTags: [
-          { icon: 'profile', label: 'Sole Product Designer' },
-          { icon: 'thunder', label: '0 to 1' }
+          { icon: 'profile', label: 'Sole Product Designer' }
         ],
-        desc: 'Real-time student insights. The dog-ear system: complexity on demand, clean by default.',
+        desc: 'Turned dense student-performance data into a real-time decision tool — giving educators a fast overview while keeping deeper insights available exactly when needed.',
         href: '#contactSection',
-        ctaLabel: 'Connect for Walkthrough →',
+        ctaLabel: 'Request a Walkthrough →',
         ctaStyle: 'tertiary'
       },
       {
@@ -7951,16 +7955,16 @@ addEventListener('load', function () {
         title: 'Stressie',
 
         metrics: [
-          { val: '17.4%', lbl: 'Engagement Rate'    },
-          { val: '$600k', lbl: 'Funding'             },
-          { val: 'Amazon', lbl: '& InKind Live'      }
+          { val: '12% → 56%', lbl: 'Daily Engagement' },
+          { val: '4m 20s',    lbl: 'Avg. Time Engaged' },
+          { val: '$600K',     lbl: 'Funding Unlocked' }
         ],
-        tags: ['Shipped', 'Wellness App', 'Harvard-incubated', 'B2B SaaS'],
+        tags: ['Shipped', 'Harvard-incubated', 'Wellness', 'B2B SaaS'],
         iconTags: [
           { icon: 'profile', label: 'Founding Designer' },
-          { icon: 'thunder', label: '0 to 1' }
+          { icon: 'thunder', label: '0→1' }
         ],
-        desc: 'Harvard-incubated workplace stress app. Full redesign: engagement hit 17.4% vs ~2% industry average.',
+        desc: 'Rebuilt a low-engagement workplace wellness product around everyday use — lifting daily engagement from 12% to 56% and helping unlock $600K in funding.',
         href: 'stressie-studio.html'
       },
       {
@@ -7968,17 +7972,17 @@ addEventListener('load', function () {
         title: 'Dearly',
 
         metrics: [
-          { val: '140',  lbl: 'Letters Written' },
-          { val: '35★',  lbl: '5-Star Ratings'  },
-          { val: '48hrs', lbl: 'Built In'        }
+          { val: '140+',      lbl: 'Letters Created' },
+          { val: '35 ★★★★★', lbl: 'Five-Star Ratings' },
+          { val: '48 hrs',    lbl: 'Concept → Live' }
         ],
-        tags: ['Shipped', 'Animated Messages', 'Voice', 'Consumer App'],
+        tags: ['Shipped', 'Consumer'],
         iconTags: [
-          { icon: 'profile', label: 'Sole Product Designer' },
-          { icon: 'thunder', label: '0 to 1' },
+          { icon: 'profile', label: 'Solo Build' },
+          { icon: 'thunder', label: '0→1' },
           { icon: 'mic',     label: 'Voice' }
         ],
-        desc: 'Animated handwriting with your real voice and photos, sent as a unique link. Built in 48 hours.',
+        desc: 'Designed and shipped a voice-and-handwriting messaging experience in 48 hours — turning personal memories into letters people could hear, see, and keep.',
         href: 'https://dearly-rho.vercel.app',
         ctaLabel: 'Visit Dearly ↗'
       },
@@ -7986,12 +7990,13 @@ addEventListener('load', function () {
         tab: 'The Engine',
         title: 'The Engine',
         metrics: [
-          { val: 'Brand', lbl: '& Art Direction' },
-          { val: 'Landing', lbl: 'Page' }
+          { val: '3 Engines', lbl: 'One Product Narrative' },
+          { val: '0→1',       lbl: 'Brand + Art Direction' },
+          { val: 'Live',      lbl: 'Launch Site' }
         ],
-        tags: ['Shipped', 'Marketing Site'],
+        tags: ['Live Site', 'Brand Direction', 'AI'],
         iconTags: [],
-        desc: 'Designed the landing page for an AI growth platform that runs content, marketing and sales autonomously.',
+        desc: 'Defined the brand direction and launch experience for an AI Revenue OS — turning three complex products across content, marketing, and sales into one clear story.',
         href: 'https://www.theengine.dev/',
         ctaLabel: 'Visit The Engine ↗'
       }
