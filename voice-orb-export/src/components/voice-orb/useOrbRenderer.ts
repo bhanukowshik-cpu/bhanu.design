@@ -206,9 +206,12 @@ export function useOrbRenderer(opts: UseOrbRendererOptions): void {
 
     // --- sizing -------------------------------------------------------------
     const applySize = () => {
-      const rect = container.getBoundingClientRect();
-      const w = Math.max(1, Math.round(rect.width));
-      const h = Math.max(1, Math.round(rect.height));
+      // Layout box, NOT getBoundingClientRect: the host page parks the orb
+      // with transform:scale(), and a gBCR measured mid-park (or a mount that
+      // lands while parked) pins the canvas at coin resolution — RO never
+      // refires on unpark because transforms don't touch the layout box.
+      const w = Math.max(1, Math.round(container.clientWidth));
+      const h = Math.max(1, Math.round(container.clientHeight));
       renderer.dpr = Math.min(maxDprRef.current, window.devicePixelRatio || 1);
       renderer.setSize(w, h);
       (uniforms.uResolution.value as number[])[0] = renderer.width * renderer.dpr;
