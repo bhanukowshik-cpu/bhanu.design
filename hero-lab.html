@@ -3949,9 +3949,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   /* no margin-top: the dots sit INSIDE .tm-nav's centred flex row, and the
      old clamp pushed them ~15px below the arrows' baseline */
   .tm-dots{display:flex;align-items:center;justify-content:center;gap:8px;}
-  .tm-dot{width:7px;height:7px;padding:0;border:0;border-radius:999px;cursor:pointer;
-    background:rgba(239,243,248,.24);
+  .tm-dot{position:relative;width:7px;height:7px;padding:0;border:0;border-radius:999px;
+    cursor:pointer;background:rgba(239,243,248,.24);
     transition:width .55s var(--ease-expo),background .35s var(--ease);}
+  /* the dot is 7px of ink but needs a finger's worth of target — this pushes
+     the hit area to 26px tall without moving a pixel of what you see */
+  .tm-dot::after{content:'';position:absolute;inset:-10px -5px;border-radius:999px;}
   .tm-dot:hover{background:rgba(239,243,248,.5);}
   .tm-dot.is-on{width:26px;background:var(--ember);}
   /* arrows flank the dots; the deck advances on click and on a timer */
@@ -3977,14 +3980,28 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   .said.is-live.revealed .said-inner>*{opacity:1;transform:none;}
 
   @media (max-width:760px){
-    .tm-deck{height:clamp(470px,64vh,540px);}
-    .tm-card{grid-template-columns:1fr;grid-template-rows:minmax(0,150px) minmax(0,1fr);
+    .tm-deck{height:clamp(500px,66vh,570px);}
+    .tm-card{grid-template-columns:minmax(0,1fr);grid-template-rows:132px minmax(0,1fr);
       align-items:stretch;gap:18px;}
-    /* the picture leads on a phone, the words follow */
-    .tm-art{grid-row:1;}
-    .tm-body{grid-row:2;}
-    .tm-qmark{font-size:40px;margin-bottom:6px;}
+    /* the picture leads on a phone, the words follow.
+       THE BUG THIS FIXES: .tm-art is aspect-ratio 1/1 with no width cap, so
+       in a single-column grid it filled the 289px column and became 289px
+       TALL — 139px past its own row. Every quote was pushed out of the deck
+       and clipped. Drive the square off the ROW height instead of the
+       column width and it stays inside its track. */
+    .tm-art{grid-row:1;height:100%;width:auto;aspect-ratio:1/1;
+      align-self:center;justify-self:center;}
+    .tm-body{grid-row:2;min-height:0;}
+    .tm-qmark{font-size:36px;margin-bottom:4px;}
     .tm-attr{padding-top:16px;}
+  }
+  /* under 480 the decorative plate costs more than it gives: it pushed the
+     testimonial itself below the fold on a 320px phone. The words are the
+     content here — the art stands down and the quote gets the card. */
+  @media (max-width:480px){
+    .tm-deck{height:clamp(430px,60vh,510px);}
+    .tm-card{grid-template-rows:minmax(0,1fr);}
+    .tm-art{display:none;}
   }
   @media (max-width:420px){
     .tm-tabs{width:100%;}
