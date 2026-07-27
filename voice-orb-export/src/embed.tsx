@@ -42,6 +42,23 @@ function LiveOrb({ palette = 'ember', size = 188, ui = true, debug = false, onSt
   const conversation = useConversation({
     onConnect: () => setErrorMsg(null),
     onError: (message: string) => setErrorMsg(message || 'Connection error'),
+    // Safety net for the open_scheduler client tool: small models often
+    // NARRATE the action ("let me get that scheduled") instead of calling
+    // the tool. If the agent's own words ask for an email, show the field
+    // anyway. showScheduler() no-ops when it's already up, so this and a
+    // real tool call can both fire — whichever lands first wins.
+    onMessage: ({ message, source }: { message: string; source: 'user' | 'ai' }) => {
+      if (source !== 'ai' || !message) return;
+      const t = message.toLowerCase();
+      const asksForEmail = /\b(e-?mail|inbox)\b/.test(t);
+      // \w* on the stems: a trailing \b would reject "scheduled"/"booking"
+      const aboutBooking = /\b(schedul\w*|book\w*|set (that|it|this) up|calendar|meeting|call)\b/.test(t);
+      const pointsAtField = /\b(below|field|box|type|enter|drop|pop)\b/.test(t);
+      if (asksForEmail && (aboutBooking || pointsAtField)) {
+        const bt = (window as unknown as { BhanuTalk?: { showScheduler?: () => void } }).BhanuTalk;
+        bt?.showScheduler?.();
+      }
+    },
   });
   const {
     status,
