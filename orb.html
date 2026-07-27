@@ -35,8 +35,8 @@
   <script type="module" src="orb/bhanu-orb.js?v=6"></script>
   <script>
     /* The orb with its controls: four designed variations, plus the
-       state / palette / simulate strip. ?tune opens the slider panel,
-       ?size=N overrides the orb size. */
+       state / palette / simulate strip. The slider panel is open by
+       default — ?clean hides it; ?size=N overrides the orb size. */
     var VARIATIONS = [
       { /* the baseline read, softened a touch — glassy and unhurried */
         name: 'still water', palette: 'arctic',
@@ -67,7 +67,7 @@
       window.BhanuOrb.mountLab(document.getElementById('orb'), {
         size: Number(q.get('size')) || 360,
         presets: VARIATIONS,
-        panel: q.has('tune'),
+        panel: !q.has('clean'),
       });
     })();
   </script>
