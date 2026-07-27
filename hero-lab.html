@@ -400,14 +400,105 @@
   .nav-links a.is-here{color:var(--ink);}
   .nav-links a.is-here::after{transform:scaleX(1);transform-origin:left;opacity:.35;}
 
-  /* ── FIRST-LOAD CHOREOGRAPHY — elements settle in, ease-out-expo ── */
+  /* ── MOBILE NAV — the row collapses into a burger under 900px ───────────
+     Below that the link row outgrew its gutter, and the old fix simply
+     display:none'd every link but the last — so a phone was shown a nav
+     advertising exactly one destination and silently hiding four.
+     The sheet is a BODY-level element on purpose: .top-nav takes a
+     backdrop-filter when scrolled, and a filtered element becomes the
+     containing block for its position:fixed descendants — a sheet nested
+     inside the nav would be trapped inside that 62px bar. */
+  .nav-burger{display:none;position:relative;width:44px;height:44px;flex-shrink:0;
+    margin-right:-10px;padding:0;background:none;border:0;cursor:pointer;
+    color:var(--ink);-webkit-tap-highlight-color:transparent;}
+  .nav-burger span{position:absolute;left:11px;width:22px;height:1.5px;border-radius:2px;
+    background:currentColor;transition:transform .42s var(--ease-expo);}
+  .nav-burger span:nth-child(1){top:19px;}
+  .nav-burger span:nth-child(2){top:25px;}
+  body.nav-open .nav-burger span:nth-child(1){transform:translateY(3px) rotate(45deg);}
+  body.nav-open .nav-burger span:nth-child(2){transform:translateY(-3px) rotate(-45deg);}
+  .nav-burger:focus-visible{outline:2px solid var(--ember);outline-offset:2px;border-radius:10px;}
+
+  .nav-sheet{position:fixed;inset:0;z-index:calc(var(--z-nav) + 5);
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(8,12,20,.88);
+    backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);
+    opacity:0;pointer-events:none;visibility:hidden;
+    transition:opacity .42s var(--ease),visibility .42s;}
+  /* visibility, not just opacity — a transparent sheet would otherwise keep
+     its five links in the tab order and in the screen reader's tree */
+  body.nav-open .nav-sheet{opacity:1;pointer-events:auto;visibility:visible;}
+  /* the bar outranks the sheet while open, so the burger stays hittable as the X */
+  body.nav-open .top-nav{z-index:calc(var(--z-nav) + 6);}
+  /* the chat FAB sits at --z-fab:60, above the sheet — it has to stand down
+     while the menu is up, or it hovers over the middle of the overlay */
+  body.nav-open .orb-fab{opacity:0;pointer-events:none;transform:translateX(40px);}
+  .nav-sheet-inner{display:flex;flex-direction:column;align-items:center;
+    gap:clamp(16px,3.2vh,28px);padding:96px 24px 40px;width:100%;}
+  .nav-sheet a{font-family:var(--sans);font-size:clamp(25px,7.2vw,34px);font-weight:540;
+    letter-spacing:-0.02em;color:var(--ink);text-decoration:none;
+    opacity:0;transform:translateY(16px);
+    transition:opacity .5s var(--ease),transform .55s var(--ease-expo),color .2s;}
+  body.nav-open .nav-sheet a{opacity:1;transform:none;}
+  body.nav-open .nav-sheet a:nth-child(1){transition-delay:.08s;}
+  body.nav-open .nav-sheet a:nth-child(2){transition-delay:.14s;}
+  body.nav-open .nav-sheet a:nth-child(3){transition-delay:.20s;}
+  body.nav-open .nav-sheet a:nth-child(4){transition-delay:.26s;}
+  body.nav-open .nav-sheet a:nth-child(5){transition-delay:.32s;}
+  .nav-sheet a:active{color:var(--ember);}
+  @media (prefers-reduced-motion:reduce){
+    .nav-sheet,.nav-sheet a,.nav-burger span{transition-duration:.01ms;}
+  }
+
+  @media (max-width:900px){
+    .nav-links{display:none;}
+    .nav-burger{display:block;}
+  }
+
+  /* ── FIRST-LOAD CHOREOGRAPHY — elements settle in, ease-out-expo ────────
+     These used to fire on page load, which meant they ran BEHIND the loader
+     and were long over by the time it lifted — the visitor's first sight of
+     the hero was of copy already parked. So the hero is now armed instead:
+     `hero-wait` goes on <html> synchronously in the loader script (which
+     parses before this markup, so nothing flashes), and `v6loaderhidden`
+     swaps it for `hero-go`, which is what actually starts the animation.
+     With JS off neither class ever lands and the hero is simply there. */
   @keyframes riseIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
   @keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
-  .top-nav{animation:fadeDown .9s var(--ease-expo) both;}
-  .eyebrow{animation:riseIn .9s var(--ease-expo) both .12s;}
-  h1{animation:riseIn 1s var(--ease-expo) both .26s;}
-  .facts{animation:riseIn .9s var(--ease-expo) both .5s;}
-  .cta-dock{animation:riseIn 1s var(--ease-expo) both .66s;}
+  /* the headline arrives a word at a time, each one lifting into its place */
+  @keyframes wordRise{
+    from{opacity:0;transform:translateY(.62em);filter:blur(7px);}
+    to{opacity:1;transform:none;filter:blur(0);}}
+
+  /* the word is inline-block and NOT clipped: an overflow mask would move
+     each span's baseline to its bottom margin edge, and the serif run sits
+     at 1.08em — the two sizes would then part company on a shared line. */
+  h1 .hw{display:inline-block;}
+
+  /* ARMED — the pre-state, held for as long as the loader is up */
+  html.hero-wait .top-nav{opacity:0;transform:translateY(-10px);}
+  html.hero-wait .eyebrow,
+  html.hero-wait .facts,
+  html.hero-wait .cta-dock{opacity:0;transform:translateY(20px);}
+  html.hero-wait h1{opacity:0;}
+  html.hero-wait h1 .hw{opacity:0;transform:translateY(.62em);}
+
+  /* RELEASED — the loader has lifted and the hero performs */
+  html.hero-go .top-nav{animation:fadeDown .9s var(--ease-expo) both;}
+  html.hero-go .eyebrow{animation:riseIn .9s var(--ease-expo) both .10s;}
+  html.hero-go h1 .hw{animation:wordRise .92s var(--ease-expo) both var(--wd,.22s);}
+  html.hero-go .facts{animation:riseIn .9s var(--ease-expo) both 1.05s;}
+  html.hero-go .cta-dock{animation:riseIn 1s var(--ease-expo) both 1.22s;}
+
+  /* reduced motion: the hero is simply present the moment the loader goes.
+     These need the same html.* specificity as the rules they cancel. */
+  @media (prefers-reduced-motion:reduce){
+    html.hero-wait .top-nav,html.hero-wait .eyebrow,html.hero-wait .facts,
+    html.hero-wait .cta-dock,html.hero-wait h1,html.hero-wait h1 .hw{
+      opacity:1;transform:none;}
+    html.hero-go .top-nav,html.hero-go .eyebrow,html.hero-go h1 .hw,
+    html.hero-go .facts,html.hero-go .cta-dock{animation:none;}
+  }
 
   /* ── COPY — top middle, centered ── */
   /* Anchored bottom-left against the plate. The dune's crest and figure own
@@ -2703,6 +2794,79 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
   .btn-end{border-color:rgba(195,59,54,.38);background:rgba(214,64,64,.08);color:#B03A34;}
   .btn-end:hover{background:rgba(214,64,64,.14);border-color:rgba(195,59,54,.6);}
 
+  /* ══ PANEL ATMOSPHERE ═══════════════════════════════════════════════
+     The room stops being a flat slab. Two quiet layers, both on the body
+     so the header and the desk stay clean planes: the page's ruled grid,
+     and an azure beam grounding the orb. (A ghost serif monogram lived
+     here for an hour — vetoed.) */
+  .panel-body::before{
+    content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+    background-image:
+      radial-gradient(88% 54% at 50% 44%,rgba(60,130,235,.11),transparent 62%),
+      linear-gradient(rgba(20,28,45,.03) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(20,28,45,.03) 1px,transparent 1px);
+    background-size:100% 100%,44px 44px,44px 44px;
+    -webkit-mask-image:radial-gradient(130% 96% at 50% 42%,#000 52%,transparent 98%);
+            mask-image:radial-gradient(130% 96% at 50% 42%,#000 52%,transparent 98%);
+    transition:opacity .5s var(--ease);
+  }
+  /* in the chat room the atmosphere steps back so the words read */
+  .chat[data-view="chat"] .panel-body::before{opacity:.55;}
+  .chat .thread{z-index:1;padding-top:78px;}
+
+  /* ══ ENTERING CHAT IS AN ARRIVAL ════════════════════════════════════
+     The complaint was real: switching rooms, the only motion was the orb
+     LEAVING. Now the thread and the desk rise to meet you, staggered,
+     while the orb docks in the corner on a quicker, quieter path. */
+  @keyframes ch-arrive{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  .chat[data-view="chat"] .thread{animation:ch-arrive .55s var(--ease) both;}
+  .chat[data-view="chat"] .composer{animation:ch-arrive .55s var(--ease) .08s both;}
+  .chat[data-view="chat"] .chat-credit{animation:ch-arrive .55s var(--ease) .16s both;}
+  .orb-hold{transition:top .45s var(--ease),left .45s var(--ease),transform .45s var(--ease);}
+  /* the docked orb is a control, not litter — it answers the cursor */
+  .chat[data-view="chat"] .orb-hold{top:40px;left:calc(100% - 40px);transform:translate(-50%,-50%) scale(.26);}
+  .chat[data-view="chat"] .orb-hold:hover{transform:translate(-50%,-50%) scale(.31);}
+  /* the orb bundle sizes its canvas from the element's TRANSFORMED rect —
+     resize the window while the orb is parked (a phone rotation is enough)
+     and the canvas gets pinned at coin size. The display box never lies: */
+  #talkOrbMount canvas{width:100% !important;height:100% !important;}
+
+  /* ══ THE PANEL ACROSS VIEWPORTS ═════════════════════════════════════ */
+  /* tablets — the drawer keeps its float but loosens its frame */
+  @media (max-width:900px){
+    .chat{width:min(480px,calc(100vw - 24px));top:12px;right:12px;bottom:12px;}
+  }
+  /* phones — the drawer becomes a full-bleed sheet: real device height,
+     no float, no radius, and it rises from the bottom (the sheet grammar
+     a thumb expects) instead of sliding in from an edge it can't reach */
+  @media (max-width:640px){
+    .chat{
+      top:0;left:0;right:0;bottom:auto;width:100%;height:100dvh;
+      border-radius:0;border:none;
+      transform:translateY(8%);opacity:0;
+      transition:transform .55s var(--ease-expo),opacity .4s var(--ease);
+    }
+    .chat.open{transform:none;opacity:1;}
+    .chat-head{padding:14px 12px 12px 16px;}
+    .chat-head .t{font-size:17px;}
+    .voice-dock{top:calc(46% + 108px);padding:0 16px;}
+    .chat .thread{padding:70px 14px 12px;}
+    .m{max-width:92%;}
+    .chat[data-view="chat"] .orb-hold{top:34px;left:calc(100% - 34px);transform:translate(-50%,-50%) scale(.22);}
+    .panel-foot{padding:12px 12px calc(12px + env(safe-area-inset-bottom));}
+    .chat-chips{padding:0 14px 8px;}
+    .talk-tertiary{bottom:calc(10px + env(safe-area-inset-bottom));}
+    .talk-sched input{width:min(300px,74vw);}
+    .chat-sched-row input{width:min(260px,62vw);}
+    /* iOS zooms any focused input under 16px — never hand it the excuse */
+    .composer input,.talk-sched input,.chat-sched-row input{font-size:16px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .chat[data-view="chat"] .thread,
+    .chat[data-view="chat"] .composer,
+    .chat[data-view="chat"] .chat-credit{animation:none;}
+  }
+
 
 /* ══ SECTION 3 — ported from index.html ════════════════════════════════
      The DNA T-shape's own rules, lifted whole. Type and colour resolve
@@ -4286,16 +4450,30 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   }
 
   @media(max-width:760px){
-    .nav-links a:not(:last-child){display:none;}
-    .top-nav{padding:10px 20px;}
-    .top-nav.scrolled{left:calc(5% + 8px);right:calc(5% + 8px);padding:10px 20px;}
+    /* the bar comes down to phone scale — 62/74px of chrome was eating the
+       top of a 667px screen. The links themselves are gone from here: the
+       burger takes over at 900px. */
+    .top-nav{padding:8px 20px;height:54px;}
+    .top-nav.scrolled{left:calc(5% + 8px);right:calc(5% + 8px);padding:8px 16px;height:60px;border-radius:16px;}
+    .nav-avatar{width:32px;height:32px;}
+    .nav-nametext{min-width:0;}
+    .nav-name{font-size:15px;}
+    .nav-callme-name{font-size:14px;}
+    .nav-callme-label{font-size:9px;letter-spacing:.12em;}
+    .nav-brand{gap:10px;min-height:32px;}
     /* let the hero grow if the stack outruns a short viewport */
     .hero{height:auto;min-height:100svh;}
     /* the 76% column is a desktop device for keeping the type off the dune's
        crest; on a phone the crest is cropped out anyway, so the copy takes
        the full width back — without this it inherits 76% and the headline
        collapses to eight lines in a 237px gutter. */
-    .copy{height:auto;min-height:100svh;max-width:none;padding:12vh 24px 56px;}
+    .copy{height:auto;min-height:100svh;max-width:none;padding:12vh 24px 56px;
+      /* phone only: the column centres. On desktop the type is deliberately
+         anchored bottom-left against the plate, but a phone crop has no
+         empty half to sit in — centred is the only balanced reading. */
+      align-items:center;text-align:center;}
+    /* the headline's 30ch cap has to centre itself once the column does */
+    .copy h1{margin-left:auto;margin-right:auto;}
     /* The desktop scrim is left-heavy because the plate keeps its bright half
        on the right. A phone crop throws that half straight behind the type,
        so here the scrim stops being directional and becomes a full wash —
@@ -4307,13 +4485,44 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        of a phone screen — the ceiling comes down so the fold can breathe */
     h1{font-size:clamp(30px,8.6vw,42px);}
     /* stats stack: centered column, dividers rotate to horizontal hairlines */
-    .facts{margin-top:32px;flex-direction:column;align-items:stretch;padding:4px 22px;}
+    /* align-self keeps the framed band full-width against a centred column,
+       which would otherwise shrink it to its longest fact */
+    .facts{margin-top:32px;flex-direction:column;align-items:stretch;padding:4px 22px;
+      align-self:stretch;}
     .fact{justify-content:center;text-align:center;padding:13px 0;}
     .fact:first-child{padding-left:0;padding-top:13px;}
     .fact:last-child{padding-right:0;padding-bottom:13px;}
     .fact+.fact{border-left:none;border-top:1px solid var(--line);}
     .cta-dock{margin-top:30px;}
     .cta-text span{font-size:12.5px;}
+  }
+
+  /* ── THE PLATE ON A PHONE — put the cliff and the figure back in frame ──
+     A 16:9 film inside a portrait window is object-fit:cover's worst case:
+     at 375×812 only ~26% of the film's width survives, and at the desktop
+     focal point (72%) that surviving strip was empty sky — the subject of
+     the shot was cropped clean off the phone.
+
+     Two moves, both through tokens the plate already reads:
+       focal-x 88%  slides the crop right, onto the summit and the figure.
+       scale 1.5 with focal-y 100% — transform-origin is the SAME pair, so
+                    parking it on the bottom edge makes the zoom push the
+                    ridge upward, into the empty band above the eyebrow.
+     object-position's y is inert here (a portrait box scaled to cover has
+     no vertical slack), so the origin is the only lever on height — which
+     is exactly why the scale is doing the lifting.
+
+     Portrait-scoped: a landscape phone IS wider than the film, so it gets
+     vertical slack back, and a 100% focal-y would drop it to the bottom
+     of the frame. Landscape keeps the desktop framing. */
+  @media(max-width:760px) and (orientation:portrait){
+    .hero-plate{--plate-focal-x:88%;--plate-focal-y:100%;--plate-scale:1.5;}
+  }
+  /* iPad portrait has the same fault, far milder — the ridge survives the
+     crop but the figure is left straddling the right edge. No zoom needed
+     here; the focal point only has to stop cutting it in half. */
+  @media(min-width:761px) and (max-width:1023px) and (orientation:portrait){
+    .hero-plate{--plate-focal-x:90%;}
   }
   @media(max-height:780px) and (min-width:761px){
     h1{font-size:clamp(38px,4.4vw,62px);}
@@ -4563,6 +4772,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       if (!loader) return;
       loader.hidden = false;
       document.documentElement.classList.add('v6-loading');
+      // arm the hero here, before its markup has parsed, so it is already
+      // holding its pre-state the first time it paints
+      document.documentElement.classList.add('hero-wait');
 
       var barEl  = document.getElementById('v6lBar');
       var pctEl  = document.getElementById('v6lPct');
@@ -4713,6 +4925,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <a href="#workPin">Work</a><a href="#aboutSection">About</a><a href="#saidSection">Testimonials</a><a href="./resume.pdf" target="_blank" rel="noopener">Résumé</a>
         <a href="#contactSection">Contact</a>
       </div>
+      <button class="nav-burger" id="navBurger" aria-label="Open menu"
+              aria-expanded="false" aria-controls="navSheet">
+        <span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </button>
     </nav>
 
     <div class="copy">
@@ -4745,6 +4961,117 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
          both no-op without this element (`if (!layer) return`), so putting
          the div back is all it takes to bring the photos back. -->
   </section>
+
+  <script>
+    /* ── HERO INTRO — cut the headline into words, then wait ───────────────
+       Runs here, immediately after the hero, so the h1 is guaranteed to
+       exist. The split walks text nodes only, which leaves the .serif run
+       intact and simply wraps the words inside it too. Each word carries
+       its own --wd delay, so the cascade is data, not a stack of nth-child
+       rules that would break the moment the copy is reworded. */
+    (function () {
+      var doc = document.documentElement;
+      var h1  = document.querySelector('.hero h1');
+
+      if (h1 && !h1.querySelector('.hw')) {
+        var i = 0;
+        (function walk(node) {
+          var kids = Array.prototype.slice.call(node.childNodes);
+          for (var k = 0; k < kids.length; k++) {
+            var n = kids[k];
+            if (n.nodeType === 3) {
+              var parts = n.textContent.split(/(\s+)/), frag = document.createDocumentFragment();
+              for (var p = 0; p < parts.length; p++) {
+                if (!parts[p]) continue;
+                if (/^\s+$/.test(parts[p])) {            // spaces stay plain text,
+                  frag.appendChild(document.createTextNode(parts[p]));  // so wrapping still works
+                  continue;
+                }
+                var s = document.createElement('span');
+                s.className = 'hw';
+                s.textContent = parts[p];
+                s.style.setProperty('--wd', (0.22 + i++ * 0.045).toFixed(3) + 's');
+                frag.appendChild(s);
+              }
+              node.replaceChild(frag, n);
+            } else if (n.nodeType === 1) {
+              walk(n);
+            }
+          }
+        })(h1);
+      }
+
+      var fired = false;
+      function reveal() {
+        if (fired) return; fired = true;
+        doc.classList.remove('hero-wait');
+        doc.classList.add('hero-go');
+      }
+      window.addEventListener('v6loaderhidden', reveal);
+
+      // no loader on the page (or it never armed): perform on load instead
+      if (!doc.classList.contains('hero-wait')) {
+        if (document.readyState === 'complete') reveal();
+        else window.addEventListener('load', reveal);
+      }
+      // backstop, well past the loader's own 8.9s ceiling — the hero must
+      // never be left sitting invisible behind a loader that failed to go
+      setTimeout(reveal, 12000);
+    })();
+  </script>
+
+  <!-- the phone/tablet menu. Body-level, outside .top-nav's backdrop-filter
+       and outside .hero's overflow:clip. -->
+  <div class="nav-sheet" id="navSheet">
+    <nav class="nav-sheet-inner" aria-label="Main menu">
+      <a href="#workPin">Work</a>
+      <a href="#aboutSection">About</a>
+      <a href="#saidSection">Testimonials</a>
+      <a href="./resume.pdf" target="_blank" rel="noopener">Résumé</a>
+      <a href="#contactSection">Contact</a>
+    </nav>
+  </div>
+
+  <script>
+    (function () {
+      var burger = document.getElementById('navBurger');
+      var sheet  = document.getElementById('navSheet');
+      if (!burger || !sheet) return;
+
+      function setOpen(open) {
+        document.body.classList.toggle('nav-open', open);
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        // Lenis owns the scroll on this page, so overflow:hidden alone would
+        // not hold it. It is defined further down the file — read it at click
+        // time, never at parse time.
+        var l = window.__lenis;
+        if (l) { open ? l.stop() : l.start(); }
+      }
+
+      burger.addEventListener('click', function () {
+        setOpen(!document.body.classList.contains('nav-open'));
+      });
+
+      // a tap on a link navigates AND closes; a tap on the backdrop just closes
+      sheet.addEventListener('click', function (e) {
+        if (e.target === sheet || e.target.closest('a')) setOpen(false);
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && document.body.classList.contains('nav-open')) {
+          setOpen(false);
+          burger.focus();
+        }
+      });
+
+      // rotating to landscape / widening past the breakpoint must not leave
+      // an invisible sheet holding the scroll lock
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 900 && document.body.classList.contains('nav-open')) setOpen(false);
+      });
+    })();
+  </script>
 
   <!-- ══ SECTION 2 — ported wholesale from index.html ══
        Markup, CSS and behaviour are the shipping section, not a rebuild.
@@ -7838,7 +8165,7 @@ addEventListener('load', function () {
      to it hard. Bump it whenever spiral.js changes. -->
 <script src="spiral-gallery/spiral.js?v=20260726-bend2"></script>
 
-<script type="module" src="orb/bhanu-orb.js?v=14"></script>
+<script type="module" src="orb/bhanu-orb.js?v=15"></script>
 
 <!-- ── AGENTATION — visual feedback for agents (agentation.com) ─────────
      Dev-only: loads ONLY on localhost, never in production. Click the
