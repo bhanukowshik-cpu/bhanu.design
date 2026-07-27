@@ -20,12 +20,12 @@
     // ── Cards ─────────────────────────────────────────────────────────────
     var CARDS = [
       { label: 'EverTutor',    img: 'images/blob.png',              video: null                       },
-      { label: 'ET Live',      img: 'images/card-et-live.png',      video: 'images/et-live.mp4'      },
-      { label: 'ET Studio',    img: 'images/card-et-studio.png',    video: 'images/et-studio.mp4'    },
-      { label: 'ET Analytics', img: 'images/card-et-analytics.png', video: 'images/et-analytics.mp4' },
-      { label: 'Stressie',     img: 'images/card-stressie.png',     video: 'images/stressie.mp4', portrait: true },
-      { label: 'Dearly',       img: 'images/card-dearly.png',       video: 'images/dearly.mp4'       },
-      { label: 'The Engine',   img: 'images/card-engine.png',       video: null                       },
+      { label: 'ET Live',      img: 'images/card-et-live.webp',      video: 'images/et-live.mp4'      },
+      { label: 'ET Studio',    img: 'images/card-et-studio.webp',    video: 'images/et-studio.mp4'    },
+      { label: 'ET Analytics', img: 'images/card-et-analytics.webp', video: 'images/et-analytics.mp4' },
+      { label: 'Stressie',     img: 'images/card-stressie.webp',     video: 'images/stressie.mp4', portrait: true },
+      { label: 'Dearly',       img: 'images/card-dearly.webp',       video: 'images/dearly.mp4'       },
+      { label: 'The Engine',   img: 'images/card-engine.webp',       video: null                       },
     ];
     // One pass, not a loop. This used to run three concatenated copies so the
     // modulo wrap happened off-screen; there is no wrap to hide now — seven
@@ -309,8 +309,18 @@ void main() {
         // reveal panel (uVideoTexture) and only slides in / plays when this card
         // is the active (front) one — see the ticker + front-card logic below.
         var vid = document.createElement('video');
-        vid.src = card.video; vid.loop = true; vid.muted = true;
-        vid.playsInline = true; vid.preload = 'auto';
+        /* preload BEFORE src — this order is the whole fix. Every video card
+           builds one of these, and the browser starts fetching the instant
+           src is assigned, using whatever preload is set at that moment. With
+           src first, all five clips (~27MB) were pulled before a visitor had
+           even scrolled to the work section, and setting preload afterwards
+           was too late to stop it. The clip only plays once its card is the
+           front one (see the ticker below) and the card face carries a static
+           thumbnail until then, so headers are all that is needed up front —
+           play() streams the rest on demand. */
+        vid.preload = 'metadata';
+        vid.loop = true; vid.muted = true; vid.playsInline = true;
+        vid.src = card.video;
         videoEls.push(vid);
         var vtex = new THREE.VideoTexture(vid);
         vtex.minFilter = THREE.LinearFilter;
@@ -341,7 +351,7 @@ void main() {
         blobAnimCtx           = blobAnimCanvas.getContext('2d');
 
         blobAnimImg     = new Image();
-        blobAnimImg.src = 'images/blob-dark.png';
+        blobAnimImg.src = 'images/blob-dark.webp';
 
         blobAnimTex           = new THREE.CanvasTexture(blobAnimCanvas);
         blobAnimTex.minFilter = THREE.LinearFilter;

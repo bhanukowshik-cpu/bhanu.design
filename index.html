@@ -2159,8 +2159,14 @@
        the desktop helix carries, framed for a thumb */
     .s2-acc-media{margin:2px 0 14px;border-radius:13px;overflow:hidden;
       border:1px solid var(--line);background:#0A0E15;aspect-ratio:16/10;}
-    .s2-acc-media video,.s2-acc-media img{width:100%;height:100%;object-fit:cover;display:block;}
-    .s2-acc-media--tall{aspect-ratio:4/5;max-width:320px;margin-inline:auto;}
+    /* contain, not cover. The frame now carries each clip's own aspect (set
+       inline from ACC_MEDIA), so contain fills it edge to edge with nothing
+       cropped and no bars. cover was silently eating the top and bottom of
+       every 16:9 clip, and most of Stressie's portrait one. */
+    .s2-acc-media video,.s2-acc-media img{width:100%;height:100%;object-fit:contain;display:block;}
+    /* a 0.46-ratio portrait clip would run taller than the phone — cap the
+       width so it stays a card rather than a full-screen column */
+    .s2-acc-media--tall{max-width:240px;margin-inline:auto;}
     @media (prefers-reduced-motion:reduce){
       .s2-acc-body,.s2-acc-chevron,.s2-acc-item{transition:none;}
     }
@@ -5479,7 +5485,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
                   <line x1="160.70" y1="51.87" x2="160.47" y2="48.87" />
                 </g>
               </svg>
-              <img class="ws-orb-img" src="Parallax cards/EverTutor Glimpse/Dark mode finalized.png" alt="EverTutor AI System" loading="lazy" />
+              <!-- same blob the helix and the phone accordion use; the old
+                   Parallax-cards path exists in no commit and 404'd on every
+                   load even though this section is display:none -->
+              <img class="ws-orb-img" src="images/blob-dark.webp" alt="EverTutor AI System" loading="lazy" />
             </div>
           </div>
 
@@ -5503,8 +5512,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <div class="ws-sub-row">
             <div class="ws-sub-card">
               <div class="ws-sub-video">
-                <video autoplay muted loop playsinline preload="auto">
-                  <source src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
+                <video autoplay muted loop playsinline preload="none">
+                  <source data-src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
                 </video>
               </div>
               <div class="ws-sub-info">
@@ -5515,8 +5524,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
             </div>
             <div class="ws-sub-card">
               <div class="ws-sub-video">
-                <video autoplay muted loop playsinline preload="auto">
-                  <source src="Projects videos/ET Studio Case study.mp4" type="video/mp4">
+                <video autoplay muted loop playsinline preload="none">
+                  <source data-src="Projects videos/ET Studio Case study.mp4" type="video/mp4">
                 </video>
               </div>
               <div class="ws-sub-info">
@@ -5527,8 +5536,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
             </div>
             <div class="ws-sub-card">
               <div class="ws-sub-video">
-                <video autoplay muted loop playsinline preload="auto">
-                  <source src="Projects videos/Et Analytics.mp4" type="video/mp4">
+                <video autoplay muted loop playsinline preload="none">
+                  <source data-src="Projects videos/Et Analytics.mp4" type="video/mp4">
                 </video>
               </div>
               <div class="ws-sub-info">
@@ -5572,11 +5581,17 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
               <a class="ws-cta" href="stressie-studio.html">View Case Study &rarr;</a>
             </div>
 
+            <!-- These three carry data-src, not src, on purpose: this whole
+                 section is display:none, and loading="lazy" does NOT reliably
+                 defer inside a hidden container — the browser fetched ~1MB of
+                 them on every visit for something nobody could see. If this
+                 section is ever brought back, rename data-src to src (or
+                 assign it in JS) or the phones will render empty. -->
             <div class="ws-visual ws-visual--phones">
               <div class="ws-phones-row">
-                <img class="ws-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Summary%20of%20the%20project/Home%20Screen%20Image.png" alt="Stressie home screen" loading="lazy" />
-                <img class="ws-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%201.png" alt="Stressie onboarding" loading="lazy" />
-                <img class="ws-phone-img" src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%202.png" alt="Stressie onboarding 2" loading="lazy" />
+                <img class="ws-phone-img" data-src="Stressie%20Case%20Study%20Updated%20Materials/Summary%20of%20the%20project/Home%20Screen%20Image.png" alt="Stressie home screen" loading="lazy" />
+                <img class="ws-phone-img" data-src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%201.png" alt="Stressie onboarding" loading="lazy" />
+                <img class="ws-phone-img" data-src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%202.png" alt="Stressie onboarding 2" loading="lazy" />
               </div>
             </div>
 
@@ -5590,8 +5605,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <!-- D: Video + content — EverTutor Live -->
       <div class="s2-video-section" style="display:none">
         <div class="s2-video-left">
-          <video autoplay muted loop playsinline preload="auto">
-            <source src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
+          <video autoplay muted loop playsinline preload="none">
+            <source data-src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
           </video>
         </div>
         <div class="s2-video-right">
@@ -5723,15 +5738,15 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
               <div class="oh2-left">
                 <div class="oh2-deck" id="ohDeck">
                   <div class="oh2-card" id="ohc-0">
-                    <img src="About%20%20me%20Pictures/Flight.jpeg" alt="On a flight">
+                    <img src="About%20%20me%20Pictures/Flight.webp" alt="On a flight">
                     <span class="oh2-label">making new friends 🐱</span>
                   </div>
                   <div class="oh2-card" id="ohc-1">
-                    <img src="About%20%20me%20Pictures/Keywest.jpeg" alt="Key West">
+                    <img src="About%20%20me%20Pictures/Keywest.webp" alt="Key West">
                     <span class="oh2-label">Key West, sunset o'clock ☀️</span>
                   </div>
                   <div class="oh2-card" id="ohc-2">
-                    <img src="About%20%20me%20Pictures/Kayaking.jpeg" alt="Kayaking in Austin">
+                    <img src="About%20%20me%20Pictures/Kayaking.webp" alt="Kayaking in Austin">
                     <span class="oh2-label">Ladybird Lake, Austin 🛶</span>
                   </div>
                 </div>
@@ -5895,8 +5910,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
     <!-- ── the closer mirrors the opener: the hero's world again, the
          figure on the LEFT this time, an ambient loop under the copy ── -->
-    <video class="ft-plate" id="ftPlate" autoplay muted loop playsinline
-           poster="images/footer-silhouette-poster.webp" src="images/footer-silhouette.mp4"
+    <!-- src is withheld until the footer is near: this clip sits at the very
+         bottom of a long page, and eagerly it cost 2.6MB of the initial load
+         for something most visitors reach late or never. The poster carries
+         the frame until then, so nothing looks empty. -->
+    <video class="ft-plate" id="ftPlate" autoplay muted loop playsinline preload="none"
+           poster="images/footer-silhouette-poster.webp" data-src="images/footer-silhouette.mp4"
            aria-hidden="true"></video>
     <div class="ft-vig" aria-hidden="true"></div>
 
@@ -6737,11 +6756,11 @@ renderChips(CHIP_POOLS.seed);
 
 /* ── project recommendations — cards the answer can point at ─────────── */
 var REC_MAP = [
-  { re: /evertutor live/i,    name: 'EverTutor Live',      href: 'evertutor-live.html',   img: 'images/card-et-live.png' },
-  { re: /evertutor studio/i,  name: 'EverTutor Studio',    href: 'evertutor-studio.html', img: 'images/card-et-studio.png' },
-  { re: /stressie/i,          name: 'Stressie',            href: 'stressie-studio.html',  img: 'images/card-stressie.png' },
-  { re: /dearly/i,            name: 'Dearly',              href: 'https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal', img: 'images/card-dearly.png' },
-  { re: /the engine/i,        name: 'The Engine',          href: 'https://www.theengine.dev/', img: 'images/card-engine.png' }
+  { re: /evertutor live/i,    name: 'EverTutor Live',      href: 'evertutor-live.html',   img: 'images/card-et-live.webp' },
+  { re: /evertutor studio/i,  name: 'EverTutor Studio',    href: 'evertutor-studio.html', img: 'images/card-et-studio.webp' },
+  { re: /stressie/i,          name: 'Stressie',            href: 'stressie-studio.html',  img: 'images/card-stressie.webp' },
+  { re: /dearly/i,            name: 'Dearly',              href: 'https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal', img: 'images/card-dearly.webp' },
+  { re: /the engine/i,        name: 'The Engine',          href: 'https://www.theengine.dev/', img: 'images/card-engine.webp' }
 ];
 function injectRecs(reply) {
   var hits = REC_MAP.filter(function (r) { return r.re.test(reply); }).slice(0, 2);
@@ -8353,14 +8372,24 @@ addEventListener('load', function () {
 
       /* the same media the desktop helix carries (spiral.js), indexed to
          S2_DATA — video where one exists, the card plate otherwise */
+      /* `ratio` is the media's OWN aspect, and the frame adopts it — so the
+         video sits fully inside the frame rather than being cropped to fill a
+         fixed 16/10 box. These differ wildly (Stressie 0.46, Dearly 2.16),
+         which is why one hardcoded frame ratio could never suit them all.
+         Where a video exists the ratio is the VIDEO's: the poster is only the
+         still you see before it plays. */
       var ACC_MEDIA = [
-        { img: 'Parallax cards/EverTutor Glimpse/Dark mode finalized.png' },
-        { img: 'images/card-et-live.png',      video: 'images/et-live.mp4' },
-        { img: 'images/card-et-studio.png',    video: 'images/et-studio.mp4' },
-        { img: 'images/card-et-analytics.png', video: 'images/et-analytics.mp4' },
-        { img: 'images/card-stressie.png',     video: 'images/stressie.mp4', portrait: true },
-        { img: 'images/card-dearly.png',       video: 'images/dearly.mp4' },
-        { img: 'images/card-engine.png' }
+        /* The blob — the same asset the desktop helix shows for this card.
+           This used to point at a Parallax-cards PNG that exists in no commit
+           and on no machine, so the first card rendered a broken-image icon
+           on every phone. */
+        { img: 'images/blob-dark.webp',                                           ratio: 1    },
+        { img: 'images/card-et-live.webp',      video: 'images/et-live.mp4',      ratio: 1.78 },
+        { img: 'images/card-et-studio.webp',    video: 'images/et-studio.mp4',    ratio: 1.78 },
+        { img: 'images/card-et-analytics.webp', video: 'images/et-analytics.mp4', ratio: 1.78 },
+        { img: 'images/card-stressie.webp',     video: 'images/stressie.mp4',     ratio: 0.46, portrait: true },
+        { img: 'images/card-dearly.webp',       video: 'images/dearly.mp4',       ratio: 2.16 },
+        { img: 'images/card-engine.webp',                                         ratio: 1.49 }
       ];
       /* open item's video plays, everything else pauses; src attaches on
          first open so seven phones' worth of mp4 never preloads at once */
@@ -8402,11 +8431,16 @@ addEventListener('load', function () {
 
           var media = ACC_MEDIA[i];
           var mediaHtml = '';
+          /* the frame takes the media's own shape, so nothing is cropped and
+             no letterbox bars appear; --tall still caps how much height a
+             portrait clip may claim on a phone */
+          var frameStyle = media && media.ratio
+            ? ' style="aspect-ratio:' + media.ratio + '"' : '';
           if (media && media.video) {
-            mediaHtml = '<div class="s2-acc-media' + (media.portrait ? ' s2-acc-media--tall' : '') + '">' +
+            mediaHtml = '<div class="s2-acc-media' + (media.portrait ? ' s2-acc-media--tall' : '') + '"' + frameStyle + '>' +
               '<video muted loop playsinline preload="none" poster="' + media.img + '" data-src="' + media.video + '"></video></div>';
           } else if (media && media.img) {
-            mediaHtml = '<div class="s2-acc-media"><img src="' + media.img + '" alt="" loading="lazy"></div>';
+            mediaHtml = '<div class="s2-acc-media"' + frameStyle + '><img src="' + media.img + '" alt="" loading="lazy"></div>';
           }
 
           item.innerHTML =
@@ -8484,7 +8518,7 @@ addEventListener('load', function () {
 <script src="vendor/three.min.js"></script>
 <!-- the ?v= is a cache-bust: this file is edited often and browsers hold on
      to it hard. Bump it whenever spiral.js changes. -->
-<script src="spiral-gallery/spiral.js?v=20260726-bend2"></script>
+<script src="spiral-gallery/spiral.js?v=20260727-perf2"></script>
 
 <script type="module" src="orb/bhanu-orb.js?v=15"></script>
 
@@ -8508,6 +8542,29 @@ addEventListener('load', function () {
       createRoot(host).render(createElement(Agentation, { endpoint: 'http://localhost:4747' }));
     } catch (e) { console.warn('Agentation failed to load:', e); }
   }
+</script>
+
+<script>
+/* Attach the footer clip's source only once the footer is within a screen of
+   the viewport. Paired with the data-src + preload="none" on #ftPlate: eagerly
+   it cost 2.6MB of every first load, spent on a video at the bottom of a very
+   long page that many visitors never reach. Falls back to loading immediately
+   where IntersectionObserver is unavailable, so the footer is never left
+   without its plate. */
+(function () {
+  var v = document.getElementById('ftPlate');
+  if (!v || !v.dataset.src) return;
+  function load() {
+    if (v.src) return;
+    v.src = v.dataset.src;
+    v.play().catch(function () {});   /* autoplay may still decline — poster stays */
+  }
+  if (!('IntersectionObserver' in window)) { load(); return; }
+  var io = new IntersectionObserver(function (entries) {
+    if (entries.some(function (e) { return e.isIntersecting; })) { load(); io.disconnect(); }
+  }, { rootMargin: '100% 0px' });   /* one screen of warning, so it is ready on arrival */
+  io.observe(v);
+})();
 </script>
 
 <!-- ── Meeting-request capture ───────────────────────────────────────────────
