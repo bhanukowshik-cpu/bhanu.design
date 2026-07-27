@@ -111,11 +111,14 @@
        The old cap was 88px, which on a 1920 screen let the content run
        almost to the glass. This keeps a real margin on big displays and
        still gives a phone its 20px. */
-    /* THE RULE: content sits centred with 10% side borders at ~1014px,
-       growing to a hard 15% cap on large screens. One clamp encodes it:
-       20.65vw − 108px passes through 10% of 1014 and 15% of 1920, and
-       the 15vw ceiling holds the 15% maximum beyond that. */
-    --gutter:clamp(20px, calc(20.65vw - 108px), 15vw);
+    /* THE RULE: content sits centred inside a flat 10% border on either
+       side — 80% of the viewport, at every width from ~1014px up. The cap
+       used to grow to 15% (leaving 70%), which put the gutter sections out
+       of step with the project bar's own 80%: two different content widths
+       stacked down one page. One number now governs both.
+       Below ~1014px the 20.65vw − 108px term takes over and tapers to the
+       20px a phone needs. */
+    --gutter:clamp(20px, calc(20.65vw - 108px), 10vw);
 
     /* ── DEPTH — a named scale, so nothing ever reaches for 9999 ──────── */
     --z-geo:0; --z-content:2; --z-nav:50; --z-fab:60; --z-scrim:70;
@@ -347,8 +350,9 @@
   .top-nav{
     position:fixed;top:var(--anno-h);left:0;right:0;z-index:var(--z-nav);
     display:flex;align-items:center;justify-content:space-between;
-    /* at rest the nav breathes WIDER than the content (10% insets);
-       scrolled, the pill collapses IN to the 15% content margin */
+    /* the nav rides the same 10% border as the content, at rest and
+       scrolled — the pill used to collapse in to a 15% margin the page
+       no longer has */
     padding:10px 10%;height:62px;
     background:transparent;             /* frameless at rest — just text on the page */
     border:1px solid transparent;
@@ -357,7 +361,7 @@
       padding .45s ease,height .45s ease,border-color .45s ease,box-shadow .45s ease;
   }
   .top-nav.scrolled{
-    top:12px;left:15%;right:15%;
+    top:12px;left:10%;right:10%;
     height:74px;padding:10px 28px;border-radius:20px;
     background:rgba(13,18,27,0.82);
     backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
