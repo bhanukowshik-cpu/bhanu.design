@@ -55,6 +55,32 @@
     --serif:'Instrument Serif',Georgia,serif;
     --sans:'Instrument Sans',system-ui,sans-serif;
     --body:'Urbanist','Instrument Sans',system-ui,sans-serif;
+
+    /* ── TYPE RAMP ────────────────────────────────────────────────────────
+       One 1.25 major third, anchored on a fixed 16px body. Before this the
+       page carried 49 separate clamp() sizes with steps 1.02–1.1x apart —
+       four different 34px maxes, and 19/19.5, 16/16.5, 15/15.5 sitting next
+       to each other. That is not a hierarchy, it is a pile, and the reason
+       the display end read as shouting: nothing tied it to the body.
+
+       Fluid on the display steps, fixed at body and below — the difference
+       across viewports is too small down there to be worth the reflow.
+       Ceiling is 61px, well under the 96px display cap.
+
+       The vw coefficients are set so every fluid step reaches its max at
+       1440px — otherwise the ladder collapses exactly where it matters: an
+       untuned lead landed on 18px against a 16px body, a 1.125x step the
+       eye reads as an accident rather than a level. */
+    --t-micro:10.24px;                           /* legal, timers          */
+    --t-caption:12.8px;                          /* metric labels, chips   */
+    --t-body:16px;                               /* body — fixed floor     */
+    --t-lead:20px;                               /* lead sentences — fixed */
+    --t-sub:clamp(21px,1.736vw,25px);            /* panel + card headers   */
+    --t-head:clamp(25px,2.17vw,31.25px);         /* section titles         */
+    --t-section:clamp(30px,2.713vw,39.06px);     /* section display        */
+    --t-display-2:clamp(34px,3.391vw,48.83px);   /* secondary display      */
+    --t-display-1:clamp(34px,4.239vw,61.04px);   /* the hero, and only it  */
+
     --ease:cubic-bezier(0.16,1,0.3,1);
     --ease-expo:cubic-bezier(0.19,1,0.22,1);   /* ease-out-expo — luxe deceleration */
     --ease-pop:cubic-bezier(0.34,1.56,0.64,1); /* the one sanctioned overshoot — FAB, hearts */
@@ -85,11 +111,14 @@
        The old cap was 88px, which on a 1920 screen let the content run
        almost to the glass. This keeps a real margin on big displays and
        still gives a phone its 20px. */
-    /* THE RULE: content sits centred with 10% side borders at ~1014px,
-       growing to a hard 15% cap on large screens. One clamp encodes it:
-       20.65vw − 108px passes through 10% of 1014 and 15% of 1920, and
-       the 15vw ceiling holds the 15% maximum beyond that. */
-    --gutter:clamp(20px, calc(20.65vw - 108px), 15vw);
+    /* THE RULE: content sits centred inside a flat 10% border on either
+       side — 80% of the viewport, at every width from ~1014px up. The cap
+       used to grow to 15% (leaving 70%), which put the gutter sections out
+       of step with the project bar's own 80%: two different content widths
+       stacked down one page. One number now governs both.
+       Below ~1014px the 20.65vw − 108px term takes over and tapers to the
+       20px a phone needs. */
+    --gutter:clamp(20px, calc(20.65vw - 108px), 10vw);
 
     /* ── DEPTH — a named scale, so nothing ever reaches for 9999 ──────── */
     --z-geo:0; --z-content:2; --z-nav:50; --z-fab:60; --z-scrim:70;
@@ -321,8 +350,9 @@
   .top-nav{
     position:fixed;top:var(--anno-h);left:0;right:0;z-index:var(--z-nav);
     display:flex;align-items:center;justify-content:space-between;
-    /* at rest the nav breathes WIDER than the content (10% insets);
-       scrolled, the pill collapses IN to the 15% content margin */
+    /* the nav rides the same 10% border as the content, at rest and
+       scrolled — the pill used to collapse in to a 15% margin the page
+       no longer has */
     padding:10px 10%;height:62px;
     background:transparent;             /* frameless at rest — just text on the page */
     border:1px solid transparent;
@@ -331,7 +361,7 @@
       padding .45s ease,height .45s ease,border-color .45s ease,box-shadow .45s ease;
   }
   .top-nav.scrolled{
-    top:12px;left:15%;right:15%;
+    top:12px;left:10%;right:10%;
     height:74px;padding:10px 28px;border-radius:20px;
     background:rgba(13,18,27,0.82);
     backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
@@ -530,7 +560,7 @@
        41px  section headings (about, testimonials — they are peers)          */
   h1{
     font-family:var(--sans);font-weight:570;color:var(--ink);
-    font-size:clamp(36px,4.4vw,72px);line-height:1.08;letter-spacing:-0.028em;
+    font-size:var(--t-display-1);line-height:1.08;letter-spacing:-0.028em;
     /* 30ch + balance settles the headline into three even lines (22ch made four) */
     max-width:min(30ch,92vw);text-wrap:balance;
   }
@@ -1156,7 +1186,7 @@
     }
 .s2-bar-title {
       font-family: var(--font-heading);
-      font-size: clamp(24px,2.1vw,34px);
+      font-size: var(--t-sub);
       font-weight: 700;
       color: var(--ink);
       margin: 0;
@@ -1191,7 +1221,7 @@
       /* Explicit size: var(--fs-body) was undefined, so this inherited 16px
          and sat level with the metric captions. The desc is the card's lead
          sentence — it steps above them. */
-      font-size: clamp(16px, 1.35vw, 19px);
+      font-size: var(--t-body);
       line-height: 1.7;
       max-width: 58ch;   /* stop the lead hugging the tags column */
       /* washed-out gray is the anti-premium tell — the lead reads at full voice */
@@ -1344,7 +1374,7 @@
 .s2-bar-metric-val {
       font-family: var(--font-mono);
       font-variant-numeric: tabular-nums;
-      font-size: clamp(24px, 2.4vw, 34px);
+      font-size: var(--t-sub);
       font-weight: 700;
       /* the page's one accent on the numbers — asked for by annotation;
          azure is the only colour this page speaks */
@@ -1356,7 +1386,7 @@
          the other half of the template tell. Readable: it was 13px at
          58% and vanished on the glass (annotation #17). */
       font-family: var(--body);
-      font-size: clamp(14px, 0.82vw, 17px);
+      font-size: var(--t-caption);
       letter-spacing: 0;
       color: rgba(239, 243, 248,0.82);
       white-space: nowrap;
@@ -2335,7 +2365,7 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
       font-family: var(--font-display);
     }
 /* — Project bar title in the display face — */
-    .s2-bar-title { font-size: clamp(24px, 2.1vw, 34px); }
+    .s2-bar-title { font-size: var(--t-sub); }
 
   
 
@@ -2415,7 +2445,7 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
      sits just under the section header's scale */
   .s2-bar-title {
     font-family: var(--sans);
-    font-size: clamp(24px, 2.1vw, 33px);
+    font-size: var(--t-sub);
     font-weight: 570;
     letter-spacing: -0.02em;
   }
@@ -2571,7 +2601,8 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
   .tc-btn svg{width:18px;height:18px;}
   .tc-end{background:#E5484D;border-color:#E5484D;color:#fff;}
   .tc-end:hover{background:#D93F44;}
-  .tc-end svg{width:20px;height:20px;}
+  /* 31-unit box (see the markup) — sized ×1.29 so the glyph keeps its old weight */
+  .tc-end svg{width:26px;height:26px;}
   .tc-mute.muted{background:#16181D;border-color:#16181D;color:#fff;}
   .talk-timer{font-family:var(--font-mono,monospace);font-size:12px;
     font-variant-numeric:tabular-nums;color:rgba(22,24,29,.5);}
@@ -2923,7 +2954,7 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     height:min(clamp(200px,47.6cqw,270px),44vh) !important;
   }
   .chat-head{padding:clamp(18px,4.29cqw,23px) clamp(16px,3.81cqw,21px) clamp(15px,3.57cqw,19px) clamp(20px,4.76cqw,26px);}
-  .chat-head .t{font-size:clamp(25px,6.2cqw,31px);}
+  .chat-head .t{font-size:var(--t-sub);}
   .chat-close{width:clamp(34px,8.1cqw,40px);height:clamp(34px,8.1cqw,40px);}
   .chat-close svg{width:clamp(15px,3.57cqw,17px);height:clamp(15px,3.57cqw,17px);}
   /* dock geometry only stretches when there is height to spend — the
@@ -2939,7 +2970,7 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
   .talk-controls{gap:clamp(14px,3.33cqw,18px);}
   .tc-btn{width:clamp(46px,10.95cqw,56px);height:clamp(46px,10.95cqw,56px);}
   .tc-btn svg{width:clamp(18px,4.29cqw,22px);height:clamp(18px,4.29cqw,22px);}
-  .tc-end svg{width:clamp(20px,4.76cqw,24px);height:clamp(20px,4.76cqw,24px);}
+  .tc-end svg{width:clamp(26px,6.15cqw,31px);height:clamp(26px,6.15cqw,31px);}
   .talk-timer{font-size:clamp(12px,2.86cqw,14px);}
   .talk-tertiary{font-size:clamp(13px,3.1cqw,15.5px);bottom:clamp(16px,3.81cqw,22px);}
   .talk-tertiary svg{width:clamp(15px,3.57cqw,18px);height:clamp(15px,3.57cqw,18px);}
@@ -4671,7 +4702,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .eyebrow{gap:10px;padding:8px 14px;font-size:11.5px;letter-spacing:.07em;}
     /* five lines of headline plus the stats band plus the button is the whole
        of a phone screen — the ceiling comes down so the fold can breathe */
-    h1{font-size:clamp(30px,8.6vw,42px);}
+    h1{font-size:clamp(26px,7.3vw,36px);}
     /* stats stack: centered column, dividers rotate to horizontal hairlines */
     /* align-self keeps the framed band full-width against a centred column,
        which would otherwise shrink it to its longest fact */
@@ -4713,7 +4744,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .hero-plate{--plate-focal-x:90%;}
   }
   @media(max-height:780px) and (min-width:761px){
-    h1{font-size:clamp(38px,4.4vw,62px);}
+    h1{font-size:clamp(32px,3.7vw,52px);}
     .facts{margin-top:26px;}
     .cta-dock{margin-top:28px;}
   }
@@ -5110,7 +5141,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </span>
       </a>
       <div class="nav-links">
-        <a href="#workPin">Work</a><a href="#aboutSection">About</a><a href="#saidSection">Testimonials</a><a href="./resume.pdf" target="_blank" rel="noopener">Résumé</a>
+        <a href="#s2FwHeader">Work</a><a href="#aboutSection">About</a><a href="#saidSection">Testimonials</a><a href="./resume.pdf" target="_blank" rel="noopener">Résumé</a>
         <a href="#contactSection">Contact</a>
       </div>
       <button class="nav-burger" id="navBurger" aria-label="Open menu"
@@ -5212,7 +5243,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        and outside .hero's overflow:clip. -->
   <div class="nav-sheet" id="navSheet">
     <nav class="nav-sheet-inner" aria-label="Main menu">
-      <a href="#workPin">Work</a>
+      <a href="#s2FwHeader">Work</a>
       <a href="#aboutSection">About</a>
       <a href="#saidSection">Testimonials</a>
       <a href="./resume.pdf" target="_blank" rel="noopener">Résumé</a>
@@ -5993,7 +6024,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="6" y="1.5" width="4" height="8" rx="2" fill="currentColor"/><path d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
           </button>
           <button type="button" class="tc-btn tc-end" id="talkEnd" aria-label="End call">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11z" transform="rotate(135 12 12)"/></svg>
+            <!-- the handset is rotated 135° to read as "hang up"; that rotation
+                 throws its corners to -2.1 … 26.1, so the box has to be grown
+                 past 0 0 24 24 or the glyph loses all four of its edges -->
+            <svg viewBox="-3.5 -3.5 31 31" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11z" transform="rotate(135 12 12)"/></svg>
           </button>
           <span class="talk-timer" id="talkTimer" hidden>0:00</span>
         </div>
@@ -6566,13 +6600,25 @@ var topNav = document.getElementById('topNav');
   var spyLinks = [].filter.call(document.querySelectorAll('.nav-links a[href^="#"]'),
     function (a) { return document.querySelector(a.getAttribute('href')); });
   var spyTick = false;
+  /* Ranges, not rects. The old test asked whether a target straddled the
+     viewport middle, which quietly assumed every section is at least half a
+     screen tall and occupies its own scroll. Work is neither: its anchor is
+     the 258px "Featured Work" band, and the reel behind it is PINNED — the
+     spacer carries ~7000px of scroll while that band sits at 900. So Work
+     lit for a few hundred pixels and went dark for the rest of its section.
+
+     Each link instead owns the span from its own target down to the next
+     one's, and the one containing the viewport middle wins. Short anchors
+     and pinned sections both fall out of it for free. */
   function spy() {
     spyTick = false;
-    var mid = innerHeight * 0.5, current = null;
-    spyLinks.forEach(function (a) {
-      var r = document.querySelector(a.getAttribute('href')).getBoundingClientRect();
-      if (r.top <= mid && r.bottom > mid) current = a;
-    });
+    var probe = scrollY + innerHeight * 0.5;
+    var marks = spyLinks.map(function (a) {
+      var el = document.querySelector(a.getAttribute('href'));
+      return { a: a, top: el.getBoundingClientRect().top + scrollY };
+    }).sort(function (x, y) { return x.top - y.top; });
+    var current = null;
+    marks.forEach(function (m) { if (m.top <= probe) current = m.a; });
     spyLinks.forEach(function (a) { a.classList.toggle('is-here', a === current); });
   }
   addEventListener('scroll', function () {
