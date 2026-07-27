@@ -849,7 +849,7 @@
       inset: 0;
       border-radius: inherit;
       padding: 1px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.07) 0%, rgba(140,197,255,0.22) 100%);
+      background: linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.18) 100%);
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
@@ -1022,7 +1022,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--ember-2);
+      color: var(--ink-2);   /* quiet — the strokes sit with the labels, not above them */
       transition: transform 0.25s ease;
     }
 .s2-bar-icon-tag-ic svg { width: 14px; height: 14px; display: block; }
@@ -1068,8 +1068,10 @@
       font-variant-numeric: tabular-nums;
       font-size: clamp(24px, 2.4vw, 30px);
       font-weight: 700;
-      /* the numbers are the proof — they carry the page's azure accent */
-      color: var(--ember-2);
+      /* monochrome: scale, weight and the mono face carry the emphasis.
+         Accent-colored numbers on dark is the stock dashboard move — the
+         structure does the hierarchy work now. */
+      color: var(--ink);
       line-height: 1;
     }
 .s2-bar-metric-lbl {
@@ -1195,7 +1197,7 @@
       -webkit-backdrop-filter: blur(2px);
       box-shadow:
         rgba(255,255,255,0.7)   6.67px  6.67px 3.36px -6.21px inset,
-        rgba(140,197,255,0.45) -6.70px -6.00px 3.36px -6.73px inset,
+        rgba(255,255,255,0.30) -6.70px -6.00px 3.36px -6.73px inset,
         rgb(140,180,190)       -2.00px  2.39px 18px   -2.60px inset;
       color: rgba(255,255,255,0.8);
       cursor: pointer;
@@ -1206,7 +1208,7 @@
       color: var(--ink);
       box-shadow:
         rgba(255,255,255,0.9)   6.67px  6.67px 3.36px -6.21px inset,
-        rgba(140,197,255,0.65) -6.70px -6.00px 3.36px -6.73px inset,
+        rgba(255,255,255,0.45) -6.70px -6.00px 3.36px -6.73px inset,
         rgb(140,180,190)       -2.00px  2.39px 24px   -2.60px inset;
     }
 .s2-tnav-btn svg { width: 9px; height: 9px; fill: currentColor; }
@@ -1225,7 +1227,7 @@
       -webkit-backdrop-filter: blur(2px);
       box-shadow:
         rgba(255,255,255,0.7)   6.67px  6.67px 3.36px -6.21px inset,
-        rgba(140,197,255,0.45) -6.70px -6.00px 3.36px -6.73px inset,
+        rgba(255,255,255,0.30) -6.70px -6.00px 3.36px -6.73px inset,
         rgb(140,180,190)       -2.00px  2.39px 18px   -2.60px inset;
       color: rgba(255,255,255,0.8);
       display: flex; align-items: center; justify-content: center;
@@ -1235,7 +1237,7 @@
       color: var(--ink);
       box-shadow:
         rgba(255,255,255,0.9)   6.67px  6.67px 3.36px -6.21px inset,
-        rgba(140,197,255,0.65) -6.70px -6.00px 3.36px -6.73px inset,
+        rgba(255,255,255,0.45) -6.70px -6.00px 3.36px -6.73px inset,
         rgb(140,180,190)       -2.00px  2.39px 24px   -2.60px inset;
     }
 /* ── Left/right nav for grid view (mirrors up/down spiral nav) ── */
@@ -1891,12 +1893,12 @@ html:not([data-theme="dark"]) .s2-bar-cta { color: var(--secondary); border-colo
 html:not([data-theme="dark"]) .s2-bar-cta:hover { background: rgba(37,37,37,0.06); border-color: rgba(37,37,37,0.35); }
 html:not([data-theme="dark"]) .s2-bar-tag { color: rgba(37,37,37,0.60); }
 html:not([data-theme="dark"]) .s2-bar-tag + .s2-bar-tag::before { color: rgba(37,37,37,0.30); }
-html:not([data-theme="dark"]) .s2-bar-icon-tag-ic { color: #3372B8; }
+html:not([data-theme="dark"]) .s2-bar-icon-tag-ic { color: rgba(37,37,37,0.60); }
 html:not([data-theme="dark"]) .s2-bar-icon-tag-lbl { color: rgba(37,37,37,0.72); }
 html:not([data-theme="dark"]) .s2-bar-title-badge {
       color: rgba(37,37,37,0.55);
     }
-html:not([data-theme="dark"]) .s2-bar-metric-val { color: #3372B8; }
+html:not([data-theme="dark"]) .s2-bar-metric-val { color: var(--secondary); }
 html:not([data-theme="dark"]) .s2-bar-metric-lbl { color: rgba(37,37,37,0.58); }
 html:not([data-theme="dark"]) .s2-bar-metric + .s2-bar-metric { border-left-color: rgba(37,37,37,0.14); }
 html:not([data-theme="dark"]) .s2-bar-rule { background: rgba(37,37,37,0.12); }
@@ -1954,8 +1956,8 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     transition: background .35s var(--ease), border-color .35s var(--ease), transform .4s var(--ease);
   }
   .s2-bar-cta:hover {
-    background: rgba(92,169,255,0.10) !important;
-    border-color: rgba(92,169,255,0.45);
+    background: rgba(255,255,255,0.08) !important;
+    border-color: rgba(239,243,248,0.38);
     filter: none;
     transform: translateY(-2px);
     box-shadow: none !important;
@@ -4149,11 +4151,6 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
     <div class="said-inner">
       <h2 class="said-h">From people who <span class="serif">know my work</span></h2>
-
-      <div class="tm-tabs" id="tmTabs" role="tablist" aria-label="Whose words to read">
-        <button class="tm-tab" type="button" role="tab" data-group="reported" aria-selected="true">People I reported to</button>
-        <button class="tm-tab" type="button" role="tab" data-group="managed" aria-selected="false">Designers I managed</button>
-      </div>
 
       <div class="tm-deck" id="tmDeck">
         <article class="tm-card" data-group="reported">
