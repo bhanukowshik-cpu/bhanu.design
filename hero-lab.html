@@ -5468,7 +5468,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </form>
         <div class="talk-toast" id="talkToast" hidden role="status">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 12 9 17 20 7"/></svg>
-          Meeting scheduled &mdash; check your inbox
+          Got it &mdash; I&rsquo;ll email you to lock a time
         </div>
 
       </div>
@@ -5838,19 +5838,27 @@ talkSched.addEventListener('submit', async function (e) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { schedEmail.classList.add('err'); schedEmail.focus(); return; }
   talkSched.classList.add('busy');
   schedEmail.disabled = true; schedGo.disabled = true;
-  /* a real booking backend can claim /api/schedule; until it exists the
-     flow settles after a beat so the states read true end to end */
+  /* the address must actually land somewhere — never claim success on a
+     failed capture. proxy.py appends it to leads.jsonl. */
   var ok = false;
   try {
     var r = await fetch(API_BASE + '/api/schedule', {
       method: 'POST', headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: email })
+      body: JSON.stringify({ email: email, source: 'voice-panel' })
     });
     ok = r.ok;
   } catch (_) {}
-  if (!ok) await new Promise(function (r) { setTimeout(r, 1600); });
   talkSched.classList.remove('busy');
   schedEmail.disabled = false; schedGo.disabled = false;
+
+  if (!ok) {
+    /* say so, and leave the field up so the address isn't lost */
+    schedEmail.classList.add('err');
+    var k = talkSched.querySelector('.talk-sched-k');
+    if (k) k.textContent = "That didn't send — email kowshikbhanu1000@gmail.com instead.";
+    return;
+  }
+
   hideScheduler();
   talkToast.hidden = false;
   requestAnimationFrame(function () { requestAnimationFrame(function () { talkToast.classList.add('on'); }); });
