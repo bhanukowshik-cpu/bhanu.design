@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- Source for images/og-image.jpg (social share card) — v6:
-     cinematic Soul portrait right (images/bhanu-cinematic.jpg), "AI Native
-     Product Designer" display type left, three grouped fact pills bottom.
+<!-- Source for images/og-image.jpg (social share card) — v15:
+     the whole scene is a Soul Cinema plate (images/og-plate.jpg — Bhanu with
+     the orb horizon and eclipse glow photographed in); HTML adds only type.
      Re-render after edits:
      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
        --screenshot=og-2x.png --window-size=1200,630 --force-device-scale-factor=2 \
@@ -18,179 +18,66 @@
     html, body { width: 1200px; height: 630px; overflow: hidden; }
     body {
       position: relative;
-      background: #0A0E15;
+      background: #05070c;
       font-family: 'Instrument Sans', system-ui, sans-serif;
       color: #EFF3F8;
     }
 
-    /* azure bloom + a breath along the bottom */
-    .bloom {
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 44% 58% at 80% 40%, rgba(92,169,255,.16) 0%, rgba(92,169,255,.06) 52%, transparent 76%),
-        radial-gradient(ellipse 80% 30% at 38% 108%, rgba(92,169,255,.10) 0%, transparent 70%);
-    }
-    /* key light from the upper left — the same lamp that lights the portrait */
-    .keylight {
-      position: absolute; inset: 0;
-      background: linear-gradient(118deg, rgba(237,244,255,.06) 0%, rgba(237,244,255,.022) 24%, transparent 48%);
-    }
-    /* one hairline arc in front of the portrait — a foreground plane */
-    .arc-front {
-      position: absolute; left: 760px; top: 240px; width: 760px; height: 760px;
-      border: 1px solid rgba(160,205,255,.13); border-radius: 50%; z-index: 4;
+    /* the plate — the whole scene, photographed */
+    .plate { position: absolute; inset: 0; }
+    .plate img { width: 1200px; height: 675px; object-fit: cover; object-position: 50% 42%; }
+
+    /* a breath of darkness behind the type column */
+    .scrim {
+      position: absolute; inset: 0; z-index: 2;
+      background: linear-gradient(to right, rgba(4,6,11,.62) 0%, rgba(4,6,11,.34) 26%, transparent 46%);
     }
 
-    /* ── the horizon — light pooling low, behind the orbs ── */
-    .horizon {
-      position: absolute; inset: 0; z-index: 1;
-      background: radial-gradient(ellipse 34% 20% at 44% 103%, rgba(140,195,255,.38) 0%, rgba(92,169,255,.12) 50%, transparent 74%);
-    }
-    /* giant out-of-focus masses cresting into the bottom corners — bokeh,
-       not outlines: heavy blur softens the form, the global grain layer
-       stays sharp on top, which is what makes it read as film */
-    .orb {
-      position: absolute; border-radius: 50%; z-index: 3;
-      background: radial-gradient(circle at 50% 8%, #18202e 0%, #0a0e16 42%, #05080e 70%);
-      box-shadow:
-        inset 0 8px 48px rgba(150,205,255,.5),
-        0 -10px 80px rgba(92,169,255,.14);
-      filter: blur(24px);
-    }
-    .orb1 { width: 1000px; height: 1000px; left: -430px; top: 470px; }
-    .orb2 { width: 1300px; height: 1300px; left: 520px; top: 498px; }
-
-    /* ── the sunrise — light erupting over the crests, the reference's soul ── */
-    .sunrise {
-      position: absolute; inset: 0; z-index: 3; pointer-events: none;
-      background:
-        radial-gradient(ellipse 11% 6% at 46% 97%, rgba(244,250,255,.68) 0%, rgba(180,220,255,.36) 42%, transparent 72%),
-        radial-gradient(ellipse 32% 19% at 46% 100%, rgba(150,202,255,.42) 0%, rgba(92,169,255,.15) 55%, transparent 78%),
-        radial-gradient(ellipse 56% 42% at 46% 104%, rgba(92,169,255,.18) 0%, transparent 72%);
-    }
-    .rays {
-      position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: .65;
-      background: repeating-conic-gradient(from -80deg at 46% 100%, rgba(150,202,255,.16) 0deg 5deg, transparent 5deg 14deg);
-      -webkit-mask-image: radial-gradient(ellipse 44% 48% at 46% 100%, #000 0%, transparent 72%);
-              mask-image: radial-gradient(ellipse 44% 48% at 46% 100%, #000 0%, transparent 72%);
-      filter: blur(7px);
-    }
-
-    /* rings centered near the portrait's face */
-    .ring {
-      position: absolute; left: 960px; top: 250px; transform: translate(-50%, -50%);
-      border: 1px solid rgba(239,243,248,.07); border-radius: 50%;
-    }
-    .r1 { width: 430px;  height: 430px; }
-    .r2 { width: 660px;  height: 660px;  border-color: rgba(239,243,248,.055); }
-    .r3 { width: 920px;  height: 920px;  border-color: rgba(239,243,248,.04); }
-    .r4 { width: 1220px; height: 1220px; border-color: rgba(239,243,248,.03); }
-    .dot {
-      position: absolute; width: 5px; height: 5px; border-radius: 50%;
-      background: rgba(140,197,255,.6); box-shadow: 0 0 9px rgba(92,169,255,.5);
-    }
-
-    .cross { position: absolute; width: 14px; height: 14px; opacity: .55; }
-    .cross::before, .cross::after { content: ''; position: absolute; background: rgba(160,205,255,.16); }
-    .cross::before { left: 0; right: 0; top: 50%; height: 1px; }
-    .cross::after  { top: 0; bottom: 0; left: 50%; width: 1px; }
-
-    .spark { position: absolute; z-index: 4; }
-    .spark svg { display: block; }
-
-    /* ── the cinematic portrait — its studio black melts into the canvas ── */
-    .cine {
-      position: absolute; left: 668px; top: 0; z-index: 2;
-      width: 532px; height: 630px; overflow: hidden;
-      -webkit-mask-image: linear-gradient(to right, transparent 0px, #000 150px);
-              mask-image: linear-gradient(to right, transparent 0px, #000 150px);
-    }
-    .cine img {
-      position: absolute; width: 572px; left: -40px; top: -14px;
-      filter: contrast(1.04) brightness(1.02);
-    }
-    /* azure whisper on the background haze corner only — never on the skin */
-    .cine-tint {
-      position: absolute; left: 668px; top: 0; width: 532px; height: 630px; z-index: 3;
-      mix-blend-mode: overlay;
-      background: radial-gradient(ellipse 42% 34% at 10% 12%, rgba(92,169,255,.16) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    /* ── left column — the name carries the accent ── */
+    /* ── type ── */
     .n0 {
-      position: absolute; left: 96px; top: 138px; z-index: 4;
+      position: absolute; left: 96px; top: 148px; z-index: 4;
       font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400;
-      font-size: 42px; line-height: 1; letter-spacing: -0.004em; color: #EFF3F8;
+      font-size: 40px; line-height: 1; letter-spacing: -0.004em; color: #EFF3F8;
+      text-shadow: 0 3px 26px rgba(2,4,8,.8);
     }
     .n1 {
-      position: absolute; left: 92px; top: 208px; z-index: 4;
-      font-weight: 600; font-size: 124px; line-height: 1.0;
+      position: absolute; left: 92px; top: 214px; z-index: 4;
+      font-weight: 600; font-size: 118px; line-height: 1.0;
       letter-spacing: -0.032em; color: #EFF3F8;
+      text-shadow: 0 6px 44px rgba(2,4,8,.75);
     }
     .n2 {
-      position: absolute; left: 96px; top: 326px; z-index: 4;
+      position: absolute; left: 96px; top: 328px; z-index: 4;
       font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400;
-      font-size: 134px; line-height: 1.0;
-      letter-spacing: -0.01em; color: #EFF3F8;
+      font-size: 128px; line-height: 1.0; letter-spacing: -0.01em; color: #EFF3F8;
+      text-shadow: 0 6px 44px rgba(2,4,8,.75);
     }
 
-    /* ── grouped fact pills — the hero facts-strip, split in three ── */
-    .pills { position: absolute; left: 96px; top: 540px; display: flex; gap: 14px; z-index: 4; }
+    /* ── grouped fact pills on the orb horizon ── */
+    .pills { position: absolute; left: 96px; top: 540px; display: flex; gap: 13px; z-index: 4; }
     .pill {
       display: inline-flex; align-items: stretch;
-      border: 1px solid rgba(239,243,248,0.11); border-radius: 18px;
-      background: rgba(11,16,24,.82);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
-      font-size: 16.5px; font-weight: 500; letter-spacing: -0.012em;
-      color: rgba(239,243,248,.88); white-space: nowrap;
+      border: 1px solid rgba(239,243,248,0.14); border-radius: 17px;
+      background: rgba(8,12,19,.66);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      font-size: 16px; font-weight: 500; letter-spacing: -0.012em;
+      color: rgba(239,243,248,.9); white-space: nowrap;
       font-variant-numeric: tabular-nums lining-nums;
     }
-    .pill span { display: inline-flex; align-items: center; padding: 12px 19px; }
-    .pill span + span { border-left: 1px solid rgba(239,243,248,0.09); }
+    .pill span { display: inline-flex; align-items: center; padding: 11px 18px; }
+    .pill span + span { border-left: 1px solid rgba(239,243,248,0.1); }
 
     .year {
-      position: absolute; right: 64px; bottom: 52px; z-index: 4;
-      font-size: 15px; font-weight: 520; letter-spacing: .08em; color: #9AA6B4;
-      text-shadow: 0 1px 12px rgba(3,6,12,.8);
-    }
-
-    .vignette {
-      position: absolute; inset: 0; z-index: 5; pointer-events: none;
-      background: radial-gradient(135% 105% at 50% 46%, transparent 56%, rgba(3,6,12,0.55) 100%);
-    }
-    .grain {
-      position: absolute; inset: 0; z-index: 6; opacity: .05; mix-blend-mode: overlay; pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      position: absolute; right: 60px; top: 54px; z-index: 4;
+      font-size: 14px; font-weight: 520; letter-spacing: .08em; color: #A9B4C2;
+      text-shadow: 0 2px 16px rgba(2,4,8,.8);
     }
   </style>
 </head>
 <body>
-  <div class="bloom"></div>
-  <div class="keylight"></div>
-  <div class="arc-front"></div>
-
-  <div class="ring r1"></div>
-  <div class="ring r2"></div>
-  <div class="ring r3"></div>
-  <div class="ring r4"></div>
-
-  <div class="dot" style="left: 719px; top: 302px;"></div>
-  <div class="dot" style="left: 1146px; top: 155px;"></div>
-  <div class="dot" style="left: 828px; top: 40px;"></div>
-  <div class="dot" style="left: 636px; top: 500px;"></div>
-
-  <div class="cross" style="left: 638px; top: 96px;"></div>
-  <div class="cross" style="left: 60px; top: 556px;"></div>
-
-  <div class="cine"><img src="images/bhanu-cinematic.jpg" alt="" /></div>
-  <div class="cine-tint"></div>
-
-  <div class="horizon"></div>
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="rays"></div>
-  <div class="sunrise"></div>
+  <div class="plate"><img src="images/og-plate.jpg" alt="" /></div>
+  <div class="scrim"></div>
 
   <div class="n0">AI Native Product Designer</div>
   <div class="n1">Bhanu</div>
@@ -203,8 +90,5 @@
   </div>
 
   <div class="year">PORTFOLIO — 2026</div>
-
-  <div class="vignette"></div>
-  <div class="grain"></div>
 </body>
 </html>
