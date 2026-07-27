@@ -6374,7 +6374,7 @@ function updateVoiceState(s) {
   if (talkCaption) talkCaption.textContent = STATE_CAPTIONS[s] || STATE_CAPTIONS.idle;
   /* the call clock runs while the line is open; the goodbye shows how
      long you talked */
-  if (live && !wasLive) startClock();
+  if (live && !wasLive) { startClock(); talkSchedDone = false; }
   if (!live && wasLive) {
     var took = fmtClock(performance.now() - callT0);
     stopClock();
@@ -6398,7 +6398,16 @@ var talkSched = document.getElementById('talkSched');
 var schedEmail = document.getElementById('schedEmail');
 var schedGo    = document.getElementById('schedGo');
 var talkToast  = document.getElementById('talkToast');
+/* Latched once the address is captured. updateVoiceState calls showScheduler()
+   on EVERY transition into 'scheduling', and the agent re-enters that state
+   while it acknowledges the booking — so without this the field reappears,
+   pre-filled, seconds after the visitor already submitted it, reading as
+   though the submission failed. The chat panel has carried the equivalent
+   latch (chatSchedOffered) since it was built; the voice panel never did.
+   Cleared when a new call opens, so a second call can still book. */
+var talkSchedDone = false;
 function showScheduler() {
+  if (talkSchedDone) return;
   if (!talkSched) return;
   /* the scheduler lives in the voice room — if the visitor wandered to
      chat mid-call, bring them back so the field is actually visible */
@@ -6443,6 +6452,7 @@ talkSched.addEventListener('submit', async function (e) {
     return;
   }
 
+  talkSchedDone = true;   /* the field must not come back this call */
   hideScheduler();
   /* close the loop BY VOICE: whisper the fact to the agent so it
      acknowledges out loud instead of asking for the email again */
