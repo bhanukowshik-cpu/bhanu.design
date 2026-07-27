@@ -4982,6 +4982,94 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
   sync();
 })();
 
+/* ── image trail — photos reveal one after another along the cursor path ── */
+(function () {
+  var layer = document.getElementById('trail');
+  if (!layer) return;
+  var SRCS = ['photos/pic-pitch-win.jpg', 'photos/pic-conference.jpg', 'photos/pic-pitch-self.jpg',
+              'photos/pic-future.jpg', 'photos/pic-check.jpg', 'photos/pic-evertutor.jpg',
+              'photos/pic-stressie.jpg'];
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine = matchMedia('(pointer:fine)').matches;
+
+  /* touch or reduced motion → four calm frames in the corners instead */
+  if (reduced || !fine) {
+    var SPOTS = [
+      { left: '5%',  top: '15%',    r: -5 }, { right: '6%',  top: '12%',    r: 4 },
+      { left: '13%', bottom: '14%', r: 5 },  { right: '12%', bottom: '12%', r: -3 }
+    ];
+    layer.classList.add('static');
+    SPOTS.forEach(function (spot, i) {
+      var d = document.createElement('div'); d.className = 'trail-img';
+      if (spot.left) d.style.left = spot.left; if (spot.right) d.style.right = spot.right;
+      if (spot.top) d.style.top = spot.top; if (spot.bottom) d.style.bottom = spot.bottom;
+      d.style.transform = 'rotate(' + spot.r + 'deg)';
+      var im = document.createElement('img'); im.src = SRCS[i]; im.alt = '';
+      d.appendChild(im); layer.appendChild(d);
+    });
+    return;
+  }
+
+  SRCS.forEach(function (s) { var im = new Image(); im.src = s; });   // warm the cache
+
+  var hero = document.querySelector('.hero');
+  var chatEl = document.getElementById('chat');
+  var idx = 0, lastX = -1e4, lastY = -1e4;
+  var GAP = 215;                                    // px of cursor travel between reveals
+  var MAX = 7;                                      // concurrent frames cap
+  var stackTop = 0;                                 // every frame lands above the one before it
+
+  hero.addEventListener('mousemove', function (e) {
+    if (chatEl.classList.contains('open')) return;
+    var dx = e.clientX - lastX, dy = e.clientY - lastY;
+    if (dx * dx + dy * dy < GAP * GAP) return;
+    lastX = e.clientX; lastY = e.clientY;
+    var rect = hero.getBoundingClientRect();
+    spawn(e.clientX - rect.left, e.clientY - rect.top, dx);
+  }, { passive: true });
+
+  /* Frames hold perfectly still — they only fade and sharpen in place. Two
+     things make the stack read correctly: every new frame is given a higher
+     z-index than the last, so the second photo is always over the first no
+     matter how the DOM churns underneath; and when the cap is reached the
+     oldest frame is retired with its own short fade instead of being cut
+     out of the document mid-animation, which is what made the trail snap. */
+  function retire(el) {
+    if (el.dataset.going) return;
+    el.dataset.going = '1';
+    var out = el.animate(
+      [{ opacity: getComputedStyle(el).opacity, filter: 'blur(0px)' },
+       { opacity: 0, filter: 'blur(5px)' }],
+      { duration: 260, fill: 'forwards', easing: 'cubic-bezier(0.5,0,0.85,0.4)' });
+    out.onfinish = function () { el.remove(); };
+  }
+
+  function spawn(x, y, dx) {
+    var el = document.createElement('div'); el.className = 'trail-img';
+    var im = document.createElement('img'); im.src = SRCS[idx]; im.alt = '';
+    idx = (idx + 1) % SRCS.length;
+    el.appendChild(im);
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+    el.style.zIndex = ++stackTop;                   /* newest always on top */
+    var rot = Math.max(-7, Math.min(7, dx * 0.05));
+    el.style.transform = 'translate(-50%,-50%) rotate(' + rot + 'deg)';
+
+    /* over the cap: fade the oldest still-living frame out rather than
+       yanking it, so nothing ever disappears in a single frame */
+    var living = [].filter.call(layer.children, function (n) { return !n.dataset.going; });
+    while (living.length >= MAX) retire(living.shift());
+    layer.appendChild(el);
+
+    var anim = el.animate([
+      { opacity: 0, filter: 'blur(6px)' },
+      { opacity: 1, filter: 'blur(0px)', offset: .18 },
+      { opacity: 1, filter: 'blur(0px)', offset: .72 },
+      { opacity: 0, filter: 'blur(4px)' }
+    ], { duration: 1900, fill: 'forwards', easing: 'ease-in-out' });
+    anim.onfinish = function () { el.remove(); };
+  }
+})();
+
 /* ═══ CUSTOM CURSOR + CTA MAGNET (ported from index.html cursor system) ═══ */
 (function initCursor() {
   if (!matchMedia('(pointer:fine)').matches) return;
