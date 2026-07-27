@@ -2083,11 +2083,11 @@ html:not([data-theme="dark"]) .s2-bar-rule { background: rgba(37,37,37,0.12); }
    The paper card is retired. Cream was one fixed surface under seven
    projects, so every card fought whatever colour was floating above it —
    green orb on warm paper, amber engine on warm paper. The frame is an
-   IMAGE frame now: the project's own artwork fills it, a dark frosted
-   layer sits over that, and the type sits on the frost. Each card
-   therefore carries its own colour, and the bar can never clash with the
-   art above it because it IS the art above it.
-   Contrast is held by the scrim, not by luck — see .s2-bar-plate::after. */
+   IMAGE frame now: the hero's own ground fills it, a dark frosted layer
+   sits over that, and the type sits on the frost. One plate for all seven,
+   so the bar reads as part of the page rather than as a reaction to
+   whatever card is floating above it — section 2 standing on section 1's
+   theme. Contrast is held by the scrim, not by luck — see the ::after. */
 .s2-project-bar {
       background: #080B11;
       border: 1px solid rgba(239,243,248,0.10);
@@ -2112,9 +2112,14 @@ html:not([data-theme="dark"]) .s2-bar-rule { background: rgba(37,37,37,0.12); }
    with the words. Deepest on the left where the title and lead sit. */
 .s2-bar-plate::after {
       content: ""; position: absolute; inset: 0;
+      /* the gradient runs WITH the plate, not against it: this image is
+         near-black at the left and carries the ridge glow at the right, so
+         the scrim is lightest where the picture is already dark and heaviest
+         over the glow. Measured against the plate under object-fit:cover,
+         the weakest text on the card holds 5.24 — clear of AA. */
       background: linear-gradient(100deg,
-        rgba(8,11,17,0.90) 0%, rgba(8,11,17,0.84) 38%,
-        rgba(8,11,17,0.74) 72%, rgba(8,11,17,0.66) 100%);
+        rgba(8,11,17,0.55) 0%, rgba(8,11,17,0.64) 34%,
+        rgba(8,11,17,0.74) 68%, rgba(8,11,17,0.82) 100%);
       backdrop-filter: blur(30px) saturate(1.25);
       -webkit-backdrop-filter: blur(30px) saturate(1.25);
     }
@@ -4755,13 +4760,14 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
       <!-- Project info bar — slides up from bottom when front card changes -->
       <div id="s2ProjectBar" class="s2-project-bar">
-        <!-- the plate: the project's own artwork, frosted back by the scrim
-             above it so the card carries that project's colour instead of
-             one generic surface. JS swaps the src per card. -->
+        <!-- the plate: the hero's own ground, cropped to the bar. ONE image
+             for every project — section 2 standing on section 1's theme, so
+             the card belongs to the page instead of to whatever is floating
+             above it. Dark at the left where the title and lead sit, the
+             ridge rising to the glow at the right where only tags are. -->
         <div class="s2-bar-plate" aria-hidden="true">
-          <!-- no src= until JS picks the project's plate: an empty src is
-               invalid and makes some browsers re-request the document -->
-          <img id="s2BarPlateImg" alt="" decoding="async" style="opacity:0">
+          <img id="s2BarPlateImg" src="images/bar-plate.webp" alt=""
+               width="1800" height="500" decoding="async">
         </div>
         <div class="s2-bar-top-row">
           <div class="s2-bar-title-col">
@@ -7279,7 +7285,6 @@ addEventListener('load', function () {
     var S2_DATA = [
       {
         tab: 'EverTutor',
-        plate: 'images/card-et-live.webp',
         title: 'EverTutor AI System',
         badge: '(Next 3 Projects)',
 
@@ -7299,7 +7304,6 @@ addEventListener('load', function () {
       },
       {
         tab: 'ET Live',
-        plate: 'images/card-et-live.webp',
         title: '1.1 EverTutor Live',
 
         metrics: [
@@ -7318,7 +7322,6 @@ addEventListener('load', function () {
       },
       {
         tab: 'ET Studio',
-        plate: 'images/card-et-studio.webp',
         title: 'EverTutor Studio',
 
         metrics: [
@@ -7336,7 +7339,6 @@ addEventListener('load', function () {
       },
       {
         tab: 'ET Analytics',
-        plate: 'images/card-et-analytics.webp',
         title: 'EverTutor Analytics',
 
         metrics: [
@@ -7356,7 +7358,6 @@ addEventListener('load', function () {
       },
       {
         tab: 'Stressie',
-        plate: 'images/card-stressie.webp',
         title: 'Stressie',
 
         metrics: [
@@ -7374,7 +7375,6 @@ addEventListener('load', function () {
       },
       {
         tab: 'Dearly',
-        plate: 'images/card-dearly.webp',
         title: 'Dearly',
 
         metrics: [
@@ -7394,7 +7394,6 @@ addEventListener('load', function () {
       },
       {
         tab: 'The Engine',
-        plate: 'images/card-engine.webp',
         title: 'The Engine',
         metrics: [
           { val: 'Brand', lbl: '& Art Direction' },
@@ -7431,7 +7430,6 @@ addEventListener('load', function () {
     var barDesc     = document.getElementById('s2BarDesc');
     var barMetrics  = document.getElementById('s2BarMetrics');
     var barCta      = document.getElementById('s2BarCta');
-    var barPlateImg = document.getElementById('s2BarPlateImg');
     /* Hash hrefs (Analytics → #contactSection) ride Lenis out of the pin
        instead of jumping — the pin-spacer keeps document flow, so a plain
        anchor jump would land without smoothing. */
@@ -7524,17 +7522,6 @@ addEventListener('load', function () {
 
       clearTimeout(updateTimer);
       updateTimer = setTimeout(function () {
-        /* Swap the plate to this project's artwork. Decode before showing so
-           the card never flashes the previous project's colour under the new
-           project's words. */
-        if (barPlateImg && card.plate && barPlateImg.getAttribute('src') !== card.plate) {
-          var next = new Image();
-          next.onload = function () { barPlateImg.src = card.plate; barPlateImg.style.opacity = 1; };
-          next.onerror = function () { barPlateImg.style.opacity = 0; };
-          barPlateImg.style.opacity = 0;
-          next.src = card.plate;
-        }
-
         /* Populate bar content */
         if (barTitle) {
           if (card.badge) {
