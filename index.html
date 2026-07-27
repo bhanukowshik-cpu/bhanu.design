@@ -6694,23 +6694,80 @@ var topNav = document.getElementById('topNav');
 var micBtn = document.getElementById('micBtn');
 var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 if (!SR) { micBtn.classList.add('hide'); }
-var rec = null, recOn = false, dictBase = '';
-micBtn.addEventListener('click', function () {
-  if (!SR) return;
-  if (recOn) { try { rec.stop(); } catch (e) {} return; }
+/* The mic is a latch, not a push-to-talk: it holds the line open until the
+   visitor presses it again. Two things had to change for that.
+
+   continuous was false, so the engine closed the session at the first pause
+   in speech — you got one sentence and the mic switched itself off.
+
+   continuous = true alone is not enough either: Chrome still fires onend
+   after a few seconds of silence, or on a transient network hiccup. So
+   wantRec records the visitor's intent, and onend restarts a fresh
+   recogniser whenever the engine quit but the visitor did not. Only a press
+   of the button, or a fatal permission error, actually stops it. */
+var rec = null, recOn = false, wantRec = false, dictBase = '', dictFinal = '';
+
+function startDictation() {
   rec = new SR();
-  rec.lang = 'en-US'; rec.interimResults = true; rec.continuous = false;
-  dictBase = input.value ? input.value.replace(/\s+$/, '') + ' ' : '';
+  rec.lang = 'en-US';
+  rec.interimResults = true;
+  rec.continuous = true;
+
   rec.onresult = function (ev) {
-    var t = '';
-    for (var i = 0; i < ev.results.length; i++) t += ev.results[i][0].transcript;
-    input.value = dictBase + t;
+    /* Results are read from ev.resultIndex, and anything final is moved into
+       dictFinal. A restarted session numbers its results from zero again, so
+       re-reading the whole list would drop every sentence spoken before the
+       restart. */
+    var interim = '';
+    for (var i = ev.resultIndex; i < ev.results.length; i++) {
+      var r = ev.results[i];
+      if (r.isFinal) dictFinal += r[0].transcript;
+      else interim += r[0].transcript;
+    }
+    input.value = dictBase + dictFinal + interim;
     syncSendState();
   };
-  rec.onstart = function () { recOn = true; micBtn.classList.add('rec'); };
-  rec.onend = function () { recOn = false; micBtn.classList.remove('rec'); input.focus(); };
-  rec.onerror = function () { recOn = false; micBtn.classList.remove('rec'); };
-  try { rec.start(); } catch (e) {}
+
+  rec.onstart = function () {
+    recOn = true;
+    micBtn.classList.add('rec');
+    micBtn.setAttribute('aria-label', 'Stop dictating');
+  };
+
+  rec.onend = function () {
+    if (wantRec) { setTimeout(startDictation, 120); return; }  /* engine quit, visitor did not */
+    recOn = false;
+    micBtn.classList.remove('rec');
+    micBtn.setAttribute('aria-label', 'Dictate your question');
+    input.focus();
+  };
+
+  rec.onerror = function (ev) {
+    /* no-speech and network are transient — onend restarts them. A refused or
+       unavailable mic is not recoverable, so stop and release the button
+       rather than looping on a permission the visitor already declined. */
+    var fatal = ev && (ev.error === 'not-allowed' || ev.error === 'service-not-allowed');
+    if (fatal) {
+      wantRec = false; recOn = false;
+      micBtn.classList.remove('rec');
+      micBtn.setAttribute('aria-label', 'Dictate your question');
+    }
+  };
+
+  try { rec.start(); } catch (e) { /* start() on a live session throws; onend will retry */ }
+}
+
+micBtn.addEventListener('click', function () {
+  if (!SR) return;
+  if (wantRec) {                     /* the visitor is asking it to stop */
+    wantRec = false;
+    try { rec && rec.stop(); } catch (e) {}
+    return;
+  }
+  wantRec = true;
+  dictBase = input.value ? input.value.replace(/\s+$/, '') + ' ' : '';
+  dictFinal = '';
+  startDictation();
 });
 
 /* ═══ TEXT CHAT — same proxy contract as index.html ═══ */
