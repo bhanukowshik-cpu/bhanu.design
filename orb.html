@@ -32,21 +32,42 @@
 <body>
   <div id="orb"></div>
 
-  <script type="module" src="orb/bhanu-orb.js?v=4"></script>
+  <script type="module" src="orb/bhanu-orb.js?v=5"></script>
   <script>
-    /* Nothing but the orb. Tune it from the URL:
-         ?palette=aurora|ember|nebula|arctic   (default arctic)
-         ?size=400                             (px, default 360)
-         ?state=idle|listening|user-speaking|assistant-speaking|connecting|error
-         ?simulate=user|assistant              (fake audio, no mic) */
+    /* The orb with its controls: four designed variations, plus the
+       state / palette / simulate strip. ?tune opens the slider panel,
+       ?size=N overrides the orb size. */
+    var VARIATIONS = [
+      { /* the baseline read, softened a touch — glassy and unhurried */
+        name: 'still water', palette: 'arctic',
+        params: { noiseAmplitude: 0.10, noiseSpeed: 0.18, maskSoftness: 0.18,
+                  saturation: 1.7, contrast: 0.24 } },
+      { /* slow churning lava — bigger, harder-edged, ember-lit */
+        name: 'molten core', palette: 'ember',
+        params: { fbmScale: 2.6, fbmPower: 2.2, fbmAmplitude: 0.22, fbmSpeed: 1.8,
+                  noiseScale: 0.62, noiseAmplitude: 0.24, fluidDisplacement: 0.6,
+                  fluidColorOpacity: 0.35, contrast: 0.45, saturation: 2.2,
+                  grainOpacity: 0.05, maskSoftness: 0.10 } },
+      { /* billowy violet gas — soft edge, fine grain, luminous streaks */
+        name: 'deep nebula', palette: 'nebula',
+        params: { fbmScale: 5.5, fbmPower: 3.6, fbmAmplitude: 0.30, fbmSpeed: 1.1,
+                  noiseAmplitude: 0.28, noiseSpeed: 0.5, fluidColorOpacity: 0.5,
+                  saturation: 2.4, maskRadius: 0.96, maskSoftness: 0.30,
+                  grainOpacity: 0.08, exposure: 0.75 } },
+      { /* a slow breathing organism — teal, soft currents, gentle */
+        name: 'aurora breath', palette: 'aurora',
+        params: { sphereScale: 1.08, spherePower: 0.5, fbmAmplitude: 0.04,
+                  fbmSpeed: 0.7, noiseAmplitude: 0.09, noiseSpeed: 0.08,
+                  fluidForce: 0.15, fluidDissipation: 0.93, fluidColorOpacity: 0.3,
+                  contrast: 0.20, saturation: 1.8, maskSoftness: 0.22 } },
+    ];
     var q = new URLSearchParams(location.search);
     (function ready() {
-      if (!(window.BhanuOrb && window.BhanuOrb.mountVisual)) { setTimeout(ready, 40); return; }
-      window.BhanuOrb.mountVisual(document.getElementById('orb'), {
-        palette: q.get('palette') || 'arctic',
+      if (!(window.BhanuOrb && window.BhanuOrb.mountLab)) { setTimeout(ready, 40); return; }
+      window.BhanuOrb.mountLab(document.getElementById('orb'), {
         size: Number(q.get('size')) || 360,
-        state: q.get('state') || 'idle',
-        simulate: q.get('simulate') || null,
+        presets: VARIATIONS,
+        panel: q.has('tune'),
       });
     })();
   </script>

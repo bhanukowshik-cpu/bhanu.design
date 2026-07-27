@@ -16,7 +16,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { ConversationProvider, useConversation } from '@elevenlabs/react';
 import { VoiceOrb, PALETTES } from './components/voice-orb';
-import type { PaletteName, VoiceOrbState } from './components/voice-orb';
+import type { OrbParams, PaletteName, VoiceOrbState } from './components/voice-orb';
 
 const AGENT_ID = 'agent_6001ky3xa8eded1r959raw2w6jth';
 
@@ -242,9 +242,25 @@ const LAB_STATES: VoiceOrbState[] = [
   'idle', 'listening', 'user-speaking', 'assistant-speaking', 'connecting', 'error',
 ];
 
-function LabOrb({ size = 320 }: { size?: number }) {
+/** A named starting point: palette + a params seed. */
+interface LabPreset {
+  name: string;
+  palette: PaletteName;
+  params?: Partial<OrbParams>;
+}
+
+interface LabOrbProps {
+  size?: number;
+  /** Optional variation row; selecting one re-seeds the orb (fresh mount). */
+  presets?: LabPreset[];
+  /** Show the slider panel (default true). */
+  panel?: boolean;
+}
+
+function LabOrb({ size = 320, presets, panel = true }: LabOrbProps) {
+  const [preset, setPreset] = useState(0);
   const [state, setState] = useState<VoiceOrbState>('idle');
-  const [palette, setPalette] = useState<PaletteName>('arctic');
+  const [palette, setPalette] = useState<PaletteName>(presets?.[0]?.palette ?? 'arctic');
   const [simulate, setSimulate] = useState<'user' | 'assistant' | null>(null);
 
   const pill = (active: boolean): React.CSSProperties => ({
@@ -262,10 +278,34 @@ function LabOrb({ size = 320 }: { size?: number }) {
     textTransform: 'uppercase', letterSpacing: '0.08em', marginRight: 2,
   };
 
+  const pickPreset = (i: number) => {
+    setPreset(i);
+    if (presets?.[i]) setPalette(presets[i].palette);
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}>
-      <VoiceOrb state={state} simulate={simulate} palette={PALETTES[palette]} size={size} debug />
+      {/* key re-mounts on variation switch so the params seed takes freshly */}
+      <VoiceOrb
+        key={preset}
+        state={state}
+        simulate={simulate}
+        palette={PALETTES[palette]}
+        params={presets?.[preset]?.params}
+        size={size}
+        debug={panel}
+      />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {presets && presets.length > 0 && (
+          <div style={row}>
+            <span style={label}>variation</span>
+            {presets.map((p, i) => (
+              <button key={p.name} style={pill(preset === i)} onClick={() => pickPreset(i)}>
+                {p.name}
+              </button>
+            ))}
+          </div>
+        )}
         <div style={row}>
           <span style={label}>state</span>
           {LAB_STATES.map((s) => (
@@ -291,9 +331,9 @@ function LabOrb({ size = 320 }: { size?: number }) {
   );
 }
 
-function mountLab(el: HTMLElement, opts: { size?: number } = {}): Root {
+function mountLab(el: HTMLElement, opts: LabOrbProps = {}): Root {
   const root = createRoot(el);
-  root.render(<LabOrb size={opts.size} />);
+  root.render(<LabOrb size={opts.size} presets={opts.presets} panel={opts.panel} />);
   return root;
 }
 

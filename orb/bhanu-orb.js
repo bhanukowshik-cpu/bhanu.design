@@ -66,31 +66,31 @@ function i1() {
     enqueueSetState: function() {
     }
   }, C = Object.assign, A = {};
-  function _(M, j, ae) {
+  function E(M, j, ae) {
     this.props = M, this.context = j, this.refs = A, this.updater = ae || k;
   }
-  _.prototype.isReactComponent = {}, _.prototype.setState = function(M, j) {
+  E.prototype.isReactComponent = {}, E.prototype.setState = function(M, j) {
     if (typeof M != "object" && typeof M != "function" && M != null)
       throw Error(
         "takes an object of state variables to update or a function which returns an object of state variables."
       );
     this.updater.enqueueSetState(this, M, j, "setState");
-  }, _.prototype.forceUpdate = function(M) {
+  }, E.prototype.forceUpdate = function(M) {
     this.updater.enqueueForceUpdate(this, M, "forceUpdate");
   };
-  function z() {
+  function B() {
   }
-  z.prototype = _.prototype;
+  B.prototype = E.prototype;
   function O(M, j, ae) {
     this.props = M, this.context = j, this.refs = A, this.updater = ae || k;
   }
-  var E = O.prototype = new z();
-  E.constructor = O, C(E, _.prototype), E.isPureReactComponent = !0;
+  var _ = O.prototype = new B();
+  _.constructor = O, C(_, E.prototype), _.isPureReactComponent = !0;
   var x = Array.isArray;
   function N() {
   }
-  var B = { H: null, A: null, T: null, S: null }, X = Object.prototype.hasOwnProperty;
-  function H(M, j, ae) {
+  var z = { H: null, A: null, T: null, S: null }, X = Object.prototype.hasOwnProperty;
+  function G(M, j, ae) {
     var re = ae.ref;
     return {
       $$typeof: i,
@@ -100,8 +100,8 @@ function i1() {
       props: ae
     };
   }
-  function G(M, j) {
-    return H(M.type, j, M.props);
+  function H(M, j) {
+    return G(M.type, j, M.props);
   }
   function $(M) {
     return typeof M == "object" && M !== null && M.$$typeof === i;
@@ -170,7 +170,7 @@ function i1() {
     if (be)
       return fe = fe(M), be = re === "" ? "." + le(M, 0) : re, x(fe) ? (ae = "", be != null && (ae = be.replace(te, "$&/") + "/"), V(fe, j, ae, "", function(It) {
         return It;
-      })) : fe != null && ($(fe) && (fe = G(
+      })) : fe != null && ($(fe) && (fe = H(
         fe,
         ae + (fe.key == null || M && M.key === fe.key ? "" : ("" + fe.key).replace(
           te,
@@ -278,10 +278,10 @@ function i1() {
       return M;
     }
   };
-  return ke.Activity = v, ke.Children = Ce, ke.Component = _, ke.Fragment = t, ke.Profiler = r, ke.PureComponent = O, ke.StrictMode = a, ke.Suspense = h, ke.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = B, ke.__COMPILER_RUNTIME = {
+  return ke.Activity = v, ke.Children = Ce, ke.Component = E, ke.Fragment = t, ke.Profiler = r, ke.PureComponent = O, ke.StrictMode = a, ke.Suspense = h, ke.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = z, ke.__COMPILER_RUNTIME = {
     __proto__: null,
     c: function(M) {
-      return B.H.useMemoCache(M);
+      return z.H.useMemoCache(M);
     }
   }, ke.cache = function(M) {
     return function() {
@@ -305,7 +305,7 @@ function i1() {
         be[Ue] = arguments[Ue + 2];
       re.children = be;
     }
-    return H(M.type, fe, re);
+    return G(M.type, fe, re);
   }, ke.createContext = function(M) {
     return M = {
       $$typeof: u,
@@ -333,7 +333,7 @@ function i1() {
     if (M && M.defaultProps)
       for (re in be = M.defaultProps, be)
         fe[re] === void 0 && (fe[re] = be[re]);
-    return H(M, ve, fe);
+    return G(M, ve, fe);
   }, ke.createRef = function() {
     return { current: null };
   }, ke.forwardRef = function(M) {
@@ -351,66 +351,66 @@ function i1() {
       compare: j === void 0 ? null : j
     };
   }, ke.startTransition = function(M) {
-    var j = B.T, ae = {};
-    B.T = ae;
+    var j = z.T, ae = {};
+    z.T = ae;
     try {
-      var re = M(), fe = B.S;
+      var re = M(), fe = z.S;
       fe !== null && fe(ae, re), typeof re == "object" && re !== null && typeof re.then == "function" && re.then(N, ge);
     } catch (ve) {
       ge(ve);
     } finally {
-      j !== null && ae.types !== null && (j.types = ae.types), B.T = j;
+      j !== null && ae.types !== null && (j.types = ae.types), z.T = j;
     }
   }, ke.unstable_useCacheRefresh = function() {
-    return B.H.useCacheRefresh();
+    return z.H.useCacheRefresh();
   }, ke.use = function(M) {
-    return B.H.use(M);
+    return z.H.use(M);
   }, ke.useActionState = function(M, j, ae) {
-    return B.H.useActionState(M, j, ae);
+    return z.H.useActionState(M, j, ae);
   }, ke.useCallback = function(M, j) {
-    return B.H.useCallback(M, j);
+    return z.H.useCallback(M, j);
   }, ke.useContext = function(M) {
-    return B.H.useContext(M);
+    return z.H.useContext(M);
   }, ke.useDebugValue = function() {
   }, ke.useDeferredValue = function(M, j) {
-    return B.H.useDeferredValue(M, j);
+    return z.H.useDeferredValue(M, j);
   }, ke.useEffect = function(M, j) {
-    return B.H.useEffect(M, j);
+    return z.H.useEffect(M, j);
   }, ke.useEffectEvent = function(M) {
-    return B.H.useEffectEvent(M);
+    return z.H.useEffectEvent(M);
   }, ke.useId = function() {
-    return B.H.useId();
+    return z.H.useId();
   }, ke.useImperativeHandle = function(M, j, ae) {
-    return B.H.useImperativeHandle(M, j, ae);
+    return z.H.useImperativeHandle(M, j, ae);
   }, ke.useInsertionEffect = function(M, j) {
-    return B.H.useInsertionEffect(M, j);
+    return z.H.useInsertionEffect(M, j);
   }, ke.useLayoutEffect = function(M, j) {
-    return B.H.useLayoutEffect(M, j);
+    return z.H.useLayoutEffect(M, j);
   }, ke.useMemo = function(M, j) {
-    return B.H.useMemo(M, j);
+    return z.H.useMemo(M, j);
   }, ke.useOptimistic = function(M, j) {
-    return B.H.useOptimistic(M, j);
+    return z.H.useOptimistic(M, j);
   }, ke.useReducer = function(M, j, ae) {
-    return B.H.useReducer(M, j, ae);
+    return z.H.useReducer(M, j, ae);
   }, ke.useRef = function(M) {
-    return B.H.useRef(M);
+    return z.H.useRef(M);
   }, ke.useState = function(M) {
-    return B.H.useState(M);
+    return z.H.useState(M);
   }, ke.useSyncExternalStore = function(M, j, ae) {
-    return B.H.useSyncExternalStore(
+    return z.H.useSyncExternalStore(
       M,
       j,
       ae
     );
   }, ke.useTransition = function() {
-    return B.H.useTransition();
+    return z.H.useTransition();
   }, ke.version = "19.2.8", ke;
 }
 var yv;
 function Fh() {
   return yv || (yv = 1, Md.exports = i1()), Md.exports;
 }
-var K = Fh(), Dd = { exports: {} }, xr = {}, Od = { exports: {} }, Nd = {};
+var Y = Fh(), Dd = { exports: {} }, xr = {}, Od = { exports: {} }, Nd = {};
 /**
  * @license React
  * scheduler.production.js
@@ -467,8 +467,8 @@ function a1() {
         return u.now() - d;
       };
     }
-    var h = [], f = [], g = 1, v = null, b = 3, S = !1, k = !1, C = !1, A = !1, _ = typeof setTimeout == "function" ? setTimeout : null, z = typeof clearTimeout == "function" ? clearTimeout : null, O = typeof setImmediate < "u" ? setImmediate : null;
-    function E(V) {
+    var h = [], f = [], g = 1, v = null, b = 3, S = !1, k = !1, C = !1, A = !1, E = typeof setTimeout == "function" ? setTimeout : null, B = typeof clearTimeout == "function" ? clearTimeout : null, O = typeof setImmediate < "u" ? setImmediate : null;
+    function _(V) {
       for (var ee = t(f); ee !== null; ) {
         if (ee.callback === null) a(f);
         else if (ee.startTime <= V)
@@ -478,7 +478,7 @@ function a1() {
       }
     }
     function x(V) {
-      if (C = !1, E(V), !k)
+      if (C = !1, _(V), !k)
         if (t(h) !== null)
           k = !0, N || (N = !0, J());
         else {
@@ -486,22 +486,22 @@ function a1() {
           ee !== null && Ae(x, ee.startTime - V);
         }
     }
-    var N = !1, B = -1, X = 5, H = -1;
-    function G() {
-      return A ? !0 : !(i.unstable_now() - H < X);
+    var N = !1, z = -1, X = 5, G = -1;
+    function H() {
+      return A ? !0 : !(i.unstable_now() - G < X);
     }
     function $() {
       if (A = !1, N) {
         var V = i.unstable_now();
-        H = V;
+        G = V;
         var ee = !0;
         try {
           e: {
-            k = !1, C && (C = !1, z(B), B = -1), S = !0;
+            k = !1, C && (C = !1, B(z), z = -1), S = !0;
             var he = b;
             try {
               t: {
-                for (E(V), v = t(h); v !== null && !(v.expirationTime > V && G()); ) {
+                for (_(V), v = t(h); v !== null && !(v.expirationTime > V && H()); ) {
                   var ge = v.callback;
                   if (typeof ge == "function") {
                     v.callback = null, b = v.priorityLevel;
@@ -509,10 +509,10 @@ function a1() {
                       v.expirationTime <= V
                     );
                     if (V = i.unstable_now(), typeof Ce == "function") {
-                      v.callback = Ce, E(V), ee = !0;
+                      v.callback = Ce, _(V), ee = !0;
                       break t;
                     }
-                    v === t(h) && a(h), E(V);
+                    v === t(h) && a(h), _(V);
                   } else a(h);
                   v = t(h);
                 }
@@ -548,10 +548,10 @@ function a1() {
       };
     } else
       J = function() {
-        _($, 0);
+        E($, 0);
       };
     function Ae(V, ee) {
-      B = _(function() {
+      z = E(function() {
         V(i.unstable_now());
       }, ee);
     }
@@ -625,8 +625,8 @@ function a1() {
         startTime: he,
         expirationTime: Ce,
         sortIndex: -1
-      }, he > ge ? (V.sortIndex = he, e(f, V), t(h) === null && V === t(f) && (C ? (z(B), B = -1) : C = !0, Ae(x, he - ge))) : (V.sortIndex = Ce, e(h, V), k || S || (k = !0, N || (N = !0, J()))), V;
-    }, i.unstable_shouldYield = G, i.unstable_wrapCallback = function(V) {
+      }, he > ge ? (V.sortIndex = he, e(f, V), t(h) === null && V === t(f) && (C ? (B(z), z = -1) : C = !0, Ae(x, he - ge))) : (V.sortIndex = Ce, e(h, V), k || S || (k = !0, N || (N = !0, J()))), V;
+    }, i.unstable_shouldYield = H, i.unstable_wrapCallback = function(V) {
       var ee = b;
       return function() {
         var he = b;
@@ -923,7 +923,7 @@ function o1() {
     }
     return null;
   }
-  var v = Object.assign, b = Symbol.for("react.element"), S = Symbol.for("react.transitional.element"), k = Symbol.for("react.portal"), C = Symbol.for("react.fragment"), A = Symbol.for("react.strict_mode"), _ = Symbol.for("react.profiler"), z = Symbol.for("react.consumer"), O = Symbol.for("react.context"), E = Symbol.for("react.forward_ref"), x = Symbol.for("react.suspense"), N = Symbol.for("react.suspense_list"), B = Symbol.for("react.memo"), X = Symbol.for("react.lazy"), H = Symbol.for("react.activity"), G = Symbol.for("react.memo_cache_sentinel"), $ = Symbol.iterator;
+  var v = Object.assign, b = Symbol.for("react.element"), S = Symbol.for("react.transitional.element"), k = Symbol.for("react.portal"), C = Symbol.for("react.fragment"), A = Symbol.for("react.strict_mode"), E = Symbol.for("react.profiler"), B = Symbol.for("react.consumer"), O = Symbol.for("react.context"), _ = Symbol.for("react.forward_ref"), x = Symbol.for("react.suspense"), N = Symbol.for("react.suspense_list"), z = Symbol.for("react.memo"), X = Symbol.for("react.lazy"), G = Symbol.for("react.activity"), H = Symbol.for("react.memo_cache_sentinel"), $ = Symbol.iterator;
   function J(n) {
     return n === null || typeof n != "object" ? null : (n = $ && n[$] || n["@@iterator"], typeof n == "function" ? n : null);
   }
@@ -936,7 +936,7 @@ function o1() {
     switch (n) {
       case C:
         return "Fragment";
-      case _:
+      case E:
         return "Profiler";
       case A:
         return "StrictMode";
@@ -944,7 +944,7 @@ function o1() {
         return "Suspense";
       case N:
         return "SuspenseList";
-      case H:
+      case G:
         return "Activity";
     }
     if (typeof n == "object")
@@ -953,12 +953,12 @@ function o1() {
           return "Portal";
         case O:
           return n.displayName || "Context";
-        case z:
+        case B:
           return (n._context.displayName || "Context") + ".Consumer";
-        case E:
+        case _:
           var s = n.render;
           return n = n.displayName, n || (n = s.displayName || s.name || "", n = n !== "" ? "ForwardRef(" + n + ")" : "ForwardRef"), n;
-        case B:
+        case z:
           return s = n.displayName || null, s !== null ? s : le(n.type) || "Memo";
         case X:
           s = n._payload, n = n._init;
@@ -1110,9 +1110,9 @@ function o1() {
             if (c !== 1 || m !== 1)
               do
                 if (c--, m--, 0 > m || w[c] !== U[m]) {
-                  var Y = `
+                  var K = `
 ` + w[c].replace(" at new ", " at ");
-                  return n.displayName && Y.includes("<anonymous>") && (Y = Y.replace("<anonymous>", n.displayName)), Y;
+                  return n.displayName && K.includes("<anonymous>") && (K = K.replace("<anonymous>", n.displayName)), K;
                 }
               while (1 <= c && 0 <= m);
             break;
@@ -1297,12 +1297,12 @@ Error generating stack: ` + c.message + `
     n.pendingLanes = o, n.suspendedLanes = 0, n.pingedLanes = 0, n.warmLanes = 0, n.expiredLanes &= o, n.entangledLanes &= o, n.errorRecoveryDisabledLanes &= o, n.shellSuspendCounter = 0;
     var T = n.entanglements, w = n.expirationTimes, U = n.hiddenUpdates;
     for (o = y & ~o; 0 < o; ) {
-      var Y = 31 - en(o), Z = 1 << Y;
-      T[Y] = 0, w[Y] = -1;
-      var F = U[Y];
+      var K = 31 - en(o), Z = 1 << K;
+      T[K] = 0, w[K] = -1;
+      var F = U[K];
       if (F !== null)
-        for (U[Y] = null, Y = 0; Y < F.length; Y++) {
-          var q = F[Y];
+        for (U[K] = null, K = 0; K < F.length; K++) {
+          var q = F[K];
           q !== null && (q.lane &= -536870913);
         }
       o &= ~Z;
@@ -2402,15 +2402,15 @@ Error generating stack: ` + c.message + `
       ) ? 26 : n === "html" || n === "head" || n === "body" ? 27 : 5;
     else
       e: switch (n) {
-        case H:
-          return n = nn(31, o, s, m), n.elementType = H, n.lanes = p, n;
+        case G:
+          return n = nn(31, o, s, m), n.elementType = G, n.lanes = p, n;
         case C:
           return da(o.children, m, p, s);
         case A:
           y = 8, m |= 24;
           break;
-        case _:
-          return n = nn(12, o, s, m | 2), n.elementType = _, n.lanes = p, n;
+        case E:
+          return n = nn(12, o, s, m | 2), n.elementType = E, n.lanes = p, n;
         case x:
           return n = nn(13, o, s, m), n.elementType = x, n.lanes = p, n;
         case N:
@@ -2421,13 +2421,13 @@ Error generating stack: ` + c.message + `
               case O:
                 y = 10;
                 break e;
-              case z:
+              case B:
                 y = 9;
                 break e;
-              case E:
+              case _:
                 y = 11;
                 break e;
-              case B:
+              case z:
                 y = 14;
                 break e;
               case X:
@@ -2914,7 +2914,7 @@ Error generating stack: ` + c.message + `
     }
     function w(P, D, I, Q) {
       var ye = I.type;
-      return ye === C ? Y(
+      return ye === C ? K(
         P,
         D,
         I.props.children,
@@ -2932,7 +2932,7 @@ Error generating stack: ` + c.message + `
     function U(P, D, I, Q) {
       return D === null || D.tag !== 4 || D.stateNode.containerInfo !== I.containerInfo || D.stateNode.implementation !== I.implementation ? (D = Kc(I, P.mode, Q), D.return = P, D) : (D = m(D, I.children || []), D.return = P, D);
     }
-    function Y(P, D, I, Q, ye) {
+    function K(P, D, I, Q, ye) {
       return D === null || D.tag !== 7 ? (D = da(
         I,
         P.mode,
@@ -3000,7 +3000,7 @@ Error generating stack: ` + c.message + `
             return I = ga(I), F(P, D, I, Q);
         }
         if (Ae(I) || J(I))
-          return ye !== null ? null : Y(P, D, I, Q, null);
+          return ye !== null ? null : K(P, D, I, Q, null);
         if (typeof I.then == "function")
           return F(
             P,
@@ -3042,7 +3042,7 @@ Error generating stack: ` + c.message + `
             );
         }
         if (Ae(Q) || J(Q))
-          return P = P.get(I) || null, Y(D, P, Q, ye, null);
+          return P = P.get(I) || null, K(D, P, Q, ye, null);
         if (typeof Q.then == "function")
           return q(
             P,
@@ -3337,16 +3337,16 @@ Error generating stack: ` + c.message + `
       m.shared.pending = null;
       var w = T, U = w.next;
       w.next = null, y === null ? p = U : y.next = U, y = w;
-      var Y = n.alternate;
-      Y !== null && (Y = Y.updateQueue, T = Y.lastBaseUpdate, T !== y && (T === null ? Y.firstBaseUpdate = U : T.next = U, Y.lastBaseUpdate = w));
+      var K = n.alternate;
+      K !== null && (K = K.updateQueue, T = K.lastBaseUpdate, T !== y && (T === null ? K.firstBaseUpdate = U : T.next = U, K.lastBaseUpdate = w));
     }
     if (p !== null) {
       var Z = m.baseState;
-      y = 0, Y = U = w = null, T = p;
+      y = 0, K = U = w = null, T = p;
       do {
         var F = T.lane & -536870913, q = F !== T.lane;
         if (q ? (Ne & F) === F : (c & F) === F) {
-          F !== 0 && F === Ja && (lu = !0), Y !== null && (Y = Y.next = {
+          F !== 0 && F === Ja && (lu = !0), K !== null && (K = K.next = {
             lane: 0,
             tag: T.tag,
             payload: T.payload,
@@ -3383,14 +3383,14 @@ Error generating stack: ` + c.message + `
             payload: T.payload,
             callback: T.callback,
             next: null
-          }, Y === null ? (U = Y = q, w = Z) : Y = Y.next = q, y |= F;
+          }, K === null ? (U = K = q, w = Z) : K = K.next = q, y |= F;
         if (T = T.next, T === null) {
           if (T = m.shared.pending, T === null)
             break;
           q = T, T = q.next, q.next = null, m.lastBaseUpdate = q, m.shared.pending = null;
         }
       } while (!0);
-      Y === null && (w = Z), m.baseState = w, m.firstBaseUpdate = U, m.lastBaseUpdate = Y, p === null && (m.shared.lanes = 0), Ni |= y, n.lanes = y, n.memoizedState = Z;
+      K === null && (w = Z), m.baseState = w, m.firstBaseUpdate = U, m.lastBaseUpdate = K, p === null && (m.shared.lanes = 0), Ni |= y, n.lanes = y, n.memoizedState = Z;
     }
   }
   function Dm(n, s) {
@@ -3569,7 +3569,7 @@ Error generating stack: ` + c.message + `
     }
     if (s == null && (s = { data: [], index: 0 }), o === null && (o = Lo(), Ee.updateQueue = o), o.memoCache = s, o = s.data[s.index], o === void 0)
       for (o = s.data[s.index] = Array(n), c = 0; c < n; c++)
-        o[c] = G;
+        o[c] = H;
     return s.index++, o;
   }
   function ei(n, s) {
@@ -3594,7 +3594,7 @@ Error generating stack: ` + c.message + `
     if (p = n.baseState, m === null) n.memoizedState = p;
     else {
       s = m.next;
-      var T = y = null, w = null, U = s, Y = !1;
+      var T = y = null, w = null, U = s, K = !1;
       do {
         var Z = U.lane & -536870913;
         if (Z !== U.lane ? (Ne & Z) === Z : ($n & Z) === Z) {
@@ -3608,9 +3608,9 @@ Error generating stack: ` + c.message + `
               hasEagerState: U.hasEagerState,
               eagerState: U.eagerState,
               next: null
-            }), Z === Ja && (Y = !0);
+            }), Z === Ja && (K = !0);
           else if (($n & F) === F) {
-            U = U.next, F === Ja && (Y = !0);
+            U = U.next, F === Ja && (K = !0);
             continue;
           } else
             Z = {
@@ -3635,7 +3635,7 @@ Error generating stack: ` + c.message + `
           }, w === null ? (T = w = F, y = p) : w = w.next = F, Ee.lanes |= Z, Ni |= Z;
         U = U.next;
       } while (U !== null && U !== s);
-      if (w === null ? y = p : w.next = T, !tn(p, n.memoizedState) && (ft = !0, Y && (o = Za, o !== null)))
+      if (w === null ? y = p : w.next = T, !tn(p, n.memoizedState) && (ft = !0, K && (o = Za, o !== null)))
         throw o;
       n.memoizedState = p, n.baseState = y, n.baseQueue = w, c.lastRenderedState = p;
     }
@@ -4017,14 +4017,14 @@ Error generating stack: ` + c.message + `
     try {
       var w = m(), U = V.S;
       if (U !== null && U(T, w), w !== null && typeof w == "object" && typeof w.then == "function") {
-        var Y = jT(
+        var K = jT(
           w,
           c
         );
         or(
           n,
           s,
-          Y,
+          K,
           ln(n)
         );
       } else
@@ -4849,10 +4849,10 @@ Error generating stack: ` + c.message + `
       p = s.stateNode;
       var T = s.memoizedProps, w = Sa(o, T);
       p.props = w;
-      var U = p.context, Y = o.contextType;
-      y = Ga, typeof Y == "object" && Y !== null && (y = At(Y));
+      var U = p.context, K = o.contextType;
+      y = Ga, typeof K == "object" && K !== null && (y = At(K));
       var Z = o.getDerivedStateFromProps;
-      Y = typeof Z == "function" || typeof p.getSnapshotBeforeUpdate == "function", T = s.pendingProps !== T, Y || typeof p.UNSAFE_componentWillReceiveProps != "function" && typeof p.componentWillReceiveProps != "function" || (T || U !== y) && Sp(
+      K = typeof Z == "function" || typeof p.getSnapshotBeforeUpdate == "function", T = s.pendingProps !== T, K || typeof p.UNSAFE_componentWillReceiveProps != "function" && typeof p.componentWillReceiveProps != "function" || (T || U !== y) && Sp(
         s,
         p,
         c,
@@ -4872,9 +4872,9 @@ Error generating stack: ` + c.message + `
         F,
         U,
         y
-      )) ? (Y || typeof p.UNSAFE_componentWillMount != "function" && typeof p.componentWillMount != "function" || (typeof p.componentWillMount == "function" && p.componentWillMount(), typeof p.UNSAFE_componentWillMount == "function" && p.UNSAFE_componentWillMount()), typeof p.componentDidMount == "function" && (s.flags |= 4194308)) : (typeof p.componentDidMount == "function" && (s.flags |= 4194308), s.memoizedProps = c, s.memoizedState = U), p.props = c, p.state = U, p.context = y, c = w) : (typeof p.componentDidMount == "function" && (s.flags |= 4194308), c = !1);
+      )) ? (K || typeof p.UNSAFE_componentWillMount != "function" && typeof p.componentWillMount != "function" || (typeof p.componentWillMount == "function" && p.componentWillMount(), typeof p.UNSAFE_componentWillMount == "function" && p.UNSAFE_componentWillMount()), typeof p.componentDidMount == "function" && (s.flags |= 4194308)) : (typeof p.componentDidMount == "function" && (s.flags |= 4194308), s.memoizedProps = c, s.memoizedState = U), p.props = c, p.state = U, p.context = y, c = w) : (typeof p.componentDidMount == "function" && (s.flags |= 4194308), c = !1);
     } else {
-      p = s.stateNode, ru(n, s), y = s.memoizedProps, Y = Sa(o, y), p.props = Y, Z = s.pendingProps, F = p.context, U = o.contextType, w = Ga, typeof U == "object" && U !== null && (w = At(U)), T = o.getDerivedStateFromProps, (U = typeof T == "function" || typeof p.getSnapshotBeforeUpdate == "function") || typeof p.UNSAFE_componentWillReceiveProps != "function" && typeof p.componentWillReceiveProps != "function" || (y !== Z || F !== w) && Sp(
+      p = s.stateNode, ru(n, s), y = s.memoizedProps, K = Sa(o, y), p.props = K, Z = s.pendingProps, F = p.context, U = o.contextType, w = Ga, typeof U == "object" && U !== null && (w = At(U)), T = o.getDerivedStateFromProps, (U = typeof T == "function" || typeof p.getSnapshotBeforeUpdate == "function") || typeof p.UNSAFE_componentWillReceiveProps != "function" && typeof p.componentWillReceiveProps != "function" || (y !== Z || F !== w) && Sp(
         s,
         p,
         c,
@@ -4886,10 +4886,10 @@ Error generating stack: ` + c.message + `
         o,
         T,
         c
-      ), q = s.memoizedState), (Y = Ri || bp(
+      ), q = s.memoizedState), (K = Ri || bp(
         s,
         o,
-        Y,
+        K,
         c,
         F,
         q,
@@ -4898,7 +4898,7 @@ Error generating stack: ` + c.message + `
         c,
         q,
         w
-      )), typeof p.componentDidUpdate == "function" && (s.flags |= 4), typeof p.getSnapshotBeforeUpdate == "function" && (s.flags |= 1024)) : (typeof p.componentDidUpdate != "function" || y === n.memoizedProps && F === n.memoizedState || (s.flags |= 4), typeof p.getSnapshotBeforeUpdate != "function" || y === n.memoizedProps && F === n.memoizedState || (s.flags |= 1024), s.memoizedProps = c, s.memoizedState = q), p.props = c, p.state = q, p.context = w, c = Y) : (typeof p.componentDidUpdate != "function" || y === n.memoizedProps && F === n.memoizedState || (s.flags |= 4), typeof p.getSnapshotBeforeUpdate != "function" || y === n.memoizedProps && F === n.memoizedState || (s.flags |= 1024), c = !1);
+      )), typeof p.componentDidUpdate == "function" && (s.flags |= 4), typeof p.getSnapshotBeforeUpdate == "function" && (s.flags |= 1024)) : (typeof p.componentDidUpdate != "function" || y === n.memoizedProps && F === n.memoizedState || (s.flags |= 4), typeof p.getSnapshotBeforeUpdate != "function" || y === n.memoizedProps && F === n.memoizedState || (s.flags |= 1024), s.memoizedProps = c, s.memoizedState = q), p.props = c, p.state = q, p.context = w, c = K) : (typeof p.componentDidUpdate != "function" || y === n.memoizedProps && F === n.memoizedState || (s.flags |= 4), typeof p.getSnapshotBeforeUpdate != "function" || y === n.memoizedProps && F === n.memoizedState || (s.flags |= 1024), c = !1);
     }
     return p = c, Go(n, s), c = (s.flags & 128) !== 0, p || c ? (p = s.stateNode, o = c && typeof o.getDerivedStateFromError != "function" ? null : p.render(), s.flags |= 1, n !== null && c ? (s.child = ya(
       s,
@@ -5255,7 +5255,7 @@ Error generating stack: ` + c.message + `
           else {
             if (n != null) {
               var m = n.$$typeof;
-              if (m === E) {
+              if (m === _) {
                 s.tag = 11, s = Ap(
                   null,
                   s,
@@ -5264,7 +5264,7 @@ Error generating stack: ` + c.message + `
                   o
                 );
                 break e;
-              } else if (m === B) {
+              } else if (m === z) {
                 s.tag = 14, s = wp(
                   null,
                   s,
@@ -5899,11 +5899,11 @@ Error generating stack: ` + c.message + `
               var w = o, U = T;
               try {
                 U();
-              } catch (Y) {
+              } catch (K) {
                 He(
                   m,
                   w,
-                  Y
+                  K
                 );
               }
             }
@@ -5911,8 +5911,8 @@ Error generating stack: ` + c.message + `
           c = c.next;
         } while (c !== p);
       }
-    } catch (Y) {
-      He(s, s.return, Y);
+    } catch (K) {
+      He(s, s.return, K);
     }
   }
   function qp(n) {
@@ -6067,13 +6067,13 @@ Error generating stack: ` + c.message + `
               o = null;
               break e;
             }
-            var y = 0, T = -1, w = -1, U = 0, Y = 0, Z = n, F = null;
+            var y = 0, T = -1, w = -1, U = 0, K = 0, Z = n, F = null;
             t: for (; ; ) {
               for (var q; Z !== o || m !== 0 && Z.nodeType !== 3 || (T = y + m), Z !== p || c !== 0 && Z.nodeType !== 3 || (w = y + c), Z.nodeType === 3 && (y += Z.nodeValue.length), (q = Z.firstChild) !== null; )
                 F = Z, Z = q;
               for (; ; ) {
                 if (Z === n) break t;
-                if (F === o && ++U === m && (T = y), F === p && ++Y === c && (w = y), (q = Z.nextSibling) !== null) break;
+                if (F === o && ++U === m && (T = y), F === p && ++K === c && (w = y), (q = Z.nextSibling) !== null) break;
                 Z = F, F = Z.parentNode;
               }
               Z = q;
@@ -6581,8 +6581,8 @@ Error generating stack: ` + c.message + `
         break;
       case 22:
         m = n.memoizedState !== null;
-        var w = o !== null && o.memoizedState !== null, U = ii, Y = mt;
-        if (ii = U || m, mt = Y || w, Gt(s, n), mt = Y, ii = U, Yt(n), c & 8192)
+        var w = o !== null && o.memoizedState !== null, U = ii, K = mt;
+        if (ii = U || m, mt = K || w, Gt(s, n), mt = K, ii = U, Yt(n), c & 8192)
           e: for (s = n.stateNode, s._visibility = m ? s._visibility & -2 : s._visibility | 1, m && (o === null || w || ii || mt || Ta(n)), o = null, s = n; ; ) {
             if (s.tag === 5 || s.tag === 26) {
               if (o === null) {
@@ -6677,8 +6677,8 @@ Error generating stack: ` + c.message + `
           default:
             throw Error(a(161));
         }
-      } catch (Y) {
-        He(n, n.return, Y);
+      } catch (K) {
+        He(n, n.return, K);
       }
       n.flags &= -3;
     }
@@ -6965,8 +6965,8 @@ Error generating stack: ` + c.message + `
         case 23:
           break;
         case 22:
-          var Y = y.stateNode;
-          y.memoizedState !== null ? Y._visibility & 2 ? as(
+          var K = y.stateNode;
+          y.memoizedState !== null ? K._visibility & 2 ? as(
             p,
             y,
             T,
@@ -6975,7 +6975,7 @@ Error generating stack: ` + c.message + `
           ) : fr(
             p,
             y
-          ) : (Y._visibility |= 2, as(
+          ) : (K._visibility |= 2, as(
             p,
             y,
             T,
@@ -7352,7 +7352,7 @@ Error generating stack: ` + c.message + `
     } while (!0);
     Ln(n);
   }
-  function ug(n, s, o, c, m, p, y, T, w, U, Y, Z, F, q) {
+  function ug(n, s, o, c, m, p, y, T, w, U, K, Z, F, q) {
     if (n.timeoutHandle = -1, Z = s.subtreeFlags, Z & 8192 || (Z & 16785408) === 16785408) {
       Z = {
         stylesheets: null,
@@ -7385,7 +7385,7 @@ Error generating stack: ` + c.message + `
             y,
             T,
             w,
-            Y,
+            K,
             Z,
             null,
             F,
@@ -7523,8 +7523,8 @@ Error generating stack: ` + c.message + `
         }
         rC(), y = at;
         break;
-      } catch (Y) {
-        dg(n, Y);
+      } catch (K) {
+        dg(n, K);
       }
     while (!0);
     return s && n.shellSuspendCounter++, Zn = fa = null, qe = c, V.H = m, V.A = p, xe === null && (Je = null, Ne = 0, To()), y;
@@ -7601,8 +7601,8 @@ Error generating stack: ` + c.message + `
         }
         lC();
         break;
-      } catch (Y) {
-        dg(n, Y);
+      } catch (K) {
+        dg(n, K);
       }
     while (!0);
     return Zn = fa = null, V.H = c, V.A = m, qe = o, xe !== null ? 0 : (Je = null, Ne = 0, To(), at);
@@ -7762,10 +7762,10 @@ Error generating stack: ` + c.message + `
             T
           )) {
             if (w !== null && Bc(T)) {
-              var U = w.start, Y = w.end;
-              if (Y === void 0 && (Y = U), "selectionStart" in T)
+              var U = w.start, K = w.end;
+              if (K === void 0 && (K = U), "selectionStart" in T)
                 T.selectionStart = U, T.selectionEnd = Math.min(
-                  Y,
+                  K,
                   T.value.length
                 );
               else {
@@ -8176,8 +8176,8 @@ Error generating stack: ` + c.message + `
             p = T, m.currentTarget = U;
             try {
               p(m);
-            } catch (Y) {
-              So(Y);
+            } catch (K) {
+              So(K);
             }
             m.currentTarget = null, p = w;
           }
@@ -8188,8 +8188,8 @@ Error generating stack: ` + c.message + `
             p = T, m.currentTarget = U;
             try {
               p(m);
-            } catch (Y) {
-              So(Y);
+            } catch (K) {
+              So(K);
             }
             m.currentTarget = null, p = w;
           }
@@ -8272,7 +8272,7 @@ Error generating stack: ` + c.message + `
         c = c.return;
       }
     Bf(function() {
-      var U = p, Y = Ac(o), Z = [];
+      var U = p, K = Ac(o), Z = [];
       e: {
         var F = hm.get(n);
         if (F !== void 0) {
@@ -8370,7 +8370,7 @@ Error generating stack: ` + c.message + `
             me,
             null,
             o,
-            Y
+            K
           ), Z.push({ event: F, listeners: Se }));
         }
       }
@@ -8378,19 +8378,19 @@ Error generating stack: ` + c.message + `
         e: {
           if (F = n === "mouseover" || n === "pointerover", q = n === "mouseout" || n === "pointerout", F && o !== Rc && (me = o.relatedTarget || o.fromElement) && (Na(me) || me[Oa]))
             break e;
-          if ((q || F) && (F = Y.window === Y ? Y : (F = Y.ownerDocument) ? F.defaultView || F.parentWindow : window, q ? (me = o.relatedTarget || o.toElement, q = U, me = me ? Na(me) : null, me !== null && (Xe = l(me), Se = me.tag, me !== Xe || Se !== 5 && Se !== 27 && Se !== 6) && (me = null)) : (q = null, me = U), q !== me)) {
+          if ((q || F) && (F = K.window === K ? K : (F = K.ownerDocument) ? F.defaultView || F.parentWindow : window, q ? (me = o.relatedTarget || o.toElement, q = U, me = me ? Na(me) : null, me !== null && (Xe = l(me), Se = me.tag, me !== Xe || Se !== 5 && Se !== 27 && Se !== 6) && (me = null)) : (q = null, me = U), q !== me)) {
             if (Se = jf, Q = "onMouseLeave", P = "onMouseEnter", D = "mouse", (n === "pointerout" || n === "pointerover") && (Se = Vf, Q = "onPointerLeave", P = "onPointerEnter", D = "pointer"), Xe = q == null ? F : zs(q), I = me == null ? F : zs(me), F = new Se(
               Q,
               D + "leave",
               q,
               o,
-              Y
-            ), F.target = Xe, F.relatedTarget = I, Q = null, Na(Y) === U && (Se = new Se(
+              K
+            ), F.target = Xe, F.relatedTarget = I, Q = null, Na(K) === U && (Se = new Se(
               P,
               D + "enter",
               me,
               o,
-              Y
+              K
             ), Se.target = I, Se.relatedTarget = Xe, Q = Se), Xe = Q, q && me)
               t: {
                 for (Se = bC, P = q, D = me, I = 0, Q = P; Q; Q = Se(Q))
@@ -8444,7 +8444,7 @@ Error generating stack: ` + c.message + `
               Z,
               Fe,
               o,
-              Y
+              K
             );
             break e;
           }
@@ -8463,13 +8463,13 @@ Error generating stack: ` + c.message + `
           case "contextmenu":
           case "mouseup":
           case "dragend":
-            zc = !1, rm(Z, o, Y);
+            zc = !1, rm(Z, o, K);
             break;
           case "selectionchange":
             if (OT) break;
           case "keydown":
           case "keyup":
-            rm(Z, o, Y);
+            rm(Z, o, K);
         }
         var _e;
         if (Ic)
@@ -8489,18 +8489,18 @@ Error generating stack: ` + c.message + `
           }
         else
           ja ? Kf(n, o) && (Pe = "onCompositionEnd") : n === "keydown" && o.keyCode === 229 && (Pe = "onCompositionStart");
-        Pe && (Hf && o.locale !== "ko" && (ja || Pe !== "onCompositionStart" ? Pe === "onCompositionEnd" && ja && (_e = Ff()) : (Ti = Y, Mc = "value" in Ti ? Ti.value : Ti.textContent, ja = !0)), pe = ol(U, Pe), 0 < pe.length && (Pe = new qf(
+        Pe && (Hf && o.locale !== "ko" && (ja || Pe !== "onCompositionStart" ? Pe === "onCompositionEnd" && ja && (_e = Ff()) : (Ti = K, Mc = "value" in Ti ? Ti.value : Ti.textContent, ja = !0)), pe = ol(U, Pe), 0 < pe.length && (Pe = new qf(
           Pe,
           n,
           null,
           o,
-          Y
+          K
         ), Z.push({ event: Pe, listeners: pe }), _e ? Pe.data = _e : (_e = Xf(o), _e !== null && (Pe.data = _e)))), (_e = CT ? kT(n, o) : ET(n, o)) && (Pe = ol(U, "onBeforeInput"), 0 < Pe.length && (pe = new qf(
           "onBeforeInput",
           "beforeinput",
           null,
           o,
-          Y
+          K
         ), Z.push({
           event: pe,
           listeners: Pe
@@ -8509,7 +8509,7 @@ Error generating stack: ` + c.message + `
           n,
           U,
           o,
-          Y
+          K
         );
       }
       Og(Z, s);
@@ -8900,34 +8900,34 @@ Error generating stack: ` + c.message + `
         var T = p = y = m = null, w = null, U = null;
         for (c in o)
           if (o.hasOwnProperty(c)) {
-            var Y = o[c];
-            if (Y != null)
+            var K = o[c];
+            if (K != null)
               switch (c) {
                 case "name":
-                  m = Y;
+                  m = K;
                   break;
                 case "type":
-                  y = Y;
+                  y = K;
                   break;
                 case "checked":
-                  w = Y;
+                  w = K;
                   break;
                 case "defaultChecked":
-                  U = Y;
+                  U = K;
                   break;
                 case "value":
-                  p = Y;
+                  p = K;
                   break;
                 case "defaultValue":
-                  T = Y;
+                  T = K;
                   break;
                 case "children":
                 case "dangerouslySetInnerHTML":
-                  if (Y != null)
+                  if (K != null)
                     throw Error(a(137, s));
                   break;
                 default:
-                  Ke(n, s, c, Y, o, null);
+                  Ke(n, s, c, K, o, null);
               }
           }
         Of(
@@ -9037,11 +9037,11 @@ Error generating stack: ` + c.message + `
         return;
       default:
         if (_c(s)) {
-          for (Y in o)
-            o.hasOwnProperty(Y) && (c = o[Y], c !== void 0 && dd(
+          for (K in o)
+            o.hasOwnProperty(K) && (c = o[K], c !== void 0 && dd(
               n,
               s,
-              Y,
+              K,
               c,
               o,
               void 0
@@ -9064,7 +9064,7 @@ Error generating stack: ` + c.message + `
       case "li":
         break;
       case "input":
-        var m = null, p = null, y = null, T = null, w = null, U = null, Y = null;
+        var m = null, p = null, y = null, T = null, w = null, U = null, K = null;
         for (q in o) {
           var Z = o[q];
           if (o.hasOwnProperty(q) && Z != null)
@@ -9093,7 +9093,7 @@ Error generating stack: ` + c.message + `
                 U = q;
                 break;
               case "defaultChecked":
-                Y = q;
+                K = q;
                 break;
               case "value":
                 y = q;
@@ -9123,7 +9123,7 @@ Error generating stack: ` + c.message + `
           T,
           w,
           U,
-          Y,
+          K,
           p,
           m
         );
@@ -9282,11 +9282,11 @@ Error generating stack: ` + c.message + `
               c,
               F
             );
-          for (Y in c)
-            F = c[Y], q = o[Y], !c.hasOwnProperty(Y) || F === q || F === void 0 && q === void 0 || dd(
+          for (K in c)
+            F = c[K], q = o[K], !c.hasOwnProperty(K) || F === q || F === void 0 && q === void 0 || dd(
               n,
               s,
-              Y,
+              K,
               F,
               c,
               q
@@ -9321,8 +9321,8 @@ Error generating stack: ` + c.message + `
           for (y = 0, T = m.responseEnd, c += 1; c < o.length; c++) {
             var w = o[c], U = w.startTime;
             if (U > T) break;
-            var Y = w.transferSize, Z = w.initiatorType;
-            Y && Lg(Z) && (w = w.responseEnd, y += Y * (w < T ? 1 : (T - U) / (w - U)));
+            var K = w.transferSize, Z = w.initiatorType;
+            K && Lg(Z) && (w = w.responseEnd, y += K * (w < T ? 1 : (T - U) / (w - U)));
           }
           if (--c, s += 8 * (p + y) / (m.duration / 1e3), n++, 10 < n) break;
         }
@@ -9679,8 +9679,8 @@ Error generating stack: ` + c.message + `
             o
           ), (o = bn.get(p)) && Sd(n, o);
           var w = y = c.createElement("link");
-          St(w), xt(w, "link", n), w._p = new Promise(function(U, Y) {
-            w.onload = U, w.onerror = Y;
+          St(w), xt(w, "link", n), w._p = new Promise(function(U, K) {
+            w.onload = U, w.onerror = K;
           }), w.addEventListener("load", function() {
             T.loading |= 1;
           }), w.addEventListener("error", function() {
@@ -10006,7 +10006,7 @@ Error generating stack: ` + c.message + `
   function GC(n, s, o, c, m, p, y, T, w) {
     this.tag = 1, this.containerInfo = n, this.pingCache = this.current = this.pendingChildren = null, this.timeoutHandle = -1, this.callbackNode = this.next = this.pendingContext = this.context = this.cancelPendingCommit = null, this.callbackPriority = 0, this.expirationTimes = vc(-1), this.entangledLanes = this.shellSuspendCounter = this.errorRecoveryDisabledLanes = this.expiredLanes = this.warmLanes = this.pingedLanes = this.suspendedLanes = this.pendingLanes = 0, this.entanglements = vc(0), this.hiddenUpdates = vc(null), this.identifierPrefix = c, this.onUncaughtError = m, this.onCaughtError = p, this.onRecoverableError = y, this.pooledCache = null, this.pooledCacheLanes = 0, this.formState = w, this.incompleteTransitions = /* @__PURE__ */ new Map();
   }
-  function nv(n, s, o, c, m, p, y, T, w, U, Y, Z) {
+  function nv(n, s, o, c, m, p, y, T, w, U, K, Z) {
     return n = new GC(
       n,
       s,
@@ -10014,7 +10014,7 @@ Error generating stack: ` + c.message + `
       y,
       w,
       U,
-      Y,
+      K,
       Z,
       T
     ), s = 1, p === !0 && (s |= 24), p = nn(3, null, null, s), n.current = p, p.stateNode = n, s = tu(), s.refCount++, n.pooledCache = s, s.refCount++, p.memoizedState = {
@@ -16170,14 +16170,14 @@ function Wk() {
       var e = function() {
       }, t = "undefined", a = typeof window !== t && typeof window.navigator !== t && /Trident\/|MSIE /.test(window.navigator.userAgent), r = ["trace", "debug", "info", "warn", "error"], l = {}, u = null;
       function d(C, A) {
-        var _ = C[A];
-        if (typeof _.bind == "function")
-          return _.bind(C);
+        var E = C[A];
+        if (typeof E.bind == "function")
+          return E.bind(C);
         try {
-          return Function.prototype.bind.call(_, C);
+          return Function.prototype.bind.call(E, C);
         } catch {
           return function() {
-            return Function.prototype.apply.apply(_, [C, arguments]);
+            return Function.prototype.apply.apply(E, [C, arguments]);
           };
         }
       }
@@ -16189,8 +16189,8 @@ function Wk() {
       }
       function g() {
         for (var C = this.getLevel(), A = 0; A < r.length; A++) {
-          var _ = r[A];
-          this[_] = A < C ? e : this.methodFactory(_, C, this.name);
+          var E = r[A];
+          this[E] = A < C ? e : this.methodFactory(E, C, this.name);
         }
         if (this.log = this.debug, typeof console === t && C < this.levels.SILENT)
           return "No console available for logging";
@@ -16200,11 +16200,11 @@ function Wk() {
           typeof console !== t && (g.call(this), this[C].apply(this, arguments));
         };
       }
-      function b(C, A, _) {
+      function b(C, A, E) {
         return f(C) || v.apply(this, arguments);
       }
       function S(C, A) {
-        var _ = this, z, O, E, x = "loglevel";
+        var E = this, B, O, _, x = "loglevel";
         typeof C == "string" ? x += ":" + C : typeof C == "symbol" && (x = void 0);
         function N($) {
           var J = (r[$] || "silent").toUpperCase();
@@ -16220,7 +16220,7 @@ function Wk() {
             }
           }
         }
-        function B() {
+        function z() {
           var $;
           if (!(typeof window === t || !x)) {
             try {
@@ -16233,7 +16233,7 @@ function Wk() {
                 le !== -1 && ($ = /^([^;]+)/.exec(J.slice(le + te.length + 1))[1]);
               } catch {
               }
-            return _.levels[$] === void 0 && ($ = void 0), $;
+            return E.levels[$] === void 0 && ($ = void 0), $;
           }
         }
         function X() {
@@ -16248,44 +16248,44 @@ function Wk() {
             }
           }
         }
-        function H($) {
+        function G($) {
           var J = $;
-          if (typeof J == "string" && _.levels[J.toUpperCase()] !== void 0 && (J = _.levels[J.toUpperCase()]), typeof J == "number" && J >= 0 && J <= _.levels.SILENT)
+          if (typeof J == "string" && E.levels[J.toUpperCase()] !== void 0 && (J = E.levels[J.toUpperCase()]), typeof J == "number" && J >= 0 && J <= E.levels.SILENT)
             return J;
           throw new TypeError("log.setLevel() called with invalid level: " + $);
         }
-        _.name = C, _.levels = {
+        E.name = C, E.levels = {
           TRACE: 0,
           DEBUG: 1,
           INFO: 2,
           WARN: 3,
           ERROR: 4,
           SILENT: 5
-        }, _.methodFactory = A || b, _.getLevel = function() {
-          return E ?? O ?? z;
-        }, _.setLevel = function($, J) {
-          return E = H($), J !== !1 && N(E), g.call(_);
-        }, _.setDefaultLevel = function($) {
-          O = H($), B() || _.setLevel($, !1);
-        }, _.resetLevel = function() {
-          E = null, X(), g.call(_);
-        }, _.enableAll = function($) {
-          _.setLevel(_.levels.TRACE, $);
-        }, _.disableAll = function($) {
-          _.setLevel(_.levels.SILENT, $);
-        }, _.rebuild = function() {
-          if (u !== _ && (z = H(u.getLevel())), g.call(_), u === _)
+        }, E.methodFactory = A || b, E.getLevel = function() {
+          return _ ?? O ?? B;
+        }, E.setLevel = function($, J) {
+          return _ = G($), J !== !1 && N(_), g.call(E);
+        }, E.setDefaultLevel = function($) {
+          O = G($), z() || E.setLevel($, !1);
+        }, E.resetLevel = function() {
+          _ = null, X(), g.call(E);
+        }, E.enableAll = function($) {
+          E.setLevel(E.levels.TRACE, $);
+        }, E.disableAll = function($) {
+          E.setLevel(E.levels.SILENT, $);
+        }, E.rebuild = function() {
+          if (u !== E && (B = G(u.getLevel())), g.call(E), u === E)
             for (var $ in l)
               l[$].rebuild();
-        }, z = H(u ? u.getLevel() : "WARN");
-        var G = B();
-        G != null && (E = H(G)), g.call(_);
+        }, B = G(u ? u.getLevel() : "WARN");
+        var H = z();
+        H != null && (_ = G(H)), g.call(E);
       }
       u = new S(), u.getLogger = function(A) {
         if (typeof A != "symbol" && typeof A != "string" || A === "")
           throw new TypeError("You must supply a name when creating a logger.");
-        var _ = l[A];
-        return _ || (_ = l[A] = new S(A, u.methodFactory)), _;
+        var E = l[A];
+        return E || (E = l[A] = new S(A, u.methodFactory)), E;
       };
       var k = typeof window !== t ? window.log : void 0;
       return u.noConflict = function() {
@@ -16390,16 +16390,16 @@ var kl = { exports: {} }, Yv;
 function iE() {
   if (Yv) return kl.exports;
   Yv = 1;
-  var i = typeof Reflect == "object" ? Reflect : null, e = i && typeof i.apply == "function" ? i.apply : function(x, N, B) {
-    return Function.prototype.apply.call(x, N, B);
+  var i = typeof Reflect == "object" ? Reflect : null, e = i && typeof i.apply == "function" ? i.apply : function(x, N, z) {
+    return Function.prototype.apply.call(x, N, z);
   }, t;
   i && typeof i.ownKeys == "function" ? t = i.ownKeys : Object.getOwnPropertySymbols ? t = function(x) {
     return Object.getOwnPropertyNames(x).concat(Object.getOwnPropertySymbols(x));
   } : t = function(x) {
     return Object.getOwnPropertyNames(x);
   };
-  function a(E) {
-    console && console.warn && console.warn(E);
+  function a(_) {
+    console && console.warn && console.warn(_);
   }
   var r = Number.isNaN || function(x) {
     return x !== x;
@@ -16407,21 +16407,21 @@ function iE() {
   function l() {
     l.init.call(this);
   }
-  kl.exports = l, kl.exports.once = _, l.EventEmitter = l, l.prototype._events = void 0, l.prototype._eventsCount = 0, l.prototype._maxListeners = void 0;
+  kl.exports = l, kl.exports.once = E, l.EventEmitter = l, l.prototype._events = void 0, l.prototype._eventsCount = 0, l.prototype._maxListeners = void 0;
   var u = 10;
-  function d(E) {
-    if (typeof E != "function")
-      throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof E);
+  function d(_) {
+    if (typeof _ != "function")
+      throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof _);
   }
   Object.defineProperty(l, "defaultMaxListeners", {
     enumerable: !0,
     get: function() {
       return u;
     },
-    set: function(E) {
-      if (typeof E != "number" || E < 0 || r(E))
-        throw new RangeError('The value of "defaultMaxListeners" is out of range. It must be a non-negative number. Received ' + E + ".");
-      u = E;
+    set: function(_) {
+      if (typeof _ != "number" || _ < 0 || r(_))
+        throw new RangeError('The value of "defaultMaxListeners" is out of range. It must be a non-negative number. Received ' + _ + ".");
+      u = _;
     }
   }), l.init = function() {
     (this._events === void 0 || this._events === Object.getPrototypeOf(this)._events) && (this._events = /* @__PURE__ */ Object.create(null), this._eventsCount = 0), this._maxListeners = this._maxListeners || void 0;
@@ -16430,41 +16430,41 @@ function iE() {
       throw new RangeError('The value of "n" is out of range. It must be a non-negative number. Received ' + x + ".");
     return this._maxListeners = x, this;
   };
-  function h(E) {
-    return E._maxListeners === void 0 ? l.defaultMaxListeners : E._maxListeners;
+  function h(_) {
+    return _._maxListeners === void 0 ? l.defaultMaxListeners : _._maxListeners;
   }
   l.prototype.getMaxListeners = function() {
     return h(this);
   }, l.prototype.emit = function(x) {
-    for (var N = [], B = 1; B < arguments.length; B++) N.push(arguments[B]);
-    var X = x === "error", H = this._events;
-    if (H !== void 0) X = X && H.error === void 0;
+    for (var N = [], z = 1; z < arguments.length; z++) N.push(arguments[z]);
+    var X = x === "error", G = this._events;
+    if (G !== void 0) X = X && G.error === void 0;
     else if (!X) return !1;
     if (X) {
-      var G;
-      if (N.length > 0 && (G = N[0]), G instanceof Error)
-        throw G;
-      var $ = new Error("Unhandled error." + (G ? " (" + G.message + ")" : ""));
-      throw $.context = G, $;
+      var H;
+      if (N.length > 0 && (H = N[0]), H instanceof Error)
+        throw H;
+      var $ = new Error("Unhandled error." + (H ? " (" + H.message + ")" : ""));
+      throw $.context = H, $;
     }
-    var J = H[x];
+    var J = G[x];
     if (J === void 0) return !1;
     if (typeof J == "function")
       e(J, this, N);
     else
-      for (var te = J.length, le = k(J, te), B = 0; B < te; ++B) e(le[B], this, N);
+      for (var te = J.length, le = k(J, te), z = 0; z < te; ++z) e(le[z], this, N);
     return !0;
   };
-  function f(E, x, N, B) {
-    var X, H, G;
-    if (d(N), H = E._events, H === void 0 ? (H = E._events = /* @__PURE__ */ Object.create(null), E._eventsCount = 0) : (H.newListener !== void 0 && (E.emit("newListener", x, N.listener ? N.listener : N), H = E._events), G = H[x]), G === void 0)
-      G = H[x] = N, ++E._eventsCount;
-    else if (typeof G == "function" ? G = H[x] = B ? [N, G] : [G, N] : B ? G.unshift(N) : G.push(N), X = h(E), X > 0 && G.length > X && !G.warned) {
-      G.warned = !0;
-      var $ = new Error("Possible EventEmitter memory leak detected. " + G.length + " " + String(x) + " listeners added. Use emitter.setMaxListeners() to increase limit");
-      $.name = "MaxListenersExceededWarning", $.emitter = E, $.type = x, $.count = G.length, a($);
+  function f(_, x, N, z) {
+    var X, G, H;
+    if (d(N), G = _._events, G === void 0 ? (G = _._events = /* @__PURE__ */ Object.create(null), _._eventsCount = 0) : (G.newListener !== void 0 && (_.emit("newListener", x, N.listener ? N.listener : N), G = _._events), H = G[x]), H === void 0)
+      H = G[x] = N, ++_._eventsCount;
+    else if (typeof H == "function" ? H = G[x] = z ? [N, H] : [H, N] : z ? H.unshift(N) : H.push(N), X = h(_), X > 0 && H.length > X && !H.warned) {
+      H.warned = !0;
+      var $ = new Error("Possible EventEmitter memory leak detected. " + H.length + " " + String(x) + " listeners added. Use emitter.setMaxListeners() to increase limit");
+      $.name = "MaxListenersExceededWarning", $.emitter = _, $.type = x, $.count = H.length, a($);
     }
-    return E;
+    return _;
   }
   l.prototype.addListener = function(x, N) {
     return f(this, x, N, !1);
@@ -16475,71 +16475,71 @@ function iE() {
     if (!this.fired)
       return this.target.removeListener(this.type, this.wrapFn), this.fired = !0, arguments.length === 0 ? this.listener.call(this.target) : this.listener.apply(this.target, arguments);
   }
-  function v(E, x, N) {
-    var B = {
+  function v(_, x, N) {
+    var z = {
       fired: !1,
       wrapFn: void 0,
-      target: E,
+      target: _,
       type: x,
       listener: N
-    }, X = g.bind(B);
-    return X.listener = N, B.wrapFn = X, X;
+    }, X = g.bind(z);
+    return X.listener = N, z.wrapFn = X, X;
   }
   l.prototype.once = function(x, N) {
     return d(N), this.on(x, v(this, x, N)), this;
   }, l.prototype.prependOnceListener = function(x, N) {
     return d(N), this.prependListener(x, v(this, x, N)), this;
   }, l.prototype.removeListener = function(x, N) {
-    var B, X, H, G, $;
+    var z, X, G, H, $;
     if (d(N), X = this._events, X === void 0) return this;
-    if (B = X[x], B === void 0) return this;
-    if (B === N || B.listener === N)
-      --this._eventsCount === 0 ? this._events = /* @__PURE__ */ Object.create(null) : (delete X[x], X.removeListener && this.emit("removeListener", x, B.listener || N));
-    else if (typeof B != "function") {
-      for (H = -1, G = B.length - 1; G >= 0; G--)
-        if (B[G] === N || B[G].listener === N) {
-          $ = B[G].listener, H = G;
+    if (z = X[x], z === void 0) return this;
+    if (z === N || z.listener === N)
+      --this._eventsCount === 0 ? this._events = /* @__PURE__ */ Object.create(null) : (delete X[x], X.removeListener && this.emit("removeListener", x, z.listener || N));
+    else if (typeof z != "function") {
+      for (G = -1, H = z.length - 1; H >= 0; H--)
+        if (z[H] === N || z[H].listener === N) {
+          $ = z[H].listener, G = H;
           break;
         }
-      if (H < 0) return this;
-      H === 0 ? B.shift() : C(B, H), B.length === 1 && (X[x] = B[0]), X.removeListener !== void 0 && this.emit("removeListener", x, $ || N);
+      if (G < 0) return this;
+      G === 0 ? z.shift() : C(z, G), z.length === 1 && (X[x] = z[0]), X.removeListener !== void 0 && this.emit("removeListener", x, $ || N);
     }
     return this;
   }, l.prototype.off = l.prototype.removeListener, l.prototype.removeAllListeners = function(x) {
-    var N, B, X;
-    if (B = this._events, B === void 0) return this;
-    if (B.removeListener === void 0)
-      return arguments.length === 0 ? (this._events = /* @__PURE__ */ Object.create(null), this._eventsCount = 0) : B[x] !== void 0 && (--this._eventsCount === 0 ? this._events = /* @__PURE__ */ Object.create(null) : delete B[x]), this;
+    var N, z, X;
+    if (z = this._events, z === void 0) return this;
+    if (z.removeListener === void 0)
+      return arguments.length === 0 ? (this._events = /* @__PURE__ */ Object.create(null), this._eventsCount = 0) : z[x] !== void 0 && (--this._eventsCount === 0 ? this._events = /* @__PURE__ */ Object.create(null) : delete z[x]), this;
     if (arguments.length === 0) {
-      var H = Object.keys(B), G;
-      for (X = 0; X < H.length; ++X)
-        G = H[X], G !== "removeListener" && this.removeAllListeners(G);
+      var G = Object.keys(z), H;
+      for (X = 0; X < G.length; ++X)
+        H = G[X], H !== "removeListener" && this.removeAllListeners(H);
       return this.removeAllListeners("removeListener"), this._events = /* @__PURE__ */ Object.create(null), this._eventsCount = 0, this;
     }
-    if (N = B[x], typeof N == "function")
+    if (N = z[x], typeof N == "function")
       this.removeListener(x, N);
     else if (N !== void 0)
       for (X = N.length - 1; X >= 0; X--)
         this.removeListener(x, N[X]);
     return this;
   };
-  function b(E, x, N) {
-    var B = E._events;
-    if (B === void 0) return [];
-    var X = B[x];
+  function b(_, x, N) {
+    var z = _._events;
+    if (z === void 0) return [];
+    var X = z[x];
     return X === void 0 ? [] : typeof X == "function" ? N ? [X.listener || X] : [X] : N ? A(X) : k(X, X.length);
   }
   l.prototype.listeners = function(x) {
     return b(this, x, !0);
   }, l.prototype.rawListeners = function(x) {
     return b(this, x, !1);
-  }, l.listenerCount = function(E, x) {
-    return typeof E.listenerCount == "function" ? E.listenerCount(x) : S.call(E, x);
+  }, l.listenerCount = function(_, x) {
+    return typeof _.listenerCount == "function" ? _.listenerCount(x) : S.call(_, x);
   }, l.prototype.listenerCount = S;
-  function S(E) {
+  function S(_) {
     var x = this._events;
     if (x !== void 0) {
-      var N = x[E];
+      var N = x[_];
       if (typeof N == "function")
         return 1;
       if (N !== void 0)
@@ -16550,46 +16550,46 @@ function iE() {
   l.prototype.eventNames = function() {
     return this._eventsCount > 0 ? t(this._events) : [];
   };
-  function k(E, x) {
-    for (var N = new Array(x), B = 0; B < x; ++B) N[B] = E[B];
+  function k(_, x) {
+    for (var N = new Array(x), z = 0; z < x; ++z) N[z] = _[z];
     return N;
   }
-  function C(E, x) {
-    for (; x + 1 < E.length; x++) E[x] = E[x + 1];
-    E.pop();
+  function C(_, x) {
+    for (; x + 1 < _.length; x++) _[x] = _[x + 1];
+    _.pop();
   }
-  function A(E) {
-    for (var x = new Array(E.length), N = 0; N < x.length; ++N)
-      x[N] = E[N].listener || E[N];
+  function A(_) {
+    for (var x = new Array(_.length), N = 0; N < x.length; ++N)
+      x[N] = _[N].listener || _[N];
     return x;
   }
-  function _(E, x) {
-    return new Promise(function(N, B) {
-      function X(G) {
-        E.removeListener(x, H), B(G);
+  function E(_, x) {
+    return new Promise(function(N, z) {
+      function X(H) {
+        _.removeListener(x, G), z(H);
       }
-      function H() {
-        typeof E.removeListener == "function" && E.removeListener("error", X), N([].slice.call(arguments));
+      function G() {
+        typeof _.removeListener == "function" && _.removeListener("error", X), N([].slice.call(arguments));
       }
-      O(E, x, H, {
+      O(_, x, G, {
         once: !0
-      }), x !== "error" && z(E, X, {
+      }), x !== "error" && B(_, X, {
         once: !0
       });
     });
   }
-  function z(E, x, N) {
-    typeof E.on == "function" && O(E, "error", x, N);
+  function B(_, x, N) {
+    typeof _.on == "function" && O(_, "error", x, N);
   }
-  function O(E, x, N, B) {
-    if (typeof E.on == "function")
-      B.once ? E.once(x, N) : E.on(x, N);
-    else if (typeof E.addEventListener == "function")
-      E.addEventListener(x, function X(H) {
-        B.once && E.removeEventListener(x, X), N(H);
+  function O(_, x, N, z) {
+    if (typeof _.on == "function")
+      z.once ? _.once(x, N) : _.on(x, N);
+    else if (typeof _.addEventListener == "function")
+      _.addEventListener(x, function X(G) {
+        z.once && _.removeEventListener(x, X), N(G);
       });
     else
-      throw new TypeError('The "emitter" argument must be of type EventEmitter. Received type ' + typeof E);
+      throw new TypeError('The "emitter" argument must be of type EventEmitter. Received type ' + typeof _);
   }
   return kl.exports;
 }
@@ -19821,68 +19821,68 @@ class sf {
         var b, S;
         try {
           let k = !1;
-          const C = (E) => R(this, void 0, void 0, function* () {
+          const C = (_) => R(this, void 0, void 0, function* () {
             if (k)
               return;
             k = !0;
-            const x = E instanceof Event ? E.currentTarget : E, N = WE(x, "Abort handler called");
-            this.streamWriter && !this.isDisconnected ? this.sendLeave().then(() => this.close(N)).catch((B) => {
-              this.log.error(B), this.close();
+            const x = _ instanceof Event ? _.currentTarget : _, N = WE(x, "Abort handler called");
+            this.streamWriter && !this.isDisconnected ? this.sendLeave().then(() => this.close(N)).catch((z) => {
+              this.log.error(z), this.close();
             }) : this.close(), A(), v(Te.cancelled(N));
           });
           r == null || r.addEventListener("abort", C);
           const A = () => {
-            clearTimeout(_), r == null || r.removeEventListener("abort", C);
-          }, _ = setTimeout(() => {
+            clearTimeout(E), r == null || r.removeEventListener("abort", C);
+          }, E = setTimeout(() => {
             C(Te.timeout("room connection has timed out (signal)"));
-          }, a.websocketTimeout), z = (E, x) => {
-            this.handleSignalConnected(E, _, x);
+          }, a.websocketTimeout), B = (_, x) => {
+            this.handleSignalConnected(_, E, x);
           }, O = new URL(h);
           O.searchParams.has("access_token") && O.searchParams.set("access_token", "<redacted>"), this.log.debug("connecting to ".concat(O), Object.assign({
             reconnect: a.reconnect,
             reconnectReason: a.reconnectReason
           }, this.logContext)), this.ws && (yield this.close(!1)), this.ws = new c_(h);
           try {
-            this.ws.closed.then((G) => {
+            this.ws.closed.then((H) => {
               var $;
-              this.isEstablishingConnection && v(Te.internal("Websocket got closed during a (re)connection attempt: ".concat(G.reason))), G.closeCode !== 1e3 && (this.log.warn("websocket closed", Object.assign(Object.assign({}, this.logContext), {
-                reason: G.reason,
-                code: G.closeCode,
-                wasClean: G.closeCode === 1e3,
+              this.isEstablishingConnection && v(Te.internal("Websocket got closed during a (re)connection attempt: ".concat(H.reason))), H.closeCode !== 1e3 && (this.log.warn("websocket closed", Object.assign(Object.assign({}, this.logContext), {
+                reason: H.reason,
+                code: H.closeCode,
+                wasClean: H.closeCode === 1e3,
                 state: this.state
-              })), this.state === Ze.CONNECTED && this.handleOnClose(($ = G.reason) !== null && $ !== void 0 ? $ : "Unexpected WS error"));
-            }).catch((G) => {
-              this.isEstablishingConnection && v(Te.internal("Websocket error during a (re)connection attempt: ".concat(G)));
+              })), this.state === Ze.CONNECTED && this.handleOnClose(($ = H.reason) !== null && $ !== void 0 ? $ : "Unexpected WS error"));
+            }).catch((H) => {
+              this.isEstablishingConnection && v(Te.internal("Websocket error during a (re)connection attempt: ".concat(H)));
             });
-            const E = yield this.ws.opened.catch((G) => R(this, void 0, void 0, function* () {
+            const _ = yield this.ws.opened.catch((H) => R(this, void 0, void 0, function* () {
               if (this.state !== Ze.CONNECTED) {
-                this.state = Ze.DISCONNECTED, clearTimeout(_);
-                const $ = yield this.handleConnectionError(G, f);
+                this.state = Ze.DISCONNECTED, clearTimeout(E);
+                const $ = yield this.handleConnectionError(H, f);
                 v($);
                 return;
               }
-              this.handleWSError(G), v(G);
+              this.handleWSError(H), v(H);
             }));
-            if (clearTimeout(_), !E)
+            if (clearTimeout(E), !_)
               return;
-            const x = E.readable.getReader();
-            this.streamWriter = E.writable.getWriter();
+            const x = _.readable.getReader();
+            this.streamWriter = _.writable.getWriter();
             const N = yield x.read();
             if (x.releaseLock(), !N.value)
               throw Te.internal("no message received as first message");
-            const B = d0(N.value), X = this.validateFirstMessage(B, (b = a.reconnect) !== null && b !== void 0 ? b : !1);
+            const z = d0(N.value), X = this.validateFirstMessage(z, (b = a.reconnect) !== null && b !== void 0 ? b : !1);
             if (!X.isValid) {
               v(X.error);
               return;
             }
-            ((S = B.message) === null || S === void 0 ? void 0 : S.case) === "join" && (this.pingTimeoutDuration = B.message.value.pingTimeout, this.pingIntervalDuration = B.message.value.pingInterval, this.pingTimeoutDuration && this.pingTimeoutDuration > 0 && this.log.debug("ping config", Object.assign(Object.assign({}, this.logContext), {
+            ((S = z.message) === null || S === void 0 ? void 0 : S.case) === "join" && (this.pingTimeoutDuration = z.message.value.pingTimeout, this.pingIntervalDuration = z.message.value.pingInterval, this.pingTimeoutDuration && this.pingTimeoutDuration > 0 && this.log.debug("ping config", Object.assign(Object.assign({}, this.logContext), {
               timeout: this.pingTimeoutDuration,
               interval: this.pingIntervalDuration
             })));
-            const H = X.shouldProcessFirstMessage ? B : void 0;
-            z(E, H), g(X.response);
-          } catch (E) {
-            v(E);
+            const G = X.shouldProcessFirstMessage ? z : void 0;
+            B(_, G), g(X.response);
+          } catch (_) {
+            v(_);
           } finally {
             A();
           }
@@ -20984,17 +20984,17 @@ function of(i, e, t) {
   var b = function() {
     var S = [].slice.call(arguments), k = this;
     return new Promise(function(C, A) {
-      var _ = u && l === void 0;
+      var E = u && l === void 0;
       if (l !== void 0 && clearTimeout(l), l = setTimeout(function() {
         if (l = void 0, f = Date.now(), !u) {
           var O = i.apply(k, S);
-          d && d(O), g.forEach(function(E) {
-            return (0, E.resolve)(O);
+          d && d(O), g.forEach(function(_) {
+            return (0, _.resolve)(O);
           }), g = [];
         }
-      }, v()), _) {
-        var z = i.apply(k, S);
-        return d && d(z), C(z);
+      }, v()), E) {
+        var B = i.apply(k, S);
+        return d && d(B), C(B);
       }
       g.push({
         resolve: C,
@@ -22405,13 +22405,13 @@ function Oh(i, e, t, a) {
     // is provided. So we'll use the legacy SVC specification for now.
     // TODO: when we upstream libwebrtc, this will need additional verification
     jn() || (A == null ? void 0 : A.name) === "Chrome" && qn(A == null ? void 0 : A.version, "113") < 0) {
-      const _ = k.suffix == "h" ? 2 : 3, z = LE(A);
+      const E = k.suffix == "h" ? 2 : 3, B = LE(A);
       for (let O = 0; O < k.spatial; O += 1)
         C.push({
           rid: Dh[2 - O],
-          maxBitrate: u.maxBitrate / Math.pow(_, O),
+          maxBitrate: u.maxBitrate / Math.pow(E, O),
           maxFramerate: v.encoding.maxFramerate,
-          scaleResolutionDownBy: z ? Math.pow(2, O) : void 0
+          scaleResolutionDownBy: B ? Math.pow(2, O) : void 0
         });
       C[0].scalabilityMode = h;
     } else
@@ -22969,8 +22969,8 @@ function A0(i, e, t, a, r, l, u) {
         var k;
         let C = (k = b.rid) !== null && k !== void 0 ? k : "";
         C === "" && (C = "q");
-        const A = Wb(C), _ = t.find((z) => z.quality === A);
-        _ && b.active !== _.enabled && (g = !0, b.active = _.enabled, l.debug("setting layer ".concat(_.quality, " to ").concat(b.active ? "enabled" : "disabled"), u), wa() && (_.enabled ? (b.scaleResolutionDownBy = e[S].scaleResolutionDownBy, b.maxBitrate = e[S].maxBitrate, b.maxFrameRate = e[S].maxFrameRate) : (b.scaleResolutionDownBy = 4, b.maxBitrate = 10, b.maxFrameRate = 2)));
+        const A = Wb(C), E = t.find((B) => B.quality === A);
+        E && b.active !== E.enabled && (g = !0, b.active = E.enabled, l.debug("setting layer ".concat(E.quality, " to ").concat(b.active ? "enabled" : "disabled"), u), wa() && (E.enabled ? (b.scaleResolutionDownBy = e[S].scaleResolutionDownBy, b.maxBitrate = e[S].maxBitrate, b.maxFrameRate = e[S].maxFrameRate) : (b.scaleResolutionDownBy = 4, b.maxBitrate = 10, b.maxFrameRate = 2)));
       })), g && (h.encodings = f, l.debug("setting encodings", Object.assign(Object.assign({}, u), {
         encodings: h.encodings
       })), yield i.setParameters(h));
@@ -24321,18 +24321,18 @@ class nR {
         write(C) {
           return R(this, void 0, void 0, function* () {
             for (const A of XE(C, O0)) {
-              const _ = new Ql({
+              const E = new Ql({
                 content: A,
                 streamId: l,
                 chunkIndex: Ea(g)
-              }), z = new Bt({
+              }), B = new Bt({
                 destinationIdentities: h,
                 value: {
                   case: "streamChunk",
-                  value: _
+                  value: E
                 }
               });
-              yield v.sendDataPacket(z, we.RELIABLE), g += 1;
+              yield v.sendDataPacket(B, we.RELIABLE), g += 1;
             }
           });
         },
@@ -24427,14 +24427,14 @@ class nR {
       });
       yield this.engine.sendDataPacket(b, we.RELIABLE);
       let S = 0;
-      const k = new Ft(), C = this.engine, A = this.log, _ = new WritableStream({
+      const k = new Ft(), C = this.engine, A = this.log, E = new WritableStream({
         write(O) {
           return R(this, void 0, void 0, function* () {
-            const E = yield k.lock();
+            const _ = yield k.lock();
             let x = 0;
             try {
               for (; x < O.byteLength; ) {
-                const N = O.slice(x, x + O0), B = new Bt({
+                const N = O.slice(x, x + O0), z = new Bt({
                   destinationIdentities: f,
                   value: {
                     case: "streamChunk",
@@ -24445,10 +24445,10 @@ class nR {
                     })
                   }
                 });
-                yield C.sendDataPacket(B, we.RELIABLE), S += 1, x += N.byteLength;
+                yield C.sendDataPacket(z, we.RELIABLE), S += 1, x += N.byteLength;
               }
             } finally {
-              E();
+              _();
             }
           });
         },
@@ -24456,21 +24456,21 @@ class nR {
           return R(this, void 0, void 0, function* () {
             const O = new Jl({
               streamId: h
-            }), E = new Bt({
+            }), _ = new Bt({
               destinationIdentities: f,
               value: {
                 case: "streamTrailer",
                 value: O
               }
             });
-            yield C.sendDataPacket(E, we.RELIABLE);
+            yield C.sendDataPacket(_, we.RELIABLE);
           });
         },
         abort(O) {
           A.error("Sink error:", O);
         }
       });
-      return new tR(_, g);
+      return new tR(E, g);
     });
   }
 }
@@ -25057,12 +25057,12 @@ function fc(i, e) {
         let C;
         const A = S ? f.audio : f.video;
         typeof A != "boolean" && (C = A);
-        const _ = b.getSettings().deviceId;
-        C != null && C.deviceId && Zi(C.deviceId) !== _ ? C.deviceId = _ : C || (C = {
-          deviceId: _
+        const E = b.getSettings().deviceId;
+        C != null && C.deviceId && Zi(C.deviceId) !== E ? C.deviceId = E : C || (C = {
+          deviceId: E
         });
-        const z = N_(b, C, e);
-        return z.kind === W.Kind.Video ? z.source = W.Source.Camera : z.kind === W.Kind.Audio && (z.source = W.Source.Microphone), z.mediaStream = v, zn(z) && a ? yield z.setProcessor(a) : ta(z) && r && (yield z.setProcessor(r)), z;
+        const B = N_(b, C, e);
+        return B.kind === W.Kind.Video ? B.source = W.Source.Camera : B.kind === W.Kind.Audio && (B.source = W.Source.Microphone), B.mediaStream = v, zn(B) && a ? yield B.setProcessor(a) : ta(B) && r && (yield B.setProcessor(r)), B;
       })));
     } catch (v) {
       if (!t)
@@ -25348,14 +25348,14 @@ class cR extends iS {
         return;
       const k = yield S.videoTrack.setPublishingCodecs(d.subscribedCodecs);
       try {
-        for (var C = !0, A = mi(k), _; _ = yield A.next(), h = _.done, !h; C = !0) {
-          v = _.value, C = !1;
-          const z = v;
-          CE(z) && (this.log.debug("publish ".concat(z, " for ").concat(S.videoTrack.sid), Object.assign(Object.assign({}, this.logContext), De(S))), yield this.publishAdditionalCodecForTrack(S.videoTrack, z, S.options));
+        for (var C = !0, A = mi(k), E; E = yield A.next(), h = E.done, !h; C = !0) {
+          v = E.value, C = !1;
+          const B = v;
+          CE(B) && (this.log.debug("publish ".concat(B, " for ").concat(S.videoTrack.sid), Object.assign(Object.assign({}, this.logContext), De(S))), yield this.publishAdditionalCodecForTrack(S.videoTrack, B, S.options));
         }
-      } catch (z) {
+      } catch (B) {
         f = {
-          error: z
+          error: B
         };
       } finally {
         try {
@@ -25706,16 +25706,16 @@ class cR extends iS {
           v = a.getConstraints();
         else {
           v = a.constraints;
-          let _;
+          let E;
           switch (a.source) {
             case W.Source.Microphone:
-              _ = "audioinput";
+              E = "audioinput";
               break;
             case W.Source.Camera:
-              _ = "videoinput";
+              E = "videoinput";
           }
-          _ && l.activeDeviceMap.has(_) && (v = Object.assign(Object.assign({}, v), {
-            deviceId: l.activeDeviceMap.get(_)
+          E && l.activeDeviceMap.has(E) && (v = Object.assign(Object.assign({}, v), {
+            deviceId: l.activeDeviceMap.get(E)
           }));
         }
         if (a instanceof MediaStreamTrack)
@@ -25741,43 +25741,43 @@ class cR extends iS {
             loggerContextCb: () => l.logContext
           });
         let b;
-        if (l.trackPublications.forEach((_) => {
-          _.track && _.track === a && (b = _);
+        if (l.trackPublications.forEach((E) => {
+          E.track && E.track === a && (b = E);
         }), b)
           return l.log.warn("track has already been published, skipping", Object.assign(Object.assign({}, l.logContext), De(b))), b;
         const S = Object.assign(Object.assign({}, l.roomOptions.publishDefaults), r), k = "channelCount" in a.mediaStreamTrack.getSettings() && // @ts-ignore `channelCount` on getSettings() is currently only available for Safari, but is generally the best way to determine a stereo track https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackSettings/channelCount
         a.mediaStreamTrack.getSettings().channelCount === 2 || a.mediaStreamTrack.getConstraints().channelCount === 2, C = (h = S.forceStereo) !== null && h !== void 0 ? h : k;
         C && (S.dtx === void 0 && l.log.info("Opus DTX will be disabled for stereo tracks by default. Enable them explicitly to make it work.", Object.assign(Object.assign({}, l.logContext), De(a))), S.red === void 0 && l.log.info("Opus RED will be disabled for stereo tracks by default. Enable them explicitly to make it work."), (f = S.dtx) !== null && f !== void 0 || (S.dtx = !1), (g = S.red) !== null && g !== void 0 || (S.red = !1)), !BE() && l.roomOptions.e2ee && (l.log.info("End-to-end encryption is set up, simulcast publishing will be disabled on Safari versions and iOS browsers running iOS < v17.2", Object.assign({}, l.logContext)), S.simulcast = !1), S.source && (a.source = S.source);
-        const A = new Promise((_, z) => R(l, void 0, void 0, function* () {
+        const A = new Promise((E, B) => R(l, void 0, void 0, function* () {
           try {
             if (this.engine.client.currentState !== Ze.CONNECTED) {
               this.log.debug("deferring track publication until signal is connected", Object.assign(Object.assign({}, this.logContext), {
                 track: De(a)
               }));
               let O = !1;
-              const E = setTimeout(() => {
-                O = !0, a.stop(), z(new e0("publishing rejected as engine not connected within timeout", 408));
+              const _ = setTimeout(() => {
+                O = !0, a.stop(), B(new e0("publishing rejected as engine not connected within timeout", 408));
               }, 15e3);
-              if (yield this.waitUntilEngineConnected(), clearTimeout(E), O)
+              if (yield this.waitUntilEngineConnected(), clearTimeout(_), O)
                 return;
               const x = yield this.publish(a, S, C);
-              _(x);
+              E(x);
             } else
               try {
                 const O = yield this.publish(a, S, C);
-                _(O);
+                E(O);
               } catch (O) {
-                z(O);
+                B(O);
               }
           } catch (O) {
-            z(O);
+            B(O);
           }
         }));
         l.pendingPublishPromises.set(a, A);
         try {
           return yield A;
-        } catch (_) {
-          throw _;
+        } catch (E) {
+          throw E;
         } finally {
           l.pendingPublishPromises.delete(a);
         }
@@ -25801,11 +25801,11 @@ class cR extends iS {
       var r, l, u, d, h, f, g, v, b, S;
       if (!this.hasPermissionsToPublish(e))
         throw new e0("failed to publish track, insufficient permissions", 403);
-      Array.from(this.trackPublications.values()).find((H) => Rs(e) && H.source === e.source) && e.source !== W.Source.Unknown && this.log.info("publishing a second track with the same source: ".concat(e.source), Object.assign(Object.assign({}, this.logContext), De(e))), t.stopMicTrackOnMute && zn(e) && (e.stopOnMute = !0), e.source === W.Source.ScreenShare && wa() && (t.simulcast = !1), t.videoCodec === "av1" && !NE() && (t.videoCodec = void 0), t.videoCodec === "vp9" && !PE() && (t.videoCodec = void 0), t.videoCodec === void 0 && (t.videoCodec = Mh), this.enabledPublishVideoCodecs.length > 0 && (this.enabledPublishVideoCodecs.some((H) => t.videoCodec === jr(H.mime)) || (t.videoCodec = jr(this.enabledPublishVideoCodecs[0].mime)));
+      Array.from(this.trackPublications.values()).find((G) => Rs(e) && G.source === e.source) && e.source !== W.Source.Unknown && this.log.info("publishing a second track with the same source: ".concat(e.source), Object.assign(Object.assign({}, this.logContext), De(e))), t.stopMicTrackOnMute && zn(e) && (e.stopOnMute = !0), e.source === W.Source.ScreenShare && wa() && (t.simulcast = !1), t.videoCodec === "av1" && !NE() && (t.videoCodec = void 0), t.videoCodec === "vp9" && !PE() && (t.videoCodec = void 0), t.videoCodec === void 0 && (t.videoCodec = Mh), this.enabledPublishVideoCodecs.length > 0 && (this.enabledPublishVideoCodecs.some((G) => t.videoCodec === jr(G.mime)) || (t.videoCodec = jr(this.enabledPublishVideoCodecs[0].mime)));
       const C = t.videoCodec;
       e.on(se.Muted, this.onTrackMuted), e.on(se.Unmuted, this.onTrackUnmuted), e.on(se.Ended, this.handleTrackEnded), e.on(se.UpstreamPaused, this.onTrackUpstreamPaused), e.on(se.UpstreamResumed, this.onTrackUpstreamResumed), e.on(se.AudioTrackFeatureUpdate, this.onTrackFeatureUpdate);
-      const A = [], _ = !(!((r = t.dtx) !== null && r !== void 0) || r), z = e.getSourceTrackSettings();
-      z.autoGainControl && A.push(Ct.TF_AUTO_GAIN_CONTROL), z.echoCancellation && A.push(Ct.TF_ECHO_CANCELLATION), z.noiseSuppression && A.push(Ct.TF_NOISE_SUPPRESSION), z.channelCount && z.channelCount > 1 && A.push(Ct.TF_STEREO), _ && A.push(Ct.TF_NO_DTX), ui(e) && e.hasPreConnectBuffer && A.push(Ct.TF_PRECONNECT_BUFFER);
+      const A = [], E = !(!((r = t.dtx) !== null && r !== void 0) || r), B = e.getSourceTrackSettings();
+      B.autoGainControl && A.push(Ct.TF_AUTO_GAIN_CONTROL), B.echoCancellation && A.push(Ct.TF_ECHO_CANCELLATION), B.noiseSuppression && A.push(Ct.TF_NOISE_SUPPRESSION), B.channelCount && B.channelCount > 1 && A.push(Ct.TF_STEREO), E && A.push(Ct.TF_NO_DTX), ui(e) && e.hasPreConnectBuffer && A.push(Ct.TF_PRECONNECT_BUFFER);
       const O = new Qr({
         // get local track id for use during publishing
         cid: e.mediaStreamTrack.id,
@@ -25813,7 +25813,7 @@ class cR extends iS {
         type: W.kindToProto(e.kind),
         muted: e.isMuted,
         source: W.sourceToProto(e.source),
-        disableDtx: _,
+        disableDtx: E,
         encryption: this.encryptionType,
         stereo: a,
         disableRed: this.isE2EEEnabled || !(!((l = t.red) !== null && l !== void 0) || l),
@@ -25821,24 +25821,24 @@ class cR extends iS {
         backupCodecPolicy: t == null ? void 0 : t.backupCodecPolicy,
         audioFeatures: A
       });
-      let E;
+      let _;
       if (e.kind === W.Kind.Video) {
-        let H = {
+        let G = {
           width: 0,
           height: 0
         };
         try {
-          H = yield e.waitForDimensions();
+          G = yield e.waitForDimensions();
         } catch {
           const $ = (d = (u = this.roomOptions.videoCaptureDefaults) === null || u === void 0 ? void 0 : u.resolution) !== null && d !== void 0 ? d : Jr.h720.resolution;
-          H = {
+          G = {
             width: $.width,
             height: $.height
           }, this.log.error("could not determine track dimensions, using defaults", Object.assign(Object.assign(Object.assign({}, this.logContext), De(e)), {
-            dims: H
+            dims: G
           }));
         }
-        O.width = H.width, O.height = H.height, Gi(e) && (Mn(C) && (e.source === W.Source.ScreenShare && (t.scalabilityMode = "L1T3", "contentHint" in e.mediaStreamTrack && (e.mediaStreamTrack.contentHint = "motion", this.log.info("forcing contentHint to motion for screenshare with SVC codecs", Object.assign(Object.assign({}, this.logContext), De(e))))), t.scalabilityMode = (h = t.scalabilityMode) !== null && h !== void 0 ? h : "L3T3_KEY"), O.simulcastCodecs = [new hh({
+        O.width = G.width, O.height = G.height, Gi(e) && (Mn(C) && (e.source === W.Source.ScreenShare && (t.scalabilityMode = "L1T3", "contentHint" in e.mediaStreamTrack && (e.mediaStreamTrack.contentHint = "motion", this.log.info("forcing contentHint to motion for screenshare with SVC codecs", Object.assign(Object.assign({}, this.logContext), De(e))))), t.scalabilityMode = (h = t.scalabilityMode) !== null && h !== void 0 ? h : "L3T3_KEY"), O.simulcastCodecs = [new hh({
           codec: C,
           cid: e.mediaStreamTrack.id
         })], t.backupCodec === !0 && (t.backupCodec = {
@@ -25847,8 +25847,8 @@ class cR extends iS {
         O.encryption === yt.NONE && (this.roomOptions.dynacast || (this.roomOptions.dynacast = !0), O.simulcastCodecs.push(new hh({
           codec: t.backupCodec.codec,
           cid: ""
-        })))), E = Oh(e.source === W.Source.ScreenShare, O.width, O.height, t), O.layers = w0(O.width, O.height, E, Mn(t.videoCodec));
-      } else e.kind === W.Kind.Audio && (E = [{
+        })))), _ = Oh(e.source === W.Source.ScreenShare, O.width, O.height, t), O.layers = w0(O.width, O.height, _, Mn(t.videoCodec));
+      } else e.kind === W.Kind.Audio && (_ = [{
         maxBitrate: (f = t.audioPreset) === null || f === void 0 ? void 0 : f.maxBitrate,
         priority: (v = (g = t.audioPreset) === null || g === void 0 ? void 0 : g.priority) !== null && v !== void 0 ? v : "high",
         networkPriority: (S = (b = t.audioPreset) === null || b === void 0 ? void 0 : b.priority) !== null && S !== void 0 ? S : "high"
@@ -25856,10 +25856,10 @@ class cR extends iS {
       if (!this.engine || this.engine.isClosed)
         throw new vt("cannot publish track when not connected");
       const x = () => R(this, void 0, void 0, function* () {
-        var H, G, $;
+        var G, H, $;
         if (!this.engine.pcManager)
           throw new vt("pcManager is not ready");
-        if (e.sender = yield this.engine.createSender(e, t, E), this.emit(ce.LocalSenderCreated, e.sender, e), Gi(e) && ((H = t.degradationPreference) !== null && H !== void 0 || (t.degradationPreference = V_(e)), e.setDegradationPreference(t.degradationPreference)), E)
+        if (e.sender = yield this.engine.createSender(e, t, _), this.emit(ce.LocalSenderCreated, e.sender, e), Gi(e) && ((G = t.degradationPreference) !== null && G !== void 0 || (t.degradationPreference = V_(e)), e.setDegradationPreference(t.degradationPreference)), _)
           if (wa() && e.kind === W.Kind.Audio) {
             let J;
             for (const te of this.engine.pcManager.publisher.getTransceivers())
@@ -25870,40 +25870,40 @@ class cR extends iS {
             J && this.engine.pcManager.publisher.setTrackCodecBitrate({
               transceiver: J,
               codec: "opus",
-              maxbr: !((G = E[0]) === null || G === void 0) && G.maxBitrate ? E[0].maxBitrate / 1e3 : 0
+              maxbr: !((H = _[0]) === null || H === void 0) && H.maxBitrate ? _[0].maxBitrate / 1e3 : 0
             });
-          } else e.codec && Mn(e.codec) && (!(($ = E[0]) === null || $ === void 0) && $.maxBitrate) && this.engine.pcManager.publisher.setTrackCodecBitrate({
+          } else e.codec && Mn(e.codec) && (!(($ = _[0]) === null || $ === void 0) && $.maxBitrate) && this.engine.pcManager.publisher.setTrackCodecBitrate({
             cid: O.cid,
             codec: e.codec,
-            maxbr: E[0].maxBitrate / 1e3
+            maxbr: _[0].maxBitrate / 1e3
           });
         yield this.engine.negotiate();
       });
       let N;
-      const B = new Promise((H, G) => R(this, void 0, void 0, function* () {
+      const z = new Promise((G, H) => R(this, void 0, void 0, function* () {
         var $;
         try {
-          N = yield this.engine.addTrack(O), H(N);
+          N = yield this.engine.addTrack(O), G(N);
         } catch (J) {
           e.sender && (!(($ = this.engine.pcManager) === null || $ === void 0) && $.publisher) && (this.engine.pcManager.publisher.removeTrack(e.sender), yield this.engine.negotiate().catch((te) => {
             this.log.error("failed to negotiate after removing track due to failed add track request", Object.assign(Object.assign(Object.assign({}, this.logContext), De(e)), {
               error: te
             }));
-          })), G(J);
+          })), H(J);
         }
       }));
       if (this.enabledPublishVideoCodecs.length > 0)
-        N = (yield Promise.all([B, x()]))[0];
+        N = (yield Promise.all([z, x()]))[0];
       else {
-        N = yield B;
-        let H;
-        if (N.codecs.forEach((G) => {
-          H === void 0 && (H = G.mimeType);
-        }), H && e.kind === W.Kind.Video) {
-          const G = jr(H);
-          G !== C && (this.log.debug("falling back to server selected codec", Object.assign(Object.assign(Object.assign({}, this.logContext), De(e)), {
-            codec: G
-          })), t.videoCodec = G, E = Oh(e.source === W.Source.ScreenShare, O.width, O.height, t));
+        N = yield z;
+        let G;
+        if (N.codecs.forEach((H) => {
+          G === void 0 && (G = H.mimeType);
+        }), G && e.kind === W.Kind.Video) {
+          const H = jr(G);
+          H !== C && (this.log.debug("falling back to server selected codec", Object.assign(Object.assign(Object.assign({}, this.logContext), De(e)), {
+            codec: H
+          })), t.videoCodec = H, _ = Oh(e.source === W.Source.ScreenShare, O.width, O.height, t));
         }
         yield x();
       }
@@ -25911,11 +25911,11 @@ class cR extends iS {
         loggerName: this.roomOptions.loggerName,
         loggerContextCb: () => this.logContext
       });
-      if (X.on(se.CpuConstrained, (H) => this.onTrackCpuConstrained(H, X)), X.options = t, e.sid = N.sid, this.log.debug("publishing ".concat(e.kind, " with encodings"), Object.assign(Object.assign({}, this.logContext), {
-        encodings: E,
+      if (X.on(se.CpuConstrained, (G) => this.onTrackCpuConstrained(G, X)), X.options = t, e.sid = N.sid, this.log.debug("publishing ".concat(e.kind, " with encodings"), Object.assign(Object.assign({}, this.logContext), {
+        encodings: _,
         trackInfo: N
       })), Gi(e) ? e.startMonitor(this.engine.client) : ui(e) && e.startMonitor(), this.addTrackPublication(X), this.emit(ce.LocalTrackPublished, X), ui(e) && N.audioFeatures.includes(Ct.TF_PRECONNECT_BUFFER)) {
-        const H = e.getPreConnectBuffer(), G = e.getPreConnectBufferMimeType();
+        const G = e.getPreConnectBuffer(), H = e.getPreConnectBufferMimeType();
         this.on(ce.LocalTrackSubscribed, ($) => {
           if ($.trackSid === N.sid) {
             if (!e.hasPreConnectBuffer) {
@@ -25924,7 +25924,7 @@ class cR extends iS {
             }
             this.log.debug("finished recording preconnect buffer", Object.assign(Object.assign({}, this.logContext), De(e))), e.stopPreConnectBuffer();
           }
-        }), H && new Promise((J, te) => R(this, void 0, void 0, function* () {
+        }), G && new Promise((J, te) => R(this, void 0, void 0, function* () {
           var le, Ae, V, ee, he, ge;
           try {
             this.log.debug("waiting for agent", Object.assign(Object.assign({}, this.logContext), De(e)));
@@ -25934,17 +25934,17 @@ class cR extends iS {
             clearTimeout(ae), this.log.debug("sending preconnect buffer", Object.assign(Object.assign({}, this.logContext), De(e)));
             const fe = yield this.streamBytes({
               name: "preconnect-buffer",
-              mimeType: G,
+              mimeType: H,
               topic: "lk.agent.pre-connect-audio-buffer",
               destinationIdentities: [re.identity],
               attributes: {
                 trackId: X.trackSid,
-                sampleRate: String((he = z.sampleRate) !== null && he !== void 0 ? he : "48000"),
-                channels: String((ge = z.channelCount) !== null && ge !== void 0 ? ge : "1")
+                sampleRate: String((he = B.sampleRate) !== null && he !== void 0 ? he : "48000"),
+                channels: String((ge = B.channelCount) !== null && ge !== void 0 ? ge : "1")
               }
             });
             try {
-              for (var Ce = !0, M = mi(H), j; j = yield M.next(), le = j.done, !le; Ce = !0) {
+              for (var Ce = !0, M = mi(G), j; j = yield M.next(), le = j.done, !le; Ce = !0) {
                 ee = j.value, Ce = !1;
                 const ve = ee;
                 yield fe.write(ve);
@@ -26254,23 +26254,23 @@ class cR extends iS {
             v(ot.builtIn("UNSUPPORTED_SERVER"));
             return;
           }
-          const A = Math.max(d, 8e3), _ = crypto.randomUUID();
-          yield this.publishRpcRequest(r, _, l, u, A);
-          const z = setTimeout(() => {
-            this.pendingAcks.delete(_), v(ot.builtIn("CONNECTION_TIMEOUT")), this.pendingResponses.delete(_), clearTimeout(O);
+          const A = Math.max(d, 8e3), E = crypto.randomUUID();
+          yield this.publishRpcRequest(r, E, l, u, A);
+          const B = setTimeout(() => {
+            this.pendingAcks.delete(E), v(ot.builtIn("CONNECTION_TIMEOUT")), this.pendingResponses.delete(E), clearTimeout(O);
           }, 7e3);
-          this.pendingAcks.set(_, {
+          this.pendingAcks.set(E, {
             resolve: () => {
-              clearTimeout(z);
+              clearTimeout(B);
             },
             participantIdentity: r
           });
           const O = setTimeout(() => {
-            this.pendingResponses.delete(_), v(ot.builtIn("RESPONSE_TIMEOUT"));
+            this.pendingResponses.delete(E), v(ot.builtIn("RESPONSE_TIMEOUT"));
           }, d);
-          this.pendingResponses.set(_, {
-            resolve: (E, x) => {
-              clearTimeout(O), this.pendingAcks.has(_) && (this.log.warn("RPC response received before ack", _), this.pendingAcks.delete(_), clearTimeout(z)), x ? v(x) : g(E ?? "");
+          this.pendingResponses.set(E, {
+            resolve: (_, x) => {
+              clearTimeout(O), this.pendingAcks.has(E) && (this.log.warn("RPC response received before ack", E), this.pendingAcks.delete(E), clearTimeout(B)), x ? v(x) : g(_ ?? "");
             },
             participantIdentity: r
           });
@@ -26752,19 +26752,19 @@ class Os extends Vn.EventEmitter {
         }));
       }));
       const v = (S, k, C) => R(this, void 0, void 0, function* () {
-        var A, _;
+        var A, E;
         this.abortController && this.abortController.abort();
-        const z = new AbortController();
-        this.abortController = z, g == null || g();
+        const B = new AbortController();
+        this.abortController = B, g == null || g();
         try {
-          if (yield As.getInstance().getBackOffPromise(u), z.signal.aborted)
+          if (yield As.getInstance().getBackOffPromise(u), B.signal.aborted)
             throw Te.cancelled("Connection attempt aborted");
-          yield this.attemptConnection(C ?? u, d, h, z), this.abortController = void 0, S();
+          yield this.attemptConnection(C ?? u, d, h, B), this.abortController = void 0, S();
         } catch (O) {
           if (this.regionUrlProvider && O instanceof Te && O.reason !== et.Cancelled && O.reason !== et.NotAllowed) {
-            let E = null;
+            let _ = null;
             try {
-              this.log.debug("Fetching next region"), E = yield this.regionUrlProvider.getNextBestRegionUrl((A = this.abortController) === null || A === void 0 ? void 0 : A.signal);
+              this.log.debug("Fetching next region"), _ = yield this.regionUrlProvider.getNextBestRegionUrl((A = this.abortController) === null || A === void 0 ? void 0 : A.signal);
             } catch (x) {
               if (x instanceof Te && (x.status === 401 || x.reason === et.Cancelled)) {
                 this.handleDisconnect(this.options.stopLocalTrackOnUnpublish), k(x);
@@ -26772,10 +26772,10 @@ class Os extends Vn.EventEmitter {
               }
             }
             // making sure we only register failed attempts on things we actually care about
-            [et.InternalError, et.ServerUnreachable, et.Timeout].includes(O.reason) && (this.log.debug("Adding failed connection attempt to back off"), As.getInstance().addFailedConnectionAttempt(u)), E && !(!((_ = this.abortController) === null || _ === void 0) && _.signal.aborted) ? (this.log.info("Initial connection failed with ConnectionError: ".concat(O.message, ". Retrying with another region: ").concat(E), this.logContext), this.recreateEngine(), yield v(S, k, E)) : (this.handleDisconnect(this.options.stopLocalTrackOnUnpublish, u0(O)), k(O));
+            [et.InternalError, et.ServerUnreachable, et.Timeout].includes(O.reason) && (this.log.debug("Adding failed connection attempt to back off"), As.getInstance().addFailedConnectionAttempt(u)), _ && !(!((E = this.abortController) === null || E === void 0) && E.signal.aborted) ? (this.log.info("Initial connection failed with ConnectionError: ".concat(O.message, ". Retrying with another region: ").concat(_), this.logContext), this.recreateEngine(), yield v(S, k, _)) : (this.handleDisconnect(this.options.stopLocalTrackOnUnpublish, u0(O)), k(O));
           } else {
-            let E = Dn.UNKNOWN_REASON;
-            O instanceof Te && (E = u0(O)), this.handleDisconnect(this.options.stopLocalTrackOnUnpublish, E), k(O);
+            let _ = Dn.UNKNOWN_REASON;
+            O instanceof Te && (_ = u0(O)), this.handleDisconnect(this.options.stopLocalTrackOnUnpublish, _), k(O);
           }
         }
       }), b = this.regionUrl;
@@ -26798,9 +26798,9 @@ class Os extends Vn.EventEmitter {
       if (A || (A = {
         version: C.serverVersion,
         region: C.serverRegion
-      }), this.serverInfo = A, this.log.debug("connected to Livekit Server ".concat(Object.entries(A).map((_) => {
-        let [z, O] = _;
-        return "".concat(z, ": ").concat(O);
+      }), this.serverInfo = A, this.log.debug("connected to Livekit Server ".concat(Object.entries(A).map((E) => {
+        let [B, O] = E;
+        return "".concat(B, ": ").concat(O);
       }).join(", ")), {
         room: (b = C.room) === null || b === void 0 ? void 0 : b.name,
         roomSid: (S = C.room) === null || S === void 0 ? void 0 : S.sid,
@@ -27440,52 +27440,52 @@ class Os extends Vn.EventEmitter {
         } : r;
         if (a === "audioinput") {
           C = l.localParticipant.audioTrackPublications.size === 0;
-          const _ = (d = l.getActiveDevice(a)) !== null && d !== void 0 ? d : l.options.audioCaptureDefaults.deviceId;
+          const E = (d = l.getActiveDevice(a)) !== null && d !== void 0 ? d : l.options.audioCaptureDefaults.deviceId;
           l.options.audioCaptureDefaults.deviceId = A;
-          const z = Array.from(l.localParticipant.audioTrackPublications.values()).filter((E) => E.source === W.Source.Microphone);
+          const B = Array.from(l.localParticipant.audioTrackPublications.values()).filter((_) => _.source === W.Source.Microphone);
           try {
-            k = (yield Promise.all(z.map((E) => {
+            k = (yield Promise.all(B.map((_) => {
               var x;
-              return (x = E.audioTrack) === null || x === void 0 ? void 0 : x.setDeviceId(A);
-            }))).every((E) => E === !0);
-          } catch (E) {
-            throw l.options.audioCaptureDefaults.deviceId = _, E;
+              return (x = _.audioTrack) === null || x === void 0 ? void 0 : x.setDeviceId(A);
+            }))).every((_) => _ === !0);
+          } catch (_) {
+            throw l.options.audioCaptureDefaults.deviceId = E, _;
           }
-          const O = z.some((E) => {
+          const O = B.some((_) => {
             var x, N;
-            return (N = (x = E.track) === null || x === void 0 ? void 0 : x.isMuted) !== null && N !== void 0 ? N : !1;
+            return (N = (x = _.track) === null || x === void 0 ? void 0 : x.isMuted) !== null && N !== void 0 ? N : !1;
           });
           k && O && (C = !0);
         } else if (a === "videoinput") {
           C = l.localParticipant.videoTrackPublications.size === 0;
-          const _ = (h = l.getActiveDevice(a)) !== null && h !== void 0 ? h : l.options.videoCaptureDefaults.deviceId;
+          const E = (h = l.getActiveDevice(a)) !== null && h !== void 0 ? h : l.options.videoCaptureDefaults.deviceId;
           l.options.videoCaptureDefaults.deviceId = A;
-          const z = Array.from(l.localParticipant.videoTrackPublications.values()).filter((E) => E.source === W.Source.Camera);
+          const B = Array.from(l.localParticipant.videoTrackPublications.values()).filter((_) => _.source === W.Source.Camera);
           try {
-            k = (yield Promise.all(z.map((E) => {
+            k = (yield Promise.all(B.map((_) => {
               var x;
-              return (x = E.videoTrack) === null || x === void 0 ? void 0 : x.setDeviceId(A);
-            }))).every((E) => E === !0);
-          } catch (E) {
-            throw l.options.videoCaptureDefaults.deviceId = _, E;
+              return (x = _.videoTrack) === null || x === void 0 ? void 0 : x.setDeviceId(A);
+            }))).every((_) => _ === !0);
+          } catch (_) {
+            throw l.options.videoCaptureDefaults.deviceId = E, _;
           }
-          const O = z.some((E) => {
+          const O = B.some((_) => {
             var x, N;
-            return (N = (x = E.track) === null || x === void 0 ? void 0 : x.isMuted) !== null && N !== void 0 ? N : !1;
+            return (N = (x = _.track) === null || x === void 0 ? void 0 : x.isMuted) !== null && N !== void 0 ? N : !1;
           });
           k && O && (C = !0);
         } else if (a === "audiooutput") {
           if (C = !0, !Ah() && !l.options.webAudioMix || l.options.webAudioMix && l.audioContext && !("setSinkId" in l.audioContext))
             throw new Error("cannot switch audio output, the current browser does not support it");
           l.options.webAudioMix && (r = (f = yield kt.getInstance().normalizeDeviceId("audiooutput", r)) !== null && f !== void 0 ? f : ""), (g = (S = l.options).audioOutput) !== null && g !== void 0 || (S.audioOutput = {});
-          const _ = (v = l.getActiveDevice(a)) !== null && v !== void 0 ? v : l.options.audioOutput.deviceId;
+          const E = (v = l.getActiveDevice(a)) !== null && v !== void 0 ? v : l.options.audioOutput.deviceId;
           l.options.audioOutput.deviceId = r;
           try {
-            l.options.webAudioMix && ((b = l.audioContext) === null || b === void 0 || b.setSinkId(r)), yield Promise.all(Array.from(l.remoteParticipants.values()).map((z) => z.setAudioOutput({
+            l.options.webAudioMix && ((b = l.audioContext) === null || b === void 0 || b.setSinkId(r)), yield Promise.all(Array.from(l.remoteParticipants.values()).map((B) => B.setAudioOutput({
               deviceId: r
             })));
-          } catch (z) {
-            throw l.options.audioOutput.deviceId = _, z;
+          } catch (B) {
+            throw l.options.audioOutput.deviceId = E, B;
           }
         }
         return C && (l.localParticipant.activeDeviceMap.set(a, r), l.emit(ie.ActiveDeviceChanged, a, r)), k;
@@ -28126,8 +28126,8 @@ class pR extends na {
             S.drawImage(a, 0, 0);
             const C = S.getImageData(0, 0, f.width, f.height).data;
             let A = !0;
-            for (let _ = 0; _ < C.length; _ += 4)
-              if (C[_] !== 0 || C[_ + 1] !== 0 || C[_ + 2] !== 0) {
+            for (let E = 0; E < C.length; E += 4)
+              if (C[E] !== 0 || C[E + 1] !== 0 || C[E + 2] !== 0) {
                 A = !1;
                 break;
               }
@@ -28933,19 +28933,19 @@ class pc extends my {
       t.authorization && h.push(`bearer.${t.authorization}`), a = new WebSocket(l, h);
       const f = await new Promise((C, A) => {
         a.addEventListener("open", () => {
-          const _ = rS(t);
-          a == null || a.send(JSON.stringify(_));
-        }, { once: !0 }), a.addEventListener("error", (_) => {
+          const E = rS(t);
+          a == null || a.send(JSON.stringify(E));
+        }, { once: !0 }), a.addEventListener("error", (E) => {
           setTimeout(() => A(new _v("The connection was closed due to a socket error.")), 0);
-        }), a.addEventListener("close", (_) => {
-          const z = _.reason || (_.code === 1e3 ? "Connection closed normally before session could be established." : "Connection closed unexpectedly before session could be established.");
-          A(new _v(z, {
-            closeCode: _.code,
-            closeReason: _.reason || void 0
+        }), a.addEventListener("close", (E) => {
+          const B = E.reason || (E.code === 1e3 ? "Connection closed normally before session could be established." : "Connection closed unexpectedly before session could be established.");
+          A(new _v(B, {
+            closeCode: E.code,
+            closeReason: E.reason || void 0
           }));
-        }), a.addEventListener("message", (_) => {
-          const z = JSON.parse(_.data);
-          Vl(z) && (z.type === "conversation_initiation_metadata" ? C(z.conversation_initiation_metadata_event) : console.warn("First received message is not conversation metadata."));
+        }), a.addEventListener("message", (E) => {
+          const B = JSON.parse(E.data);
+          Vl(B) && (B.type === "conversation_initiation_metadata" ? C(B.conversation_initiation_metadata_event) : console.warn("First received message is not conversation metadata."));
         }, { once: !0 });
       }), { conversation_id: g, agent_output_audio_format: v, user_input_audio_format: b } = f, S = ql(b ?? "pcm_16000"), k = ql(v);
       return new pc(a, g, S, k);
@@ -29422,10 +29422,10 @@ class Vr {
         ...P0
       };
       if (Ns() && a) {
-        const O = (await window.navigator.mediaDevices.enumerateDevices()).find((E) => (
+        const O = (await window.navigator.mediaDevices.enumerateDevices()).find((_) => (
           // cautious to include "bluetooth" in the search
           // as might trigger bluetooth speakers
-          E.kind === "audioinput" && ["airpod", "headphone", "earphone"].find((x) => E.label.toLowerCase().includes(x))
+          _.kind === "audioinput" && ["airpod", "headphone", "earphone"].find((x) => _.label.toLowerCase().includes(x))
         ));
         O && (v.deviceId = { ideal: O.deviceId });
       }
@@ -29445,10 +29445,10 @@ class Vr {
         sampleRate: e,
         chunkDurationMs: h
       }), C.connect(S), S.connect(A), await f.resume();
-      const _ = await navigator.permissions.query({
+      const E = await navigator.permissions.query({
         name: "microphone"
       });
-      return new Vr(f, S, A, g, C, _, d);
+      return new Vr(f, S, A, g, C, E, d);
     } catch (v) {
       throw g == null || g.getTracks().forEach((b) => {
         b.stop();
@@ -29905,25 +29905,25 @@ const SA = {
 };
 fA();
 zR(() => new yA());
-const Is = K.createContext(null);
+const Is = Y.createContext(null);
 function pS() {
-  const i = K.useContext(Is);
+  const i = Y.useContext(Is);
   return (i == null ? void 0 : i.conversation) ?? null;
 }
 function gS() {
-  const i = K.useContext(Is);
+  const i = Y.useContext(Is);
   if (!i)
     throw new Error("useRawConversationRef must be used within a ConversationProvider");
   return i.conversationRef;
 }
 function to(i) {
-  const e = K.useContext(Is);
+  const e = Y.useContext(Is);
   if (!e)
     throw new Error("useRegisterCallbacks must be used within a ConversationProvider");
-  const { registerCallbacks: t } = e, a = K.useRef(i), r = Object.keys(i).filter((l) => i[l] !== void 0).sort().join("|");
-  K.useLayoutEffect(() => {
+  const { registerCallbacks: t } = e, a = Y.useRef(i), r = Object.keys(i).filter((l) => i[l] !== void 0).sort().join("|");
+  Y.useLayoutEffect(() => {
     a.current = i;
-  }), K.useLayoutEffect(() => {
+  }), Y.useLayoutEffect(() => {
     const l = r === "" ? [] : r.split("|"), u = Object.fromEntries(l.map((d) => [
       d,
       (...h) => {
@@ -29934,51 +29934,51 @@ function to(i) {
     return t(u);
   }, [t, r]);
 }
-const j0 = new Uint8Array(0), vS = K.createContext(null);
+const j0 = new Uint8Array(0), vS = Y.createContext(null);
 function TA({ children: i }) {
-  const e = K.useContext(Is);
+  const e = Y.useContext(Is);
   if (!e)
     throw new Error("ConversationControlsProvider must be rendered inside a ConversationProvider");
-  const { conversationRef: t } = e, a = K.useCallback(() => {
+  const { conversationRef: t } = e, a = Y.useCallback(() => {
     const O = t.current;
     if (!O)
       throw new Error("No active conversation. Call startSession() first.");
     return O;
-  }, [t]), r = K.useCallback((O) => {
+  }, [t]), r = Y.useCallback((O) => {
     a().sendUserMessage(O);
-  }, [a]), l = K.useCallback((O) => {
+  }, [a]), l = Y.useCallback((O) => {
     a().sendMultimodalMessage(O);
-  }, [a]), u = K.useCallback((O) => a().uploadFile(O), [a]), d = K.useCallback((O, E) => {
-    a().sendContextualUpdate(O, E);
-  }, [a]), h = K.useCallback(() => {
+  }, [a]), u = Y.useCallback((O) => a().uploadFile(O), [a]), d = Y.useCallback((O, _) => {
+    a().sendContextualUpdate(O, _);
+  }, [a]), h = Y.useCallback(() => {
     a().sendUserActivity();
-  }, [a]), f = K.useCallback((O, E) => {
-    a().sendMCPToolApprovalResult(O, E);
-  }, [a]), g = K.useCallback((O) => {
+  }, [a]), f = Y.useCallback((O, _) => {
+    a().sendMCPToolApprovalResult(O, _);
+  }, [a]), g = Y.useCallback((O) => {
     a().setVolume(O);
-  }, [a]), v = K.useCallback(async (O) => {
-    const E = a();
-    if (E instanceof $r)
-      return await E.changeInputDevice(O);
+  }, [a]), v = Y.useCallback(async (O) => {
+    const _ = a();
+    if (_ instanceof $r)
+      return await _.changeInputDevice(O);
     throw new Error("Device switching is only available for voice conversations");
-  }, [a]), b = K.useCallback(async (O) => {
-    const E = a();
-    if (E instanceof $r)
-      return await E.changeOutputDevice(O);
+  }, [a]), b = Y.useCallback(async (O) => {
+    const _ = a();
+    if (_ instanceof $r)
+      return await _.changeOutputDevice(O);
     throw new Error("Device switching is only available for voice conversations");
-  }, [a]), S = K.useCallback(() => {
+  }, [a]), S = Y.useCallback(() => {
     var O;
     return ((O = t.current) == null ? void 0 : O.getInputByteFrequencyData()) ?? j0;
-  }, [t]), k = K.useCallback(() => {
+  }, [t]), k = Y.useCallback(() => {
     var O;
     return ((O = t.current) == null ? void 0 : O.getOutputByteFrequencyData()) ?? j0;
-  }, [t]), C = K.useCallback(() => {
+  }, [t]), C = Y.useCallback(() => {
     var O;
     return ((O = t.current) == null ? void 0 : O.getInputVolume()) ?? 0;
-  }, [t]), A = K.useCallback(() => {
+  }, [t]), A = Y.useCallback(() => {
     var O;
     return ((O = t.current) == null ? void 0 : O.getOutputVolume()) ?? 0;
-  }, [t]), _ = K.useCallback(() => a().getId(), [a]), z = K.useMemo(() => ({
+  }, [t]), E = Y.useCallback(() => a().getId(), [a]), B = Y.useMemo(() => ({
     startSession: e.startSession,
     endSession: e.endSession,
     sendUserMessage: r,
@@ -29994,7 +29994,7 @@ function TA({ children: i }) {
     getOutputByteFrequencyData: k,
     getInputVolume: C,
     getOutputVolume: A,
-    getId: _
+    getId: E
   }), [
     e.startSession,
     e.endSession,
@@ -30011,19 +30011,19 @@ function TA({ children: i }) {
     k,
     C,
     A,
-    _
+    E
   ]);
-  return de.jsx(vS.Provider, { value: z, children: i });
+  return de.jsx(vS.Provider, { value: B, children: i });
 }
 function CA() {
-  const i = K.useContext(vS);
+  const i = Y.useContext(vS);
   if (!i)
     throw new Error("useConversationControls must be used within a ConversationProvider");
   return i;
 }
-const yS = K.createContext(null);
+const yS = Y.createContext(null);
 function kA({ children: i }) {
-  const [e, t] = K.useState("disconnected"), [a, r] = K.useState(void 0);
+  const [e, t] = Y.useState("disconnected"), [a, r] = Y.useState(void 0);
   to({
     onStatusChange({ status: u }) {
       u !== "disconnecting" && (t(u), r(void 0));
@@ -30032,42 +30032,42 @@ function kA({ children: i }) {
       t("error"), r(u);
     }
   });
-  const l = K.useMemo(() => ({ status: e, message: a }), [e, a]);
+  const l = Y.useMemo(() => ({ status: e, message: a }), [e, a]);
   return de.jsx(yS.Provider, { value: l, children: i });
 }
 function EA() {
-  const i = K.useContext(yS);
+  const i = Y.useContext(yS);
   if (!i)
     throw new Error("useConversationStatus must be used within a ConversationProvider");
   return i;
 }
-const bS = K.createContext(null);
+const bS = Y.createContext(null);
 function _A({ children: i, isMuted: e, onMutedChange: t }) {
-  const a = pS(), r = gS(), l = typeof e == "boolean", [u, d] = K.useState(!1), h = l ? e : u;
+  const a = pS(), r = gS(), l = typeof e == "boolean", [u, d] = Y.useState(!1), h = l ? e : u;
   to({
     onDisconnect() {
       l || d(!1);
     }
-  }), K.useEffect(() => {
+  }), Y.useEffect(() => {
     l && a && a.setMicMuted(e);
   }, [a, e, l]);
-  const f = K.useCallback((v) => {
+  const f = Y.useCallback((v) => {
     const b = r.current;
     if (!b)
       throw new Error("No active conversation. Call startSession() first.");
     l || (b.setMicMuted(v), d(v)), t == null || t(v);
-  }, [r, l, t]), g = K.useMemo(() => ({ isMuted: h, setMuted: f }), [h, f]);
+  }, [r, l, t]), g = Y.useMemo(() => ({ isMuted: h, setMuted: f }), [h, f]);
   return de.jsx(bS.Provider, { value: g, children: i });
 }
 function RA() {
-  const i = K.useContext(bS);
+  const i = Y.useContext(bS);
   if (!i)
     throw new Error("useConversationInput must be used within a ConversationProvider");
   return i;
 }
-const SS = K.createContext(null);
+const SS = Y.createContext(null);
 function AA({ children: i }) {
-  const [e, t] = K.useState("listening");
+  const [e, t] = Y.useState("listening");
   to({
     onModeChange({ mode: r }) {
       t(r);
@@ -30076,7 +30076,7 @@ function AA({ children: i }) {
       t("listening");
     }
   });
-  const a = K.useMemo(() => ({
+  const a = Y.useMemo(() => ({
     mode: e,
     isSpeaking: e === "speaking",
     isListening: e === "listening"
@@ -30084,14 +30084,14 @@ function AA({ children: i }) {
   return de.jsx(SS.Provider, { value: a, children: i });
 }
 function wA() {
-  const i = K.useContext(SS);
+  const i = Y.useContext(SS);
   if (!i)
     throw new Error("useConversationMode must be used within a ConversationProvider");
   return i;
 }
-const TS = K.createContext(null);
+const TS = Y.createContext(null);
 function xA({ children: i }) {
-  const e = gS(), [t, a] = K.useState(!1);
+  const e = gS(), [t, a] = Y.useState(!1);
   to({
     onCanSendFeedbackChange({ canSendFeedback: u }) {
       a(u);
@@ -30100,17 +30100,17 @@ function xA({ children: i }) {
       a(!1);
     }
   });
-  const r = K.useCallback((u, d) => {
+  const r = Y.useCallback((u, d) => {
     var h;
     (h = e.current) == null || h.sendFeedback(u, d);
-  }, [e]), l = K.useMemo(() => ({
+  }, [e]), l = Y.useMemo(() => ({
     canSendFeedback: t,
     sendFeedback: r
   }), [t, r]);
   return de.jsx(TS.Provider, { value: l, children: i });
 }
 function MA() {
-  const i = K.useContext(TS);
+  const i = Y.useContext(TS);
   if (!i)
     throw new Error("useConversationFeedback must be used within a ConversationProvider");
   return i;
@@ -30124,12 +30124,12 @@ function DA(i, e) {
   }
   return t;
 }
-const OA = K.createContext(null);
+const OA = Y.createContext(null);
 function NA({ children: i }) {
-  const e = K.useContext(Is);
+  const e = Y.useContext(Is);
   if (!e)
     throw new Error("ConversationClientToolsProvider must be rendered inside a ConversationProvider");
-  const { clientToolsRegistry: t, clientToolsRef: a } = e, r = K.useCallback((l, u) => {
+  const { clientToolsRegistry: t, clientToolsRef: a } = e, r = Y.useCallback((l, u) => {
     if (t.has(l))
       throw new Error(`Client tool "${l}" is already registered by another hook. Each tool name must be unique.`);
     return t.set(l, u), a.current[l] = u, () => {
@@ -30197,7 +30197,7 @@ class UA {
   }
 }
 function CS(i) {
-  const e = K.useRef({}), t = Gr.filter((l) => i[l] !== void 0), a = t.join("|"), r = K.useMemo(
+  const e = Y.useRef({}), t = Gr.filter((l) => i[l] !== void 0), a = t.join("|"), r = Y.useMemo(
     () => Object.fromEntries(t.map((l) => [
       l,
       (...u) => {
@@ -30220,22 +30220,22 @@ const LA = [
   NA
 ];
 function BA({ children: i, isMuted: e, onMutedChange: t, ...a }) {
-  const r = K.useRef(null), l = K.useRef(null), u = K.useRef(0), d = K.useRef(!1), [h] = K.useState(() => /* @__PURE__ */ new Map()), f = K.useRef({}), g = K.useRef(a);
+  const r = Y.useRef(null), l = Y.useRef(null), u = Y.useRef(0), d = Y.useRef(!1), [h] = Y.useState(() => /* @__PURE__ */ new Map()), f = Y.useRef({}), g = Y.useRef(a);
   g.current = a;
-  const [v] = K.useState(() => new UA(Gr)), [b, S] = K.useState(null), k = CS(a), C = K.useCallback((E) => v.register(E), [v]);
-  K.useLayoutEffect(() => v.register({
+  const [v] = Y.useState(() => new UA(Gr)), [b, S] = Y.useState(null), k = CS(a), C = Y.useCallback((_) => v.register(_), [v]);
+  Y.useLayoutEffect(() => v.register({
     onDisconnect: () => {
       r.current = null, S(null);
     }
   }), [v]);
-  const A = K.useCallback((E) => {
+  const A = Y.useCallback((_) => {
     if (r.current || l.current)
       return;
     d.current = !1;
-    const x = ++u.current, N = g.current, B = f1((E == null ? void 0 : E.serverLocation) || (N == null ? void 0 : N.serverLocation)), X = m1(B), H = p1(B), G = { ...N };
+    const x = ++u.current, N = g.current, z = f1((_ == null ? void 0 : _.serverLocation) || (N == null ? void 0 : N.serverLocation)), X = m1(z), G = p1(z), H = { ...N };
     for (const ge of Gr)
-      delete G[ge];
-    const $ = h1({ livekitUrl: H }, G, k, v.compose(), E ?? {}, { origin: X }), J = DA($.clientTools, h);
+      delete H[ge];
+    const $ = h1({ livekitUrl: G }, H, k, v.compose(), _ ?? {}, { origin: X }), J = DA($.clientTools, h);
     f.current = J, $.clientTools = J;
     const te = $.onConversationCreated, le = () => x !== u.current, he = {
       ...$,
@@ -30264,47 +30264,47 @@ function BA({ children: i, isMuted: e, onMutedChange: t, ...a }) {
       const Ce = ge instanceof Error ? ge.message : "Session failed to start";
       (M = $.onError) == null || M.call($, Ce, ge);
     });
-  }, [k, v, h, f]), _ = K.useCallback(() => {
+  }, [k, v, h, f]), E = Y.useCallback(() => {
     d.current = !0;
-    const E = l.current, x = r.current;
-    r.current = null, S(null), E ? E.then((N) => N.endSession(), () => {
+    const _ = l.current, x = r.current;
+    r.current = null, S(null), _ ? _.then((N) => N.endSession(), () => {
     }) : x == null || x.endSession();
   }, []);
-  K.useEffect(() => () => {
-    var E;
+  Y.useEffect(() => () => {
+    var _;
     d.current = !0, l.current ? l.current.then((x) => x.endSession(), () => {
-    }) : (E = r.current) == null || E.endSession();
+    }) : (_ = r.current) == null || _.endSession();
   }, []);
-  const z = K.useMemo(() => ({
+  const B = Y.useMemo(() => ({
     conversation: b,
     conversationRef: r,
     startSession: A,
-    endSession: _,
+    endSession: E,
     registerCallbacks: C,
     clientToolsRegistry: h,
     clientToolsRef: f
-  }), [b, r, A, _, C, h, f]), O = LA.reduceRight((E, x) => de.jsx(x, { children: E }), de.jsx(_A, { isMuted: e, onMutedChange: t, children: i }));
-  return de.jsx(Is.Provider, { value: z, children: O });
+  }), [b, r, A, E, C, h, f]), O = LA.reduceRight((_, x) => de.jsx(x, { children: _ }), de.jsx(_A, { isMuted: e, onMutedChange: t, children: i }));
+  return de.jsx(Is.Provider, { value: B, children: O });
 }
 function FA(i = {}) {
   const { micMuted: e, volume: t, ...a } = i, r = CS(a);
   to(r);
-  const l = K.useRef(a);
+  const l = Y.useRef(a);
   l.current = a;
-  const u = CA(), { status: d, message: h } = EA(), { isMuted: f, setMuted: g } = RA(), { mode: v, isSpeaking: b, isListening: S } = wA(), { canSendFeedback: k, sendFeedback: C } = MA(), A = K.useCallback((z) => {
+  const u = CA(), { status: d, message: h } = EA(), { isMuted: f, setMuted: g } = RA(), { mode: v, isSpeaking: b, isListening: S } = wA(), { canSendFeedback: k, sendFeedback: C } = MA(), A = Y.useCallback((B) => {
     const O = { ...l.current };
-    for (const E of Gr)
-      delete O[E];
+    for (const _ of Gr)
+      delete O[_];
     u.startSession({
       ...O,
-      ...z
+      ...B
     });
-  }, [u, l]), _ = pS();
-  return K.useEffect(() => {
-    e !== void 0 && _ && g(e);
-  }, [e, _, g]), K.useEffect(() => {
-    t !== void 0 && _ && _.setVolume({ volume: t });
-  }, [t, _]), {
+  }, [u, l]), E = pS();
+  return Y.useEffect(() => {
+    e !== void 0 && E && g(e);
+  }, [e, E, g]), Y.useEffect(() => {
+    t !== void 0 && E && E.setVolume({ volume: t });
+  }, [t, E]), {
     ...u,
     startSession: A,
     status: d,
@@ -31080,28 +31080,28 @@ function Ow(i) {
   return i[0] = 1, i[1] = 0, i[2] = 0, i[3] = 0, i[4] = 0, i[5] = 1, i[6] = 0, i[7] = 0, i[8] = 0, i[9] = 0, i[10] = 1, i[11] = 0, i[12] = 0, i[13] = 0, i[14] = 0, i[15] = 1, i;
 }
 function Nw(i, e) {
-  let t = e[0], a = e[1], r = e[2], l = e[3], u = e[4], d = e[5], h = e[6], f = e[7], g = e[8], v = e[9], b = e[10], S = e[11], k = e[12], C = e[13], A = e[14], _ = e[15], z = t * d - a * u, O = t * h - r * u, E = t * f - l * u, x = a * h - r * d, N = a * f - l * d, B = r * f - l * h, X = g * C - v * k, H = g * A - b * k, G = g * _ - S * k, $ = v * A - b * C, J = v * _ - S * C, te = b * _ - S * A, le = z * te - O * J + E * $ + x * G - N * H + B * X;
-  return le ? (le = 1 / le, i[0] = (d * te - h * J + f * $) * le, i[1] = (r * J - a * te - l * $) * le, i[2] = (C * B - A * N + _ * x) * le, i[3] = (b * N - v * B - S * x) * le, i[4] = (h * G - u * te - f * H) * le, i[5] = (t * te - r * G + l * H) * le, i[6] = (A * E - k * B - _ * O) * le, i[7] = (g * B - b * E + S * O) * le, i[8] = (u * J - d * G + f * X) * le, i[9] = (a * G - t * J - l * X) * le, i[10] = (k * N - C * E + _ * z) * le, i[11] = (v * E - g * N - S * z) * le, i[12] = (d * H - u * $ - h * X) * le, i[13] = (t * $ - a * H + r * X) * le, i[14] = (C * O - k * x - A * z) * le, i[15] = (g * x - v * O + b * z) * le, i) : null;
+  let t = e[0], a = e[1], r = e[2], l = e[3], u = e[4], d = e[5], h = e[6], f = e[7], g = e[8], v = e[9], b = e[10], S = e[11], k = e[12], C = e[13], A = e[14], E = e[15], B = t * d - a * u, O = t * h - r * u, _ = t * f - l * u, x = a * h - r * d, N = a * f - l * d, z = r * f - l * h, X = g * C - v * k, G = g * A - b * k, H = g * E - S * k, $ = v * A - b * C, J = v * E - S * C, te = b * E - S * A, le = B * te - O * J + _ * $ + x * H - N * G + z * X;
+  return le ? (le = 1 / le, i[0] = (d * te - h * J + f * $) * le, i[1] = (r * J - a * te - l * $) * le, i[2] = (C * z - A * N + E * x) * le, i[3] = (b * N - v * z - S * x) * le, i[4] = (h * H - u * te - f * G) * le, i[5] = (t * te - r * H + l * G) * le, i[6] = (A * _ - k * z - E * O) * le, i[7] = (g * z - b * _ + S * O) * le, i[8] = (u * J - d * H + f * X) * le, i[9] = (a * H - t * J - l * X) * le, i[10] = (k * N - C * _ + E * B) * le, i[11] = (v * _ - g * N - S * B) * le, i[12] = (d * G - u * $ - h * X) * le, i[13] = (t * $ - a * G + r * X) * le, i[14] = (C * O - k * x - A * B) * le, i[15] = (g * x - v * O + b * B) * le, i) : null;
 }
 function _S(i) {
-  let e = i[0], t = i[1], a = i[2], r = i[3], l = i[4], u = i[5], d = i[6], h = i[7], f = i[8], g = i[9], v = i[10], b = i[11], S = i[12], k = i[13], C = i[14], A = i[15], _ = e * u - t * l, z = e * d - a * l, O = e * h - r * l, E = t * d - a * u, x = t * h - r * u, N = a * h - r * d, B = f * k - g * S, X = f * C - v * S, H = f * A - b * S, G = g * C - v * k, $ = g * A - b * k, J = v * A - b * C;
-  return _ * J - z * $ + O * G + E * H - x * X + N * B;
+  let e = i[0], t = i[1], a = i[2], r = i[3], l = i[4], u = i[5], d = i[6], h = i[7], f = i[8], g = i[9], v = i[10], b = i[11], S = i[12], k = i[13], C = i[14], A = i[15], E = e * u - t * l, B = e * d - a * l, O = e * h - r * l, _ = t * d - a * u, x = t * h - r * u, N = a * h - r * d, z = f * k - g * S, X = f * C - v * S, G = f * A - b * S, H = g * C - v * k, $ = g * A - b * k, J = v * A - b * C;
+  return E * J - B * $ + O * H + _ * G - x * X + N * z;
 }
 function W0(i, e, t) {
-  let a = e[0], r = e[1], l = e[2], u = e[3], d = e[4], h = e[5], f = e[6], g = e[7], v = e[8], b = e[9], S = e[10], k = e[11], C = e[12], A = e[13], _ = e[14], z = e[15], O = t[0], E = t[1], x = t[2], N = t[3];
-  return i[0] = O * a + E * d + x * v + N * C, i[1] = O * r + E * h + x * b + N * A, i[2] = O * l + E * f + x * S + N * _, i[3] = O * u + E * g + x * k + N * z, O = t[4], E = t[5], x = t[6], N = t[7], i[4] = O * a + E * d + x * v + N * C, i[5] = O * r + E * h + x * b + N * A, i[6] = O * l + E * f + x * S + N * _, i[7] = O * u + E * g + x * k + N * z, O = t[8], E = t[9], x = t[10], N = t[11], i[8] = O * a + E * d + x * v + N * C, i[9] = O * r + E * h + x * b + N * A, i[10] = O * l + E * f + x * S + N * _, i[11] = O * u + E * g + x * k + N * z, O = t[12], E = t[13], x = t[14], N = t[15], i[12] = O * a + E * d + x * v + N * C, i[13] = O * r + E * h + x * b + N * A, i[14] = O * l + E * f + x * S + N * _, i[15] = O * u + E * g + x * k + N * z, i;
+  let a = e[0], r = e[1], l = e[2], u = e[3], d = e[4], h = e[5], f = e[6], g = e[7], v = e[8], b = e[9], S = e[10], k = e[11], C = e[12], A = e[13], E = e[14], B = e[15], O = t[0], _ = t[1], x = t[2], N = t[3];
+  return i[0] = O * a + _ * d + x * v + N * C, i[1] = O * r + _ * h + x * b + N * A, i[2] = O * l + _ * f + x * S + N * E, i[3] = O * u + _ * g + x * k + N * B, O = t[4], _ = t[5], x = t[6], N = t[7], i[4] = O * a + _ * d + x * v + N * C, i[5] = O * r + _ * h + x * b + N * A, i[6] = O * l + _ * f + x * S + N * E, i[7] = O * u + _ * g + x * k + N * B, O = t[8], _ = t[9], x = t[10], N = t[11], i[8] = O * a + _ * d + x * v + N * C, i[9] = O * r + _ * h + x * b + N * A, i[10] = O * l + _ * f + x * S + N * E, i[11] = O * u + _ * g + x * k + N * B, O = t[12], _ = t[13], x = t[14], N = t[15], i[12] = O * a + _ * d + x * v + N * C, i[13] = O * r + _ * h + x * b + N * A, i[14] = O * l + _ * f + x * S + N * E, i[15] = O * u + _ * g + x * k + N * B, i;
 }
 function Pw(i, e, t) {
-  let a = t[0], r = t[1], l = t[2], u, d, h, f, g, v, b, S, k, C, A, _;
-  return e === i ? (i[12] = e[0] * a + e[4] * r + e[8] * l + e[12], i[13] = e[1] * a + e[5] * r + e[9] * l + e[13], i[14] = e[2] * a + e[6] * r + e[10] * l + e[14], i[15] = e[3] * a + e[7] * r + e[11] * l + e[15]) : (u = e[0], d = e[1], h = e[2], f = e[3], g = e[4], v = e[5], b = e[6], S = e[7], k = e[8], C = e[9], A = e[10], _ = e[11], i[0] = u, i[1] = d, i[2] = h, i[3] = f, i[4] = g, i[5] = v, i[6] = b, i[7] = S, i[8] = k, i[9] = C, i[10] = A, i[11] = _, i[12] = u * a + g * r + k * l + e[12], i[13] = d * a + v * r + C * l + e[13], i[14] = h * a + b * r + A * l + e[14], i[15] = f * a + S * r + _ * l + e[15]), i;
+  let a = t[0], r = t[1], l = t[2], u, d, h, f, g, v, b, S, k, C, A, E;
+  return e === i ? (i[12] = e[0] * a + e[4] * r + e[8] * l + e[12], i[13] = e[1] * a + e[5] * r + e[9] * l + e[13], i[14] = e[2] * a + e[6] * r + e[10] * l + e[14], i[15] = e[3] * a + e[7] * r + e[11] * l + e[15]) : (u = e[0], d = e[1], h = e[2], f = e[3], g = e[4], v = e[5], b = e[6], S = e[7], k = e[8], C = e[9], A = e[10], E = e[11], i[0] = u, i[1] = d, i[2] = h, i[3] = f, i[4] = g, i[5] = v, i[6] = b, i[7] = S, i[8] = k, i[9] = C, i[10] = A, i[11] = E, i[12] = u * a + g * r + k * l + e[12], i[13] = d * a + v * r + C * l + e[13], i[14] = h * a + b * r + A * l + e[14], i[15] = f * a + S * r + E * l + e[15]), i;
 }
 function Iw(i, e, t) {
   let a = t[0], r = t[1], l = t[2];
   return i[0] = e[0] * a, i[1] = e[1] * a, i[2] = e[2] * a, i[3] = e[3] * a, i[4] = e[4] * r, i[5] = e[5] * r, i[6] = e[6] * r, i[7] = e[7] * r, i[8] = e[8] * l, i[9] = e[9] * l, i[10] = e[10] * l, i[11] = e[11] * l, i[12] = e[12], i[13] = e[13], i[14] = e[14], i[15] = e[15], i;
 }
 function Uw(i, e, t, a) {
-  let r = a[0], l = a[1], u = a[2], d = Math.hypot(r, l, u), h, f, g, v, b, S, k, C, A, _, z, O, E, x, N, B, X, H, G, $, J, te, le, Ae;
-  return Math.abs(d) < xw ? null : (d = 1 / d, r *= d, l *= d, u *= d, h = Math.sin(t), f = Math.cos(t), g = 1 - f, v = e[0], b = e[1], S = e[2], k = e[3], C = e[4], A = e[5], _ = e[6], z = e[7], O = e[8], E = e[9], x = e[10], N = e[11], B = r * r * g + f, X = l * r * g + u * h, H = u * r * g - l * h, G = r * l * g - u * h, $ = l * l * g + f, J = u * l * g + r * h, te = r * u * g + l * h, le = l * u * g - r * h, Ae = u * u * g + f, i[0] = v * B + C * X + O * H, i[1] = b * B + A * X + E * H, i[2] = S * B + _ * X + x * H, i[3] = k * B + z * X + N * H, i[4] = v * G + C * $ + O * J, i[5] = b * G + A * $ + E * J, i[6] = S * G + _ * $ + x * J, i[7] = k * G + z * $ + N * J, i[8] = v * te + C * le + O * Ae, i[9] = b * te + A * le + E * Ae, i[10] = S * te + _ * le + x * Ae, i[11] = k * te + z * le + N * Ae, e !== i && (i[12] = e[12], i[13] = e[13], i[14] = e[14], i[15] = e[15]), i);
+  let r = a[0], l = a[1], u = a[2], d = Math.hypot(r, l, u), h, f, g, v, b, S, k, C, A, E, B, O, _, x, N, z, X, G, H, $, J, te, le, Ae;
+  return Math.abs(d) < xw ? null : (d = 1 / d, r *= d, l *= d, u *= d, h = Math.sin(t), f = Math.cos(t), g = 1 - f, v = e[0], b = e[1], S = e[2], k = e[3], C = e[4], A = e[5], E = e[6], B = e[7], O = e[8], _ = e[9], x = e[10], N = e[11], z = r * r * g + f, X = l * r * g + u * h, G = u * r * g - l * h, H = r * l * g - u * h, $ = l * l * g + f, J = u * l * g + r * h, te = r * u * g + l * h, le = l * u * g - r * h, Ae = u * u * g + f, i[0] = v * z + C * X + O * G, i[1] = b * z + A * X + _ * G, i[2] = S * z + E * X + x * G, i[3] = k * z + B * X + N * G, i[4] = v * H + C * $ + O * J, i[5] = b * H + A * $ + _ * J, i[6] = S * H + E * $ + x * J, i[7] = k * H + B * $ + N * J, i[8] = v * te + C * le + O * Ae, i[9] = b * te + A * le + _ * Ae, i[10] = S * te + E * le + x * Ae, i[11] = k * te + B * le + N * Ae, e !== i && (i[12] = e[12], i[13] = e[13], i[14] = e[14], i[15] = e[15]), i);
 }
 function Lw(i, e) {
   return i[0] = e[12], i[1] = e[13], i[2] = e[14], i;
@@ -31120,8 +31120,8 @@ const AS = /* @__PURE__ */ (function() {
   return function(e, t) {
     let a = i;
     RS(a, t);
-    let r = 1 / a[0], l = 1 / a[1], u = 1 / a[2], d = t[0] * r, h = t[1] * l, f = t[2] * u, g = t[4] * r, v = t[5] * l, b = t[6] * u, S = t[8] * r, k = t[9] * l, C = t[10] * u, A = d + v + C, _ = 0;
-    return A > 0 ? (_ = Math.sqrt(A + 1) * 2, e[3] = 0.25 * _, e[0] = (b - k) / _, e[1] = (S - f) / _, e[2] = (h - g) / _) : d > v && d > C ? (_ = Math.sqrt(1 + d - v - C) * 2, e[3] = (b - k) / _, e[0] = 0.25 * _, e[1] = (h + g) / _, e[2] = (S + f) / _) : v > C ? (_ = Math.sqrt(1 + v - d - C) * 2, e[3] = (S - f) / _, e[0] = (h + g) / _, e[1] = 0.25 * _, e[2] = (b + k) / _) : (_ = Math.sqrt(1 + C - d - v) * 2, e[3] = (h - g) / _, e[0] = (S + f) / _, e[1] = (b + k) / _, e[2] = 0.25 * _), e;
+    let r = 1 / a[0], l = 1 / a[1], u = 1 / a[2], d = t[0] * r, h = t[1] * l, f = t[2] * u, g = t[4] * r, v = t[5] * l, b = t[6] * u, S = t[8] * r, k = t[9] * l, C = t[10] * u, A = d + v + C, E = 0;
+    return A > 0 ? (E = Math.sqrt(A + 1) * 2, e[3] = 0.25 * E, e[0] = (b - k) / E, e[1] = (S - f) / E, e[2] = (h - g) / E) : d > v && d > C ? (E = Math.sqrt(1 + d - v - C) * 2, e[3] = (b - k) / E, e[0] = 0.25 * E, e[1] = (h + g) / E, e[2] = (S + f) / E) : v > C ? (E = Math.sqrt(1 + v - d - C) * 2, e[3] = (S - f) / E, e[0] = (h + g) / E, e[1] = 0.25 * E, e[2] = (b + k) / E) : (E = Math.sqrt(1 + C - d - v) * 2, e[3] = (h - g) / E, e[0] = (S + f) / E, e[1] = (b + k) / E, e[2] = 0.25 * E), e;
   };
 })();
 function Fw(i, e, t, a) {
@@ -31132,12 +31132,12 @@ function Fw(i, e, t, a) {
   h[0] *= f, h[1] *= f, h[2] *= f, h[4] *= g, h[5] *= g, h[6] *= g, h[8] *= v, h[9] *= v, h[10] *= v, AS(e, h), a[0] = r, a[1] = l, a[2] = u;
 }
 function zw(i, e, t, a) {
-  const r = i, l = e[0], u = e[1], d = e[2], h = e[3], f = l + l, g = u + u, v = d + d, b = l * f, S = l * g, k = l * v, C = u * g, A = u * v, _ = d * v, z = h * f, O = h * g, E = h * v, x = a[0], N = a[1], B = a[2];
-  return r[0] = (1 - (C + _)) * x, r[1] = (S + E) * x, r[2] = (k - O) * x, r[3] = 0, r[4] = (S - E) * N, r[5] = (1 - (b + _)) * N, r[6] = (A + z) * N, r[7] = 0, r[8] = (k + O) * B, r[9] = (A - z) * B, r[10] = (1 - (b + C)) * B, r[11] = 0, r[12] = t[0], r[13] = t[1], r[14] = t[2], r[15] = 1, r;
+  const r = i, l = e[0], u = e[1], d = e[2], h = e[3], f = l + l, g = u + u, v = d + d, b = l * f, S = l * g, k = l * v, C = u * g, A = u * v, E = d * v, B = h * f, O = h * g, _ = h * v, x = a[0], N = a[1], z = a[2];
+  return r[0] = (1 - (C + E)) * x, r[1] = (S + _) * x, r[2] = (k - O) * x, r[3] = 0, r[4] = (S - _) * N, r[5] = (1 - (b + E)) * N, r[6] = (A + B) * N, r[7] = 0, r[8] = (k + O) * z, r[9] = (A - B) * z, r[10] = (1 - (b + C)) * z, r[11] = 0, r[12] = t[0], r[13] = t[1], r[14] = t[2], r[15] = 1, r;
 }
 function jw(i, e) {
-  let t = e[0], a = e[1], r = e[2], l = e[3], u = t + t, d = a + a, h = r + r, f = t * u, g = a * u, v = a * d, b = r * u, S = r * d, k = r * h, C = l * u, A = l * d, _ = l * h;
-  return i[0] = 1 - v - k, i[1] = g + _, i[2] = b - A, i[3] = 0, i[4] = g - _, i[5] = 1 - f - k, i[6] = S + C, i[7] = 0, i[8] = b + A, i[9] = S - C, i[10] = 1 - f - v, i[11] = 0, i[12] = 0, i[13] = 0, i[14] = 0, i[15] = 1, i;
+  let t = e[0], a = e[1], r = e[2], l = e[3], u = t + t, d = a + a, h = r + r, f = t * u, g = a * u, v = a * d, b = r * u, S = r * d, k = r * h, C = l * u, A = l * d, E = l * h;
+  return i[0] = 1 - v - k, i[1] = g + E, i[2] = b - A, i[3] = 0, i[4] = g - E, i[5] = 1 - f - k, i[6] = S + C, i[7] = 0, i[8] = b + A, i[9] = S - C, i[10] = 1 - f - v, i[11] = 0, i[12] = 0, i[13] = 0, i[14] = 0, i[15] = 1, i;
 }
 function qw(i, e, t, a, r) {
   let l = 1 / Math.tan(e / 2), u = 1 / (a - r);
@@ -31356,8 +31356,8 @@ function Qw(i, e) {
   return i[0] = e[0], i[1] = e[1], i[2] = e[2], i[3] = e[4], i[4] = e[5], i[5] = e[6], i[6] = e[8], i[7] = e[9], i[8] = e[10], i;
 }
 function Jw(i, e) {
-  let t = e[0], a = e[1], r = e[2], l = e[3], u = t + t, d = a + a, h = r + r, f = t * u, g = a * u, v = a * d, b = r * u, S = r * d, k = r * h, C = l * u, A = l * d, _ = l * h;
-  return i[0] = 1 - v - k, i[3] = g - _, i[6] = b + A, i[1] = g + _, i[4] = 1 - f - k, i[7] = S - C, i[2] = b - A, i[5] = S + C, i[8] = 1 - f - v, i;
+  let t = e[0], a = e[1], r = e[2], l = e[3], u = t + t, d = a + a, h = r + r, f = t * u, g = a * u, v = a * d, b = r * u, S = r * d, k = r * h, C = l * u, A = l * d, E = l * h;
+  return i[0] = 1 - v - k, i[3] = g - E, i[6] = b + A, i[1] = g + E, i[4] = 1 - f - k, i[7] = S - C, i[2] = b - A, i[5] = S + C, i[8] = 1 - f - v, i;
 }
 function Zw(i, e) {
   return i[0] = e[0], i[1] = e[1], i[2] = e[2], i[3] = e[3], i[4] = e[4], i[5] = e[5], i[6] = e[6], i[7] = e[7], i[8] = e[8], i;
@@ -31373,8 +31373,8 @@ function ex(i, e) {
   return k ? (k = 1 / k, i[0] = v * k, i[1] = (-g * a + r * f) * k, i[2] = (d * a - r * u) * k, i[3] = b * k, i[4] = (g * t - r * h) * k, i[5] = (-d * t + r * l) * k, i[6] = S * k, i[7] = (-f * t + a * h) * k, i[8] = (u * t - a * l) * k, i) : null;
 }
 function ny(i, e, t) {
-  let a = e[0], r = e[1], l = e[2], u = e[3], d = e[4], h = e[5], f = e[6], g = e[7], v = e[8], b = t[0], S = t[1], k = t[2], C = t[3], A = t[4], _ = t[5], z = t[6], O = t[7], E = t[8];
-  return i[0] = b * a + S * u + k * f, i[1] = b * r + S * d + k * g, i[2] = b * l + S * h + k * v, i[3] = C * a + A * u + _ * f, i[4] = C * r + A * d + _ * g, i[5] = C * l + A * h + _ * v, i[6] = z * a + O * u + E * f, i[7] = z * r + O * d + E * g, i[8] = z * l + O * h + E * v, i;
+  let a = e[0], r = e[1], l = e[2], u = e[3], d = e[4], h = e[5], f = e[6], g = e[7], v = e[8], b = t[0], S = t[1], k = t[2], C = t[3], A = t[4], E = t[5], B = t[6], O = t[7], _ = t[8];
+  return i[0] = b * a + S * u + k * f, i[1] = b * r + S * d + k * g, i[2] = b * l + S * h + k * v, i[3] = C * a + A * u + E * f, i[4] = C * r + A * d + E * g, i[5] = C * l + A * h + E * v, i[6] = B * a + O * u + _ * f, i[7] = B * r + O * d + _ * g, i[8] = B * l + O * h + _ * v, i;
 }
 function tx(i, e, t) {
   let a = e[0], r = e[1], l = e[2], u = e[3], d = e[4], h = e[5], f = e[6], g = e[7], v = e[8], b = t[0], S = t[1];
@@ -31389,8 +31389,8 @@ function ix(i, e, t) {
   return i[0] = a * e[0], i[1] = a * e[1], i[2] = a * e[2], i[3] = r * e[3], i[4] = r * e[4], i[5] = r * e[5], i[6] = e[6], i[7] = e[7], i[8] = e[8], i;
 }
 function ax(i, e) {
-  let t = e[0], a = e[1], r = e[2], l = e[3], u = e[4], d = e[5], h = e[6], f = e[7], g = e[8], v = e[9], b = e[10], S = e[11], k = e[12], C = e[13], A = e[14], _ = e[15], z = t * d - a * u, O = t * h - r * u, E = t * f - l * u, x = a * h - r * d, N = a * f - l * d, B = r * f - l * h, X = g * C - v * k, H = g * A - b * k, G = g * _ - S * k, $ = v * A - b * C, J = v * _ - S * C, te = b * _ - S * A, le = z * te - O * J + E * $ + x * G - N * H + B * X;
-  return le ? (le = 1 / le, i[0] = (d * te - h * J + f * $) * le, i[1] = (h * G - u * te - f * H) * le, i[2] = (u * J - d * G + f * X) * le, i[3] = (r * J - a * te - l * $) * le, i[4] = (t * te - r * G + l * H) * le, i[5] = (a * G - t * J - l * X) * le, i[6] = (C * B - A * N + _ * x) * le, i[7] = (A * E - k * B - _ * O) * le, i[8] = (k * N - C * E + _ * z) * le, i) : null;
+  let t = e[0], a = e[1], r = e[2], l = e[3], u = e[4], d = e[5], h = e[6], f = e[7], g = e[8], v = e[9], b = e[10], S = e[11], k = e[12], C = e[13], A = e[14], E = e[15], B = t * d - a * u, O = t * h - r * u, _ = t * f - l * u, x = a * h - r * d, N = a * f - l * d, z = r * f - l * h, X = g * C - v * k, G = g * A - b * k, H = g * E - S * k, $ = v * A - b * C, J = v * E - S * C, te = b * E - S * A, le = B * te - O * J + _ * $ + x * H - N * G + z * X;
+  return le ? (le = 1 / le, i[0] = (d * te - h * J + f * $) * le, i[1] = (h * H - u * te - f * G) * le, i[2] = (u * J - d * H + f * X) * le, i[3] = (r * J - a * te - l * $) * le, i[4] = (t * te - r * H + l * G) * le, i[5] = (a * H - t * J - l * X) * le, i[6] = (C * z - A * N + E * x) * le, i[7] = (A * _ - k * z - E * O) * le, i[8] = (k * N - C * _ + E * B) * le, i) : null;
 }
 class sx extends Array {
   constructor(e = 1, t = 0, a = 0, r = 0, l = 1, u = 0, d = 0, h = 0, f = 1) {
@@ -31479,13 +31479,13 @@ class ic {
     unpackAlignment: k = 4,
     flipY: C = a == (e.TEXTURE_2D || e.TEXTURE_3D),
     anisotropy: A = 0,
-    level: _ = 0,
-    width: z,
+    level: E = 0,
+    width: B,
     // used for RenderTargets or Data Textures
-    height: O = z,
-    length: E = 1
+    height: O = B,
+    length: _ = 1
   } = {}) {
-    this.gl = e, this.id = ox++, this.image = t, this.target = a, this.type = r, this.format = l, this.internalFormat = u, this.minFilter = v, this.magFilter = b, this.wrapS = d, this.wrapT = h, this.wrapR = f, this.generateMipmaps = g, this.premultiplyAlpha = S, this.unpackAlignment = k, this.flipY = C, this.anisotropy = Math.min(A, this.gl.renderer.parameters.maxAnisotropy), this.level = _, this.width = z, this.height = O, this.length = E, this.texture = this.gl.createTexture(), this.store = {
+    this.gl = e, this.id = ox++, this.image = t, this.target = a, this.type = r, this.format = l, this.internalFormat = u, this.minFilter = v, this.magFilter = b, this.wrapS = d, this.wrapT = h, this.wrapR = f, this.generateMipmaps = g, this.premultiplyAlpha = S, this.unpackAlignment = k, this.flipY = C, this.anisotropy = Math.min(A, this.gl.renderer.parameters.maxAnisotropy), this.level = E, this.width = B, this.height = O, this.length = _, this.texture = this.gl.createTexture(), this.store = {
       image: null
     }, this.glState = this.gl.renderer.state, this.state = {}, this.state.minFilter = this.gl.NEAREST_MIPMAP_LINEAR, this.state.magFilter = this.gl.LINEAR, this.state.wrapS = this.gl.REPEAT, this.state.wrapT = this.gl.REPEAT, this.state.anisotropy = 0;
   }
@@ -31533,12 +31533,12 @@ class lx {
     type: k = e.UNSIGNED_BYTE,
     format: C = e.RGBA,
     internalFormat: A = C,
-    unpackAlignment: _,
-    premultiplyAlpha: z
+    unpackAlignment: E,
+    premultiplyAlpha: B
   } = {}) {
     this.gl = e, this.width = t, this.height = a, this.depth = u, this.stencil = d, this.buffer = this.gl.createFramebuffer(), this.target = r, this.gl.renderer.bindFramebuffer(this), this.textures = [];
     const O = [];
-    for (let E = 0; E < l; E++)
+    for (let _ = 0; _ < l; _++)
       this.textures.push(
         new ic(e, {
           width: t,
@@ -31551,19 +31551,19 @@ class lx {
           type: k,
           format: C,
           internalFormat: A,
-          unpackAlignment: _,
-          premultiplyAlpha: z,
+          unpackAlignment: E,
+          premultiplyAlpha: B,
           flipY: !1,
           generateMipmaps: !1
         })
-      ), this.textures[E].update(), this.gl.framebufferTexture2D(
+      ), this.textures[_].update(), this.gl.framebufferTexture2D(
         this.target,
-        this.gl.COLOR_ATTACHMENT0 + E,
+        this.gl.COLOR_ATTACHMENT0 + _,
         this.gl.TEXTURE_2D,
-        this.textures[E].texture,
+        this.textures[_].texture,
         0
         /* level */
-      ), O.push(this.gl.COLOR_ATTACHMENT0 + E);
+      ), O.push(this.gl.COLOR_ATTACHMENT0 + _);
     O.length > 1 && this.gl.renderer.drawBuffers(O), this.texture = this.textures[0], h && (this.gl.renderer.isWebgl2 || this.gl.renderer.getExtension("WEBGL_depth_texture")) ? (this.depthTexture = new ic(e, {
       width: t,
       height: a,
@@ -31884,15 +31884,15 @@ function dx(i, e = pf) {
   const { core: t, mid: a, outer: r, edge: l, iridescence: u } = i, d = new Uint8Array(e * e * 4), h = [0.32, 0.42, 0.86], f = Math.hypot(h[0], h[1], h[2]), g = h[0] / f, v = h[1] / f, b = h[2] / f;
   for (let S = 0; S < e; S++)
     for (let k = 0; k < e; k++) {
-      const C = (k + 0.5) / e * 2 - 1, A = (S + 0.5) / e * 2 - 1, _ = Math.min(Math.hypot(C, A), 1), z = Math.sqrt(Math.max(0, 1 - _ * _)), O = C * g + A * v + z * b, E = Math.max(0, O * 0.5 + 0.5), x = 0.12 + 0.96 * Math.pow(E, 1.65), N = Math.sin(C * 2.1 + A * 1.4 + 0.6), B = Math.sin(A * 2.6 - C * 1.1 - 0.5), X = Math.min(1, Math.max(0, 0.5 + 0.2 * N + 0.16 * B));
-      let H = Rl(t, a, ah(0.25, 0.66, X));
-      H = Rl(H, r, ah(0.66, 0.98, X)), H = [H[0] * x, H[1] * x, H[2] * x];
-      const G = ah(0.62, 1.02, _);
-      H = Rl(H, l, G);
-      const $ = Math.pow(Math.min(1, _), 3) * (1 - G);
-      H = Rl(H, r, $ * u);
+      const C = (k + 0.5) / e * 2 - 1, A = (S + 0.5) / e * 2 - 1, E = Math.min(Math.hypot(C, A), 1), B = Math.sqrt(Math.max(0, 1 - E * E)), O = C * g + A * v + B * b, _ = Math.max(0, O * 0.5 + 0.5), x = 0.12 + 0.96 * Math.pow(_, 1.65), N = Math.sin(C * 2.1 + A * 1.4 + 0.6), z = Math.sin(A * 2.6 - C * 1.1 - 0.5), X = Math.min(1, Math.max(0, 0.5 + 0.2 * N + 0.16 * z));
+      let G = Rl(t, a, ah(0.25, 0.66, X));
+      G = Rl(G, r, ah(0.66, 0.98, X)), G = [G[0] * x, G[1] * x, G[2] * x];
+      const H = ah(0.62, 1.02, E);
+      G = Rl(G, l, H);
+      const $ = Math.pow(Math.min(1, E), 3) * (1 - H);
+      G = Rl(G, r, $ * u);
       const J = (ux(k, S) - 0.5) / 255, te = (S * e + k) * 4;
-      d[te + 0] = sh((H[0] + J) * 255), d[te + 1] = sh((H[1] + J) * 255), d[te + 2] = sh((H[2] + J) * 255), d[te + 3] = 255;
+      d[te + 0] = sh((G[0] + J) * 255), d[te + 1] = sh((G[1] + J) * 255), d[te + 2] = sh((G[2] + J) * 255), d[te + 3] = 255;
     }
   return d;
 }
@@ -32282,12 +32282,12 @@ function kx(i) {
     audioRef: f,
     onFrameRef: g,
     onError: v
-  } = i, b = K.useRef(r), S = K.useRef(l), k = K.useRef(u), C = K.useRef(d), A = K.useRef(void 0), _ = `${Sx(a)}|${t}`, z = K.useRef(a);
-  z.current = a;
-  const O = K.useRef(t);
+  } = i, b = Y.useRef(r), S = Y.useRef(l), k = Y.useRef(u), C = Y.useRef(d), A = Y.useRef(void 0), E = `${Sx(a)}|${t}`, B = Y.useRef(a);
+  B.current = a;
+  const O = Y.useRef(t);
   O.current = t;
-  const E = K.useRef(v);
-  E.current = v, K.useEffect(() => {
+  const _ = Y.useRef(v);
+  _.current = v, Y.useEffect(() => {
     var jt, Ot;
     const x = e.current;
     if (!x) return;
@@ -32303,24 +32303,24 @@ function kx(i) {
         powerPreference: "high-performance"
       });
     } catch {
-      (jt = E.current) == null || jt.call(E);
+      (jt = _.current) == null || jt.call(_);
       return;
     }
-    const B = N.gl;
+    const z = N.gl;
     if (!N.isWebgl2) {
-      (Ot = E.current) == null || Ot.call(E);
+      (Ot = _.current) == null || Ot.call(_);
       return;
     }
-    const X = B.canvas;
-    X.style.position = "absolute", X.style.inset = "0", X.style.width = "100%", X.style.height = "100%", X.style.display = "block", x.appendChild(X), B.clearColor(0, 0, 0, 0);
-    const H = hx(B, z.current), G = Cx(B), $ = px(N, 128), J = h.current ?? eo, te = {
+    const X = z.canvas;
+    X.style.position = "absolute", X.style.inset = "0", X.style.width = "100%", X.style.height = "100%", X.style.display = "block", x.appendChild(X), z.clearColor(0, 0, 0, 0);
+    const G = hx(z, B.current), H = Cx(z), $ = px(N, 128), J = h.current ?? eo, te = {
       uTime: { value: 0 },
       uResolution: { value: [1, 1] },
       uTextureResolution: { value: [sy, sy] },
       uAlpha: { value: J.alpha },
       uFadeInDuration: { value: 0.8 },
-      uTexture: { value: H },
-      uFluidSimTexture: { value: G },
+      uTexture: { value: G },
+      uFluidSimTexture: { value: H },
       uSphereScale: { value: J.sphereScale },
       uSpherePower: { value: J.spherePower },
       uMaskRadius: { value: J.maskRadius },
@@ -32337,7 +32337,7 @@ function kx(i) {
       uNoiseAmplitude: { value: J.noiseAmplitude },
       uNoiseSpeed: { value: J.noiseSpeed },
       uDriftSpeed: { value: J.driftSpeed },
-      uFluidColor: { value: [...z.current.fluid] },
+      uFluidColor: { value: [...B.current.fluid] },
       uFluidDisplacement: { value: J.fluidDisplacement },
       uFluidColorOpacity: { value: J.fluidColorOpacity },
       uRingColorOpacity: { value: J.ringColorOpacity },
@@ -32346,7 +32346,7 @@ function kx(i) {
       uAudioAverage: { value: [0, 0, 0, 0] },
       uAudioAverageInput: { value: [0, 0, 0, 0] },
       uCumulativeAudio: { value: [0, 0, 0, 0] }
-    }, le = new xS(B), Ae = new ES(B, {
+    }, le = new xS(z), Ae = new ES(z, {
       vertex: MS,
       fragment: DS(cx),
       uniforms: te,
@@ -32354,8 +32354,8 @@ function kx(i) {
       depthTest: !1,
       depthWrite: !1
     });
-    Ae.setBlendFunc(B.ONE, B.ONE_MINUS_SRC_ALPHA);
-    const V = new wS(B, { geometry: le, program: Ae }), ee = { ...h.current }, he = () => {
+    Ae.setBlendFunc(z.ONE, z.ONE_MINUS_SRC_ALPHA);
+    const V = new wS(z, { geometry: le, program: Ae }), ee = { ...h.current }, he = () => {
       const Ge = x.getBoundingClientRect(), bt = Math.max(1, Math.round(Ge.width)), Gn = Math.max(1, Math.round(Ge.height));
       N.dpr = Math.min(O.current, window.devicePixelRatio || 1), N.setSize(bt, Gn), te.uResolution.value[0] = N.width * N.dpr, te.uResolution.value[1] = N.height * N.dpr;
     };
@@ -32400,12 +32400,12 @@ function kx(i) {
     const Wt = () => Et();
     return document.addEventListener("visibilitychange", Wt), Et(), () => {
       var Ge;
-      It(), A.current = void 0, document.removeEventListener("visibilitychange", Wt), ge.disconnect(), M.disconnect(), $ == null || $.dispose(), le.remove(), Ae.remove(), B.deleteTexture(H.texture), B.deleteTexture(G.texture), X.parentNode && X.parentNode.removeChild(X), (Ge = B.getExtension("WEBGL_lose_context")) == null || Ge.loseContext();
+      It(), A.current = void 0, document.removeEventListener("visibilitychange", Wt), ge.disconnect(), M.disconnect(), $ == null || $.dispose(), le.remove(), Ae.remove(), z.deleteTexture(G.texture), z.deleteTexture(H.texture), X.parentNode && X.parentNode.removeChild(X), (Ge = z.getExtension("WEBGL_lose_context")) == null || Ge.loseContext();
     };
-  }, [_]), K.useEffect(() => {
+  }, [E]), Y.useEffect(() => {
     var x;
     b.current = r, S.current = l, k.current = u, (x = A.current) == null || x.call(A);
-  }, [r, l, u]), K.useEffect(() => {
+  }, [r, l, u]), Y.useEffect(() => {
     C.current = d;
   }, [d]);
 }
@@ -32436,16 +32436,16 @@ function Rx(i, e) {
   };
 }
 function Ax(i) {
-  const e = K.useRef(oy()), t = K.useRef(oy()), a = K.useRef({ ...ac, ...i.params });
+  const e = Y.useRef(oy()), t = Y.useRef(oy()), a = Y.useRef({ ...ac, ...i.params });
   i.paramsRef || (a.current = { ...ac, ...i.params });
-  const r = i.paramsRef ?? a, l = K.useRef(!!i.paused);
+  const r = i.paramsRef ?? a, l = Y.useRef(!!i.paused);
   l.current = !!i.paused;
-  const u = K.useRef(i.simulate ?? null), d = K.useRef(null), h = K.useRef(i.getFrequencyData ?? null);
+  const u = Y.useRef(i.simulate ?? null), d = Y.useRef(null), h = Y.useRef(i.getFrequencyData ?? null);
   h.current = i.getFrequencyData ?? null;
-  const f = K.useRef(0);
-  return K.useEffect(() => {
+  const f = Y.useRef(0);
+  return Y.useEffect(() => {
     i.simulate !== u.current && (f.current = 0), u.current = i.simulate ?? null;
-  }, [i.simulate]), K.useEffect(() => {
+  }, [i.simulate]), Y.useEffect(() => {
     const g = i.source ?? null;
     if (!g) {
       d.current = null;
@@ -32481,26 +32481,26 @@ function Ax(i) {
       var C;
       (C = d.current) == null || C.cleanup(), d.current = null;
     };
-  }, [i.source]), K.useEffect(() => {
+  }, [i.source]), Y.useEffect(() => {
     let g = 0, v = performance.now();
     const b = new Float32Array(4096);
-    let S = 0, k = 0, C = 0, A = 0, _ = 0, z = 0, O = 0, E = 0, x = 0;
-    const N = (X, H, G, $) => {
-      const J = Math.max(0, Math.floor(G / H)), te = Math.min(X.length - 1, Math.ceil($ / H));
+    let S = 0, k = 0, C = 0, A = 0, E = 0, B = 0, O = 0, _ = 0, x = 0;
+    const N = (X, G, H, $) => {
+      const J = Math.max(0, Math.floor(H / G)), te = Math.min(X.length - 1, Math.ceil($ / G));
       if (te < J) return 0;
       let le = 0;
       for (let Ae = J; Ae <= te; Ae++) le += X[Ae];
       return le / (te - J + 1) / 255;
-    }, B = (X) => {
+    }, z = (X) => {
       var ve;
-      g = requestAnimationFrame(B);
-      const H = Math.min((X - v) / 1e3, 0.05);
+      g = requestAnimationFrame(z);
+      const G = Math.min((X - v) / 1e3, 0.05);
       if (v = X, l.current) return;
-      const G = r.current, $ = u.current, J = d.current;
+      const H = r.current, $ = u.current, J = d.current;
       let te;
       const le = u.current ? null : ((ve = h.current) == null ? void 0 : ve.call(h)) ?? null;
       if ($)
-        f.current += H, te = Rx(f.current, $);
+        f.current += G, te = Rx(f.current, $);
       else if (le && le.length) {
         const be = le.length, Ue = 8e3 / be;
         let Le = 0, It = 0;
@@ -32513,9 +32513,9 @@ function Ax(i) {
         const Et = Le / be, Wt = Math.min(1, Math.max(0, Et - S) * 6);
         S = Et, te = {
           rms: Et,
-          low: N(le, Ue, G.low[0], G.low[1]),
-          mid: N(le, Ue, G.mid[0], G.mid[1]),
-          high: N(le, Ue, G.high[0], G.high[1]),
+          low: N(le, Ue, H.low[0], H.low[1]),
+          mid: N(le, Ue, H.mid[0], H.mid[1]),
+          high: N(le, Ue, H.high[0], H.high[1]),
           rawAmp: Et,
           transient: Wt,
           flux: Math.min(1, It / (be * 0.1))
@@ -32537,28 +32537,28 @@ function Ax(i) {
         const Ot = Math.min(1, Math.max(0, Wt - S) * 6);
         S = Wt, te = {
           rms: Wt,
-          low: N(Ue, It, G.low[0], G.low[1]),
-          mid: N(Ue, It, G.mid[0], G.mid[1]),
-          high: N(Ue, It, G.high[0], G.high[1]),
+          low: N(Ue, It, H.low[0], H.low[1]),
+          mid: N(Ue, It, H.mid[0], H.mid[1]),
+          high: N(Ue, It, H.high[0], H.high[1]),
           rawAmp: Wt,
           transient: Ot,
           flux: Math.min(1, jt / (Ue.length * 0.1))
         };
       } else
         te = _x;
-      const Ae = G.noiseFloor, V = G.gain, ee = (be) => $ ? be : Math.min(1, Math.max(0, be - Ae) / (1 - Ae) * V), he = ee(te.rms), ge = ee(te.low), Ce = ee(te.mid), M = ee(te.high), j = (be, Ue) => {
-        const Le = Ue > be ? G.attack : G.release;
-        return be + (Ue - be) * (1 - Math.exp(-H / Le));
+      const Ae = H.noiseFloor, V = H.gain, ee = (be) => $ ? be : Math.min(1, Math.max(0, be - Ae) / (1 - Ae) * V), he = ee(te.rms), ge = ee(te.low), Ce = ee(te.mid), M = ee(te.high), j = (be, Ue) => {
+        const Le = Ue > be ? H.attack : H.release;
+        return be + (Ue - be) * (1 - Math.exp(-G / Le));
       };
-      k = j(k, he), C = j(C, ge), A = j(A, Ce), _ = j(_, M), z = j(z, he > 0.02 ? 1 : 0);
-      const ae = (C + A + _) / 3;
-      ae > 0.01 && (O += ae * H * 0.7, E += ae * H * 0.9, x += ae * H * 0.5);
+      k = j(k, he), C = j(C, ge), A = j(A, Ce), E = j(E, M), B = j(B, he > 0.02 ? 1 : 0);
+      const ae = (C + A + E) / 3;
+      ae > 0.01 && (O += ae * G * 0.7, _ += ae * G * 0.9, x += ae * G * 0.5);
       const re = e.current;
-      re.average[0] = k, re.average[1] = C, re.average[2] = A, re.average[3] = _, re.input[0] = te.rawAmp, re.input[1] = te.transient, re.input[2] = te.flux, re.input[3] = z, re.cumulative[0] = O, re.cumulative[1] = 0, re.cumulative[2] = E, re.cumulative[3] = x;
+      re.average[0] = k, re.average[1] = C, re.average[2] = A, re.average[3] = E, re.input[0] = te.rawAmp, re.input[1] = te.transient, re.input[2] = te.flux, re.input[3] = B, re.cumulative[0] = O, re.cumulative[1] = 0, re.cumulative[2] = _, re.cumulative[3] = x;
       const fe = t.current;
-      fe.average[0] = te.rms, fe.average[1] = te.low, fe.average[2] = te.mid, fe.average[3] = te.high, fe.input[0] = te.rawAmp, fe.input[1] = te.transient, fe.input[2] = te.flux, fe.input[3] = z, fe.cumulative[0] = O, fe.cumulative[2] = E, fe.cumulative[3] = x;
+      fe.average[0] = te.rms, fe.average[1] = te.low, fe.average[2] = te.mid, fe.average[3] = te.high, fe.input[0] = te.rawAmp, fe.input[1] = te.transient, fe.input[2] = te.flux, fe.input[3] = B, fe.cumulative[0] = O, fe.cumulative[2] = _, fe.cumulative[3] = x;
     };
-    return g = requestAnimationFrame(B), () => cancelAnimationFrame(g);
+    return g = requestAnimationFrame(z), () => cancelAnimationFrame(g);
   }, []), { audioRef: e, metersRef: t };
 }
 var wx = uy();
@@ -32604,23 +32604,23 @@ function Dx({
   metersRef: t,
   telemetryRef: a
 }) {
-  const [r, l] = K.useState({ ...i.current }), [u, d] = K.useState({
+  const [r, l] = Y.useState({ ...i.current }), [u, d] = Y.useState({
     attack: e.current.attack,
     release: e.current.release,
     noiseFloor: e.current.noiseFloor,
     gain: e.current.gain
-  }), [, h] = K.useState(0), f = K.useRef(0);
-  K.useEffect(() => {
-    let A = 0, _ = performance.now();
-    const z = (O) => {
-      f.current = requestAnimationFrame(z), A += O - _, _ = O, A >= 80 && (A = 0, h((E) => E + 1));
+  }), [, h] = Y.useState(0), f = Y.useRef(0);
+  Y.useEffect(() => {
+    let A = 0, E = performance.now();
+    const B = (O) => {
+      f.current = requestAnimationFrame(B), A += O - E, E = O, A >= 80 && (A = 0, h((_) => _ + 1));
     };
-    return f.current = requestAnimationFrame(z), () => cancelAnimationFrame(f.current);
+    return f.current = requestAnimationFrame(B), () => cancelAnimationFrame(f.current);
   }, []);
-  const g = (A, _) => {
-    i.current[A] = _, l((z) => ({ ...z, [A]: _ }));
-  }, v = (A, _) => {
-    e.current[A] = _, d((z) => ({ ...z, [A]: _ }));
+  const g = (A, E) => {
+    i.current[A] = E, l((B) => ({ ...B, [A]: E }));
+  }, v = (A, E) => {
+    e.current[A] = E, d((B) => ({ ...B, [A]: E }));
   }, b = () => {
     Object.assign(i.current, eo), l({ ...eo });
   }, S = () => {
@@ -32648,21 +32648,21 @@ function Dx({
       /* @__PURE__ */ de.jsxs("div", { className: "orbdbg-scroll", children: [
         xx.map((A) => /* @__PURE__ */ de.jsxs("div", { className: "orbdbg-group", children: [
           /* @__PURE__ */ de.jsx("div", { className: "orbdbg-group-title", children: A }),
-          OS.filter((_) => _.group === A).map((_) => /* @__PURE__ */ de.jsxs("label", { className: "orbdbg-row", children: [
-            /* @__PURE__ */ de.jsx("span", { className: "orbdbg-key", children: _.key }),
+          OS.filter((E) => E.group === A).map((E) => /* @__PURE__ */ de.jsxs("label", { className: "orbdbg-row", children: [
+            /* @__PURE__ */ de.jsx("span", { className: "orbdbg-key", children: E.key }),
             /* @__PURE__ */ de.jsx(
               "input",
               {
                 type: "range",
-                min: _.min,
-                max: _.max,
-                step: _.step,
-                value: r[_.key],
-                onChange: (z) => g(_.key, parseFloat(z.target.value))
+                min: E.min,
+                max: E.max,
+                step: E.step,
+                value: r[E.key],
+                onChange: (B) => g(E.key, parseFloat(B.target.value))
               }
             ),
-            /* @__PURE__ */ de.jsx("span", { className: "orbdbg-num", children: r[_.key].toFixed(3) })
-          ] }, _.key))
+            /* @__PURE__ */ de.jsx("span", { className: "orbdbg-num", children: r[E.key].toFixed(3) })
+          ] }, E.key))
         ] }, A)),
         /* @__PURE__ */ de.jsxs("div", { className: "orbdbg-group", children: [
           /* @__PURE__ */ de.jsx("div", { className: "orbdbg-group-title", children: "Audio smoothing" }),
@@ -32676,7 +32676,7 @@ function Dx({
                 max: A.max,
                 step: A.step,
                 value: u[A.key],
-                onChange: (_) => v(A.key, parseFloat(_.target.value))
+                onChange: (E) => v(A.key, parseFloat(E.target.value))
               }
             ),
             /* @__PURE__ */ de.jsx("span", { className: "orbdbg-num", children: u[A.key].toFixed(3) })
@@ -32727,10 +32727,10 @@ const Ox = `
 .orbdbg-actions button:hover { background:rgba(255,255,255,0.12); }
 `;
 function Nx() {
-  const [i, e] = K.useState(
+  const [i, e] = Y.useState(
     () => typeof window < "u" && typeof window.matchMedia == "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
-  return K.useEffect(() => {
+  return Y.useEffect(() => {
     if (typeof window.matchMedia != "function") return;
     const t = window.matchMedia("(prefers-reduced-motion: reduce)"), a = () => e(t.matches);
     return t.addEventListener("change", a), () => t.removeEventListener("change", a);
@@ -32764,41 +32764,42 @@ function gf({
   paused: r = !1,
   debug: l = !1,
   palette: u,
-  maxDpr: d = 2,
-  simulate: h = null,
-  audioParams: f,
-  getFrequencyData: g,
-  onFrame: v
+  params: d,
+  maxDpr: h = 2,
+  simulate: f = null,
+  audioParams: g,
+  getFrequencyData: v,
+  onFrame: b
 }) {
-  const b = K.useRef(null), [S, k] = K.useState(!1), C = JSON.stringify(u ?? {}), A = K.useMemo(() => bx(u), [C]), _ = K.useRef({ ...eo }), z = K.useRef({ ...ac, ...f }), O = JSON.stringify(f ?? {});
-  K.useEffect(() => {
-    Object.assign(z.current, ac, f);
-  }, [O]);
-  const E = Nx(), { audioRef: x, metersRef: N } = Ax({
+  const S = Y.useRef(null), [k, C] = Y.useState(!1), A = JSON.stringify(u ?? {}), E = Y.useMemo(() => bx(u), [A]), B = Y.useRef({ ...eo, ...d }), O = Y.useRef({ ...ac, ...g }), _ = JSON.stringify(g ?? {});
+  Y.useEffect(() => {
+    Object.assign(O.current, ac, g);
+  }, [_]);
+  const x = Nx(), { audioRef: N, metersRef: z } = Ax({
     source: e,
-    simulate: h,
+    simulate: f,
     paused: r,
-    paramsRef: z,
-    getFrequencyData: g
-  }), B = K.useRef(null), X = K.useRef(void 0);
-  return X.current = (H) => {
-    B.current = H, v == null || v(H);
+    paramsRef: O,
+    getFrequencyData: v
+  }), X = Y.useRef(null), G = Y.useRef(void 0);
+  return G.current = (H) => {
+    X.current = H, b == null || b(H);
   }, kx({
-    containerRef: b,
-    maxDpr: d,
-    palette: A,
+    containerRef: S,
+    maxDpr: h,
+    palette: E,
     paused: r,
-    reducedMotion: E,
+    reducedMotion: x,
     debug: l,
     state: i,
-    paramsRef: _,
-    audioRef: x,
-    onFrameRef: X,
-    onError: () => k(!0)
+    paramsRef: B,
+    audioRef: N,
+    onFrameRef: G,
+    onError: () => C(!0)
   }), /* @__PURE__ */ de.jsxs(
     "div",
     {
-      ref: b,
+      ref: S,
       className: a,
       "data-orb-state": i,
       style: {
@@ -32809,14 +32810,14 @@ function gf({
         contain: "layout paint size"
       },
       children: [
-        S && /* @__PURE__ */ de.jsx(Px, { palette: A }),
-        l && !S && /* @__PURE__ */ de.jsx(
+        k && /* @__PURE__ */ de.jsx(Px, { palette: E }),
+        l && !k && /* @__PURE__ */ de.jsx(
           Dx,
           {
-            paramsRef: _,
-            audioParamsRef: z,
-            metersRef: N,
-            telemetryRef: B
+            paramsRef: B,
+            audioParamsRef: O,
+            metersRef: z,
+            telemetryRef: X
           }
         )
       ]
@@ -32825,32 +32826,32 @@ function gf({
 }
 const Ix = "agent_6001ky3xa8eded1r959raw2w6jth";
 function Ux({ palette: i = "ember", size: e = 188, ui: t = !0, debug: a = !1, onState: r, controls: l }) {
-  const [u, d] = K.useState(!1), [h, f] = K.useState(!1), [g, v] = K.useState(!1), [b, S] = K.useState(null), k = FA({
+  const [u, d] = Y.useState(!1), [h, f] = Y.useState(!1), [g, v] = Y.useState(!1), [b, S] = Y.useState(null), k = FA({
     onConnect: () => S(null),
     onError: (j) => S(j || "Connection error")
   }), {
     status: C,
     isSpeaking: A,
-    startSession: _,
-    endSession: z,
+    startSession: E,
+    endSession: B,
     getInputByteFrequencyData: O,
-    getOutputByteFrequencyData: E,
+    getOutputByteFrequencyData: _,
     getInputVolume: x
-  } = k, N = K.useRef(A);
+  } = k, N = Y.useRef(A);
   N.current = A;
-  const B = K.useRef(C);
-  B.current = C;
-  const X = K.useRef(!1), H = K.useRef(!1), G = K.useRef(0), $ = K.useCallback(() => {
-    if (B.current !== "connected") return null;
+  const z = Y.useRef(C);
+  z.current = C;
+  const X = Y.useRef(!1), G = Y.useRef(!1), H = Y.useRef(0), $ = Y.useCallback(() => {
+    if (z.current !== "connected") return null;
     try {
-      return N.current ? E() : X.current ? O() : null;
+      return N.current ? _() : X.current ? O() : null;
     } catch {
       return null;
     }
-  }, [E, O]);
-  K.useEffect(() => {
+  }, [_, O]);
+  Y.useEffect(() => {
     if (C !== "connected") {
-      X.current = !1, H.current = !1, d(!1), f(!1);
+      X.current = !1, G.current = !1, d(!1), f(!1);
       return;
     }
     let j = 0;
@@ -32863,22 +32864,22 @@ function Ux({ palette: i = "ember", size: e = 188, ui: t = !0, debug: a = !1, on
         re = 0;
       }
       if (N.current) {
-        X.current && (X.current = !1, d(!1)), H.current && (H.current = !1, f(!1)), G.current = 0;
+        X.current && (X.current = !1, d(!1)), G.current && (G.current = !1, f(!1)), H.current = 0;
         return;
       }
       const fe = X.current, ve = fe ? re > 0.05 : re > 0.12;
-      ve !== fe && (X.current = ve, d(ve), fe && !ve && (G.current = performance.now()));
-      const be = !ve && G.current > 0 && performance.now() - G.current < 7e3;
-      be !== H.current && (H.current = be, f(be));
+      ve !== fe && (X.current = ve, d(ve), fe && !ve && (H.current = performance.now()));
+      const be = !ve && H.current > 0 && performance.now() - H.current < 7e3;
+      be !== G.current && (G.current = be, f(be));
     };
     return j = requestAnimationFrame(ae), () => cancelAnimationFrame(j);
   }, [C, x]);
-  const J = C === "connecting" ? "connecting" : C === "error" || b ? "error" : C === "connected" ? A ? "assistant-speaking" : u ? "user-speaking" : h ? "thinking" : "listening" : g ? "mic-denied" : "idle", te = K.useRef(r);
-  te.current = r, K.useEffect(() => {
+  const J = C === "connecting" ? "connecting" : C === "error" || b ? "error" : C === "connected" ? A ? "assistant-speaking" : u ? "user-speaking" : h ? "thinking" : "listening" : g ? "mic-denied" : "idle", te = Y.useRef(r);
+  te.current = r, Y.useEffect(() => {
     var j;
     (j = te.current) == null || j.call(te, J);
   }, [J]);
-  const le = K.useCallback(async () => {
+  const le = Y.useCallback(async () => {
     v(!1), S(null);
     try {
       (await navigator.mediaDevices.getUserMedia({ audio: !0 })).getTracks().forEach((ae) => ae.stop());
@@ -32886,9 +32887,9 @@ function Ux({ palette: i = "ember", size: e = 188, ui: t = !0, debug: a = !1, on
       v(!0);
       return;
     }
-    _({ agentId: Ix, connectionType: "webrtc" });
-  }, [_]), Ae = K.useRef(l);
-  Ae.current = l, K.useEffect(() => {
+    E({ agentId: Ix, connectionType: "webrtc" });
+  }, [E]), Ae = Y.useRef(l);
+  Ae.current = l, Y.useEffect(() => {
     var j;
     (j = Ae.current) == null || j.call(Ae, {
       start: () => {
@@ -32896,12 +32897,12 @@ function Ux({ palette: i = "ember", size: e = 188, ui: t = !0, debug: a = !1, on
       },
       end: () => {
         try {
-          z();
+          B();
         } catch {
         }
       }
     });
-  }, [le, z]);
+  }, [le, B]);
   const V = J === "connecting" ? "connecting" : J === "error" || J === "mic-denied" ? "error" : J === "assistant-speaking" ? "assistant-speaking" : J === "user-speaking" ? "user-speaking" : J === "thinking" ? "connecting" : J === "listening" ? "listening" : "idle", ee = /* @__PURE__ */ de.jsx(
     gf,
     {
@@ -32915,7 +32916,7 @@ function Ux({ palette: i = "ember", size: e = 188, ui: t = !0, debug: a = !1, on
   );
   if (!t) return ee;
   const he = C === "connected", ge = C === "connecting", Ce = () => {
-    ge || (he ? z() : le());
+    ge || (he ? B() : le());
   };
   let M;
   return g ? M = "Enable microphone access, then tap again" : b && !he ? M = b + " — tap to retry" : ge ? M = "Connecting…" : J === "assistant-speaking" ? M = "Speaking… (tap to end)" : he ? M = "Listening — go ahead (tap to end)" : M = "Tap to talk", /* @__PURE__ */ de.jsxs("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }, children: [
@@ -32965,47 +32966,65 @@ const Bx = [
   "connecting",
   "error"
 ];
-function Fx({ size: i = 320 }) {
-  const [e, t] = K.useState("idle"), [a, r] = K.useState("arctic"), [l, u] = K.useState(null), d = (g) => ({
+function Fx({ size: i = 320, presets: e, panel: t = !0 }) {
+  var C, A;
+  const [a, r] = Y.useState(0), [l, u] = Y.useState("idle"), [d, h] = Y.useState(((C = e == null ? void 0 : e[0]) == null ? void 0 : C.palette) ?? "arctic"), [f, g] = Y.useState(null), v = (E) => ({
     padding: "5px 10px",
     borderRadius: 999,
     cursor: "pointer",
     border: "1px solid rgba(255,255,255,0.12)",
-    background: g ? "rgba(155,92,255,0.35)" : "rgba(255,255,255,0.05)",
-    color: g ? "#fff" : "#a7abbd",
+    background: E ? "rgba(155,92,255,0.35)" : "rgba(255,255,255,0.05)",
+    color: E ? "#fff" : "#a7abbd",
     font: "11px/1 ui-monospace, SFMono-Regular, Menlo, monospace"
-  }), h = {
+  }), b = {
     display: "flex",
     gap: 6,
     flexWrap: "wrap",
     justifyContent: "center",
     alignItems: "center"
-  }, f = {
+  }, S = {
     font: "10px/1 ui-monospace, SFMono-Regular, Menlo, monospace",
     color: "#6f7386",
     textTransform: "uppercase",
     letterSpacing: "0.08em",
     marginRight: 2
+  }, k = (E) => {
+    r(E), e != null && e[E] && h(e[E].palette);
   };
   return /* @__PURE__ */ de.jsxs("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 28 }, children: [
-    /* @__PURE__ */ de.jsx(gf, { state: e, simulate: l, palette: Ps[a], size: i, debug: !0 }),
+    /* @__PURE__ */ de.jsx(
+      gf,
+      {
+        state: l,
+        simulate: f,
+        palette: Ps[d],
+        params: (A = e == null ? void 0 : e[a]) == null ? void 0 : A.params,
+        size: i,
+        debug: t
+      },
+      a
+    ),
     /* @__PURE__ */ de.jsxs("div", { style: { display: "flex", flexDirection: "column", gap: 10 }, children: [
-      /* @__PURE__ */ de.jsxs("div", { style: h, children: [
-        /* @__PURE__ */ de.jsx("span", { style: f, children: "state" }),
-        Bx.map((g) => /* @__PURE__ */ de.jsx("button", { style: d(e === g), onClick: () => t(g), children: g }, g))
+      e && e.length > 0 && /* @__PURE__ */ de.jsxs("div", { style: b, children: [
+        /* @__PURE__ */ de.jsx("span", { style: S, children: "variation" }),
+        e.map((E, B) => /* @__PURE__ */ de.jsx("button", { style: v(a === B), onClick: () => k(B), children: E.name }, E.name))
       ] }),
-      /* @__PURE__ */ de.jsxs("div", { style: h, children: [
-        /* @__PURE__ */ de.jsx("span", { style: f, children: "palette" }),
-        Object.keys(Ps).map((g) => /* @__PURE__ */ de.jsx("button", { style: d(a === g), onClick: () => r(g), children: g }, g)),
-        /* @__PURE__ */ de.jsx("span", { style: { ...f, marginLeft: 14 }, children: "simulate" }),
-        ["user", "assistant"].map((g) => /* @__PURE__ */ de.jsx(
+      /* @__PURE__ */ de.jsxs("div", { style: b, children: [
+        /* @__PURE__ */ de.jsx("span", { style: S, children: "state" }),
+        Bx.map((E) => /* @__PURE__ */ de.jsx("button", { style: v(l === E), onClick: () => u(E), children: E }, E))
+      ] }),
+      /* @__PURE__ */ de.jsxs("div", { style: b, children: [
+        /* @__PURE__ */ de.jsx("span", { style: S, children: "palette" }),
+        Object.keys(Ps).map((E) => /* @__PURE__ */ de.jsx("button", { style: v(d === E), onClick: () => h(E), children: E }, E)),
+        /* @__PURE__ */ de.jsx("span", { style: { ...S, marginLeft: 14 }, children: "simulate" }),
+        ["user", "assistant"].map((E) => /* @__PURE__ */ de.jsx(
           "button",
           {
-            style: d(l === g),
-            onClick: () => u((v) => v === g ? null : g),
-            children: g
+            style: v(f === E),
+            onClick: () => g((B) => B === E ? null : E),
+            children: E
           },
-          g
+          E
         ))
       ] })
     ] })
@@ -33013,7 +33032,7 @@ function Fx({ size: i = 320 }) {
 }
 function zx(i, e = {}) {
   const t = zh.createRoot(i);
-  return t.render(/* @__PURE__ */ de.jsx(Fx, { size: e.size })), t;
+  return t.render(/* @__PURE__ */ de.jsx(Fx, { size: e.size, presets: e.presets, panel: e.panel })), t;
 }
 window.BhanuOrb = { mount: NS, mountVisual: Lx, mountLab: zx, PALETTES: Ps };
 const Ur = document.getElementById("bhanu-orb");
