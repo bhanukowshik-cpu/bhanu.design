@@ -4115,6 +4115,49 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* size comes from the display scale on .dna2-heading; this only frees the wrap */
     .dna2-heading { white-space: normal; text-wrap: balance; }
 
+    /* ── THE T ON A PHONE ──────────────────────────────────────────────
+       Below 768 the five-column bar had no scaling step of its own, so it
+       kept desktop tiles inside a ~335px frame: every label was clipped
+       mid-word ("ustom/iscover"), and the quote card — still in columns
+       4-6 — came out ~73px wide and set one word per line.
+
+       The T is NOT stacked or scrolled here: the shape IS the point. The
+       bar keeps its five columns, the stem keeps column 3, and the whole
+       figure just scales down. Only the quote card leaves the row — it
+       drops to a full-width second row, being the one part that cannot
+       survive at a fifth of a phone screen.
+
+       NOTE ON POSITION: this block lives AFTER the dna2 base rules on
+       purpose. The other dna2 breakpoints sit up at ~3776, above
+       `.dna2-bar{gap:20px}` and `.dna2-panel{grid-column:4/6}` — equal
+       specificity, later in source, so the base rules quietly win and
+       those breakpoints never actually land. Keep new dna2 overrides
+       down here. */
+    @media (max-width: 767px) {
+      .dna2-bar, .dna2-lower { gap: 5px; }
+      .dna2-tile {
+        min-height: 0; padding: 8px 3px; gap: 4px; border-radius: 9px;
+        /* square blocks keep the bar reading as a bar rather than a row
+           of slabs; the stem inherits the same tile */
+        aspect-ratio: 1 / 1;
+      }
+      .dna2-tile-ic { width: clamp(17px, 5.4vw, 26px); height: clamp(17px, 5.4vw, 26px); }
+      .dna2-tile-nm {
+        font-size: clamp(7px, 2.3vw, 11px); line-height: 1.15; letter-spacing: -0.012em;
+        /* "Engineering" alone is wider than a fifth of the screen —
+           let it break instead of spilling out of the tile */
+        overflow-wrap: anywhere; hyphens: auto;
+      }
+      .dna2-stem { gap: 5px; }
+      /* out of columns 4-6, onto its own full-width row under the T */
+      .dna2-panel {
+        grid-column: 1 / -1; grid-row: 2;
+        margin-left: 0; margin-top: 14px;
+        padding: 15px 16px 14px; border-radius: 14px;
+      }
+      .dna2-quote { font-size: 13.5px; line-height: 1.55; }
+    }
+
   /* ── 04 — SAID: word of mouth ───────────────────────────────────────────
        One voice at a time, set like an epigraph: a serif quote on a still
        stage, the four names waiting quietly underneath. The dwell line under
