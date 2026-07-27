@@ -777,15 +777,17 @@
     }
 /* ── Section 2 redesign — Featured Work ─────────────────── */
     .s2-fw-header {
-      /* ── THE RIDGE DIVIDER ─────────────────────────────────────────
-         The band between the hero and the work is the hero's horizon
-         carried forward: a near-black ramp (no third page colour — it
-         leaves the hero's dark and eases into the section's navy) with
-         one glowing azure ridge line under the heading, so the title
-         stands on the ridge the way the silhouette does. */
+      /* ── THE DIVIDER ───────────────────────────────────────────────
+         The band between the hero and the work: the title alone in a
+         near-black breath. The ramp's ends are matched to its
+         neighbours — #05070B against the hero's dark, and #0B0C0F at
+         the seam, which is the tone the section's vignette actually
+         reaches at its top edge — so no strip of "third colour" ever
+         shows. (The azure ridge line lived here briefly; it bothered
+         more than it gave.) */
       margin: 0;
       padding: 13vh 40px 9vh;
-      background: linear-gradient(180deg, #05070B 0%, #080B11 55%, var(--bg) 100%);
+      background: linear-gradient(180deg, #05070B 0%, #090C11 50%, #0B0C0F 100%);
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -799,33 +801,10 @@
       z-index: 20;
     }
 .s2-fw-header.s2-fwh-in { opacity: 1; transform: none; }
-/* the ridge — a full-width structural hairline (the Locomotive/basement
-   grammar), lit with an off-centre hot spot where the hero's god-ray
-   lands; the soft radial is the only glow */
-    .fwh-ridge {
-      width: 100%;
-      height: 1px;
-      margin-top: 30px;
-      position: relative;
-      background: linear-gradient(90deg,
-        transparent 0%, rgba(92,169,255,0.08) 18%,
-        rgba(140,197,255,0.75) 62%,
-        rgba(92,169,255,0.08) 88%, transparent 100%);
-      transform: scaleX(0.62);
-      opacity: 0;
-      transition: transform 1.1s cubic-bezier(0.22,1,0.36,1) 0.18s,
-                  opacity 1.1s cubic-bezier(0.22,1,0.36,1) 0.18s;
-    }
-.s2-fw-header.s2-fwh-in .fwh-ridge { transform: none; opacity: 1; }
-.fwh-ridge::after {
-      content: '';
-      position: absolute;
-      inset: -14px -4%;
-      background: radial-gradient(46% 100% at 62% 50%, rgba(92,169,255,0.30), transparent 72%);
-      pointer-events: none;
-    }
+/* (the azure ridge hairline lived here — removed, it bothered more than
+   it gave; the title now stands alone in the breath) */
 @media (prefers-reduced-motion: reduce) {
-      .s2-fw-header, .fwh-ridge { transition: none; }
+      .s2-fw-header { transition: none; }
     }
 .s2-fwh-row {
       display: flex;
@@ -1946,17 +1925,8 @@ html:not([data-theme="dark"]) .s2-vt-thumb {
       -webkit-text-fill-color: var(--secondary);
       color: var(--secondary);
     }
-/* the band and the ridge flip with the theme — light ground, deep azure */
+/* the band flips with the theme — flat light ground, nothing else */
     html:not([data-theme="dark"]) .s2-fw-header { background: var(--bg); }
-    html:not([data-theme="dark"]) .fwh-ridge {
-      background: linear-gradient(90deg,
-        transparent 0%, rgba(36,99,220,0.10) 18%,
-        rgba(36,99,220,0.65) 62%,
-        rgba(36,99,220,0.10) 88%, transparent 100%);
-    }
-    html:not([data-theme="dark"]) .fwh-ridge::after {
-      background: radial-gradient(46% 100% at 62% 50%, rgba(36,99,220,0.18), transparent 72%);
-    }
 html:not([data-theme="dark"]) .s2-tab-btn {
       color: rgba(37,37,37,0.60);
       background: rgba(37,37,37,0.07);
@@ -3913,7 +3883,6 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <div class="s2-fwh-row">
           <h2 class="fw-title">Featured <span class="serif">Work</span></h2>
         </div>
-        <span class="fwh-ridge" aria-hidden="true"></span>
         <!-- the spiral/grid toggle is gone: there is one view of the work now.
              The JS that wired it is null-guarded, so it simply stands down. -->
       </div>
