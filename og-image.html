@@ -12,7 +12,7 @@
   <meta charset="UTF-8" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:wght@400..700&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 1200px; height: 630px; overflow: hidden; }
@@ -23,11 +23,16 @@
       color: #EFF3F8;
     }
 
-    /* the plate — the whole scene, photographed; grayscale guarantees pure B&W */
-    .plate { position: absolute; inset: 0; }
-    .plate img {
-      position: absolute; width: 1660px; left: -460px; top: -254px;
-      filter: grayscale(1) contrast(1.05);
+    /* the portrait — the chosen car-bokeh frame, B&W, blended at its left edge */
+    .cine {
+      position: absolute; left: 620px; top: 0; width: 580px; height: 630px;
+      overflow: hidden; z-index: 1;
+      -webkit-mask-image: linear-gradient(to right, transparent 0px, #000 150px);
+              mask-image: linear-gradient(to right, transparent 0px, #000 150px);
+    }
+    .cine img {
+      position: absolute; width: 760px; left: -134px; top: -37px;
+      filter: grayscale(1) contrast(1.08) brightness(1.02);
     }
 
     /* a breath of darkness behind the type column */
@@ -38,11 +43,10 @@
 
     /* ── type ── */
     .n0 {
-      position: absolute; left: 96px; top: 148px; z-index: 4;
-      font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400;
-      font-size: 40px; line-height: 1; letter-spacing: -0.004em; color: #EFF3F8;
+      position: absolute; left: 96px; top: 126px; z-index: 4;
+      font-family: 'Urbanist', sans-serif; font-weight: 550;
+      font-size: 34px; line-height: 1; letter-spacing: .01em; color: #EFF3F8;
       text-shadow: 0 3px 26px rgba(2,4,8,.8);
-      top: 122px;
     }
     .n1 {
       position: absolute; left: 92px; top: 188px; z-index: 4;
@@ -80,7 +84,7 @@
   </style>
 </head>
 <body>
-  <div class="plate"><img src="images/og-plate.jpg" alt="" /></div>
+  <div class="cine"><img src="images/bhanu-cinematic.jpg" alt="" /></div>
   <div class="scrim"></div>
 
   <div class="n0">AI Native Product Designer</div>
