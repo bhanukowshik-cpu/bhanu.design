@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" class="anno-off">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -202,6 +202,45 @@
   /* ── SMOKE — pure rising smoke, no visible shape ── */
   #smoke{position:absolute;inset:0;z-index:0;width:100%;height:100%;display:block;pointer-events:none;}
 
+  /* ── THE SILHOUETTE PLATE — the hero's ground ─────────────────────────
+     A generated loop (see silhouette-lab.html, where these numbers were
+     dialled in) sitting under everything. The grade is a CSS correction
+     stack, never a re-encode: the same file can be re-graded anywhere by
+     overriding these eight properties. The composition puts its crest and
+     its lone figure in the right third, which is what opens the left for
+     the headline — do not re-centre one without re-centring the other. ── */
+  :root{
+    --plate-focal-x:72%; --plate-focal-y:50%;
+    --plate-exposure:100%; --plate-saturate:100%; --plate-hue:0deg;
+    --plate-scale:1; --plate-scrim:0.55; --plate-vignette:0.5; --plate-grain:0.35;
+  }
+  .hero-plate{position:absolute;inset:0;z-index:0;width:100%;height:100%;
+    object-fit:cover;object-position:var(--plate-focal-x) var(--plate-focal-y);
+    transform:scale(var(--plate-scale));
+    transform-origin:var(--plate-focal-x) var(--plate-focal-y);
+    filter:brightness(var(--plate-exposure)) saturate(var(--plate-saturate)) hue-rotate(var(--plate-hue));
+    pointer-events:none;}
+  /* left-heavy, because the empty half of the frame is where the type lives */
+  .hero-scrim{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(100deg,
+      rgba(10,14,21,calc(var(--plate-scrim) * 1.05)) 0%,
+      rgba(10,14,21,calc(var(--plate-scrim) * 0.72)) 34%,
+      rgba(10,14,21,0) 68%);}
+  .hero-vig{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(120% 92% at 62% 46%,
+      rgba(10,14,21,0) 42%, rgba(10,14,21,calc(var(--plate-vignette) * .55)) 76%,
+      rgba(10,14,21,calc(var(--plate-vignette) * .95)) 100%);}
+  /* SVG turbulence, so there is no image request and no resolution to lose */
+  .hero-grain{position:absolute;inset:-120%;z-index:1;pointer-events:none;
+    opacity:var(--plate-grain);mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation:grainshift 7s steps(6) infinite;}
+  @keyframes grainshift{
+    0%{transform:translate(0,0)}      16%{transform:translate(-4%,-3%)}
+    33%{transform:translate(3%,-5%)}  50%{transform:translate(-5%,4%)}
+    66%{transform:translate(5%,3%)}   83%{transform:translate(-3%,5%)}
+    100%{transform:translate(0,0)}}
+
   /* ── RINGS — concentric hairlines from the bottom center (artisan-style, subtle) ── */
   .rings{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;}
   .ring,.orbit{position:absolute;left:50%;bottom:0;transform:translate(-50%,50%);border-radius:50%;}
@@ -335,8 +374,14 @@
   .cta-dock{animation:riseIn 1s var(--ease-expo) both .66s;}
 
   /* ── COPY — top middle, centered ── */
-  .copy{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    text-align:center;height:100%;padding:calc(88px + var(--anno-h)) 24px 64px;}
+  /* Anchored bottom-left against the plate. The dune's crest and figure own
+     the right third, so the type takes the empty half and stops well short
+     of them — hence the max-width, which is in px and vw, never ch: a ch
+     here would resolve against this container's font, not the headline's. */
+  .copy{position:relative;z-index:10;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;
+    text-align:left;height:100%;
+    max-width:min(1120px,76%);
+    padding:calc(88px + var(--anno-h)) 24px clamp(92px,13vh,150px) clamp(26px,5.4vw,92px);}
   /* identity line — plain label row, deliberately chrome-less */
   .eyebrow{display:inline-flex;align-items:center;gap:16px;
     margin-bottom:clamp(18px,2.8vh,28px);
@@ -366,7 +411,7 @@
     border:1px solid rgba(239,243,248,.22);}
   .hero-pill img{width:100%;height:100%;object-fit:cover;display:block;}
   /* stats band — one framed strip so the three facts read as a single unit */
-  .facts{margin-top:46px;display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;
+  .facts{margin-top:46px;display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:stretch;
     padding:15px clamp(22px,2.6vw,32px);border:1px solid var(--line);border-radius:18px;
     background:rgba(13,18,27,.38);
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
@@ -3667,7 +3712,17 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .top-nav.scrolled{left:calc(5% + 8px);right:calc(5% + 8px);padding:10px 20px;}
     /* let the hero grow if the stack outruns a short viewport */
     .hero{height:auto;min-height:100svh;}
-    .copy{height:auto;min-height:100svh;padding:12vh 24px 56px;}
+    /* the 76% column is a desktop device for keeping the type off the dune's
+       crest; on a phone the crest is cropped out anyway, so the copy takes
+       the full width back — without this it inherits 76% and the headline
+       collapses to eight lines in a 237px gutter. */
+    .copy{height:auto;min-height:100svh;max-width:none;padding:12vh 24px 56px;}
+    /* The desktop scrim is left-heavy because the plate keeps its bright half
+       on the right. A phone crop throws that half straight behind the type,
+       so here the scrim stops being directional and becomes a full wash —
+       without it the last headline line sits on the rim light and vanishes. */
+    .hero-scrim{background:linear-gradient(180deg,
+      rgba(10,14,21,.70) 0%, rgba(10,14,21,.56) 44%, rgba(10,14,21,.82) 100%);}
     .eyebrow{gap:10px;padding:8px 14px;font-size:10.5px;letter-spacing:.07em;}
     /* five lines of headline plus the stats band plus the button is the whole
        of a phone screen — the ceiling comes down so the fold can breathe */
@@ -3698,25 +3753,18 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 </style>
 </head>
 <body>
-  <!-- the announcement strip — first fold only, lifts away on scroll -->
-  <aside class="anno" id="anno">
-    <span class="anno-txt">Currently building <span class="serif">Dearly</span><span class="anno-long"> — a side project about keeping people close.</span></span>
-    <a class="anno-cta" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">
-      View Dearly
-      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9L9 3M4.2 3H9v4.8"/></svg>
-    </a>
-    <button class="anno-x" id="annoX" type="button" aria-label="Dismiss announcement">
-      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6"/></svg>
-    </button>
-  </aside>
+  <!-- The Dearly announcement strip is out. Its CSS and its dismiss/scroll
+       IIFE both remain and both no-op without this element, and <html> now
+       carries anno-off so --anno-h collapses to 0 — restoring the strip is
+       putting the <aside> back and dropping that class. -->
 
   <section class="hero">
-    <canvas id="smoke"></canvas>
-
-    <div class="rings" aria-hidden="true">
-      <i class="ring r1"></i><i class="ring r2"></i><i class="ring r3"></i><i class="ring r4"></i>
-      <i class="orbit o1"><b></b></i><i class="orbit o2"><b></b></i>
-    </div>
+    <video class="hero-plate" id="heroPlate" autoplay muted loop playsinline
+           poster="images/silhouette-poster.webp" src="images/silhouette.mp4"
+           aria-hidden="true"></video>
+    <div class="hero-scrim" aria-hidden="true"></div>
+    <div class="hero-vig" aria-hidden="true"></div>
+    <div class="hero-grain" aria-hidden="true"></div>
 
     <nav class="top-nav" id="topNav">
       <a class="nav-brand" href="#top">
@@ -3736,7 +3784,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
     <div class="copy">
       <div class="eyebrow"><span>Product Designer</span><i aria-hidden="true"></i><span>Builder</span><i aria-hidden="true"></i><span>Explorer</span></div>
-      <h1>Designing products <span class="hero-pill" aria-hidden="true"><img src="About  me Pictures/Kayaking.jpeg" alt=""></span> that scale, convert &amp; connect through first principles and <span class="serif">obsessive detail to craft.</span></h1>
+      <h1>Designing products that scale, convert &amp; connect through first principles and <span class="serif">obsessive detail to craft.</span></h1>
       <div class="facts">
         <div class="fact"><span class="v">5+ Years</span></div>
         <div class="fact"><span class="v">Conversational AI, Agentic Systems, 0→1</span></div>
@@ -3757,7 +3805,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       </div>
     </div>
 
-    <div class="trail" id="trail" aria-hidden="true"></div>
+    <!-- The image trail is retired on this hero: the silhouette carries it
+         alone. Its CSS and its spawn IIFE are both still in the file and
+         both no-op without this element (`if (!layer) return`), so putting
+         the div back is all it takes to bring the photos back. -->
   </section>
 
   <!-- ══ SECTION 2 — ported wholesale from index.html ══
@@ -4604,9 +4655,28 @@ function mountSmoke(canvas) {
   return { freeze: freeze };
 }
 
-/* the hero's — the talk panel holds this one still */
+/* the hero's smoke is retired — the silhouette plate is the hero's ground now.
+   mountSmoke returns null on a missing canvas, so this stays harmless and the
+   shader comes straight back if the canvas is ever restored. */
 var heroSmoke = mountSmoke(document.getElementById('smoke'));
 window.__freezeHero = heroSmoke ? heroSmoke.freeze : function () {};
+
+/* The plate runs at half speed: the drift reads as weather at 1×, as
+   atmosphere at 0.5×. Re-applied on metadata because attaching a source
+   resets the rate, and paused with the tab so a background hero costs
+   nothing. */
+(function () {
+  var plate = document.getElementById('heroPlate');
+  if (!plate) return;
+  var RATE = 0.5;
+  function rate() { plate.playbackRate = RATE; }
+  plate.addEventListener('loadedmetadata', rate);
+  rate();
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) plate.pause();
+    else { var p = plate.play(); if (p && p.catch) p.catch(function () {}); }
+  });
+})();
 
 /* the footer's — the same field, but it only runs while you are looking at
    it, so the page is never paying for two shaders at once */
