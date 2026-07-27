@@ -3726,8 +3726,15 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
   /* the page closes the way it opened: the same dome, the same rising smoke,
      the same circle as wide as the viewport with only its crest on screen */
+  /* the closer's plate — the hero's world mirrored, figure on the left */
+  .ft-plate{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;}
+  .ft-vig{position:absolute;inset:0;z-index:0;pointer-events:none;
+    background:
+      linear-gradient(180deg,var(--seam) 0%,transparent 16%),
+      radial-gradient(130% 100% at 24% 38%,transparent 0%,rgba(5,7,11,.28) 55%,rgba(5,7,11,.85) 100%);}
   .ft-grain{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
-  #ftSmoke{position:absolute;inset:0;width:100%;height:100%;display:block;}
+  /* the smoke dome stands down — the plate is the footer's world now */
+  #ftSmoke{position:absolute;inset:0;width:100%;height:100%;display:none;}
   /* scrim keeps the headline readable where the dome is brightest */
   .ft-scrim{position:absolute;inset:0;
     background:
@@ -3749,7 +3756,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
   .ft-inner{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;
     padding:clamp(40px,6vh,72px) var(--gutter) clamp(80px,11vh,128px);}
-  .ft-spread{flex:1;width:100%;max-width:1240px;margin:0 auto;display:flex;
+  .ft-spread{flex:1;width:100%;max-width:min(1240px, calc(100% - var(--gutter) * 2));margin:0 auto;display:flex;
+    /* row-reverse: the plate's figure owns the left, so the copy takes
+       the right and the note settles over the dark slope */
+    flex-direction:row-reverse;
     align-items:center;justify-content:space-between;gap:clamp(40px,5vw,72px);}
   .ft-left{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:28px;}
 
@@ -4828,6 +4838,13 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <!-- ── 05 — FOOTER ───────────────────────────────────────────────────── -->
   <footer class="ft" id="contactSection">
 
+    <!-- ── the closer mirrors the opener: the hero's world again, the
+         figure on the LEFT this time, an ambient loop under the copy ── -->
+    <video class="ft-plate" id="ftPlate" autoplay muted loop playsinline
+           poster="images/footer-silhouette-poster.webp" src="images/footer-silhouette.mp4"
+           aria-hidden="true"></video>
+    <div class="ft-vig" aria-hidden="true"></div>
+
     <div class="ft-grain" aria-hidden="true">
       <canvas id="ftSmoke"></canvas>
       <div class="ft-scrim"></div>
@@ -5315,7 +5332,9 @@ var topNav = document.getElementById('topNav');
   var reduced = matchMedia('(prefers-reduced-motion: reduce)');
   function smoothTo(el) {
     if (window.__lenis && !reduced.matches) {
-      window.__lenis.scrollTo(el, { duration: 1.2 });
+      /* land clear of the floating nav pill (bottom edge 86px) — the
+         Engine's anchors do the same */
+      window.__lenis.scrollTo(el, { offset: -96, duration: 1.25 });
     } else {
       el.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth' });
     }
@@ -5364,7 +5383,9 @@ var topNav = document.getElementById('topNav');
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   gsap.registerPlugin(ScrollTrigger);
-  var lenis = new Lenis({ duration: 1.1 });
+  /* 1.35 over the Engine's 1.1 — the longer glide is the plushness; the
+     easing stays Lenis's own expo-out */
+  var lenis = new Lenis({ duration: 1.35 });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
   gsap.ticker.lagSmoothing(0);
@@ -6191,11 +6212,22 @@ addEventListener('load', function () {
   /* ── a regular section, pinned for its reel ────────────────────────────
      The title-leads intro is out: "Featured Work" is a static heading at
      the top of the section — helix below it, like every other section's
-     header — and the pin's whole travel belongs to the reel. Map progress
-     straight onto it; the cards fly in via their own entrance
-     choreography. */
+     header — and the pin's whole travel belongs to the reel. */
   var fwHeader = document.getElementById('s2FwHeader');
   if (fwHeader) fwHeader.classList.add('s2-fwh-in');   /* the heading is simply on */
+
+  /* the reel CHASES the pin through a framerate-normalised lerp instead
+     of snapping 1:1 to each wheel step — seven viewports of raw coupling
+     was exactly what read as cheap scroll. The ticker detaches itself
+     the moment it lands. */
+  var reelTarget = 0, reelState = 0, reelTicking = false;
+  function reelTick() {
+    var k = 1 - Math.pow(1 - 0.14, gsap.ticker.deltaRatio());
+    reelState += (reelTarget - reelState) * k;
+    if (Math.abs(reelTarget - reelState) < 0.0004) reelState = reelTarget;
+    root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: reelState } }));
+    if (reelState === reelTarget) { gsap.ticker.remove(reelTick); reelTicking = false; }
+  }
 
   ScrollTrigger.create({
     trigger: sec,
@@ -6206,7 +6238,8 @@ addEventListener('load', function () {
     anticipatePin: 1,
     invalidateOnRefresh: true,
     onUpdate: function (self) {
-      root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: self.progress } }));
+      reelTarget = self.progress;
+      if (!reelTicking) { reelTicking = true; gsap.ticker.add(reelTick); }
     }
   });
   /* Lenis measures the document once and caches the limit. The pin-spacer is
