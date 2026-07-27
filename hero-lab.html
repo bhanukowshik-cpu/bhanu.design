@@ -1286,63 +1286,13 @@
 .s2-cards-zone {
       position: absolute;
       inset: 0;
-      /* No slab: the zone is clear so the helix floats on the intro's
-         backdrop image below it (z1). */
+      /* No slab: the zone is clear so the helix floats on the section's
+         own dark. */
       background: transparent;
       z-index: 2;
     }
-/* ── s1→s2 intro — driven inline by the pin's onUpdate ─────────── */
-    .s2-intro {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      overflow: hidden;
-      pointer-events: none;
-      visibility: hidden;            /* armed by the pin JS */
-    }
-.s2-intro.s2-intro-armed { visibility: visible; }
-.s2-intro-img-wrap {
-      /* Engine-style rise, compositor-friendly: the image is mounted
-         full-bleed ONCE and a clip-path window opens onto it — no layout
-         or re-raster per frame, unlike animating left/right/top. The
-         initial clip matches drive(0): a wide rounded panel at the
-         bottom edge, top peeking. */
-      position: absolute;
-      inset: 0;
-      clip-path: inset(86vh 12vw 0 12vw round 28px 28px 0 0);
-      will-change: clip-path;
-    }
-.s2-intro-img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      /* blur is CONSTANT — animating filter() re-blurs a viewport-sized
-         image every frame and is exactly what janky feels like. The
-         darkening rides the .s2-intro-shade overlay's opacity instead. */
-      filter: blur(22px);
-      transform: scale(1.06);        /* keep blur's soft edges outside the crop */
-    }
-.s2-intro-shade {
-      position: absolute;
-      inset: 0;
-      background: #05070B;
-      opacity: 0.22;
-      will-change: opacity;
-    }
-.s2-intro-title {
-      position: absolute;
-      left: 50%; top: 38vh;
-      transform: translate(-50%, 0);
-      font-family: var(--font-heading);
-      font-size: clamp(34px, 4vw, 56px);
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--ink);
-      text-shadow: 0 2px 24px rgba(0,0,0,0.45);
-      white-space: nowrap;
-      margin: 0;
-      will-change: transform, opacity;
-    }
-@media (max-width: 900px) { .s2-intro { display: none; } }
+/* (the s1→s2 image-grow intro lived here — removed; the section arrives
+   clean and the reel owns the whole pin) */
 /* Video + content row */
     .s2-video-section {
       display: flex;
@@ -2061,9 +2011,9 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
      ported markup carries no class, and !important because those are inline
      styles. */
   #spiral-root{
-    /* Transparent: the intro's blurred still is the section's persistent
-       backdrop, and the cards float straight on it. The renderer is already
-       alpha:true — this (!important) beats spiral.js's inline ground. */
+    /* Transparent: no ground, no grid — the cards float on the section's
+       own dark. The renderer is already alpha:true; this (!important)
+       beats spiral.js's inline ground paint. */
     background: transparent !important;}
 
   /* ══ RESTORED ═══════════════════════════════════════════════════════
@@ -3716,18 +3666,6 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        Its type and colour resolve through the alias tokens below, so it
        adopts this page's system instead of importing Montserrat. -->
       <section class="s2-section-wrap" id="s2Section">
-
-      <!-- ── s1→s2 intro: a blurred work still sits low in the frame, grows
-           to full-bleed as the pin advances, then the section's content
-           slides up over it. Armed by the pin JS (s2-intro-armed) so no-JS,
-           reduced-motion and mobile paths never see it. ── -->
-      <div class="s2-intro" id="s2Intro" aria-hidden="true">
-        <div class="s2-intro-img-wrap" id="s2IntroImgWrap">
-          <img class="s2-intro-img" src="images/card-et-live.png" alt="">
-          <div class="s2-intro-shade" id="s2IntroShade" aria-hidden="true"></div>
-        </div>
-        <h2 class="s2-intro-title" id="s2IntroTitle">Featured Work</h2>
-      </div>
 
 <!-- Canvas covers full section — renders behind header and work container -->
       <div class="s2-cards-zone" id="s2CardsZone">
@@ -5481,101 +5419,20 @@ addEventListener('load', function () {
 
   gsap.registerPlugin(ScrollTrigger);
 
-  /* ── the intro rides the front of the pin ──────────────────────────────
-     Phase A (grow, INTRO_GROW viewports): a blurred still sits low in the
-     frame; it swells to full-bleed as its blur clears, and the intro title
-     rides up the screen. Phase B (slide, INTRO_SLIDE viewports): the
-     section's real content — canvas and work container — slides up from
-     the bottom over the image while the header plays its own entrance.
-     Phase C (reel, REEL viewports): the remaining travel drives the helix
-     exactly as before. All inline-driven from onUpdate: scrubbed, no
-     tweens, so it tracks the finger. */
-  /* Phases OVERLAP — the slide starts before the grow lands and hands to
-     the reel without a gap; hard sequential gates read as dead stops. */
-  var GROW_END = 1.2, SLIDE_START = 0.95, SLIDE_END = 1.6, REEL = 1.1 * 7;
-  var TOTAL = SLIDE_END + REEL;
-  var intro      = document.getElementById('s2Intro');
-  var introWrap  = document.getElementById('s2IntroImgWrap');
-  var introShade = document.getElementById('s2IntroShade');
-  var introTitle = document.getElementById('s2IntroTitle');
-  var fwHeader   = document.getElementById('s2FwHeader');
-  var slideEls   = [
-    document.getElementById('s2CardsZone'),
-    document.querySelector('.s2-work-container')
-  ].filter(Boolean);
-  if (intro) intro.classList.add('s2-intro-armed');
-
-  function lerpN(a, b, t) { return a + (b - a) * t; }
-  function clamp01(t) { return t < 0 ? 0 : t > 1 ? 1 : t; }
-  function easeInOut(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
-  function easeOutC(t) { return 1 - Math.pow(1 - t, 3); }
-
-  function drive(vh) {
-    var a = easeInOut(clamp01(vh / GROW_END));
-    var b = easeOutC(clamp01((vh - SLIDE_START) / (SLIDE_END - SLIDE_START)));
-    var reelP = clamp01((vh - SLIDE_END) / REEL);
-
-    /* Engine-style rise, one compositor-friendly write: the image sits
-       full-bleed and a clip window opens onto it — top edge climbs from
-       the 86vh peek, sides open 12vw→0, corners relax. No layout, no
-       re-raster, no filter churn. */
-    if (introWrap) {
-      var rad = lerpN(28, 0, a).toFixed(1);
-      introWrap.style.clipPath = 'inset(' +
-        lerpN(86, 0, a).toFixed(2) + 'vh ' +
-        lerpN(12, 0, a).toFixed(2) + 'vw 0 ' +
-        lerpN(12, 0, a).toFixed(2) + 'vw round ' + rad + 'px ' + rad + 'px 0 0)';
-    }
-    /* darkening rides a composited opacity, not brightness() */
-    if (introShade) introShade.style.opacity = lerpN(0.22, 0.46, a).toFixed(3);
-    /* The title starts mid-frame (like the Engine's "One system…") and is
-       chased off the top by the panel's rising edge. */
-    if (introTitle) {
-      introTitle.style.transform = 'translate(-50%, ' + lerpN(0, -70, a).toFixed(2) + 'vh)';
-      introTitle.style.opacity = String(1 - Math.min(1, b * 2));
-    }
-    /* The intro never hides: its full-bleed blurred still stays on as the
-       section's backdrop, and the transparent canvas floats the helix
-       straight on it. */
-    for (var i = 0; i < slideEls.length; i++) {
-      slideEls[i].style.transform = b >= 1 ? '' : 'translateY(' + lerpN(100, 0, b).toFixed(2) + 'vh)';
-    }
-    /* Header enters via its own 0.9s transition — class-driven, so its
-       translateY(24px) entrance never fights the scrub. */
-    if (fwHeader) {
-      if (b > 0.5) fwHeader.classList.add('s2-fwh-in');
-      else if (b < 0.05) fwHeader.classList.remove('s2-fwh-in');
-    }
-    root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: reelP } }));
-  }
-
-  /* Scrub smoothing: drive() chases the scroll through a framerate-
-     normalized lerp instead of snapping 1:1 to each wheel step. The
-     plushness is the difference between gliding and twitching; the
-     ticker detaches itself the moment it lands. */
-  var driveTarget = 0, driveState = 0, driveTicking = false;
-  function driveTick() {
-    var k = 1 - Math.pow(1 - 0.16, gsap.ticker.deltaRatio());
-    driveState += (driveTarget - driveState) * k;
-    if (Math.abs(driveTarget - driveState) < 0.0004) driveState = driveTarget;
-    drive(driveState);
-    if (driveState === driveTarget) { gsap.ticker.remove(driveTick); driveTicking = false; }
-  }
-  function requestDrive(vh) {
-    driveTarget = vh;
-    if (!driveTicking) { driveTicking = true; gsap.ticker.add(driveTick); }
-  }
-
-  var st = ScrollTrigger.create({
+  /* The image-grow intro is gone — it read as cheap however it was
+     tuned. The section arrives clean: pin the section, map the pin's
+     progress straight onto the reel. The stage stays transparent and
+     the cards fly in via their own entrance choreography. */
+  ScrollTrigger.create({
     trigger: sec,
     start: 'top top',
-    end: function () { return '+=' + Math.round(innerHeight * TOTAL); },
+    end: function () { return '+=' + Math.round(innerHeight * 1.1 * 7); },
     pin: true,
     pinSpacing: true,
     anticipatePin: 1,
     invalidateOnRefresh: true,
     onUpdate: function (self) {
-      requestDrive(self.progress * TOTAL);
+      root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: self.progress } }));
     }
   });
   /* Lenis measures the document once and caches the limit. The pin-spacer is
@@ -5589,12 +5446,6 @@ addEventListener('load', function () {
   ScrollTrigger.addEventListener('refresh', syncLenis);
   ScrollTrigger.refresh();
   syncLenis();
-  /* Paint the resting state immediately — content parked below the fold,
-     intro at its small blurred pose — so arriving at the section never
-     flashes the un-driven layout. Seed the smoother so there's no
-     catch-up glide on load. */
-  driveState = driveTarget = st.progress * TOTAL;
-  drive(driveState);
   addEventListener('resize', function () { ScrollTrigger.refresh(); });
 });
 </script>
@@ -5630,13 +5481,8 @@ addEventListener('load', function () {
     function update() {
       var vpH = window.innerHeight;
 
-      /* A: FW title fade-in — stands down when the s2 intro pin drives the
-         header instead (desktop helix path); mobile/no-pin keeps this. */
-      var introDriven = (function () {
-        var r = document.getElementById('spiral-root');
-        return !!(document.getElementById('s2Intro') && r && r.hasAttribute('data-driven'));
-      })();
-      if (!fwHDone && !introDriven) {
+      /* A: FW title fade-in */
+      if (!fwHDone) {
         var hr = fwHeader.getBoundingClientRect();
         if (hr.top < vpH * 0.82) {
           fwHDone = true;
