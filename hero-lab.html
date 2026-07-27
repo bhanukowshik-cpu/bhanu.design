@@ -3098,7 +3098,12 @@ html:not([data-theme="dark"]) .abt-title { color: var(--secondary); }
 .dna2-sig-name { font-family: var(--font-heading); font-size: var(--fs-sm); font-weight: 700; color: var(--ink); letter-spacing: -0.005em; }
 .dna2-sig-role { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.65); }
 /* The T: breadth bar on top, then quote panel (left) + depth stem (right column) */
-    .dna2-t { width: min(100%, 1060px); min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+    .dna2-t { width: min(100%, 1060px); min-width: 0; display: flex; flex-direction: column; gap: 24px; position: relative; }
+/* Connector — an orthogonal line from the selected tile to the fixed
+   card, drawn by JS in the tile's own accent colour. First child of
+   .dna2-t so tiles and card paint above it. */
+    .dna2-link { position: absolute; inset: 0; pointer-events: none; overflow: visible; transition: opacity 0.18s ease; }
+.dna2-link path { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.75; }
 /* Axis labels — Caveat, flanked by arrows that expand outward from the centre */
     .dna2-axis { display: flex; align-items: center; gap: 12px; }
 .dna2-axis.breadth { justify-content: center; }
@@ -3148,10 +3153,14 @@ html:not([data-theme="dark"]) .abt-title { color: var(--secondary); }
 .dna2-tile.is-sel::after { opacity: 1; }
 /* Quote panel — the big glass card in the open corner, drives off the selected tile */
     .dna2-panel {
-      grid-column: 1 / 3; grid-row: 1; align-self: end; position: relative; background: #141418; border-radius: 18px;
+      /* fixed in one place: hugging the bar from below (the T's open
+         corner), 20px under the tiles. The connector line does the
+         pointing; the card never moves. Side-stripe accent retired —
+         the ring and glow carry the colour. */
+      grid-column: 1 / 3; grid-row: 1; align-self: start; position: relative; background: #141418; border-radius: 18px;
       padding: 20px 22px 18px; display: flex; flex-direction: column; overflow: hidden;
       margin-right: 20px;
-      border-left: 2px solid color-mix(in srgb, var(--lc) 42%, transparent);
+      margin-top: -4px;   /* band gap is 24px; the ask is 20 */
     }
 .dna2-panel::before {
       content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit; padding: 1px;
@@ -4059,7 +4068,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
                   </div>
                   <div class="dna2-axis depth"><span class="dna2-arm up"></span><span class="dna2-axis-label">Depth: how I think</span><span class="dna2-arm down"></span></div>
                   <div class="dna2-panel" id="dnaPanel">
-                    <div class="dna2-cardhead"><span class="dna2-ic"></span><span class="dna2-name dna2-fade"></span></div>
+                    <!-- no cardhead: the connector line names the source tile;
+                         repeating its title here read as an echo -->
                     <span class="dna2-qmark">&ldquo;</span>
                     <p class="dna2-quote dna2-fade"></p>
                   </div>
@@ -5038,10 +5048,53 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
       var dna = document.querySelector('.dna2');
       if (!dna) return;
       var panel = dna.querySelector('#dnaPanel');
-      var pName = panel && panel.querySelector('.dna2-name');
+      var pName = panel && panel.querySelector('.dna2-name');   // gone with the cardhead; guarded below
       var pQuote = panel && panel.querySelector('.dna2-quote');
       var tiles = Array.from(dna.querySelectorAll('.dna2-tile'));
       if (!panel || !tiles.length) return;
+
+      /* Connector: an orthogonal line from the selected tile to the fixed
+         card, in the tile's own accent. SVG with no viewBox — user units
+         are the element's own pixels. First child so everything paints
+         over it. */
+      var tRoot = dna.querySelector('.dna2-t');
+      var link = null, linkPath = null;
+      if (tRoot) {
+        link = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        link.setAttribute('class', 'dna2-link');
+        link.setAttribute('aria-hidden', 'true');
+        linkPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        link.appendChild(linkPath);
+        tRoot.insertBefore(link, tRoot.firstChild);
+      }
+      function drawLink(tile) {
+        if (!linkPath) return;
+        var rr = tRoot.getBoundingClientRect();
+        var tr = tile.getBoundingClientRect();
+        var pr = panel.getBoundingClientRect();
+        var d;
+        if (tr.bottom <= pr.top + 1) {
+          /* bar tile: drop from its foot, walk to the card's centre, drop in */
+          var x1 = tr.left + tr.width / 2 - rr.left;
+          var y1 = tr.bottom - rr.top;
+          var yTop = pr.top - rr.top;
+          var xC = pr.left + pr.width / 2 - rr.left;
+          d = Math.abs(x1 - xC) < 1
+            ? 'M' + x1 + ' ' + y1 + ' V' + yTop
+            : 'M' + x1 + ' ' + y1 + ' V' + ((y1 + yTop) / 2) + ' H' + xC + ' V' + yTop;
+        } else if (tr.top < pr.bottom) {
+          /* stem tile beside the card: straight across into its right edge */
+          var yS = tr.top + tr.height / 2 - rr.top;
+          d = 'M' + (tr.left - rr.left) + ' ' + yS + ' H' + (pr.right - rr.left);
+        } else {
+          /* stem tile below the card: across, then up into its foot */
+          var yB = tr.top + tr.height / 2 - rr.top;
+          var xC2 = pr.left + pr.width / 2 - rr.left;
+          d = 'M' + (tr.left - rr.left) + ' ' + yB + ' H' + xC2 + ' V' + (pr.bottom - rr.top);
+        }
+        linkPath.setAttribute('d', d);
+        linkPath.setAttribute('stroke', tile.style.getPropertyValue('--lc') || 'currentColor');
+      }
 
       var swapT;
       function select(tile) {
@@ -5056,13 +5109,18 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
         panel.style.setProperty('--c2', tile.style.getPropertyValue('--c2'));
         panel.style.setProperty('--lc', tile.style.getPropertyValue('--lc'));
         panel.style.setProperty('--icon', tile.style.getPropertyValue('--icon'));
-        // soft cross-fade the text
+        // soft cross-fade the text, and the line with it
         panel.classList.add('is-swapping');
+        if (link) link.style.opacity = '0';
         clearTimeout(swapT);
         swapT = setTimeout(function () {
-          pName.textContent = name;
+          if (pName) pName.textContent = name;
           pQuote.innerHTML = quote;
           panel.classList.remove('is-swapping');
+          /* redraw after the swap — the card's height may change with the
+             quote, and the line should land on the settled edge */
+          drawLink(tile);
+          if (link) link.style.opacity = '1';
         }, 170);
       }
 
@@ -5079,8 +5137,17 @@ document.getElementById('chatForm').addEventListener('submit', async function (e
       panel.style.setProperty('--c2', first.style.getPropertyValue('--c2'));
       panel.style.setProperty('--lc', first.style.getPropertyValue('--lc'));
       panel.style.setProperty('--icon', first.style.getPropertyValue('--icon'));
-      pName.textContent = first.querySelector('.dna2-tile-nm').textContent;
+      if (pName) pName.textContent = first.querySelector('.dna2-tile-nm').textContent;
       pQuote.innerHTML = first.querySelector('.dna2-q').innerHTML;
+      requestAnimationFrame(function () { drawLink(first); });
+      addEventListener('resize', function () {
+        var sel = dna.querySelector('.dna2-tile.is-sel');
+        if (sel) drawLink(sel);
+      });
+      addEventListener('load', function () {
+        var sel = dna.querySelector('.dna2-tile.is-sel');
+        if (sel) drawLink(sel);
+      });
     })();
 </script>
 <script>
