@@ -4078,14 +4078,37 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     }
 
     /* faint azure atmosphere pooling behind the centred portrait */
+    /* the share card's beam, not a blue bloom: a soft neutral rake of
+       light from the upper left, echoing the portrait's own key */
     .v6l-glow {
-      position: absolute; z-index: 1; left: 50%; bottom: -32vmax;
-      width: 84vmax; height: 84vmax; transform: translateX(-50%);
+      position: absolute; z-index: 1; inset: 0;
       pointer-events: none;
-      background: radial-gradient(closest-side,
-        rgba(92,169,255,.12), rgba(92,169,255,.045) 45%, transparent 72%);
+      background: linear-gradient(115deg,
+        rgba(240,246,255,.075) 0%, rgba(240,246,255,.03) 22%, transparent 46%);
       opacity: 0; transition: opacity 1.2s ease;
     }
+    /* giant hairline monogram, parked half off the frame */
+    .v6l-monogram {
+      position: absolute; z-index: 0; left: -4vw; top: 50%;
+      transform: translateY(-54%);
+      font-family: var(--sans); font-weight: 700;
+      font-size: min(72vh, 46vw); line-height: 1; letter-spacing: -0.03em;
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(239,243,248,.055);
+      pointer-events: none; user-select: none;
+    }
+    /* coordinate crosses — the card's tick marks */
+    .v6l-tick {
+      position: absolute; z-index: 2; width: 20px; height: 20px;
+      opacity: .55; pointer-events: none;
+    }
+    .v6l-tick::before, .v6l-tick::after {
+      content: ''; position: absolute; background: rgba(239,243,248,.3);
+    }
+    .v6l-tick::before { left: 0; right: 0; top: 50%; height: 1px; }
+    .v6l-tick::after  { top: 0; bottom: 0; left: 50%; width: 1px; }
+    .v6l-tick--tl { left: 6%; top: 15%; }
+    .v6l-tick--br { right: 6%; bottom: 14%; }
     #v6Loader.img-in .v6l-glow { opacity: 1; }
 
     /* Act I — the portrait: waits below the frame, slides up to centre
@@ -4192,16 +4215,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   </style>
 
   <div id="v6Loader" hidden role="status" aria-label="Loading portfolio">
-    <!-- the page's geometry vocabulary, staged around the centred portrait —
-         same hairline furniture as the thumbnails and sections -->
-    <div class="geo" aria-hidden="true">
-      <span class="geo-arc" style="width:88vmax;height:88vmax;left:50%;top:47%;margin-left:-44vmax;margin-top:-44vmax;"></span>
-      <span class="geo-arc thin" style="width:124vmax;height:124vmax;left:50%;top:47%;margin-left:-62vmax;margin-top:-62vmax;"></span>
-      <span class="geo-orbit" style="width:64vmax;height:64vmax;left:50%;top:47%;margin-left:-32vmax;margin-top:-32vmax;--spin:150s;"><b></b></span>
-      <span class="geo-cross" style="left:11%;top:26%;"></span>
-      <span class="geo-cross" style="right:13%;bottom:22%;"></span>
-      <span class="geo-sq" style="right:7%;top:15%;"></span>
-    </div>
+    <!-- the share card's furniture, not the page's orbits: a giant ghost
+         monogram parked off-frame and two hairline coordinate crosses.
+         The circles and the blue bloom are out. -->
+    <div class="v6l-monogram" aria-hidden="true">B</div>
+    <span class="v6l-tick v6l-tick--tl" aria-hidden="true"></span>
+    <span class="v6l-tick v6l-tick--br" aria-hidden="true"></span>
     <div class="v6l-glow" aria-hidden="true"></div>
     <figure class="v6l-portrait" aria-hidden="true">
       <img src="images/loader-portrait.webp" alt="" width="1050" height="1400"
@@ -6499,10 +6518,11 @@ addEventListener('load', function () {
     anticipatePin: 1,
     invalidateOnRefresh: true,
     onUpdate: function (self) {
-      /* the reel holds its opening pose through the first half of the pin
-         and plays across the second (annotation): the section is read
-         before the cards start moving. */
-      var HOLD = 0.5;
+      /* the reel waits until the visitor is ~half a viewport into the
+         section, then plays across everything that's left. HOLD is that
+         half-screen expressed as a fraction of the pin's 7.7 viewports —
+         NOT half the pin, which buried four screens in a dead zone. */
+      var HOLD = 0.5 / (1.1 * 7);
       reelTarget = self.progress <= HOLD ? 0 : (self.progress - HOLD) / (1 - HOLD);
       if (!reelTicking) { reelTicking = true; gsap.ticker.add(reelTick); }
     }
