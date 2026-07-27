@@ -2052,8 +2052,65 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
-/* ─── MOBILE ACCORDION (Section 2) ───────────────────────── */
+/* ─── MOBILE ACCORDION (Section 2) ─────────────────────────
+   The fallback for every visitor the helix turns away — under 901px, on a
+   coarse pointer, or with reduced motion asked for. It was built in JS but
+   had NO stylesheet and no rule ever un-hid it, so section 2 was a blank
+   band on every phone. `s2-no-helix` is set by the helix gate itself, so
+   this tracks the real decision instead of guessing at a width. */
     .s2-mobile-accordion { display: none; }
+
+    html.s2-no-helix .s2-mobile-accordion{
+      display:flex;flex-direction:column;gap:12px;
+      padding:0 var(--gutter) clamp(56px,9vh,88px);}
+    /* the helix never builds here, so its zone is an empty 100vh hole and
+       the project bar is its furniture */
+    html.s2-no-helix .s2-cards-zone,
+    html.s2-no-helix .s2-project-bar{display:none;}
+    /* the wrap is one locked screen built for a pinned helix; a list in
+       document flow has to be free to be as tall as it needs */
+    html.s2-no-helix .s2-section-wrap{height:auto;overflow:visible;}
+    /* .s2-fwh-in is added by the pin block — also desktop-only */
+    html.s2-no-helix .s2-fw-header{opacity:1;transform:none;}
+
+    .s2-acc-item{border:1px solid var(--line);border-radius:18px;
+      background:rgba(13,18,27,.5);
+      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+      overflow:hidden;transition:border-color .3s var(--ease);}
+    .s2-acc-item.s2-acc-open{border-color:rgba(92,169,255,.34);}
+    .s2-acc-header{display:flex;align-items:center;justify-content:space-between;gap:16px;
+      width:100%;padding:17px 18px;background:none;border:0;cursor:pointer;
+      text-align:left;color:var(--ink);font-family:var(--sans);
+      -webkit-tap-highlight-color:transparent;}
+    .s2-acc-name{font-size:16.5px;font-weight:550;letter-spacing:-0.012em;}
+    .s2-acc-chevron{width:19px;height:19px;flex-shrink:0;color:var(--ink-3);
+      transition:transform .42s var(--ease-expo),color .3s;}
+    .s2-acc-open .s2-acc-chevron{transform:rotate(180deg);color:var(--ember);}
+    /* max-height rather than a 0fr grid: the body has four children, and
+       grid-template-rows:0fr would only ever collapse the first of them */
+    .s2-acc-body{max-height:0;opacity:0;overflow:hidden;padding:0 18px;
+      transition:max-height .55s var(--ease-expo),opacity .3s ease,padding .55s var(--ease-expo);}
+    .s2-acc-open .s2-acc-body{max-height:760px;opacity:1;padding:0 18px 18px;}
+    .s2-acc-desc{margin:0 0 14px;font-size:14px;line-height:1.62;color:var(--ink-2);}
+    .s2-acc-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:15px;}
+    .s2-acc-tag{padding:5px 11px;border:1px solid var(--line);border-radius:100px;
+      font-size:11px;font-weight:500;letter-spacing:.03em;color:var(--ink-3);
+      background:rgba(239,243,248,.04);}
+    .s2-acc-metrics{display:flex;flex-wrap:wrap;gap:22px;
+      padding-top:14px;border-top:1px solid var(--line);}
+    .s2-acc-metric{display:flex;flex-direction:column;gap:3px;}
+    .s2-acc-metric-val{font-size:19px;font-weight:600;letter-spacing:-0.018em;color:var(--ink);
+      font-variant-numeric:tabular-nums lining-nums;}
+    .s2-acc-metric-lbl{font-size:10.5px;font-weight:550;letter-spacing:.1em;
+      text-transform:uppercase;color:var(--ink-3);}
+    .s2-acc-cta{display:inline-flex;align-items:center;gap:7px;margin-top:16px;
+      padding:11px 19px;border-radius:13px;border:1px solid rgba(92,169,255,.34);
+      font-size:13.5px;font-weight:550;letter-spacing:.01em;
+      color:var(--ember);text-decoration:none;background:rgba(92,169,255,.07);}
+    .s2-acc-cta:active{background:rgba(92,169,255,.15);}
+    @media (prefers-reduced-motion:reduce){
+      .s2-acc-body,.s2-acc-chevron,.s2-acc-item{transition:none;}
+    }
 /* ═══════════════════════════════════════════════════════════
        LIGHT MODE OVERRIDES — "dark island" sections
        All sections below used hardcoded var(--cream) / #111 / #252525
@@ -7492,7 +7549,13 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
   var ok = innerWidth >= 901 &&
            matchMedia('(pointer:fine)').matches &&
            !matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!ok) { root.removeAttribute('id'); return; }
+  /* the flag the accordion's CSS keys off — set here so it tracks this
+     exact decision (width AND pointer AND motion), not a guessed width */
+  if (!ok) {
+    root.removeAttribute('id');
+    document.documentElement.classList.add('s2-no-helix');
+    return;
+  }
   root.classList.add('is-live');
   /* data-driven stands spiral.js's own wheel handler down: the pin below owns
      the travel. That handler calls preventDefault, which would stop the pin
@@ -7869,7 +7932,14 @@ addEventListener('load', function () {
       else t.scrollIntoView({ behavior: 'smooth' });
     });
 
-    if (!spiralRoot) return;
+    /* The spiral-only bail used to sit HERE, and it took the phone's whole
+       work section down with it: the helix gate strips #spiral-root below
+       901px, so spiralRoot was null and this returned before ever reaching
+       buildAccordion() — leaving section 2 an empty band on every phone.
+       It now sits after the accordion is built, so the mobile path lives.
+       Everything between is either tabsList-guarded or a click handler on
+       a control that is hidden at those widths; the dispatches below are
+       null-safe regardless. */
 
     /* Build tab buttons (only if tab strip still exists in DOM) */
     var tabBtns = [];
@@ -7884,7 +7954,7 @@ addEventListener('load', function () {
         btn.className = 's2-tab-btn' + (i === 0 ? ' s2-tab-active' : '');
         btn.textContent = card.tab;
         btn.addEventListener('click', function () {
-          spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', { detail: { idx: i } }));
+          spiralRoot && spiralRoot.dispatchEvent(new CustomEvent('s2:goToCard', { detail: { idx: i } }));
         });
         tabsList.appendChild(btn);
         tabBtns.push(btn);
@@ -7899,18 +7969,18 @@ addEventListener('load', function () {
     var navUp = document.getElementById('s2NavUp');
     var navDn = document.getElementById('s2NavDown');
     if (navUp) navUp.addEventListener('click', function () {
-      spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: -1 } }));
+      spiralRoot && spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: -1 } }));
     });
     if (navDn) navDn.addEventListener('click', function () {
-      spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: 1 } }));
+      spiralRoot && spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: 1 } }));
     });
     var sideNavPrev = document.getElementById('s2SideNavPrev');
     var sideNavNext = document.getElementById('s2SideNavNext');
     if (sideNavPrev) sideNavPrev.addEventListener('click', function () {
-      spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: -1 } }));
+      spiralRoot && spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: -1 } }));
     });
     if (sideNavNext) sideNavNext.addEventListener('click', function () {
-      spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: 1 } }));
+      spiralRoot && spiralRoot.dispatchEvent(new CustomEvent('s2:stepCard', { detail: { dir: 1 } }));
     });
 
     /* Count a metric value from 0 up to its number, preserving prefix/suffix */
@@ -8154,6 +8224,10 @@ addEventListener('load', function () {
         });
       });
     })();
+
+    /* …and the spiral-only bail lands here, with the accordion already
+       built. Below 901px everything past this point is desktop furniture. */
+    if (!spiralRoot) return;
 
     /* Init with card 0 */
     setTimeout(function () { updatePanels(0); }, 900);
