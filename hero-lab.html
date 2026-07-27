@@ -776,7 +776,9 @@
     }
 /* ── Section 2 redesign — Featured Work ─────────────────── */
     .s2-fw-header {
-      padding: 20px 40px 10px;
+      /* clears the floating nav pill (top 12 + height 74) so the heading
+         reads below it, the way a regular section header would */
+      padding: 100px 40px 10px;
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -5733,79 +5735,26 @@ addEventListener('load', function () {
 
   gsap.registerPlugin(ScrollTrigger);
 
-  /* ── the title leads the section in ────────────────────────────────────
-     Premium-portfolio grammar (Koto's NEXT-UP frames, MOUTHWASH's lone
-     floating line): the section opens on "Featured Work" alone at display
-     scale, and as the pin advances the SAME element docks into its header
-     slot — FLIP on the real node, so it lands pixel-perfect — while the
-     content rises from below. Type-only: transform and opacity, nothing
-     repaints, and the scrub is smoothed so it glides. */
-  var TITLE = 0.9, REEL = 1.1 * 7, TOTAL = TITLE + REEL;
-  var DOCK_SCALE = 2.6;
+  /* ── a regular section, pinned for its reel ────────────────────────────
+     The title-leads intro is out: "Featured Work" is a static heading at
+     the top of the section — helix below it, like every other section's
+     header — and the pin's whole travel belongs to the reel. Map progress
+     straight onto it; the cards fly in via their own entrance
+     choreography. */
   var fwHeader = document.getElementById('s2FwHeader');
-  var fwTitle  = fwHeader ? fwHeader.querySelector('.fw-title') : null;
-  var slideEls = [
-    document.getElementById('s2CardsZone'),
-    document.querySelector('.s2-work-container')
-  ].filter(Boolean);
-  if (fwHeader) fwHeader.classList.add('s2-fwh-in');   /* the title acts from frame one */
-  if (fwTitle) fwTitle.style.transformOrigin = '50% 50%';
+  if (fwHeader) fwHeader.classList.add('s2-fwh-in');   /* the heading is simply on */
 
-  var dockDeltaY = 0;
-  function measureDock() {
-    if (!fwTitle) return;
-    var prev = fwTitle.style.transform;
-    fwTitle.style.transform = 'none';
-    var r = fwTitle.getBoundingClientRect();
-    var secTop = sec.getBoundingClientRect().top;
-    dockDeltaY = innerHeight * 0.44 - ((r.top - secTop) + r.height / 2);
-    fwTitle.style.transform = prev;
-  }
-
-  function lerpN(a, b, t) { return a + (b - a) * t; }
-  function clamp01(t) { return t < 0 ? 0 : t > 1 ? 1 : t; }
-  function easeInOut(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
-  function easeOutC(t) { return 1 - Math.pow(1 - t, 3); }
-
-  function drive(vh) {
-    var t = easeInOut(clamp01(vh / TITLE));
-    /* content rises while the title is still docking — overlapped, no gate */
-    var c = easeOutC(clamp01((vh - TITLE * 0.45) / (TITLE * 0.8)));
-    var reelP = clamp01((vh - TITLE) / REEL);
-    if (fwTitle) {
-      fwTitle.style.transform =
-        'translateY(' + (dockDeltaY * (1 - t)).toFixed(1) + 'px) scale(' + lerpN(DOCK_SCALE, 1, t).toFixed(4) + ')';
-    }
-    for (var i = 0; i < slideEls.length; i++) {
-      slideEls[i].style.transform = c >= 1 ? '' : 'translateY(' + lerpN(100, 0, c).toFixed(2) + 'vh)';
-    }
-    root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: reelP } }));
-  }
-
-  /* scrub smoothing — glide, not twitch; the ticker detaches on landing */
-  var driveTarget = 0, driveState = 0, driveTicking = false;
-  function driveTick() {
-    var k = 1 - Math.pow(1 - 0.16, gsap.ticker.deltaRatio());
-    driveState += (driveTarget - driveState) * k;
-    if (Math.abs(driveTarget - driveState) < 0.0004) driveState = driveTarget;
-    drive(driveState);
-    if (driveState === driveTarget) { gsap.ticker.remove(driveTick); driveTicking = false; }
-  }
-  function requestDrive(vh) {
-    driveTarget = vh;
-    if (!driveTicking) { driveTicking = true; gsap.ticker.add(driveTick); }
-  }
-
-  var st = ScrollTrigger.create({
+  ScrollTrigger.create({
     trigger: sec,
     start: 'top top',
-    end: function () { return '+=' + Math.round(innerHeight * TOTAL); },
+    end: function () { return '+=' + Math.round(innerHeight * 1.1 * 7); },
     pin: true,
     pinSpacing: true,
     anticipatePin: 1,
     invalidateOnRefresh: true,
-    onRefresh: measureDock,
-    onUpdate: function (self) { requestDrive(self.progress * TOTAL); }
+    onUpdate: function (self) {
+      root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: self.progress } }));
+    }
   });
   /* Lenis measures the document once and caches the limit. The pin-spacer is
      added by ScrollTrigger afterwards, so without re-measuring Lenis still
@@ -5818,11 +5767,6 @@ addEventListener('load', function () {
   ScrollTrigger.addEventListener('refresh', syncLenis);
   ScrollTrigger.refresh();
   syncLenis();
-  /* seed the resting pose — big lone title, content parked — so arriving
-     at the section never flashes the docked layout */
-  measureDock();
-  driveState = driveTarget = st.progress * TOTAL;
-  drive(driveState);
   addEventListener('resize', function () { ScrollTrigger.refresh(); });
 });
 </script>
@@ -6420,6 +6364,6 @@ addEventListener('load', function () {
      to it hard. Bump it whenever spiral.js changes. -->
 <script src="spiral-gallery/spiral.js?v=20260726-bend2"></script>
 
-<script type="module" src="orb/bhanu-orb.js?v=2"></script>
+<script type="module" src="orb/bhanu-orb.js?v=3"></script>
 </body>
 </html>
