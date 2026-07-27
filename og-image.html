@@ -35,11 +35,6 @@
       position: absolute; inset: 0;
       background: linear-gradient(118deg, rgba(237,244,255,.06) 0%, rgba(237,244,255,.022) 24%, transparent 48%);
     }
-    /* the site's announcement-bar gradient, worn as a hairline crown */
-    .topline {
-      position: absolute; top: 0; left: 0; right: 0; height: 4px; z-index: 7;
-      background: linear-gradient(90deg,#101C3F 0%,#1B3A87 26%,#2A62C8 52%,#1D4396 78%,#111F45 100%);
-    }
     /* one hairline arc in front of the portrait — a foreground plane */
     .arc-front {
       position: absolute; left: 760px; top: 240px; width: 760px; height: 760px;
@@ -51,20 +46,16 @@
       position: absolute; inset: 0; z-index: 1;
       background: radial-gradient(ellipse 34% 20% at 44% 103%, rgba(140,195,255,.38) 0%, rgba(92,169,255,.12) 50%, transparent 74%);
     }
-    /* giant grained orbs cresting into the bottom corners, rim-lit from above */
+    /* giant out-of-focus masses cresting into the bottom corners — bokeh,
+       not outlines: heavy blur softens the form, the global grain layer
+       stays sharp on top, which is what makes it read as film */
     .orb {
       position: absolute; border-radius: 50%; z-index: 3;
-      background: radial-gradient(circle at 50% 10%, #131a26 0%, #080c13 45%, #05080e 70%);
+      background: radial-gradient(circle at 50% 8%, #18202e 0%, #0a0e16 42%, #05080e 70%);
       box-shadow:
-        inset 0 4px 34px rgba(150,205,255,.42),
-        inset 0 1px 2px rgba(210,232,255,.5),
-        0 -8px 70px rgba(92,169,255,.12);
-      overflow: hidden;
-    }
-    .orb::after {
-      content: ''; position: absolute; inset: 0; border-radius: 50%;
-      opacity: .16; mix-blend-mode: overlay;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        inset 0 8px 48px rgba(150,205,255,.5),
+        0 -10px 80px rgba(92,169,255,.14);
+      filter: blur(24px);
     }
     .orb1 { width: 1000px; height: 1000px; left: -430px; top: 470px; }
     .orb2 { width: 1300px; height: 1300px; left: 520px; top: 498px; }
@@ -161,7 +152,6 @@
 <body>
   <div class="bloom"></div>
   <div class="keylight"></div>
-  <div class="topline"></div>
   <div class="arc-front"></div>
 
   <div class="ring r1"></div>
