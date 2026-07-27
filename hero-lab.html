@@ -2452,9 +2452,65 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
     box-shadow:0 0 0 3px rgba(47,162,78,.15);flex-shrink:0;}
   .chat-credit{display:block;text-align:center;padding:8px 0 2px;
     font-size:11px;font-weight:550;letter-spacing:.02em;color:rgba(22,24,29,.42);}
+
+  /* ── talk and chat are separate rooms: the composer, chips and credit
+     belong to chat view only ── */
+  .chat[data-view="voice"] .composer,
+  .chat[data-view="voice"] .chat-chips,
+  .chat[data-view="voice"] .chat-credit{display:none;}
+  /* the door between the rooms — a quiet tertiary under the call buttons */
+  .talk-tertiary{appearance:none;background:none;border:none;padding:6px 2px;
+    font-family:var(--sans);font-size:13px;font-weight:550;cursor:pointer;
+    color:rgba(22,24,29,.5);text-decoration:underline;text-underline-offset:3px;
+    text-decoration-color:rgba(22,24,29,.22);transition:color .2s,text-decoration-color .2s;}
+  .talk-tertiary:hover{color:#16181D;text-decoration-color:#3372B8;}
+
+  /* ── the mid-call scheduler ── */
+  .talk-sched{display:flex;flex-direction:column;align-items:center;gap:8px;
+    margin-top:4px;opacity:0;transform:translateY(10px);
+    transition:opacity .45s var(--ease),transform .45s var(--ease);}
+  .talk-sched.on{opacity:1;transform:none;}
+  .talk-sched-k{font-family:var(--sans);font-size:12.5px;font-weight:550;color:rgba(22,24,29,.6);}
+  .talk-sched-row{display:flex;align-items:center;gap:8px;}
+  .talk-sched input{width:min(280px,60vw);padding:11px 16px;border-radius:999px;
+    border:1px solid rgba(20,28,45,.2);background:#fff;color:#16181D;
+    font-family:var(--sans);font-size:14px;outline:none;
+    transition:border-color .2s,box-shadow .2s;}
+  .talk-sched input:focus{border-color:#3372B8;box-shadow:0 0 0 3px rgba(51,114,184,.14);}
+  .talk-sched input.err{border-color:#D9534F;box-shadow:0 0 0 3px rgba(217,83,79,.14);}
+  .talk-sched button{display:grid;place-items:center;width:42px;height:42px;flex:none;
+    border-radius:50%;border:1px solid rgba(20,28,45,.2);background:#16181D;color:#fff;
+    cursor:pointer;padding:0;transition:transform .2s,opacity .2s;}
+  .talk-sched button:hover{transform:translateY(-1px);}
+  .talk-sched button:disabled{opacity:.7;cursor:default;transform:none;}
+  .talk-sched .sched-arrow{width:16px;height:16px;}
+  .talk-sched .sched-spin{display:none;width:16px;height:16px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.35);border-top-color:#fff;
+    animation:sched-spin .7s linear infinite;}
+  .talk-sched.busy .sched-arrow{display:none;}
+  .talk-sched.busy .sched-spin{display:block;}
+  @keyframes sched-spin{to{transform:rotate(360deg)}}
+  /* the confirmation — a toast where the CTA was, then everything fades */
+  .talk-toast{display:inline-flex;align-items:center;gap:9px;margin-top:6px;
+    padding:11px 18px;border-radius:999px;
+    background:rgba(47,162,78,.12);border:1px solid rgba(47,162,78,.32);color:#1D7A38;
+    font-family:var(--sans);font-size:13.5px;font-weight:600;
+    opacity:0;transform:translateY(8px);
+    transition:opacity .45s var(--ease),transform .45s var(--ease);}
+  .talk-toast.on{opacity:1;transform:none;}
+  .talk-toast svg{width:15px;height:15px;flex:none;}
+
+  /* ── user messages: no frame — just the words, the name above ── */
+  .chat .thread .m.me{background:none;border:none;box-shadow:none;
+    padding:2px 0;border-radius:0;color:#16181D;margin-top:6px;}
+  .chat .thread .m.me::before{content:'You';display:block;text-align:right;
+    font-family:var(--sans);font-size:10.5px;font-weight:650;letter-spacing:.08em;
+    text-transform:uppercase;color:rgba(22,24,29,.42);margin-bottom:3px;}
+
   @media (prefers-reduced-motion: reduce){
     .m,.chip,.ch-w{animation:none;}
     .think-status{animation:none;-webkit-text-fill-color:rgba(22,24,29,.6);}
+    .talk-sched,.talk-toast{transition:none;}
   }
   @keyframes tp{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
 
@@ -5256,8 +5312,28 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <span id="talkStartLabel" aria-live="polite">Start talking</span>
         </button>
         <button type="button" class="btn-end" id="talkEnd">End call</button>
-        <!-- "Chat instead" removed — the composer sits below by default;
-             the first sent message flips the panel into chat view. -->
+
+        <!-- ── mid-call email capture: appears when the agent moves to
+             schedule ("enter your email below"), walks loading → done,
+             then fades itself away ── -->
+        <form class="talk-sched" id="talkSched" hidden>
+          <label class="talk-sched-k" for="schedEmail">Drop your email &mdash; I&rsquo;ll set the meeting up</label>
+          <div class="talk-sched-row">
+            <input id="schedEmail" type="email" required placeholder="you@company.com"
+                   autocomplete="email" inputmode="email" aria-label="Your email">
+            <button type="submit" id="schedGo" aria-label="Schedule the meeting">
+              <svg class="sched-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="sched-spin" aria-hidden="true"></span>
+            </button>
+          </div>
+        </form>
+        <div class="talk-toast" id="talkToast" hidden role="status">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 12 9 17 20 7"/></svg>
+          Meeting scheduled &mdash; check your inbox
+        </div>
+
+        <!-- talk and chat are separate rooms again: this is the door -->
+        <button type="button" class="talk-tertiary" id="talkToChat">Chat instead</button>
       </div>
       <div class="thread" id="thread">
         <div class="m ai">Hi — I&rsquo;m Bhanu&rsquo;s AI twin, running on his second brain. Ask about the work, the process, or why you&rsquo;d want him on your team.</div>
@@ -5541,9 +5617,62 @@ function updateVoiceState(s) {
   chat.classList.toggle('denied', s === 'mic-denied' || s === 'error');
   talkStart.disabled = s === 'connecting';
   talkStartLabel.textContent = STATE_LABELS[s] || 'Start talking';
+  /* the agent moved to book a meeting — surface the email capture */
+  if (s === 'scheduling') showScheduler();
 }
 talkStart.addEventListener('click', function () { if (voiceApi) voiceApi.start(); });
 talkEnd.addEventListener('click', function () { if (voiceApi) voiceApi.end(); });
+
+/* ── the door between the rooms ── */
+document.getElementById('talkToChat').addEventListener('click', function () { setView('chat'); });
+
+/* ── mid-call scheduler: agent asks → input appears → loading → toast →
+   everything fades away. Exposed on window for the agent's client tool. ── */
+var talkSched = document.getElementById('talkSched');
+var schedEmail = document.getElementById('schedEmail');
+var schedGo    = document.getElementById('schedGo');
+var talkToast  = document.getElementById('talkToast');
+function showScheduler() {
+  if (!talkSched || !talkSched.hidden) return;
+  talkSched.hidden = false;
+  requestAnimationFrame(function () { requestAnimationFrame(function () {
+    talkSched.classList.add('on');
+    schedEmail.focus();
+  }); });
+}
+function hideScheduler() {
+  talkSched.classList.remove('on');
+  setTimeout(function () { talkSched.hidden = true; }, 460);
+}
+window.BhanuTalk = { showScheduler: showScheduler };
+schedEmail.addEventListener('input', function () { schedEmail.classList.remove('err'); });
+talkSched.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  var email = schedEmail.value.trim();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { schedEmail.classList.add('err'); schedEmail.focus(); return; }
+  talkSched.classList.add('busy');
+  schedEmail.disabled = true; schedGo.disabled = true;
+  /* a real booking backend can claim /api/schedule; until it exists the
+     flow settles after a beat so the states read true end to end */
+  var ok = false;
+  try {
+    var r = await fetch(API_BASE + '/api/schedule', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    ok = r.ok;
+  } catch (_) {}
+  if (!ok) await new Promise(function (r) { setTimeout(r, 1600); });
+  talkSched.classList.remove('busy');
+  schedEmail.disabled = false; schedGo.disabled = false;
+  hideScheduler();
+  talkToast.hidden = false;
+  requestAnimationFrame(function () { requestAnimationFrame(function () { talkToast.classList.add('on'); }); });
+  setTimeout(function () {
+    talkToast.classList.remove('on');
+    setTimeout(function () { talkToast.hidden = true; }, 460);
+  }, 4200);
+});
 
 function mountTalkOrb() {
   if (talkRoot) return;
@@ -5876,7 +6005,12 @@ async function sendMessage(text) {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1024, system: SYSTEM, messages: messages, stream: true }),
     });
-    if (!res.ok) throw new Error('API ' + res.status);
+    if (!res.ok) {
+      /* the proxy answers with a real reason — say THAT, not "offline" */
+      var why = '';
+      try { why = (await res.clone().json()).error || ''; } catch (_) {}
+      var e2 = new Error('API ' + res.status); e2.reason = why; throw e2;
+    }
     var reader = res.body.getReader(), dec = new TextDecoder(), buf = '';
     while (true) {
       var c = await reader.read();
@@ -5910,7 +6044,19 @@ async function sendMessage(text) {
     renderChips(routeChips(full));
   } catch (err) {
     stopThinking(); shell.remove();
-    bubble('ai', "I'm offline right now (the chat backend isn't running). Start proxy.py on :3001 and try again — or email kowshikbhanu1000@gmail.com.");
+    var msg;
+    if (err && /API_KEY/i.test(err.reason || '')) {
+      /* the proxy is up but keyless — the one fix that actually works */
+      msg = "My brain isn't plugged in yet — the proxy is running but has no API key. " +
+            "Add ANTHROPIC_API_KEY to a .env file next to proxy.py and restart it. " +
+            "Meanwhile: kowshikbhanu1000@gmail.com.";
+    } else if (err && err.reason) {
+      msg = "The backend hit an error: " + err.reason + " — or email kowshikbhanu1000@gmail.com.";
+    } else {
+      msg = "I can't reach my backend right now (start proxy.py on :3001). " +
+            "In the meantime, email kowshikbhanu1000@gmail.com.";
+    }
+    bubble('ai', msg);
     messages.pop();
     renderChips(CHIP_POOLS.seed);
   } finally {
