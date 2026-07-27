@@ -2888,6 +2888,64 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
      and the canvas gets pinned at coin size. The display box never lies: */
   #talkOrbMount canvas{width:100% !important;height:100% !important;}
 
+  /* ══ THE ROOM SCALES WITH THE SCREEN ════════════════════════════════
+     The frame already grows (420 → 600px); until now the furniture
+     didn't. The panel is a container, everything inside is sized in cqw
+     with today's 420-panel look as the clamp floor — so small screens
+     are untouched and big screens get a genuinely bigger room, not a
+     wide room with small furniture. */
+  .chat{container-type:inline-size;}
+  /* the orb itself — the bundle writes an inline size; the page outranks
+     it, and applySize follows the layout box at full resolution */
+  #talkOrbMount > div[data-orb-state]{
+    width:min(clamp(200px,47.6cqw,270px),44vh) !important;
+    height:min(clamp(200px,47.6cqw,270px),44vh) !important;
+  }
+  .chat-head{padding:clamp(18px,4.29cqw,23px) clamp(16px,3.81cqw,21px) clamp(15px,3.57cqw,19px) clamp(20px,4.76cqw,26px);}
+  .chat-head .t{font-size:clamp(19px,4.52cqw,23px);}
+  .head-live{font-size:clamp(12px,2.86cqw,14px);}
+  .chat-close{width:clamp(34px,8.1cqw,40px);height:clamp(34px,8.1cqw,40px);}
+  .chat-close svg{width:clamp(15px,3.57cqw,17px);height:clamp(15px,3.57cqw,17px);}
+  /* dock geometry only stretches when there is height to spend — the
+     short-panel compaction rules above must keep winning below 760px */
+  @media (min-height:761px){
+    .voice-dock{top:calc(46% + clamp(128px,30.5cqw,164px));}
+    .talk-pill{margin-top:calc(-1 * clamp(58px,13.8cqw,74px));}
+  }
+  .talk-pill{font-size:clamp(14px,3.33cqw,16.5px);
+    padding:clamp(11px,2.62cqw,13px) clamp(20px,4.76cqw,26px);}
+  .tp-dot{width:clamp(8px,1.9cqw,10px);height:clamp(8px,1.9cqw,10px);}
+  .talk-caption{font-size:clamp(12.5px,2.98cqw,15px);}
+  .talk-controls{gap:clamp(14px,3.33cqw,18px);}
+  .tc-btn{width:clamp(46px,10.95cqw,56px);height:clamp(46px,10.95cqw,56px);}
+  .tc-btn svg{width:clamp(18px,4.29cqw,22px);height:clamp(18px,4.29cqw,22px);}
+  .tc-end svg{width:clamp(20px,4.76cqw,24px);height:clamp(20px,4.76cqw,24px);}
+  .talk-timer{font-size:clamp(12px,2.86cqw,14px);}
+  .talk-tertiary{font-size:clamp(13px,3.1cqw,15.5px);bottom:clamp(16px,3.81cqw,22px);}
+  .talk-tertiary svg{width:clamp(15px,3.57cqw,18px);height:clamp(15px,3.57cqw,18px);}
+  .talk-sched-k{font-size:clamp(12.5px,2.98cqw,14.5px);}
+  .talk-sched input{font-size:clamp(14px,3.33cqw,16px);width:clamp(280px,66.7cqw,340px);}
+  .talk-sched button{width:clamp(42px,10cqw,50px);height:clamp(42px,10cqw,50px);}
+  .talk-toast{font-size:clamp(13.5px,3.21cqw,15.5px);}
+  .chat .thread{padding:clamp(78px,18.6cqw,96px) clamp(18px,4.29cqw,26px) clamp(14px,3.33cqw,18px);gap:clamp(11px,2.62cqw,14px);}
+  .m{font-size:clamp(14px,3.33cqw,16px);}
+  .chat .thread .m.ai:not(.think-shell):not(.chat-recs)::before{font-size:clamp(10.5px,2.5cqw,12px);}
+  .think-ava{width:clamp(22px,5.24cqw,26px);height:clamp(22px,5.24cqw,26px);}
+  .think-status{font-size:clamp(13px,3.1cqw,15px);}
+  .chat-rec{font-size:clamp(13px,3.1cqw,15px);}
+  .chat-rec img{width:clamp(44px,10.48cqw,52px);height:clamp(44px,10.48cqw,52px);}
+  .chat-sched-row input{font-size:clamp(13.5px,3.21cqw,15px);width:clamp(240px,57.1cqw,290px);}
+  .chat-sched-row button{width:clamp(38px,9.05cqw,46px);height:clamp(38px,9.05cqw,46px);}
+  .chat-chips{padding:0 clamp(18px,4.29cqw,26px) clamp(10px,2.38cqw,13px);}
+  .chip{font-size:clamp(12.5px,2.98cqw,14.5px);padding:clamp(8px,1.9cqw,10px) clamp(14px,3.33cqw,18px);}
+  .panel-foot{padding:clamp(16px,3.81cqw,22px);}
+  .composer{gap:clamp(10px,2.38cqw,12px);}
+  .composer input{font-size:clamp(14px,3.33cqw,16px);padding:clamp(13px,3.1cqw,16px) clamp(15px,3.57cqw,19px);}
+  .mic-btn{width:clamp(46px,10.95cqw,54px);}
+  .send-btn{width:clamp(52px,12.38cqw,60px);}
+  .send-btn svg{width:clamp(17px,4.05cqw,20px);height:clamp(17px,4.05cqw,20px);}
+  .chat-credit{font-size:clamp(11px,2.62cqw,13px);}
+
   /* ══ THE PANEL ACROSS VIEWPORTS ═════════════════════════════════════ */
   /* tablets — the drawer keeps its float but loosens its frame */
   @media (max-width:900px){
