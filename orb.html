@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Orb</title>
+<script>
+  /* ?rafshim — the local preview tab is backgrounded, which suspends
+     requestAnimationFrame and freezes WebGL. Pump queued callbacks via timers
+     so the orb renders for screenshotting. Off in a real browser. */
+  if (new URLSearchParams(location.search).has('rafshim')) (function () {
+    var queue = [];
+    window.requestAnimationFrame = function (cb) { queue.push(cb); return queue.length; };
+    window.cancelAnimationFrame = function () {};
+    function pump() {
+      var now = performance.now();
+      var cbs = queue; queue = [];
+      for (var i = 0; i < cbs.length; i++) { try { cbs[i](now); } catch (e) {} }
+    }
+    setInterval(pump, 33);
+    var ch = new MessageChannel();
+    ch.port1.onmessage = pump;
+    setInterval(function () { ch.port2.postMessage(0); }, 33);
+  })();
+</script>
+<style>
+  *{margin:0;box-sizing:border-box;}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(120% 90% at 50% 115%, #131a28 0%, #0c111b 48%, #080b11 100%);}
+</style>
+</head>
+<body>
+  <div id="orb"></div>
+
+  <script type="module" src="orb/bhanu-orb.js?v=4"></script>
+  <script>
+    /* Nothing but the orb. Tune it from the URL:
+         ?palette=aurora|ember|nebula|arctic   (default arctic)
+         ?size=400                             (px, default 360)
+         ?state=idle|listening|user-speaking|assistant-speaking|connecting|error
+         ?simulate=user|assistant              (fake audio, no mic) */
+    var q = new URLSearchParams(location.search);
+    (function ready() {
+      if (!(window.BhanuOrb && window.BhanuOrb.mountVisual)) { setTimeout(ready, 40); return; }
+      window.BhanuOrb.mountVisual(document.getElementById('orb'), {
+        palette: q.get('palette') || 'arctic',
+        size: Number(q.get('size')) || 360,
+        state: q.get('state') || 'idle',
+        simulate: q.get('simulate') || null,
+      });
+    })();
+  </script>
+</body>
+</html>
