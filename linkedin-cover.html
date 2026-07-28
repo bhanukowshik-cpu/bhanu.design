@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- Source for images/linkedin-cover.jpg — the v20 og-card language at LinkedIn's
-     1584x396 banner size. The profile avatar overlaps the bottom-left on
-     desktop, so that zone stays atmospheric.
+<!-- Source for images/linkedin-cover.jpg — LinkedIn banner, 1584x396.
+     No name/role (the profile already says it): the loader portrait on the
+     right, the title-sequence loop on the left. Avatar overlaps bottom-left.
      Render:
      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
        --screenshot=li-2x.png --window-size=1584,396 --force-device-scale-factor=2 \
@@ -23,16 +23,16 @@
       color: #EFF3F8;
     }
 
-    /* ── the portrait — far right, left edge dissolving ── */
+    /* ── the loader portrait — right side, left edge dissolving ── */
     .cine {
-      position: absolute; left: 1120px; top: 0; width: 464px; height: 396px;
+      position: absolute; left: 1000px; top: 0; width: 584px; height: 396px;
       overflow: hidden; z-index: 1;
-      -webkit-mask-image: linear-gradient(to right, transparent 0px, #000 130px);
-              mask-image: linear-gradient(to right, transparent 0px, #000 130px);
+      -webkit-mask-image: linear-gradient(to right, transparent 0px, #000 140px);
+              mask-image: linear-gradient(to right, transparent 0px, #000 140px);
     }
     .cine img {
-      position: absolute; width: 470px; left: -40px; top: -30px;
-      filter: grayscale(1) contrast(1.08) brightness(1.02);
+      position: absolute; width: 660px; left: -30px; top: -60px;
+      filter: contrast(1.05);
     }
 
     /* ── shapes ── */
@@ -51,36 +51,24 @@
       background: linear-gradient(112deg, rgba(240,246,255,.07) 0%, rgba(240,246,255,.025) 24%, transparent 46%);
     }
 
-    /* ── type ── */
-    .eyebrow {
-      position: absolute; left: 434px; top: 84px; z-index: 4;
-      font-family: 'JetBrains Mono', monospace; font-weight: 500;
-      font-size: 15px; letter-spacing: .34em; text-transform: uppercase;
-      color: #9AA6B4; white-space: nowrap;
-    }
-    .name { position: absolute; left: 430px; top: 122px; z-index: 4; white-space: nowrap; }
-    .n1 {
-      display: inline-block; vertical-align: baseline;
-      font-weight: 700; font-size: 104px; line-height: 1.0; letter-spacing: -0.03em;
+    /* ── the loop, poster-sized ── */
+    .loop { position: absolute; left: 430px; top: 96px; z-index: 4; white-space: nowrap; }
+    .loop .row { display: block; line-height: 1; }
+    .loop .row + .row { margin-top: 26px; }
+    .w {
+      display: inline-block;
+      font-weight: 700; font-size: 88px; letter-spacing: -0.03em;
       background: linear-gradient(178deg, #FFFFFF 8%, #EDF1F6 52%, #9AA5B2 100%);
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
-    .n2 {
-      display: inline-block; vertical-align: baseline; margin-left: 26px;
+    .w.serif {
       font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400;
-      font-size: 112px; line-height: 1.0; letter-spacing: -0.005em;
-      background: linear-gradient(178deg, #FFFFFF 10%, #E9EDF3 55%, #AEB8C4 100%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
+      font-size: 96px; letter-spacing: -0.005em;
     }
-
-    .pills { position: absolute; left: 434px; top: 286px; display: flex; gap: 12px; z-index: 4; }
-    .pill {
-      display: inline-flex; align-items: center;
-      padding: 11px 20px; border: 1px solid rgba(239,243,248,.26); border-radius: 999px;
-      background: rgba(6,8,9,.4);
-      font-family: 'JetBrains Mono', monospace; font-weight: 500;
-      font-size: 12px; letter-spacing: .24em; text-transform: uppercase;
-      color: rgba(239,243,248,.92); white-space: nowrap;
+    .arrow {
+      display: inline-block; margin: 0 22px; transform: translateY(-10px);
+      font-family: 'JetBrains Mono', monospace; font-weight: 400;
+      font-size: 54px; color: #7C8794; vertical-align: middle;
     }
 
     .year {
@@ -98,19 +86,14 @@
 </head>
 <body>
   <div class="ghost">B</div>
-  <div class="cine"><img src="images/bhanu-cinematic.jpg" alt="" /></div>
+  <div class="cine"><img src="images/loader-portrait.webp" alt="" /></div>
   <div class="beam"></div>
   <div class="cross" style="left: 388px; bottom: 34px;"></div>
-  <div class="cross" style="right: 480px; top: 40px;"></div>
+  <div class="cross" style="right: 620px; top: 40px;"></div>
 
-  <div class="eyebrow">AI-Native Product Designer</div>
-  <div class="name"><span class="n1">Bhanu</span><span class="n2">Kowshik</span></div>
-
-  <div class="pills">
-    <span class="pill">0 → 1</span>
-    <span class="pill">AI Systems</span>
-    <span class="pill">Impact Driven</span>
-    <span class="pill">San Francisco</span>
+  <div class="loop">
+    <span class="row"><span class="w">Ideate</span><span class="arrow">→</span><span class="w">Build</span><span class="arrow">→</span></span>
+    <span class="row"><span class="w">Validate</span><span class="arrow">→</span><span class="w serif">Repeat</span></span>
   </div>
 
   <div class="year">Portfolio / 2026</div>
