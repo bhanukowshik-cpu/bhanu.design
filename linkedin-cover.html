@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- Source for images/linkedin-cover.jpg — LinkedIn banner, 1584x396.
-     No name/role (the profile already says it): the loader portrait on the
-     right, the title-sequence loop on the left. Avatar overlaps bottom-left.
+     The hero's silhouette plate full-bleed (figure on the ridge, right of
+     center), the title-sequence loop on the left. Avatar overlaps bottom-left.
      Render:
      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
        --screenshot=li-2x.png --window-size=1584,396 --force-device-scale-factor=2 \
@@ -23,35 +23,12 @@
       color: #EFF3F8;
     }
 
-    /* ── the loader portrait — right side, left edge dissolving ── */
-    .cine {
-      position: absolute; left: 1000px; top: 0; width: 584px; height: 396px;
-      overflow: hidden; z-index: 1;
-      -webkit-mask-image: linear-gradient(to right, transparent 0px, #000 140px);
-              mask-image: linear-gradient(to right, transparent 0px, #000 140px);
-    }
-    .cine img {
-      position: absolute; width: 660px; left: -30px; top: -60px;
-      filter: contrast(1.05);
-    }
+    /* ── the silhouette plate, full-bleed: a 4:1 band through the source
+       keeps the crest, the figure and the ridge line in frame ── */
+    .plate { position: absolute; inset: 0; z-index: 0; }
+    .plate img { position: absolute; width: 1584px; left: 0; top: -201px; }
 
-    /* ── shapes ── */
-    .ghost {
-      position: absolute; left: -40px; top: -120px; z-index: 0;
-      font-weight: 700; font-size: 460px; line-height: 1;
-      color: transparent; -webkit-text-stroke: 1.5px rgba(239,243,248,.05);
-      letter-spacing: -0.03em;
-    }
-    .cross { position: absolute; width: 16px; height: 16px; opacity: .5; z-index: 2; }
-    .cross::before, .cross::after { content: ''; position: absolute; background: rgba(239,243,248,.3); }
-    .cross::before { left: 0; right: 0; top: 50%; height: 1px; }
-    .cross::after  { top: 0; bottom: 0; left: 50%; width: 1px; }
-    .beam {
-      position: absolute; inset: 0; z-index: 2; pointer-events: none;
-      background: linear-gradient(112deg, rgba(240,246,255,.07) 0%, rgba(240,246,255,.025) 24%, transparent 46%);
-    }
-
-    /* ── the loop, poster-sized ── */
+    /* ── the loop, poster-sized, over the dark sky ── */
     .loop { position: absolute; left: 430px; top: 96px; z-index: 4; white-space: nowrap; }
     .loop .row { display: block; line-height: 1; }
     .loop .row + .row { margin-top: 26px; }
@@ -60,6 +37,7 @@
       font-weight: 700; font-size: 88px; letter-spacing: -0.03em;
       background: linear-gradient(178deg, #FFFFFF 8%, #EDF1F6 52%, #9AA5B2 100%);
       -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(0 4px 30px rgba(2,4,8,.65));
     }
     .w.serif {
       font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400;
@@ -68,28 +46,25 @@
     .arrow {
       display: inline-block; margin: 0 22px; transform: translateY(-10px);
       font-family: 'JetBrains Mono', monospace; font-weight: 400;
-      font-size: 54px; color: #7C8794; vertical-align: middle;
+      font-size: 54px; color: #8CA0B4; vertical-align: middle;
+      text-shadow: 0 2px 18px rgba(2,4,8,.7);
     }
 
     .year {
       position: absolute; right: 54px; top: 44px; z-index: 4;
       font-family: 'JetBrains Mono', monospace; font-weight: 500;
-      font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: #9AA6B4;
+      font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: #B6C2CE;
       text-shadow: 0 2px 16px rgba(2,4,8,.8);
     }
 
     .grain {
-      position: absolute; inset: 0; z-index: 6; opacity: .06; mix-blend-mode: overlay; pointer-events: none;
+      position: absolute; inset: 0; z-index: 6; opacity: .05; mix-blend-mode: overlay; pointer-events: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
   </style>
 </head>
 <body>
-  <div class="ghost">B</div>
-  <div class="cine"><img src="images/loader-portrait.webp" alt="" /></div>
-  <div class="beam"></div>
-  <div class="cross" style="left: 388px; bottom: 34px;"></div>
-  <div class="cross" style="right: 620px; top: 40px;"></div>
+  <div class="plate"><img src="images/silhouette-poster.webp" alt="" /></div>
 
   <div class="loop">
     <span class="row"><span class="w">Ideate</span><span class="arrow">→</span><span class="w">Build</span><span class="arrow">→</span></span>
