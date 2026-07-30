@@ -183,21 +183,23 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 5vh 5vw;
+      padding: clamp(20px, 4vw, 48px);
     }
 
-    /* ─── GLASS FRAME ───────────────────────────────────────── */
+    /* ─── GLASS SHEET — the whole page is the frame ─────────── */
     .glass {
       position: relative;
-      width: min(92vw, 640px);
-      padding: clamp(2.4rem, 6vh, 3.8rem) clamp(1.6rem, 5vw, 3.2rem);
-      border-radius: 28px;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 36px;
       background: var(--glass-bg);
       -webkit-backdrop-filter: blur(22px) saturate(160%);
       backdrop-filter: blur(22px) saturate(160%);
       border: 1px solid var(--glass-border);
       box-shadow: var(--glass-shadow);
-      text-align: center;
       transition: background 0.7s ease, border-color 0.7s ease, box-shadow 0.9s ease;
     }
     /* top rim catches the light */
@@ -211,71 +213,32 @@
       transition: background 0.7s ease;
     }
 
-    .glass-label {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      color: var(--ink-soft);
-      transition: color 0.6s ease;
-    }
-
-    .glass h1 {
-      margin: 1.1rem auto 0;
-      font-size: clamp(2rem, 6vw, 3.3rem);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.12;
-      text-wrap: balance;
-      transition: color 0.6s ease;
-    }
-
-    .glass .sub {
-      margin: 1.05rem auto 0;
-      max-width: 44ch;
-      font-size: clamp(0.92rem, 2.4vw, 1.02rem);
-      font-weight: 500;
-      line-height: 1.65;
-      color: var(--ink-soft);
-      text-wrap: pretty;
-      transition: color 0.6s ease;
-    }
-
-    /* ─── THE TOGGLE — hero object, centered "in between" ───── */
-    .toggle-row {
-      margin-top: clamp(1.8rem, 5vh, 2.6rem);
-      display: flex;
-      justify-content: center;
-    }
+    /* ─── THE TOGGLE — hero object, native-size XL (no scale, no blur) ── */
     .theme-toggle {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 130px;
-      height: 70px;
       background: none;
       border: none;
       padding: 0;
       cursor: pointer;
-      border-radius: 100px;
+      border-radius: 999px;
       transition: transform 0.15s ease;
     }
-    .theme-toggle:active { transform: scale(0.93); }
+    .theme-toggle:active { transform: scale(0.95); }
     .theme-toggle:focus-visible {
       outline: 2px solid var(--ink);
-      outline-offset: 4px;
+      outline-offset: 8px;
     }
     .tt-track {
       position: relative;
-      width: 58px;
-      height: 30px;
-      border-radius: 100px;
+      width: 232px;
+      height: 120px;
+      border-radius: 999px;
       background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%);
-      border: 1.5px solid rgba(255,255,255,0.40);
+      border: 3px solid rgba(255,255,255,0.40);
       flex-shrink: 0;
       overflow: hidden;
-      transform: scale(2.1);
-      transform-origin: center;
       transition: background 0.5s ease, border-color 0.4s ease;
     }
     .tt-track::after {
@@ -292,7 +255,7 @@
     .tt-hill-back {
       position: absolute;
       bottom: 0; left: -5%;
-      width: 75%; height: 13px;
+      width: 75%; height: 52px;
       background: #72B87A;
       border-radius: 50% 60% 0 0;
       z-index: 1;
@@ -301,7 +264,7 @@
     .tt-hill-front {
       position: absolute;
       bottom: 0; right: -8%;
-      width: 62%; height: 11px;
+      width: 62%; height: 44px;
       background: #5DA066;
       border-radius: 60% 50% 0 0;
       z-index: 2;
@@ -316,10 +279,10 @@
       transition: opacity 0.4s ease;
       z-index: 1;
     }
-    .tt-star-1 { width: 2.5px; height: 2.5px; top: 5px;  left: 8px;  }
-    .tt-star-2 { width: 2px;   height: 2px;   top: 11px; left: 18px; }
-    .tt-star-3 { width: 2px;   height: 2px;   top: 6px;  left: 27px; }
-    .tt-star-4 { width: 1.5px; height: 1.5px; top: 13px; left: 11px; }
+    .tt-star-1 { width: 10px; height: 10px; top: 20px; left: 32px;  }
+    .tt-star-2 { width: 8px;  height: 8px;  top: 44px; left: 72px;  }
+    .tt-star-3 { width: 8px;  height: 8px;  top: 24px; left: 108px; }
+    .tt-star-4 { width: 6px;  height: 6px;  top: 52px; left: 44px;  }
     [data-theme="dark"] .tt-star { opacity: 1; }
     @keyframes tt-twinkle {
       0%, 100% { opacity: 1; }
@@ -332,10 +295,10 @@
     /* Shooting star */
     .tt-shoot {
       position: absolute;
-      top: 3px; left: 4px;
-      width: 9px; height: 1px;
+      top: 12px; left: 16px;
+      width: 36px; height: 4px;
       background: linear-gradient(to right, transparent, #FFE87A);
-      border-radius: 1px;
+      border-radius: 4px;
       opacity: 0;
       transform: rotate(35deg);
       z-index: 2;
@@ -344,17 +307,17 @@
     @keyframes tt-shooting-star {
       0%   { opacity: 0; transform: translate(0, 0) rotate(35deg); }
       3%   { opacity: 0.85; }
-      15%  { opacity: 0; transform: translate(20px, 8px) rotate(35deg); }
-      100% { opacity: 0; transform: translate(20px, 8px) rotate(35deg); }
+      15%  { opacity: 0; transform: translate(80px, 32px) rotate(35deg); }
+      100% { opacity: 0; transform: translate(80px, 32px) rotate(35deg); }
     }
     [data-theme="dark"] .tt-shoot { animation: tt-shooting-star 5s ease-in 2s infinite; }
     /* Clouds — light mode only */
     .tt-cloud {
       position: absolute;
-      right: 9px; top: 6px;
-      width: 15px; height: 7px;
+      right: 36px; top: 24px;
+      width: 60px; height: 28px;
       background: rgba(255,255,255,0.95);
-      border-radius: 10px;
+      border-radius: 40px;
       opacity: 1;
       transition: opacity 0.4s ease;
       z-index: 1;
@@ -362,31 +325,31 @@
     .tt-cloud::before {
       content: '';
       position: absolute;
-      width: 9px; height: 9px;
+      width: 36px; height: 36px;
       background: rgba(255,255,255,0.95);
       border-radius: 50%;
-      top: -5px; left: 2px;
+      top: -20px; left: 8px;
     }
     .tt-cloud::after {
       content: '';
       position: absolute;
-      width: 7px; height: 7px;
+      width: 28px; height: 28px;
       background: rgba(255,255,255,0.95);
       border-radius: 50%;
-      top: -4px; left: 7px;
+      top: -16px; left: 28px;
     }
     [data-theme="dark"] .tt-cloud { opacity: 0; }
     @keyframes tt-cloud-drift {
-      from { transform: translateX(30px);  }
-      to   { transform: translateX(-85px); }
+      from { transform: translateX(120px);  }
+      to   { transform: translateX(-340px); }
     }
     [data-theme="light"] .tt-cloud { animation: tt-cloud-drift 26s linear 0s infinite backwards; }
     .tt-cloud-b {
       position: absolute;
-      right: 3px; top: 11px;
-      width: 9px; height: 4px;
+      right: 12px; top: 44px;
+      width: 36px; height: 16px;
       background: rgba(255,255,255,0.95);
-      border-radius: 8px;
+      border-radius: 32px;
       opacity: 0;
       transition: opacity 0.4s ease;
       z-index: 1;
@@ -395,18 +358,18 @@
     .tt-cloud-b::before {
       content: '';
       position: absolute;
-      width: 6px; height: 6px;
+      width: 24px; height: 24px;
       background: rgba(255,255,255,0.95);
       border-radius: 50%;
-      top: -3px; left: 1px;
+      top: -12px; left: 4px;
     }
     .tt-cloud-b::after {
       content: '';
       position: absolute;
-      width: 5px; height: 5px;
+      width: 20px; height: 20px;
       background: rgba(255,255,255,0.95);
       border-radius: 50%;
-      top: -3px; left: 4px;
+      top: -12px; left: 16px;
     }
     [data-theme="dark"]  .tt-cloud-b { opacity: 0; }
     [data-theme="light"] .tt-cloud-b {
@@ -415,10 +378,10 @@
     }
     .tt-cloud-c {
       position: absolute;
-      right: 18px; top: 4px;
-      width: 11px; height: 5px;
+      right: 72px; top: 16px;
+      width: 44px; height: 20px;
       background: rgba(255,255,255,0.95);
-      border-radius: 8px;
+      border-radius: 32px;
       opacity: 0;
       transition: opacity 0.4s ease;
       z-index: 1;
@@ -427,18 +390,18 @@
     .tt-cloud-c::before {
       content: '';
       position: absolute;
-      width: 7px; height: 7px;
+      width: 28px; height: 28px;
       background: rgba(255,255,255,0.95);
       border-radius: 50%;
-      top: -4px; left: 1px;
+      top: -16px; left: 4px;
     }
     .tt-cloud-c::after {
       content: '';
       position: absolute;
-      width: 6px; height: 6px;
+      width: 24px; height: 24px;
       background: rgba(255,255,255,0.95);
       border-radius: 50%;
-      top: -3px; left: 5px;
+      top: -12px; left: 20px;
     }
     [data-theme="dark"]  .tt-cloud-c { opacity: 0; }
     [data-theme="light"] .tt-cloud-c {
@@ -448,9 +411,9 @@
     /* Thumb — sun on the left by day, moon on the right by night */
     .tt-thumb {
       position: absolute;
-      width: 24px; height: 24px;
+      width: 96px; height: 96px;
       border-radius: 50%;
-      top: 50%; left: 1.5px;
+      top: 50%; left: 6px;
       overflow: hidden;
       background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800);
       transform: translateX(0) translateY(-50%);
@@ -467,8 +430,8 @@
       opacity: 0;
       transition: opacity 0.4s ease;
     }
-    .tt-thumb::before { width: 7px; height: 7px; top: 4px;  left: 5px;  }
-    .tt-thumb::after  { width: 5px; height: 5px; top: 13px; left: 14px; }
+    .tt-thumb::before { width: 28px; height: 28px; top: 16px; left: 20px; }
+    .tt-thumb::after  { width: 20px; height: 20px; top: 52px; left: 56px; }
     [data-theme="dark"] .tt-thumb::before,
     [data-theme="dark"] .tt-thumb::after { opacity: 1; }
     /* Light mode — explicit so transitions fire as rule-swaps, not rule-removals */
@@ -497,72 +460,13 @@
     [data-theme="dark"] .tt-hill-back  { background: #1D3D25; }
     [data-theme="dark"] .tt-hill-front { background: #152C1A; }
     [data-theme="dark"] .tt-thumb {
-      transform: translateX(28px) translateY(-50%);
+      transform: translateX(118px) translateY(-50%);
       background: #EEF0F5;
-    }
-
-    /* ─── STATE CHIP + HINT ─────────────────────────────────── */
-    .state-chip {
-      margin: clamp(1.6rem, 4vh, 2.2rem) auto 0;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.55em;
-      padding: 0.5em 1.05em;
-      border-radius: 100px;
-      background: var(--chip-bg);
-      border: 1px solid var(--glass-border);
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--ink);
-      transition: background 0.6s ease, border-color 0.6s ease, color 0.6s ease;
-    }
-    .state-chip .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--chip-dot);
-      transition: background 0.6s ease;
-    }
-    .state-chip .mode-word { display: inline-block; min-width: 9ch; text-align: left; }
-
-    .hint {
-      margin-top: 0.9rem;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--hint);
-      transition: color 0.6s ease;
-    }
-
-    /* ─── FOOTER MARK ───────────────────────────────────────── */
-    .page-mark {
-      position: fixed;
-      bottom: 1.4rem;
-      left: 0; right: 0;
-      z-index: 1;
-      text-align: center;
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      letter-spacing: 0.06em;
-      color: var(--ink);
-      opacity: 0.75;
-      text-shadow: 0 1px 8px var(--page-bg);
-      transition: color 0.6s ease;
-      pointer-events: none;
     }
 
     /* ─── SMALL SCREENS ─────────────────────────────────────── */
     @media (max-width: 480px) {
-      .glass { border-radius: 22px; }
-      .page-mark { display: none; }
-    }
-    @media (max-height: 620px) {
-      .glass { padding-top: 1.6rem; padding-bottom: 1.6rem; }
-      .glass h1 { margin-top: 0.7rem; }
-      .toggle-row { margin-top: 1.1rem; }
-      .state-chip { margin-top: 1.1rem; }
-    }
-    @media (pointer: coarse) {
-      .theme-toggle { padding: 7px; margin: -7px; }
+      .glass { border-radius: 24px; }
     }
 
     /* ─── REDUCED MOTION ────────────────────────────────────── */
@@ -599,44 +503,29 @@
 
   <main class="stage">
     <section class="glass">
-      <p class="glass-label">bhanu·design — theme lab</p>
-      <h1>One switch.<br>Two worlds.</h1>
-      <p class="sub">Flip it and the whole scene answers — the sun sets, the moon rises, and the glass and ink follow. Even the little hills inside the switch keep time.</p>
-
-      <div class="toggle-row">
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-          <span class="tt-track">
-            <span class="tt-star tt-star-1"></span>
-            <span class="tt-star tt-star-2"></span>
-            <span class="tt-star tt-star-3"></span>
-            <span class="tt-star tt-star-4"></span>
-            <span class="tt-shoot"></span>
-            <span class="tt-cloud"></span>
-            <span class="tt-cloud-b"></span>
-            <span class="tt-cloud-c"></span>
-            <span class="tt-hill-back"></span>
-            <span class="tt-hill-front"></span>
-            <span class="tt-thumb"></span>
-          </span>
-        </button>
-      </div>
-
-      <div class="state-chip" role="status" aria-live="polite">
-        <span class="dot" aria-hidden="true"></span>
-        <span class="mode-word" id="modeWord">light mode</span>
-      </div>
-      <p class="hint">click it — go on</p>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <span class="tt-track">
+          <span class="tt-star tt-star-1"></span>
+          <span class="tt-star tt-star-2"></span>
+          <span class="tt-star tt-star-3"></span>
+          <span class="tt-star tt-star-4"></span>
+          <span class="tt-shoot"></span>
+          <span class="tt-cloud"></span>
+          <span class="tt-cloud-b"></span>
+          <span class="tt-cloud-c"></span>
+          <span class="tt-hill-back"></span>
+          <span class="tt-hill-front"></span>
+          <span class="tt-thumb"></span>
+        </span>
+      </button>
     </section>
   </main>
-
-  <p class="page-mark">day &amp; night · a dark-mode demo by bhanu kowshik</p>
 
   <script>
   /* ── Dark / Light mode toggle — WAAPI scene from portfolio v5 ── */
   (function () {
     var root = document.documentElement;
     var btn  = document.getElementById('themeToggle');
-    var word = document.getElementById('modeWord');
     var KEY  = 'theme-demo';
     var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -672,8 +561,8 @@
       ], { duration: 400, easing: ease.easing, fill: ease.fill });
 
       thumb.animate([
-        { transform: toDark ? 'translateX(0) translateY(-50%)' : 'translateX(28px) translateY(-50%)' },
-        { transform: toDark ? 'translateX(28px) translateY(-50%)' : 'translateX(0) translateY(-50%)' }
+        { transform: toDark ? 'translateX(0) translateY(-50%)' : 'translateX(118px) translateY(-50%)' },
+        { transform: toDark ? 'translateX(118px) translateY(-50%)' : 'translateX(0) translateY(-50%)' }
       ], { duration: 440, easing: spring.easing, fill: spring.fill });
 
       thumb.animate([
@@ -714,18 +603,11 @@
       ], { duration: 400, easing: ease.easing, fill: ease.fill });
     }
 
-    function setWord(theme) {
-      if (word) word.textContent = theme === 'dark' ? 'dark mode' : 'light mode';
-    }
-
     function apply(theme, animate) {
       if (animate && !reduceMotion) animateToggleScene(theme === 'dark');
       root.setAttribute('data-theme', theme);
-      setWord(theme);
       try { localStorage.setItem(KEY, theme); } catch (e) {}
     }
-
-    setWord(root.getAttribute('data-theme'));
 
     if (btn) {
       btn.addEventListener('click', function () {
