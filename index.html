@@ -5160,7 +5160,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </span>
       </a>
       <div class="nav-links">
-        <a href="#s2FwHeader">Work</a><a href="#aboutSection">About</a><a href="#saidSection">Testimonials</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a>
+        <a href="#s2FwHeader">Work</a><a href="#shortsSection">Shorts</a><a href="#aboutSection">About</a><a href="#saidSection">Testimonials</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a>
         <a href="#contactSection">Contact</a>
       </div>
       <button class="nav-burger" id="navBurger" aria-label="Open menu"
@@ -5263,6 +5263,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <div class="nav-sheet" id="navSheet">
     <nav class="nav-sheet-inner" aria-label="Main menu">
       <a href="#s2FwHeader">Work</a>
+      <a href="#shortsSection">Shorts</a>
       <a href="#aboutSection">About</a>
       <a href="#saidSection">Testimonials</a>
       <a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a>
@@ -5651,6 +5652,291 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
            lives inside the section, to the left of the T ── -->
       <div class="sec-divider sec-divider--empty" aria-hidden="true"></div>
 
+  <!-- ══ SHORTS — "Design, out loud." ═══════════════════════════════════
+       Short-form film, featured twice: this rail, and the hero FAB that
+       hands the corner to the orb on scroll. Self-contained block — this
+       style tag carries the section, the FAB and the overlay player; the
+       REEL array in the script (before the orb-fab button) feeds all
+       three. Adding a short = one object there + three files in shorts/
+       + one card here. -->
+  <style>
+    /* ── the section ─────────────────────────────────────────────────── */
+    .reel-section{position:relative;z-index:var(--z-content);padding:10vh var(--gutter) 12vh;}
+    .reel-head{display:flex;align-items:flex-end;justify-content:space-between;gap:26px 40px;flex-wrap:wrap;}
+    .reel-title{font-family:var(--sans);font-size:clamp(36px,4.6vw,60px);font-weight:700;
+      letter-spacing:-0.015em;line-height:1.02;color:var(--ink);text-wrap:balance;}
+    .reel-title .serif{font-size:1.04em;}
+    .reel-lede{margin-top:16px;max-width:56ch;font-size:var(--t-body);line-height:1.7;color:var(--ink-2);text-wrap:pretty;}
+    /* the social chip — a rounded rectangle like every CTA, never a pill */
+    .reel-feed{display:inline-flex;align-items:center;gap:12px;padding:13px 20px;
+      border:1px solid var(--line);border-radius:var(--cta-r-sm);text-decoration:none;
+      font-family:var(--sans);font-size:14px;font-weight:550;letter-spacing:.01em;color:var(--ink-2);
+      transition:color .3s ease,border-color .3s ease,background .3s ease,transform .45s var(--ease);}
+    .reel-feed:hover{color:var(--ink);border-color:rgba(140,197,255,.4);background:rgba(92,169,255,.06);transform:translateY(-2px);}
+    .reel-feed svg{flex:none;opacity:.85;}
+    .reel-feed .arr{font-family:var(--sans);opacity:.6;transition:transform .35s var(--ease);}
+    .reel-feed:hover .arr{transform:translate(2px,-2px);}
+
+    /* ── the rail — 9:16 cards, scroll-snap, edge-faded ──────────────── */
+    .reel-rail{display:flex;gap:clamp(16px,1.8vw,26px);margin-top:clamp(36px,6vh,60px);
+      overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;
+      padding:6px 2px 10px;
+      -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 2%,#000 98%,transparent 100%);
+              mask-image:linear-gradient(90deg,transparent 0,#000 2%,#000 98%,transparent 100%);}
+    .reel-rail::-webkit-scrollbar{display:none;}
+    .reel-card{position:relative;flex:none;width:clamp(230px,21vw,300px);aspect-ratio:9/16;
+      scroll-snap-align:start;border-radius:20px;overflow:hidden;cursor:pointer;
+      border:1px solid var(--line);background:var(--card);padding:0;text-align:left;
+      transition:border-color .35s ease,transform .55s var(--ease),box-shadow .55s ease;}
+    .reel-card:hover{border-color:rgba(140,197,255,.35);transform:translateY(-6px);
+      box-shadow:0 24px 60px rgba(0,0,0,.45);}
+    .reel-card:focus-visible{outline:2px solid var(--ember);outline-offset:4px;}
+    .reel-card img,.reel-card video{position:absolute;inset:0;width:100%;height:100%;
+      object-fit:cover;transition:transform .8s var(--ease);}
+    .reel-card:hover img,.reel-card:hover video{transform:scale(1.045);}
+    .reel-card video{opacity:0;transition:opacity .4s ease,transform .8s var(--ease);}
+    .reel-card.playing video{opacity:1;}
+    /* number chip, top-left; duration, bottom-right — the site's micro voice */
+    .reel-no,.reel-dur{position:absolute;font-family:var(--sans);font-size:var(--t-caption);
+      font-weight:550;letter-spacing:.12em;color:rgba(239,243,248,.9);z-index:2;}
+    .reel-no{top:14px;left:16px;text-transform:uppercase;}
+    .reel-dur{right:16px;bottom:14px;font-variant-numeric:tabular-nums;}
+    .reel-card-shade{position:absolute;left:0;right:0;bottom:0;height:52%;z-index:1;
+      background:linear-gradient(180deg,transparent 0%,rgba(4,6,10,.78) 82%);}
+    .reel-card-t{position:absolute;left:16px;right:52px;bottom:12px;z-index:2;
+      font-family:var(--sans);font-size:var(--t-body);font-weight:600;letter-spacing:-0.005em;
+      line-height:1.3;color:var(--ink);}
+    /* the hover play disc — glass, no gradient, arrives with the pop ease */
+    .reel-card-play{position:absolute;left:50%;top:50%;width:54px;height:54px;z-index:2;
+      transform:translate(-50%,-50%) scale(.72);display:grid;place-items:center;border-radius:50%;
+      background:rgba(10,14,21,.55);border:1px solid rgba(226,238,252,.22);
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+      opacity:0;transition:opacity .3s ease,transform .45s var(--ease-pop);}
+    .reel-card:hover .reel-card-play{opacity:1;transform:translate(-50%,-50%) scale(1);}
+    /* ghost slots — the edit bay */
+    .reel-ghost{position:relative;flex:none;width:clamp(230px,21vw,300px);aspect-ratio:9/16;
+      scroll-snap-align:start;border-radius:20px;border:1px dashed rgba(226,238,252,.14);
+      display:grid;place-content:center;justify-items:center;gap:10px;}
+    .reel-ghost .g-no{font-family:var(--sans);font-size:var(--t-caption);font-weight:550;
+      letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);}
+    .reel-ghost .g-t{font-family:var(--serif);font-style:italic;font-size:var(--t-lead);color:var(--ink-3);}
+
+    /* ── entrance — enhances an already-visible default ──────────────── */
+    html.js-reel .reel-head,html.js-reel .reel-card,html.js-reel .reel-ghost{
+      opacity:0;transform:translateY(22px);
+      transition:opacity .9s ease,transform 1s var(--ease-expo);}
+    html.js-reel .reel-section.in .reel-head,
+    html.js-reel .reel-section.in .reel-card,
+    html.js-reel .reel-section.in .reel-ghost{opacity:1;transform:none;}
+    html.js-reel .reel-section.in .reel-card{transition-delay:.12s;}
+    html.js-reel .reel-section.in .reel-ghost{transition-delay:.22s;}
+    html.js-reel .reel-section.in .reel-ghost + .reel-ghost{transition-delay:.3s;}
+
+    /* ── the hero FAB — a 9:16 sliver of film in the orb's corner ────── */
+    .reel-fab{position:fixed;right:clamp(16px,2.4vw,32px);bottom:clamp(16px,2.4vw,32px);
+      z-index:var(--z-fab);width:clamp(92px,7.6vw,116px);aspect-ratio:9/16;padding:0;
+      border-radius:18px;overflow:hidden;cursor:pointer;text-align:left;
+      border:1px solid rgba(226,238,252,.18);background:var(--card);
+      box-shadow:0 18px 50px rgba(0,0,0,.5);
+      opacity:0;transform:translateY(28px);pointer-events:none;
+      transition:opacity .7s ease,transform .7s var(--ease-expo),border-color .35s ease,box-shadow .5s ease;}
+    .reel-fab.in{opacity:1;transform:none;pointer-events:auto;}
+    .reel-fab.in:hover{transform:translateY(-4px) scale(1.02);border-color:rgba(140,197,255,.45);
+      box-shadow:0 26px 64px rgba(0,0,0,.6);}
+    .reel-fab.away,body.nav-open .reel-fab{opacity:0;transform:translateY(28px);pointer-events:none;}
+    .reel-fab:focus-visible{outline:2px solid var(--ember);outline-offset:4px;}
+    .reel-fab video,.reel-fab img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .reel-fab-shade{position:absolute;left:0;right:0;bottom:0;height:46%;
+      background:linear-gradient(180deg,transparent,rgba(4,6,10,.72));}
+    .reel-fab-live{position:absolute;top:10px;left:11px;display:flex;align-items:center;gap:6px;
+      font-family:var(--sans);font-size:var(--t-micro);font-weight:600;letter-spacing:.14em;
+      color:rgba(239,243,248,.92);text-transform:uppercase;}
+    .reel-fab-live b{width:6px;height:6px;border-radius:50%;background:var(--ember);
+      box-shadow:0 0 0 0 rgba(92,169,255,.5);animation:reelPulse 2.4s ease-out infinite;}
+    @keyframes reelPulse{0%{box-shadow:0 0 0 0 rgba(92,169,255,.5);}
+      70%{box-shadow:0 0 0 9px rgba(92,169,255,0);}100%{box-shadow:0 0 0 0 rgba(92,169,255,0);}}
+    .reel-fab-dur{position:absolute;right:11px;bottom:9px;font-family:var(--sans);
+      font-size:var(--t-micro);font-weight:550;letter-spacing:.08em;
+      font-variant-numeric:tabular-nums;color:rgba(239,243,248,.85);}
+    /* the label plate that slides out on hover — names the film, promises sound */
+    .reel-fab-tip{position:absolute;right:calc(100% + 14px);bottom:14px;white-space:nowrap;
+      padding:10px 16px;border-radius:var(--cta-r-sm);pointer-events:none;
+      background:rgba(10,14,21,.82);border:1px solid var(--line);
+      backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+      font-family:var(--sans);font-size:13px;font-weight:550;color:var(--ink);
+      opacity:0;transform:translateX(8px);transition:opacity .35s ease,transform .5s var(--ease);}
+    .reel-fab-tip small{display:block;margin-top:2px;font-size:11px;font-weight:500;
+      letter-spacing:.06em;color:var(--ink-3);}
+    .reel-fab:hover .reel-fab-tip,.reel-fab:focus-visible .reel-fab-tip{opacity:1;transform:none;}
+
+    /* ── the overlay — scrim, copy left, film right ──────────────────── */
+    .reel-ov{position:fixed;inset:0;z-index:var(--z-panel);display:grid;place-items:center;}
+    .reel-ov[hidden]{display:none;}
+    .reel-ov-scrim{position:absolute;inset:0;background:rgba(4,6,10,.88);
+      backdrop-filter:blur(20px) saturate(.9);-webkit-backdrop-filter:blur(20px) saturate(.9);
+      opacity:0;transition:opacity .45s ease;}
+    .reel-ov.open .reel-ov-scrim{opacity:1;}
+    .reel-ov-stage{position:relative;display:grid;grid-template-columns:minmax(340px,500px) auto;
+      align-items:center;gap:clamp(40px,5vw,84px);padding:24px var(--gutter);
+      max-width:100%;max-height:100dvh;}
+    .reel-ov-close{position:absolute;top:clamp(14px,3vh,28px);right:clamp(16px,2.4vw,32px);
+      width:46px;height:46px;display:grid;place-items:center;border-radius:50%;cursor:pointer;
+      background:rgba(10,14,21,.6);border:1px solid var(--line);color:var(--ink-2);
+      backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+      transition:color .3s ease,border-color .3s ease,transform .4s var(--ease);}
+    .reel-ov-close:hover{color:var(--ink);border-color:rgba(140,197,255,.4);transform:rotate(90deg);}
+    /* copy column */
+    .reel-ov-copy{max-width:52ch;}
+    .reel-ov-k{font-family:var(--sans);font-size:var(--t-caption);font-weight:550;
+      letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
+      font-variant-numeric:tabular-nums;}
+    .reel-ov-title{margin-top:16px;font-family:var(--sans);font-size:var(--t-display-2);
+      font-weight:700;letter-spacing:-0.015em;line-height:1.04;color:var(--ink);text-wrap:balance;}
+    .reel-ov-hook{margin-top:18px;font-size:var(--t-lead);line-height:1.5;color:var(--ink-2);
+      font-family:var(--serif);font-style:italic;}
+    .reel-ov-body{margin-top:18px;display:grid;gap:14px;}
+    .reel-ov-body p{font-size:var(--t-body);line-height:1.7;color:var(--ink-2);text-wrap:pretty;}
+    .reel-ov-next{margin-top:30px;padding-top:22px;border-top:1px solid var(--line);}
+    .reel-ov-next-k{font-family:var(--sans);font-size:var(--t-caption);font-weight:550;
+      letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);}
+    .reel-ov-next-row{display:flex;gap:12px;margin-top:14px;}
+    .reel-ov-th{position:relative;width:64px;aspect-ratio:9/16;border-radius:12px;overflow:hidden;
+      border:1px solid rgba(140,197,255,.5);padding:0;flex:none;}
+    .reel-ov-th img{width:100%;height:100%;object-fit:cover;display:block;}
+    .reel-ov-th-ghost{width:64px;aspect-ratio:9/16;border-radius:12px;flex:none;
+      border:1px dashed rgba(226,238,252,.14);display:grid;place-items:center;
+      font-family:var(--sans);font-size:var(--t-micro);font-weight:550;letter-spacing:.1em;
+      color:var(--ink-3);text-transform:uppercase;}
+    .reel-ov-soc{display:inline-flex;align-items:center;gap:8px;margin-top:24px;
+      font-family:var(--sans);font-size:13.5px;font-weight:550;color:var(--ink-2);text-decoration:none;
+      border-bottom:1px solid rgba(140,197,255,.35);padding-bottom:3px;
+      transition:color .3s ease,border-color .3s ease;}
+    .reel-ov-soc:hover{color:var(--ink);border-color:var(--ember);}
+    /* the film */
+    .reel-ov-player{position:relative;height:min(84dvh,780px);aspect-ratio:9/16;
+      border-radius:22px;overflow:hidden;border:1px solid rgba(226,238,252,.16);
+      background:#04060A;box-shadow:0 40px 120px rgba(0,0,0,.6);}
+    .reel-ov-player video{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;}
+    .reel-ov-big{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.8);
+      width:72px;height:72px;display:grid;place-items:center;border-radius:50%;cursor:pointer;
+      background:rgba(10,14,21,.55);border:1px solid rgba(226,238,252,.25);color:var(--ink);
+      backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+      opacity:0;pointer-events:none;transition:opacity .3s ease,transform .45s var(--ease-pop);}
+    .reel-ov-player.paused .reel-ov-big{opacity:1;pointer-events:auto;transform:translate(-50%,-50%);}
+    .reel-ov-hud{position:absolute;left:0;right:0;bottom:0;padding:36px 18px 14px;z-index:2;
+      background:linear-gradient(180deg,transparent,rgba(4,6,10,.82));
+      opacity:1;transition:opacity .4s ease;}
+    .reel-ov-bar{position:relative;height:14px;display:flex;align-items:center;cursor:pointer;}
+    .reel-ov-bar::before{content:'';position:absolute;left:0;right:0;height:3px;border-radius:99px;
+      background:rgba(239,243,248,.22);}
+    .reel-ov-fill{position:absolute;left:0;height:3px;border-radius:99px;width:0%;
+      background:var(--ember);}
+    .reel-ov-row{display:flex;align-items:center;gap:14px;margin-top:6px;}
+    .reel-ov-row button{display:grid;place-items:center;width:34px;height:34px;padding:0;
+      background:none;border:0;border-radius:8px;color:var(--ink);cursor:pointer;opacity:.9;
+      transition:opacity .25s ease;}
+    .reel-ov-row button:hover{opacity:1;}
+    .reel-ov-time{font-family:var(--sans);font-size:var(--t-caption);font-weight:550;
+      letter-spacing:.06em;font-variant-numeric:tabular-nums;color:rgba(239,243,248,.85);
+      margin-right:auto;}
+    .reel-ov-row .ic{display:none;}
+    .reel-ov-row .ic.on{display:block;}
+    /* open choreography — the film rises, the copy follows a half-beat later */
+    .reel-ov .reel-ov-player{opacity:0;transform:translateY(16px) scale(.965);
+      transition:opacity .6s ease,transform .7s var(--ease-expo);}
+    .reel-ov .reel-ov-copy>*{opacity:0;transform:translateY(14px);
+      transition:opacity .55s ease,transform .65s var(--ease-expo);}
+    .reel-ov.open .reel-ov-player{opacity:1;transform:none;}
+    .reel-ov.open .reel-ov-copy>*{opacity:1;transform:none;}
+    .reel-ov.open .reel-ov-copy>*:nth-child(1){transition-delay:.1s;}
+    .reel-ov.open .reel-ov-copy>*:nth-child(2){transition-delay:.16s;}
+    .reel-ov.open .reel-ov-copy>*:nth-child(3){transition-delay:.22s;}
+    .reel-ov.open .reel-ov-copy>*:nth-child(4){transition-delay:.28s;}
+    .reel-ov.open .reel-ov-copy>*:nth-child(5){transition-delay:.34s;}
+    .reel-ov.open .reel-ov-copy>*:nth-child(6){transition-delay:.4s;}
+    html.reel-lock,html.reel-lock body{overflow:hidden;}
+
+    /* ── smaller screens ─────────────────────────────────────────────── */
+    @media (max-width:1023px){
+      .reel-ov-stage{grid-template-columns:1fr;justify-items:center;gap:26px;
+        overflow-y:auto;max-height:100dvh;padding:76px var(--gutter) 40px;align-items:start;}
+      .reel-ov-player{height:min(62dvh,560px);}
+      .reel-ov-copy{max-width:60ch;order:2;}
+    }
+    @media (max-width:767px){
+      .reel-section{padding:8vh var(--gutter) 10vh;}
+      .reel-card,.reel-ghost{width:64vw;}
+      .reel-fab{width:84px;border-radius:16px;}
+      .reel-fab-tip{display:none;}
+      /* the hero CTA pill hugs its cycling prompt and can run under the
+         FAB's corner on a phone. Cap the pill AND its text well (the
+         cycler sets an inline width) so both stop 132px short of the
+         right edge — long prompts clip behind the pill's own padding,
+         and a tap opens the chat either way. */
+      .hero .cta{max-width:calc(100vw - 132px);}
+      /* a constant text well (the !important outranks the cycler's inline
+         width) whose tail fades out — long prompts dissolve before the
+         FAB instead of hard-cutting at its edge; short ones end before
+         the fade zone and never feel it */
+      .hero .cta-text{width:calc(100vw - 226px) !important;
+        -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);
+                mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);}
+      .reel-ov-player{height:min(58dvh,520px);}
+      .reel-ov-title{font-size:var(--t-head);}
+    }
+    /* ── reduced motion — crossfades, no travel, no pulse ────────────── */
+    @media (prefers-reduced-motion:reduce){
+      .reel-fab,.reel-fab.in:hover,.reel-card:hover,.reel-card:hover img,
+      .reel-card:hover video,.reel-ov .reel-ov-player,.reel-ov .reel-ov-copy>*{
+        transform:none;transition-duration:.01s;}
+      .reel-fab-live b{animation:none;}
+      html.js-reel .reel-head,html.js-reel .reel-card,html.js-reel .reel-ghost{
+        transform:none;transition-duration:.01s;}
+    }
+  </style>
+
+  <section class="reel-section" id="shortsSection" aria-label="Short-form films">
+    <div class="reel-head">
+      <div>
+        <h2 class="reel-title">Design, out <span class="serif">loud.</span></h2>
+        <p class="reel-lede">The thinking that shapes my products, cut into sixty-second
+           films &mdash; the psychology of why good design works, posted where you
+           already scroll.</p>
+      </div>
+      <a class="reel-feed" href="https://www.linkedin.com/in/bhanukowshik/" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+        Playing in your feed<span class="arr" aria-hidden="true">&#8599;</span>
+      </a>
+    </div>
+
+    <div class="reel-rail" id="reelRail">
+      <button class="reel-card" type="button" data-reel="endowment-effect"
+              aria-label="Play short: The Endowment Effect" aria-haspopup="dialog">
+        <img src="shorts/endowment-effect-poster.webp" alt="" loading="lazy" width="720" height="1290">
+        <video muted loop playsinline preload="none" data-src="shorts/endowment-effect-preview.mp4"
+               aria-hidden="true" tabindex="-1"></video>
+        <span class="reel-card-shade" aria-hidden="true"></span>
+        <span class="reel-no">N&ordm; 001</span>
+        <span class="reel-card-t">The Endowment Effect</span>
+        <span class="reel-dur">1:21</span>
+        <span class="reel-card-play" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#EFF3F8" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+        </span>
+      </button>
+      <div class="reel-ghost" aria-hidden="true">
+        <span class="g-no">N&ordm; 002</span>
+        <span class="g-t">in the edit bay</span>
+      </div>
+      <div class="reel-ghost" aria-hidden="true">
+        <span class="g-no">N&ordm; 003</span>
+        <span class="g-t">being written</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── shorts→about seam — the same breath the other sections get ── -->
+  <div class="sec-divider sec-divider--empty" aria-hidden="true"></div>
+
   <!-- ── 03 — ABOUT: the T ─────────────────────────────────────────────── -->
   <!-- ══ SECTION 3 — ported from index.html ══════════════════════════
        The DNA T-shape as it ships on the reference, not a rebuild. -->
@@ -6019,6 +6305,310 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     </span>
     <span id="ftToastMsg">Mail copied</span>
   </div>
+
+  <!-- ══ SHORTS FAB — a sliver of film in the orb's corner ══════════════
+       Lives only while the hero does: it leaves at 35% scroll, the orb
+       arrives when the CTA is gone — the corner is handed over, never
+       shared. Styles live with the shorts section block. -->
+  <button class="reel-fab" id="reelFab" type="button" data-reel="endowment-effect"
+          aria-label="Watch short: The Endowment Effect, 1 minute 21 seconds" aria-haspopup="dialog">
+    <img src="shorts/endowment-effect-poster.webp" alt="" width="720" height="1290">
+    <video id="reelFabVid" muted loop playsinline preload="auto" autoplay
+           src="shorts/endowment-effect-preview.mp4" poster="shorts/endowment-effect-poster.webp"
+           aria-hidden="true" tabindex="-1"></video>
+    <span class="reel-fab-shade" aria-hidden="true"></span>
+    <span class="reel-fab-live" aria-hidden="true"><b></b>Short</span>
+    <span class="reel-fab-dur" aria-hidden="true">1:21</span>
+    <span class="reel-fab-tip" aria-hidden="true">The Endowment Effect<small>Watch with sound</small></span>
+  </button>
+
+  <!-- ══ SHORTS OVERLAY — the film with its sound, the story beside it ══ -->
+  <div class="reel-ov" id="reelOv" role="dialog" aria-modal="true"
+       aria-labelledby="reelOvTitle" hidden>
+    <div class="reel-ov-scrim" id="reelOvScrim"></div>
+    <div class="reel-ov-stage">
+      <button class="reel-ov-close" id="reelOvClose" type="button" aria-label="Close player">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+      </button>
+      <div class="reel-ov-copy">
+        <p class="reel-ov-k" id="reelOvK"></p>
+        <h3 class="reel-ov-title" id="reelOvTitle"></h3>
+        <p class="reel-ov-hook" id="reelOvHook"></p>
+        <div class="reel-ov-body" id="reelOvBody"></div>
+        <div class="reel-ov-next">
+          <span class="reel-ov-next-k">The reel so far</span>
+          <div class="reel-ov-next-row" id="reelOvNextRow"></div>
+        </div>
+        <a class="reel-ov-soc" href="https://www.linkedin.com/in/bhanukowshik/" target="_blank" rel="noopener">
+          New ones land on LinkedIn first&nbsp;&#8599;</a>
+      </div>
+      <figure class="reel-ov-player paused" id="reelOvPlayer">
+        <video id="reelOvVideo" playsinline preload="metadata"></video>
+        <button class="reel-ov-big" id="reelOvBig" type="button" aria-label="Play">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+        </button>
+        <div class="reel-ov-hud">
+          <div class="reel-ov-bar" id="reelOvBar" role="slider" aria-label="Seek"
+               aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <span class="reel-ov-fill" id="reelOvFill"></span>
+          </div>
+          <div class="reel-ov-row">
+            <button id="reelOvPlay" type="button" aria-label="Pause">
+              <svg class="ic ic-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+              <svg class="ic ic-pause on" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h3.4v14H7zM13.6 5H17v14h-3.4z"/></svg>
+            </button>
+            <span class="reel-ov-time" id="reelOvTime">0:00 / 0:00</span>
+            <button id="reelOvMute" type="button" aria-label="Mute">
+              <svg class="ic ic-vol on" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <svg class="ic ic-mut" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </figure>
+    </div>
+  </div>
+
+  <script>
+  /* ══ SHORTS — one array feeds the FAB, the rail and the overlay ══════
+     Add a short: one object here, three files in shorts/, one card in
+     the rail. Everything else follows. */
+  (function () {
+    var REEL = [
+      {
+        id: 'endowment-effect',
+        no: '001',
+        dur: '1:21',
+        title: 'The Endowment <span class="serif">Effect.</span>',
+        hook: 'Why a head start you never asked for keeps you coming back.',
+        body: [
+          'Hand someone a loyalty card with ten slots and two stamps already filled, and they finish it far more often than someone holding a blank eight-slot card. Same distance to the free wash &mdash; completely different behaviour.',
+          'That is the endowment effect: the moment something feels like <em>yours</em> &mdash; a little progress, a profile, a streak &mdash; walking away starts to register as a loss. And losing what we own stings roughly twice as hard as gaining it feels good.',
+          'In sixty seconds I break down the classic car-wash experiment and how products quietly wield it &mdash; and where the line sits between building momentum and manufacturing guilt.'
+        ],
+        src: 'shorts/endowment-effect.mp4',
+        poster: 'shorts/endowment-effect-poster.webp'
+      }
+    ];
+
+    var doc = document.documentElement;
+    var reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+    var fab = document.getElementById('reelFab');
+    var fabVid = document.getElementById('reelFabVid');
+    var ov = document.getElementById('reelOv');
+    var player = document.getElementById('reelOvPlayer');
+    var vid = document.getElementById('reelOvVideo');
+    if (!fab || !ov || !vid) return;
+
+    /* ── FAB: preview runs muted unless the visitor asked for stillness.
+       play() can reject when the tab loads hidden or the policy is grumpy,
+       so it is retried on visibility and once on first touch — the film
+       must already be rolling when the loader lifts, never click-started. ── */
+    function fabPlay() {
+      if (reduced.matches) return;
+      if (fab.classList.contains('away') || !ov.hidden) return;
+      var p = fabVid.play(); if (p && p.catch) p.catch(function () {});
+    }
+    if (reduced.matches) { fabVid.removeAttribute('autoplay'); fabVid.pause(); }
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) fabPlay();
+    });
+    addEventListener('pointerdown', function onceGesture() {
+      removeEventListener('pointerdown', onceGesture);
+      if (fabVid.paused) fabPlay();
+    }, { passive: true });
+
+    /* arrives after the hero copy has landed; polling because the loader
+       decides when hero-go happens and rAF may be parked in hidden tabs */
+    (function arm() {
+      if (doc.classList.contains('hero-go')) {
+        setTimeout(function () { fab.classList.add('in'); fabPlay(); }, 1500);
+      } else { setTimeout(arm, 200); }
+    })();
+
+    /* leaves at 35% scroll — the corner sits empty for a beat, then the
+       orb slides in at CTA-gone. A handoff, not a swap. */
+    var heroCta = document.getElementById('cta');
+    var fabTick = false;
+    function fabSync() {
+      fabTick = false;
+      var away = heroCta ? heroCta.getBoundingClientRect().bottom < innerHeight * 0.35
+                         : scrollY > innerHeight * 0.45;
+      fab.classList.toggle('away', away);
+      if (away) fabVid.pause(); else if (!ov.classList.contains('open')) fabPlay();
+    }
+    addEventListener('scroll', function () {
+      if (!fabTick) { fabTick = true; requestAnimationFrame(fabSync); }
+    }, { passive: true });
+    addEventListener('resize', fabSync);
+    fabSync();
+
+    /* ── rail cards: hover runs the preview, click opens the film ── */
+    var cards = [].slice.call(document.querySelectorAll('.reel-card'));
+    cards.forEach(function (card) {
+      var cv = card.querySelector('video');
+      card.addEventListener('mouseenter', function () {
+        if (reduced.matches || !cv) return;
+        if (!cv.src) cv.src = cv.getAttribute('data-src');
+        card.classList.add('playing');
+        var p = cv.play(); if (p && p.catch) p.catch(function () {});
+      });
+      card.addEventListener('mouseleave', function () {
+        if (!cv) return;
+        card.classList.remove('playing');
+        cv.pause();
+      });
+      card.addEventListener('click', function () { openReel(card.dataset.reel, card); });
+    });
+    fab.addEventListener('click', function () { openReel(fab.dataset.reel, fab); });
+
+    /* ── section entrance — JS-gated so no-JS still shows everything ── */
+    var section = document.getElementById('shortsSection');
+    if (section && 'IntersectionObserver' in window && !reduced.matches) {
+      doc.classList.add('js-reel');
+      new IntersectionObserver(function (entries, io) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { section.classList.add('in'); io.disconnect(); }
+        });
+      }, { threshold: 0.18 }).observe(section);
+    }
+
+    /* ── the overlay ── */
+    var kEl = document.getElementById('reelOvK');
+    var tEl = document.getElementById('reelOvTitle');
+    var hEl = document.getElementById('reelOvHook');
+    var bEl = document.getElementById('reelOvBody');
+    var nextRow = document.getElementById('reelOvNextRow');
+    var closeBtn = document.getElementById('reelOvClose');
+    var scrim = document.getElementById('reelOvScrim');
+    var big = document.getElementById('reelOvBig');
+    var playBtn = document.getElementById('reelOvPlay');
+    var muteBtn = document.getElementById('reelOvMute');
+    var bar = document.getElementById('reelOvBar');
+    var fill = document.getElementById('reelOvFill');
+    var timeEl = document.getElementById('reelOvTime');
+    var opener = null;
+    var openedAt = 0;   /* a fast double-click's second press lands on the
+                           scrim — ignore dismissals in the first beat */
+
+    function fmt(s) {
+      if (!isFinite(s)) return '0:00';
+      s = Math.round(s);
+      return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
+    }
+
+    function fillNext(activeId) {
+      nextRow.innerHTML = '';
+      REEL.forEach(function (r) {
+        var th = document.createElement('span');
+        th.className = 'reel-ov-th';
+        th.innerHTML = '<img src="' + r.poster + '" alt="">';
+        if (r.id === activeId) th.style.borderColor = 'rgba(140,197,255,.5)';
+        nextRow.appendChild(th);
+      });
+      for (var i = 0; i < 2; i++) {
+        var g = document.createElement('span');
+        g.className = 'reel-ov-th-ghost';
+        g.textContent = 'soon';
+        nextRow.appendChild(g);
+      }
+    }
+
+    function openReel(id, from) {
+      var r = REEL.filter(function (x) { return x.id === id; })[0] || REEL[0];
+      opener = from || null;
+      kEl.textContent = 'Short — Nº ' + r.no + ' · ' + r.dur;
+      tEl.innerHTML = r.title;
+      hEl.textContent = r.hook;
+      bEl.innerHTML = r.body.map(function (p) { return '<p>' + p + '</p>'; }).join('');
+      fillNext(r.id);
+      if (vid.getAttribute('src') !== r.src) { vid.src = r.src; }
+      vid.poster = r.poster;
+      ov.hidden = false;
+      openedAt = Date.now();
+      requestAnimationFrame(function () { requestAnimationFrame(function () {
+        ov.classList.add('open');
+      }); });
+      doc.classList.add('reel-lock');
+      if (window.__lenis) window.__lenis.stop();
+      fabVid.pause();
+      vid.muted = false; vid.currentTime = 0;
+      var p = vid.play();
+      if (p && p.catch) p.catch(function () { setPaused(true); });
+      closeBtn.focus();
+    }
+
+    function closeReel() {
+      if (Date.now() - openedAt < 350) return;
+      vid.pause();
+      ov.classList.remove('open');
+      setTimeout(function () { ov.hidden = true; }, 420);
+      doc.classList.remove('reel-lock');
+      if (window.__lenis) window.__lenis.start();
+      if (!fab.classList.contains('away')) fabPlay();
+      if (opener && opener.focus) opener.focus();
+    }
+
+    function setPaused(paused) {
+      player.classList.toggle('paused', paused);
+      playBtn.querySelector('.ic-play').classList.toggle('on', paused);
+      playBtn.querySelector('.ic-pause').classList.toggle('on', !paused);
+      playBtn.setAttribute('aria-label', paused ? 'Play' : 'Pause');
+    }
+    vid.addEventListener('play', function () { setPaused(false); });
+    vid.addEventListener('pause', function () { setPaused(true); });
+    vid.addEventListener('ended', function () { setPaused(true); });
+
+    function toggle() { if (vid.paused) vid.play(); else vid.pause(); }
+    vid.addEventListener('click', toggle);
+    big.addEventListener('click', function () { vid.play(); });
+    playBtn.addEventListener('click', toggle);
+
+    muteBtn.addEventListener('click', function () {
+      vid.muted = !vid.muted;
+      muteBtn.querySelector('.ic-vol').classList.toggle('on', !vid.muted);
+      muteBtn.querySelector('.ic-mut').classList.toggle('on', vid.muted);
+      muteBtn.setAttribute('aria-label', vid.muted ? 'Unmute' : 'Mute');
+    });
+
+    vid.addEventListener('timeupdate', function () {
+      if (!vid.duration) return;
+      var pct = (vid.currentTime / vid.duration) * 100;
+      fill.style.width = pct + '%';
+      bar.setAttribute('aria-valuenow', Math.round(pct));
+      timeEl.textContent = fmt(vid.currentTime) + ' / ' + fmt(vid.duration);
+    });
+    vid.addEventListener('loadedmetadata', function () {
+      timeEl.textContent = fmt(0) + ' / ' + fmt(vid.duration);
+    });
+
+    function seekTo(clientX) {
+      var rect = bar.getBoundingClientRect();
+      var ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+      if (vid.duration) vid.currentTime = ratio * vid.duration;
+    }
+    bar.addEventListener('pointerdown', function (e) {
+      seekTo(e.clientX);
+      function move(ev) { seekTo(ev.clientX); }
+      function up() { removeEventListener('pointermove', move); removeEventListener('pointerup', up); }
+      addEventListener('pointermove', move); addEventListener('pointerup', up);
+    });
+    bar.addEventListener('keydown', function (e) {
+      if (!vid.duration) return;
+      if (e.key === 'ArrowRight') { vid.currentTime = Math.min(vid.duration, vid.currentTime + 5); e.preventDefault(); }
+      if (e.key === 'ArrowLeft')  { vid.currentTime = Math.max(0, vid.currentTime - 5); e.preventDefault(); }
+    });
+
+    closeBtn.addEventListener('click', closeReel);
+    scrim.addEventListener('click', closeReel);
+    addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && ov.classList.contains('open')) closeReel();
+    });
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden && ov.classList.contains('open')) vid.pause();
+    });
+  })();
+  </script>
 
   <!-- the same orb, parked bottom-right once the hero's own CTA has scrolled off -->
   <button class="orb-fab" id="orbFab" type="button" aria-label="Talk to Bhanu AI" aria-haspopup="dialog">
