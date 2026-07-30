@@ -39,9 +39,67 @@
     background: radial-gradient(130% 100% at 50% 42%, transparent 58%, rgba(4,7,12,0.42) 100%);
   }
 
+  /* ─── CABIN — the seat you're in ────────────────────────── */
+  .cabin { position: fixed; inset: 0; pointer-events: none; z-index: 2;
+    transition: filter 1.2s ease; }
+  [data-mode="night"] .cabin { filter: brightness(0.5); }
+  .roof {
+    position: absolute; top: 0; left: -3%; right: -3%; height: 10vh;
+    background: linear-gradient(180deg, #14181F 0%, #10141A 55%, #0B0E13 100%);
+    border-radius: 0 0 50% 50% / 0 0 90% 90%;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.35);
+  }
+  .rearview {
+    position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
+    width: min(220px, 24vw); height: 60px;
+    background: linear-gradient(180deg, #0A0D11, #12161D);
+    border-radius: 0 0 16px 16px;
+    border: 1px solid rgba(255,255,255,0.06); border-top: none;
+  }
+  .rearview::after {
+    content: ''; position: absolute; inset: 7px 9px 9px;
+    border-radius: 0 0 11px 11px;
+    background: linear-gradient(120deg, #1D242E 0%, #2A3340 45%, #1A212B 100%);
+  }
+  .pillar {
+    position: absolute; top: -6vh; height: 92vh; width: 7vw; max-width: 96px;
+    background: linear-gradient(90deg, #171C24, #0C0F14);
+  }
+  .pillar-l { left: 9vw;  transform: rotate(15deg);  transform-origin: bottom left; }
+  .pillar-r { right: 9vw; transform: rotate(-15deg); transform-origin: bottom right; }
+  .side-glass {
+    position: absolute; top: 7vh; bottom: 26vh; width: 13vw;
+    background: linear-gradient(180deg, rgba(8,12,18,0.32), rgba(8,12,18,0.07) 45%, rgba(8,12,18,0.34));
+  }
+  .glass-l { left: 0; }
+  .glass-r { right: 0; }
+  .door {
+    position: absolute; bottom: 0; width: 15vw; height: 40vh;
+    background: linear-gradient(180deg, #161B23, #0B0E13);
+  }
+  .door-l { left: 0;  clip-path: polygon(0 14%, 100% 42%, 100% 100%, 0 100%); }
+  .door-r { right: 0; clip-path: polygon(100% 14%, 0 42%, 0 100%, 100% 100%); }
+  .wing {
+    position: absolute; bottom: 32vh; width: min(120px, 10vw); height: 7vh;
+    background: #10141A; border: 1px solid rgba(255,255,255,0.05);
+  }
+  .wing-l { left: 0.6vw;  border-radius: 12px 22px 18px 8px; }
+  .wing-r { right: 0.6vw; border-radius: 22px 12px 8px 18px; }
+  .wing::after {
+    content: ''; position: absolute; inset: 6px 8px;
+    border-radius: 8px;
+    background: linear-gradient(115deg, #232B36, #171E27 70%);
+  }
+  .hood {
+    position: absolute; left: -8%; right: -8%; bottom: 20vh; height: 10vh;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    background: linear-gradient(180deg, #3A444F 0%, #2A323D 46%, #1E252E 100%);
+    box-shadow: 0 -3px 18px rgba(0,0,0,0.25), inset 0 2px 2px rgba(255,255,255,0.09);
+  }
+
   /* ─── TOP: MODE SWITCH ──────────────────────────────────── */
   .mode-bar {
-    position: fixed; top: clamp(18px, 4vh, 40px); left: 0; right: 0; z-index: 3;
+    position: fixed; top: clamp(78px, 12vh, 118px); left: 0; right: 0; z-index: 3;
     display: flex; flex-direction: column; align-items: center; gap: 14px;
     pointer-events: none;
   }
@@ -54,44 +112,98 @@
   .mode-lbl.active { color: var(--ink); }
   [data-mode="night"] .mode-lbl.active { text-shadow: 0 0 14px rgba(110,168,255,0.55); }
 
+  /* Bhanu's v5 day-night scene toggle — native 2x, no scaling */
   .mode-toggle {
-    position: relative; width: 148px; height: 54px; border-radius: 100px;
-    border: 1px solid rgba(255,255,255,0.28);
-    background: rgba(20, 26, 36, 0.42);
-    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-    cursor: pointer; padding: 0;
-    transition: border-color 0.5s ease, background 0.5s ease, box-shadow 0.5s ease;
-  }
-  .mode-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
-  [data-mode="night"] .mode-toggle { box-shadow: 0 0 34px rgba(110,168,255,0.25); }
-  .mt-icon {
-    position: absolute; top: 50%; width: 22px; height: 22px; transform: translateY(-50%);
-    transition: opacity 0.4s ease; pointer-events: none;
-  }
-  .mt-sun  { left: 17px; }
-  .mt-moon { right: 17px; }
-  .mt-icon svg { display: block; width: 100%; height: 100%; }
-  .mt-thumb {
-    position: absolute; top: 4px; left: 4px; width: 74px; height: 44px; border-radius: 100px;
-    background: linear-gradient(180deg, #ffffff, #E8ECF2);
-    box-shadow: 0 3px 14px rgba(0,0,0,0.35);
+    position: relative;
     display: flex; align-items: center; justify-content: center;
-    transition: transform 0.55s cubic-bezier(0.34,1.4,0.5,1), background 0.55s ease, box-shadow 0.55s ease;
+    background: none; border: none; padding: 0; cursor: pointer;
+    border-radius: 999px;
+    transition: transform 0.15s ease;
   }
-  .mt-thumb svg { width: 22px; height: 22px; }
-  .mt-thumb .th-sun  { display: block; }
-  .mt-thumb .th-moon { display: none; }
-  [data-mode="night"] .mt-thumb {
-    transform: translateX(66px);
-    background: linear-gradient(180deg, #7FA8FF, #4F79E8);
-    box-shadow: 0 0 26px rgba(110,168,255,0.75), 0 3px 14px rgba(0,0,0,0.45);
+  .mode-toggle:active { transform: scale(0.94); }
+  .mode-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; }
+  [data-mode="night"] .mode-toggle { filter: drop-shadow(0 0 16px rgba(110,168,255,0.3)); }
+  .tt-track {
+    position: relative; width: 116px; height: 60px; border-radius: 999px;
+    background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%);
+    border: 3px solid rgba(255,255,255,0.40);
+    overflow: hidden;
+    transition: background 0.5s ease, border-color 0.4s ease;
   }
-  [data-mode="night"] .mt-thumb .th-sun  { display: none; }
-  [data-mode="night"] .mt-thumb .th-moon { display: block; }
-  [data-mode="day"]  .mt-sun  { opacity: 0; }
-  [data-mode="day"]  .mt-moon { opacity: 0.75; }
-  [data-mode="night"] .mt-sun  { opacity: 0.6; }
-  [data-mode="night"] .mt-moon { opacity: 0; }
+  .tt-track::after {
+    content: ''; position: absolute; left: 0; right: 0; top: 0; height: 50%;
+    border-radius: 999px 999px 50% 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0));
+    pointer-events: none; z-index: 10;
+  }
+  .tt-hill-back  { position: absolute; bottom: 0; left: -5%;  width: 75%; height: 26px; background: #72B87A; border-radius: 50% 60% 0 0; z-index: 1; transition: background 0.5s ease; }
+  .tt-hill-front { position: absolute; bottom: 0; right: -8%; width: 62%; height: 22px; background: #5DA066; border-radius: 60% 50% 0 0; z-index: 2; transition: background 0.5s ease; }
+  .tt-star { position: absolute; background: rgba(255,255,255,0.9); border-radius: 50%; opacity: 0; transition: opacity 0.4s ease; z-index: 1; }
+  .tt-star-1 { width: 5px; height: 5px; top: 10px; left: 16px; }
+  .tt-star-2 { width: 4px; height: 4px; top: 22px; left: 36px; }
+  .tt-star-3 { width: 4px; height: 4px; top: 12px; left: 54px; }
+  .tt-star-4 { width: 3px; height: 3px; top: 26px; left: 22px; }
+  [data-mode="night"] .tt-star { opacity: 1; }
+  @keyframes tt-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.12; } }
+  [data-mode="night"] .tt-star-1 { animation: tt-twinkle 2.1s ease-in-out infinite; }
+  [data-mode="night"] .tt-star-2 { animation: tt-twinkle 1.7s ease-in-out 0.8s infinite; }
+  [data-mode="night"] .tt-star-3 { animation: tt-twinkle 2.5s ease-in-out 1.5s infinite; }
+  [data-mode="night"] .tt-star-4 { animation: tt-twinkle 1.9s ease-in-out 0.4s infinite; }
+  .tt-shoot {
+    position: absolute; top: 6px; left: 8px; width: 18px; height: 2px;
+    background: linear-gradient(to right, transparent, #FFE87A);
+    border-radius: 2px; opacity: 0; transform: rotate(35deg); z-index: 2; pointer-events: none;
+  }
+  @keyframes tt-shooting-star {
+    0%   { opacity: 0; transform: translate(0, 0) rotate(35deg); }
+    3%   { opacity: 0.85; }
+    15%  { opacity: 0; transform: translate(40px, 16px) rotate(35deg); }
+    100% { opacity: 0; transform: translate(40px, 16px) rotate(35deg); }
+  }
+  [data-mode="night"] .tt-shoot { animation: tt-shooting-star 5s ease-in 2s infinite; }
+  .tt-cloud { position: absolute; right: 18px; top: 12px; width: 30px; height: 14px; background: rgba(255,255,255,0.95); border-radius: 20px; opacity: 1; transition: opacity 0.4s ease; z-index: 1; }
+  .tt-cloud::before { content: ''; position: absolute; width: 18px; height: 18px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -10px; left: 4px; }
+  .tt-cloud::after  { content: ''; position: absolute; width: 14px; height: 14px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -8px; left: 14px; }
+  [data-mode="night"] .tt-cloud { opacity: 0; }
+  @keyframes tt-cloud-drift { from { transform: translateX(60px); } to { transform: translateX(-170px); } }
+  [data-mode="day"] .tt-cloud { animation: tt-cloud-drift 26s linear 0s infinite backwards; }
+  .tt-cloud-b { position: absolute; right: 6px; top: 22px; width: 18px; height: 8px; background: rgba(255,255,255,0.95); border-radius: 16px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
+  .tt-cloud-b::before { content: ''; position: absolute; width: 12px; height: 12px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -6px; left: 2px; }
+  .tt-cloud-b::after  { content: ''; position: absolute; width: 10px; height: 10px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -6px; left: 8px; }
+  [data-mode="night"] .tt-cloud-b { opacity: 0; }
+  [data-mode="day"]  .tt-cloud-b { opacity: 0.65; animation: tt-cloud-drift 18s linear 4s infinite backwards; }
+  .tt-cloud-c { position: absolute; right: 36px; top: 8px; width: 22px; height: 10px; background: rgba(255,255,255,0.95); border-radius: 16px; opacity: 0; transition: opacity 0.4s ease; z-index: 1; pointer-events: none; }
+  .tt-cloud-c::before { content: ''; position: absolute; width: 14px; height: 14px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -8px; left: 2px; }
+  .tt-cloud-c::after  { content: ''; position: absolute; width: 12px; height: 12px; background: rgba(255,255,255,0.95); border-radius: 50%; top: -6px; left: 10px; }
+  [data-mode="night"] .tt-cloud-c { opacity: 0; }
+  [data-mode="day"]  .tt-cloud-c { opacity: 0.45; animation: tt-cloud-drift 34s linear 7.5s infinite backwards; }
+  .tt-thumb {
+    position: absolute; width: 48px; height: 48px; border-radius: 50%;
+    top: 50%; left: 3px; overflow: hidden;
+    background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800);
+    transform: translateX(0) translateY(-50%);
+    transition: transform 0.44s cubic-bezier(0.34,1.56,0.64,1), background 0.5s ease;
+    z-index: 3;
+  }
+  .tt-thumb::before, .tt-thumb::after {
+    content: ''; position: absolute; border-radius: 50%;
+    background: rgba(148,158,185,0.50); opacity: 0; transition: opacity 0.4s ease;
+  }
+  .tt-thumb::before { width: 14px; height: 14px; top: 8px;  left: 10px; }
+  .tt-thumb::after  { width: 10px; height: 10px; top: 26px; left: 28px; }
+  [data-mode="night"] .tt-thumb::before, [data-mode="night"] .tt-thumb::after { opacity: 1; }
+  [data-mode="day"] .tt-track { background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%); border-color: rgba(255,255,255,0.40); }
+  [data-mode="day"] .tt-hill-back  { background: #72B87A; }
+  [data-mode="day"] .tt-hill-front { background: #5DA066; }
+  [data-mode="day"] .tt-thumb { transform: translateX(0) translateY(-50%); background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800); }
+  [data-mode="day"] .tt-star  { opacity: 0; }
+  [data-mode="day"] .tt-cloud { opacity: 1; }
+  [data-mode="day"] .tt-thumb::before, [data-mode="day"] .tt-thumb::after { opacity: 0; }
+  [data-mode="night"] .tt-track { background: linear-gradient(180deg, #0B1829 0%, #152238 100%); border-color: rgba(255,255,255,0.10); }
+  [data-mode="night"] .tt-track::after { background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0)); }
+  [data-mode="night"] .tt-hill-back  { background: #1D3D25; }
+  [data-mode="night"] .tt-hill-front { background: #152C1A; }
+  [data-mode="night"] .tt-thumb { transform: translateX(56px) translateY(-50%); background: #EEF0F5; }
 
   .mode-tag {
     font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.42em;
@@ -118,6 +230,7 @@
     position: absolute; left: 11%; bottom: -290px; width: 480px; height: 480px;
     border-radius: 50%; border: 30px solid #191E26;
     box-shadow: inset 0 4px 10px rgba(255,255,255,0.05), 0 -6px 30px rgba(0,0,0,0.45);
+    z-index: 1;
   }
   .wheel::after {
     content: ''; position: absolute; left: 50%; top: 50%; width: 150px; height: 150px;
@@ -125,10 +238,11 @@
     background: radial-gradient(circle at 42% 36%, #232A34, #12161D);
   }
 
-  /* cluster — behind the wheel */
+  /* cluster — set into the dash, seen through the wheel */
   .cluster {
-    position: absolute; left: clamp(60px, 13%, 260px); bottom: clamp(28px, 7vh, 70px);
-    width: 240px; padding: 18px 22px 16px;
+    position: absolute; left: calc(11% + 240px); bottom: 5vh; transform: translateX(-50%);
+    z-index: 0;
+    width: 230px; padding: 16px 20px 14px;
     border-radius: 18px;
     background: var(--panel);
     border: 1px solid var(--panel-border);
@@ -160,9 +274,9 @@
 
   /* center HUD */
   .hud {
-    position: absolute; left: 50%; bottom: clamp(26px, 6.5vh, 64px); transform: translateX(-50%);
+    position: absolute; left: auto; right: clamp(20px, 4vw, 64px); bottom: clamp(26px, 6.5vh, 64px);
     display: grid; grid-template-columns: 1fr auto 1fr; gap: 26px; align-items: center;
-    width: min(560px, 62vw); padding: 20px 26px;
+    width: min(520px, 46vw); padding: 20px 26px;
     border-radius: 22px;
     background: var(--panel);
     border: 1px solid var(--panel-border);
@@ -206,41 +320,35 @@
     34% { opacity: 1; } 46% { opacity: 0.45; } 58% { opacity: 1; } 100% { opacity: 1; }
   }
 
-  /* lane chevrons */
-  .lane-btn {
-    position: fixed; top: 52%; z-index: 3; width: 52px; height: 52px; border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.18);
-    background: rgba(14, 18, 25, 0.4);
-    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-    color: var(--ink); font-size: 1.1rem; cursor: pointer;
-    opacity: 0.5; transition: opacity 0.25s ease, transform 0.15s ease;
-  }
-  .lane-btn:hover { opacity: 1; }
-  .lane-btn:active { transform: scale(0.92); }
-  .lane-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
-  .lane-l { left: clamp(14px, 3vw, 40px); }
-  .lane-r { right: clamp(14px, 3vw, 40px); }
-
   @media (max-width: 900px) {
     .wheel { left: -6%; width: 380px; height: 380px; bottom: -240px; }
-    .cluster { left: 16px; width: 190px; padding: 14px 16px 12px; }
+    .cluster { left: calc(-6% + 190px); width: 190px; padding: 12px 16px 10px; bottom: 4vh; }
     .speed-num { font-size: 44px; }
     .hud { width: min(480px, 92vw); gap: 16px; padding: 16px 18px;
            left: auto; right: 12px; transform: none; }
+    .rearview { display: none; }
+    .mode-bar { top: clamp(20px, 5vh, 50px); }
   }
   @media (max-width: 640px) {
     .hud { grid-template-columns: auto 1fr; left: 12px; right: 12px; width: auto; transform: none; padding: 14px 16px; }
     .hud-turn { display: none; }
-    .cluster { left: 12px; bottom: 212px; width: 150px; padding: 10px 14px; }
+    .cluster { left: 12px; bottom: 212px; width: 150px; padding: 10px 14px; transform: none; z-index: 2; }
     .speed-num { font-size: 34px; }
     .signals { margin-bottom: 2px; }
     .range-row { margin-top: 6px; padding-top: 6px; }
     .mode-hint { display: none; }
-    .lane-btn { top: 42%; }
+    .pillar, .wing { display: none; }
+    .side-glass { width: 7vw; }
+    .door { width: 8vw; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .mt-thumb { transition-duration: 0.15s; }
+    .tt-thumb { transition: transform 0.15s ease, background 0.15s ease; }
+    [data-mode="night"] .tt-star-1, [data-mode="night"] .tt-star-2,
+    [data-mode="night"] .tt-star-3, [data-mode="night"] .tt-star-4,
+    [data-mode="night"] .tt-shoot,
+    [data-mode="day"] .tt-cloud, [data-mode="day"] .tt-cloud-b,
+    [data-mode="day"] .tt-cloud-c { animation: none; }
     .booting .cluster, .booting .hud, .booting .speed-num,
     .booting .eta-time, .booting .turn-dist { animation: none; }
   }
@@ -255,31 +363,39 @@
   <div class="mode-row">
     <span class="mode-lbl lbl-day active" id="lblDay">DAY</span>
     <button class="mode-toggle" id="modeToggle" aria-label="Toggle night mode">
-      <span class="mt-icon mt-sun" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#F4C95D" stroke-width="2" stroke-linecap="round">
-          <circle cx="12" cy="12" r="4.4" fill="#F4C95D" stroke="none"/>
-          <path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.2 5.2l1.7 1.7M17.1 17.1l1.7 1.7M18.8 5.2l-1.7 1.7M6.9 17.1l-1.7 1.7"/>
-        </svg>
-      </span>
-      <span class="mt-icon mt-moon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M20.2 14.2A8.5 8.5 0 0 1 9.8 3.8a8.5 8.5 0 1 0 10.4 10.4z" fill="#C9D6EE"/></svg>
-      </span>
-      <span class="mt-thumb" aria-hidden="true">
-        <svg class="th-sun" viewBox="0 0 24 24" fill="none" stroke="#E8A200" stroke-width="2" stroke-linecap="round">
-          <circle cx="12" cy="12" r="4.4" fill="#F9B93C" stroke="none"/>
-          <path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.2 5.2l1.7 1.7M17.1 17.1l1.7 1.7M18.8 5.2l-1.7 1.7M6.9 17.1l-1.7 1.7"/>
-        </svg>
-        <svg class="th-moon" viewBox="0 0 24 24"><path d="M20.2 14.2A8.5 8.5 0 0 1 9.8 3.8a8.5 8.5 0 1 0 10.4 10.4z" fill="#0E1B33"/></svg>
+      <span class="tt-track">
+        <span class="tt-star tt-star-1"></span>
+        <span class="tt-star tt-star-2"></span>
+        <span class="tt-star tt-star-3"></span>
+        <span class="tt-star tt-star-4"></span>
+        <span class="tt-shoot"></span>
+        <span class="tt-cloud"></span>
+        <span class="tt-cloud-b"></span>
+        <span class="tt-cloud-c"></span>
+        <span class="tt-hill-back"></span>
+        <span class="tt-hill-front"></span>
+        <span class="tt-thumb"></span>
       </span>
     </button>
     <span class="mode-lbl lbl-night" id="lblNight">NIGHT</span>
   </div>
   <div class="mode-tag">ADAPTIVE VIEW. MAXIMUM FOCUS.</div>
-  <div class="mode-hint">←  →  CHANGE LANES</div>
+  <div class="mode-hint">AUTOPILOT ENGAGED</div>
 </div>
 
-<button class="lane-btn lane-l" id="laneL" aria-label="Change lane left">‹</button>
-<button class="lane-btn lane-r" id="laneR" aria-label="Change lane right">›</button>
+<div class="cabin" aria-hidden="true">
+  <div class="roof"></div>
+  <div class="rearview"></div>
+  <div class="side-glass glass-l"></div>
+  <div class="side-glass glass-r"></div>
+  <div class="pillar pillar-l"></div>
+  <div class="pillar pillar-r"></div>
+  <div class="hood"></div>
+  <div class="door door-l"></div>
+  <div class="door door-r"></div>
+  <div class="wing wing-l"></div>
+  <div class="wing wing-r"></div>
+</div>
 
 <div class="cockpit" id="cockpit">
   <div class="dash-body"></div>
@@ -346,7 +462,7 @@ renderer.toneMappingExposure = 1.05;
 document.getElementById('gl').appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(62, W() / H(), 0.1, 2000);
+const camera = new THREE.PerspectiveCamera(74, W() / H(), 0.1, 2000);
 const CAM_Y = 1.38;
 camera.position.set(0, CAM_Y, 0);
 camera.rotation.order = 'YXZ';
@@ -411,11 +527,27 @@ function disc(r, color, opacity = 1) {
   );
   return m;
 }
-const sun = disc(32, '#FFF3BE'); sun.position.set(-265, 280, -680);
-const sunHalo = disc(70, '#FFD98A', 0.5); sunHalo.position.copy(sun.position); sunHalo.position.z -= 1;
-const moon = disc(21, '#EDF1F9'); moon.position.set(248, -90, -650);
-const moonHalo = disc(44, '#C9D8F5', 0.22); moonHalo.position.copy(moon.position); moonHalo.position.z -= 1;
-scene.add(sun, sunHalo, moon, moonHalo);
+const sunGroup = new THREE.Group();
+const sun = disc(32, '#FFF3BE');
+const sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: null, color: 0xFFD98A, transparent: true, opacity: 0.5, fog: false, toneMapped: false, depthWrite: false,
+}));
+sunGlow.scale.set(150, 150, 1); sunGlow.position.z = -1;
+sunGroup.add(sunGlow, sun);
+sunGroup.position.set(-265, 280, -680);
+
+/* the moon is a crescent: a sky-coloured mask disc bites into the lit disc */
+const moonGroup = new THREE.Group();
+const moon = disc(20, '#DCE4F2');
+const moonMask = disc(18, '#0B1829');
+moonMask.position.set(7.5, 4.5, 0.6);
+const moonGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: null, color: 0xAFC2E2, transparent: true, opacity: 0, fog: false, toneMapped: false, depthWrite: false,
+}));
+moonGlow.scale.set(64, 64, 1); moonGlow.position.z = -1;
+moonGroup.add(moonGlow, moon, moonMask);
+moonGroup.position.set(248, -90, -650);
+scene.add(sunGroup, moonGroup);
 
 const starGeo = new THREE.BufferGeometry();
 {
@@ -427,27 +559,94 @@ const starGeo = new THREE.BufferGeometry();
   starGeo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
 }
 const starMat = new THREE.PointsMaterial({
-  color: 0xffffff, size: 2.1, sizeAttenuation: false, transparent: true,
+  color: 0xC9D2E4, size: 2.2, sizeAttenuation: false, transparent: true,
   opacity: 0, fog: false, depthWrite: false, toneMapped: false,
 });
 scene.add(new THREE.Points(starGeo, starMat));
 
-function blobTexture(inner = 'rgba(255,255,255,0.95)') {
-  const c = document.createElement('canvas'); c.width = c.height = 128;
+/* sky shooting stars — additive streaks that roam the night */
+const shooters = [];
+for (let i = 0; i < 2; i++) {
+  const m = new THREE.Mesh(
+    new THREE.PlaneGeometry(30, 1.8),
+    new THREE.MeshBasicMaterial({
+      color: 0xFFF3C8, transparent: true, opacity: 0, fog: false,
+      toneMapped: false, depthWrite: false, blending: THREE.AdditiveBlending,
+    })
+  );
+  m.rotation.z = -0.33;
+  scene.add(m);
+  shooters.push({ mesh: m, t0: -99, next: 4 + i * 5, x0: 0, y0: 200 });
+}
+
+/* dither-free radial glow — per-pixel alpha, no canvas gradients (Chrome dithers those
+   into chroma speckle when magnified) */
+function radialTexture(size = 128, edge = 1.8) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
   const g = c.getContext('2d');
-  const gr = g.createRadialGradient(64, 64, 6, 64, 64, 62);
-  gr.addColorStop(0, inner); gr.addColorStop(1, 'rgba(255,255,255,0)');
-  g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+  const img = g.createImageData(size, size);
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const dx = (x + 0.5) / size - 0.5, dy = (y + 0.5) / size - 0.5;
+    const d = Math.min(1, Math.hypot(dx, dy) * 2);
+    const idx = (y * size + x) * 4;
+    img.data[idx] = img.data[idx + 1] = img.data[idx + 2] = 255;
+    img.data[idx + 3] = Math.round(Math.pow(1 - d, edge) * 255);
+  }
+  g.putImageData(img, 0, 0);
   return new THREE.CanvasTexture(c);
 }
-const cloudTex = blobTexture();
+const glowTex = radialTexture();
+sunGlow.material.map = glowTex;
+moonGlow.material.map = glowTex;
+
+/* ground glow quads computed in-shader — perfectly smooth, no texture grain */
+function glowQuadMat(hex) {
+  return new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    uniforms: { uColor: { value: new THREE.Color(hex) }, uOp: { value: 0 } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+    fragmentShader: `uniform vec3 uColor; uniform float uOp; varying vec2 vUv;
+      void main(){ vec2 q=vUv-0.5; float d=min(length(q)*2.0,1.0);
+      float a=pow(1.0-d,1.7)*uOp; gl_FragColor=vec4(uColor*a,a); }`,
+  });
+}
+
+/* puffy metaball clouds — hand-computed alpha, natural silhouettes */
+function cloudTexture(seed) {
+  const w = 512, h = 256;
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d');
+  const img = g.createImageData(w, h);
+  let s = seed;
+  const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+  const blobs = [];
+  const n = 5 + Math.floor(rnd() * 3);
+  for (let i = 0; i < n; i++) blobs.push({ x: 0.2 + rnd() * 0.6, y: 0.4 + rnd() * 0.28, r: 0.1 + rnd() * 0.15 });
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const u = x / w, v = y / h;
+    let f = 0;
+    for (const b of blobs) {
+      const dx = (u - b.x) / (b.r * 1.7), dy = (v - b.y) / b.r;
+      f += Math.max(0, 1 - (dx * dx + dy * dy));
+    }
+    let a = Math.min(1, f * 0.85);
+    a = a * a * (3 - 2 * a);
+    if (v > 0.7) a *= Math.max(0, 1 - (v - 0.7) / 0.14);
+    const idx = (y * w + x) * 4;
+    img.data[idx] = img.data[idx + 1] = img.data[idx + 2] = 255;
+    img.data[idx + 3] = Math.round(a * 235);
+  }
+  g.putImageData(img, 0, 0);
+  return new THREE.CanvasTexture(c);
+}
+const cloudTexes = [cloudTexture(1013), cloudTexture(4517), cloudTexture(9203)];
 const clouds = [];
 for (let i = 0; i < 6; i++) {
   const s = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: cloudTex, transparent: true, opacity: 0.8, fog: false, depthWrite: false, toneMapped: false,
+    map: cloudTexes[i % 3], transparent: true, opacity: 0.8, fog: false, depthWrite: false, toneMapped: false,
   }));
-  const sc = 60 + Math.random() * 90;
-  s.scale.set(sc * 1.9, sc * 0.62, 1);
+  const sc = 42 + Math.random() * 40;
+  s.scale.set(sc * 2, sc, 1);
   s.position.set(-260 + Math.random() * 520, 120 + Math.random() * 120, -600 - Math.random() * 120);
   clouds.push(s); scene.add(s);
 }
@@ -579,7 +778,6 @@ const railMat = new THREE.MeshStandardMaterial({ color: 0xCBD2D9, roughness: 0.5
 
 /* streetlights */
 const poleMat = new THREE.MeshStandardMaterial({ color: 0x525C68, roughness: 0.6 });
-const lampGlowTex = blobTexture('rgba(255,214,140,0.95)');
 const LAMPS = [];
 const LAMP_SPACING = 82;
 for (let i = 0; i < 14; i++) {
@@ -594,18 +792,12 @@ for (let i = 0; i < 14; i++) {
   head.rotation.z = Math.PI / 2;
   head.position.set(-side * 2.45, 7.16, 0);
   const glow = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: lampGlowTex, transparent: true, opacity: 0, depthWrite: false,
+    map: glowTex, color: 0xFFD9A0, transparent: true, opacity: 0, depthWrite: false,
     blending: THREE.AdditiveBlending, toneMapped: false,
   }));
   glow.scale.set(3.6, 3.6, 1);
   glow.position.copy(head.position);
-  const pool = new THREE.Mesh(
-    new THREE.PlaneGeometry(9, 13),
-    new THREE.MeshBasicMaterial({
-      map: lampGlowTex, transparent: true, opacity: 0, depthWrite: false,
-      blending: THREE.AdditiveBlending, toneMapped: false, color: 0xFFC97A,
-    })
-  );
+  const pool = new THREE.Mesh(new THREE.PlaneGeometry(9, 13), glowQuadMat(0xFFC97A));
   pool.rotation.x = -Math.PI / 2;
   pool.position.set(-side * 2.45, 0.03, 0);
   g.add(pole, arm, head, glow, pool);
@@ -616,7 +808,7 @@ for (let i = 0; i < 14; i++) {
 
 /* traffic — rounded EV silhouettes */
 const carPalette = [0xE9EDF0, 0x39434F, 0x9FB2C2];
-const shadowTex = blobTexture();
+const shadowTex = glowTex;
 const canopyMat = new THREE.MeshPhysicalMaterial({
   color: 0x1A222C, roughness: 0.14, metalness: 0.4, clearcoat: 1, clearcoatRoughness: 0.12,
 });
@@ -651,24 +843,27 @@ function makeCar(colorHex) {
   g.add(body, canopy, bar, shadow);
   return g;
 }
+/* dv = our speed minus theirs: positive → we gain on them and pass; negative → they overtake us */
 const cars = [];
-[[0, -42], [1, -90], [-1, -148]].forEach(([lane, z], i) => {
+[
+  { lane: 0,  z: -46,  dv:  2.6 },
+  { lane: 1,  z: -120, dv:  3.6 },
+  { lane: -1, z: -200, dv:  4.2 },
+  { lane: 1,  z: -265, dv:  3.0 },
+  { lane: -1, z: 18,   dv: -4.6 },
+].forEach((d, i) => {
   const car = makeCar(carPalette[i % carPalette.length]);
-  car.position.set(lane * LANE_W, 0, z);
-  car.userData.lane = lane;
-  car.userData.baseZ = z;
-  car.userData.phase = Math.random() * Math.PI * 2;
+  car.position.set(d.lane * LANE_W, 0, d.z);
+  car.userData.lane = d.lane;
+  car.userData.dv = d.dv;
   cars.push(car); world.add(car);
 });
+function laneFree(l, zMin, zMax, self) {
+  return !cars.some((c) => c !== self && c.userData.lane === l && c.position.z > zMin && c.position.z < zMax);
+}
 
 /* headlight beam pool on the road */
-const beam = new THREE.Mesh(
-  new THREE.PlaneGeometry(5.4, 21),
-  new THREE.MeshBasicMaterial({
-    map: blobTexture('rgba(255,233,190,0.9)'), transparent: true, opacity: 0,
-    blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false,
-  })
-);
+const beam = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 21), glowQuadMat(0xFFE9C0));
 beam.rotation.x = -Math.PI / 2;
 beam.position.set(0, 0.04, -16);
 scene.add(beam);
@@ -686,7 +881,9 @@ const state = {
   speed: 66, speedTarget: 66,
   dipUntil: 0,
   signal: 0,              // -1 left, 1 right, 0 none
-  signalUntil: 0,
+  pendingLane: null,
+  laneCommitAt: 0,
+  tLaneStart: 0,
   changing: false,
   range: 432,
   eta: 34,
@@ -729,23 +926,12 @@ function requestLane(dirn) {
   (dirn < 0 ? el.sigL : el.sigR).classList.add('blink');
   state.speedTarget -= 7;
   state.dipUntil = simT + 1.15;
-  setTimeout(() => { state.lane = target; }, REDUCED ? 60 : 480);
-  const settle = setInterval(() => {
-    if (Math.abs(state.laneX - state.lane * LANE_W) < 0.06 && simT - state.tLaneStart > 1.4) {
-      clearInterval(settle);
-      el.sigL.classList.remove('blink');
-      el.sigR.classList.remove('blink');
-      state.signal = 0;
-      state.changing = false;
-    }
-  }, 120);
+  state.pendingLane = target;
+  state.laneCommitAt = simT + (REDUCED ? 0.06 : 0.48);
   state.tLaneStart = simT;
 }
-document.getElementById('laneL').addEventListener('click', () => requestLane(-1));
-document.getElementById('laneR').addEventListener('click', () => requestLane(1));
+/* no manual lane control — the autopilot drives; T still flips the theme */
 addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft')  { e.preventDefault(); requestLane(-1); }
-  if (e.key === 'ArrowRight') { e.preventDefault(); requestLane(1); }
   if (e.key === 't' || e.key === 'T') setMode(state.mode === 'day' ? 'night' : 'day');
 });
 
@@ -843,6 +1029,19 @@ function frame(dtOv) {
   state.speed += (targetNow - state.speed) * Math.min(1, dt * 1.8);
   const mps = state.speed * 0.48;
 
+  /* lane maneuver — commit and settle on sim time */
+  if (state.pendingLane != null && t >= state.laneCommitAt) {
+    state.lane = state.pendingLane;
+    state.pendingLane = null;
+  }
+  if (state.changing && state.pendingLane == null &&
+      Math.abs(state.laneX - state.lane * LANE_W) < 0.06 && t - state.tLaneStart > 1.4) {
+    el.sigL.classList.remove('blink');
+    el.sigR.classList.remove('blink');
+    state.signal = 0;
+    state.changing = false;
+  }
+
   /* lane spring */
   const targetX = state.lane * LANE_W;
   state.laneVX += (targetX - state.laneX) * 5.2 * dt;
@@ -883,11 +1082,33 @@ function frame(dtOv) {
     if (c.position.x > 320) c.position.x = -320;
   }
   cars.forEach((c, i) => {
-    const drift = Math.sin(t * 0.16 + c.userData.phase) * 14;
-    const zGoal = c.userData.baseZ + drift;
-    c.position.z += (zGoal - c.position.z) * dt * 0.5;
-    c.position.x = c.userData.lane * LANE_W + Math.sin(t * 0.9 + i * 2.1) * 0.07;
+    const u = c.userData;
+    c.position.z += u.dv * dt;
+    if (u.dv > 0 && c.position.z > 12) {           /* passed us — respawn far ahead */
+      c.position.z = -260 - Math.random() * 60;
+      const opts = [-1, 0, 1].filter((l) => laneFree(l, c.position.z - 45, c.position.z + 45, c));
+      if (opts.length) u.lane = opts[Math.floor(Math.random() * opts.length)];
+    } else if (u.dv < 0 && c.position.z < -280) {  /* overtaker done — return behind us */
+      c.position.z = 16 + Math.random() * 10;
+      const opts = [-1, 0, 1].filter((l) => l !== state.lane && laneFree(l, -30, 30, c));
+      if (opts.length) u.lane = opts[Math.floor(Math.random() * opts.length)];
+    }
+    c.position.x = u.lane * LANE_W + Math.sin(t * 0.9 + i * 2.1) * 0.07;
   });
+
+  /* autopilot — when traffic ahead slows us, signal and take a free lane */
+  if (!state.changing && t > 6 && t - (state.lastChange || 0) > 7) {
+    const blocked = cars.some((c) => c.userData.lane === state.lane && c.position.z > -48 && c.position.z < -10);
+    if (blocked) {
+      const free = [state.lane - 1, state.lane + 1]
+        .filter((l) => l >= -1 && l <= 1)
+        .filter((l) => laneFree(l, -70, 16, null));
+      if (free.length) {
+        state.lastChange = t;
+        requestLane(free[Math.floor(Math.random() * free.length)] - state.lane);
+      }
+    }
+  }
 
   /* palettes */
   skyMat.uniforms.topColor.value = ramp(PAL.skyTop, p, tmpA).clone();
@@ -910,14 +1131,29 @@ function frame(dtOv) {
 
   /* celestial */
   const sunY = lerp(250, -95, smooth(0, 0.62, p));
-  sun.position.y = sunY; sunHalo.position.y = sunY;
+  sunGroup.position.y = sunY;
   const sunFade = 1 - smooth(0.5, 0.66, p);
-  sun.material.opacity = sunFade; sunHalo.material.opacity = 0.28 * sunFade;
+  sun.material.opacity = sunFade;
+  sunGlow.material.opacity = 0.5 * sunFade;
   const moonY = lerp(-95, 245, smooth(0.4, 0.96, p));
-  moon.position.y = moonY; moonHalo.position.y = moonY;
+  moonGroup.position.y = moonY;
   const moonShow = smooth(0.45, 0.8, p);
-  moon.material.opacity = moonShow; moonHalo.material.opacity = 0.22 * moonShow;
-  starMat.opacity = smooth(0.58, 0.96, p) * 0.95;
+  moon.material.opacity = moonShow;
+  moonMask.material.opacity = moonShow;
+  moonMask.material.color.copy(skyMat.uniforms.topColor.value).lerp(skyMat.uniforms.bottomColor.value, 0.3);
+  moonGlow.material.opacity = 0.3 * moonShow;
+  starMat.opacity = smooth(0.58, 0.96, p) * 0.8;
+  shooters.forEach((sh) => {
+    if (!REDUCED && p > 0.85 && t > sh.next) {
+      sh.t0 = t; sh.next = t + 4.5 + Math.random() * 6;
+      sh.x0 = -280 + Math.random() * 560; sh.y0 = 150 + Math.random() * 110;
+    }
+    const life = t - sh.t0;
+    if (life >= 0 && life <= 1 && p > 0.6) {
+      sh.mesh.position.set(sh.x0 + life * 130, sh.y0 - life * 46, -640);
+      sh.mesh.material.opacity = Math.sin(life * Math.PI) * 0.9;
+    } else sh.mesh.material.opacity = 0;
+  });
   const cloudOp = 1 - smooth(0.32, 0.72, p);
   clouds.forEach((c) => { c.material.opacity = 0.8 * cloudOp; });
 
@@ -945,7 +1181,7 @@ function frame(dtOv) {
     const v = L.userData.on;
     L.userData.headMat.color.setRGB(0.14 + v * 1.1, 0.14 + v * 0.92, 0.16 + v * 0.55);
     L.userData.glow.opacity = v * 0.62;
-    L.userData.pool.opacity = v * 0.6;
+    L.userData.pool.uniforms.uOp.value = v * 0.6;
   });
 
   /* taillights */
@@ -964,7 +1200,8 @@ function frame(dtOv) {
   if (!goingNight && p < 0.5) state.headlightOn = false;
   const headGoal = state.headlightOn ? 1 : 0;
   headlight.intensity += (headGoal * 60 - headlight.intensity) * Math.min(1, dt * 6);
-  beam.material.opacity += (headGoal * 0.3 - beam.material.opacity) * Math.min(1, dt * 6);
+  const bu = beam.material.uniforms.uOp;
+  bu.value += (headGoal * 0.34 - bu.value) * Math.min(1, dt * 6);
 
   /* DOM readouts (10 Hz) */
   acc += dt;
