@@ -5662,13 +5662,13 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <style>
     /* ── the section ─────────────────────────────────────────────────── */
     .reel-section{position:relative;z-index:var(--z-content);padding:10vh var(--gutter) 12vh;}
-    .reel-head{display:flex;align-items:flex-end;justify-content:space-between;gap:26px 40px;flex-wrap:wrap;}
+    .reel-head{display:flex;flex-direction:column;align-items:center;text-align:center;}
     .reel-title{font-family:var(--sans);font-size:clamp(36px,4.6vw,60px);font-weight:700;
       letter-spacing:-0.015em;line-height:1.02;color:var(--ink);text-wrap:balance;}
     .reel-title .serif{font-size:1.04em;}
     .reel-lede{margin-top:16px;max-width:56ch;font-size:var(--t-body);line-height:1.7;color:var(--ink-2);text-wrap:pretty;}
     /* the social chip — a rounded rectangle like every CTA, never a pill */
-    .reel-feed{display:inline-flex;align-items:center;gap:12px;padding:13px 20px;
+    .reel-feed{display:inline-flex;align-items:center;gap:12px;padding:13px 20px;margin-top:26px;
       border:1px solid var(--line);border-radius:var(--cta-r-sm);text-decoration:none;
       font-family:var(--sans);font-size:14px;font-weight:550;letter-spacing:.01em;color:var(--ink-2);
       transition:color .3s ease,border-color .3s ease,background .3s ease,transform .45s var(--ease);}
@@ -5684,10 +5684,27 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 2%,#000 98%,transparent 100%);
               mask-image:linear-gradient(90deg,transparent 0,#000 2%,#000 98%,transparent 100%);}
     .reel-rail::-webkit-scrollbar{display:none;}
-    .reel-card{position:relative;flex:none;width:clamp(230px,21vw,300px);aspect-ratio:9/16;
-      scroll-snap-align:start;border-radius:20px;overflow:hidden;cursor:pointer;
+    /* centred when the cards fit, scrollable the moment they don't —
+       the auto margins collapse to zero on overflow */
+    .reel-rail > :first-child{margin-left:auto;}
+    .reel-rail > :last-child{margin-right:auto;}
+    /* a slot holds each film: the card button and, beside it in the DOM,
+       the sound button — interactive elements never nest */
+    .reel-slot{position:relative;flex:none;width:clamp(230px,21vw,300px);scroll-snap-align:start;}
+    .reel-card{position:relative;display:block;width:100%;aspect-ratio:9/16;
+      border-radius:20px;overflow:hidden;cursor:pointer;
       border:1px solid var(--line);background:var(--card);padding:0;text-align:left;
       transition:border-color .35s ease,transform .55s var(--ease),box-shadow .55s ease;}
+    /* the card's voice — running muted, one press to speak */
+    .reel-snd{position:absolute;top:12px;right:12px;z-index:3;width:38px;height:38px;
+      display:grid;place-items:center;border-radius:50%;cursor:pointer;padding:0;
+      background:rgba(10,14,21,.55);border:1px solid rgba(226,238,252,.22);color:var(--ink);
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+      transition:border-color .3s ease,transform .45s var(--ease-pop);}
+    .reel-snd:hover{border-color:rgba(140,197,255,.45);transform:scale(1.08);}
+    .reel-snd:focus-visible{outline:2px solid var(--ember);outline-offset:3px;}
+    .reel-snd .ic{display:none;}
+    .reel-snd .ic.on{display:block;}
     .reel-card:hover{border-color:rgba(140,197,255,.35);transform:translateY(-6px);
       box-shadow:0 24px 60px rgba(0,0,0,.45);}
     .reel-card:focus-visible{outline:2px solid var(--ember);outline-offset:4px;}
@@ -5865,7 +5882,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     }
     @media (max-width:767px){
       .reel-section{padding:8vh var(--gutter) 10vh;}
-      .reel-card,.reel-ghost{width:64vw;}
+      .reel-slot,.reel-ghost{width:64vw;}
       .reel-fab{width:84px;border-radius:16px;}
       .reel-fab-tip{display:none;}
       /* the hero CTA pill hugs its cycling prompt and can run under the
@@ -5910,25 +5927,31 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     </div>
 
     <div class="reel-rail" id="reelRail">
-      <button class="reel-card" type="button" data-reel="endowment-effect"
-              aria-label="Play short: The Endowment Effect" aria-haspopup="dialog">
-        <img src="shorts/endowment-effect-poster.webp" alt="" loading="lazy" width="720" height="1290">
-        <video muted loop playsinline preload="none" data-src="shorts/endowment-effect-preview.mp4"
-               aria-hidden="true" tabindex="-1"></video>
-        <span class="reel-card-shade" aria-hidden="true"></span>
-        <span class="reel-no">N&ordm; 001</span>
-        <span class="reel-card-t">The Endowment Effect</span>
-        <span class="reel-dur">1:21</span>
-        <span class="reel-card-play" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#EFF3F8" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
-        </span>
-      </button>
+      <div class="reel-slot">
+        <button class="reel-card" type="button" data-reel="endowment-effect"
+                aria-label="Play short: The Endowment Effect" aria-haspopup="dialog">
+          <img src="shorts/endowment-effect-poster.webp" alt="" loading="lazy" width="720" height="1290">
+          <video muted loop playsinline preload="metadata" src="shorts/endowment-effect.mp4"
+                 poster="shorts/endowment-effect-poster.webp" aria-hidden="true" tabindex="-1"></video>
+          <span class="reel-card-shade" aria-hidden="true"></span>
+          <span class="reel-no">1</span>
+          <span class="reel-card-t">The Endowment Effect</span>
+          <span class="reel-dur">1:21</span>
+          <span class="reel-card-play" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#EFF3F8" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+          </span>
+        </button>
+        <button class="reel-snd" type="button" aria-label="Unmute preview" aria-pressed="false">
+          <svg class="ic ic-vol" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg class="ic ic-mut on" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
       <div class="reel-ghost" aria-hidden="true">
-        <span class="g-no">N&ordm; 002</span>
+        <span class="g-no">2</span>
         <span class="g-t">in the edit bay</span>
       </div>
       <div class="reel-ghost" aria-hidden="true">
-        <span class="g-no">N&ordm; 003</span>
+        <span class="g-no">3</span>
         <span class="g-t">being written</span>
       </div>
     </div>
@@ -6313,7 +6336,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <button class="reel-fab" id="reelFab" type="button" data-reel="endowment-effect"
           aria-label="Watch short: The Endowment Effect, 1 minute 21 seconds" aria-haspopup="dialog">
     <img src="shorts/endowment-effect-poster.webp" alt="" width="720" height="1290">
-    <video id="reelFabVid" muted loop playsinline preload="auto" autoplay
+    <video id="reelFabVid" muted loop playsinline preload="auto"
            src="shorts/endowment-effect-preview.mp4" poster="shorts/endowment-effect-poster.webp"
            aria-hidden="true" tabindex="-1"></video>
     <span class="reel-fab-shade" aria-hidden="true"></span>
@@ -6377,7 +6400,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     var REEL = [
       {
         id: 'endowment-effect',
-        no: '001',
+        no: '1',
         dur: '1:21',
         title: 'The Endowment <span class="serif">Effect.</span>',
         hook: 'Why a head start you never asked for keeps you coming back.',
@@ -6407,10 +6430,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        must already be rolling when the loader lifts, never click-started. ── */
     function fabPlay() {
       if (reduced.matches) return;
+      /* not before its entrance: the film starts at 0:00 when the loader
+         lifts and the FAB arrives — never behind the loading screen */
+      if (!fab.classList.contains('in')) return;
       if (fab.classList.contains('away') || !ov.hidden) return;
       var p = fabVid.play(); if (p && p.catch) p.catch(function () {});
     }
-    if (reduced.matches) { fabVid.removeAttribute('autoplay'); fabVid.pause(); }
     document.addEventListener('visibilitychange', function () {
       if (!document.hidden) fabPlay();
     });
@@ -6418,12 +6443,22 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       removeEventListener('pointerdown', onceGesture);
       if (fabVid.paused) fabPlay();
     }, { passive: true });
+    /* the loop never rests: if anything pauses the preview while it is
+       on duty, it picks itself back up (fabPlay's guards keep the
+       legitimate pauses — away, overlay open — honoured) */
+    fabVid.addEventListener('pause', function () {
+      setTimeout(function () { if (!document.hidden) fabPlay(); }, 150);
+    });
 
     /* arrives after the hero copy has landed; polling because the loader
        decides when hero-go happens and rAF may be parked in hidden tabs */
     (function arm() {
       if (doc.classList.contains('hero-go')) {
-        setTimeout(function () { fab.classList.add('in'); fabPlay(); }, 1500);
+        setTimeout(function () {
+          fab.classList.add('in');
+          try { fabVid.currentTime = 0; } catch (e) {}
+          fabPlay();
+        }, 1500);
       } else { setTimeout(arm, 200); }
     })();
 
@@ -6444,24 +6479,73 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     addEventListener('resize', fabSync);
     fabSync();
 
-    /* ── rail cards: hover runs the preview, click opens the film ── */
+    /* ── rail cards: running muted like the FAB, click opens the film.
+       Each plays only while on screen; the slot's sound button unmutes
+       it in place — one voice at a time. ── */
     var cards = [].slice.call(document.querySelectorAll('.reel-card'));
+    var snds  = [].slice.call(document.querySelectorAll('.reel-snd'));
+    function cardPlay(card) {
+      var v = card.querySelector('video');
+      if (!v || reduced.matches) return;
+      card.classList.add('playing');
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+    }
+    function setSnd(btn, unmuted) {
+      btn.setAttribute('aria-pressed', String(unmuted));
+      btn.setAttribute('aria-label', unmuted ? 'Mute preview' : 'Unmute preview');
+      btn.querySelector('.ic-vol').classList.toggle('on', unmuted);
+      btn.querySelector('.ic-mut').classList.toggle('on', !unmuted);
+    }
+    function hushCards(pauseToo) {
+      cards.forEach(function (c) {
+        var v = c.querySelector('video');
+        if (v) { v.muted = true; if (pauseToo) v.pause(); }
+      });
+      snds.forEach(function (b) { setSnd(b, false); });
+    }
+    if ('IntersectionObserver' in window) {
+      var vio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          e.target.dataset.inview = e.isIntersecting ? '1' : '';
+          var v = e.target.querySelector('video');
+          if (e.isIntersecting && ov.hidden) cardPlay(e.target);
+          else if (v) v.pause();
+        });
+      }, { threshold: 0.35 });
+      cards.forEach(function (c) { vio.observe(c); });
+    } else {
+      cards.forEach(function (c) { c.dataset.inview = '1'; cardPlay(c); });
+    }
     cards.forEach(function (card) {
-      var cv = card.querySelector('video');
-      card.addEventListener('mouseenter', function () {
-        if (reduced.matches || !cv) return;
-        if (!cv.src) cv.src = cv.getAttribute('data-src');
-        card.classList.add('playing');
-        var p = cv.play(); if (p && p.catch) p.catch(function () {});
-      });
-      card.addEventListener('mouseleave', function () {
-        if (!cv) return;
-        card.classList.remove('playing');
-        cv.pause();
-      });
       card.addEventListener('click', function () { openReel(card.dataset.reel, card); });
     });
+    snds.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var v = btn.parentNode.querySelector('.reel-card video');
+        if (!v) return;
+        var wantSound = v.muted;
+        hushCards(false);
+        if (wantSound) {
+          v.muted = false;
+          setSnd(btn, true);
+          /* an explicit press outranks the reduced-motion default */
+          if (v.paused) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+        }
+      });
+    });
     fab.addEventListener('click', function () { openReel(fab.dataset.reel, fab); });
+
+    /* ── live timers — the chips count down with the film instead of
+       naming a frozen duration; they read the full length again the
+       moment the loop restarts ── */
+    function liveTimer(v, el) {
+      if (!v || !el) return;
+      v.addEventListener('timeupdate', function () {
+        if (v.duration) el.textContent = fmt(Math.max(0, v.duration - v.currentTime));
+      });
+    }
+    liveTimer(fabVid, fab.querySelector('.reel-fab-dur'));
+    cards.forEach(function (c) { liveTimer(c.querySelector('video'), c.querySelector('.reel-dur')); });
 
     /* ── section entrance — JS-gated so no-JS still shows everything ── */
     var section = document.getElementById('shortsSection');
@@ -6518,7 +6602,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     function openReel(id, from) {
       var r = REEL.filter(function (x) { return x.id === id; })[0] || REEL[0];
       opener = from || null;
-      kEl.textContent = 'Short — Nº ' + r.no + ' · ' + r.dur;
+      kEl.textContent = 'Short ' + r.no + ' · ' + r.dur;
       tEl.innerHTML = r.title;
       hEl.textContent = r.hook;
       bEl.innerHTML = r.body.map(function (p) { return '<p>' + p + '</p>'; }).join('');
@@ -6533,6 +6617,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       doc.classList.add('reel-lock');
       if (window.__lenis) window.__lenis.stop();
       fabVid.pause();
+      hushCards(true);                 /* the overlay is the only voice */
       vid.muted = false; vid.currentTime = 0;
       var p = vid.play();
       if (p && p.catch) p.catch(function () { setPaused(true); });
@@ -6547,6 +6632,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       doc.classList.remove('reel-lock');
       if (window.__lenis) window.__lenis.start();
       if (!fab.classList.contains('away')) fabPlay();
+      cards.forEach(function (c) { if (c.dataset.inview) cardPlay(c); });
       if (opener && opener.focus) opener.focus();
     }
 
