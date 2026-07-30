@@ -5008,6 +5008,13 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     (function () {
       var loader = document.getElementById('v6Loader');
       if (!loader) return;
+      /* the title sequence runs once per visit — coming BACK from a case
+         study (or any same-session return) goes straight to the hero,
+         which still plays its own word cascade on load */
+      var seen = false;
+      try { seen = sessionStorage.getItem('v6loaderPlayed') === '1'; } catch (e) {}
+      if (seen) { loader.style.display = 'none'; return; }
+      try { sessionStorage.setItem('v6loaderPlayed', '1'); } catch (e) {}
       loader.hidden = false;
       document.documentElement.classList.add('v6-loading');
       // arm the hero here, before its markup has parsed, so it is already
@@ -7310,6 +7317,11 @@ var topNav = document.getElementById('topNav');
   document.querySelectorAll('a[href^="#"]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       var hash = a.getAttribute('href');
+      /* the bar CTA is captured here while it still says href="#", then
+         the work section rewrites it to a real page — an unconditional
+         preventDefault was eating every case-study click. Repurposed
+         anchors walk on by. */
+      if (!hash || hash.charAt(0) !== '#') return;
       e.preventDefault();
       if (hash === '#top' || hash === '#') {
         if (window.__lenis && !reduced.matches) window.__lenis.scrollTo(0, { duration: 1.2 });
@@ -8027,6 +8039,12 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
     e.preventDefault();
     document.documentElement.classList.add('page-leave');
     setTimeout(function () { location.href = a.href; }, 230);
+  });
+
+  /* coming back via bfcache restores the page exactly as it left —
+     dimmed for the exit. Lift the breath so it never sticks. */
+  addEventListener('pageshow', function (e) {
+    if (e.persisted) document.documentElement.classList.remove('page-leave');
   });
 })();
 </script>
