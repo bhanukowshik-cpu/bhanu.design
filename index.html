@@ -9138,7 +9138,9 @@ addEventListener('load', function () {
     }
 
     /* Listen for spiral frontmost card changes */
+    var barSynced = false;
     window.addEventListener('s2:frontCard', function (e) {
+      barSynced = true;
       updatePanels(e.detail.idx);
     });
 
@@ -9304,8 +9306,11 @@ addEventListener('load', function () {
        built. Below 901px everything past this point is desktop furniture. */
     if (!spiralRoot) return;
 
-    /* Init with card 0 */
-    setTimeout(function () { updatePanels(0); }, 900);
+    /* Init with card 0 — unless the spiral already named the front card:
+       a browser-restored scroll (back from a case study) lands mid-
+       section, the spiral emits the real index within its first frames,
+       and this blind timer was stomping the bar back to project 0. */
+    setTimeout(function () { if (!barSynced) updatePanels(0); }, 900);
   })();
 </script>
 
