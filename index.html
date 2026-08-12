@@ -1429,12 +1429,10 @@
 .s2-bar-cta:hover { filter: brightness(1.12); transform: scale(1.04); box-shadow: 0 0 14px 4px rgba(255,255,255,0.55), 0 0 32px 10px rgba(255,255,255,0.22); }
 .s2-bar-cta:active { transform: scale(0.96); }
 /* the note variant — "Next 3 Projects" for entries with no case study of
-   their own: same seat as the CTA, none of its invitation */
+   their own: wears the tertiary (Request-a-Walkthrough) text style, the
+   JS adds both classes — this only strips the interactivity */
 .s2-bar-cta--note, .s2-bar-cta--note:hover {
-  background: none; box-shadow: none; filter: none; transform: none;
-  backdrop-filter: none; -webkit-backdrop-filter: none;
-  border: 1px dashed rgba(239,243,248,0.28);
-  color: rgba(239,243,248,0.62);
+  box-shadow: none; filter: none; transform: none;
   cursor: default; pointer-events: none;
 }
 .s2-bar-in .s2-bar-cta { animation: s2FadeUp 0.38s 0.30s ease forwards; }
@@ -9294,8 +9292,9 @@ addEventListener('load', function () {
           barCta.classList.toggle('s2-bar-cta--note', isNote);
           if (isNote) { barCta.removeAttribute('href'); }
           else        { barCta.href = card.href; }
-          /* tertiary = text-level action (Analytics' footer walkthrough) */
-          barCta.classList.toggle('s2-bar-cta--tertiary', card.ctaStyle === 'tertiary');
+          /* tertiary = text-level look (Analytics' walkthrough CTA);
+             notes wear it too so they read as quiet text, not a button */
+          barCta.classList.toggle('s2-bar-cta--tertiary', card.ctaStyle === 'tertiary' || isNote);
           if (!isNote && /^https?:\/\//.test(card.href)) {
             barCta.target = '_blank'; barCta.rel = 'noopener';
           } else {
