@@ -8115,7 +8115,8 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
     /* over a helix card that has a case study, the cursor makes the
        offer — the helix host maintains __s2CursorSay from its raycast */
     if (el && el.closest('#spiral-root') && window.__s2CursorSay) {
-      if (mode !== 'say') enterSay('Open Case Study ↗');
+      /* the label is per-card, so re-enter say when it changes mid-hover */
+      if (mode !== 'say' || dot.textContent !== window.__s2CursorSay) enterSay(window.__s2CursorSay);
       return;
     }
     /* over a card's imagery, the cursor becomes the invitation */
@@ -8809,8 +8810,11 @@ addEventListener('load', function () {
   root.addEventListener('s2:hoverCard', function (e) {
     hoverCardIdx = e.detail.idx;
     var d = (window.S2_PROJECT_DATA || [])[hoverCardIdx] || {};
-    /* the custom cursor reads this to offer "Open Case Study ↗" */
-    window.__s2CursorSay = !!(hoverCardIdx >= 0 && d.href && d.href !== '#');
+    /* the label the cursor pill shows — the card's own CTA when it has
+       one ("Visit Dearly ↗", "Visit The Engine ↗"), the default else */
+    window.__s2CursorSay = (hoverCardIdx >= 0 && d.href && d.href !== '#')
+      ? (d.ctaLabel || 'Open Case Study ↗')
+      : '';
   });
   root.addEventListener('s2:cardClick', function (e) {
     var d = (window.S2_PROJECT_DATA || [])[e.detail.idx] || {};
