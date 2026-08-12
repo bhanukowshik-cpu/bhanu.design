@@ -8807,25 +8807,32 @@ addEventListener('load', function () {
     });
   }
 
-  root.addEventListener('s2:hoverCard', function (e) {
-    hoverCardIdx = e.detail.idx;
+  /* the pill only speaks over the ACTIVE card — its own CTA label
+     ("Visit Dearly ↗") or the "Open Case Study ↗" default. Re-evaluated
+     every tick, because the front card changes under a still cursor
+     while the reel glides or drifts. */
+  function updateCursorSay() {
     var d = (window.S2_PROJECT_DATA || [])[hoverCardIdx] || {};
-    /* the label the cursor pill shows — the card's own CTA when it has
-       one ("Visit Dearly ↗", "Visit The Engine ↗"), the default else */
-    window.__s2CursorSay = (hoverCardIdx >= 0 && d.href && d.href !== '#')
+    var isFront = hoverCardIdx >= 0 && Math.abs(hoverCardIdx - frontFloat()) < 0.5;
+    window.__s2CursorSay = (isFront && d.href && d.href !== '#')
       ? (d.ctaLabel || 'Open Case Study ↗')
       : '';
+  }
+  root.addEventListener('s2:hoverCard', function (e) {
+    hoverCardIdx = e.detail.idx;
+    updateCursorSay();
   });
   root.addEventListener('s2:cardClick', function (e) {
-    var d = (window.S2_PROJECT_DATA || [])[e.detail.idx] || {};
-    if (d.href && d.href !== '#') {
-      /* the card IS the case study — same external/internal split the
-         bar CTA makes */
+    var idx = e.detail.idx;
+    var d = (window.S2_PROJECT_DATA || [])[idx] || {};
+    /* only the ACTIVE card opens; a background card repositions to the
+       front first — clicking it again (now active) does the opening */
+    if (Math.abs(idx - frontFloat()) < 0.5 && d.href && d.href !== '#') {
       if (/^https?:\/\//.test(d.href)) window.open(d.href, '_blank', 'noopener');
       else window.location.href = d.href;
       return;
     }
-    promoteCard(e.detail.idx);   /* no case study → bring it to the front */
+    promoteCard(idx);
   });
 
   var driftVel = 0;     /* eased px/s so the reel never lurches */
@@ -8842,6 +8849,7 @@ addEventListener('load', function () {
   addEventListener('keydown',    noteInput, { passive: true, capture: true });
 
   gsap.ticker.add(function (t, dtMs) {
+    updateCursorSay();
     var dt = Math.min(0.05, dtMs / 1000);
     var want = 0;
     /* the drift engages as soon as the section is in the frame — half a
