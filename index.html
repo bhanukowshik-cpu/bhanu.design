@@ -1428,12 +1428,12 @@
     }
 .s2-bar-cta:hover { filter: brightness(1.12); transform: scale(1.04); box-shadow: 0 0 14px 4px rgba(255,255,255,0.55), 0 0 32px 10px rgba(255,255,255,0.22); }
 .s2-bar-cta:active { transform: scale(0.96); }
-/* the note variant — "Next 3 Projects" for entries with no case study of
-   their own: wears the tertiary (Request-a-Walkthrough) text style, the
-   JS adds both classes — this only strips the interactivity */
+/* the note variant — "Next 3 Projects →" for entries with no case study
+   of their own: wears the tertiary (Request-a-Walkthrough) text style
+   (the JS adds both classes) and clicking it steps the reel to the next
+   card — this rule only strips the glass button's leftovers */
 .s2-bar-cta--note, .s2-bar-cta--note:hover {
   box-shadow: none; filter: none; transform: none;
-  cursor: default; pointer-events: none;
 }
 .s2-bar-in .s2-bar-cta { animation: s2FadeUp 0.38s 0.30s ease forwards; }
 /* Project tab strip — centered below Featured Work */
@@ -5677,9 +5677,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* ── the section ─────────────────────────────────────────────────── */
     .reel-section{position:relative;z-index:var(--z-content);padding:10vh var(--gutter) 12vh;}
     .reel-head{display:flex;flex-direction:column;align-items:center;text-align:center;}
-    .reel-title{font-family:var(--sans);font-size:clamp(36px,4.6vw,60px);font-weight:700;
-      letter-spacing:-0.015em;line-height:1.02;color:var(--ink);text-wrap:balance;}
-    .reel-title .serif{font-size:1.04em;}
+    /* the canonical section-heading scale — the same clamp the Featured
+       Work, about and testimonial bands share ("change them together") */
+    .reel-title{font-family:var(--sans);font-size:clamp(30px,3.2vw,48px);font-weight:570;
+      letter-spacing:-0.022em;line-height:1.2;color:var(--ink);text-wrap:balance;}
+    .reel-title .serif{font-weight:400;font-size:1.08em;letter-spacing:-0.004em;}
     .reel-lede{margin-top:16px;max-width:56ch;font-size:var(--t-body);line-height:1.7;color:var(--ink-2);text-wrap:pretty;}
     /* the social chip — a rounded rectangle like every CTA, never a pill */
     .reel-feed{display:inline-flex;align-items:center;gap:12px;padding:13px 20px;margin-top:26px;
@@ -5692,7 +5694,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .reel-feed:hover .arr{transform:translate(2px,-2px);}
 
     /* ── the rail — 9:16 cards, scroll-snap, edge-faded ──────────────── */
-    .reel-rail{display:flex;gap:clamp(16px,1.8vw,26px);margin-top:clamp(36px,6vh,60px);
+    .reel-rail{display:flex;align-items:center;gap:clamp(16px,1.8vw,26px);margin-top:clamp(36px,6vh,60px);
       overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;
       padding:6px 2px 10px;
       -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 2%,#000 98%,transparent 100%);
@@ -5705,6 +5707,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* a slot holds each film: the card button and, beside it in the DOM,
        the sound button — interactive elements never nest */
     .reel-slot{position:relative;flex:none;width:clamp(230px,21vw,300px);scroll-snap-align:start;}
+    /* a landscape film in the rail: same height as its 9:16 neighbours,
+       16:9 wide — (16/9)² ≈ 3.161 of the portrait slot width */
+    .reel-slot--wide{width:calc(clamp(230px,21vw,300px) * 3.161);}
+    .reel-slot--wide .reel-card{aspect-ratio:16/9;}
     .reel-card{position:relative;display:block;width:100%;aspect-ratio:9/16;
       border-radius:20px;overflow:hidden;cursor:pointer;
       border:1px solid var(--line);background:var(--card);padding:0;text-align:left;
@@ -5911,6 +5917,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     @media (max-width:767px){
       .reel-section{padding:8vh var(--gutter) 10vh;}
       .reel-slot,.reel-ghost{width:64vw;}
+      .reel-slot--wide{width:88vw;}
       .reel-fab{width:84px;border-radius:10px;}
       .reel-fab.wide{aspect-ratio:9/16;width:84px;}
       .reel-fab-tip{display:none;}
@@ -5952,12 +5959,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     </div>
 
     <div class="reel-rail" id="reelRail">
-      <div class="reel-slot">
+      <div class="reel-slot reel-slot--wide">
         <button class="reel-card" type="button" data-reel="labor-illusion"
                 aria-label="Play short: The Labor Illusion" aria-haspopup="dialog">
-          <img src="shorts/labor-illusion-poster.webp" alt="" loading="lazy" width="720" height="1280">
+          <img src="shorts/labor-illusion-poster-wide.webp" alt="" loading="lazy" width="1280" height="720">
           <video muted loop playsinline preload="metadata" src="shorts/labor-illusion.mp4"
-                 poster="shorts/labor-illusion-poster.webp" aria-hidden="true" tabindex="-1"></video>
+                 poster="shorts/labor-illusion-poster-wide.webp" aria-hidden="true" tabindex="-1"></video>
           <span class="reel-card-shade" aria-hidden="true"></span>
           <span class="reel-no">2</span>
           <span class="reel-card-t">The Labor Illusion</span>
@@ -8731,7 +8738,8 @@ addEventListener('load', function () {
   var CARD_COUNT   = (window.S2_PROJECT_DATA || []).length || 7;
   var HOLD_F       = 0;                 /* lockstep with the pin's mapping — no hold-off */
   var IDLE_MS      = 3000;              /* quiet time before drift starts */
-  var DRIFT_SLOT_S = 8;                 /* seconds per card while drifting */
+  var DRIFT_SLOT_S = 10;                /* seconds per card while drifting
+                                           (was 8 — slowed 20% by request) */
   var hoverCardIdx = -1, hoverDeliberate = false, promoteTween = null;
   var lastMoveAt = 0, lastInputAt = performance.now();
 
@@ -9287,11 +9295,12 @@ addEventListener('load', function () {
              Projects") sits where the CTA would, as a quiet note */
           barCta.style.display = (isNote && !card.badge) ? 'none' : '';
           barCta.textContent = isNote
-            ? (card.badge || '').replace(/^\(|\)$/g, '')
+            ? (card.badge || '').replace(/^\(|\)$/g, '') + ' →'
             : (card.ctaLabel || 'View Case Study →');
           barCta.classList.toggle('s2-bar-cta--note', isNote);
-          if (isNote) { barCta.removeAttribute('href'); }
-          else        { barCta.href = card.href; }
+          /* the note keeps a '#' href so it stays focusable — its click
+             is intercepted below and steps the reel instead */
+          barCta.href = isNote ? '#' : card.href;
           /* tertiary = text-level look (Analytics' walkthrough CTA);
              notes wear it too so they read as quiet text, not a button */
           barCta.classList.toggle('s2-bar-cta--tertiary', card.ctaStyle === 'tertiary' || isNote);
@@ -9324,6 +9333,18 @@ addEventListener('load', function () {
       barSynced = true;
       updatePanels(e.detail.idx);
     });
+
+    /* the "Next 3 Projects →" note is also a step: clicking it hands the
+       front slot to the next card, through the same click-promote path
+       the helix cards use (the host glides the pinned scroll there) */
+    if (barCta) {
+      barCta.addEventListener('click', function (e) {
+        if (!barCta.classList.contains('s2-bar-cta--note')) return;
+        e.preventDefault();
+        if (spiralRoot) spiralRoot.dispatchEvent(
+          new CustomEvent('s2:cardClick', { detail: { idx: currentIdx + 1 } }));
+      });
+    }
 
 
     /* Shoot up tab strip when section scrolls into view */
