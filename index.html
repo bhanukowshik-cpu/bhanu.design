@@ -5792,6 +5792,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .reel-fab-tip small{display:block;margin-top:2px;font-size:11px;font-weight:500;
       letter-spacing:.06em;color:var(--ink-3);}
     .reel-fab:hover .reel-fab-tip,.reel-fab:focus-visible .reel-fab-tip{opacity:1;transform:none;}
+    /* a landscape short in the corner: the FAB turns 16:9 on desktop; on
+       phones it stays the 9:16 sliver and plays the vertical crop */
+    .reel-fab.wide{aspect-ratio:16/9;width:clamp(168px,13vw,204px);}
 
     /* ── the overlay — scrim, copy left, film right ──────────────────── */
     .reel-ov{position:fixed;inset:0;z-index:var(--z-panel);display:grid;place-items:center;}
@@ -5841,6 +5844,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       border-radius:22px;overflow:hidden;border:1px solid rgba(226,238,252,.16);
       background:#04060A;box-shadow:0 40px 120px rgba(0,0,0,.6);}
     .reel-ov-player video{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;}
+    /* a landscape film — the player turns 16:9 and sizes by width; the
+       copy column is untouched. Set per film by the REEL entry's wide flag. */
+    .reel-ov-player.wide{aspect-ratio:16/9;height:auto;width:min(52vw,960px);}
     .reel-ov-big{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.8);
       width:72px;height:72px;display:grid;place-items:center;border-radius:50%;cursor:pointer;
       background:rgba(10,14,21,.55);border:1px solid rgba(226,238,252,.25);color:var(--ink);
@@ -5878,19 +5884,28 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .reel-ov.open .reel-ov-copy>*:nth-child(4){transition-delay:.28s;}
     .reel-ov.open .reel-ov-copy>*:nth-child(5){transition-delay:.34s;}
     .reel-ov.open .reel-ov-copy>*:nth-child(6){transition-delay:.4s;}
-    html.reel-lock,html.reel-lock body{overflow:hidden;}
+    /* the lock must never touch overflow: hiding the root's overflow
+       collapses the scroll box and clamps scrollTop to 0, which is what
+       threw the page back to section 1 whenever the player opened.
+       Lenis.stop() holds the wheel, a keydown guard holds the keys, and
+       these hold touch — the scroll position itself is never disturbed. */
+    .reel-ov-scrim{touch-action:none;}
+    html.reel-lock,html.reel-lock body{overscroll-behavior:none;}
 
     /* ── smaller screens ─────────────────────────────────────────────── */
     @media (max-width:1023px){
       .reel-ov-stage{grid-template-columns:1fr;justify-items:center;gap:26px;
-        overflow-y:auto;max-height:100dvh;padding:76px var(--gutter) 40px;align-items:start;}
+        overflow-y:auto;max-height:100dvh;padding:76px var(--gutter) 40px;align-items:start;
+        touch-action:pan-y;overscroll-behavior:contain;}
       .reel-ov-player{height:min(62dvh,560px);}
+      .reel-ov-player.wide{width:min(92vw,760px);}
       .reel-ov-copy{max-width:60ch;order:2;}
     }
     @media (max-width:767px){
       .reel-section{padding:8vh var(--gutter) 10vh;}
       .reel-slot,.reel-ghost{width:64vw;}
       .reel-fab{width:84px;border-radius:16px;}
+      .reel-fab.wide{aspect-ratio:9/16;width:84px;}
       .reel-fab-tip{display:none;}
       /* the hero CTA pill hugs its cycling prompt and can run under the
          FAB's corner on a phone. Cap the pill AND its text well (the
@@ -5922,18 +5937,33 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <section class="reel-section" id="shortsSection" aria-label="Short-form films">
     <div class="reel-head">
       <div>
-        <h2 class="reel-title">Design, out <span class="serif">loud.</span></h2>
-        <p class="reel-lede">The thinking that shapes my products, cut into sixty-second
-           films &mdash; the psychology of why good design works, posted where you
-           already scroll.</p>
+        <h2 class="reel-title">Sharing what <span class="serif">good design</span> is.</h2>
+        <!-- (the lede and the "Playing in your feed" chip are out — the
+             title stands alone now; .reel-lede/.reel-feed CSS remains,
+             recoverable) -->
       </div>
-      <a class="reel-feed" href="https://www.linkedin.com/in/bhanukowshik/" target="_blank" rel="noopener">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
-        Playing in your feed<span class="arr" aria-hidden="true">&#8599;</span>
-      </a>
     </div>
 
     <div class="reel-rail" id="reelRail">
+      <div class="reel-slot">
+        <button class="reel-card" type="button" data-reel="labor-illusion"
+                aria-label="Play short: The Labor Illusion" aria-haspopup="dialog">
+          <img src="shorts/labor-illusion-poster.webp" alt="" loading="lazy" width="720" height="1280">
+          <video muted loop playsinline preload="metadata" src="shorts/labor-illusion.mp4"
+                 poster="shorts/labor-illusion-poster.webp" aria-hidden="true" tabindex="-1"></video>
+          <span class="reel-card-shade" aria-hidden="true"></span>
+          <span class="reel-no">2</span>
+          <span class="reel-card-t">The Labor Illusion</span>
+          <span class="reel-dur">2:25</span>
+          <span class="reel-card-play" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#EFF3F8" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+          </span>
+        </button>
+        <button class="reel-snd" type="button" aria-label="Unmute preview" aria-pressed="false">
+          <svg class="ic ic-vol" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg class="ic ic-mut on" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
       <div class="reel-slot">
         <button class="reel-card" type="button" data-reel="endowment-effect"
                 aria-label="Play short: The Endowment Effect" aria-haspopup="dialog">
@@ -5954,12 +5984,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </button>
       </div>
       <div class="reel-ghost" aria-hidden="true">
-        <span class="g-no">2</span>
-        <span class="g-t">in the edit bay</span>
-      </div>
-      <div class="reel-ghost" aria-hidden="true">
         <span class="g-no">3</span>
-        <span class="g-t">being written</span>
+        <span class="g-t">in the edit bay</span>
       </div>
     </div>
   </section>
@@ -6340,16 +6366,19 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        Lives only while the hero does: it leaves at 35% scroll, the orb
        arrives when the CTA is gone — the corner is handed over, never
        shared. Styles live with the shorts section block. -->
-  <button class="reel-fab" id="reelFab" type="button" data-reel="endowment-effect"
-          aria-label="Watch short: The Endowment Effect, 1 minute 21 seconds" aria-haspopup="dialog">
-    <img src="shorts/endowment-effect-poster.webp" alt="" width="720" height="1290">
+  <button class="reel-fab wide" id="reelFab" type="button" data-reel="labor-illusion"
+          aria-label="Watch short: The Labor Illusion, 2 minutes 25 seconds" aria-haspopup="dialog">
+    <picture>
+      <source media="(max-width:767px)" srcset="shorts/labor-illusion-poster.webp">
+      <img src="shorts/labor-illusion-poster-wide.webp" alt="" width="1280" height="720">
+    </picture>
     <video id="reelFabVid" muted loop playsinline preload="auto"
-           src="shorts/endowment-effect-preview.mp4" poster="shorts/endowment-effect-poster.webp"
+           src="shorts/labor-illusion-preview-wide.mp4" poster="shorts/labor-illusion-poster-wide.webp"
            aria-hidden="true" tabindex="-1"></video>
     <span class="reel-fab-shade" aria-hidden="true"></span>
     <span class="reel-fab-live" aria-hidden="true"><b></b>Short</span>
-    <span class="reel-fab-dur" aria-hidden="true">1:21</span>
-    <span class="reel-fab-tip" aria-hidden="true">The Endowment Effect<small>Watch with sound</small></span>
+    <span class="reel-fab-dur" aria-hidden="true">2:25</span>
+    <span class="reel-fab-tip" aria-hidden="true">The Labor Illusion<small>Watch with sound</small></span>
   </button>
 
   <!-- ══ SHORTS OVERLAY — the film with its sound, the story beside it ══ -->
@@ -6404,7 +6433,26 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
      Add a short: one object here, three files in shorts/, one card in
      the rail. Everything else follows. */
   (function () {
+    /* the copy stays a hook and ONE tight paragraph — a hiring manager
+       skims this between meetings; the film itself does the explaining.
+       `wide` marks a landscape film: the overlay player turns 16:9 for it
+       (posterWide is its 16:9 poster; the 9:16 poster still feeds the
+       rail card, the FAB and the reel-so-far thumbs). */
     var REEL = [
+      {
+        id: 'labor-illusion',
+        no: '2',
+        dur: '2:25',
+        title: 'The Labor <span class="serif">Illusion.</span>',
+        hook: 'Why effort you can watch makes the same result feel more trustworthy.',
+        body: [
+          'A transfer that lands instantly reads as suspicious; add &ldquo;verifying bank details&hellip; securing transfer&rdquo; and the same two seconds feel safe. That is the labor illusion &mdash; and it is why AI products show you their thinking. Two minutes on where honest visible effort ends and theatre begins.'
+        ],
+        src: 'shorts/labor-illusion.mp4',
+        poster: 'shorts/labor-illusion-poster.webp',
+        posterWide: 'shorts/labor-illusion-poster-wide.webp',
+        wide: true
+      },
       {
         id: 'endowment-effect',
         no: '1',
@@ -6412,9 +6460,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         title: 'The Endowment <span class="serif">Effect.</span>',
         hook: 'Why a head start you never asked for keeps you coming back.',
         body: [
-          'Hand someone a loyalty card with ten slots and two stamps already filled, and they finish it far more often than someone holding a blank eight-slot card. Same distance to the free wash &mdash; completely different behaviour.',
-          'That is the endowment effect: the moment something feels like <em>yours</em> &mdash; a little progress, a profile, a streak &mdash; walking away starts to register as a loss. And losing what we own stings roughly twice as hard as gaining it feels good.',
-          'In sixty seconds I break down the classic car-wash experiment and how products quietly wield it &mdash; and where the line sits between building momentum and manufacturing guilt.'
+          'Two stamps already on the loyalty card, and people finish it &mdash; the moment progress feels like <em>yours</em>, walking away registers as a loss. Sixty seconds on the classic car-wash experiment, and where building momentum tips into manufacturing guilt.'
         ],
         src: 'shorts/endowment-effect.mp4',
         poster: 'shorts/endowment-effect-poster.webp'
@@ -6430,6 +6476,13 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     var player = document.getElementById('reelOvPlayer');
     var vid = document.getElementById('reelOvVideo');
     if (!fab || !ov || !vid) return;
+
+    /* the FAB carries a landscape film on desktop; on a phone the corner
+       sliver stays 9:16 and plays the vertical crop instead */
+    if (fab.classList.contains('wide') && matchMedia('(max-width:767px)').matches) {
+      fabVid.src = 'shorts/labor-illusion-preview.mp4';
+      fabVid.poster = 'shorts/labor-illusion-poster.webp';
+    }
 
     /* ── FAB: preview runs muted unless the visitor asked for stillness.
        play() can reject when the tab loads hidden or the policy is grumpy,
@@ -6595,10 +6648,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         var th = document.createElement('span');
         th.className = 'reel-ov-th';
         th.innerHTML = '<img src="' + r.poster + '" alt="">';
-        if (r.id === activeId) th.style.borderColor = 'rgba(140,197,255,.5)';
+        th.style.borderColor = r.id === activeId ? 'rgba(140,197,255,.6)'
+                                                 : 'rgba(226,238,252,.14)';
         nextRow.appendChild(th);
       });
-      for (var i = 0; i < 2; i++) {
+      for (var i = 0; i < 1; i++) {
         var g = document.createElement('span');
         g.className = 'reel-ov-th-ghost';
         g.textContent = 'soon';
@@ -6615,7 +6669,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       bEl.innerHTML = r.body.map(function (p) { return '<p>' + p + '</p>'; }).join('');
       fillNext(r.id);
       if (vid.getAttribute('src') !== r.src) { vid.src = r.src; }
-      vid.poster = r.poster;
+      vid.poster = r.posterWide || r.poster;
+      player.classList.toggle('wide', !!r.wide);
       ov.hidden = false;
       openedAt = Date.now();
       requestAnimationFrame(function () { requestAnimationFrame(function () {
@@ -6628,8 +6683,21 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       vid.muted = false; vid.currentTime = 0;
       var p = vid.play();
       if (p && p.catch) p.catch(function () { setPaused(true); });
-      closeBtn.focus();
+      closeBtn.focus({ preventScroll: true });
     }
+
+    /* scroll keys are held while the film is up — Lenis.stop() only owns
+       the wheel, and a stray PageDown would drag the page under the
+       overlay. The seek bar keeps its own arrow keys; buttons keep Space. */
+    addEventListener('keydown', function (e) {
+      if (!ov.classList.contains('open')) return;
+      var keys = ['PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', ' '];
+      if (keys.indexOf(e.key) === -1) return;
+      var t = e.target;
+      if (t && t.closest && t.closest('.reel-ov-bar')) return;
+      if (e.key === ' ' && t && /^(BUTTON|INPUT|TEXTAREA|SELECT|VIDEO)$/.test(t.tagName)) return;
+      e.preventDefault();
+    });
 
     function closeReel() {
       if (Date.now() - openedAt < 350) return;
@@ -7925,7 +7993,7 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
   document.documentElement.classList.add('cc-active');
 
   var DOT = 'rgba(239,243,248,0.9)';
-  var CARET = '#FF6A1A';
+  var CARET = '#FFDA00';   /* the caret yellow the user picked */
   var mx = -300, my = -300, visible = false;
   var mode = 'dot', magnetEl = null, origCX = 0, origCY = 0, snapW = 0, snapH = 0;
 
@@ -7945,7 +8013,7 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
   }
   function clearSay()  { if (dot.classList.contains('cc-say')) { dot.classList.remove('cc-say'); dot.textContent = ''; } }
   function enterDot()  { releaseMagnet(); clearSay(); mode = 'dot';  setShape(12, 12, 999, DOT); }
-  function enterText() { releaseMagnet(); clearSay(); mode = 'text'; setShape(3, 30, 3, CARET); }
+  function enterText() { releaseMagnet(); clearSay(); mode = 'text'; setShape(5, 38, 4, CARET); }
   function enterSay(label) {
     releaseMagnet(); mode = 'say';
     dot.classList.add('cc-say'); dot.textContent = label;
@@ -8622,7 +8690,7 @@ addEventListener('load', function () {
     if (reelState === reelTarget) { gsap.ticker.remove(reelTick); reelTicking = false; }
   }
 
-  ScrollTrigger.create({
+  var st = ScrollTrigger.create({
     trigger: sec,
     start: 'top top',
     end: function () { return '+=' + Math.round(innerHeight * 1.1 * 7); },
@@ -8640,6 +8708,83 @@ addEventListener('load', function () {
       if (!reelTicking) { reelTicking = true; gsap.ticker.add(reelTick); }
     }
   });
+  /* ── the reel idles forward, and a hovered card takes the front ─────────
+     Two ways the reel now moves without the wheel, both written straight
+     back into the pinned page scroll (via Lenis) so scroll position and
+     reel position never disagree and the wheel always resumes seamlessly:
+     – idle: after ~3s without input the reel drifts, one card every ~8s,
+       until the tail has played or the visitor touches anything.
+     – click: clicking a background card glides the reel until that card
+       holds the front slot. Hover never repositions — it only pauses the
+       idle drift while the pointer is deliberately resting on a card
+       (deliberate = the mouse itself moved there, not a card sliding
+       under a parked cursor). */
+  var CARD_COUNT   = (window.S2_PROJECT_DATA || []).length || 7;
+  var HOLD_F       = 0.5 / (1.1 * 7);   /* same HOLD as the pin's onUpdate */
+  var IDLE_MS      = 3000;              /* quiet time before drift starts */
+  var DRIFT_SLOT_S = 8;                 /* seconds per card while drifting */
+  var hoverCardIdx = -1, hoverDeliberate = false, promoteTween = null;
+  var lastMoveAt = 0, lastInputAt = performance.now();
+
+  function reelScrollY(idx) {
+    var p = HOLD_F + (idx / (CARD_COUNT - 1)) * (1 - HOLD_F);
+    return Math.min(st.end - 2, st.start + p * (st.end - st.start));
+  }
+  function frontFloat() {
+    var p = Math.max(0, Math.min(1, (st.progress - HOLD_F) / (1 - HOLD_F)));
+    return p * (CARD_COUNT - 1);
+  }
+  function setScroll(y) {
+    if (window.__lenis) window.__lenis.scrollTo(y, { immediate: true });
+    else window.scrollTo(0, y);
+  }
+
+  function promoteCard(idx) {
+    if (idx < 0 || !st.isActive) return;
+    if (Math.abs(idx - frontFloat()) < 0.5) return;          /* already front */
+    if (promoteTween) promoteTween.kill();                   /* retarget */
+    var proxy = { y: window.scrollY };
+    promoteTween = gsap.to(proxy, {
+      y: reelScrollY(idx), duration: 1.05, ease: 'power3.inOut',
+      onUpdate:   function () { setScroll(proxy.y); },
+      onComplete: function () { promoteTween = null; lastInputAt = performance.now(); }
+    });
+  }
+
+  root.addEventListener('s2:hoverCard', function (e) {
+    hoverCardIdx    = e.detail.idx;
+    hoverDeliberate = hoverCardIdx >= 0 && (performance.now() - lastMoveAt) < 600;
+  });
+  root.addEventListener('s2:cardClick', function (e) {
+    promoteCard(e.detail.idx);
+  });
+
+  addEventListener('mousemove', function () {
+    lastMoveAt = performance.now();
+    if (hoverCardIdx >= 0) hoverDeliberate = true;
+  }, { passive: true });
+
+  function noteInput() {
+    lastInputAt = performance.now();
+    if (promoteTween) { promoteTween.kill(); promoteTween = null; }
+  }
+  addEventListener('wheel',      noteInput, { passive: true, capture: true });
+  addEventListener('touchstart', noteInput, { passive: true, capture: true });
+  addEventListener('keydown',    noteInput, { passive: true, capture: true });
+
+  gsap.ticker.add(function (t, dtMs) {
+    if (!st.isActive || promoteTween || document.hidden) return;
+    if (hoverCardIdx >= 0 && hoverDeliberate) return;  /* reading a card */
+    if (performance.now() - lastInputAt < IDLE_MS) return;
+    var chatEl = document.getElementById('chat');
+    if (chatEl && chatEl.classList.contains('open')) return;
+    var slotPx = (st.end - st.start) * (1 - HOLD_F) / (CARD_COUNT - 1);
+    var y      = window.scrollY;
+    var maxY   = st.end - 2;
+    if (y >= maxY) return;                             /* tail played out */
+    setScroll(Math.min(maxY, y + slotPx * (dtMs / 1000) / DRIFT_SLOT_S));
+  });
+
   /* Lenis measures the document once and caches the limit. The pin-spacer is
      added by ScrollTrigger afterwards, so without re-measuring Lenis still
      believes the page ends where it did before the pin — it simply refuses to
@@ -9317,7 +9462,7 @@ addEventListener('load', function () {
 <script src="vendor/three.min.js"></script>
 <!-- the ?v= is a cache-bust: this file is edited often and browsers hold on
      to it hard. Bump it whenever spiral.js changes. -->
-<script src="spiral-gallery/spiral.js?v=20260727-perf2"></script>
+<script src="spiral-gallery/spiral.js?v=20260811-helix3"></script>
 
 <script type="module" src="orb/bhanu-orb.js?v=15"></script>
 
