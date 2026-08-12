@@ -8791,8 +8791,14 @@ addEventListener('load', function () {
   gsap.ticker.add(function (t, dtMs) {
     var dt = Math.min(0.05, dtMs / 1000);
     var want = 0;
-    if (st.isActive && !promoteTween && !document.hidden &&
-        !(hoverCardIdx >= 0 && hoverDeliberate) &&
+    /* the drift engages as soon as the section is in the frame — half a
+       viewport of pre-roll before the pin, so stopping just shy of the
+       pin start still triggers it and the page glides itself in. Hover
+       does NOT hold the drift (the reference never pauses; and the
+       cursor parks on the centre card at arrival, which froze it). */
+    var y0 = window.scrollY;
+    if (!promoteTween && !document.hidden &&
+        y0 >= st.start - innerHeight * 0.5 && y0 < st.end - 2 &&
         performance.now() - lastInputAt >= IDLE_MS) {
       var chatEl = document.getElementById('chat');
       if (!chatEl || !chatEl.classList.contains('open')) {
@@ -8804,6 +8810,9 @@ addEventListener('load', function () {
     driftVel += (want - driftVel) * Math.min(1, dt * 2.5);
     if (driftVel < 0.5) { driftPos = null; return; }
     if (driftPos === null) driftPos = window.scrollY;
+    /* someone else moved the page (scrollbar drag, anchor jump, script
+       scroll): follow it — never yank back to the accumulator */
+    else if (Math.abs(window.scrollY - driftPos) > 24) driftPos = window.scrollY;
     var maxY = st.end - 2;
     if (driftPos >= maxY) { driftVel = 0; driftPos = null; return; }
     driftPos = Math.min(maxY, driftPos + driftVel * dt);
