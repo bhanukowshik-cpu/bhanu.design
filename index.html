@@ -8105,6 +8105,12 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
       return;
     }
     dot.style.opacity = '1';
+    /* over a helix card that has a case study, the cursor makes the
+       offer — the helix host maintains __s2CursorSay from its raycast */
+    if (el && el.closest('#spiral-root') && window.__s2CursorSay) {
+      if (mode !== 'say') enterSay('Open Case Study ↗');
+      return;
+    }
     /* over a card's imagery, the cursor becomes the invitation */
     if (el && el.closest('.slide-media')) {
       if (mode !== 'say') enterSay('View case ↗');
@@ -8755,18 +8761,18 @@ addEventListener('load', function () {
      reel position never disagree and the wheel always resumes seamlessly:
      – idle: after ~3s without input the reel drifts, one card every ~8s,
        until the tail has played or the visitor touches anything.
-     – click: clicking a background card glides the reel until that card
-       holds the front slot. Hover never repositions — it only pauses the
-       idle drift while the pointer is deliberately resting on a card
-       (deliberate = the mouse itself moved there, not a card sliding
-       under a parked cursor). */
+     – click: a card with a case study opens it (external hrefs in a new
+       tab, like the bar CTA); a card without one glides to the front
+       slot instead. The custom cursor announces the offer — the host
+       keeps window.__s2CursorSay current and the cursor system reads it.
+     – hover: resting the pointer on any card PAUSES the drift; the reel
+       is otherwise always rolling. */
   var CARD_COUNT   = (window.S2_PROJECT_DATA || []).length || 7;
   var HOLD_F       = 0;                 /* lockstep with the pin's mapping — no hold-off */
-  var IDLE_MS      = 3000;              /* quiet time before drift starts */
-  var DRIFT_SLOT_S = 10;                /* seconds per card while drifting
-                                           (was 8 — slowed 20% by request) */
-  var hoverCardIdx = -1, hoverDeliberate = false, promoteTween = null;
-  var lastMoveAt = 0, lastInputAt = performance.now();
+  var IDLE_MS      = 1500;              /* breath after real input before the roll resumes */
+  var DRIFT_SLOT_S = 10;                /* seconds per card while drifting */
+  var hoverCardIdx = -1, promoteTween = null;
+  var lastInputAt = performance.now();
 
   function reelScrollY(idx) {
     var p = HOLD_F + (idx / (CARD_COUNT - 1)) * (1 - HOLD_F);
@@ -8794,17 +8800,22 @@ addEventListener('load', function () {
   }
 
   root.addEventListener('s2:hoverCard', function (e) {
-    hoverCardIdx    = e.detail.idx;
-    hoverDeliberate = hoverCardIdx >= 0 && (performance.now() - lastMoveAt) < 600;
+    hoverCardIdx = e.detail.idx;
+    var d = (window.S2_PROJECT_DATA || [])[hoverCardIdx] || {};
+    /* the custom cursor reads this to offer "Open Case Study ↗" */
+    window.__s2CursorSay = !!(hoverCardIdx >= 0 && d.href && d.href !== '#');
   });
   root.addEventListener('s2:cardClick', function (e) {
-    promoteCard(e.detail.idx);
+    var d = (window.S2_PROJECT_DATA || [])[e.detail.idx] || {};
+    if (d.href && d.href !== '#') {
+      /* the card IS the case study — same external/internal split the
+         bar CTA makes */
+      if (/^https?:\/\//.test(d.href)) window.open(d.href, '_blank', 'noopener');
+      else window.location.href = d.href;
+      return;
+    }
+    promoteCard(e.detail.idx);   /* no case study → bring it to the front */
   });
-
-  addEventListener('mousemove', function () {
-    lastMoveAt = performance.now();
-    if (hoverCardIdx >= 0) hoverDeliberate = true;
-  }, { passive: true });
 
   var driftVel = 0;     /* eased px/s so the reel never lurches */
   var driftPos = null;  /* float accumulator — window.scrollY is integer-
@@ -8823,12 +8834,11 @@ addEventListener('load', function () {
     var dt = Math.min(0.05, dtMs / 1000);
     var want = 0;
     /* the drift engages as soon as the section is in the frame — half a
-       viewport of pre-roll before the pin, so stopping just shy of the
-       pin start still triggers it and the page glides itself in. Hover
-       does NOT hold the drift (the reference never pauses; and the
-       cursor parks on the centre card at arrival, which froze it). */
+       viewport of pre-roll before the pin — and rolls perpetually.
+       Resting the pointer on a card is the pause button; the empty
+       background never holds it. */
     var y0 = window.scrollY;
-    if (!promoteTween && !document.hidden &&
+    if (!promoteTween && !document.hidden && hoverCardIdx < 0 &&
         y0 >= st.start - innerHeight * 0.5 && y0 < st.end - 2 &&
         performance.now() - lastInputAt >= IDLE_MS) {
       var chatEl = document.getElementById('chat');
