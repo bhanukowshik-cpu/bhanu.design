@@ -8712,12 +8712,10 @@ addEventListener('load', function () {
     anticipatePin: 1,
     invalidateOnRefresh: true,
     onUpdate: function (self) {
-      /* the reel waits until the visitor is ~half a viewport into the
-         section, then plays across everything that's left. HOLD is that
-         half-screen expressed as a fraction of the pin's 7.7 viewports —
-         NOT half the pin, which buried four screens in a dead zone. */
-      var HOLD = 0.5 / (1.1 * 7);
-      reelTarget = self.progress <= HOLD ? 0 : (self.progress - HOLD) / (1 - HOLD);
+      /* no hold-off: the reel answers the very first pixel of pin travel.
+         The old half-viewport HOLD dead zone read as the animation "not
+         starting" when the section arrived. */
+      reelTarget = self.progress;
       if (!reelTicking) { reelTicking = true; gsap.ticker.add(reelTick); }
     }
   });
@@ -8733,7 +8731,7 @@ addEventListener('load', function () {
        (deliberate = the mouse itself moved there, not a card sliding
        under a parked cursor). */
   var CARD_COUNT   = (window.S2_PROJECT_DATA || []).length || 7;
-  var HOLD_F       = 0.5 / (1.1 * 7);   /* same HOLD as the pin's onUpdate */
+  var HOLD_F       = 0;                 /* lockstep with the pin's mapping — no hold-off */
   var IDLE_MS      = 3000;              /* quiet time before drift starts */
   var DRIFT_SLOT_S = 8;                 /* seconds per card while drifting */
   var hoverCardIdx = -1, hoverDeliberate = false, promoteTween = null;
