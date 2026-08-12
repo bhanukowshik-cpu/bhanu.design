@@ -1428,6 +1428,15 @@
     }
 .s2-bar-cta:hover { filter: brightness(1.12); transform: scale(1.04); box-shadow: 0 0 14px 4px rgba(255,255,255,0.55), 0 0 32px 10px rgba(255,255,255,0.22); }
 .s2-bar-cta:active { transform: scale(0.96); }
+/* the note variant — "Next 3 Projects" for entries with no case study of
+   their own: same seat as the CTA, none of its invitation */
+.s2-bar-cta--note, .s2-bar-cta--note:hover {
+  background: none; box-shadow: none; filter: none; transform: none;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+  border: 1px dashed rgba(239,243,248,0.28);
+  color: rgba(239,243,248,0.62);
+  cursor: default; pointer-events: none;
+}
 .s2-bar-in .s2-bar-cta { animation: s2FadeUp 0.38s 0.30s ease forwards; }
 /* Project tab strip — centered below Featured Work */
     .s2-project-tabs {
@@ -5759,7 +5768,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* ── the hero FAB — a 9:16 sliver of film in the orb's corner ────── */
     .reel-fab{position:fixed;right:clamp(16px,2.4vw,32px);bottom:clamp(16px,2.4vw,32px);
       z-index:var(--z-fab);width:clamp(92px,7.6vw,116px);aspect-ratio:9/16;padding:0;
-      border-radius:18px;overflow:hidden;cursor:pointer;text-align:left;
+      border-radius:10px;overflow:hidden;cursor:pointer;text-align:left;
       border:1px solid rgba(226,238,252,.18);background:var(--card);
       box-shadow:0 18px 50px rgba(0,0,0,.5);
       opacity:0;transform:translateY(28px);pointer-events:none;
@@ -5904,7 +5913,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     @media (max-width:767px){
       .reel-section{padding:8vh var(--gutter) 10vh;}
       .reel-slot,.reel-ghost{width:64vw;}
-      .reel-fab{width:84px;border-radius:16px;}
+      .reel-fab{width:84px;border-radius:10px;}
       .reel-fab.wide{aspect-ratio:9/16;width:84px;}
       .reel-fab-tip{display:none;}
       /* the hero CTA pill hugs its cycling prompt and can run under the
@@ -6376,7 +6385,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
            src="shorts/labor-illusion-preview-wide.mp4" poster="shorts/labor-illusion-poster-wide.webp"
            aria-hidden="true" tabindex="-1"></video>
     <span class="reel-fab-shade" aria-hidden="true"></span>
-    <span class="reel-fab-live" aria-hidden="true"><b></b>Short</span>
+    <!-- (the "Short" live tag is out — the film speaks for itself;
+         .reel-fab-live CSS remains, recoverable) -->
     <span class="reel-fab-dur" aria-hidden="true">2:25</span>
     <span class="reel-fab-tip" aria-hidden="true">The Labor Illusion<small>Watch with sound</small></span>
   </button>
@@ -8685,7 +8695,10 @@ addEventListener('load', function () {
   function reelTick() {
     var k = 1 - Math.pow(1 - 0.14, gsap.ticker.deltaRatio());
     reelState += (reelTarget - reelState) * k;
-    if (Math.abs(reelTarget - reelState) < 0.0004) reelState = reelTarget;
+    /* the landing threshold must sit well under one idle-drift frame's
+       step (~0.0003 progress), or the chase snaps 1:1 to every step and
+       the drift reads as stutter instead of glide */
+    if (Math.abs(reelTarget - reelState) < 0.00003) reelState = reelTarget;
     root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: reelState } }));
     if (reelState === reelTarget) { gsap.ticker.remove(reelTick); reelTicking = false; }
   }
@@ -8764,8 +8777,13 @@ addEventListener('load', function () {
     if (hoverCardIdx >= 0) hoverDeliberate = true;
   }, { passive: true });
 
+  var driftVel = 0;     /* eased px/s so the reel never lurches */
+  var driftPos = null;  /* float accumulator — window.scrollY is integer-
+                           rounded, and a read-modify-write loop off it
+                           stutters; this keeps the true position */
   function noteInput() {
     lastInputAt = performance.now();
+    driftVel = 0; driftPos = null;                     /* hand back cleanly */
     if (promoteTween) { promoteTween.kill(); promoteTween = null; }
   }
   addEventListener('wheel',      noteInput, { passive: true, capture: true });
@@ -8773,16 +8791,25 @@ addEventListener('load', function () {
   addEventListener('keydown',    noteInput, { passive: true, capture: true });
 
   gsap.ticker.add(function (t, dtMs) {
-    if (!st.isActive || promoteTween || document.hidden) return;
-    if (hoverCardIdx >= 0 && hoverDeliberate) return;  /* reading a card */
-    if (performance.now() - lastInputAt < IDLE_MS) return;
-    var chatEl = document.getElementById('chat');
-    if (chatEl && chatEl.classList.contains('open')) return;
-    var slotPx = (st.end - st.start) * (1 - HOLD_F) / (CARD_COUNT - 1);
-    var y      = window.scrollY;
-    var maxY   = st.end - 2;
-    if (y >= maxY) return;                             /* tail played out */
-    setScroll(Math.min(maxY, y + slotPx * (dtMs / 1000) / DRIFT_SLOT_S));
+    var dt = Math.min(0.05, dtMs / 1000);
+    var want = 0;
+    if (st.isActive && !promoteTween && !document.hidden &&
+        !(hoverCardIdx >= 0 && hoverDeliberate) &&
+        performance.now() - lastInputAt >= IDLE_MS) {
+      var chatEl = document.getElementById('chat');
+      if (!chatEl || !chatEl.classList.contains('open')) {
+        want = (st.end - st.start) * (1 - HOLD_F) / (CARD_COUNT - 1) / DRIFT_SLOT_S;
+      }
+    }
+    /* velocity chases its target, so starts, pauses and resumes are all
+       glides — never a step change in speed */
+    driftVel += (want - driftVel) * Math.min(1, dt * 2.5);
+    if (driftVel < 0.5) { driftPos = null; return; }
+    if (driftPos === null) driftPos = window.scrollY;
+    var maxY = st.end - 2;
+    if (driftPos >= maxY) { driftVel = 0; driftPos = null; return; }
+    driftPos = Math.min(maxY, driftPos + driftVel * dt);
+    setScroll(driftPos);
   });
 
   /* Lenis measures the document once and caches the limit. The pin-spacer is
@@ -9187,13 +9214,9 @@ addEventListener('load', function () {
       clearTimeout(updateTimer);
       updateTimer = setTimeout(function () {
         /* Populate bar content */
-        if (barTitle) {
-          if (card.badge) {
-            barTitle.innerHTML = card.title + '<span class="s2-bar-title-badge">' + card.badge + '</span>';
-          } else {
-            barTitle.textContent = card.title;
-          }
-        }
+        /* the badge no longer rides the title — it shows in the CTA slot
+           below for entries that have no case study of their own */
+        if (barTitle) barTitle.textContent = card.title;
 
         if (barTagsCol) {
           barTagsCol.classList.toggle('s2-bar-tags-col--merged', !!(card.iconTags && card.iconTags.length));
@@ -9254,12 +9277,19 @@ addEventListener('load', function () {
         }
 
         if (barCta) {
-          barCta.href = card.href;
-          barCta.style.display = card.href === '#' ? 'none' : '';
-          barCta.textContent = card.ctaLabel || 'View Case Study →';
+          var isNote = card.href === '#';
+          /* no case study → the slot still speaks: the badge ("Next 3
+             Projects") sits where the CTA would, as a quiet note */
+          barCta.style.display = (isNote && !card.badge) ? 'none' : '';
+          barCta.textContent = isNote
+            ? (card.badge || '').replace(/^\(|\)$/g, '')
+            : (card.ctaLabel || 'View Case Study →');
+          barCta.classList.toggle('s2-bar-cta--note', isNote);
+          if (isNote) { barCta.removeAttribute('href'); }
+          else        { barCta.href = card.href; }
           /* tertiary = text-level action (Analytics' footer walkthrough) */
           barCta.classList.toggle('s2-bar-cta--tertiary', card.ctaStyle === 'tertiary');
-          if (/^https?:\/\//.test(card.href)) {
+          if (!isNote && /^https?:\/\//.test(card.href)) {
             barCta.target = '_blank'; barCta.rel = 'noopener';
           } else {
             barCta.removeAttribute('target'); barCta.removeAttribute('rel');
