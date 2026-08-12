@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day &amp; Night — Theme Demo · Bhanu Kowshik</title>
+  <meta name="description" content="A one-page demo: flip the toggle and the whole world — sky, glass, ink — follows.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌗</text></svg>">
+
+  <!-- Set theme before first paint — no flash -->
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('theme-demo'); } catch (e) {}
+      if (t !== 'dark' && t !== 'light') {
+        t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Both worlds preloaded — the first flip never flashes -->
+  <link rel="preload" as="image" href="images/theme-demo-day.jpg">
+  <link rel="preload" as="image" href="images/theme-demo-night.jpg">
+
+  <style>
+    :root {
+      --primary: #E6F28D;
+      --sun: #F9A800;
+      --font-heading: 'Montserrat', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    [data-theme="light"] {
+      --page-bg: #C2E9FA;
+      --ink: #1E2A38;
+      --ink-soft: rgba(30, 42, 56, 0.78);
+      --glass-bg: rgba(255, 252, 248, 0.46);
+      --glass-border: rgba(255, 255, 255, 0.65);
+      --glass-highlight: rgba(255, 255, 255, 0.85);
+      --glass-shadow: 0 24px 70px rgba(30, 58, 92, 0.28);
+      --chip-bg: rgba(255, 255, 255, 0.55);
+      --chip-dot: var(--sun);
+      --hint: rgba(30, 42, 56, 0.55);
+    }
+    [data-theme="dark"] {
+      --page-bg: #0B1829;
+      --ink: #EFF3F8;
+      --ink-soft: rgba(239, 243, 248, 0.80);
+      --glass-bg: rgba(11, 24, 41, 0.42);
+      --glass-border: rgba(255, 255, 255, 0.16);
+      --glass-highlight: rgba(255, 255, 255, 0.28);
+      --glass-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+      --chip-bg: rgba(255, 255, 255, 0.08);
+      --chip-dot: var(--primary);
+      --hint: rgba(239, 243, 248, 0.5);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font-heading);
+      background: var(--page-bg);
+      color: var(--ink);
+      overflow: hidden;
+      transition: background 0.9s ease, color 0.6s ease;
+    }
+
+    /* ─── BACKGROUND — two worlds, crossfaded ───────────────── */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1.1s ease;
+      will-change: opacity;
+    }
+    .bg-day   { background-image: url('images/theme-demo-day.jpg'); }
+    .bg-night { background-image: url('images/theme-demo-night.jpg'); }
+    [data-theme="light"] .bg-day   { opacity: 1; }
+    [data-theme="dark"]  .bg-night { opacity: 1; }
+
+    /* Slow breathing zoom — the world is alive, barely */
+    @keyframes bg-drift {
+      from { transform: scale(1); }
+      to   { transform: scale(1.06); }
+    }
+    .bg-layer { animation: bg-drift 46s ease-in-out infinite alternate; }
+    .bg-night { animation-delay: -23s; }
+
+    /* ─── STARFIELD — night only, twinkles + shooting stars ── */
+    .starfield {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+    [data-theme="dark"] .starfield { opacity: 1; transition-delay: 0.45s; }
+    .sky-star {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.92);
+      animation: sky-twinkle var(--tw-dur, 2.2s) ease-in-out var(--tw-delay, 0s) infinite;
+    }
+    @keyframes sky-twinkle {
+      0%, 100% { opacity: var(--tw-max, 0.85); }
+      50%      { opacity: 0.08; }
+    }
+    .sky-shoot {
+      position: absolute;
+      width: 90px;
+      height: 1.5px;
+      background: linear-gradient(to right, transparent, rgba(255,232,122,0.9));
+      border-radius: 2px;
+      opacity: 0;
+      transform: rotate(32deg);
+    }
+    [data-theme="dark"] .sky-shoot     { animation: sky-shooting 7s ease-in 1.2s infinite; }
+    [data-theme="dark"] .sky-shoot.s2  { animation-duration: 9.5s; animation-delay: 5.4s; }
+    @keyframes sky-shooting {
+      0%   { opacity: 0; transform: translate(0, 0) rotate(32deg); }
+      2%   { opacity: 0.9; }
+      9%   { opacity: 0; transform: translate(230px, 144px) rotate(32deg); }
+      100% { opacity: 0; transform: translate(230px, 144px) rotate(32deg); }
+    }
+
+    /* ─── CELESTIAL BODIES — the sun sets, the moon rises ───── */
+    .celestial {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+    .sun-orb, .moon-orb {
+      position: absolute;
+      border-radius: 50%;
+      will-change: transform, opacity;
+      transition: transform 1.4s var(--ease-out), opacity 1.1s ease;
+    }
+    .sun-orb {
+      top: 14%; left: 13%;
+      width: clamp(90px, 11vw, 150px);
+      aspect-ratio: 1;
+      background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800);
+      box-shadow: 0 0 60px 20px rgba(249, 168, 0, 0.32),
+                  0 0 150px 70px rgba(255, 233, 122, 0.22);
+    }
+    .moon-orb {
+      top: 11%; right: 13%;
+      width: clamp(70px, 9vw, 120px);
+      aspect-ratio: 1;
+      background: radial-gradient(circle at 42% 38%, #FFFFFF, #D7DCE7);
+      box-shadow: 0 0 50px 14px rgba(238, 240, 245, 0.20),
+                  0 0 120px 40px rgba(238, 240, 245, 0.10);
+    }
+    /* craters */
+    .moon-orb::before, .moon-orb::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(148, 158, 185, 0.35);
+    }
+    .moon-orb::before { width: 26%; height: 26%; top: 18%; left: 22%; }
+    .moon-orb::after  { width: 18%; height: 18%; top: 55%; left: 58%; }
+
+    /* Light: sun holds the sky, moon waits below the horizon */
+    [data-theme="light"] .sun-orb  { transform: translateY(0) scale(1); opacity: 1; transition-delay: 0.25s, 0.25s; }
+    [data-theme="light"] .moon-orb { transform: translateY(52vh) scale(0.92); opacity: 0; transition-delay: 0s, 0s; }
+    /* Dark: sun sinks to the horizon and dissolves, moon takes over */
+    [data-theme="dark"] .sun-orb  { transform: translateY(48vh) scale(0.92); opacity: 0; transition-delay: 0s, 0s; }
+    [data-theme="dark"] .moon-orb { transform: translateY(0) scale(1); opacity: 1; transition-delay: 0.25s, 0.25s; }
+
+    /* ─── STAGE ─────────────────────────────────────────────── */
+    .stage {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(20px, 4vw, 48px);
+    }
+
+    /* ─── GLASS SHEET — the whole page is the frame ─────────── */
+    .glass {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 36px;
+      background: var(--glass-bg);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      backdrop-filter: blur(22px) saturate(160%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      transition: background 0.7s ease, border-color 0.7s ease, box-shadow 0.9s ease;
+    }
+    /* top rim catches the light */
+    .glass::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 24px; right: 24px;
+      height: 1px;
+      border-radius: 1px;
+      background: linear-gradient(90deg, transparent, var(--glass-highlight), transparent);
+      transition: background 0.7s ease;
+    }
+
+    /* ─── THE TOGGLE — hero object, native-size XL (no scale, no blur) ── */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      transition: transform 0.15s ease;
+    }
+    .theme-toggle:active { transform: scale(0.95); }
+    .theme-toggle:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 8px;
+    }
+    .tt-track {
+      position: relative;
+      width: 232px;
+      height: 120px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%);
+      border: 3px solid rgba(255,255,255,0.40);
+      flex-shrink: 0;
+      overflow: hidden;
+      transition: background 0.5s ease, border-color 0.4s ease;
+    }
+    .tt-track::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; top: 0;
+      height: 50%;
+      border-radius: 100px 100px 50% 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 100%);
+      pointer-events: none;
+      z-index: 10;
+    }
+    /* Hills */
+    .tt-hill-back {
+      position: absolute;
+      bottom: 0; left: -5%;
+      width: 75%; height: 52px;
+      background: #72B87A;
+      border-radius: 50% 60% 0 0;
+      z-index: 1;
+      transition: background 0.5s ease;
+    }
+    .tt-hill-front {
+      position: absolute;
+      bottom: 0; right: -8%;
+      width: 62%; height: 44px;
+      background: #5DA066;
+      border-radius: 60% 50% 0 0;
+      z-index: 2;
+      transition: background 0.5s ease;
+    }
+    /* Stars — hidden in light mode */
+    .tt-star {
+      position: absolute;
+      background: rgba(255,255,255,0.90);
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+    }
+    .tt-star-1 { width: 10px; height: 10px; top: 20px; left: 32px;  }
+    .tt-star-2 { width: 8px;  height: 8px;  top: 44px; left: 72px;  }
+    .tt-star-3 { width: 8px;  height: 8px;  top: 24px; left: 108px; }
+    .tt-star-4 { width: 6px;  height: 6px;  top: 52px; left: 44px;  }
+    [data-theme="dark"] .tt-star { opacity: 1; }
+    @keyframes tt-twinkle {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.12; }
+    }
+    [data-theme="dark"] .tt-star-1 { animation: tt-twinkle 2.1s ease-in-out infinite; }
+    [data-theme="dark"] .tt-star-2 { animation: tt-twinkle 1.7s ease-in-out 0.8s infinite; }
+    [data-theme="dark"] .tt-star-3 { animation: tt-twinkle 2.5s ease-in-out 1.5s infinite; }
+    [data-theme="dark"] .tt-star-4 { animation: tt-twinkle 1.9s ease-in-out 0.4s infinite; }
+    /* Shooting star */
+    .tt-shoot {
+      position: absolute;
+      top: 12px; left: 16px;
+      width: 36px; height: 4px;
+      background: linear-gradient(to right, transparent, #FFE87A);
+      border-radius: 4px;
+      opacity: 0;
+      transform: rotate(35deg);
+      z-index: 2;
+      pointer-events: none;
+    }
+    @keyframes tt-shooting-star {
+      0%   { opacity: 0; transform: translate(0, 0) rotate(35deg); }
+      3%   { opacity: 0.85; }
+      15%  { opacity: 0; transform: translate(80px, 32px) rotate(35deg); }
+      100% { opacity: 0; transform: translate(80px, 32px) rotate(35deg); }
+    }
+    [data-theme="dark"] .tt-shoot { animation: tt-shooting-star 5s ease-in 2s infinite; }
+    /* Clouds — light mode only */
+    .tt-cloud {
+      position: absolute;
+      right: 36px; top: 24px;
+      width: 60px; height: 28px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 40px;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+    }
+    .tt-cloud::before {
+      content: '';
+      position: absolute;
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      top: -20px; left: 8px;
+    }
+    .tt-cloud::after {
+      content: '';
+      position: absolute;
+      width: 28px; height: 28px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      top: -16px; left: 28px;
+    }
+    [data-theme="dark"] .tt-cloud { opacity: 0; }
+    @keyframes tt-cloud-drift {
+      from { transform: translateX(120px);  }
+      to   { transform: translateX(-340px); }
+    }
+    [data-theme="light"] .tt-cloud { animation: tt-cloud-drift 26s linear 0s infinite backwards; }
+    .tt-cloud-b {
+      position: absolute;
+      right: 12px; top: 44px;
+      width: 36px; height: 16px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 32px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .tt-cloud-b::before {
+      content: '';
+      position: absolute;
+      width: 24px; height: 24px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      top: -12px; left: 4px;
+    }
+    .tt-cloud-b::after {
+      content: '';
+      position: absolute;
+      width: 20px; height: 20px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      top: -12px; left: 16px;
+    }
+    [data-theme="dark"]  .tt-cloud-b { opacity: 0; }
+    [data-theme="light"] .tt-cloud-b {
+      opacity: 0.65;
+      animation: tt-cloud-drift 18s linear 4s infinite backwards;
+    }
+    .tt-cloud-c {
+      position: absolute;
+      right: 72px; top: 16px;
+      width: 44px; height: 20px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 32px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .tt-cloud-c::before {
+      content: '';
+      position: absolute;
+      width: 28px; height: 28px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      top: -16px; left: 4px;
+    }
+    .tt-cloud-c::after {
+      content: '';
+      position: absolute;
+      width: 24px; height: 24px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      top: -12px; left: 20px;
+    }
+    [data-theme="dark"]  .tt-cloud-c { opacity: 0; }
+    [data-theme="light"] .tt-cloud-c {
+      opacity: 0.45;
+      animation: tt-cloud-drift 34s linear 7.5s infinite backwards;
+    }
+    /* Thumb — sun on the left by day, moon on the right by night */
+    .tt-thumb {
+      position: absolute;
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      top: 50%; left: 6px;
+      overflow: hidden;
+      background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800);
+      transform: translateX(0) translateY(-50%);
+      transition: transform 0.44s cubic-bezier(0.34,1.56,0.64,1),
+                  background 0.5s ease;
+      z-index: 3;
+    }
+    .tt-thumb::before,
+    .tt-thumb::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(148,158,185,0.50);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .tt-thumb::before { width: 28px; height: 28px; top: 16px; left: 20px; }
+    .tt-thumb::after  { width: 20px; height: 20px; top: 52px; left: 56px; }
+    [data-theme="dark"] .tt-thumb::before,
+    [data-theme="dark"] .tt-thumb::after { opacity: 1; }
+    /* Light mode — explicit so transitions fire as rule-swaps, not rule-removals */
+    [data-theme="light"] .tt-track {
+      background: linear-gradient(180deg, #9DD8F5 0%, #C2E9FA 100%);
+      border-color: rgba(255,255,255,0.40);
+    }
+    [data-theme="light"] .tt-hill-back  { background: #72B87A; }
+    [data-theme="light"] .tt-hill-front { background: #5DA066; }
+    [data-theme="light"] .tt-thumb {
+      transform: translateX(0) translateY(-50%);
+      background: radial-gradient(circle at 40% 38%, #FFE97A, #F9A800);
+    }
+    [data-theme="light"] .tt-star  { opacity: 0; }
+    [data-theme="light"] .tt-cloud { opacity: 1; }
+    [data-theme="light"] .tt-thumb::before,
+    [data-theme="light"] .tt-thumb::after { opacity: 0; }
+    /* Dark mode */
+    [data-theme="dark"] .tt-track {
+      background: linear-gradient(180deg, #0B1829 0%, #152238 100%);
+      border-color: rgba(255,255,255,0.10);
+    }
+    [data-theme="dark"] .tt-track::after {
+      background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%);
+    }
+    [data-theme="dark"] .tt-hill-back  { background: #1D3D25; }
+    [data-theme="dark"] .tt-hill-front { background: #152C1A; }
+    [data-theme="dark"] .tt-thumb {
+      transform: translateX(118px) translateY(-50%);
+      background: #EEF0F5;
+    }
+
+    /* ─── SMALL SCREENS ─────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .glass { border-radius: 24px; }
+    }
+
+    /* ─── REDUCED MOTION ────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .bg-layer { animation: none; transition-duration: 0.15s; }
+      .sun-orb, .moon-orb { transition-duration: 0.15s, 0.15s; transition-delay: 0s, 0s !important; }
+      .sky-star { animation: none; }
+      .sky-shoot { animation: none !important; }
+      body, .glass, .glass::before { transition-duration: 0.15s; }
+      .tt-thumb { transition: transform 0.15s ease, background 0.15s ease; }
+      [data-theme="dark"] .tt-star-1, [data-theme="dark"] .tt-star-2,
+      [data-theme="dark"] .tt-star-3, [data-theme="dark"] .tt-star-4,
+      [data-theme="dark"] .tt-shoot,
+      [data-theme="light"] .tt-cloud,
+      [data-theme="light"] .tt-cloud-b,
+      [data-theme="light"] .tt-cloud-c { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-layer bg-day" aria-hidden="true"></div>
+  <div class="bg-layer bg-night" aria-hidden="true"></div>
+
+  <div class="starfield" aria-hidden="true">
+    <span class="sky-shoot"></span>
+    <span class="sky-shoot s2"></span>
+  </div>
+
+  <div class="celestial" aria-hidden="true">
+    <div class="sun-orb"></div>
+    <div class="moon-orb"></div>
+  </div>
+
+  <main class="stage">
+    <section class="glass">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <span class="tt-track">
+          <span class="tt-star tt-star-1"></span>
+          <span class="tt-star tt-star-2"></span>
+          <span class="tt-star tt-star-3"></span>
+          <span class="tt-star tt-star-4"></span>
+          <span class="tt-shoot"></span>
+          <span class="tt-cloud"></span>
+          <span class="tt-cloud-b"></span>
+          <span class="tt-cloud-c"></span>
+          <span class="tt-hill-back"></span>
+          <span class="tt-hill-front"></span>
+          <span class="tt-thumb"></span>
+        </span>
+      </button>
+    </section>
+  </main>
+
+  <script>
+  /* ── Dark / Light mode toggle — WAAPI scene from portfolio v5 ── */
+  (function () {
+    var root = document.documentElement;
+    var btn  = document.getElementById('themeToggle');
+    var KEY  = 'theme-demo';
+    var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function animateToggleScene(toDark) {
+      var track     = document.querySelector('.tt-track');
+      var thumb     = document.querySelector('.tt-thumb');
+      var hillBack  = document.querySelector('.tt-hill-back');
+      var hillFront = document.querySelector('.tt-hill-front');
+      var stars     = document.querySelectorAll('.tt-star');
+      var cloud     = document.querySelector('.tt-cloud');
+      var cloudB    = document.querySelector('.tt-cloud-b');
+      var cloudC    = document.querySelector('.tt-cloud-c');
+      if (!track) return;
+
+      [track, thumb, hillBack, hillFront, cloud, cloudB, cloudC].forEach(function (el) {
+        if (el) el.getAnimations().forEach(function (a) { a.cancel(); });
+      });
+      stars.forEach(function (el) {
+        el.getAnimations().forEach(function (a) { a.cancel(); });
+      });
+
+      var ease   = { easing: 'ease', fill: 'none' };
+      var spring = { easing: 'cubic-bezier(0.34,1.56,0.64,1)', fill: 'none' };
+
+      track.animate([
+        { background: toDark ? 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' : 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' },
+        { background: toDark ? 'linear-gradient(180deg,#0B1829 0%,#152238 100%)' : 'linear-gradient(180deg,#9DD8F5 0%,#C2E9FA 100%)' }
+      ], { duration: 500, easing: ease.easing, fill: ease.fill });
+
+      track.animate([
+        { borderColor: toDark ? 'rgba(255,255,255,0.40)' : 'rgba(255,255,255,0.10)' },
+        { borderColor: toDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.40)' }
+      ], { duration: 400, easing: ease.easing, fill: ease.fill });
+
+      thumb.animate([
+        { transform: toDark ? 'translateX(0) translateY(-50%)' : 'translateX(118px) translateY(-50%)' },
+        { transform: toDark ? 'translateX(118px) translateY(-50%)' : 'translateX(0) translateY(-50%)' }
+      ], { duration: 440, easing: spring.easing, fill: spring.fill });
+
+      thumb.animate([
+        { background: toDark ? 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' : '#EEF0F5' },
+        { background: toDark ? '#EEF0F5' : 'radial-gradient(circle at 40% 38%,#FFE97A,#F9A800)' }
+      ], { duration: 500, easing: ease.easing, fill: ease.fill });
+
+      hillBack.animate([
+        { background: toDark ? '#72B87A' : '#1D3D25' },
+        { background: toDark ? '#1D3D25' : '#72B87A' }
+      ], { duration: 500, easing: ease.easing, fill: ease.fill });
+
+      hillFront.animate([
+        { background: toDark ? '#5DA066' : '#152C1A' },
+        { background: toDark ? '#152C1A' : '#5DA066' }
+      ], { duration: 500, easing: ease.easing, fill: ease.fill });
+
+      stars.forEach(function (s) {
+        s.animate([
+          { opacity: toDark ? 0 : 1 },
+          { opacity: toDark ? 1 : 0 }
+        ], { duration: 400, easing: ease.easing, fill: ease.fill });
+      });
+
+      cloud.animate([
+        { opacity: toDark ? 1 : 0 },
+        { opacity: toDark ? 0 : 1 }
+      ], { duration: 400, easing: ease.easing, fill: ease.fill });
+
+      if (cloudB) cloudB.animate([
+        { opacity: toDark ? 0.65 : 0 },
+        { opacity: toDark ? 0 : 0.65 }
+      ], { duration: 400, easing: ease.easing, fill: ease.fill });
+
+      if (cloudC) cloudC.animate([
+        { opacity: toDark ? 0.45 : 0 },
+        { opacity: toDark ? 0 : 0.45 }
+      ], { duration: 400, easing: ease.easing, fill: ease.fill });
+    }
+
+    function apply(theme, animate) {
+      if (animate && !reduceMotion) animateToggleScene(theme === 'dark');
+      root.setAttribute('data-theme', theme);
+      try { localStorage.setItem(KEY, theme); } catch (e) {}
+    }
+
+    if (btn) {
+      btn.addEventListener('click', function () {
+        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
+      });
+    }
+  })();
+
+  /* ── Starfield — scatter twinkling stars, roam the shooting stars ── */
+  (function () {
+    var field = document.querySelector('.starfield');
+    if (!field) return;
+
+    for (var i = 0; i < 26; i++) {
+      var s = document.createElement('span');
+      s.className = 'sky-star';
+      var size = (Math.random() * 1.8 + 1.2).toFixed(1);
+      s.style.width  = size + 'px';
+      s.style.height = size + 'px';
+      s.style.left   = (Math.random() * 100).toFixed(2) + '%';
+      s.style.top    = (Math.random() * 52 + 3).toFixed(2) + '%';
+      s.style.setProperty('--tw-dur',   (Math.random() * 1.8 + 1.5).toFixed(2) + 's');
+      s.style.setProperty('--tw-delay', (Math.random() * 3).toFixed(2) + 's');
+      s.style.setProperty('--tw-max',   (Math.random() * 0.4 + 0.55).toFixed(2));
+      field.appendChild(s);
+    }
+
+    field.querySelectorAll('.sky-shoot').forEach(function (sh) {
+      function place() {
+        sh.style.left = (Math.random() * 55 + 5).toFixed(1) + '%';
+        sh.style.top  = (Math.random() * 30 + 5).toFixed(1) + '%';
+      }
+      place();
+      sh.addEventListener('animationiteration', place);
+    });
+  })();
+  </script>
+</body>
+</html>

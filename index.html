@@ -1428,6 +1428,13 @@
     }
 .s2-bar-cta:hover { filter: brightness(1.12); transform: scale(1.04); box-shadow: 0 0 14px 4px rgba(255,255,255,0.55), 0 0 32px 10px rgba(255,255,255,0.22); }
 .s2-bar-cta:active { transform: scale(0.96); }
+/* the note variant — "Next 3 Projects →" for entries with no case study
+   of their own: wears the tertiary (Request-a-Walkthrough) text style
+   (the JS adds both classes) and clicking it steps the reel to the next
+   card — this rule only strips the glass button's leftovers */
+.s2-bar-cta--note, .s2-bar-cta--note:hover {
+  box-shadow: none; filter: none; transform: none;
+}
 .s2-bar-in .s2-bar-cta { animation: s2FadeUp 0.38s 0.30s ease forwards; }
 /* Project tab strip — centered below Featured Work */
     .s2-project-tabs {
@@ -3100,7 +3107,9 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
 /* ─── ABOUT ME TAB PANEL ────────────────────────────────── */
     /* Full-viewport snap section — exactly one screen, same as .tm-section / .s2-section-wrap */
     .am-section {
-      padding: 40px var(--gutter) 40px;
+      /* top-light on purpose: the sec-divider band above already gives
+         the section its breath, so equal paddings read as top-heavy */
+      padding: 24px var(--gutter) 56px;
       scroll-snap-align: start;
       /* the sec-divider band above carries the breath (and the statement)
          now — no margin of bare page needed */
@@ -3117,6 +3126,11 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
         linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
       background-size: 100% 100%, 52px 52px, 52px 52px;
+    }
+    /* shorter screens: the T is taller than the fold, so centring piles
+       all the leftover room above the bar — start high instead */
+    @media (max-height: 820px) {
+      .am-section { justify-content: flex-start; padding-top: 12px; }
     }
 .am-inner {
       display: grid;
@@ -4986,7 +5000,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <span class="v6l-tick v6l-tick--br" aria-hidden="true"></span>
     <div class="v6l-glow" aria-hidden="true"></div>
     <figure class="v6l-portrait" aria-hidden="true">
-      <img src="images/loader-portrait.webp" alt="" width="1050" height="1400"
+      <img src="images/loader-portrait.webp?v=2" alt="" width="1050" height="1400"
            fetchpriority="high" decoding="async">
     </figure>
     <div class="v6l-copy" aria-hidden="true">
@@ -5157,7 +5171,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <a class="nav-brand" href="#top">
         <!-- the trained Higgsfield portrait — the same face the loader
              raises, now standing at the door -->
-        <img class="nav-avatar" src="images/loader-portrait.webp" alt="" aria-hidden="true">
+        <img class="nav-avatar" src="images/nav-portrait.webp" alt="" aria-hidden="true">
         <span class="nav-nametext">
           <span class="nav-name">Bhanu Kowshik</span>
           <span class="nav-callme" aria-hidden="true">
@@ -5670,9 +5684,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* ── the section ─────────────────────────────────────────────────── */
     .reel-section{position:relative;z-index:var(--z-content);padding:10vh var(--gutter) 12vh;}
     .reel-head{display:flex;flex-direction:column;align-items:center;text-align:center;}
-    .reel-title{font-family:var(--sans);font-size:clamp(36px,4.6vw,60px);font-weight:700;
-      letter-spacing:-0.015em;line-height:1.02;color:var(--ink);text-wrap:balance;}
-    .reel-title .serif{font-size:1.04em;}
+    /* the canonical section-heading scale — the same clamp the Featured
+       Work, about and testimonial bands share ("change them together") */
+    .reel-title{font-family:var(--sans);font-size:clamp(30px,3.2vw,48px);font-weight:570;
+      letter-spacing:-0.022em;line-height:1.2;color:var(--ink);text-wrap:balance;}
+    .reel-title .serif{font-weight:400;font-size:1.08em;letter-spacing:-0.004em;}
     .reel-lede{margin-top:16px;max-width:56ch;font-size:var(--t-body);line-height:1.7;color:var(--ink-2);text-wrap:pretty;}
     /* the social chip — a rounded rectangle like every CTA, never a pill */
     .reel-feed{display:inline-flex;align-items:center;gap:12px;padding:13px 20px;margin-top:26px;
@@ -5685,11 +5701,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .reel-feed:hover .arr{transform:translate(2px,-2px);}
 
     /* ── the rail — 9:16 cards, scroll-snap, edge-faded ──────────────── */
-    .reel-rail{display:flex;gap:clamp(16px,1.8vw,26px);margin-top:clamp(36px,6vh,60px);
+    /* (the edge-fade mask is out — it read as a weird blur clipping the
+       first card; the arrows below own the overflow story now) */
+    .reel-rail{display:flex;align-items:center;gap:clamp(16px,1.8vw,26px);margin-top:clamp(36px,6vh,60px);
       overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;
-      padding:6px 2px 10px;
-      -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 2%,#000 98%,transparent 100%);
-              mask-image:linear-gradient(90deg,transparent 0,#000 2%,#000 98%,transparent 100%);}
+      padding:6px 2px 10px;}
     .reel-rail::-webkit-scrollbar{display:none;}
     /* centred when the cards fit, scrollable the moment they don't —
        the auto margins collapse to zero on overflow */
@@ -5698,6 +5714,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* a slot holds each film: the card button and, beside it in the DOM,
        the sound button — interactive elements never nest */
     .reel-slot{position:relative;flex:none;width:clamp(230px,21vw,300px);scroll-snap-align:start;}
+    /* a landscape film in the rail: same height as its 9:16 neighbours,
+       16:9 wide — (16/9)² ≈ 3.161 of the portrait slot width */
+    .reel-slot--wide{width:calc(clamp(230px,21vw,300px) * 3.161);}
+    .reel-slot--wide .reel-card{aspect-ratio:16/9;}
     .reel-card{position:relative;display:block;width:100%;aspect-ratio:9/16;
       border-radius:20px;overflow:hidden;cursor:pointer;
       border:1px solid var(--line);background:var(--card);padding:0;text-align:left;
@@ -5737,6 +5757,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
       opacity:0;transition:opacity .3s ease,transform .45s var(--ease-pop);}
     .reel-card:hover .reel-card-play{opacity:1;transform:translate(-50%,-50%) scale(1);}
+    /* the rail's arrow row — the same seat .tm-nav gives the testimonial
+       arrows (the buttons themselves reuse .tm-arrow verbatim) */
+    .reel-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:26px;}
+
     /* ghost slots — the edit bay */
     .reel-ghost{position:relative;flex:none;width:clamp(230px,21vw,300px);aspect-ratio:9/16;
       scroll-snap-align:start;border-radius:20px;border:1px dashed rgba(226,238,252,.14);
@@ -5759,7 +5783,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* ── the hero FAB — a 9:16 sliver of film in the orb's corner ────── */
     .reel-fab{position:fixed;right:clamp(16px,2.4vw,32px);bottom:clamp(16px,2.4vw,32px);
       z-index:var(--z-fab);width:clamp(92px,7.6vw,116px);aspect-ratio:9/16;padding:0;
-      border-radius:18px;overflow:hidden;cursor:pointer;text-align:left;
+      border-radius:10px;overflow:hidden;cursor:pointer;text-align:left;
       border:1px solid rgba(226,238,252,.18);background:var(--card);
       box-shadow:0 18px 50px rgba(0,0,0,.5);
       opacity:0;transform:translateY(28px);pointer-events:none;
@@ -5792,6 +5816,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .reel-fab-tip small{display:block;margin-top:2px;font-size:11px;font-weight:500;
       letter-spacing:.06em;color:var(--ink-3);}
     .reel-fab:hover .reel-fab-tip,.reel-fab:focus-visible .reel-fab-tip{opacity:1;transform:none;}
+    /* a landscape short in the corner: the FAB turns 16:9 on desktop; on
+       phones it stays the 9:16 sliver and plays the vertical crop */
+    .reel-fab.wide{aspect-ratio:16/9;width:clamp(168px,13vw,204px);}
 
     /* ── the overlay — scrim, copy left, film right ──────────────────── */
     .reel-ov{position:fixed;inset:0;z-index:var(--z-panel);display:grid;place-items:center;}
@@ -5841,6 +5868,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       border-radius:22px;overflow:hidden;border:1px solid rgba(226,238,252,.16);
       background:#04060A;box-shadow:0 40px 120px rgba(0,0,0,.6);}
     .reel-ov-player video{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;}
+    /* a landscape film — the player turns 16:9 and sizes by width; the
+       copy column is untouched. Set per film by the REEL entry's wide flag. */
+    .reel-ov-player.wide{aspect-ratio:16/9;height:auto;width:min(52vw,960px);}
     .reel-ov-big{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.8);
       width:72px;height:72px;display:grid;place-items:center;border-radius:50%;cursor:pointer;
       background:rgba(10,14,21,.55);border:1px solid rgba(226,238,252,.25);color:var(--ink);
@@ -5878,19 +5908,29 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .reel-ov.open .reel-ov-copy>*:nth-child(4){transition-delay:.28s;}
     .reel-ov.open .reel-ov-copy>*:nth-child(5){transition-delay:.34s;}
     .reel-ov.open .reel-ov-copy>*:nth-child(6){transition-delay:.4s;}
-    html.reel-lock,html.reel-lock body{overflow:hidden;}
+    /* the lock must never touch overflow: hiding the root's overflow
+       collapses the scroll box and clamps scrollTop to 0, which is what
+       threw the page back to section 1 whenever the player opened.
+       Lenis.stop() holds the wheel, a keydown guard holds the keys, and
+       these hold touch — the scroll position itself is never disturbed. */
+    .reel-ov-scrim{touch-action:none;}
+    html.reel-lock,html.reel-lock body{overscroll-behavior:none;}
 
     /* ── smaller screens ─────────────────────────────────────────────── */
     @media (max-width:1023px){
       .reel-ov-stage{grid-template-columns:1fr;justify-items:center;gap:26px;
-        overflow-y:auto;max-height:100dvh;padding:76px var(--gutter) 40px;align-items:start;}
+        overflow-y:auto;max-height:100dvh;padding:76px var(--gutter) 40px;align-items:start;
+        touch-action:pan-y;overscroll-behavior:contain;}
       .reel-ov-player{height:min(62dvh,560px);}
+      .reel-ov-player.wide{width:min(92vw,760px);}
       .reel-ov-copy{max-width:60ch;order:2;}
     }
     @media (max-width:767px){
       .reel-section{padding:8vh var(--gutter) 10vh;}
       .reel-slot,.reel-ghost{width:64vw;}
-      .reel-fab{width:84px;border-radius:16px;}
+      .reel-slot--wide{width:88vw;}
+      .reel-fab{width:84px;border-radius:10px;}
+      .reel-fab.wide{aspect-ratio:9/16;width:84px;}
       .reel-fab-tip{display:none;}
       /* the hero CTA pill hugs its cycling prompt and can run under the
          FAB's corner on a phone. Cap the pill AND its text well (the
@@ -5922,18 +5962,32 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <section class="reel-section" id="shortsSection" aria-label="Short-form films">
     <div class="reel-head">
       <div>
-        <h2 class="reel-title">Design, out <span class="serif">loud.</span></h2>
-        <p class="reel-lede">The thinking that shapes my products, cut into sixty-second
-           films &mdash; the psychology of why good design works, posted where you
-           already scroll.</p>
+        <h2 class="reel-title">Sharing what <span class="serif">good design</span> is.</h2>
+        <!-- (the lede and the "Playing in your feed" chip are out — the
+             title stands alone now; .reel-lede/.reel-feed CSS remains,
+             recoverable) -->
       </div>
-      <a class="reel-feed" href="https://www.linkedin.com/in/bhanukowshik/" target="_blank" rel="noopener">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
-        Playing in your feed<span class="arr" aria-hidden="true">&#8599;</span>
-      </a>
     </div>
 
     <div class="reel-rail" id="reelRail">
+      <div class="reel-slot reel-slot--wide">
+        <button class="reel-card" type="button" data-reel="labor-illusion"
+                aria-label="Play short: The Labor Illusion" aria-haspopup="dialog">
+          <img src="shorts/labor-illusion-poster-wide.webp" alt="" loading="lazy" width="1280" height="720">
+          <video muted loop playsinline preload="metadata" src="shorts/labor-illusion.mp4"
+                 poster="shorts/labor-illusion-poster-wide.webp" aria-hidden="true" tabindex="-1"></video>
+          <span class="reel-card-shade" aria-hidden="true"></span>
+          <span class="reel-card-t">The Labor Illusion</span>
+          <span class="reel-dur">2:25</span>
+          <span class="reel-card-play" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#EFF3F8" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+          </span>
+        </button>
+        <button class="reel-snd" type="button" aria-label="Unmute preview" aria-pressed="false">
+          <svg class="ic ic-vol" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg class="ic ic-mut on" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
       <div class="reel-slot">
         <button class="reel-card" type="button" data-reel="endowment-effect"
                 aria-label="Play short: The Endowment Effect" aria-haspopup="dialog">
@@ -5941,7 +5995,6 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <video muted loop playsinline preload="metadata" src="shorts/endowment-effect.mp4"
                  poster="shorts/endowment-effect-poster.webp" aria-hidden="true" tabindex="-1"></video>
           <span class="reel-card-shade" aria-hidden="true"></span>
-          <span class="reel-no">1</span>
           <span class="reel-card-t">The Endowment Effect</span>
           <span class="reel-dur">1:21</span>
           <span class="reel-card-play" aria-hidden="true">
@@ -5954,13 +6007,18 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </button>
       </div>
       <div class="reel-ghost" aria-hidden="true">
-        <span class="g-no">2</span>
         <span class="g-t">in the edit bay</span>
       </div>
-      <div class="reel-ghost" aria-hidden="true">
-        <span class="g-no">3</span>
-        <span class="g-t">being written</span>
-      </div>
+    </div>
+
+    <!-- left/right rail nav — the testimonial arrows, verbatim classes -->
+    <div class="reel-nav">
+      <button class="tm-arrow" id="reelPrev" type="button" aria-label="Scroll films left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="tm-arrow" id="reelNext" type="button" aria-label="Scroll films right">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
   </section>
 
@@ -6340,16 +6398,20 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        Lives only while the hero does: it leaves at 35% scroll, the orb
        arrives when the CTA is gone — the corner is handed over, never
        shared. Styles live with the shorts section block. -->
-  <button class="reel-fab" id="reelFab" type="button" data-reel="endowment-effect"
-          aria-label="Watch short: The Endowment Effect, 1 minute 21 seconds" aria-haspopup="dialog">
-    <img src="shorts/endowment-effect-poster.webp" alt="" width="720" height="1290">
+  <button class="reel-fab wide" id="reelFab" type="button" data-reel="labor-illusion"
+          aria-label="Watch short: The Labor Illusion, 2 minutes 25 seconds" aria-haspopup="dialog">
+    <picture>
+      <source media="(max-width:767px)" srcset="shorts/labor-illusion-poster.webp">
+      <img src="shorts/labor-illusion-poster-wide.webp" alt="" width="1280" height="720">
+    </picture>
     <video id="reelFabVid" muted loop playsinline preload="auto"
-           src="shorts/endowment-effect-preview.mp4" poster="shorts/endowment-effect-poster.webp"
+           src="shorts/labor-illusion-preview-wide.mp4" poster="shorts/labor-illusion-poster-wide.webp"
            aria-hidden="true" tabindex="-1"></video>
     <span class="reel-fab-shade" aria-hidden="true"></span>
-    <span class="reel-fab-live" aria-hidden="true"><b></b>Short</span>
-    <span class="reel-fab-dur" aria-hidden="true">1:21</span>
-    <span class="reel-fab-tip" aria-hidden="true">The Endowment Effect<small>Watch with sound</small></span>
+    <!-- (the "Short" live tag is out — the film speaks for itself;
+         .reel-fab-live CSS remains, recoverable) -->
+    <span class="reel-fab-dur" aria-hidden="true">2:25</span>
+    <span class="reel-fab-tip" aria-hidden="true">The Labor Illusion<small>Watch with sound</small></span>
   </button>
 
   <!-- ══ SHORTS OVERLAY — the film with its sound, the story beside it ══ -->
@@ -6404,7 +6466,26 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
      Add a short: one object here, three files in shorts/, one card in
      the rail. Everything else follows. */
   (function () {
+    /* the copy stays a hook and ONE tight paragraph — a hiring manager
+       skims this between meetings; the film itself does the explaining.
+       `wide` marks a landscape film: the overlay player turns 16:9 for it
+       (posterWide is its 16:9 poster; the 9:16 poster still feeds the
+       rail card, the FAB and the reel-so-far thumbs). */
     var REEL = [
+      {
+        id: 'labor-illusion',
+        no: '2',
+        dur: '2:25',
+        title: 'The Labor <span class="serif">Illusion.</span>',
+        hook: 'Why effort you can watch makes the same result feel more trustworthy.',
+        body: [
+          'A transfer that lands instantly reads as suspicious; add &ldquo;verifying bank details&hellip; securing transfer&rdquo; and the same two seconds feel safe. That is the labor illusion &mdash; and it is why AI products show you their thinking. Two minutes on where honest visible effort ends and theatre begins.'
+        ],
+        src: 'shorts/labor-illusion.mp4',
+        poster: 'shorts/labor-illusion-poster.webp',
+        posterWide: 'shorts/labor-illusion-poster-wide.webp',
+        wide: true
+      },
       {
         id: 'endowment-effect',
         no: '1',
@@ -6412,9 +6493,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         title: 'The Endowment <span class="serif">Effect.</span>',
         hook: 'Why a head start you never asked for keeps you coming back.',
         body: [
-          'Hand someone a loyalty card with ten slots and two stamps already filled, and they finish it far more often than someone holding a blank eight-slot card. Same distance to the free wash &mdash; completely different behaviour.',
-          'That is the endowment effect: the moment something feels like <em>yours</em> &mdash; a little progress, a profile, a streak &mdash; walking away starts to register as a loss. And losing what we own stings roughly twice as hard as gaining it feels good.',
-          'In sixty seconds I break down the classic car-wash experiment and how products quietly wield it &mdash; and where the line sits between building momentum and manufacturing guilt.'
+          'Two stamps already on the loyalty card, and people finish it &mdash; the moment progress feels like <em>yours</em>, walking away registers as a loss. Sixty seconds on the classic car-wash experiment, and where building momentum tips into manufacturing guilt.'
         ],
         src: 'shorts/endowment-effect.mp4',
         poster: 'shorts/endowment-effect-poster.webp'
@@ -6430,6 +6509,13 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     var player = document.getElementById('reelOvPlayer');
     var vid = document.getElementById('reelOvVideo');
     if (!fab || !ov || !vid) return;
+
+    /* the FAB carries a landscape film on desktop; on a phone the corner
+       sliver stays 9:16 and plays the vertical crop instead */
+    if (fab.classList.contains('wide') && matchMedia('(max-width:767px)').matches) {
+      fabVid.src = 'shorts/labor-illusion-preview.mp4';
+      fabVid.poster = 'shorts/labor-illusion-poster.webp';
+    }
 
     /* ── FAB: preview runs muted unless the visitor asked for stillness.
        play() can reject when the tab loads hidden or the policy is grumpy,
@@ -6554,6 +6640,20 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     liveTimer(fabVid, fab.querySelector('.reel-fab-dur'));
     cards.forEach(function (c) { liveTimer(c.querySelector('video'), c.querySelector('.reel-dur')); });
 
+    /* ── rail arrows — one hop ≈ a portrait card, smooth-scrolled; the
+       browser clamps at either end so no disable logic is needed ── */
+    var rail = document.getElementById('reelRail');
+    var reelPrev = document.getElementById('reelPrev');
+    var reelNext = document.getElementById('reelNext');
+    function railStep(dir) {
+      if (!rail) return;
+      var slot = rail.querySelector('.reel-slot:not(.reel-slot--wide), .reel-ghost');
+      var step = (slot ? slot.getBoundingClientRect().width : 280) + 24;
+      rail.scrollBy({ left: dir * step, behavior: 'smooth' });
+    }
+    if (reelPrev) reelPrev.addEventListener('click', function () { railStep(-1); });
+    if (reelNext) reelNext.addEventListener('click', function () { railStep(1); });
+
     /* ── section entrance — JS-gated so no-JS still shows everything ── */
     var section = document.getElementById('shortsSection');
     if (section && 'IntersectionObserver' in window && !reduced.matches) {
@@ -6595,10 +6695,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         var th = document.createElement('span');
         th.className = 'reel-ov-th';
         th.innerHTML = '<img src="' + r.poster + '" alt="">';
-        if (r.id === activeId) th.style.borderColor = 'rgba(140,197,255,.5)';
+        th.style.borderColor = r.id === activeId ? 'rgba(140,197,255,.6)'
+                                                 : 'rgba(226,238,252,.14)';
         nextRow.appendChild(th);
       });
-      for (var i = 0; i < 2; i++) {
+      for (var i = 0; i < 1; i++) {
         var g = document.createElement('span');
         g.className = 'reel-ov-th-ghost';
         g.textContent = 'soon';
@@ -6615,7 +6716,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       bEl.innerHTML = r.body.map(function (p) { return '<p>' + p + '</p>'; }).join('');
       fillNext(r.id);
       if (vid.getAttribute('src') !== r.src) { vid.src = r.src; }
-      vid.poster = r.poster;
+      vid.poster = r.posterWide || r.poster;
+      player.classList.toggle('wide', !!r.wide);
       ov.hidden = false;
       openedAt = Date.now();
       requestAnimationFrame(function () { requestAnimationFrame(function () {
@@ -6628,8 +6730,21 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       vid.muted = false; vid.currentTime = 0;
       var p = vid.play();
       if (p && p.catch) p.catch(function () { setPaused(true); });
-      closeBtn.focus();
+      closeBtn.focus({ preventScroll: true });
     }
+
+    /* scroll keys are held while the film is up — Lenis.stop() only owns
+       the wheel, and a stray PageDown would drag the page under the
+       overlay. The seek bar keeps its own arrow keys; buttons keep Space. */
+    addEventListener('keydown', function (e) {
+      if (!ov.classList.contains('open')) return;
+      var keys = ['PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', ' '];
+      if (keys.indexOf(e.key) === -1) return;
+      var t = e.target;
+      if (t && t.closest && t.closest('.reel-ov-bar')) return;
+      if (e.key === ' ' && t && /^(BUTTON|INPUT|TEXTAREA|SELECT|VIDEO)$/.test(t.tagName)) return;
+      e.preventDefault();
+    });
 
     function closeReel() {
       if (Date.now() - openedAt < 350) return;
@@ -7653,7 +7768,7 @@ function stopThinking() { if (thinkTimer) { clearTimeout(thinkTimer); thinkTimer
 function makeThinkShell() {
   var el = document.createElement('div');
   el.className = 'm ai think-shell';
-  el.innerHTML = '<img class="think-ava" src="images/loader-portrait.webp" alt="">' +
+  el.innerHTML = '<img class="think-ava" src="images/nav-portrait.webp" alt="">' +
     '<span class="think-status"></span>' +
     '<span class="think-squares" aria-hidden="true"><i></i><i></i><i></i></span>';
   thread.appendChild(el); thread.scrollTop = thread.scrollHeight;
@@ -7925,7 +8040,7 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
   document.documentElement.classList.add('cc-active');
 
   var DOT = 'rgba(239,243,248,0.9)';
-  var CARET = '#FF6A1A';
+  var CARET = '#FFDA00';   /* the caret yellow the user picked */
   var mx = -300, my = -300, visible = false;
   var mode = 'dot', magnetEl = null, origCX = 0, origCY = 0, snapW = 0, snapH = 0;
 
@@ -7945,7 +8060,7 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
   }
   function clearSay()  { if (dot.classList.contains('cc-say')) { dot.classList.remove('cc-say'); dot.textContent = ''; } }
   function enterDot()  { releaseMagnet(); clearSay(); mode = 'dot';  setShape(12, 12, 999, DOT); }
-  function enterText() { releaseMagnet(); clearSay(); mode = 'text'; setShape(3, 30, 3, CARET); }
+  function enterText() { releaseMagnet(); clearSay(); mode = 'text'; setShape(5, 38, 4, CARET); }
   function enterSay(label) {
     releaseMagnet(); mode = 'say';
     dot.classList.add('cc-say'); dot.textContent = label;
@@ -7997,6 +8112,13 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
       return;
     }
     dot.style.opacity = '1';
+    /* over a helix card that has a case study, the cursor makes the
+       offer — the helix host maintains __s2CursorSay from its raycast */
+    if (el && el.closest('#spiral-root') && window.__s2CursorSay) {
+      /* the label is per-card, so re-enter say when it changes mid-hover */
+      if (mode !== 'say' || dot.textContent !== window.__s2CursorSay) enterSay(window.__s2CursorSay);
+      return;
+    }
     /* over a card's imagery, the cursor becomes the invitation */
     if (el && el.closest('.slide-media')) {
       if (mode !== 'say') enterSay('View case ↗');
@@ -8617,12 +8739,15 @@ addEventListener('load', function () {
   function reelTick() {
     var k = 1 - Math.pow(1 - 0.14, gsap.ticker.deltaRatio());
     reelState += (reelTarget - reelState) * k;
-    if (Math.abs(reelTarget - reelState) < 0.0004) reelState = reelTarget;
+    /* the landing threshold must sit well under one idle-drift frame's
+       step (~0.0003 progress), or the chase snaps 1:1 to every step and
+       the drift reads as stutter instead of glide */
+    if (Math.abs(reelTarget - reelState) < 0.00003) reelState = reelTarget;
     root.dispatchEvent(new CustomEvent('s2:scrollTo', { detail: { progress: reelState } }));
     if (reelState === reelTarget) { gsap.ticker.remove(reelTick); reelTicking = false; }
   }
 
-  ScrollTrigger.create({
+  var st = ScrollTrigger.create({
     trigger: sec,
     start: 'top top',
     end: function () { return '+=' + Math.round(innerHeight * 1.1 * 7); },
@@ -8631,15 +8756,129 @@ addEventListener('load', function () {
     anticipatePin: 1,
     invalidateOnRefresh: true,
     onUpdate: function (self) {
-      /* the reel waits until the visitor is ~half a viewport into the
-         section, then plays across everything that's left. HOLD is that
-         half-screen expressed as a fraction of the pin's 7.7 viewports —
-         NOT half the pin, which buried four screens in a dead zone. */
-      var HOLD = 0.5 / (1.1 * 7);
-      reelTarget = self.progress <= HOLD ? 0 : (self.progress - HOLD) / (1 - HOLD);
+      /* no hold-off: the reel answers the very first pixel of pin travel.
+         The old half-viewport HOLD dead zone read as the animation "not
+         starting" when the section arrived. */
+      reelTarget = self.progress;
       if (!reelTicking) { reelTicking = true; gsap.ticker.add(reelTick); }
     }
   });
+  /* ── the reel idles forward, and a hovered card takes the front ─────────
+     Two ways the reel now moves without the wheel, both written straight
+     back into the pinned page scroll (via Lenis) so scroll position and
+     reel position never disagree and the wheel always resumes seamlessly:
+     – idle: after ~3s without input the reel drifts, one card every ~8s,
+       until the tail has played or the visitor touches anything.
+     – click: a card with a case study opens it (external hrefs in a new
+       tab, like the bar CTA); a card without one glides to the front
+       slot instead. The custom cursor announces the offer — the host
+       keeps window.__s2CursorSay current and the cursor system reads it.
+     – hover: resting the pointer on any card PAUSES the drift; the reel
+       is otherwise always rolling. */
+  var CARD_COUNT   = (window.S2_PROJECT_DATA || []).length || 7;
+  var HOLD_F       = 0;                 /* lockstep with the pin's mapping — no hold-off */
+  var IDLE_MS      = 1500;              /* breath after real input before the roll resumes */
+  var DRIFT_SLOT_S = 10;                /* seconds per card while drifting */
+  var hoverCardIdx = -1, promoteTween = null;
+  var lastInputAt = performance.now();
+
+  function reelScrollY(idx) {
+    var p = HOLD_F + (idx / (CARD_COUNT - 1)) * (1 - HOLD_F);
+    return Math.min(st.end - 2, st.start + p * (st.end - st.start));
+  }
+  function frontFloat() {
+    var p = Math.max(0, Math.min(1, (st.progress - HOLD_F) / (1 - HOLD_F)));
+    return p * (CARD_COUNT - 1);
+  }
+  function setScroll(y) {
+    if (window.__lenis) window.__lenis.scrollTo(y, { immediate: true });
+    else window.scrollTo(0, y);
+  }
+
+  function promoteCard(idx) {
+    if (idx < 0 || !st.isActive) return;
+    if (Math.abs(idx - frontFloat()) < 0.5) return;          /* already front */
+    if (promoteTween) promoteTween.kill();                   /* retarget */
+    var proxy = { y: window.scrollY };
+    promoteTween = gsap.to(proxy, {
+      y: reelScrollY(idx), duration: 1.05, ease: 'power3.inOut',
+      onUpdate:   function () { setScroll(proxy.y); },
+      onComplete: function () { promoteTween = null; lastInputAt = performance.now(); }
+    });
+  }
+
+  /* the pill only speaks over the ACTIVE card — its own CTA label
+     ("Visit Dearly ↗") or the "Open Case Study ↗" default. Re-evaluated
+     every tick, because the front card changes under a still cursor
+     while the reel glides or drifts. */
+  function updateCursorSay() {
+    var d = (window.S2_PROJECT_DATA || [])[hoverCardIdx] || {};
+    var isFront = hoverCardIdx >= 0 && Math.abs(hoverCardIdx - frontFloat()) < 0.5;
+    window.__s2CursorSay = (isFront && d.href && d.href !== '#')
+      ? (d.ctaLabel || 'Open Case Study ↗')
+      : '';
+  }
+  root.addEventListener('s2:hoverCard', function (e) {
+    hoverCardIdx = e.detail.idx;
+    updateCursorSay();
+  });
+  root.addEventListener('s2:cardClick', function (e) {
+    var idx = e.detail.idx;
+    var d = (window.S2_PROJECT_DATA || [])[idx] || {};
+    /* only the ACTIVE card opens; a background card repositions to the
+       front first — clicking it again (now active) does the opening */
+    if (Math.abs(idx - frontFloat()) < 0.5 && d.href && d.href !== '#') {
+      if (/^https?:\/\//.test(d.href)) window.open(d.href, '_blank', 'noopener');
+      else window.location.href = d.href;
+      return;
+    }
+    promoteCard(idx);
+  });
+
+  var driftVel = 0;     /* eased px/s so the reel never lurches */
+  var driftPos = null;  /* float accumulator — window.scrollY is integer-
+                           rounded, and a read-modify-write loop off it
+                           stutters; this keeps the true position */
+  function noteInput() {
+    lastInputAt = performance.now();
+    driftVel = 0; driftPos = null;                     /* hand back cleanly */
+    if (promoteTween) { promoteTween.kill(); promoteTween = null; }
+  }
+  addEventListener('wheel',      noteInput, { passive: true, capture: true });
+  addEventListener('touchstart', noteInput, { passive: true, capture: true });
+  addEventListener('keydown',    noteInput, { passive: true, capture: true });
+
+  gsap.ticker.add(function (t, dtMs) {
+    updateCursorSay();
+    var dt = Math.min(0.05, dtMs / 1000);
+    var want = 0;
+    /* the drift engages as soon as the section is in the frame — half a
+       viewport of pre-roll before the pin — and rolls perpetually.
+       Resting the pointer on a card is the pause button; the empty
+       background never holds it. */
+    var y0 = window.scrollY;
+    if (!promoteTween && !document.hidden && hoverCardIdx < 0 &&
+        y0 >= st.start - innerHeight * 0.5 && y0 < st.end - 2 &&
+        performance.now() - lastInputAt >= IDLE_MS) {
+      var chatEl = document.getElementById('chat');
+      if (!chatEl || !chatEl.classList.contains('open')) {
+        want = (st.end - st.start) * (1 - HOLD_F) / (CARD_COUNT - 1) / DRIFT_SLOT_S;
+      }
+    }
+    /* velocity chases its target, so starts, pauses and resumes are all
+       glides — never a step change in speed */
+    driftVel += (want - driftVel) * Math.min(1, dt * 2.5);
+    if (driftVel < 0.5) { driftPos = null; return; }
+    if (driftPos === null) driftPos = window.scrollY;
+    /* someone else moved the page (scrollbar drag, anchor jump, script
+       scroll): follow it — never yank back to the accumulator */
+    else if (Math.abs(window.scrollY - driftPos) > 24) driftPos = window.scrollY;
+    var maxY = st.end - 2;
+    if (driftPos >= maxY) { driftVel = 0; driftPos = null; return; }
+    driftPos = Math.min(maxY, driftPos + driftVel * dt);
+    setScroll(driftPos);
+  });
+
   /* Lenis measures the document once and caches the limit. The pin-spacer is
      added by ScrollTrigger afterwards, so without re-measuring Lenis still
      believes the page ends where it did before the pin — it simply refuses to
@@ -8805,7 +9044,7 @@ addEventListener('load', function () {
           { val: '3,000+',       lbl: 'Lessons Created' },
           { val: '104→4 hrs',    lbl: 'Creation Time / Lesson' }
         ],
-        tags: ['B2B2C EdTech'],
+        tags: ['B2B2C · Shipped'],
         iconTags: [
           { icon: 'profile', label: 'Sole Product Designer' },
           { icon: 'thunder', label: '0→1' },
@@ -8823,7 +9062,7 @@ addEventListener('load', function () {
           { val: '300+ hrs/day', lbl: 'Tutoring Delivered' },
           { val: '85%',          lbl: 'Session Completion' }
         ],
-        tags: ['Shipped', 'B2B2C EdTech'],
+        tags: ['Shipped', 'B2B2C'],
         iconTags: [
           { icon: 'profile', label: 'Sole Product Designer' },
           { icon: 'thunder', label: '0→1' },
@@ -8841,7 +9080,7 @@ addEventListener('load', function () {
           { val: '3,000+',    lbl: 'Lessons Created' },
           { val: '~25×',      lbl: 'Faster Production' }
         ],
-        tags: ['Shipped', 'AI Authoring', 'B2B EdTech'],
+        tags: ['Shipped', 'AI Authoring', 'B2B'],
         iconTags: [
           { icon: 'profile', label: 'Sole Product Designer' },
           { icon: 'thunder', label: '0→1' }
@@ -8897,7 +9136,7 @@ addEventListener('load', function () {
         iconTags: [
           { icon: 'profile', label: 'Solo Build' },
           { icon: 'thunder', label: '0→1' },
-          { icon: 'mic',     label: 'Voice' }
+          { icon: 'thunder', label: '48 Hour Build' }
         ],
         desc: 'Designed and shipped a voice-and-handwriting messaging experience in 48 hours, turning personal memories into letters people could hear, see, and keep.',
         href: 'https://dearly-rho.vercel.app',
@@ -9042,13 +9281,9 @@ addEventListener('load', function () {
       clearTimeout(updateTimer);
       updateTimer = setTimeout(function () {
         /* Populate bar content */
-        if (barTitle) {
-          if (card.badge) {
-            barTitle.innerHTML = card.title + '<span class="s2-bar-title-badge">' + card.badge + '</span>';
-          } else {
-            barTitle.textContent = card.title;
-          }
-        }
+        /* the badge no longer rides the title — it shows in the CTA slot
+           below for entries that have no case study of their own */
+        if (barTitle) barTitle.textContent = card.title;
 
         if (barTagsCol) {
           barTagsCol.classList.toggle('s2-bar-tags-col--merged', !!(card.iconTags && card.iconTags.length));
@@ -9109,12 +9344,21 @@ addEventListener('load', function () {
         }
 
         if (barCta) {
-          barCta.href = card.href;
-          barCta.style.display = card.href === '#' ? 'none' : '';
-          barCta.textContent = card.ctaLabel || 'View Case Study →';
-          /* tertiary = text-level action (Analytics' footer walkthrough) */
-          barCta.classList.toggle('s2-bar-cta--tertiary', card.ctaStyle === 'tertiary');
-          if (/^https?:\/\//.test(card.href)) {
+          var isNote = card.href === '#';
+          /* no case study → the slot still speaks: the badge ("Next 3
+             Projects") sits where the CTA would, as a quiet note */
+          barCta.style.display = (isNote && !card.badge) ? 'none' : '';
+          barCta.textContent = isNote
+            ? (card.badge || '').replace(/^\(|\)$/g, '') + ' →'
+            : (card.ctaLabel || 'View Case Study →');
+          barCta.classList.toggle('s2-bar-cta--note', isNote);
+          /* the note keeps a '#' href so it stays focusable — its click
+             is intercepted below and steps the reel instead */
+          barCta.href = isNote ? '#' : card.href;
+          /* tertiary = text-level look (Analytics' walkthrough CTA);
+             notes wear it too so they read as quiet text, not a button */
+          barCta.classList.toggle('s2-bar-cta--tertiary', card.ctaStyle === 'tertiary' || isNote);
+          if (!isNote && /^https?:\/\//.test(card.href)) {
             barCta.target = '_blank'; barCta.rel = 'noopener';
           } else {
             barCta.removeAttribute('target'); barCta.removeAttribute('rel');
@@ -9143,6 +9387,18 @@ addEventListener('load', function () {
       barSynced = true;
       updatePanels(e.detail.idx);
     });
+
+    /* the "Next 3 Projects →" note is also a step: clicking it hands the
+       front slot to the next card, through the same click-promote path
+       the helix cards use (the host glides the pinned scroll there) */
+    if (barCta) {
+      barCta.addEventListener('click', function (e) {
+        if (!barCta.classList.contains('s2-bar-cta--note')) return;
+        e.preventDefault();
+        if (spiralRoot) spiralRoot.dispatchEvent(
+          new CustomEvent('s2:cardClick', { detail: { idx: currentIdx + 1 } }));
+      });
+    }
 
 
     /* Shoot up tab strip when section scrolls into view */
@@ -9317,7 +9573,7 @@ addEventListener('load', function () {
 <script src="vendor/three.min.js"></script>
 <!-- the ?v= is a cache-bust: this file is edited often and browsers hold on
      to it hard. Bump it whenever spiral.js changes. -->
-<script src="spiral-gallery/spiral.js?v=20260727-perf2"></script>
+<script src="spiral-gallery/spiral.js?v=20260811-helix5"></script>
 
 <script type="module" src="orb/bhanu-orb.js?v=15"></script>
 

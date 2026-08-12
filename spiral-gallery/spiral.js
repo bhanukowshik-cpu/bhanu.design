@@ -71,26 +71,20 @@ void main() {
   vec3 worldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
   vec3 newPosition   = position;
 
-  /* Two standing deformations — a horizontal bow (sin(uv.x)*0.04 on z) and
-     a view-space shear that grows with height — give the resting cards
-     their wrapped, sculptural read. uBend gates both per card: 0 on the
-     active (front) card so it sits flat and crisp, ramping to 1 over one
-     slot of travel as a card leaves the front. The ticker drives it from
-     distFromFront. The scroll-speed bend below stays unconditional and
-     decays to zero the moment the reel rests. */
-  newPosition.z = sin(uv.x * PI) * 0.04 * uBend;
+  /* The reference deformations, verbatim from pacomepertant.com's vertex
+     shader: a strong horizontal bow (sin(uv.x)*0.2 on z) and the ABSOLUTE
+     view-space shear pow(worldPosition.y,2)*0.1 — high cards smear
+     sideways and roll their backs to the camera, which is what gives the
+     out-of-focus cards their ghosted, sculptural read (their blur is the
+     back-face kernel, not a separate DOF pass). uBend still gates both
+     per card — 0 on the active card so its video panel stays flat and
+     legible, full strength one slot of travel away. */
+  newPosition.z = sin(uv.x * PI) * 0.2 * uBend;
 
   vec4 modelPosition = modelMatrix * vec4(newPosition, 1.0);
   vec4 viewPosition  = viewMatrix  * modelPosition;
 
-  /* The shear is centre-relative: pow(vertex.y) minus pow(centre.y) keeps
-     the skew shape (top edge leads, more so the higher the card rides)
-     while the card's centre stays planted on its helix lane. The absolute
-     form — pow(worldPosition.y,2)*0.1 alone — displaced whole cards
-     sideways, quadratically more with height, and the top cards slid into
-     each other. */
-  vec3 centerWorld = (modelMatrix * vec4(vec3(0.0), 1.0)).xyz;
-  viewPosition.x += (pow(worldPosition.y, 2.0) - pow(centerWorld.y, 2.0)) * 0.1 * uBend;
+  viewPosition.x += pow(worldPosition.y, 2.0) * 0.1 * uBend;
   viewPosition.x += sin(uv.y * PI) * uScrollSpeed * 2.0;
 
   gl_Position = projectionMatrix * viewPosition;
@@ -113,6 +107,7 @@ uniform float uFogOpacity;
 uniform float uAuroraStrength;
 uniform float uTime;
 uniform float uIsPortrait;
+uniform float uBlur;
 
 varying vec2 vUv;
 
@@ -168,6 +163,25 @@ void main() {
   vec4 color;
   if (gl_FrontFacing) {
     color = blended;
+    /* Depth of field: cards away from the front slot defocus, the way the
+       reference reel reads. uBlur is 0 on the active card and grows with
+       distance, so a card sharpens continuously as it glides into focus.
+       Radius scales with uBlur; the kernel mirrors the back-face one. */
+    if (uBlur > 0.001) {
+      float off = (40.0 / 1024.0) * uBlur;
+      vec4 b = vec4(0.0);
+      b += texture2D(uTexture, zoomedUv + vec2(-off, -off)) * 1.0;
+      b += texture2D(uTexture, zoomedUv + vec2( 0.0,  -off)) * 2.0;
+      b += texture2D(uTexture, zoomedUv + vec2( off,  -off)) * 1.0;
+      b += texture2D(uTexture, zoomedUv + vec2(-off,   0.0)) * 2.0;
+      b += texture2D(uTexture, zoomedUv)                     * 4.0;
+      b += texture2D(uTexture, zoomedUv + vec2( off,   0.0)) * 2.0;
+      b += texture2D(uTexture, zoomedUv + vec2(-off,   off)) * 1.0;
+      b += texture2D(uTexture, zoomedUv + vec2( 0.0,   off)) * 2.0;
+      b += texture2D(uTexture, zoomedUv + vec2( off,   off)) * 1.0;
+      b /= 16.0;
+      color = mix(color, b, min(1.0, uBlur * 1.4));
+    }
     color = mix(color, vec4(0.0, 0.0, 0.0, 1.0), uColorStrength);
   } else {
     float offset = 40.0 / 1024.0;
@@ -232,8 +246,13 @@ void main() {
     // ── Spiral constants — matched to the reference implementation's proven
     //    values (verticalGap 0.5, angleGap 0.85, baseRadius 2), scaled up
     //    modestly by CARD_SCALE per the earlier size-bump request. ────────
-    var CARD_SCALE   = 1.15;
-    var VERTICAL_GAP = 0.5 * CARD_SCALE;
+    var CARD_SCALE   = 1.0;   /* 1.0 = the reference's own composition
+                                 (1.7×1-ish planes, gap .5, radius 2) —
+                                 the earlier 1.15 size-bump is retired to
+                                 match pacomepertant.com's airier frame */
+    var VERTICAL_GAP = 0.5 * CARD_SCALE;  /* the reference's own value —
+                                             spacing copied 1:1 (its planes
+                                             are 1.7×1 too, see geometry) */
     var ANGLE_GAP    = 0.85;
     var BASE_RADIUS  = 2 * CARD_SCALE;
     var totalCount   = allCards.length;
@@ -242,8 +261,10 @@ void main() {
     // old B_MIN/B_MAX edges are meaningless here. What the fade is for now is
     // simply the far ends of that tail: full opacity within FADE_FULL slots of
     // the front, gone by FADE_OUT.
-    var FADE_FULL = 4.0;
-    var FADE_OUT  = 6.0;
+    var FADE_FULL = 5.0;
+    var FADE_OUT  = 8.0;   /* the reference never fades (it wraps); our
+                              bounded tail keeps a whisper of fade at the
+                              far ends but every card stays visible */
 
     var uniforms       = [];
     var hiddenProgress = [];
@@ -257,13 +278,15 @@ void main() {
     var videoRevealTarget   = [];
 
     allCards.forEach(function (_, i) {
-      var geo = new THREE.PlaneGeometry(16/9 * CARD_SCALE, 1.0 * CARD_SCALE, 8, 8);
+      /* 1.7×1, the reference's exact plane — NOT 16:9; its cover-fit
+         shader crops the media the same sliver theirs does */
+      var geo = new THREE.PlaneGeometry(1.7 * CARD_SCALE, 1.0 * CARD_SCALE, 8, 8);
       var u = {
         uTexture:        { value: new THREE.Texture() },
         uVideoTexture:   { value: new THREE.Texture() },
         uColorStrength:  { value: 0 },
         uZoom:           { value: 1 },
-        uPlaneSizes:     { value: new THREE.Vector2(16/9 * CARD_SCALE, 1.0 * CARD_SCALE) },
+        uPlaneSizes:     { value: new THREE.Vector2(1.7 * CARD_SCALE, 1.0 * CARD_SCALE) },
         uImageSizes:     { value: new THREE.Vector2(1280, 720) },
         uRevealProgress: { value: 0 },
         uVideoReveal:    { value: 0 },
@@ -273,6 +296,7 @@ void main() {
         uAuroraStrength:  { value: 0 },
         uTime:            { value: 0 },
         uIsPortrait:      { value: allCards[i].portrait ? 1.0 : 0.0 },
+        uBlur:            { value: 0 },
       };
       uniforms.push(u);
       hiddenProgress.push(1);
@@ -417,6 +441,7 @@ void main() {
     var mouse     = new THREE.Vector2(-9999, -9999);
 
     var isHovered = false;
+    var lastHoverIdx = -1; // nearest front-facing card under the pointer, -1 = none
     el.addEventListener('mousemove', function (e) {
       var rect   = el.getBoundingClientRect();
       var xRatio = (e.clientX - rect.left) / rect.width;
@@ -427,6 +452,14 @@ void main() {
     el.addEventListener('mouseleave', function () {
       isHovered = false;
       mouse.set(-9999, -9999);
+    });
+    /* clicking a card asks the host to bring it to the front slot — the
+       raycast in the ticker keeps lastHoverIdx current, so the click
+       itself is just a report. Hover deliberately does NOT reposition. */
+    el.addEventListener('click', function () {
+      if (lastHoverIdx >= 0) {
+        el.dispatchEvent(new CustomEvent('s2:cardClick', { detail: { idx: lastHoverIdx } }));
+      }
     });
 
     // ── List overlay — editorial title list ───────────────────────────
@@ -769,6 +802,21 @@ void main() {
       hits.forEach(function (h) {
         if (h.face && h.face.normal.dot(raycaster.ray.direction) < 0) hitSet.add(h.object);
       });
+      /* The nearest front-facing hit is the card the visitor is actually on.
+         The host listens for s2:hoverCard to promote that card to the front
+         slot; hidden (pre-reveal / list-view) and fully-faded tail cards
+         never count, so an invisible card can't be promoted. */
+      var hoverIdxNow = -1;
+      for (var hi = 0; hi < hits.length; hi++) {
+        var hIdx = meshes.indexOf(hits[hi].object);
+        if (hIdx !== -1 && hitSet.has(hits[hi].object) &&
+            hiddenTarget[hIdx] === 0 &&
+            uniforms[hIdx].uRevealProgress.value > 0.35) { hoverIdxNow = hIdx; break; }
+      }
+      if (hoverIdxNow !== lastHoverIdx) {
+        lastHoverIdx = hoverIdxNow;
+        el.dispatchEvent(new CustomEvent('s2:hoverCard', { detail: { idx: hoverIdxNow } }));
+      }
 
       // Per-card update
       allCards.forEach(function (_, i) {
@@ -804,11 +852,17 @@ void main() {
         uniforms[i].uVideoReveal.value    = videoRevealProgress[i];
 
         uniforms[i].uScrollSpeed.value    = wheelDeltaY;
-        uniforms[i].uColorStrength.value  = 0; // darkening removed
+        // the reference's hover: the card dims toward black — now that a
+        // click promotes it, the dim doubles as the click affordance
+        uniforms[i].uColorStrength.value  = 0.55 * hoverProgress[i];
 
-        // Depth fog: darken cards further from the front slot (B=2)
+        // The reference runs no depth fog and no front-face DOF — its
+        // background cards ghost purely through the vertex smear plus the
+        // back-face blur kernel. Fog is parked at 1.0 and uBlur at 0 (both
+        // uniforms remain wired for an easy change of heart).
         var distFromFront = Math.abs(B - 2);
-        uniforms[i].uFogOpacity.value = Math.max(0.15, 1.0 - distFromFront * 0.25);
+        uniforms[i].uFogOpacity.value = 1.0;
+        uniforms[i].uBlur.value = 0.0;
 
         // Standing bend: flat on the active (front) card, full wrap on the
         // rest. distFromFront is continuous, so a card straightens as it
