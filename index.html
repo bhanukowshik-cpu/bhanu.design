@@ -3107,7 +3107,9 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
 /* ─── ABOUT ME TAB PANEL ────────────────────────────────── */
     /* Full-viewport snap section — exactly one screen, same as .tm-section / .s2-section-wrap */
     .am-section {
-      padding: 40px var(--gutter) 40px;
+      /* top-light on purpose: the sec-divider band above already gives
+         the section its breath, so equal paddings read as top-heavy */
+      padding: 24px var(--gutter) 56px;
       scroll-snap-align: start;
       /* the sec-divider band above carries the breath (and the statement)
          now — no margin of bare page needed */
@@ -3124,6 +3126,11 @@ html:not([data-theme="dark"]) .s2-side-nav-btn:hover {
         linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
       background-size: 100% 100%, 52px 52px, 52px 52px;
+    }
+    /* shorter screens: the T is taller than the fold, so centring piles
+       all the leftover room above the bar — start high instead */
+    @media (max-height: 820px) {
+      .am-section { justify-content: flex-start; padding-top: 12px; }
     }
 .am-inner {
       display: grid;
@@ -9554,7 +9561,7 @@ addEventListener('load', function () {
 <script src="vendor/three.min.js"></script>
 <!-- the ?v= is a cache-bust: this file is edited often and browsers hold on
      to it hard. Bump it whenever spiral.js changes. -->
-<script src="spiral-gallery/spiral.js?v=20260811-helix4"></script>
+<script src="spiral-gallery/spiral.js?v=20260811-helix5"></script>
 
 <script type="module" src="orb/bhanu-orb.js?v=15"></script>
 
