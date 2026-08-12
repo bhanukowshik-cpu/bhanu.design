@@ -5694,11 +5694,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .reel-feed:hover .arr{transform:translate(2px,-2px);}
 
     /* ── the rail — 9:16 cards, scroll-snap, edge-faded ──────────────── */
+    /* (the edge-fade mask is out — it read as a weird blur clipping the
+       first card; the arrows below own the overflow story now) */
     .reel-rail{display:flex;align-items:center;gap:clamp(16px,1.8vw,26px);margin-top:clamp(36px,6vh,60px);
       overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;
-      padding:6px 2px 10px;
-      -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 2%,#000 98%,transparent 100%);
-              mask-image:linear-gradient(90deg,transparent 0,#000 2%,#000 98%,transparent 100%);}
+      padding:6px 2px 10px;}
     .reel-rail::-webkit-scrollbar{display:none;}
     /* centred when the cards fit, scrollable the moment they don't —
        the auto margins collapse to zero on overflow */
@@ -5750,6 +5750,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
       opacity:0;transition:opacity .3s ease,transform .45s var(--ease-pop);}
     .reel-card:hover .reel-card-play{opacity:1;transform:translate(-50%,-50%) scale(1);}
+    /* the rail's arrow row — the same seat .tm-nav gives the testimonial
+       arrows (the buttons themselves reuse .tm-arrow verbatim) */
+    .reel-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:26px;}
+
     /* ghost slots — the edit bay */
     .reel-ghost{position:relative;flex:none;width:clamp(230px,21vw,300px);aspect-ratio:9/16;
       scroll-snap-align:start;border-radius:20px;border:1px dashed rgba(226,238,252,.14);
@@ -5966,7 +5970,6 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <video muted loop playsinline preload="metadata" src="shorts/labor-illusion.mp4"
                  poster="shorts/labor-illusion-poster-wide.webp" aria-hidden="true" tabindex="-1"></video>
           <span class="reel-card-shade" aria-hidden="true"></span>
-          <span class="reel-no">2</span>
           <span class="reel-card-t">The Labor Illusion</span>
           <span class="reel-dur">2:25</span>
           <span class="reel-card-play" aria-hidden="true">
@@ -5985,7 +5988,6 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <video muted loop playsinline preload="metadata" src="shorts/endowment-effect.mp4"
                  poster="shorts/endowment-effect-poster.webp" aria-hidden="true" tabindex="-1"></video>
           <span class="reel-card-shade" aria-hidden="true"></span>
-          <span class="reel-no">1</span>
           <span class="reel-card-t">The Endowment Effect</span>
           <span class="reel-dur">1:21</span>
           <span class="reel-card-play" aria-hidden="true">
@@ -5998,9 +6000,18 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </button>
       </div>
       <div class="reel-ghost" aria-hidden="true">
-        <span class="g-no">3</span>
         <span class="g-t">in the edit bay</span>
       </div>
+    </div>
+
+    <!-- left/right rail nav — the testimonial arrows, verbatim classes -->
+    <div class="reel-nav">
+      <button class="tm-arrow" id="reelPrev" type="button" aria-label="Scroll films left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="tm-arrow" id="reelNext" type="button" aria-label="Scroll films right">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
   </section>
 
@@ -6621,6 +6632,20 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     }
     liveTimer(fabVid, fab.querySelector('.reel-fab-dur'));
     cards.forEach(function (c) { liveTimer(c.querySelector('video'), c.querySelector('.reel-dur')); });
+
+    /* ── rail arrows — one hop ≈ a portrait card, smooth-scrolled; the
+       browser clamps at either end so no disable logic is needed ── */
+    var rail = document.getElementById('reelRail');
+    var reelPrev = document.getElementById('reelPrev');
+    var reelNext = document.getElementById('reelNext');
+    function railStep(dir) {
+      if (!rail) return;
+      var slot = rail.querySelector('.reel-slot:not(.reel-slot--wide), .reel-ghost');
+      var step = (slot ? slot.getBoundingClientRect().width : 280) + 24;
+      rail.scrollBy({ left: dir * step, behavior: 'smooth' });
+    }
+    if (reelPrev) reelPrev.addEventListener('click', function () { railStep(-1); });
+    if (reelNext) reelNext.addEventListener('click', function () { railStep(1); });
 
     /* ── section entrance — JS-gated so no-JS still shows everything ── */
     var section = document.getElementById('shortsSection');
