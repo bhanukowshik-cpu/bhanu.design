@@ -250,7 +250,10 @@ void main() {
                                  (1.7×1-ish planes, gap .5, radius 2) —
                                  the earlier 1.15 size-bump is retired to
                                  match pacomepertant.com's airier frame */
-    var VERTICAL_GAP = 0.5 * CARD_SCALE;
+    var VERTICAL_GAP = 0.65 * CARD_SCALE; /* the reference ran 0.5, but its
+                                             planes were plainer — opened up
+                                             so neighbouring cards clear each
+                                             other instead of stacking */
     var ANGLE_GAP    = 0.85;
     var BASE_RADIUS  = 2 * CARD_SCALE;
     var totalCount   = allCards.length;
