@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golden Gate — 1:1 Steel · Bhanu Kowshik</title>
+<!-- A geometrically faithful Golden Gate Bridge. 1 unit = 1 metre.
+     Every headline dimension is the real one: 1,280.2 m main span, 342.9 m side spans,
+     227.4 m towers, 144.8 m cable sag, 27.4 m deck, 7.6 m truss, suspenders every 15.24 m.
+     Main cables are true parabolas (uniform deck load), not beziers. -->
+<meta name="description" content="A 1:1 digital Golden Gate Bridge — real spans, real sag, true parabolic cables. Built in Three.js.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌉</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #EFF3F8;
+    --ink-dim: rgba(239,243,248,0.55);
+    --orange: #F04A00;
+    --panel: rgba(14, 19, 26, 0.72);
+    --panel-border: rgba(255,255,255,0.10);
+    --font-heading: 'Montserrat', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; background: #9FBFD4; }
+  body { font-family: var(--font-heading); color: var(--ink); }
+
+  #gl { position: fixed; inset: 0; cursor: grab; }
+  #gl.dragging { cursor: grabbing; }
+  #gl canvas { display: block; }
+
+  .vignette {
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background: radial-gradient(120% 100% at 50% 44%, transparent 62%, rgba(8,14,20,0.30) 100%);
+  }
+
+  /* ─── TITLE PLATE ─────────────────────────────────────────── */
+  .plate {
+    position: fixed; top: clamp(18px, 3.5vh, 34px); left: clamp(18px, 3vw, 38px); z-index: 3;
+    background: var(--panel); border: 1px solid var(--panel-border);
+    border-radius: 14px; padding: 16px 20px 14px;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    max-width: min(340px, 82vw);
+  }
+  .plate h1 {
+    font-size: 1.02rem; font-weight: 700; letter-spacing: 0.14em;
+  }
+  .plate h1 span { color: var(--orange); }
+  .plate .sub {
+    font-family: var(--font-mono); font-size: 0.64rem; color: var(--ink-dim);
+    letter-spacing: 0.08em; margin-top: 4px;
+  }
+
+  /* ─── SPEC SHEET ──────────────────────────────────────────── */
+  .specs {
+    margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--panel-border);
+    font-family: var(--font-mono); font-size: 0.66rem; line-height: 1.85;
+    letter-spacing: 0.04em; color: var(--ink-dim);
+  }
+  .specs .row { display: flex; justify-content: space-between; gap: 18px; }
+  .specs .row b { color: var(--ink); font-weight: 500; white-space: nowrap; }
+  .specs .foot {
+    margin-top: 9px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.12);
+    font-size: 0.6rem; color: var(--ink-dim); line-height: 1.6;
+  }
+  .specs .foot i { color: var(--orange); font-style: normal; }
+
+  /* ─── CONTROL BUTTONS ─────────────────────────────────────── */
+  .ctrls {
+    position: fixed; right: clamp(18px, 3vw, 38px); top: clamp(18px, 3.5vh, 34px); z-index: 3;
+    display: flex; gap: 10px;
+  }
+  .btn {
+    font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500;
+    letter-spacing: 0.16em; color: var(--ink-dim);
+    background: var(--panel); border: 1px solid var(--panel-border);
+    border-radius: 999px; padding: 9px 16px; cursor: pointer;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    transition: color .25s ease, border-color .25s ease;
+  }
+  .btn:hover { color: var(--ink); }
+  .btn.on { color: var(--orange); border-color: rgba(240,74,0,0.5); }
+
+  /* ─── HINT ────────────────────────────────────────────────── */
+  .hint {
+    position: fixed; bottom: clamp(16px, 3vh, 28px); left: 50%; transform: translateX(-50%);
+    z-index: 3; font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.14em; color: rgba(20, 36, 46, 0.72);
+    background: rgba(255,255,255,0.4); border: 1px solid rgba(20,36,46,0.12);
+    border-radius: 999px; padding: 8px 18px; pointer-events: none;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 700px) {
+    .specs .row:nth-child(n+6) { display: none; }
+    .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="gl"></div>
+<div class="vignette"></div>
+
+<div class="plate">
+  <h1>GOLDEN GATE <span>1:1</span></h1>
+  <div class="sub">digital steel · one unit = one metre</div>
+  <div class="specs" id="specs">
+    <div class="row"><span>main span</span><b>1,280.2 m</b></div>
+    <div class="row"><span>side spans</span><b>2 × 342.9 m</b></div>
+    <div class="row"><span>tower above water</span><b>227.4 m</b></div>
+    <div class="row"><span>cable sag</span><b>144.8 m</b></div>
+    <div class="row"><span>main cable ø</span><b>0.92 m</b></div>
+    <div class="row"><span>deck width</span><b>27.4 m</b></div>
+    <div class="row"><span>truss depth</span><b>7.6 m</b></div>
+    <div class="row"><span>suspenders</span><b id="suspCount">— × 15.24 m</b></div>
+    <div class="foot">cables solve <i>y = 82.6 + 144.8·(x/640.1)²</i> — the true parabola of a uniformly loaded span, not a bezier.</div>
+  </div>
+</div>
+
+<div class="ctrls">
+  <button class="btn on" id="btnDims">DIMS</button>
+  <button class="btn" id="btnKarl">KARL</button>
+</div>
+
+<div class="hint">drag — orbit&nbsp;&nbsp;·&nbsp;&nbsp;scroll — zoom&nbsp;&nbsp;·&nbsp;&nbsp;karl — fog</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.min.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+/* ══════════════════════════ SETUP ══════════════════════════ */
+const RAFSHIM = new URLSearchParams(location.search).has('rafshim');
+const W = () => innerWidth  || document.documentElement.clientWidth  || 1280;
+const H = () => innerHeight || document.documentElement.clientHeight || 800;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.setSize(W(), H());
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.02;
+const glHost = document.getElementById('gl');
+glHost.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const SKY_CLEAR = new THREE.Color(0x9FC2D8), SKY_KARL = new THREE.Color(0xCDD6DA);
+scene.background = SKY_CLEAR.clone();
+const FOG_CLEAR = { color: 0xB6CEDD, near: 1200, far: 7000 };
+const FOG_KARL  = { color: 0xCDD6DA, near: 140,  far: 2650 };
+scene.fog = new THREE.Fog(FOG_CLEAR.color, FOG_CLEAR.near, FOG_CLEAR.far);
+
+const camera = new THREE.PerspectiveCamera(52, W() / H(), 1, 14000);
+
+addEventListener('resize', () => {
+  camera.aspect = W() / H();
+  camera.updateProjectionMatrix();
+  renderer.setSize(W(), H());
+});
+
+/* ══════════════════ THE REAL DIMENSIONS (m) ═════════════════ */
+const MAIN_HALF = 640.1;                 // half of the 1,280.2 m main span
+const SIDE      = 342.9;                 // each side span
+const X_TOWER   = MAIN_HALF;             // tower centrelines
+const X_END     = MAIN_HALF + SIDE;      // 983.0 — pylons / anchorage face
+const TOWER_TOP = 227.4;                 // tower height above water
+const SAG       = 144.8;                 // main-cable sag
+const CABLE_LOW = TOWER_TOP - SAG;       // 82.6 — cable low point above water
+const DECK_W    = 27.4;                  // deck width
+const TRUSS_D   = 7.6;                   // stiffening-truss depth
+const TRUSS_HALF= 11.5;                  // truss web planes
+const CABLE_Z   = 15.5;                  // cable planes / tower-leg centrelines
+const BAY       = 15.24;                 // suspender + truss bay spacing (50 ft)
+const CABLE_R   = 0.46;                  // main cable radius (0.92 m ø)
+const ANCH_Y    = 64;                    // cable elevation entering the anchorage
+const X_APPROACH= 1080;                  // approach deck runs on past the pylons
+
+/* deck top-of-roadway profile — crest at midspan (67.1 m clearance under the truss) */
+const deckY = x => 74.7 - 8 * Math.pow(x / X_END, 2);
+
+/* main cable elevation — true parabola in the main span, sagging chord in the side spans */
+function cableY(x) {
+  const ax = Math.abs(x);
+  if (ax <= X_TOWER) return CABLE_LOW + SAG * Math.pow(x / X_TOWER, 2);
+  const t = Math.min(1, (ax - X_TOWER) / SIDE);
+  const chord = TOWER_TOP + (ANCH_Y - TOWER_TOP) * t;
+  return chord - 24 * t * (1 - t);       // side-span cables sag ~6 m below their chord
+}
+
+/* ══════════════════════ MATERIALS ══════════════════════════ */
+const INTL_ORANGE = 0xF04A00;            // CMYK 0/69/100/6 — the district's own mix
+const matSteel   = new THREE.MeshStandardMaterial({ color: INTL_ORANGE, roughness: 0.58, metalness: 0.22 });
+const matCable   = new THREE.MeshStandardMaterial({ color: 0xE04400,   roughness: 0.5,  metalness: 0.3  });
+const matConcrete= new THREE.MeshStandardMaterial({ color: 0xB7B1A4,   roughness: 0.95, metalness: 0    });
+const matAsphalt = new THREE.MeshStandardMaterial({ color: 0x3B3E43,   roughness: 0.98, metalness: 0    });
+const matWalk    = new THREE.MeshStandardMaterial({ color: 0x8E8A82,   roughness: 0.95, metalness: 0    });
+const matStripe  = new THREE.MeshBasicMaterial({ color: 0xE8E4D8 });
+const matWater   = new THREE.MeshStandardMaterial({ color: 0x2E5266,   roughness: 0.35, metalness: 0.1  });
+const matLand    = new THREE.MeshStandardMaterial({ color: 0x5C6B4C,   roughness: 1 });
+const matRock    = new THREE.MeshStandardMaterial({ color: 0x6E6659,   roughness: 1 });
+
+/* ═══════════════ INSTANCED-MEMBER PLUMBING ═════════════════ */
+/* every straight steel member is one instance of a unit box, posed by a matrix */
+const unitBox = new THREE.BoxGeometry(1, 1, 1);
+const unitCyl = new THREE.CylinderGeometry(1, 1, 1, 8);
+const pierGeo = new THREE.CylinderGeometry(1, 1, 1, 40);
+const UP = new THREE.Vector3(0, 1, 0);
+
+function memberMatrix(ax, ay, az, bx, by, bz, sx, sz) {
+  const a = new THREE.Vector3(ax, ay, az), b = new THREE.Vector3(bx, by, bz);
+  const dir = b.clone().sub(a), len = dir.length();
+  const q = new THREE.Quaternion().setFromUnitVectors(UP, dir.normalize());
+  return new THREE.Matrix4().compose(
+    a.add(b.clone().sub(a).multiplyScalar(0)).lerp(b, 0.5),
+    q, new THREE.Vector3(sx, len, sz));
+}
+
+function bakeInstances(geo, mat, matrices) {
+  const m = new THREE.InstancedMesh(geo, mat, matrices.length);
+  matrices.forEach((mx, i) => m.setMatrixAt(i, mx));
+  m.instanceMatrix.needsUpdate = true;
+  scene.add(m);
+  return m;
+}
+
+const steel = [], slabs = [], walks = [], stripes = [], ropes = [];
+
+/* ═══════════════════ STIFFENING TRUSS + DECK ═══════════════ */
+const X0 = -X_APPROACH, X1 = X_APPROACH;
+const nBays = Math.round((X1 - X0) / BAY);
+let flip = 1;
+for (let i = 0; i < nBays; i++) {
+  const xa = X0 + i * BAY, xb = xa + BAY;
+  const ya = deckY(xa), yb = deckY(xb);
+  for (const s of [-1, 1]) {
+    const z = s * TRUSS_HALF;
+    steel.push(memberMatrix(xa, ya, z, xb, yb, z, 1.1, 1.1));                       // top chord
+    steel.push(memberMatrix(xa, ya - TRUSS_D, z, xb, yb - TRUSS_D, z, 1.1, 1.1));   // bottom chord
+    steel.push(memberMatrix(xb, yb - TRUSS_D, z, xb, yb, z, 0.75, 0.75));           // vertical
+    steel.push(flip > 0                                                              // diagonal
+      ? memberMatrix(xa, ya, z, xb, yb - TRUSS_D, z, 0.65, 0.65)
+      : memberMatrix(xa, ya - TRUSS_D, z, xb, yb, z, 0.65, 0.65));
+  }
+  /* floor beam — cantilevers out to the cable planes to catch the suspenders */
+  steel.push(memberMatrix(xa, ya - 1.2, -CABLE_Z, xa, ya - 1.2, CABLE_Z, 1.4, 2.0));
+  /* bottom lateral bracing, alternating */
+  if (i % 2 === 0) {
+    steel.push(memberMatrix(xa, ya - TRUSS_D + 0.4, -TRUSS_HALF, xb, yb - TRUSS_D + 0.4, TRUSS_HALF, 0.55, 0.55));
+    steel.push(memberMatrix(xa, ya - TRUSS_D + 0.4, TRUSS_HALF, xb, yb - TRUSS_D + 0.4, -TRUSS_HALF, 0.55, 0.55));
+  }
+  /* roadway slab + sidewalks ride the same grade */
+  slabs.push(memberMatrix(xa, ya, 0, xb, yb, 0, 0.55, 20.4));
+  for (const s of [-1, 1])
+    walks.push(memberMatrix(xa, ya + 0.28, s * 11.05, xb, yb + 0.28, s * 11.05, 0.5, 1.9));
+  /* lane striping — 6 lanes */
+  for (const lz of [-6.8, -3.4, 3.4, 6.8])
+    stripes.push(memberMatrix(xa + 3, ya + 0.34, lz, xa + 7.5, yb + 0.34, lz, 0.05, 0.3));
+  stripes.push(memberMatrix(xa, ya + 0.34, 0, xb, yb + 0.34, 0, 0.05, 0.32));       // centre line
+  flip = -flip;
+}
+
+/* ═══════════════════════ SUSPENDERS ════════════════════════ */
+let suspCount = 0;
+for (let x = -X_END + BAY; x <= X_END - BAY + 0.01; x += BAY) {
+  if (Math.abs(Math.abs(x) - X_TOWER) < BAY * 0.6) continue;   // towers take that panel
+  const yc = cableY(x), yd = deckY(x);
+  if (yc - yd < 2.2) continue;                                  // cable meets deck near anchorage
+  for (const s of [-1, 1])
+    ropes.push(memberMatrix(x, yd, s * CABLE_Z, x, yc, s * CABLE_Z, 0.18, 0.18));
+  suspCount += 2;
+}
+document.getElementById('suspCount').textContent = suspCount + ' × 15.24 m';
+
+/* ═══════════════════════ MAIN CABLES ═══════════════════════ */
+for (const s of [-1, 1]) {
+  const pts = [];
+  for (let x = -X_END; x <= X_END + 0.01; x += 4)
+    pts.push(new THREE.Vector3(x, cableY(x), s * CABLE_Z));
+  const curve = new THREE.CatmullRomCurve3(pts);
+  scene.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 480, CABLE_R, 10), matCable));
+}
+
+/* ═══════════════════════════ TOWERS ════════════════════════ */
+/* legs taper 10.5→5.8 m longitudinally, 7.6→5.0 m transversally, in 6 stepped lifts */
+function buildTower(xc) {
+  const g = new THREE.Group();
+  const LIFTS = 6, h = TOWER_TOP / LIFTS;
+  for (const s of [-1, 1]) {
+    for (let i = 0; i < LIFTS; i++) {
+      const t0 = i / LIFTS, t1 = (i + 1) / LIFTS, tm = (t0 + t1) / 2;
+      const wx = 10.5 + (5.8 - 10.5) * tm;
+      const wz = 7.6  + (5.0 - 7.6)  * tm;
+      const seg = new THREE.Mesh(unitBox, matSteel);
+      seg.position.set(0, (i + 0.5) * h, s * CABLE_Z);
+      seg.scale.set(wx, h, wz);
+      g.add(seg);
+    }
+    /* cable saddle housing */
+    const saddle = new THREE.Mesh(unitBox, matSteel);
+    saddle.position.set(0, TOWER_TOP + 2.6, s * CABLE_Z);
+    saddle.scale.set(7.4, 5.2, 4.2);
+    g.add(saddle);
+  }
+  /* the four Art Deco portal struts above the roadway — stepped fascia in 3 layers */
+  const dk = deckY(xc);
+  for (const [y, depth, hgt] of [[dk + 22, 5.6, 13], [dk + 62, 5.0, 12], [dk + 99, 4.4, 11], [dk + 133, 3.8, 10]]) {
+    for (const [dScale, hScale] of [[1, 1], [0.62, 1.22], [0.3, 1.42]]) {
+      const strut = new THREE.Mesh(unitBox, matSteel);
+      strut.position.set(0, y, 0);
+      strut.scale.set(depth * dScale, hgt * hScale, CABLE_Z * 2 + 4);
+      g.add(strut);
+    }
+  }
+  /* below deck: one strut + X-bracing down to the pier */
+  const low = new THREE.Mesh(unitBox, matSteel);
+  low.position.set(0, dk - 22, 0); low.scale.set(4.6, 9, CABLE_Z * 2 + 3);
+  g.add(low);
+  const brace = [];
+  brace.push(memberMatrix(xc, 9, -CABLE_Z, xc, dk - 28, CABLE_Z, 1.6, 1.6));
+  brace.push(memberMatrix(xc, 9, CABLE_Z, xc, dk - 28, -CABLE_Z, 1.6, 1.6));
+  brace.forEach(mx => { const m = new THREE.Mesh(unitBox, matSteel); mx.decompose(m.position, m.quaternion, m.scale); m.position.x -= xc; g.add(m); });
+  /* pier + fender at the waterline */
+  const pier = new THREE.Mesh(pierGeo, matConcrete);
+  pier.position.set(0, 2.6, 0); pier.scale.set(31, 9, 23);
+  g.add(pier);
+  g.position.x = xc;
+  scene.add(g);
+}
+buildTower(-X_TOWER);
+buildTower(X_TOWER);
+
+/* ══════════════ PYLONS + ANCHORAGES (both shores) ══════════ */
+for (const s of [-1, 1]) {
+  const xe = s * X_END, dk = deckY(xe);
+  /* steel portal pylon straddling the deck */
+  for (const z of [-1, 1]) {
+    const leg = new THREE.Mesh(unitBox, matSteel);
+    leg.position.set(xe, (dk + 14) / 2 + 4, z * (TRUSS_HALF + 2.6));
+    leg.scale.set(4.6, dk + 14 - 8, 3.6);
+    scene.add(leg);
+  }
+  const cap = new THREE.Mesh(unitBox, matSteel);
+  cap.position.set(xe, dk + 12.4, 0); cap.scale.set(4.6, 4.4, TRUSS_HALF * 2 + 9);
+  scene.add(cap);
+  /* stepped concrete anchorage block eating the cable */
+  const a1 = new THREE.Mesh(unitBox, matConcrete);
+  a1.position.set(xe + s * 38, 26, 0); a1.scale.set(58, 52, 46);
+  scene.add(a1);
+  const a2 = new THREE.Mesh(unitBox, matConcrete);
+  a2.position.set(xe + s * 52, 55, 0); a2.scale.set(34, 22, 38);
+  scene.add(a2);
+  /* approach trestle columns under the deck run-off */
+  for (let i = 1; i <= 2; i++) {
+    const xcol = s * (X_END + (X_APPROACH - X_END) * i / 3 + 20);
+    for (const z of [-1, 1]) {
+      const col = new THREE.Mesh(unitBox, matConcrete);
+      const yd = deckY(xcol) - TRUSS_D;
+      col.position.set(xcol, yd / 2 + 14, z * 8.5);
+      col.scale.set(3.4, yd - 28, 3.4);
+      scene.add(col);
+    }
+  }
+}
+
+/* ═══════════════ WATER + HEADLANDS + CITY SIDE ═════════════ */
+const water = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), matWater);
+water.rotation.x = -Math.PI / 2;
+scene.add(water);
+
+function hill(x, z, r, h, mat) {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), mat);
+  m.position.set(x, 0, z); m.scale.set(r, h, r * 0.82);
+  scene.add(m);
+}
+/* Marin headlands — north end (+x): steep, bare */
+const marin = new THREE.Mesh(unitBox, matRock);
+marin.position.set(1560, 16, 0); marin.scale.set(1100, 36, 1900);
+scene.add(marin);
+hill(1210, -140, 340, 165, matRock);
+hill(1330, 190, 420, 205, matLand);
+hill(1620, -290, 520, 230, matRock);
+hill(1860, 120, 640, 260, matLand);
+/* San Francisco side — south end (−x): lower, greener (Presidio) */
+const sf = new THREE.Mesh(unitBox, matLand);
+sf.position.set(-1580, 12, 60); sf.scale.set(1150, 28, 2000);
+scene.add(sf);
+hill(-1300, 260, 380, 95, matLand);
+hill(-1650, -180, 520, 120, matLand);
+/* Fort Point, tucked under the south approach */
+const fort = new THREE.Mesh(unitBox, new THREE.MeshStandardMaterial({ color: 0x7A5548, roughness: 0.9 }));
+fort.position.set(-1015, 8, -34); fort.scale.set(48, 16, 32);
+scene.add(fort);
+
+/* ══════════════════ BAKE THE INSTANCED STEEL ═══════════════ */
+bakeInstances(unitBox, matSteel, steel);
+bakeInstances(unitBox, matAsphalt, slabs);
+bakeInstances(unitBox, matWalk, walks);
+bakeInstances(unitBox, matStripe, stripes);
+bakeInstances(unitCyl, matCable, ropes);
+
+/* ═══════════════════════ LIGHTING ══════════════════════════ */
+scene.add(new THREE.HemisphereLight(0xBFD9EC, 0x5E6357, 0.95));
+const sun = new THREE.DirectionalLight(0xFFF1DE, 2.3);
+sun.position.set(-1400, 1500, 900);
+scene.add(sun);
+const bounce = new THREE.DirectionalLight(0xAFC6D8, 0.5);
+bounce.position.set(900, 300, -1100);
+scene.add(bounce);
+
+/* ═══════════════ DIMENSION CALLOUTS (the flex) ═════════════ */
+const dims = new THREE.Group();
+scene.add(dims);
+const DIM_INK = 0x11313E;
+const dimLineMat = new THREE.LineBasicMaterial({ color: DIM_INK, transparent: true, opacity: 0.85 });
+
+function dimLine(pts) {
+  const g = new THREE.BufferGeometry().setFromPoints(pts.map(p => new THREE.Vector3(...p)));
+  dims.add(new THREE.Line(g, dimLineMat));
+}
+function label(text, x, y, z, scale = 1) {
+  const cv = document.createElement('canvas');
+  cv.width = 1024; cv.height = 160;
+  const cx = cv.getContext('2d');
+  const draw = () => {
+    cx.clearRect(0, 0, 1024, 160);
+    cx.font = '600 76px "JetBrains Mono", monospace';
+    cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.lineWidth = 14; cx.strokeStyle = 'rgba(236,243,247,0.9)';
+    cx.strokeText(text, 512, 84);
+    cx.fillStyle = '#11313E';
+    cx.fillText(text, 512, 84);
+    tex.needsUpdate = true;
+  };
+  const tex = new THREE.CanvasTexture(cv);
+  const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+  spr.position.set(x, y, z);
+  spr.scale.set(150 * scale, 23.4 * scale, 1);
+  dims.add(spr);
+  draw();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+}
+const DZ = 30;   /* dims float on the near side of the deck */
+/* main span, measured tower-to-tower under the deck */
+dimLine([[-X_TOWER, 34, DZ], [X_TOWER, 34, DZ]]);
+dimLine([[-X_TOWER, 28, DZ], [-X_TOWER, 40, DZ]]);
+dimLine([[X_TOWER, 28, DZ], [X_TOWER, 40, DZ]]);
+label('main span — 1,280.2 m', 0, 45, DZ, 1.35);
+/* tower height, beside the south tower */
+dimLine([[-X_TOWER - 46, 0, DZ], [-X_TOWER - 46, TOWER_TOP, DZ]]);
+dimLine([[-X_TOWER - 52, TOWER_TOP, DZ], [-X_TOWER - 22, TOWER_TOP, DZ]]);
+dimLine([[-X_TOWER - 52, 0.5, DZ], [-X_TOWER - 22, 0.5, DZ]]);
+label('227.4 m', -X_TOWER - 118, TOWER_TOP / 2, DZ, 0.85);
+/* cable sag at midspan */
+dimLine([[0, CABLE_LOW, DZ], [0, TOWER_TOP, DZ]]);
+dimLine([[-16, TOWER_TOP, DZ], [16, TOWER_TOP, DZ]]);
+label('sag 144.8 m', 66, (CABLE_LOW + TOWER_TOP) / 2 + 16, DZ, 0.85);
+/* clearance under midspan */
+dimLine([[110, 0.5, DZ], [110, deckY(110) - TRUSS_D, DZ]]);
+label('67.1 m clear', 178, 32, DZ, 0.8);
+
+/* ═══════════════════ ORBIT CONTROLS (custom) ═══════════════ */
+const target = new THREE.Vector3(0, 80, 0);
+/* narrow viewports need to stand further back to hold the full span */
+const DIST0 = W() / H() >= 1.4 ? 1560 : W() / H() >= 0.9 ? 2250 : 2900;
+let azim = 0.32, elev = 0.24, dist = DIST0;
+let azimV = 0, elevV = 0, distGoal = dist;
+let lastPointer = 0;
+const pointers = new Map();
+let pinchD0 = 0, pinchDist0 = 0;
+
+glHost.addEventListener('pointerdown', e => {
+  glHost.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  glHost.classList.add('dragging');
+  if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()];
+    pinchD0 = Math.hypot(a.x - b.x, a.y - b.y);
+    pinchDist0 = distGoal;
+  }
+});
+glHost.addEventListener('pointermove', e => {
+  const p = pointers.get(e.pointerId);
+  if (!p) return;
+  lastPointer = performance.now();
+  if (pointers.size === 1) {
+    azimV += (e.clientX - p.x) * -0.000045;
+    elevV += (e.clientY - p.y) * 0.000045;
+  }
+  p.x = e.clientX; p.y = e.clientY;
+  if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y);
+    if (pinchD0 > 0) distGoal = THREE.MathUtils.clamp(pinchDist0 * pinchD0 / Math.max(40, d), 220, 4200);
+  }
+});
+const endPointer = e => {
+  pointers.delete(e.pointerId);
+  if (!pointers.size) glHost.classList.remove('dragging');
+};
+glHost.addEventListener('pointerup', endPointer);
+glHost.addEventListener('pointercancel', endPointer);
+glHost.addEventListener('wheel', e => {
+  e.preventDefault();
+  lastPointer = performance.now();
+  distGoal = THREE.MathUtils.clamp(distGoal * Math.exp(e.deltaY * 0.0011), 220, 4200);
+}, { passive: false });
+
+/* ═════════════════════════ TOGGLES ═════════════════════════ */
+const btnDims = document.getElementById('btnDims');
+const btnKarl = document.getElementById('btnKarl');
+let karl = false, karlMix = 0;
+btnDims.addEventListener('click', () => {
+  dims.visible = !dims.visible;
+  btnDims.classList.toggle('on', dims.visible);
+});
+btnKarl.addEventListener('click', () => {
+  karl = !karl;
+  btnKarl.classList.toggle('on', karl);
+});
+
+/* ═══════════════════════════ LOOP ══════════════════════════ */
+let tPrev = 0;
+function frame(dtFixed) {
+  const now = performance.now() / 1000;
+  const dt = dtFixed !== undefined ? dtFixed : Math.min(0.05, now - tPrev || 0.016);
+  tPrev = now;
+
+  /* idle drift after 5 s of stillness */
+  if (performance.now() - lastPointer > 5000 && pointers.size === 0) azimV += 0.0000032;
+
+  azim += azimV; elev += elevV;
+  azimV *= 0.92; elevV *= 0.92;
+  elev = THREE.MathUtils.clamp(elev, 0.03, 1.25);
+  dist += (distGoal - dist) * Math.min(1, dt * 6);
+
+  camera.position.set(
+    target.x + dist * Math.cos(elev) * Math.sin(azim),
+    target.y + dist * Math.sin(elev),
+    target.z + dist * Math.cos(elev) * Math.cos(azim));
+  camera.lookAt(target);
+
+  /* Karl rolls in */
+  karlMix += ((karl ? 1 : 0) - karlMix) * Math.min(1, dt * 1.6);
+  scene.fog.color.setHex(FOG_CLEAR.color).lerp(new THREE.Color(FOG_KARL.color), karlMix);
+  scene.fog.near = THREE.MathUtils.lerp(FOG_CLEAR.near, FOG_KARL.near, karlMix);
+  scene.fog.far  = THREE.MathUtils.lerp(FOG_CLEAR.far,  FOG_KARL.far,  karlMix);
+  scene.background.copy(SKY_CLEAR).lerp(SKY_KARL, karlMix);
+
+  renderer.render(scene, camera);
+}
+
+if (RAFSHIM) {
+  window.__bridge = {
+    camera, target,
+    set: (a, e, d) => { azim = a; elev = e; dist = distGoal = d; },
+    karl: v => { karl = v; btnKarl.classList.toggle('on', v); },
+    dims: v => { dims.visible = v; btnDims.classList.toggle('on', v); },
+    step: (n = 1) => { for (let i = 0; i < n; i++) frame(1 / 60); },
+  };
+  setInterval(() => frame(1 / 60), 16);
+} else {
+  renderer.setAnimationLoop(() => frame());
+}
+</script>
+</body>
+</html>
