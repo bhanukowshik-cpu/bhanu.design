@@ -83,20 +83,51 @@
   .btn:hover { color: var(--ink); }
   .btn.on { color: var(--orange); border-color: rgba(240,74,0,0.5); }
 
-  /* ─── HINT ────────────────────────────────────────────────── */
-  .hint {
-    position: fixed; bottom: clamp(16px, 3vh, 28px); left: 50%; transform: translateX(-50%);
-    z-index: 3; font-family: var(--font-mono); font-size: 0.62rem;
-    letter-spacing: 0.14em; color: rgba(20, 36, 46, 0.72);
-    background: rgba(255,255,255,0.4); border: 1px solid rgba(20,36,46,0.12);
-    border-radius: 999px; padding: 8px 18px; pointer-events: none;
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    white-space: nowrap;
+  /* ─── CONSTRUCTION TIMELINE ───────────────────────────────── */
+  .timeline {
+    position: fixed; bottom: clamp(14px, 3vh, 26px); left: 50%; transform: translateX(-50%);
+    z-index: 3; width: min(720px, 92vw);
+    display: flex; align-items: center; gap: 14px;
+    background: var(--panel); border: 1px solid var(--panel-border);
+    border-radius: 16px; padding: 12px 18px 14px;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  .tl-play {
+    flex: 0 0 auto; width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--panel-border); background: rgba(255,255,255,0.06);
+    color: var(--ink); font-size: 0.72rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .25s ease, color .25s ease;
+  }
+  .tl-play:hover { color: var(--orange); border-color: rgba(240,74,0,0.5); }
+  .tl-main { flex: 1; min-width: 0; }
+  .tl-top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: var(--font-mono); margin-bottom: 8px; gap: 12px;
+  }
+  .tl-date { font-size: 0.78rem; font-weight: 700; color: var(--orange); letter-spacing: 0.14em; flex: 0 0 auto; }
+  .tl-cap {
+    font-size: 0.62rem; color: var(--ink-dim); letter-spacing: 0.08em; text-align: right;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #tlSlider {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 4px; display: block;
+    background: linear-gradient(90deg, var(--orange) var(--fill, 100%), rgba(255,255,255,0.16) var(--fill, 100%));
+    border-radius: 999px; outline: none; cursor: pointer;
+  }
+  #tlSlider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%;
+    background: var(--orange); border: 2px solid #FFF7EF;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.4);
+  }
+  #tlSlider::-moz-range-thumb {
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--orange); border: 2px solid #FFF7EF;
   }
 
   @media (max-width: 700px) {
     .specs .row:nth-child(n+6) { display: none; }
-    .hint { display: none; }
+    .tl-cap { display: none; }
   }
 </style>
 </head>
@@ -126,7 +157,16 @@
   <button class="btn" id="btnKarl">KARL</button>
 </div>
 
-<div class="hint">drag — orbit&nbsp;&nbsp;·&nbsp;&nbsp;scroll — zoom&nbsp;&nbsp;·&nbsp;&nbsp;karl — fog</div>
+<div class="timeline">
+  <button class="tl-play" id="tlPlay" aria-label="play the build">▶</button>
+  <div class="tl-main">
+    <div class="tl-top">
+      <span class="tl-date" id="tlDate">MAY 1937</span>
+      <span class="tl-cap" id="tlCap">may 27, 1937 — opening day</span>
+    </div>
+    <input type="range" id="tlSlider" min="0" max="1000" value="1000" aria-label="construction timeline">
+  </div>
+</div>
 
 <script type="importmap">
 {
@@ -207,6 +247,33 @@ const matStripe  = new THREE.MeshBasicMaterial({ color: 0xE8E4D8 });
 const matWater   = new THREE.MeshStandardMaterial({ color: 0x2E5266,   roughness: 0.35, metalness: 0.1  });
 const matLand    = new THREE.MeshStandardMaterial({ color: 0x5C6B4C,   roughness: 1 });
 const matRock    = new THREE.MeshStandardMaterial({ color: 0x6E6659,   roughness: 1 });
+const matCat     = new THREE.MeshStandardMaterial({ color: 0x3E4247,   roughness: 1 });
+
+/* ── the paint sweep ─────────────────────────────────────────
+   during construction the steel wears its raw primer grey; in the
+   final weeks a plane of International Orange sweeps south → north.
+   uPaintX is the world-x frontier of the painted zone. */
+const paintU = { value: 1400 };
+function paintify(mat) {
+  mat.onBeforeCompile = sh => {
+    sh.uniforms.uPaintX = paintU;
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying float vPX;')
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        vec4 pwp = vec4(transformed, 1.0);
+        #ifdef USE_INSTANCING
+          pwp = instanceMatrix * pwp;
+        #endif
+        vPX = (modelMatrix * pwp).x;`);
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nuniform float uPaintX;\nvarying float vPX;')
+      .replace('#include <color_fragment>', `#include <color_fragment>
+        float pMix = 1.0 - smoothstep(uPaintX - 90.0, uPaintX + 90.0, vPX);
+        diffuseColor.rgb = mix(vec3(0.245, 0.255, 0.275), diffuseColor.rgb, pMix);`);
+  };
+}
+paintify(matSteel);
+paintify(matCable);
 
 /* ═══════════════ INSTANCED-MEMBER PLUMBING ═════════════════ */
 /* every straight steel member is one instance of a unit box, posed by a matrix */
@@ -281,12 +348,60 @@ for (let x = -X_END + BAY; x <= X_END - BAY + 0.01; x += BAY) {
 document.getElementById('suspCount').textContent = suspCount + ' × 15.24 m';
 
 /* ═══════════════════════ MAIN CABLES ═══════════════════════ */
+const cableMeshes = [];
 for (const s of [-1, 1]) {
   const pts = [];
   for (let x = -X_END; x <= X_END + 0.01; x += 4)
     pts.push(new THREE.Vector3(x, cableY(x), s * CABLE_Z));
   const curve = new THREE.CatmullRomCurve3(pts);
-  scene.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 480, CABLE_R, 10), matCable));
+  const cbl = new THREE.Mesh(new THREE.TubeGeometry(curve, 480, CABLE_R, 10), matCable);
+  cableMeshes.push(cbl);
+  scene.add(cbl);
+}
+/* spinning catwalks — strung autumn 1935, struck once the deck hangs */
+const catwalkMeshes = [];
+for (const s of [-1, 1]) {
+  const pts = [];
+  for (let x = -X_END; x <= X_END + 0.01; x += 6)
+    pts.push(new THREE.Vector3(x, cableY(x) - 3, s * CABLE_Z));
+  const cw = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 320, 0.5, 6), matCat);
+  catwalkMeshes.push(cw);
+  scene.add(cw);
+}
+
+/* ═══════════ CONSTRUCTION REGISTRY (timeline scrub) ════════ */
+/* every non-instanced mesh registers a build window in months since
+   Jan 1933; upright meshes grow from their base, rotated ones from
+   their centre. t = 1 restores the exact original transform. */
+const grown = [];
+function reg(mesh, t0, t1) {
+  const q = mesh.quaternion;
+  grown.push({
+    m: mesh, t0, t1: Math.max(t1, t0 + 0.1),
+    sx: mesh.scale.x, sy: mesh.scale.y, sz: mesh.scale.z,
+    baseY: mesh.position.y - mesh.scale.y / 2,
+    upright: Math.abs(q.x) + Math.abs(q.y) + Math.abs(q.z) < 1e-6,
+  });
+}
+function applyGrow(r, mth) {
+  const p = THREE.MathUtils.clamp((mth - r.t0) / (r.t1 - r.t0), 0, 1);
+  r.m.visible = p > 0.002;
+  if (!r.m.visible) return;
+  if (r.upright) {
+    r.m.scale.set(r.sx, r.sy * p, r.sz);
+    r.m.position.y = r.baseY + r.sy * p / 2;
+  } else {
+    r.m.scale.set(r.sx * p, r.sy * p, r.sz * p);
+  }
+}
+/* a tower's children build in height order inside the tower's window */
+function regTower(g, pier0, pier1, t0, t1) {
+  const dur = t1 - t0;
+  g.children.forEach(ch => {
+    if (ch.material === matConcrete) { reg(ch, pier0, pier1); return; }
+    const a = THREE.MathUtils.clamp(ch.position.y / (TOWER_TOP + 6), 0, 1);
+    reg(ch, t0 + dur * Math.max(0, a - 0.07), Math.min(t1, t0 + dur * (a + 0.07)));
+  });
 }
 
 /* ═══════════════════════════ TOWERS ════════════════════════ */
@@ -334,9 +449,12 @@ function buildTower(xc) {
   g.add(pier);
   g.position.x = xc;
   scene.add(g);
+  return g;
 }
-buildTower(-X_TOWER);
-buildTower(X_TOWER);
+/* Marin (north, +x) went first: pier Jun'33, steel topped out May'34.
+   The SF pier was the open-ocean fight — done Jan'35, tower Jun'35. */
+regTower(buildTower(-X_TOWER), 8, 24, 24, 29.5);
+regTower(buildTower(X_TOWER), 3, 10, 10, 16.5);
 
 /* ══════════════ PYLONS + ANCHORAGES (both shores) ══════════ */
 for (const s of [-1, 1]) {
@@ -347,17 +465,21 @@ for (const s of [-1, 1]) {
     leg.position.set(xe, (dk + 14) / 2 + 4, z * (TRUSS_HALF + 2.6));
     leg.scale.set(4.6, dk + 14 - 8, 3.6);
     scene.add(leg);
+    reg(leg, 36, 40);
   }
   const cap = new THREE.Mesh(unitBox, matSteel);
   cap.position.set(xe, dk + 12.4, 0); cap.scale.set(4.6, 4.4, TRUSS_HALF * 2 + 9);
   scene.add(cap);
+  reg(cap, 39.5, 40.5);
   /* stepped concrete anchorage block eating the cable */
   const a1 = new THREE.Mesh(unitBox, matConcrete);
   a1.position.set(xe + s * 38, 26, 0); a1.scale.set(58, 52, 46);
   scene.add(a1);
+  reg(a1, 0, 9);
   const a2 = new THREE.Mesh(unitBox, matConcrete);
   a2.position.set(xe + s * 52, 55, 0); a2.scale.set(34, 22, 38);
   scene.add(a2);
+  reg(a2, 6, 14);
   /* approach trestle columns under the deck run-off */
   for (let i = 1; i <= 2; i++) {
     const xcol = s * (X_END + (X_APPROACH - X_END) * i / 3 + 20);
@@ -367,6 +489,7 @@ for (const s of [-1, 1]) {
       col.position.set(xcol, yd / 2 + 14, z * 8.5);
       col.scale.set(3.4, yd - 28, 3.4);
       scene.add(col);
+      reg(col, 2, 6);
     }
   }
 }
@@ -401,11 +524,19 @@ fort.position.set(-1015, 8, -34); fort.scale.set(48, 16, 32);
 scene.add(fort);
 
 /* ══════════════════ BAKE THE INSTANCED STEEL ═══════════════ */
-bakeInstances(unitBox, matSteel, steel);
-bakeInstances(unitBox, matAsphalt, slabs);
-bakeInstances(unitBox, matWalk, walks);
-bakeInstances(unitBox, matStripe, stripes);
-bakeInstances(unitCyl, matCable, ropes);
+/* each instance also gets a build month, derived from where it sits:
+   deck steel hangs outward from whichever tower is nearer (Jun–Nov '36,
+   midspan closing last), paving sweeps south → north in early '37. */
+const bayMonth  = x => 41 + 5.5 * Math.pow(Math.min(Math.abs(x - X_TOWER), Math.abs(x + X_TOWER)) / MAIN_HALF, 0.9);
+const paveMonth = x => 47 + 2.6 * (x + X_APPROACH) / (2 * X_APPROACH);
+const mX = m => m.elements[12];
+const built = [
+  { mesh: bakeInstances(unitBox, matSteel, steel),    mats: steel,   times: steel.map(m => bayMonth(mX(m))) },
+  { mesh: bakeInstances(unitBox, matAsphalt, slabs),  mats: slabs,   times: slabs.map(m => paveMonth(mX(m))) },
+  { mesh: bakeInstances(unitBox, matWalk, walks),     mats: walks,   times: walks.map(m => paveMonth(mX(m)) + 0.15) },
+  { mesh: bakeInstances(unitBox, matStripe, stripes), mats: stripes, times: stripes.map(m => paveMonth(mX(m)) + 0.3) },
+  { mesh: bakeInstances(unitCyl, matCable, ropes),    mats: ropes,   times: ropes.map(m => Math.max(41, bayMonth(mX(m)) - 0.6)) },
+];
 
 /* ═══════════════════════ LIGHTING ══════════════════════════ */
 scene.add(new THREE.HemisphereLight(0xBFD9EC, 0x5E6357, 0.95));
@@ -467,6 +598,79 @@ label('sag 144.8 m', 66, (CABLE_LOW + TOWER_TOP) / 2 + 16, DZ, 0.85);
 dimLine([[110, 0.5, DZ], [110, deckY(110) - TRUSS_D, DZ]]);
 label('67.1 m clear', 178, 32, DZ, 0.8);
 
+/* ══════════════ CONSTRUCTION TIMELINE ENGINE ═══════════════ */
+/* T ∈ [0,1] ↔ Jan 1933 → late May 1937 (52.4 months) */
+const M_END = 52.4;
+const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const monthLabel = m => {
+  const mm = Math.min(52, Math.floor(m));
+  return MONTH_NAMES[mm % 12] + ' ' + (1933 + Math.floor(mm / 12));
+};
+const PHASES = [
+  [0,    'ground broken — anchorages begin'],
+  [3,    'marin pier rises in the strait'],
+  [10,   'marin tower climbs, lift by lift'],
+  [16.5, 'sf pier — the open-ocean fight'],
+  [24,   'sf tower climbs'],
+  [30,   'catwalks strung tower to tower'],
+  [34,   'spinning the cables — 27,572 wires each'],
+  [41,   'deck hangs outward from both towers'],
+  [46.4, 'midspan closes — nov 18, 1936'],
+  [47,   'paving the roadway'],
+  [50,   'the final coat of international orange'],
+  [52.2, 'may 27, 1937 — opening day'],
+];
+const tlSlider = document.getElementById('tlSlider');
+const tlPlay   = document.getElementById('tlPlay');
+const tlDate   = document.getElementById('tlDate');
+const tlCap    = document.getElementById('tlCap');
+let T = 1, Tgoal = 1, Tapplied = -1, playing = false, dimsUserOn = true;
+const ZERO_M = new THREE.Matrix4().makeScale(0, 0, 0);
+
+function applyConstruction(t) {
+  Tapplied = t;
+  const mth = t * M_END;
+  for (const r of grown) applyGrow(r, mth);
+  for (const b of built) {
+    for (let i = 0; i < b.mats.length; i++)
+      b.mesh.setMatrixAt(i, mth >= b.times[i] ? b.mats[i] : ZERO_M);
+    b.mesh.instanceMatrix.needsUpdate = true;
+  }
+  /* cables spin south → north, Nov '35 – May '36 */
+  const cp = THREE.MathUtils.clamp((mth - 34) / 6.5, 0, 1);
+  for (const c of cableMeshes) {
+    c.visible = cp > 0.001;
+    c.geometry.setDrawRange(0, Math.max(3, Math.floor(c.geometry.index.count * cp / 3) * 3));
+  }
+  const wp = THREE.MathUtils.clamp((mth - 30) / 2.5, 0, 1);
+  for (const c of catwalkMeshes) {
+    c.visible = wp > 0.001 && mth < 44;
+    c.geometry.setDrawRange(0, Math.max(3, Math.floor(c.geometry.index.count * wp / 3) * 3));
+  }
+  /* the orange frontier */
+  paintU.value = mth < 50 ? -1400
+    : THREE.MathUtils.lerp(-1400, 1400, THREE.MathUtils.clamp((mth - 50) / 2.2, 0, 1));
+  /* you only measure a finished bridge */
+  dims.visible = dimsUserOn && mth >= 52.1;
+  /* readouts */
+  tlDate.textContent = monthLabel(mth);
+  let cap = PHASES[0][1];
+  for (const [m0, c] of PHASES) if (mth >= m0) cap = c;
+  tlCap.textContent = cap;
+  tlSlider.style.setProperty('--fill', (t * 100).toFixed(1) + '%');
+}
+
+tlSlider.addEventListener('input', () => {
+  playing = false;
+  tlPlay.textContent = '▶';
+  Tgoal = tlSlider.value / 1000;
+});
+tlPlay.addEventListener('click', () => {
+  playing = !playing;
+  if (playing && Tgoal > 0.98) T = Tgoal = 0;
+  tlPlay.textContent = playing ? '❚❚' : '▶';
+});
+
 /* ═══════════════════ ORBIT CONTROLS (custom) ═══════════════ */
 const target = new THREE.Vector3(0, 80, 0);
 /* narrow viewports need to stand further back to hold the full span */
@@ -519,8 +723,9 @@ const btnDims = document.getElementById('btnDims');
 const btnKarl = document.getElementById('btnKarl');
 let karl = false, karlMix = 0;
 btnDims.addEventListener('click', () => {
-  dims.visible = !dims.visible;
-  btnDims.classList.toggle('on', dims.visible);
+  dimsUserOn = !dimsUserOn;
+  btnDims.classList.toggle('on', dimsUserOn);
+  applyConstruction(Math.max(0, Tapplied));
 });
 btnKarl.addEventListener('click', () => {
   karl = !karl;
@@ -536,6 +741,16 @@ function frame(dtFixed) {
 
   /* idle drift after 5 s of stillness */
   if (performance.now() - lastPointer > 5000 && pointers.size === 0) azimV += 0.0000032;
+
+  /* construction time advances (≈34 s for the full four years) */
+  if (playing) {
+    Tgoal = Math.min(1, Tgoal + dt / 34);
+    if (Tgoal >= 1) { playing = false; tlPlay.textContent = '▶'; }
+    tlSlider.value = Tgoal * 1000;
+  }
+  T += (Tgoal - T) * Math.min(1, dt * 7);
+  if (Math.abs(Tgoal - T) < 0.001) T = Tgoal;
+  if (Math.abs(T - Tapplied) > 0.0004) applyConstruction(T);
 
   azim += azimV; elev += elevV;
   azimV *= 0.92; elevV *= 0.92;
@@ -563,7 +778,9 @@ if (RAFSHIM) {
     camera, target,
     set: (a, e, d) => { azim = a; elev = e; dist = distGoal = d; },
     karl: v => { karl = v; btnKarl.classList.toggle('on', v); },
-    dims: v => { dims.visible = v; btnDims.classList.toggle('on', v); },
+    dims: v => { dimsUserOn = v; btnDims.classList.toggle('on', v); applyConstruction(Math.max(0, Tapplied)); },
+    build: t => { playing = false; T = Tgoal = t; applyConstruction(t); tlSlider.value = t * 1000; },
+    play: () => tlPlay.click(),
     step: (n = 1) => { for (let i = 0; i < n; i++) frame(1 / 60); },
   };
   setInterval(() => frame(1 / 60), 16);
