@@ -367,6 +367,12 @@ function paintify(mat) {
 }
 paintify(matSteel);
 paintify(matCable);
+/* after dark the real bridge is floodlit — the steel carries its own
+   orange glow at night (ramped in the frame loop, gated by the timeline) */
+matSteel.emissive = new THREE.Color(0xFF5A1E);
+matSteel.emissiveIntensity = 0;
+matCable.emissive = new THREE.Color(0xE84A14);
+matCable.emissiveIntensity = 0;
 
 /* ═══════════════ INSTANCED-MEMBER PLUMBING ═════════════════ */
 /* every straight steel member is one instance of a unit box, posed by a matrix */
@@ -726,6 +732,15 @@ function tvn(x, z) {
 }
 const fbm2 = (x, z) => tvn(x, z) * 0.55 + tvn(x * 2.3, z * 2.3) * 0.28 + tvn(x * 5.1, z * 5.1) * 0.17;
 const sm01 = t => { t = THREE.MathUtils.clamp(t, 0, 1); return t * t * (3 - 2 * t); };
+function headlandH(side, x, z) {
+  const maxH = side > 0 ? 290 : 150;
+  const ax = Math.abs(x);
+  let h = maxH * sm01((ax - 950) / 290) * (0.62 + 0.38 * fbm2(x * 0.004, z * 0.004));
+  h += (side > 0 ? 40 : 18) * fbm2(x * 0.012 + 9, z * 0.012);
+  const corridor = sm01((Math.abs(z) - 60) / 180);
+  h = Math.min(h, THREE.MathUtils.lerp(12, 4000, corridor));
+  return THREE.MathUtils.lerp(-14, h, sm01((ax - 925) / 95));
+}
 function headland(side) {
   const Wd = 2200, Dd = 4600;
   const geo = new THREE.PlaneGeometry(Wd, Dd, 72, 52);
@@ -741,12 +756,7 @@ function headland(side) {
   const c = new THREE.Color();
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i) + cx, z = pos.getZ(i);
-    const ax = Math.abs(x);
-    let h = maxH * sm01((ax - 950) / 290) * (0.62 + 0.38 * fbm2(x * 0.004, z * 0.004));
-    h += (side > 0 ? 40 : 18) * fbm2(x * 0.012 + 9, z * 0.012);
-    const corridor = sm01((Math.abs(z) - 60) / 180);
-    h = Math.min(h, THREE.MathUtils.lerp(12, 4000, corridor));
-    h = THREE.MathUtils.lerp(-14, h, sm01((ax - 925) / 95));
+    const h = headlandH(side, x, z);
     pos.setY(i, h);
     const n = fbm2(x * 0.02 + 3, z * 0.02);
     c.copy(cLow).lerp(cHigh, THREE.MathUtils.clamp(h / (maxH * 0.68) + n * 0.3 - 0.15, 0, 1));
@@ -763,6 +773,34 @@ function headland(side) {
 }
 headland(1);
 headland(-1);
+
+/* city lights — SF glitter to the south, a Sausalito sprinkle north;
+   they fade in with dusk and glow through the bloom pass */
+const CITY_N = 560;
+const cityMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
+const cityMesh = new THREE.InstancedMesh(unitBox, cityMat, CITY_N);
+{
+  const m4 = new THREE.Matrix4(), cq = new THREE.Quaternion(), cs = new THREE.Vector3(), cp = new THREE.Vector3();
+  const cc = new THREE.Color();
+  let placed = 0, tries = 0;
+  while (placed < CITY_N && tries < CITY_N * 8) {
+    tries++;
+    const r1 = th(tries * 7.31, 3.7), r2 = th(tries * 3.97, 11.2), r3 = th(tries * 5.53, 6.1);
+    const south = placed < CITY_N - 80;
+    const x = south ? -(1150 + r1 * 1550) : (1080 + r1 * 620);
+    const z = south ? (r2 * 2 - 1) * 2000 : (500 + r2 * 1300);
+    const y = headlandH(south ? -1 : 1, x, z);
+    if (y < 5) continue;
+    m4.compose(cp.set(x, y + 1.6, z), cq, cs.set(2.4, 1.4, 2.4));
+    cityMesh.setMatrixAt(placed, m4);
+    cc.setHex(r3 < 0.6 ? 0xFFD9A0 : r3 < 0.85 ? 0xFFB25E : 0xCFE0FF);
+    cityMesh.setColorAt(placed, cc);
+    placed++;
+  }
+  cityMesh.count = placed;
+}
+cityMesh.visible = false;
+scene.add(cityMesh);
 /* Fort Point, tucked under the south approach */
 const fort = new THREE.Mesh(unitBox, new THREE.MeshStandardMaterial({ color: 0x7A5548, roughness: 0.9 }));
 fort.position.set(-1015, 8, -34); fort.scale.set(48, 16, 32);
@@ -1116,6 +1154,15 @@ function frame(dtFixed) {
   }
   bloom.strength = THREE.MathUtils.lerp(e.bloom, e.bloom * 0.6, karlMix);
   renderer.toneMappingExposure = e.expo;
+  /* floodlit steel — towers glow international orange after dark,
+     but only once there's a finished bridge to floodlight */
+  const flood = e.lamp * (Tapplied >= 0.99 ? 1 : 0.15) * (1 - karlMix * 0.4);
+  matSteel.emissiveIntensity = flood * 0.38;
+  matCable.emissiveIntensity = flood * 0.2;
+  cityMat.opacity = e.city * (1 - karlMix * 0.8);
+  cityMesh.visible = cityMat.opacity > 0.02;
+  /* the measurement cards belong to daylight */
+  dims.visible = dimsUserOn && Tapplied >= 0.993 && dayMix < 0.5;
   /* lamps warm up at dusk, the beacon blinks, road paint stops glowing */
   matLamp.emissiveIntensity = 0.05 + e.lamp * 2.6;
   matBeacon.emissiveIntensity = 0.25 + (Math.sin(uT * 2.2) > 0.15 ? 1 : 0.05) * (0.5 + 2.6 * e.lamp);
