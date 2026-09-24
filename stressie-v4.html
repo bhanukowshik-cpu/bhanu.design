@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -277,7 +277,7 @@
     /* ─── PHONES ─────────────────────────────────────────────── */
     /* iPhone bezel drawn in CSS: a graphite ring, a hairline of glass, and
        the Dynamic Island over the simulator's own black pill */
-    .phones { display: grid; gap: 22px; align-items: start; }
+    .phones { display: grid; gap: 28px; align-items: start; }
     .phones-3 { grid-template-columns: repeat(3, 1fr); }
     .phones-4 { grid-template-columns: repeat(4, 1fr); }
     .ph { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
@@ -319,8 +319,15 @@
     .meta dd { font-family: var(--font-heading); font-weight: 500; font-size: 15px; line-height: 1.5; color: var(--secondary); margin-top: 6px; }
 
     /* screens first: a rail of six phones, larger than the copy above it */
-    .rail { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; margin-top: 44px; align-items: end; }
-    .rail .ph:nth-child(even) { transform: translateY(28px); }
+    /* one plate, three phones, the middle one lifted; the plate crops the
+       phones' feet so the eye lands on the top of each screen */
+    .rail {
+      display: grid; grid-template-columns: repeat(3, 300px); justify-content: center; gap: 40px;
+      margin-top: 44px; padding: 64px 48px 0; height: 640px; overflow: hidden; align-items: start;
+      border-radius: 28px; background: linear-gradient(180deg, #FBEEDD 0%, #FFF7E9 100%);
+    }
+    .rail .ph:nth-child(2) { transform: translateY(-28px); }
+    [data-theme="dark"] .rail { background: linear-gradient(180deg, #1A1208 0%, #120D06 100%); }
     .credit { font-family: var(--font-heading); font-size: var(--fs-sm); color: var(--ink-3); margin-top: 52px; }
     .credit a { color: var(--orange-ink); text-decoration: none; }
     .credit a:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -361,7 +368,7 @@
     .s > .code-note { margin-top: 36px; max-width: 900px; }
 
     /* ─── COMMUNITY FILMSTRIP ────────────────────────────────── */
-    .film { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; counter-reset: frame; }
+    .film { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; counter-reset: frame; }
     .film .ph { counter-increment: frame; }
     .film .ph-cap::before { content: counter(frame, decimal-leading-zero) '  '; font-family: var(--font-mono); font-weight: 600; color: var(--orange-ink); letter-spacing: 0.08em; }
 
@@ -372,55 +379,32 @@
     .study-t { font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs); letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange-ink); margin-top: 12px; }
     .study-p { font-family: var(--font-heading); font-size: 14px; line-height: 1.55; color: var(--ink-3); margin-top: 6px; }
 
-    /* ─── THE ORBIT ──────────────────────────────────────────── */
-    /* The designer is the sun. Four dashed rings turn at their own speeds;
-       each carries the numbers of one phase. A satellite is pinned to its
-       ring by a rotating arm and counter-rotated by the same amount, so the
-       ring turns and the words never do. Hover pauses; Reduce Motion stops. */
-    .orbit-wrap { display: grid; grid-template-columns: 1fr; justify-items: center; margin: 56px 0 72px; gap: 18px; }
-    .orbit { position: relative; width: min(820px, 100%); aspect-ratio: 1; }
-    .ring { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); border-radius: 50%; border: 1.5px dashed var(--ring); }
-    .ring.r1 { width: 44%; height: 44%; } .ring.r2 { width: 62%; height: 62%; } .ring.r3 { width: 80%; height: 80%; } .ring.r4 { width: 98%; height: 98%; }
-    .carrier { position: absolute; left: 50%; top: 50%; width: 0; height: 0; animation: spin var(--spin) linear infinite; }
-    .carrier.c1 { --spin: 44s; } .carrier.c2 { --spin: 62s; animation-direction: reverse; }
-    .carrier.c3 { --spin: 80s; } .carrier.c4 { --spin: 104s; animation-direction: reverse; }
-    .orbit:hover .carrier, .orbit:hover .sat { animation-play-state: paused; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .arm { position: absolute; left: 0; top: 0; transform: rotate(var(--a)) translateX(var(--r)); }
-    .sat {
-      position: absolute; left: 0; top: 0;
-      transform: translate(-50%,-50%) rotate(calc(-1 * var(--a)));
-      animation: unspin var(--spin) linear infinite;
-      background: var(--plate); color: var(--secondary); border: 1px solid var(--ring); border-radius: 999px;
-      padding: 8px 14px 8px 10px; display: flex; align-items: center; gap: 8px; white-space: nowrap;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.16); font-family: var(--font-heading); font-size: 13px;
-    }
-    .carrier.c2 .sat, .carrier.c4 .sat { animation-direction: reverse; }
-    @keyframes unspin { to { transform: translate(-50%,-50%) rotate(calc(-1 * var(--a) - 360deg)); } }
-    .sat b { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
-    .sat i { font-style: normal; color: var(--ink-3); }
-    .sat .dot, .orbit-key i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-    .k1 .dot, .orbit-key i.k1 { background: #8E6BD9; } .k2 .dot, .orbit-key i.k2 { background: #F78521; }
-    .k3 .dot, .orbit-key i.k3 { background: #5E9B63; } .k4 .dot, .orbit-key i.k4 { background: #4B8AF0; }
-    .sun {
-      position: absolute; left: 50%; top: 50%; width: 30%; aspect-ratio: 1; transform: translate(-50%,-50%);
-      border-radius: 50%; overflow: hidden; background: #1A1A1A;
-      box-shadow: 0 0 0 8px var(--bg), 0 0 0 9.5px var(--ring), 0 0 80px rgba(var(--orange-rgb),0.22), 0 30px 70px rgba(0,0,0,0.35);
-    }
-    .sun img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; display: block; }
-    .orbit-key { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
-    .orbit-key span { display: inline-flex; align-items: center; gap: 8px; }
-    .orbit-hint { color: var(--ink-3); opacity: .7; }
-    @media (prefers-reduced-motion: reduce) { .carrier, .sat { animation: none; } }
+    /* ─── THE COIN ───────────────────────────────────────────── */
+    .coin-block { margin-top: 72px; }
+    .coin-plate { background: #FFF7E9; }
+    [data-theme="dark"] .coin-plate { background: #1A1208; }
+    .rejects { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .reject img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; display: block; border: 1px solid var(--hair); filter: saturate(.85); }
+    .reject span { display: block; margin-top: 8px; font-family: var(--font-heading); font-weight: 600; font-size: 13px; color: var(--secondary); }
+    .reject em { display: block; font-style: normal; font-weight: 400; font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+    .reject em::before { content: 'Rejected: '; }
+
+    /* ─── HOW I WORKED ───────────────────────────────────────── */
+    .how { display: grid; grid-template-columns: 150px repeat(4, 1fr); gap: 28px; margin: 48px 0 64px; padding: 32px 0; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); align-items: start; }
+    .how-me { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+    .how-me img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; object-position: 50% 18%; display: block; }
+    .how-me span { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+    .how-col strong { display: block; font-family: var(--font-heading); font-weight: 600; font-size: 17px; line-height: 1.35; letter-spacing: -0.01em; color: var(--secondary); margin: 10px 0 8px; }
+    .how-col p { font-family: var(--font-heading); font-size: 14px; line-height: 1.6; color: var(--ink-3); }
 
     /* ─── RULES, HONEST, STRIP ───────────────────────────────── */
-    .rules { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 24px; margin: 44px 0; }
+    .rules { list-style: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px 24px; margin: 44px 0; }
     .rules li { font-family: var(--font-heading); font-size: 15px; line-height: 1.6; color: var(--ink-3); padding: 14px 0; border-top: 1px solid var(--hair); }
     .rules li strong { display: block; font-weight: 600; color: var(--secondary); }
     .honest { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--hair); }
     .honest p { font-family: var(--font-heading); font-size: 15px; line-height: 1.7; color: var(--ink-3); }
     .honest strong { font-weight: 600; color: var(--secondary); }
-    .strip { display: grid; grid-template-columns: repeat(10, 1fr); gap: 12px; }
+    .strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
     .strip .ph-cap { font-size: 12px; }
 
     /* ─── OUTCOMES ───────────────────────────────────────────── */
@@ -488,10 +472,9 @@
       .s { padding: 0 5% 72px; }
       .s-head { margin-bottom: 28px; padding-top: 28px; }
       .two, .honest, .next, .bar-stack { grid-template-columns: 1fr; gap: 24px; }
-      .phones-3, .phones-4, .film, .strip, .studies { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .phones-3, .phones-4, .film, .strip, .rejects { grid-template-columns: 1fr 1fr; gap: 12px; }
       .bets, .three, .rules, .bar { grid-template-columns: 1fr; }
-      .orbit-wrap { margin: 36px 0 48px; }
-      .sat { font-size: 11px; padding: 6px 10px 6px 8px; gap: 6px; } .sat b { font-size: 12px; }
+      .how { grid-template-columns: 1fr; gap: 20px; }
       .insight-q, .insight-t { font-size: 17px; }
     }
 
@@ -567,23 +550,20 @@
       <section id="overview" data-has-content="true">
         <div class="hero">
           <p class="eyebrow hero-in" id="heroEyebrow">Stressie V4 · iOS · 2026 · <span class="badge">In validation</span></p>
-          <h1 class="hero-h" id="csHeading">Ninety seconds at your desk, <em>paid back after work.</em></h1>
-          <p class="hero-p hero-in" id="csSubtitle">Stressie V4 turns a workplace stress check-in into reset coins, then spends them on real wellness experiences and community events nearby. V2 proved people stayed for the quick resets. V4 gives them somewhere to go.</p>
+          <h1 class="hero-h" id="csHeading">Turning a ninety-second check-in into <em>plans after work.</em></h1>
+          <p class="hero-p hero-in" id="csSubtitle">Stressie is a workplace wellness app. V2 got people to check in and use quick resets. In V4 I designed and built what comes next: coins earned by checking in, a map of wellness experiences to spend them on, and community events people can reserve or host.</p>
 
           <dl class="meta hero-in" id="heroMeta">
-            <div><dt>Role</dt><dd>Product designer and iOS engineer (SwiftUI)</dd></div>
-            <div><dt>Team</dt><dd>1 designer and engineer (me), founders as stakeholders</dd></div>
-            <div><dt>Stack</dt><dd>Figma · SwiftUI · Metal · TestFlight</dd></div>
-            <div><dt>Status</dt><dd>Shipped to the team, metrics validating</dd></div>
+            <div><dt>Role</dt><dd>Product designer and iOS engineer</dd></div>
+            <div><dt>Team</dt><dd>Me, with two founders as stakeholders</dd></div>
+            <div><dt>Stack</dt><dd>Figma, SwiftUI, Metal, TestFlight</dd></div>
+            <div><dt>Status</dt><dd>With the team, metrics being validated</dd></div>
           </dl>
 
-          <div class="rail hero-in" id="heroRail" aria-label="Six screens from the build">
+          <div class="rail hero-in" id="heroRail" aria-label="Three screens from the build">
             <div class="ph"><div class="ph-img"><img src="images/stressie-v4/hero-atwork.webp" alt="At Work home: the stress shape and slider" /></div></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-resources.webp" alt="The resources panel after a check-in" /></div></div>
             <div class="ph"><div class="ph-img"><img src="images/stressie-v4/hero-offwork.webp" alt="Off Work: a map of wellness experiences" /></div></div>
             <div class="ph"><div class="ph-img"><img src="images/stressie-v4/hero-event.webp" alt="A community event page" /></div></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/hero-rewards.webp" alt="Rewards and the reset coin balance" /></div></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/talk-listening.webp" alt="Talk, listening" /></div></div>
           </div>
           <p class="credit hero-in">Designed and built by Bhanu Kowshik · <a href="https://www.stressieapp.com" target="_blank" rel="noopener">stressieapp.com ↗</a></p>
         </div>
@@ -594,36 +574,36 @@
         <div class="s">
           <div class="s-head tr-anim">
             <p class="eyebrow">The problem in evidence</p>
-            <h2 class="s-h">V2 worked. Then the pilots told us exactly where it stopped.</h2>
+            <h2 class="s-h">V2 worked. The pilots also showed where it stopped.</h2>
           </div>
           <div class="two tr-anim">
             <div>
               <div class="plate"><img src="images/stressie-v4/before-after.webp" alt="Home screen, V2 beside V4" loading="lazy" /></div>
-              <p class="cap">Home, V2 beside V4. The check-in stayed. Everything after it is new.</p>
+              <p class="cap">Home in V2 (left) and V4 (right). I kept the check-in and rebuilt everything after it.</p>
             </div>
             <div class="insights">
               <div class="insight">
                 <span class="insight-k">01</span>
-                <p class="insight-t">Trust was asked for too early.</p>
+                <p class="insight-t">People were asked to trust the app too early.</p>
                 <p class="insight-q">"I haven't built trust with the app yet, so sharing personal feelings this early is uncomfortable."</p>
                 <p class="insight-src">Pilot participant, Amazon hardware team</p>
               </div>
               <div class="insight">
                 <span class="insight-k">02</span>
-                <p class="insight-t">The points had no price.</p>
+                <p class="insight-t">The points had no visible value.</p>
                 <p class="insight-q">"I didn't find the coping points compelling as an incentive. I don't know their value."</p>
                 <p class="insight-src">Pilot participant, InKind</p>
               </div>
               <div class="insight">
                 <span class="insight-k">03</span>
-                <p class="insight-t">Nothing happened after six.</p>
-                <p class="insight-q">Sessions clustered inside work hours. Meanwhile wellness moved into the room: run clubs, sound baths, dinner nights on Luma and Partiful.</p>
-                <p class="insight-src">Usage read plus a competitive scan, 2026</p>
+                <p class="insight-t">There was nothing to do after work.</p>
+                <p class="insight-q">Usage clustered inside work hours. Meanwhile the wellness market moved to in-person events: run clubs, sound baths, dinners on Luma and Partiful.</p>
+                <p class="insight-src">Usage data and a competitive scan, 2026</p>
               </div>
             </div>
           </div>
           <div class="bar tr-anim">
-            <span class="bar-label">The bar V2 set</span>
+            <span class="bar-label">What V2 achieved</span>
             <div class="bar-cell"><strong>~2% → 17.4%</strong>retention, from the industry baseline</div>
             <div class="bar-cell"><strong>12% → 56%</strong>daily engagement</div>
             <div class="bar-cell"><strong>4m 20s</strong>average time engaged</div>
@@ -637,12 +617,12 @@
         <div class="s">
           <div class="s-head tr-anim">
             <p class="eyebrow">Three bets</p>
-            <h2 class="s-h">Judge the screens against these.</h2>
+            <h2 class="s-h">I made three bets. The rest of the page shows how they played out.</h2>
           </div>
           <div class="bets tr-anim">
-            <div class="bet"><span class="bet-k">Bet 1</span><p class="bet-t">A check-in has to lead somewhere inside the same ninety seconds.</p><p class="bet-p">Asking how someone feels and then doing nothing with it wastes the one moment they gave you.</p></div>
-            <div class="bet"><span class="bet-k">Bet 2</span><p class="bet-t">Coins have to buy something real, off work, or they are points.</p><p class="bet-p">A price in the room, a code at the front desk, a seat with your name on it.</p></div>
-            <div class="bet"><span class="bet-k">Bet 3</span><p class="bet-t">Community is the product. The app is how you get there.</p><p class="bet-p">The wellness space went in person. Stressie's job is to be the map and the ticket.</p></div>
+            <div class="bet"><span class="bet-k">Bet 1</span><p class="bet-t">Every check-in leads to an action within the same ninety seconds.</p></div>
+            <div class="bet"><span class="bet-k">Bet 2</span><p class="bet-t">Coins buy real things outside the app, or they are just points.</p></div>
+            <div class="bet"><span class="bet-k">Bet 3</span><p class="bet-t">Community is the product. The app gets you there.</p></div>
           </div>
         </div>
       </section>
@@ -652,20 +632,20 @@
         <div class="s">
           <div class="s-head tr-anim">
             <p class="eyebrow">Bet 1 · At Work</p>
-            <h2 class="s-h">Check in, then act, then get paid.</h2>
-            <p class="s-p">Slide to answer. The stress shape names the feeling instead of grading it. Releasing the slider logs the check-in and raises a panel with two films, two quick resets and a way to talk. Finishing a reset lands the coin.</p>
+            <h2 class="s-h">Check in, then act, then earn.</h2>
+            <p class="s-p">You slide to answer. The stress shape shows the level instead of a number. When you release the slider the check-in is saved and a panel opens with two short films, two quick resets and a way to talk. Finishing a reset earns coins.</p>
           </div>
           <div class="phones phones-4 tr-anim">
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-shape.webp" alt="First check-in: the stress shape at extremely stressed" loading="lazy" /></div><p class="ph-cap"><strong>The shape.</strong> Seven levels, orange through green to violet. Never red.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-resources.webp" alt="The resources panel after a check-in" loading="lazy" /></div><p class="ph-cap"><strong>The panel.</strong> Rises on the release, not on a button.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-reset.webp" alt="A 45 second unclench reset" loading="lazy" /></div><p class="ph-cap"><strong>The reset.</strong> Forty-five seconds. Pause, or say you're done.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-reward.webp" alt="The reward moment: you just earned 10 coins" loading="lazy" /></div><p class="ph-cap"><strong>The coin.</strong> One beat for the coin, one for the words.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-shape.webp" alt="First check-in: the stress shape at extremely stressed" loading="lazy" /></div><p class="ph-cap"><strong>The shape</strong> has seven levels, orange to violet. Never red.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-resources.webp" alt="The resources panel after a check-in" loading="lazy" /></div><p class="ph-cap"><strong>The panel</strong> opens on release, not on a button.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-reset.webp" alt="A 45 second unclench reset" loading="lazy" /></div><p class="ph-cap"><strong>The reset</strong> is 45 seconds. You can pause or stop.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-reward.webp" alt="The reward moment: you just earned 10 coins" loading="lazy" /></div><p class="ph-cap"><strong>The coin</strong> lands first, then the words.</p></div>
           </div>
           <div class="two two-tight tr-anim">
             <div class="plate"><img src="images/stressie-v4/shape-levels.webp" alt="The seven stress shape levels" loading="lazy" /></div>
             <div class="stack">
-              <p class="s-p">The shape is the only thing on the screen that changes with you. It sharpens and cools as stress climbs, so a bad day looks different without looking like an error. The words stay about the feeling: <strong>running hot</strong>, not 7 out of 10.</p>
-              <div class="code-note"><span class="code-k">Because I wrote the code</span>The release gesture, not a Continue button, is the commit. The panel is driven off the same drag, and the coin lands on the reset's own completion handler, so the reward can never fire before the work is done.</div>
+              <p class="s-p">The shape is the only element that changes with your answer. It gets sharper and cooler as stress rises, so a bad day looks different without looking like an error. The copy names the feeling, <strong>running hot</strong>, instead of grading it.</p>
+              <div class="code-note"><span class="code-k">What building it changed</span>I wired the release gesture as the commit, so there is no Continue button. The panel is driven by the same drag, and the coin fires from the reset's completion handler, so a reward cannot appear before the work is done.</div>
             </div>
           </div>
         </div>
@@ -676,16 +656,16 @@
         <div class="s">
           <div class="s-head tr-anim">
             <p class="eyebrow">Bet 2 · Off Work</p>
-            <h2 class="s-h">Flip Home, and the city becomes the app.</h2>
-            <p class="s-p">The same Home has an Off Work mode: a map of wellness experiences nearby, partners and open places told apart by pin, chips for spas, parks, movement and open now. Every place carries a real offer with a real price in coins.</p>
+            <h2 class="s-h">Switch to Off Work and Home becomes a map.</h2>
+            <p class="s-p">The same Home screen has an Off Work mode: a map of wellness experiences nearby. Partner venues and public places get different pins, and chips filter for spas, parks, movement and open now. Every place shows a real offer with a price in coins.</p>
           </div>
           <div class="phones phones-4 tr-anim">
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-map.webp" alt="Off Work map with partner pins" loading="lazy" /></div><p class="ph-cap"><strong>The map.</strong> Pins, chips, and a sheet with three stops.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-list.webp" alt="The resources sheet listing nearby offers" loading="lazy" /></div><p class="ph-cap"><strong>The list.</strong> Wellness experiences and community events, one sheet.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-place.webp" alt="A place page with a coin offer" loading="lazy" /></div><p class="ph-cap"><strong>The place.</strong> Reviews, amenities, one labelled action: redeem for 80 coins.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-redeem.webp" alt="Show code when you arrive" loading="lazy" /></div><p class="ph-cap"><strong>The code.</strong> A QR and a code for the front desk.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-map.webp" alt="Off Work map with partner pins" loading="lazy" /></div><p class="ph-cap"><strong>The map</strong>, with pins, chips and a three-stop sheet.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-list.webp" alt="The resources sheet listing nearby offers" loading="lazy" /></div><p class="ph-cap"><strong>The list</strong>: wellness experiences and community events.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-place.webp" alt="A place page with a coin offer" loading="lazy" /></div><p class="ph-cap"><strong>A place page</strong>: reviews, amenities and one action, redeem for 80 coins.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-redeem.webp" alt="Show code when you arrive" loading="lazy" /></div><p class="ph-cap"><strong>The code</strong> and QR you show at the front desk.</p></div>
           </div>
-          <div class="code-note tr-anim"><span class="code-k">Because I wrote the code</span>Location is requested the first time the map is useful, from the Off Work toggle, not in onboarding. The first check-in happens before there is an account at all. Too few coins reads "Top up", never a dead button.</div>
+          <div class="code-note tr-anim"><span class="code-k">What building it changed</span>I ask for location the first time the map is opened, not during onboarding, and the first check-in happens before there is an account. If you are short of coins the button reads "Top up" instead of going dead.</div>
         </div>
       </section>
 
@@ -694,8 +674,8 @@
         <div class="s">
           <div class="s-head tr-anim">
             <p class="eyebrow">Bet 3 · Community, the flagship</p>
-            <h2 class="s-h">Reserve a seat with your check-ins, or host one.</h2>
-            <p class="s-p">Events on the same map: breathwork circles, pottery socials, dinner nights, a quiet hour online. Reserve for coins, add to calendar, share. Hosting is one form: a name, a line about it, when, spots, in person or online, free or a price.</p>
+            <h2 class="s-h">Reserve a seat with your coins, or host an event.</h2>
+            <p class="s-p">Events live on the same map: breathwork circles, pottery socials, dinner nights, a quiet hour online. You reserve with coins, add the event to your calendar and share it. Hosting is one form: name, description, time, capacity, in person or online, free or paid.</p>
           </div>
           <div class="film tr-anim">
             <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c01-list.webp" alt="Community events list" loading="lazy" /></div><p class="ph-cap">The list</p></div>
@@ -707,9 +687,9 @@
             <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c13-published.webp" alt="Your event is sent for review" loading="lazy" /></div><p class="ph-cap">Sent for review</p></div>
           </div>
           <div class="three tr-anim">
-            <div class="decision"><span class="decision-k">Decision</span>Online events list instantly. In-person ones wait for approval, because a stranger's address needs a person to look at it first.</div>
-            <div class="decision"><span class="decision-k">Decision</span>Reserving costs coins. A free seat gets skipped; a seat paid for with a week of check-ins gets shown up to.</div>
-            <div class="decision"><span class="decision-k">Because I wrote the code</span>Both paths share one form and one approval state. The cover is suggested from the name and description, so a host never publishes a grey card. Thirteen Figma frames, thirteen build states.</div>
+            <div class="decision"><span class="decision-k">Decision</span>Online events publish instantly. In-person events wait for approval, because a stranger's address needs a human check first.</div>
+            <div class="decision"><span class="decision-k">Decision</span>Reserving costs coins. Free seats get skipped. A seat paid for with a week of check-ins gets used.</div>
+            <div class="decision"><span class="code-k">What building it changed</span>Both paths share one form and one approval state. The cover image is suggested from the name and description, so no host publishes a blank card. All 13 Figma frames have a matching build state.</div>
           </div>
         </div>
       </section>
@@ -719,36 +699,40 @@
         <div class="s">
           <div class="s-head tr-anim">
             <p class="eyebrow">The economy</p>
-            <h2 class="s-h">A coin you can earn, top up, share and spend.</h2>
-            <p class="s-p">Five coins a check-in, up to three a day. A reset once a day, past halfway. Two hundred when a friend checks in. Short of a reward, top up. Coins leave only through a labelled action, once, and the words stay about the feeling, not the balance.</p>
+            <h2 class="s-h">The coin economy: earn, top up, share, spend.</h2>
+            <p class="s-p">You earn five coins per check-in, up to three a day, and more for finishing a reset. Inviting a friend who checks in earns 200. If you are short, you can top up. Coins are only spent through a labelled button, once.</p>
           </div>
           <div class="phones phones-4 tr-anim">
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/welcome-coins.webp" alt="Welcome to Stressie: coins to start with" loading="lazy" /></div><p class="ph-cap"><strong>Earn.</strong> The first coins arrive before the account does.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/coins-rewards.webp" alt="Rewards: balance, next reset and available rewards" loading="lazy" /></div><p class="ph-cap"><strong>Spend.</strong> Balance, the next reward, coins to go.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/topup-card.webp" alt="Top up: a card chosen" loading="lazy" /></div><p class="ph-cap"><strong>Top up.</strong> Four tiles, Apple Pay or a card, one CTA.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/referral-sheet.webp" alt="Invite a friend and earn reset coins" loading="lazy" /></div><p class="ph-cap"><strong>Share.</strong> The one flow allowed its own colour.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-reward.webp" alt="You just earned 10 coins" loading="lazy" /></div><p class="ph-cap"><strong>Earn</strong>: five per check-in, more for a finished reset.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/coins-rewards.webp" alt="Rewards: balance, next reset and available rewards" loading="lazy" /></div><p class="ph-cap"><strong>Spend</strong>: your balance, the next reward and coins to go.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/topup-card.webp" alt="Top up: a card chosen" loading="lazy" /></div><p class="ph-cap"><strong>Top up</strong>: four amounts, Apple Pay or a card.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/referral-sheet.webp" alt="Invite a friend and earn reset coins" loading="lazy" /></div><p class="ph-cap"><strong>Share</strong>: the invite flow, the one screen with its own colour.</p></div>
           </div>
 
-          <div class="sub-head tr-anim">
-            <p class="eyebrow">Designing the coin</p>
-            <h3 class="s-h3">Five studies before one coin was allowed on screen.</h3>
-            <p class="s-p">There is one coin, and everything that shows a coin shows that one. Getting there took an opal, an agate, a wreath and a rule.</p>
-          </div>
-          <div class="studies tr-anim">
-            <div class="study"><div class="study-img"><img src="images/stressie-v4/coin-opal-pattern.webp" alt="Opal pattern, the painted interior" loading="lazy" /></div><p class="study-t">01 · Opal gem</p><p class="study-p">A pattern wrapped in glass, refracted at the rim. Metal shaders. Beautiful, and not a coin.</p></div>
-            <div class="study"><div class="study-img"><img src="images/stressie-v4/coin-agate-stack.webp" alt="Orange agate coin stack" loading="lazy" /></div><p class="study-t">02 · Agate coin</p><p class="study-p">Real 3D meshes in RealityKit, gold rim, a fire-opal face. Read as lava on a calm screen.</p></div>
-            <div class="study"><div class="study-img"><img src="images/stressie-v4/coin-wreath-sheet.webp" alt="Wreath coin variants A to D" loading="lazy" /></div><p class="study-t">03 · Wreath</p><p class="study-p">Four leaf palettes around a centre. Closer, still two objects.</p></div>
-            <div class="study"><div class="study-img"><img src="images/stressie-v4/coin-wreath-centres.webp" alt="Wreath centres: world, plain, honey amber, teal glass" loading="lazy" /></div><p class="study-t">04 · Centres</p><p class="study-p">World, plain wash, honey amber, teal glass. Honey won the warmth, lost the shape.</p></div>
-            <div class="study"><div class="study-img"><img src="images/stressie-v4/coin-beat1.webp" alt="The bloom coin at rest" loading="lazy" /></div><p class="study-t">05 · The bloom coin</p><p class="study-p">Gold, three petals raised out of the face, real geometry. Rendered once, used everywhere.</p></div>
+          <div class="two two-tight coin-block tr-anim">
+            <div class="plate coin-plate"><img src="images/stressie-v4/coin-final.webp" alt="The final Stressie coin: gold with three raised petals" loading="lazy" /></div>
+            <div class="stack">
+              <div>
+                <p class="eyebrow">Designing the coin</p>
+                <h3 class="s-h3">One coin, rendered once, used everywhere.</h3>
+                <p class="s-p">I went through four versions before this one: an opal gem in Metal, a fire agate coin in RealityKit, a wreath coin in four palettes, and a honey centre. Each was rejected for a reason. The final coin is gold with three raised petals, real geometry, rendered from one scene.</p>
+              </div>
+              <div class="rejects">
+                <div class="reject"><img src="images/stressie-v4/reject-opal.webp" alt="Opal gem study" loading="lazy" /><span>Opal gem<em>Beautiful, not a coin</em></span></div>
+                <div class="reject"><img src="images/stressie-v4/reject-agate.webp" alt="Agate coin study" loading="lazy" /><span>Agate coin<em>Read as lava</em></span></div>
+                <div class="reject"><img src="images/stressie-v4/reject-wreath.webp" alt="Wreath coin study" loading="lazy" /><span>Wreath<em>Two objects</em></span></div>
+                <div class="reject"><img src="images/stressie-v4/reject-honey.webp" alt="Honey centre study" loading="lazy" /><span>Honey centre<em>Warm, lost the shape</em></span></div>
+              </div>
+            </div>
           </div>
           <div class="two two-tight tr-anim">
             <div>
               <div class="plate"><img src="images/stressie-v4/reward-lights.webp" alt="Reward moment: four lighting options side by side" loading="lazy" /></div>
-              <p class="cap">The reward moment, four lights: peach beam, gold beam, house light, rays. The sunrise fan won; a burst read as Duolingo.</p>
+              <p class="cap">The reward moment with four lighting options: peach beam, gold beam, house light, rays. The upward fan won; a burst read as Duolingo.</p>
             </div>
             <div class="stack">
-              <p class="s-p">The reward moment was researched before it was drawn: Apple Fitness clears the stage and centres one object, Headspace celebrates with a breath, Robinhood dropped its confetti under regulator pressure. So: two beats. The coin rises and settles on a spring with no bounce in the rotation, then the words land.</p>
-              <div class="code-note"><span class="code-k">Because I wrote the code</span>The haptic fires from the coin's completion handler, on the visual landing. Under Reduce Motion the coin fades in already at rest, the progress bar still fills, and the haptic still plays.</div>
+              <p class="s-p">Before drawing the reward moment I studied how Apple Fitness, Duolingo, Headspace and Robinhood celebrate. The result is two beats: the coin rises and settles on a spring with no bounce in the rotation, then the text lands.</p>
+              <div class="code-note"><span class="code-k">What building it changed</span>The haptic fires from the coin's completion handler, on the visual landing. With Reduce Motion on, the coin fades in at rest, the progress bar still fills and the haptic still plays.</div>
             </div>
           </div>
         </div>
@@ -759,68 +743,46 @@
         <div class="s">
           <div class="s-head tr-anim">
             <p class="eyebrow">Design to build</p>
-            <h2 class="s-h">One pair of hands, from the research read to the App Store build.</h2>
-            <p class="s-p">I designed V4 in Figma and built it in SwiftUI myself. The design system lives in code: screens never name a colour, a radius or a type size, and a lint fails the build when one does.</p>
+            <h2 class="s-h">I designed it in Figma and built it in SwiftUI.</h2>
+            <p class="s-p">The design system lives in code. Screens never name a colour, radius or type size, and a lint fails the build if one does.</p>
           </div>
 
-          <div class="orbit-wrap tr-anim">
-            <div class="orbit" id="orbit" aria-label="Research, design, build and validate, with the numbers behind each">
-              <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="ring r4"></div>
-              <div class="carrier c1">
-                <div class="arm" style="--a:20deg;  --r:calc(var(--w) * 0.22)"><div class="sat k1"><span class="dot"></span><b>3</b><i>pilots read</i></div></div>
-                <div class="arm" style="--a:200deg; --r:calc(var(--w) * 0.22)"><div class="sat k1"><span class="dot"></span><b>8</b><i>user quotes</i></div></div>
-              </div>
-              <div class="carrier c2">
-                <div class="arm" style="--a:300deg; --r:calc(var(--w) * 0.31)"><div class="sat k2"><span class="dot"></span><b>13 / 13</b><i>frames matched</i></div></div>
-                <div class="arm" style="--a:120deg; --r:calc(var(--w) * 0.31)"><div class="sat k2"><span class="dot"></span><b>37</b><i>logged decisions</i></div></div>
-                <div class="arm" style="--a:30deg;  --r:calc(var(--w) * 0.31)"><div class="sat k2"><span class="dot"></span><b>5</b><i>coin studies</i></div></div>
-              </div>
-              <div class="carrier c3">
-                <div class="arm" style="--a:70deg;  --r:calc(var(--w) * 0.40)"><div class="sat k3"><span class="dot"></span><b>171</b><i>Swift files</i></div></div>
-                <div class="arm" style="--a:190deg; --r:calc(var(--w) * 0.40)"><div class="sat k3"><span class="dot"></span><b>20M+</b><i>tokens burned</i></div></div>
-                <div class="arm" style="--a:310deg; --r:calc(var(--w) * 0.40)"><div class="sat k3"><span class="dot"></span><b>3</b><i>languages</i></div></div>
-              </div>
-              <div class="carrier c4">
-                <div class="arm" style="--a:250deg; --r:calc(var(--w) * 0.49)"><div class="sat k4"><span class="dot"></span><b>17.4%</b><i>the V2 bar</i></div></div>
-                <div class="arm" style="--a:100deg; --r:calc(var(--w) * 0.49)"><div class="sat k4"><span class="dot"></span><b>5</b><i>metrics in flight</i></div></div>
-              </div>
-              <div class="sun"><img src="images/stressie-v4/portrait.webp" alt="Bhanu Kowshik" loading="lazy" /></div>
-            </div>
-            <div class="orbit-key">
-              <span><i class="k1"></i>Research</span><span><i class="k2"></i>Design</span><span><i class="k3"></i>Build</span><span><i class="k4"></i>Validate</span>
-              <span class="orbit-hint">Hover to pause</span>
-            </div>
+          <div class="how tr-anim">
+            <div class="how-me"><img src="images/stressie-v4/portrait.webp" alt="Bhanu Kowshik" loading="lazy" /><span>One designer, every step</span></div>
+            <div class="how-col"><span class="eyebrow">01 · Research</span><strong>3 pilots read, 8 quotes kept</strong><p>I read the Amazon, InKind and Austin PD pilot findings and scanned where the wellness market moved.</p></div>
+            <div class="how-col"><span class="eyebrow">02 · Design</span><strong>13 of 13 frames, 37 logged decisions</strong><p>Every Figma frame has a matching build state, and every decision is dated and explained in DESIGN.md.</p></div>
+            <div class="how-col"><span class="eyebrow">03 · Build</span><strong>171 Swift files, 3 languages, 20M+ tokens</strong><p>SwiftUI, Liquid Glass, Dynamic Type and a design-system lint, with a lot of model time behind it.</p></div>
+            <div class="how-col"><span class="eyebrow">04 · Validate</span><strong>5 metrics in flight</strong><p>Off-work opens, events reserved, hosts, redemptions and referral conversion. V2's 17.4% retention is the bar.</p></div>
           </div>
 
           <div class="two tr-anim">
             <div>
               <div class="plate"><img src="images/stressie-v4/craft-sidebyside.webp" alt="The event page: Figma render beside the simulator build" loading="lazy" /></div>
-              <p class="cap">Event page, Figma render beside the build. Measured at 3 px/pt against one anchor per pane.</p>
+              <p class="cap">The event page: Figma render on the left, simulator build on the right, measured at 3 px/pt.</p>
             </div>
             <div>
               <div class="plate"><img src="images/stressie-v4/craft-glass.webp" alt="Figma versus build: glass and glow on the Talk screen" loading="lazy" /></div>
-              <p class="cap">Talk, glass and glow. Real Liquid Glass on iOS 26 with material fallbacks.</p>
+              <p class="cap">Talk, glass and glow: real Liquid Glass on iOS 26 with material fallbacks.</p>
             </div>
           </div>
 
           <ul class="rules tr-anim">
-            <li><strong>Amber is for action.</strong> One per screen. A second makes both weaker.</li>
+            <li><strong>Amber is for action.</strong> One per screen.</li>
             <li><strong>Sage is for reassurance.</strong> Never an action colour.</li>
-            <li><strong>Never red.</strong> Stress is not an error. Red only ends something.</li>
+            <li><strong>Never red.</strong> Stress is not an error state.</li>
             <li><strong>Lora for the one thing the screen is about.</strong> Hanken for what you read.</li>
             <li><strong>Every text is a Dynamic Type role.</strong> Screens never name a size.</li>
-            <li><strong>Pull-overs are the only presentation.</strong> Grabber, from a screen root, tab bar hidden.</li>
           </ul>
 
           <div class="phones phones-3 tr-anim">
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-en.webp" alt="Onboarding question in English" loading="lazy" /></div><p class="ph-cap"><strong>English.</strong> The language menu sits above the first question.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-es.webp" alt="Onboarding question in Spanish" loading="lazy" /></div><p class="ph-cap"><strong>Spanish.</strong> About 1,150 strings relocalise live, answers kept.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-sw.webp" alt="Onboarding question in Swahili" loading="lazy" /></div><p class="ph-cap"><strong>Swahili.</strong> Layout built for the longest translation first.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-en.webp" alt="Onboarding question in English" loading="lazy" /></div><p class="ph-cap"><strong>English</strong>: the language menu sits above the first question.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-es.webp" alt="Onboarding question in Spanish" loading="lazy" /></div><p class="ph-cap"><strong>Spanish</strong>: about 1,150 strings switch live, answers kept.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-sw.webp" alt="Onboarding question in Swahili" loading="lazy" /></div><p class="ph-cap"><strong>Swahili</strong>: I laid out for the longest translation first.</p></div>
           </div>
 
           <div class="honest tr-anim">
-            <p><strong>What I built:</strong> every screen and flow, the design system and its lint, the check-in, resets, map, community, coins, referral, Talk's voice UI, three languages, Reduce Motion and Dynamic Type across all of it.</p>
-            <p><strong>What I did not build:</strong> the backend, payments, and the model behind Talk. Accounts, events and coins are local stores with the seams marked for the team, and the handoff says so.</p>
+            <p><strong>What I built:</strong> every screen and flow, the design system and its lint, check-in, resets, the map, community, coins, referral, Talk's voice UI, three languages, Reduce Motion and Dynamic Type.</p>
+            <p><strong>What I did not build:</strong> the backend, payments and the model behind Talk. Those run on local stores with the seams marked for the team.</p>
           </div>
         </div>
       </section>
@@ -830,7 +792,7 @@
         <div class="s">
           <div class="s-head tr-anim">
             <p class="eyebrow">The real path</p>
-            <h2 class="s-h">Splash to a seat at a breathwork circle, on device, no switches.</h2>
+            <h2 class="s-h">The real path on device, with no debug switches.</h2>
           </div>
           <div class="strip tr-anim">
             <div class="ph"><div class="ph-img"><img src="images/stressie-v4/flow-splash.webp" alt="Splash" loading="lazy" /></div><p class="ph-cap">Splash</p></div>
@@ -852,37 +814,37 @@
         <div class="s">
           <div class="s-head tr-anim">
             <p class="eyebrow">Outcomes so far</p>
-            <h2 class="s-h">Currently validating. Metrics will be updated soon.</h2>
-            <p class="s-p">V4 is in the hands of its first users. The numbers that matter are the ones V2 never had a way to earn, and they will be posted here as they land, not before. Until then, this is what is being measured and what it has to beat.</p>
+            <h2 class="s-h">Metrics are being validated now.</h2>
+            <p class="s-p">V4 is with its first users. I will post the numbers here as they come in, not before. This is what I am measuring, and what V2 set as the bar.</p>
           </div>
           <div class="two tr-anim">
             <div class="measure-list">
-              <div class="measure"><strong>Off-work opens</strong>Share of sessions that start after work hours. V2 had almost none.</div>
-              <div class="measure"><strong>Events reserved</strong>Seats paid for with coins, and the show-up rate behind them.</div>
-              <div class="measure"><strong>Hosts</strong>People who publish an event, and how many pass approval.</div>
-              <div class="measure"><strong>Coin redemptions</strong>Codes shown at a front desk. The proof coins buy something.</div>
+              <div class="measure"><strong>Off-work opens</strong>The share of sessions that start after work hours. V2 had almost none.</div>
+              <div class="measure"><strong>Events reserved</strong>Seats paid for with coins, and how many people show up.</div>
+              <div class="measure"><strong>Hosts</strong>People who publish an event, and how many get approved.</div>
+              <div class="measure"><strong>Coin redemptions</strong>Codes shown at a front desk. This is the proof that coins buy something.</div>
               <div class="measure"><strong>Referral conversion</strong>Invited friends who complete a first check-in.</div>
             </div>
             <div class="stack">
               <div class="bar bar-stack">
-                <span class="bar-label">The bar to beat, from V2</span>
+                <span class="bar-label">The bar V2 set</span>
                 <div class="bar-cell"><strong>17.4%</strong>retention, from the ~2% baseline</div>
                 <div class="bar-cell"><strong>12% → 56%</strong>daily engagement</div>
                 <div class="bar-cell"><strong>4m 20s</strong>average time engaged</div>
                 <div class="bar-cell"><strong>~$600K</strong>funding unlocked, pilots with Amazon's hardware team, InKind and 50 Austin PD officers</div>
               </div>
               <div class="reflect">
-                <p class="eyebrow">What I'd do next</p>
+                <p class="eyebrow">What I would do next</p>
                 <ul>
-                  <li>Ship the approval queue to a real reviewer before the first in-person host arrives.</li>
-                  <li>Give Talk a model, and keep the crisis handoff exactly as blunt as it is.</li>
-                  <li>Designing and building alone was fast and honest; the next version needs a second pair of eyes on the code before the numbers do.</li>
+                  <li>Put a real reviewer behind the approval queue before the first in-person host signs up.</li>
+                  <li>Give Talk a model, and keep the crisis handoff as direct as it is.</li>
+                  <li>Working alone was fast. The next version needs a second engineer reviewing the code before the numbers are trusted.</li>
                 </ul>
               </div>
             </div>
           </div>
           <div class="next tr-anim">
-            <a class="next-card" href="stressie-studio.html"><span class="eyebrow">Previous</span><strong>Stressie V1 to V2</strong><span>The pilots, the redesign, and the numbers above.</span></a>
+            <a class="next-card" href="stressie-studio.html"><span class="eyebrow">Previous</span><strong>Stressie V1 to V2</strong><span>The pilots, the redesign and the numbers above.</span></a>
             <a class="next-card" href="evertutor-live.html"><span class="eyebrow">Next</span><strong>EverTutor Live</strong><span>1:1 AI tutoring for 2,000 students a day.</span></a>
           </div>
         </div>
@@ -904,7 +866,7 @@
     const CTA_SEL   = 'a[href]:not(.op-card), button, [role="button"], .op-card-cta';
     const TEXT_SEL  = [
       'p','h1','h2','h3','h4','h5','h6','li',
-      '.hero-h','.s-h','.s-h3','.bet-t','.insight-t','.insight-q','.study-t','.measure','.next-card strong',
+      '.hero-h','.s-h','.s-h3','.bet-t','.insight-t','.insight-q','.study-t','.measure','.next-card strong','.how-col strong',
       '.heading-orange','.heading-dark','.st-orange-italic',
       '.st-card-title','.pf-card-title','.principle-title',
       '.conv-name','.cw-orange','.cs-thankyou-text',
@@ -1106,15 +1068,6 @@
   }, { threshold: 0.08 });
   animGroups.forEach((_, parentEl) => elObs.observe(parentEl));
 
-  /* ═══════════════════════════════════════════════════════════
-     ORBIT — the arms need the orbit's width in px
-  ═══════════════════════════════════════════════════════════ */
-  (function () {
-    const o = document.getElementById('orbit');
-    if (!o) return;
-    function fit() { o.style.setProperty('--w', o.clientWidth + 'px'); }
-    fit(); new ResizeObserver(fit).observe(o);
-  })();
   </script>
 
 
