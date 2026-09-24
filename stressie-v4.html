@@ -275,19 +275,23 @@
     .stack .s-p { margin-top: 0; }
 
     /* ─── PHONES ─────────────────────────────────────────────── */
-    /* iPhone bezel drawn in CSS: a graphite ring, a hairline of glass, and
-       the Dynamic Island over the simulator's own black pill */
+    /* iPhone frame drawn in CSS. The simulator shots already carry the
+       status bar and the Dynamic Island, so the frame adds only what the
+       screenshot lacks: a titanium band, a black bezel, and the device's
+       screen radius (62pt on a 402pt screen). No second island. */
     .phones { display: grid; gap: 28px; align-items: start; }
     .phones-3 { grid-template-columns: repeat(3, 1fr); }
     .phones-4 { grid-template-columns: repeat(4, 1fr); }
     .ph { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
     .ph-img {
-      position: relative; border-radius: 11.5% / 5.3%; overflow: hidden; aspect-ratio: 1206 / 2622;
-      background: #1C1C1E; padding: 2.6%;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), 0 18px 44px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.10);
+      position: relative; aspect-ratio: 1206 / 2622; padding: 3%;
+      border-radius: 17% / 7.8%; background: #0B0B0C;
+      box-shadow:
+        0 0 0 2px #8A8A8E,                 /* the band */
+        0 0 0 3px rgba(0,0,0,0.30),        /* its shadow line */
+        0 30px 60px rgba(30,20,10,0.22), 0 4px 12px rgba(30,20,10,0.10);
     }
-    .ph-img img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 9.8% / 4.5%; background: #EDE7DE; }
-    .ph-img::after { content: ''; position: absolute; left: 50%; top: 4.4%; width: 27%; height: 2.9%; transform: translateX(-50%); border-radius: 100px; background: #000; pointer-events: none; }
+    .ph-img img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 15.4% / 7.1%; background: #EDE7DE; }
     .ph-cap { font-family: var(--font-heading); font-size: var(--fs-sm); line-height: 1.5; color: var(--ink-3); padding: 0 4px; }
     .ph-cap strong { font-weight: 600; color: var(--secondary); }
 
