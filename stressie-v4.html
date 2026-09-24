@@ -6,11 +6,11 @@
   <title>Stressie V4 · Bhanu Kowshik</title>
 
   <!-- ── Social share meta (image source: og-image.html → images/og-image.jpg) ── -->
-  <meta name="description" content="Stressie V4 case study. Community, an Off Work map and a reset coin economy, designed and built in SwiftUI. By Bhanu Kowshik, AI Native Product Designer." />
+  <meta name="description" content="Stressie V4 case study. A stress check-in that pays for your evening: community events, an Off Work map and a reset coin economy, designed in Figma and built in SwiftUI by one designer. By Bhanu Kowshik." />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Bhanu Kowshik" />
   <meta property="og:title" content="Stressie V4 · Bhanu Kowshik" />
-  <meta property="og:description" content="Case study: turning a ninety-second check-in into something to do with the rest of your day." />
+  <meta property="og:description" content="Case study: ninety seconds at your desk, paid back after work. Designed and built in SwiftUI." />
   <meta property="og:url" content="https://bhanu.build/stressie-v4.html" />
   <meta property="og:image" content="https://bhanu.build/images/og-image.jpg" />
   <meta property="og:image:width" content="1200" />
@@ -238,427 +238,273 @@
     /* ─── PAGE + CONTENT COLUMN ──────────────────────────────── */
     /* frame retired — the column follows hero-lab's 1400px width system */
     .page { display: flex; justify-content: center; padding: 74px 0 0; }
-    .card {
-      background: none; width: 100%; max-width: 1400px;
-      overflow: hidden; display: flex; flex-direction: column;
-    }
+    .card { background: none; width: 100%; max-width: 1400px; overflow: hidden; display: flex; flex-direction: column; }
 
-    /* ─── SHARED — section rhythm ────────────────────────────── */
-    /* every section is a header (number, italic serif title, one line of
-       intent) followed by screens; copy stays at two to four sentences */
-    .sec { padding: 0 48px 96px; }
-    .sec-head {
-      display: grid; grid-template-columns: 72px 1fr; gap: 0 24px;
-      align-items: baseline; margin-bottom: 36px;
-      padding-top: 28px; border-top: 1px solid rgba(37,37,37,0.12);
-    }
-    .sec-num {
-      font-family: var(--font-mono); font-weight: 500; font-size: var(--fs-sm);
-      letter-spacing: 0.08em; color: var(--orange-ink);
-    }
-    .sec-title {
-      font-family: var(--font-display); font-style: italic; font-weight: 400;
-      font-size: clamp(34px, 3.6vw, 52px); line-height: 1.1;
-      color: var(--secondary); letter-spacing: -0.01em;
-    }
-    .sec-title em { font-style: italic; color: var(--orange); }
-    .sec-lede {
-      grid-column: 2; margin-top: 14px; max-width: 720px;
-      font-family: var(--font-heading); font-weight: 400;
-      font-size: var(--fs-md); line-height: 1.65; color: rgba(37,37,37,0.72);
-    }
-    .sec-lede strong { font-weight: 600; color: var(--secondary); }
-
-    /* body copy beside or under screens */
-    .copy {
-      font-family: var(--font-heading); font-weight: 400;
-      font-size: var(--fs-base); line-height: 1.75; color: rgba(37,37,37,0.78);
-      max-width: 640px;
-    }
-    .copy strong { font-weight: 600; color: var(--secondary); }
-
-    /* the one "decision" per section — amber rail, plain words */
-    .decision {
-      position: relative; padding: 18px 22px 18px 26px;
-      border-radius: 14px; background: var(--orange-light);
-      font-family: var(--font-heading); font-size: 15px; line-height: 1.6;
-      color: var(--secondary); max-width: 640px;
-    }
-    .decision::before {
-      content: ''; position: absolute; left: 0; top: 14px; bottom: 14px;
-      width: 3px; border-radius: 3px; background: var(--orange);
-    }
-    .decision-label {
-      display: block; margin-bottom: 4px;
+    /* ─── TYPE ROLES ─────────────────────────────────────────── */
+    /* the page has four voices: an eyebrow, a sentence heading, a
+       paragraph, and a caption. Everything else is one of those. */
+    .eyebrow {
       font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs);
-      letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange-ink);
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange-ink);
     }
-    .decision-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .decision-row .decision { max-width: none; }
+    .badge {
+      display: inline-block; margin-left: 6px; padding: 3px 9px; border-radius: 999px;
+      border: 1px solid rgba(var(--orange-rgb),0.45); color: var(--orange-ink); letter-spacing: 0.1em;
+    }
+    .s-h {
+      font-family: var(--font-heading); font-weight: 600; letter-spacing: -0.02em;
+      font-size: clamp(28px, 3vw, 42px); line-height: 1.15; color: var(--secondary); max-width: 900px;
+      margin-top: 14px;
+    }
+    .s-h3 { font-family: var(--font-heading); font-weight: 600; letter-spacing: -0.015em; font-size: clamp(22px, 2.2vw, 30px); line-height: 1.2; color: var(--secondary); margin-top: 10px; }
+    .s-p {
+      font-family: var(--font-heading); font-weight: 400; font-size: 17px; line-height: 1.7;
+      color: var(--ink-2); max-width: 680px; margin-top: 18px;
+    }
+    .s-p strong { font-weight: 600; color: var(--secondary); }
+    .cap { font-family: var(--font-heading); font-size: var(--fs-sm); line-height: 1.55; color: var(--ink-3); padding: 12px 4px 0; }
+
+    /* ─── SECTION RHYTHM ─────────────────────────────────────── */
+    .s { padding: 0 48px 120px; }
+    .s-head { padding-top: 40px; border-top: 1px solid var(--hair); margin-bottom: 44px; }
+    .sub-head { margin: 72px 0 32px; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+    .two-tight { margin-top: 44px; align-items: center; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 36px; }
+    .stack { display: flex; flex-direction: column; gap: 22px; }
+    .stack .s-p { margin-top: 0; }
 
     /* ─── PHONES ─────────────────────────────────────────────── */
-    /* the phone frame is the screenshot's own corners plus a soft shadow;
-       1206×2622 shots keep their aspect, so a row's height follows its width */
-    .phones { display: grid; gap: 20px; align-items: start; }
-    .phones-2 { grid-template-columns: repeat(2, 1fr); }
+    /* iPhone bezel drawn in CSS: a graphite ring, a hairline of glass, and
+       the Dynamic Island over the simulator's own black pill */
+    .phones { display: grid; gap: 22px; align-items: start; }
     .phones-3 { grid-template-columns: repeat(3, 1fr); }
     .phones-4 { grid-template-columns: repeat(4, 1fr); }
     .ph { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-    /* iPhone bezel drawn in CSS: a graphite ring, a hairline of glass, and
-       the Dynamic Island. The simulator shots already carry the real
-       status bar, so the island only has to cover the black pill they draw. */
     .ph-img {
-      position: relative;
-      border-radius: 11.5% / 5.3%; overflow: hidden; aspect-ratio: 1206 / 2622;
-      background: #1C1C1E;
-      padding: 2.6%;
-      box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.10),
-        0 18px 44px rgba(37,20,4,0.22), 0 2px 8px rgba(37,20,4,0.10);
+      position: relative; border-radius: 11.5% / 5.3%; overflow: hidden; aspect-ratio: 1206 / 2622;
+      background: #1C1C1E; padding: 2.6%;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), 0 18px 44px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.10);
     }
-    .ph-img img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-      border-radius: 9.8% / 4.5%; background: #EDE7DE;
-    }
-    .ph-img::after {
-      content: ''; position: absolute; left: 50%; top: 4.4%;
-      width: 27%; height: 2.9%; transform: translateX(-50%);
-      border-radius: 100px; background: #000; pointer-events: none;
-    }
-    .ph-cap {
-      font-family: var(--font-heading); font-size: var(--fs-sm); line-height: 1.5;
-      color: rgba(37,37,37,0.62); padding: 0 4px;
-    }
+    .ph-img img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 9.8% / 4.5%; background: #EDE7DE; }
+    .ph-img::after { content: ''; position: absolute; left: 50%; top: 4.4%; width: 27%; height: 2.9%; transform: translateX(-50%); border-radius: 100px; background: #000; pointer-events: none; }
+    .ph-cap { font-family: var(--font-heading); font-size: var(--fs-sm); line-height: 1.5; color: var(--ink-3); padding: 0 4px; }
     .ph-cap strong { font-weight: 600; color: var(--secondary); }
 
-    /* screens + copy, side by side */
-    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
-    .split .stack { display: flex; flex-direction: column; gap: 22px; }
-
-    /* wide plates (side by sides, strips) */
-    .plate {
-      border-radius: 18px; overflow: hidden; background: #FFFFFF;
-      border: 1px solid rgba(37,37,37,0.08);
-    }
+    /* plates for wide images */
+    .plate { border-radius: 16px; overflow: hidden; background: var(--plate); border: 1px solid var(--hair); }
     .plate img { width: 100%; display: block; }
-    .plate-cap {
-      display: flex; justify-content: space-between; gap: 16px;
-      padding: 12px 4px 0;
-      font-family: var(--font-heading); font-size: var(--fs-sm);
-      color: rgba(37,37,37,0.62);
-    }
-    .plate-cap span:first-child { white-space: nowrap; }
-    .plate-cap span:last-child { text-align: right; }
 
     /* ─── HERO ───────────────────────────────────────────────── */
-    .cs-hero {
-      display: flex; flex-direction: column; gap: 24px;
-      padding: clamp(34px, 4.2vw, 64px) clamp(28px, 3.6vw, 52px) 0;
-      margin: 0 48px 56px; position: relative; isolation: isolate;
-      border-radius: 16px; overflow: hidden;
+    .hero { padding: 56px 48px 40px; }
+    .hero-h {
+      font-family: var(--font-heading); font-weight: 600; letter-spacing: -0.025em;
+      font-size: clamp(38px, 5vw, 68px); line-height: 1.06; color: var(--secondary); max-width: 1000px; margin-top: 22px;
     }
-    .cs-hero > .et-bg-img {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      object-fit: cover; object-position: 50% 86%;
-      display: none; pointer-events: none; z-index: 0;
-    }
-    [data-theme="dark"] .cs-hero > .et-bg-img { display: block; }
-    .hero-scrim {
-      position: absolute; inset: 0; z-index: 1; pointer-events: none;
-      background: linear-gradient(100deg, #FFFCF8 0%, #FEF9F2 58%, #FBEEDD 100%);
-    }
-    .cs-hero > *:not(.et-bg-img):not(.hero-scrim) { position: relative; z-index: 2; }
+    .hero-h em { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 1.06em; color: var(--orange); letter-spacing: 0; }
+    .hero-h .word { display: inline-block; opacity: 0; transform: translateY(18px); }
+    .hero-h .word.visible { animation: word-rise 0.5s cubic-bezier(0.22,0.61,0.36,1) both; }
+    .hero-p { font-family: var(--font-heading); font-size: 19px; line-height: 1.65; color: var(--ink-2); max-width: 720px; margin-top: 24px; }
+    .hero-in { opacity: 0; }
+    .hero-in.visible { animation: fade-up 0.6s cubic-bezier(0.22,0.61,0.36,1) both; }
 
-    .hero-top-row { display: flex; align-items: center; justify-content: space-between; opacity: 0; }
-    .hero-top-row.visible { animation: fade-in 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
-    .hero-pills { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .hero-pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      border: 0.8px solid rgba(191,98,18,0.55);
-      padding: 9px 18px; border-radius: 50px;
-      font-family: var(--font-heading); font-weight: 600; font-size: var(--fs-sm);
-      color: var(--secondary); white-space: nowrap; text-decoration: none;
-      transition: background 0.15s ease;
+    /* the four-cell block every recent hire puts under the headline */
+    .meta {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+      margin: 36px 0 0; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair);
     }
-    .hero-pill:hover { background: rgba(191,98,18,0.06); }
-    .hero-link-plain {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-family: var(--font-heading); font-weight: 500; font-size: var(--fs-sm);
-      color: var(--orange-ink); text-decoration: none; white-space: nowrap; flex-shrink: 0;
-    }
-    .hero-link-plain:hover { text-decoration: underline; text-underline-offset: 3px; }
-    .hero-link-plain .link-arrow { display: inline-flex; transition: transform 0.15s ease; }
-    .hero-link-plain:hover .link-arrow { transform: translate(2px, -2px); }
+    .meta > div { padding: 18px 20px 18px 0; border-right: 1px solid var(--hair); margin-right: 20px; }
+    .meta > div:last-child { border-right: 0; margin-right: 0; }
+    .meta dt { font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange-ink); }
+    .meta dd { font-family: var(--font-heading); font-weight: 500; font-size: 15px; line-height: 1.5; color: var(--secondary); margin-top: 6px; }
 
-    .cs-heading { font-size: 54px; line-height: 1.28; color: var(--secondary); max-width: 1040px; }
-    .cs-heading .word {
-      display: inline-block; opacity: 0; transform: translateY(22px); will-change: opacity, transform;
-    }
-    .cs-heading .word.visible { animation: word-rise 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
-    .heading-orange {
-      font-family: var(--font-display); font-style: italic; font-weight: 400;
-      font-size: 1.06em; color: var(--orange);
-    }
-    .heading-dark { font-family: var(--font-heading); font-weight: 600; color: var(--secondary); }
+    /* screens first: a rail of six phones, larger than the copy above it */
+    .rail { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; margin-top: 44px; align-items: end; }
+    .rail .ph:nth-child(even) { transform: translateY(28px); }
+    .credit { font-family: var(--font-heading); font-size: var(--fs-sm); color: var(--ink-3); margin-top: 52px; }
+    .credit a { color: var(--orange-ink); text-decoration: none; }
+    .credit a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-    .cs-subtitle {
-      font-family: var(--font-heading); font-weight: 500;
-      font-size: var(--fs-md); line-height: 1.65;
-      color: rgba(37,37,37,0.72); max-width: 700px; opacity: 0;
-    }
-    .cs-subtitle.visible { animation: fade-in 0.6s cubic-bezier(0.22,0.61,0.36,1) both; }
+    /* ─── PROBLEM ────────────────────────────────────────────── */
+    .insights { display: flex; flex-direction: column; }
+    .insight { padding: 22px 0; border-top: 1px solid var(--hair); display: grid; grid-template-columns: 44px 1fr; gap: 0 12px; }
+    .insight:last-child { border-bottom: 1px solid var(--hair); }
+    .insight-k { font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs); letter-spacing: 0.12em; color: var(--orange-ink); padding-top: 4px; }
+    .insight-t { font-family: var(--font-heading); font-weight: 600; font-size: 19px; line-height: 1.3; color: var(--secondary); grid-column: 2; }
+    .insight-q { font-family: var(--font-display); font-style: italic; font-size: 19px; line-height: 1.45; color: var(--ink-2); grid-column: 2; margin-top: 8px; }
+    .insight-src { font-family: var(--font-heading); font-size: var(--fs-sm); color: var(--ink-3); grid-column: 2; margin-top: 8px; }
 
-    /* ownership row — who did what, up front */
-    .hero-facts {
-      display: flex; flex-wrap: wrap; gap: 10px 28px; opacity: 0;
-    }
-    .hero-facts.visible { animation: fade-in 0.6s cubic-bezier(0.22,0.61,0.36,1) both; }
-    .hero-fact {
-      font-family: var(--font-heading); font-size: var(--fs-sm); color: rgba(37,37,37,0.62);
-    }
-    .hero-fact strong { display: block; font-weight: 600; font-size: var(--fs-base); color: var(--secondary); }
+    .bar { display: grid; grid-template-columns: auto repeat(4, 1fr); gap: 14px; align-items: stretch; margin-top: 44px; }
+    .bar-label { font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); writing-mode: vertical-rl; transform: rotate(180deg); padding: 6px 0; }
+    .bar-cell { border: 1px solid var(--hair); border-radius: 14px; padding: 16px 18px; font-family: var(--font-heading); font-size: var(--fs-sm); line-height: 1.5; color: var(--ink-3); background: var(--plate); }
+    .bar-cell strong { display: block; font-weight: 600; font-size: 24px; letter-spacing: -0.01em; color: var(--secondary); margin-bottom: 4px; }
+    .bar-stack { grid-template-columns: 1fr 1fr; margin-top: 0; }
+    .bar-stack .bar-label { writing-mode: horizontal-tb; transform: none; grid-column: 1 / -1; }
 
-    /* four fanned phones on a dark plate, the flagship screens first */
-    .hero-fan {
-      position: relative; margin-top: 8px; height: 520px;
-      border-radius: 30px 30px 0 0; overflow: hidden;
-      background:
-        radial-gradient(ellipse at 74% 30%, rgba(190,100,20,0.48) 0%, rgba(140,68,14,0.22) 36%, transparent 60%),
-        #1A0F06;
-      opacity: 0; transform: translateY(32px);
-    }
-    .hero-fan.visible { animation: card-rise 0.85s cubic-bezier(0.16,1,0.3,1) both; }
-    .fan-ph {
-      position: absolute; top: 56px; width: 21%; max-width: 250px;
-      border-radius: 9.2% / 4.2%; overflow: hidden;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 6px 20px rgba(0,0,0,0.4);
-      transform-origin: 50% 120%;
-      transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
-    }
-    .fan-ph img { width: 100%; display: block; }
-    .fan-ph:nth-child(1) { left: 9%;  transform: rotate(-7deg) translateY(24px); }
-    .fan-ph:nth-child(2) { left: 30%; transform: rotate(-2.5deg); }
-    .fan-ph:nth-child(3) { left: 51%; transform: rotate(2.5deg); }
-    .fan-ph:nth-child(4) { left: 72%; transform: rotate(7deg) translateY(24px); }
-    .hero-fan:hover .fan-ph { transform: rotate(0) translateY(-6px); }
-    .fan-labels {
-      position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 24px;
-      display: flex; justify-content: space-around; gap: 12px;
-      background: linear-gradient(to top, rgba(26,15,6,0.95), rgba(26,15,6,0));
-      font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.1em;
-      text-transform: uppercase; color: rgba(255,250,240,0.7);
-    }
+    /* ─── BETS ───────────────────────────────────────────────── */
+    .bets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .bet { border: 1px solid var(--hair); border-radius: 18px; padding: 26px 26px 28px; background: var(--plate); }
+    .bet-k { font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange-ink); }
+    .bet-t { font-family: var(--font-heading); font-weight: 600; font-size: 22px; line-height: 1.3; letter-spacing: -0.01em; color: var(--secondary); margin-top: 12px; }
+    .bet-p { font-family: var(--font-heading); font-size: 15px; line-height: 1.6; color: var(--ink-3); margin-top: 12px; }
 
-    /* ─── 01 WHY V4 ──────────────────────────────────────────── */
-    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-    .why-cell {
-      background: var(--orange-light); border-radius: 20px; padding: 26px 28px 28px;
-      display: flex; flex-direction: column; gap: 12px;
+    /* ─── DECISIONS + BUILD NOTES ────────────────────────────── */
+    .decision, .code-note {
+      position: relative; padding: 18px 22px 18px 26px; border-radius: 14px;
+      background: var(--plate); border: 1px solid var(--hair);
+      font-family: var(--font-heading); font-size: 15px; line-height: 1.6; color: var(--secondary);
     }
-    .why-label {
-      font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs);
-      letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange-ink);
-    }
-    .why-title {
-      font-family: var(--font-display); font-style: italic; font-weight: 400;
-      font-size: 28px; line-height: 1.15; color: var(--secondary);
-    }
-    .why-body {
-      font-family: var(--font-heading); font-size: 15px; line-height: 1.7; color: rgba(37,37,37,0.74);
-    }
-    .why-body strong { font-weight: 600; color: var(--secondary); }
-    .why-bet {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
-      margin-top: 40px;
-    }
-    .bet-line {
-      font-family: var(--font-heading); font-weight: 600; font-size: 28px; line-height: 1.45;
-      color: var(--secondary);
-    }
-    .bet-line em { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 1.12em; color: var(--orange); }
+    .decision::before, .code-note::before { content: ''; position: absolute; left: -1px; top: 16px; bottom: 16px; width: 3px; border-radius: 3px; background: var(--orange); }
+    .decision-k, .code-k { display: block; margin-bottom: 6px; font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs); letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange-ink); }
+    .code-note::before { background: #4B8AF0; }
+    .code-note .code-k, .decision .code-k { color: #4B8AF0; }
+    .s > .code-note { margin-top: 36px; max-width: 900px; }
 
-    /* ─── 04 COMMUNITY FILMSTRIP ─────────────────────────────── */
-    .film {
-      display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px;
-      counter-reset: frame;
-    }
+    /* ─── COMMUNITY FILMSTRIP ────────────────────────────────── */
+    .film { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; counter-reset: frame; }
     .film .ph { counter-increment: frame; }
-    .film .ph-cap::before {
-      content: counter(frame, decimal-leading-zero) '  ';
-      font-family: var(--font-mono); font-weight: 600; color: var(--orange-ink); letter-spacing: 0.08em;
-    }
-    .film-wrap { margin: 0 0 28px; }
+    .film .ph-cap::before { content: counter(frame, decimal-leading-zero) '  '; font-family: var(--font-mono); font-weight: 600; color: var(--orange-ink); letter-spacing: 0.08em; }
 
-    /* ─── 05 COINS · TALK · INSIGHTS ─────────────────────────── */
-    .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .trio-cell {
-      background: var(--orange-light); border-radius: 22px; padding: 26px 26px 0;
-      display: flex; flex-direction: column; gap: 14px; overflow: hidden;
-    }
-    .trio-cell .why-title { font-size: 30px; }
-    .trio-cell .copy { font-size: 15px; max-width: none; }
-    .trio-shot {
-      margin: 10px -4px 0; border-radius: 22px 22px 0 0; overflow: hidden;
-      box-shadow: 0 -10px 30px rgba(37,20,4,0.12); aspect-ratio: 1206 / 1900; background: #EDE7DE;
-    }
-    .trio-shot img { width: 100%; display: block; }
+    /* ─── COIN STUDIES ───────────────────────────────────────── */
+    .studies { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+    .study-img { aspect-ratio: 1; border-radius: 14px; overflow: hidden; background: #0B0B0C; border: 1px solid var(--hair); }
+    .study-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .study-t { font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs); letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange-ink); margin-top: 12px; }
+    .study-p { font-family: var(--font-heading); font-size: 14px; line-height: 1.55; color: var(--ink-3); margin-top: 6px; }
 
-    /* ─── 06 CRAFT ───────────────────────────────────────────── */
-    .rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
-    .rule {
-      border: 1px solid rgba(191,98,18,0.22); border-radius: 16px; padding: 20px 22px;
-      background: #FFFFFF; display: flex; flex-direction: column; gap: 8px;
+    /* ─── THE ORBIT ──────────────────────────────────────────── */
+    /* The designer is the sun. Four dashed rings turn at their own speeds;
+       each carries the numbers of one phase. A satellite is pinned to its
+       ring by a rotating arm and counter-rotated by the same amount, so the
+       ring turns and the words never do. Hover pauses; Reduce Motion stops. */
+    .orbit-wrap { display: grid; grid-template-columns: 1fr; justify-items: center; margin: 56px 0 72px; gap: 18px; }
+    .orbit { position: relative; width: min(820px, 100%); aspect-ratio: 1; }
+    .ring { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); border-radius: 50%; border: 1.5px dashed var(--ring); }
+    .ring.r1 { width: 44%; height: 44%; } .ring.r2 { width: 62%; height: 62%; } .ring.r3 { width: 80%; height: 80%; } .ring.r4 { width: 98%; height: 98%; }
+    .carrier { position: absolute; left: 50%; top: 50%; width: 0; height: 0; animation: spin var(--spin) linear infinite; }
+    .carrier.c1 { --spin: 44s; } .carrier.c2 { --spin: 62s; animation-direction: reverse; }
+    .carrier.c3 { --spin: 80s; } .carrier.c4 { --spin: 104s; animation-direction: reverse; }
+    .orbit:hover .carrier, .orbit:hover .sat { animation-play-state: paused; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .arm { position: absolute; left: 0; top: 0; transform: rotate(var(--a)) translateX(var(--r)); }
+    .sat {
+      position: absolute; left: 0; top: 0;
+      transform: translate(-50%,-50%) rotate(calc(-1 * var(--a)));
+      animation: unspin var(--spin) linear infinite;
+      background: var(--plate); color: var(--secondary); border: 1px solid var(--ring); border-radius: 999px;
+      padding: 8px 14px 8px 10px; display: flex; align-items: center; gap: 8px; white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.16); font-family: var(--font-heading); font-size: 13px;
     }
-    .rule-swatch { display: flex; gap: 6px; }
-    .rule-swatch i { width: 18px; height: 18px; border-radius: 6px; display: block; }
-    .rule-title { font-family: var(--font-heading); font-weight: 600; font-size: var(--fs-base); color: var(--secondary); }
-    .rule-body { font-family: var(--font-heading); font-size: 14px; line-height: 1.6; color: rgba(37,37,37,0.7); }
-    .craft-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; align-items: start; margin-bottom: 20px; }
-    .craft-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
-    .stat {
-      background: var(--orange-light); border-radius: 16px; padding: 20px 22px;
-      font-family: var(--font-heading); font-size: var(--fs-sm); color: rgba(37,37,37,0.62);
+    .carrier.c2 .sat, .carrier.c4 .sat { animation-direction: reverse; }
+    @keyframes unspin { to { transform: translate(-50%,-50%) rotate(calc(-1 * var(--a) - 360deg)); } }
+    .sat b { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+    .sat i { font-style: normal; color: var(--ink-3); }
+    .sat .dot, .orbit-key i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    .k1 .dot, .orbit-key i.k1 { background: #8E6BD9; } .k2 .dot, .orbit-key i.k2 { background: #F78521; }
+    .k3 .dot, .orbit-key i.k3 { background: #5E9B63; } .k4 .dot, .orbit-key i.k4 { background: #4B8AF0; }
+    .sun {
+      position: absolute; left: 50%; top: 50%; width: 30%; aspect-ratio: 1; transform: translate(-50%,-50%);
+      border-radius: 50%; overflow: hidden; background: #1A1A1A;
+      box-shadow: 0 0 0 8px var(--bg), 0 0 0 9.5px var(--ring), 0 0 80px rgba(var(--orange-rgb),0.22), 0 30px 70px rgba(0,0,0,0.35);
     }
-    .stat strong { display: block; font-weight: 700; font-size: 28px; line-height: 1.2; color: var(--secondary); margin-bottom: 4px; }
+    .sun img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; display: block; }
+    .orbit-key { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+    .orbit-key span { display: inline-flex; align-items: center; gap: 8px; }
+    .orbit-hint { color: var(--ink-3); opacity: .7; }
+    @media (prefers-reduced-motion: reduce) { .carrier, .sat { animation: none; } }
 
-    /* ─── 07 STATUS ──────────────────────────────────────────── */
-    .status-plate {
-      border-radius: 30px; padding: 48px 44px;
-      background:
-        radial-gradient(ellipse at 20% 0%, rgba(190,100,20,0.42) 0%, rgba(140,68,14,0.18) 40%, transparent 65%),
-        #1A0F06;
-      display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; color: #FFFCF8;
-    }
-    .status-line {
-      font-family: var(--font-display); font-style: italic; font-weight: 400;
-      font-size: clamp(30px, 3.2vw, 44px); line-height: 1.15; color: #FFFCF8;
-    }
-    .status-sub { font-family: var(--font-heading); font-size: var(--fs-base); line-height: 1.7; color: rgba(255,250,240,0.62); margin-top: 16px; max-width: 520px; }
-    .status-sub strong { color: rgba(255,250,240,0.95); font-weight: 600; }
-    .measure { list-style: none; margin-top: 22px; display: flex; flex-wrap: wrap; gap: 8px; }
-    .measure li {
-      font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em; text-transform: uppercase;
-      padding: 8px 12px; border-radius: 100px; border: 1px solid rgba(255,250,240,0.22); color: rgba(255,250,240,0.85);
-    }
-    .bar-label { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,250,240,0.55); margin-bottom: 14px; }
-    .bar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .bar-cell {
-      background: rgba(255,252,248,0.07); border: 1px solid rgba(255,252,248,0.10);
-      border-radius: 16px; padding: 14px 16px;
-      font-family: var(--font-heading); font-size: 13px; line-height: 1.5; color: rgba(255,252,248,0.6);
-    }
-    .bar-cell strong { display: block; font-weight: 600; font-size: 22px; color: rgba(255,252,248,0.95); }
-    .bar-cell.wide { grid-column: 1 / -1; }
-    .bar-cell.wide strong { font-size: 16px; }
-    .v2-link {
-      display: inline-flex; align-items: center; gap: 8px; margin-top: 22px;
-      background: var(--cta-grad); color: #fff; text-decoration: none;
-      font-family: var(--font-heading); font-size: 13px; font-weight: 600;
-      padding: 12px 18px; border-radius: 12px; transition: transform 0.18s ease;
-    }
-    .v2-link:hover { background: var(--cta-grad-hover); transform: translateY(-3px); }
+    /* ─── RULES, HONEST, STRIP ───────────────────────────────── */
+    .rules { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 24px; margin: 44px 0; }
+    .rules li { font-family: var(--font-heading); font-size: 15px; line-height: 1.6; color: var(--ink-3); padding: 14px 0; border-top: 1px solid var(--hair); }
+    .rules li strong { display: block; font-weight: 600; color: var(--secondary); }
+    .honest { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--hair); }
+    .honest p { font-family: var(--font-heading); font-size: 15px; line-height: 1.7; color: var(--ink-3); }
+    .honest strong { font-weight: 600; color: var(--secondary); }
+    .strip { display: grid; grid-template-columns: repeat(10, 1fr); gap: 12px; }
+    .strip .ph-cap { font-size: 12px; }
+
+    /* ─── OUTCOMES ───────────────────────────────────────────── */
+    .measure-list { display: flex; flex-direction: column; }
+    .measure { padding: 18px 0; border-top: 1px solid var(--hair); font-family: var(--font-heading); font-size: 15px; line-height: 1.6; color: var(--ink-3); }
+    .measure:last-child { border-bottom: 1px solid var(--hair); }
+    .measure strong { display: block; font-weight: 600; font-size: 17px; color: var(--secondary); margin-bottom: 4px; }
+    .reflect ul { list-style: none; margin-top: 12px; }
+    .reflect li { font-family: var(--font-heading); font-size: 15px; line-height: 1.65; color: var(--ink-3); padding: 10px 0 10px 18px; position: relative; border-top: 1px solid var(--hair); }
+    .reflect li::before { content: ''; position: absolute; left: 0; top: 19px; width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+    .next { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 56px; }
+    .next-card { display: flex; flex-direction: column; gap: 8px; padding: 24px 26px; border-radius: 18px; border: 1px solid var(--hair); background: var(--plate); text-decoration: none; color: var(--secondary); transition: transform 0.18s ease, border-color 0.18s ease; }
+    .next-card:hover { transform: translateY(-3px); border-color: rgba(var(--orange-rgb),0.5); }
+    .next-card strong { font-family: var(--font-heading); font-weight: 600; font-size: 22px; letter-spacing: -0.01em; }
+    .next-card span:last-child { font-family: var(--font-heading); font-size: var(--fs-sm); color: var(--ink-3); }
 
     /* ─── THANK YOU BAR ──────────────────────────────────────── */
     .cs-thankyou { background: var(--orange-badge); width: 100%; padding: 12px 40px; display: flex; align-items: center; justify-content: center; }
     .cs-thankyou-text { font-family: var(--font-mono); font-weight: 500; font-size: 15px; letter-spacing: 0.08em; color: #FFFCF8; }
 
     /* ─── REVEALS ────────────────────────────────────────────── */
-    .tr-anim { opacity: 0; transform: translateY(40px); }
-    .tr-anim.visible { animation: section-rise 1.1s cubic-bezier(0.16,1,0.3,1) both; }
-    .el-anim { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+    .tr-anim { opacity: 0; transform: translateY(32px); }
+    .tr-anim.visible { animation: section-rise 1s cubic-bezier(0.16,1,0.3,1) both; }
+    .el-anim { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1); }
     .el-anim.el-visible { opacity: 1; transform: translateY(0); }
+    @keyframes word-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes section-rise { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: translateY(0); } }
 
-    @keyframes word-rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes card-rise { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes section-rise { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* ─── RESPONSIVE ─────────────────────────────────────────── */
-    @media (hover: none) {
-      #ccDot { display: none; }
-      body { cursor: auto; }
-      a, button { cursor: pointer; }
-    }
-    @media (max-width: 1024px) {
-      .nav               { padding: 8px 24px; }
-      .nav-sections      { display: none; }
-      .nav-hamburger     { display: flex; }
-      .cs-hero           { margin: 0 28px 44px; gap: 20px; }
-      .cs-heading        { font-size: 42px; }
-      .hero-fan          { height: 420px; }
-      .sec               { padding: 0 28px 80px; }
-      .why-grid, .trio, .rules, .decision-row { grid-template-columns: 1fr 1fr; }
-      .film              { grid-template-columns: repeat(4, 1fr); }
-      .craft-grid        { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 767px) {
-      .page              { padding: 60px 0 0; }
-      .cs-hero           { margin: 0 5% 36px; gap: 16px; padding-left: 20px; padding-right: 20px; }
-      .cs-heading        { font-size: 30px; }
-      .cs-subtitle       { font-size: 15px; }
-      .hero-pill         { font-size: 12px; padding: 8px 14px; }
-      .hero-top-row      { flex-direction: column; align-items: flex-start; gap: 10px; }
-      .hero-fan          { height: 300px; border-radius: 22px 22px 0 0; }
-      .fan-ph            { top: 36px; width: 26%; }
-      .fan-ph:nth-child(1) { left: 2%; }  .fan-ph:nth-child(2) { left: 25%; }
-      .fan-ph:nth-child(3) { left: 48%; } .fan-ph:nth-child(4) { left: 71%; }
-      .fan-labels        { display: none; }
-      .sec               { padding: 0 5% 64px; }
-      .sec-head          { grid-template-columns: 1fr; gap: 6px; margin-bottom: 24px; }
-      .sec-lede          { grid-column: 1; font-size: 16px; }
-      .phones-3, .phones-4, .phones-2 { grid-template-columns: 1fr 1fr; gap: 12px; }
-      .split, .why-bet   { grid-template-columns: 1fr; gap: 24px; }
-      .why-grid, .trio, .rules, .decision-row, .craft-stats, .bar-grid { grid-template-columns: 1fr; }
-      .film              { grid-template-columns: 1fr 1fr; gap: 12px; }
-      .status-plate      { grid-template-columns: 1fr; padding: 32px 24px; border-radius: 22px; }
-      .bet-line          { font-size: 22px; }
-      .why-title         { font-size: 24px; }
-    }
-
-    /* ─── DARK MODE TOKENS ───────────────────────────────────── */
+    /* ─── LIGHT / DARK INK ───────────────────────────────────── */
+    :root { --ink-2: rgba(37,37,37,0.74); --ink-3: rgba(37,37,37,0.58); --hair: rgba(37,37,37,0.12); --plate: #FFFFFF; --ring: rgba(37,37,37,0.26); }
     [data-theme="dark"] {
-      --secondary:    #EFF3F8;
-      --bg:           #0A0E15;
-      --white:        #0E141D;
-      --grey:         #A9B4C2;
-      --border:       #222C3D;
-      --orange:       #FF8A3D;
-      --orange-light: #2A1A08;
-      --orange-rgb:   255,138,61;
-      --orange-ink:   #FF8A3D;
+      --secondary: #EFF3F8; --bg: #0A0E15; --white: #0E141D; --grey: #A9B4C2; --border: #222C3D;
+      --orange: #FF8A3D; --orange-light: #2A1A08; --orange-rgb: 255,138,61; --orange-ink: #FF8A3D;
+      --ink-2: #C7CFDA; --ink-3: #A9B4C2; --hair: rgba(240,237,232,0.12); --plate: #0E141D; --ring: rgba(240,237,232,0.26);
     }
     [data-theme="dark"] .nav-home img { filter: invert(1); }
     [data-theme="dark"] .nav { background: rgba(26,26,26,0.92); box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.06); }
     [data-theme="dark"] .nav-btn:hover:not(.active) { background: #182130; }
     [data-theme="dark"] .mobile-menu { box-shadow: -8px 0 32px rgba(0,0,0,0.40); }
-    [data-theme="dark"] .hero-pill { border-color: rgba(191,98,18,0.45); }
-    [data-theme="dark"] .hero-pill:hover { background: rgba(191,98,18,0.12); }
-    [data-theme="dark"] .hero-scrim {
-      background: linear-gradient(100deg, rgba(10,14,21,0.88) 0%, rgba(10,14,21,0.68) 38%, rgba(10,14,21,0.30) 64%, rgba(10,14,21,0.05) 88%);
+    [data-theme="dark"] .ph-img { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), 0 18px 44px rgba(0,0,0,0.5); }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+    @media (hover: none) { #ccDot { display: none; } body { cursor: auto; } a, button { cursor: pointer; } }
+    @media (max-width: 1024px) {
+      .nav { padding: 8px 24px; } .nav-sections { display: none; } .nav-hamburger { display: flex; }
+      .hero { padding: 44px 28px 32px; }
+      .s { padding: 0 28px 96px; }
+      .meta { grid-template-columns: 1fr 1fr; }
+      .meta > div:nth-child(2) { border-right: 0; }
+      .rail { grid-template-columns: repeat(6, 1fr); gap: 12px; }
+      .film { grid-template-columns: repeat(4, 1fr); }
+      .studies { grid-template-columns: repeat(3, 1fr); }
+      .strip { grid-template-columns: repeat(5, 1fr); }
+      .bar { grid-template-columns: 1fr 1fr; } .bar-label { writing-mode: horizontal-tb; transform: none; grid-column: 1 / -1; }
+      .bets, .three, .rules { grid-template-columns: 1fr 1fr; }
     }
-    [data-theme="dark"] .cs-subtitle, [data-theme="dark"] .sec-lede,
-    [data-theme="dark"] .copy, [data-theme="dark"] .why-body, [data-theme="dark"] .rule-body,
-    [data-theme="dark"] .ph-cap, [data-theme="dark"] .plate-cap, [data-theme="dark"] .hero-fact,
-    [data-theme="dark"] .stat { color: #A9B4C2; }
-    [data-theme="dark"] .sec-head { border-top-color: rgba(240,237,232,0.12); }
-    [data-theme="dark"] .rule, [data-theme="dark"] .plate { background: #0E141D; border-color: rgba(240,237,232,0.12); }
-    [data-theme="dark"] .ph-img, [data-theme="dark"] .trio-shot { background: #182130; box-shadow: 0 18px 44px rgba(0,0,0,0.5); }
+    @media (max-width: 767px) {
+      .page { padding: 60px 0 0; }
+      .hero { padding: 32px 5% 24px; }
+      .hero-h { font-size: 34px; }
+      .hero-p { font-size: 16px; }
+      .meta { grid-template-columns: 1fr; } .meta > div { border-right: 0; margin-right: 0; padding: 14px 0; border-bottom: 1px solid var(--hair); } .meta > div:last-child { border-bottom: 0; }
+      .rail { grid-template-columns: repeat(3, 1fr); gap: 10px; } .rail .ph:nth-child(even) { transform: none; }
+      .s { padding: 0 5% 72px; }
+      .s-head { margin-bottom: 28px; padding-top: 28px; }
+      .two, .honest, .next, .bar-stack { grid-template-columns: 1fr; gap: 24px; }
+      .phones-3, .phones-4, .film, .strip, .studies { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .bets, .three, .rules, .bar { grid-template-columns: 1fr; }
+      .orbit-wrap { margin: 36px 0 48px; }
+      .sat { font-size: 11px; padding: 6px 10px 6px 8px; gap: 6px; } .sat b { font-size: 12px; }
+      .insight-q, .insight-t { font-size: 17px; }
+    }
 
     /* ─── KEYBOARD FOCUS ─────────────────────────────────────── */
     .nav-home:focus-visible, .nav-btn:focus-visible, .nav-hamburger:focus-visible,
-    .mobile-menu a:focus-visible, .hero-pill:focus-visible,
-    .hero-link-plain:focus-visible, .v2-link:focus-visible {
+    .mobile-menu a:focus-visible, .next-card:focus-visible, .credit a:focus-visible {
       outline: 2px solid var(--secondary); outline-offset: 3px;
     }
     .nav-btn:focus-visible, .nav-hamburger:focus-visible { border-radius: 6px; }
 
     /* ─── REDUCED MOTION ─────────────────────────────────────── */
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
     }
   </style>
   <!-- Microsoft Clarity -->
@@ -682,14 +528,15 @@
       <span>Stressie V4</span>
     </a>
     <div class="nav-sections">
-      <a href="#summary"   class="nav-btn active" data-section="summary">Summary</a>
-      <a href="#why"       class="nav-btn"        data-section="why">Why V4</a>
+      <a href="#overview"  class="nav-btn active" data-section="overview">Overview</a>
+      <a href="#problem"   class="nav-btn"        data-section="problem">Problem</a>
+      <a href="#bets"      class="nav-btn"        data-section="bets">Bets</a>
       <a href="#checkin"   class="nav-btn"        data-section="checkin">Check in</a>
       <a href="#offwork"   class="nav-btn"        data-section="offwork">Off Work</a>
       <a href="#community" class="nav-btn"        data-section="community">Community</a>
-      <a href="#more"      class="nav-btn"        data-section="more">Coins · Talk · Insights</a>
-      <a href="#craft"     class="nav-btn"        data-section="craft">Craft</a>
-      <a href="#status"    class="nav-btn"        data-section="status">Status</a>
+      <a href="#coins"     class="nav-btn"        data-section="coins">Coins</a>
+      <a href="#build"     class="nav-btn"        data-section="build">Build</a>
+      <a href="#outcomes"  class="nav-btn"        data-section="outcomes">Outcomes</a>
     </div>
     <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
@@ -699,304 +546,349 @@
   <!-- ── MOBILE MENU ────────────────────────────────────────── -->
   <div class="mobile-menu-backdrop" id="menuBackdrop"></div>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="#summary">Summary</a>
-    <a href="#why">Why V4</a>
-    <a href="#checkin">Check in, then act</a>
+    <a href="#overview">Overview</a>
+    <a href="#problem">Problem</a>
+    <a href="#bets">Bets</a>
+    <a href="#checkin">Check in</a>
     <a href="#offwork">Off Work</a>
     <a href="#community">Community</a>
-    <a href="#more">Coins · Talk · Insights</a>
-    <a href="#craft">Craft</a>
-    <a href="#status">Status</a>
+    <a href="#coins">Coins</a>
+    <a href="#build">Build</a>
+    <a href="#outcomes">Outcomes</a>
   </div>
 
   <!-- ── PAGE ───────────────────────────────────────────────── -->
   <div class="page">
     <div class="card">
 
-      <!-- ══ SUMMARY (hero) ══════════════════════════════════ -->
-      <section id="summary" data-has-content="true">
-        <div class="cs-hero">
+      <!-- ══ OVERVIEW (hero) ═════════════════════════════════
+           Screens first. The headline is the promise, the four-cell block
+           under it says who did what, and the rail is the real build. -->
+      <section id="overview" data-has-content="true">
+        <div class="hero">
+          <p class="eyebrow hero-in" id="heroEyebrow">Stressie V4 · iOS · 2026 · <span class="badge">In validation</span></p>
+          <h1 class="hero-h" id="csHeading">Ninety seconds at your desk, <em>paid back after work.</em></h1>
+          <p class="hero-p hero-in" id="csSubtitle">Stressie V4 turns a workplace stress check-in into reset coins, then spends them on real wellness experiences and community events nearby. V2 proved people stayed for the quick resets. V4 gives them somewhere to go.</p>
 
-          <img id="etBgImg" class="et-bg-img" alt="" />
-          <div class="hero-scrim" aria-hidden="true"></div>
+          <dl class="meta hero-in" id="heroMeta">
+            <div><dt>Role</dt><dd>Product designer and iOS engineer (SwiftUI)</dd></div>
+            <div><dt>Team</dt><dd>1 designer and engineer (me), founders as stakeholders</dd></div>
+            <div><dt>Stack</dt><dd>Figma · SwiftUI · Metal · TestFlight</dd></div>
+            <div><dt>Status</dt><dd>Shipped to the team, metrics validating</dd></div>
+          </dl>
 
-          <div class="hero-top-row" id="heroTopRow">
-            <div class="hero-pills">
-              <span class="hero-pill">Founding Product Designer</span>
-              <span class="hero-pill">2026</span>
-              <span class="hero-pill">iOS</span>
-              <span class="hero-pill">V4</span>
-              <span class="hero-pill">Wellness</span>
-              <span class="hero-pill">B2B / B2C</span>
-            </div>
-            <a href="https://www.stressieapp.com" class="hero-link-plain" target="_blank" rel="noopener">
-              www.stressieapp.com
-              <span class="link-arrow">
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                  <path d="M2 11L11 2M11 2H4.5M11 2V8.5" stroke="#BF6212" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-            </a>
+          <div class="rail hero-in" id="heroRail" aria-label="Six screens from the build">
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/hero-atwork.webp" alt="At Work home: the stress shape and slider" /></div></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-resources.webp" alt="The resources panel after a check-in" /></div></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/hero-offwork.webp" alt="Off Work: a map of wellness experiences" /></div></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/hero-event.webp" alt="A community event page" /></div></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/hero-rewards.webp" alt="Rewards and the reset coin balance" /></div></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/talk-listening.webp" alt="Talk, listening" /></div></div>
           </div>
-
-          <div class="cs-heading" id="csHeading"><span class="heading-orange">Stressie V4 turns a ninety-second check-in</span><span class="heading-dark"> into something to do with the rest of your day.</span></div>
-
-          <p class="cs-subtitle" id="csSubtitle">V2 proved people stay for the quick resets and the calm UI. V4 gives them a reason to open the app after work: a community of wellness experiences, paid for with the coins their check-ins earn.</p>
-
-          <div class="hero-facts" id="heroFacts">
-            <div class="hero-fact"><strong>Designed and built it</strong>Figma to SwiftUI, one designer</div>
-            <div class="hero-fact"><strong>171 Swift files</strong>iOS 26, Liquid Glass, Dynamic Type</div>
-            <div class="hero-fact"><strong>3 languages</strong>English, Spanish, Swahili</div>
-            <div class="hero-fact"><strong>Currently validating</strong>Metrics will be updated soon</div>
-          </div>
-
-          <div class="hero-fan" id="heroFan">
-            <div class="fan-ph"><img src="images/stressie-v4/hero-atwork.webp" alt="At Work home: the stress shape and slider" /></div>
-            <div class="fan-ph"><img src="images/stressie-v4/hero-offwork.webp" alt="Off Work: a map of wellness experiences" /></div>
-            <div class="fan-ph"><img src="images/stressie-v4/hero-event.webp" alt="A community event page" /></div>
-            <div class="fan-ph"><img src="images/stressie-v4/hero-rewards.webp" alt="Rewards and the reset coin balance" /></div>
-            <div class="fan-labels" aria-hidden="true">
-              <span>At Work</span><span>Off Work</span><span>Community</span><span>Rewards</span>
-            </div>
-          </div>
-
-        </div><!-- /cs-hero -->
+          <p class="credit hero-in">Designed and built by Bhanu Kowshik · <a href="https://www.stressieapp.com" target="_blank" rel="noopener">stressieapp.com ↗</a></p>
+        </div>
       </section>
 
-      <!-- ══ 01 WHY V4 ═══════════════════════════════════════ -->
-      <section id="why" data-has-content="true">
-        <div class="sec">
-          <div class="sec-head tr-anim">
-            <span class="sec-num">01</span>
-            <h2 class="sec-title">Why <em>V4</em></h2>
-            <p class="sec-lede">V2 worked. The question was what people would do with an app that had earned ninety seconds of their day, and what the wellness space had become while we were measuring.</p>
+      <!-- ══ PROBLEM ═════════════════════════════════════════ -->
+      <section id="problem" data-has-content="true">
+        <div class="s">
+          <div class="s-head tr-anim">
+            <p class="eyebrow">The problem in evidence</p>
+            <h2 class="s-h">V2 worked. Then the pilots told us exactly where it stopped.</h2>
           </div>
-
-          <div class="why-grid tr-anim">
-            <div class="why-cell">
-              <span class="why-label">What V2 proved</span>
-              <h3 class="why-title">People stayed for the resets and the calm.</h3>
-              <p class="why-body">Retention went from the <strong>~2% industry baseline to 17.4%</strong>, daily engagement from <strong>12% to 56%</strong>, and the average session ran <strong>4m 20s</strong>. Quick resets and a quiet UI were the whole reason.</p>
-            </div>
-            <div class="why-cell">
-              <span class="why-label">What users asked for</span>
-              <h3 class="why-title">Ask for less, earlier. Give more, later.</h3>
-              <p class="why-body">Onboarding asked for <strong>trust before the app had done anything</strong>. Coping points piled up with <strong>no clear value</strong>. And once the workday ended there was <strong>nothing to do</strong> in the app at all.</p>
-            </div>
-            <div class="why-cell">
-              <span class="why-label">Where the space went</span>
-              <h3 class="why-title">Wellness left the app and went into the room.</h3>
-              <p class="why-body">Run clubs, sound baths, dinner nights, Luma and Partiful style events. <strong>The product that wins is the one that gets you there</strong>, not the one with the best breathing timer.</p>
-            </div>
-          </div>
-
-          <div class="why-bet tr-anim">
-            <p class="bet-line">The bet: <em>Community.</em> Make the check-in pay for something real, off work, with other people.</p>
+          <div class="two tr-anim">
             <div>
               <div class="plate"><img src="images/stressie-v4/before-after.webp" alt="Home screen, V2 beside V4" loading="lazy" /></div>
-              <div class="plate-cap"><span>Home, V2</span><span>Home, V4: the same shape, an Off Work mode and a way out of the screen</span></div>
+              <p class="cap">Home, V2 beside V4. The check-in stayed. Everything after it is new.</p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ══ 02 CHECK IN, THEN ACT ═══════════════════════════ -->
-      <section id="checkin" data-has-content="true">
-        <div class="sec">
-          <div class="sec-head tr-anim">
-            <span class="sec-num">02</span>
-            <h2 class="sec-title">Check in, <em>then act</em></h2>
-            <p class="sec-lede">Slide to answer. The stress shape names the feeling instead of grading it, the release opens a panel of things to do, and finishing one lands a coin.</p>
-          </div>
-
-          <div class="phones phones-4 tr-anim">
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-shape.webp" alt="First check-in: the stress shape at extremely stressed" loading="lazy" /></div><p class="ph-cap"><strong>The shape.</strong> Seven levels, orange through green to violet. Never red.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-resources.webp" alt="The resources panel after a check-in" loading="lazy" /></div><p class="ph-cap"><strong>The panel.</strong> Two films, two quick resets, a way to talk.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-reset.webp" alt="A 45 second unclench reset" loading="lazy" /></div><p class="ph-cap"><strong>The reset.</strong> Forty-five seconds. Pause, or say you're done.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-reward.webp" alt="The reward moment: you just earned 10 coins" loading="lazy" /></div><p class="ph-cap"><strong>The coin.</strong> One beat for the coin, one for the words.</p></div>
-          </div>
-
-          <div class="split tr-anim" style="margin-top:36px">
-            <div class="plate"><img src="images/stressie-v4/shape-levels.webp" alt="The seven stress shape levels" loading="lazy" /></div>
-            <div class="stack">
-              <p class="copy">The shape is the one thing on the screen that changes with you. It sharpens and cools as stress climbs, so a bad day looks different without ever looking like an error. The words stay about the feeling: <strong>running hot</strong>, not stress level 7 of 10.</p>
-              <div class="decision"><span class="decision-label">Decision</span>A check-in that leads nowhere wastes the ninety seconds. Every check-in ends in something to do, and every reset ends in coins that are good for something.</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ══ 03 OFF WORK ═════════════════════════════════════ -->
-      <section id="offwork" data-has-content="true">
-        <div class="sec">
-          <div class="sec-head tr-anim">
-            <span class="sec-num">03</span>
-            <h2 class="sec-title">Off Work: <em>the map</em></h2>
-            <p class="sec-lede">Flip Home from At Work to Off Work and it becomes a map of wellness experiences nearby. The coins from the workday spend here.</p>
-          </div>
-
-          <div class="phones phones-4 tr-anim">
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-map.webp" alt="Off Work map with partner pins" loading="lazy" /></div><p class="ph-cap"><strong>The map.</strong> Partners and open places, told apart by pin. Chips for spas, parks, movement, open now.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-list.webp" alt="The resources sheet listing nearby offers" loading="lazy" /></div><p class="ph-cap"><strong>The sheet.</strong> Wellness experiences and community events, one list, three stops.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-place.webp" alt="A place page with a coin offer" loading="lazy" /></div><p class="ph-cap"><strong>The place.</strong> Reviews, amenities, and one labelled action: redeem for 80 coins.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-redeem.webp" alt="Show code when you arrive" loading="lazy" /></div><p class="ph-cap"><strong>The code.</strong> A QR and a code for the front desk, valid until the date it says.</p></div>
-          </div>
-
-          <div class="split tr-anim" style="margin-top:36px">
-            <p class="copy">Every place carries a real offer with a real price in coins. Too few coins reads <strong>top up</strong>, never a dead button. A redeemed place keeps its code on the card so the front desk is a single tap away, and the map shows what's open right now before anything else.</p>
-            <div class="decision"><span class="decision-label">Decision</span>Trust arrives late, on purpose. Location is asked for the first time the map is useful, not on day one, and the first check-in happens before there is an account at all.</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ══ 04 COMMUNITY ════════════════════════════════════ -->
-      <section id="community" data-has-content="true">
-        <div class="sec">
-          <div class="sec-head tr-anim">
-            <span class="sec-num">04</span>
-            <h2 class="sec-title">Community: <em>the flagship</em></h2>
-            <p class="sec-lede">Events on the same map. Breathwork circles, pottery socials, dinner nights, a quiet hour online. Reserve one with coins, or host your own.</p>
-          </div>
-
-          <div class="film-wrap tr-anim">
-            <div class="film">
-              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c01-list.webp" alt="Community events list" loading="lazy" /></div><p class="ph-cap">The list. Hosted by Stressie, partners and people.</p></div>
-              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c03-event.webp" alt="Pottery and coffee social event page" loading="lazy" /></div><p class="ph-cap">The event. When, where, how far, who's going.</p></div>
-              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c04-check.webp" alt="Reserve confirmed, check and confetti" loading="lazy" /></div><p class="ph-cap">Reserve. A check, then confetti.</p></div>
-              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c05-going.webp" alt="You're going, with calendar and share" loading="lazy" /></div><p class="ph-cap">You're going. Calendar, share, done.</p></div>
-              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c07-create.webp" alt="Create an event form" loading="lazy" /></div><p class="ph-cap">Host. Name, about, when, spots, price.</p></div>
-              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c10-preview.webp" alt="Host preview of the event" loading="lazy" /></div><p class="ph-cap">Preview. Exactly the page guests will see.</p></div>
-              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c13-published.webp" alt="Your event is sent for review" loading="lazy" /></div><p class="ph-cap">Sent for review. In person waits; online lists now.</p></div>
-            </div>
-          </div>
-
-          <p class="copy tr-anim" style="margin-bottom:22px">Reserving costs coins, and the coins came from check-ins, so a seat has a cost the person already paid in attention. Hosting is one form: a name, a line about it, when, capacity, in person or online, free or a price in coins. <strong>Thirteen Figma frames, thirteen build states, matched one to one.</strong></p>
-
-          <div class="decision-row tr-anim">
-            <div class="decision"><span class="decision-label">Decision</span>Online events list instantly. In-person ones wait for approval, because a stranger's address needs a person to look at it first.</div>
-            <div class="decision"><span class="decision-label">Decision</span>Reserving costs coins. A free seat gets skipped; a seat paid for with a week of check-ins gets shown up to.</div>
-            <div class="decision"><span class="decision-label">Decision</span>The cover is suggested from the name and the description, so a host never faces an empty photo well or publishes a grey card.</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ══ 05 COINS · TALK · INSIGHTS ══════════════════════ -->
-      <section id="more" data-has-content="true">
-        <div class="sec">
-          <div class="sec-head tr-anim">
-            <span class="sec-num">05</span>
-            <h2 class="sec-title">Coins, <em>Talk</em> and Insights</h2>
-            <p class="sec-lede">Three more pieces, one screen each. The economy that pays for the map, a voice for the days a reset isn't enough, and the view a team lead gets.</p>
-          </div>
-
-          <div class="trio tr-anim">
-            <div class="trio-cell">
-              <span class="why-label">Reset coins</span>
-              <h3 class="why-title">A real economy, not points.</h3>
-              <p class="copy">Five coins a check-in, up to three a day. A reset once a day, past halfway. Two hundred when a friend checks in. Short of a reward, top up. Coins leave only through a labelled action, once.</p>
-              <div class="trio-shot"><img src="images/stressie-v4/coins-rewards.webp" alt="Rewards: balance, next reset and available rewards" loading="lazy" /></div>
-            </div>
-            <div class="trio-cell">
-              <span class="why-label">Talk</span>
-              <h3 class="why-title">An orb that listens.</h3>
-              <p class="copy">Resting, listening, thinking and speaking each have a colour; the light stays warm whatever the last check-in said. Anything that reads as crisis gets a handoff to 988, not a chat. It says so, and stops.</p>
-              <div class="trio-shot"><img src="images/stressie-v4/talk-listening.webp" alt="Talk, listening" loading="lazy" /></div>
-            </div>
-            <div class="trio-cell">
-              <span class="why-label">Insights, B2B</span>
-              <h3 class="why-title">Your team is steadier than it was.</h3>
-              <p class="copy">Stress across the team over time, the top stressors, and huddles to run. Managers get a fifth tab; nobody else sees it, and no individual is ever shown.</p>
-              <div class="trio-shot"><img src="images/stressie-v4/insights.webp" alt="Team insights: 44 members, top stressors, stress over time" loading="lazy" /></div>
-            </div>
-          </div>
-
-          <div class="plate tr-anim" style="margin-top:20px"><img src="images/stressie-v4/orb-states.webp" alt="The four orb states and their colour ramps" loading="lazy" /></div>
-          <div class="plate-cap tr-anim"><span>Talk orb states: resting, listening, thinking, speaking</span><span>Each ramp is five steps and a weight</span></div>
-        </div>
-      </section>
-
-      <!-- ══ 06 CRAFT ════════════════════════════════════════ -->
-      <section id="craft" data-has-content="true">
-        <div class="sec">
-          <div class="sec-head tr-anim">
-            <span class="sec-num">06</span>
-            <h2 class="sec-title">Craft: <em>the rules</em> that held</h2>
-            <p class="sec-lede">The design system lives in code. Screens never name a colour, a radius or a type size, and a lint fails the build when one does.</p>
-          </div>
-
-          <div class="rules tr-anim">
-            <div class="rule"><div class="rule-swatch"><i style="background:#F78521"></i><i style="background:#FFF0E3"></i></div><div class="rule-title">Amber is for action</div><div class="rule-body">One amber element per screen, the thing you want tapped. A second one makes both weaker.</div></div>
-            <div class="rule"><div class="rule-swatch"><i style="background:#5E7A4E"></i><i style="background:#EAF5E8"></i></div><div class="rule-title">Sage is for reassurance</div><div class="rule-body">Breathing, chat, you're fine. It is never an action colour.</div></div>
-            <div class="rule"><div class="rule-swatch"><i style="background:#F78521"></i><i style="background:#8E6BD9"></i><i style="background:#FF4545;opacity:.35"></i></div><div class="rule-title">Never red</div><div class="rule-body">Stress is not an error state. High stress runs amber through violet on the shape's own scale. Red only ends something.</div></div>
-            <div class="rule"><div class="rule-swatch"><i style="background:#252525"></i><i style="background:#9C9C9C"></i></div><div class="rule-title">Lora and Hanken</div><div class="rule-body">Serif for the one thing the screen is about. Sans for everything you read rather than look at. Sentence case everywhere.</div></div>
-            <div class="rule"><div class="rule-swatch"><i style="background:rgba(120,140,170,.35);border:1px solid rgba(120,140,170,.6)"></i><i style="background:#EDE7DE"></i></div><div class="rule-title">Liquid Glass, real glass</div><div class="rule-body">glassEffect on iOS 26 with material fallbacks. Nav carries no tint of ours; content passes under the floating tab bar.</div></div>
-            <div class="rule"><div class="rule-swatch"><i style="background:#BF6212"></i><i style="background:#E6F7EA"></i></div><div class="rule-title">Dynamic Type, and a lint</div><div class="rule-body">Every text is a role that scales with the reader. A build phase fails any screen that names a raw colour or size.</div></div>
-          </div>
-
-          <div class="craft-grid tr-anim">
-            <div>
-              <div class="plate"><img src="images/stressie-v4/craft-sidebyside.webp" alt="The event page: Figma render beside the simulator build" loading="lazy" /></div>
-              <div class="plate-cap"><span>Event page, Figma render beside the build</span><span>Measured at 3 px/pt, one anchor per pane</span></div>
-            </div>
-            <div>
-              <div class="plate"><img src="images/stressie-v4/craft-glass.webp" alt="Figma versus build: glass and glow on the Talk screen" loading="lazy" /></div>
-              <div class="plate-cap"><span>Talk, glass and glow</span></div>
-            </div>
-          </div>
-
-          <div class="phones phones-3 tr-anim">
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-en.webp" alt="Onboarding question in English" loading="lazy" /></div><p class="ph-cap"><strong>English.</strong> The language menu sits on the first screen, above the first question.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-es.webp" alt="Onboarding question in Spanish" loading="lazy" /></div><p class="ph-cap"><strong>Spanish.</strong> Every string relocalises live, mid-flow, answers kept.</p></div>
-            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-sw.webp" alt="Onboarding question in Swahili" loading="lazy" /></div><p class="ph-cap"><strong>Swahili.</strong> The layout was built for the longest translation first.</p></div>
-          </div>
-
-          <div class="craft-stats tr-anim">
-            <div class="stat"><strong>171</strong>Swift files, one designer, Figma to simulator</div>
-            <div class="stat"><strong>3</strong>languages, about 1,150 strings each</div>
-            <div class="stat"><strong>13 of 13</strong>community frames matched to build states</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ══ 07 STATUS ═══════════════════════════════════════ -->
-      <section id="status" data-has-content="true">
-        <div class="sec">
-          <div class="sec-head tr-anim">
-            <span class="sec-num">07</span>
-            <h2 class="sec-title">Where it <em>stands</em></h2>
-          </div>
-
-          <div class="status-plate tr-anim">
-            <div>
-              <p class="status-line">Currently validating. Metrics will be updated soon.</p>
-              <p class="status-sub">V4 is in the hands of its first users now. The numbers that matter are the ones V2 never had a way to earn, and they will be posted here as they land, <strong>not before</strong>.</p>
-              <ul class="measure">
-                <li>Off-work opens</li>
-                <li>Events reserved</li>
-                <li>Hosts</li>
-                <li>Coin redemptions</li>
-                <li>Referral conversion</li>
-              </ul>
-              <a class="v2-link" href="stressie-studio.html">Read the V1 to V2 case study →</a>
-            </div>
-            <div>
-              <div class="bar-label">The bar to beat: V2</div>
-              <div class="bar-grid">
-                <div class="bar-cell"><strong>17.4%</strong>retention, from the ~2% industry baseline</div>
-                <div class="bar-cell"><strong>12% → 56%</strong>daily engagement</div>
-                <div class="bar-cell"><strong>4m 20s</strong>average time engaged</div>
-                <div class="bar-cell"><strong>~$600K</strong>funding unlocked</div>
-                <div class="bar-cell wide"><strong>Pilots</strong>Amazon's hardware team, InKind, and 50 Austin PD officers</div>
+            <div class="insights">
+              <div class="insight">
+                <span class="insight-k">01</span>
+                <p class="insight-t">Trust was asked for too early.</p>
+                <p class="insight-q">"I haven't built trust with the app yet, so sharing personal feelings this early is uncomfortable."</p>
+                <p class="insight-src">Pilot participant, Amazon hardware team</p>
+              </div>
+              <div class="insight">
+                <span class="insight-k">02</span>
+                <p class="insight-t">The points had no price.</p>
+                <p class="insight-q">"I didn't find the coping points compelling as an incentive. I don't know their value."</p>
+                <p class="insight-src">Pilot participant, InKind</p>
+              </div>
+              <div class="insight">
+                <span class="insight-k">03</span>
+                <p class="insight-t">Nothing happened after six.</p>
+                <p class="insight-q">Sessions clustered inside work hours. Meanwhile wellness moved into the room: run clubs, sound baths, dinner nights on Luma and Partiful.</p>
+                <p class="insight-src">Usage read plus a competitive scan, 2026</p>
               </div>
             </div>
           </div>
+          <div class="bar tr-anim">
+            <span class="bar-label">The bar V2 set</span>
+            <div class="bar-cell"><strong>~2% → 17.4%</strong>retention, from the industry baseline</div>
+            <div class="bar-cell"><strong>12% → 56%</strong>daily engagement</div>
+            <div class="bar-cell"><strong>4m 20s</strong>average time engaged</div>
+            <div class="bar-cell"><strong>~$600K</strong>funding unlocked</div>
+          </div>
         </div>
       </section>
 
-      <!-- ── Thank You bar ──────────────────────────────────── -->
-      <div class="cs-thankyou">
-        <span class="cs-thankyou-text">✦ THANK_YOU</span>
-      </div>
+      <!-- ══ BETS ════════════════════════════════════════════ -->
+      <section id="bets" data-has-content="true">
+        <div class="s">
+          <div class="s-head tr-anim">
+            <p class="eyebrow">Three bets</p>
+            <h2 class="s-h">Judge the screens against these.</h2>
+          </div>
+          <div class="bets tr-anim">
+            <div class="bet"><span class="bet-k">Bet 1</span><p class="bet-t">A check-in has to lead somewhere inside the same ninety seconds.</p><p class="bet-p">Asking how someone feels and then doing nothing with it wastes the one moment they gave you.</p></div>
+            <div class="bet"><span class="bet-k">Bet 2</span><p class="bet-t">Coins have to buy something real, off work, or they are points.</p><p class="bet-p">A price in the room, a code at the front desk, a seat with your name on it.</p></div>
+            <div class="bet"><span class="bet-k">Bet 3</span><p class="bet-t">Community is the product. The app is how you get there.</p><p class="bet-p">The wellness space went in person. Stressie's job is to be the map and the ticket.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ CHECK IN ════════════════════════════════════════ -->
+      <section id="checkin" data-has-content="true">
+        <div class="s">
+          <div class="s-head tr-anim">
+            <p class="eyebrow">Bet 1 · At Work</p>
+            <h2 class="s-h">Check in, then act, then get paid.</h2>
+            <p class="s-p">Slide to answer. The stress shape names the feeling instead of grading it. Releasing the slider logs the check-in and raises a panel with two films, two quick resets and a way to talk. Finishing a reset lands the coin.</p>
+          </div>
+          <div class="phones phones-4 tr-anim">
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-shape.webp" alt="First check-in: the stress shape at extremely stressed" loading="lazy" /></div><p class="ph-cap"><strong>The shape.</strong> Seven levels, orange through green to violet. Never red.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-resources.webp" alt="The resources panel after a check-in" loading="lazy" /></div><p class="ph-cap"><strong>The panel.</strong> Rises on the release, not on a button.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-reset.webp" alt="A 45 second unclench reset" loading="lazy" /></div><p class="ph-cap"><strong>The reset.</strong> Forty-five seconds. Pause, or say you're done.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-reward.webp" alt="The reward moment: you just earned 10 coins" loading="lazy" /></div><p class="ph-cap"><strong>The coin.</strong> One beat for the coin, one for the words.</p></div>
+          </div>
+          <div class="two two-tight tr-anim">
+            <div class="plate"><img src="images/stressie-v4/shape-levels.webp" alt="The seven stress shape levels" loading="lazy" /></div>
+            <div class="stack">
+              <p class="s-p">The shape is the only thing on the screen that changes with you. It sharpens and cools as stress climbs, so a bad day looks different without looking like an error. The words stay about the feeling: <strong>running hot</strong>, not 7 out of 10.</p>
+              <div class="code-note"><span class="code-k">Because I wrote the code</span>The release gesture, not a Continue button, is the commit. The panel is driven off the same drag, and the coin lands on the reset's own completion handler, so the reward can never fire before the work is done.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ OFF WORK ════════════════════════════════════════ -->
+      <section id="offwork" data-has-content="true">
+        <div class="s">
+          <div class="s-head tr-anim">
+            <p class="eyebrow">Bet 2 · Off Work</p>
+            <h2 class="s-h">Flip Home, and the city becomes the app.</h2>
+            <p class="s-p">The same Home has an Off Work mode: a map of wellness experiences nearby, partners and open places told apart by pin, chips for spas, parks, movement and open now. Every place carries a real offer with a real price in coins.</p>
+          </div>
+          <div class="phones phones-4 tr-anim">
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-map.webp" alt="Off Work map with partner pins" loading="lazy" /></div><p class="ph-cap"><strong>The map.</strong> Pins, chips, and a sheet with three stops.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-list.webp" alt="The resources sheet listing nearby offers" loading="lazy" /></div><p class="ph-cap"><strong>The list.</strong> Wellness experiences and community events, one sheet.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-place.webp" alt="A place page with a coin offer" loading="lazy" /></div><p class="ph-cap"><strong>The place.</strong> Reviews, amenities, one labelled action: redeem for 80 coins.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-redeem.webp" alt="Show code when you arrive" loading="lazy" /></div><p class="ph-cap"><strong>The code.</strong> A QR and a code for the front desk.</p></div>
+          </div>
+          <div class="code-note tr-anim"><span class="code-k">Because I wrote the code</span>Location is requested the first time the map is useful, from the Off Work toggle, not in onboarding. The first check-in happens before there is an account at all. Too few coins reads "Top up", never a dead button.</div>
+        </div>
+      </section>
+
+      <!-- ══ COMMUNITY ═══════════════════════════════════════ -->
+      <section id="community" data-has-content="true">
+        <div class="s">
+          <div class="s-head tr-anim">
+            <p class="eyebrow">Bet 3 · Community, the flagship</p>
+            <h2 class="s-h">Reserve a seat with your check-ins, or host one.</h2>
+            <p class="s-p">Events on the same map: breathwork circles, pottery socials, dinner nights, a quiet hour online. Reserve for coins, add to calendar, share. Hosting is one form: a name, a line about it, when, spots, in person or online, free or a price.</p>
+          </div>
+          <div class="film tr-anim">
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c01-list.webp" alt="Community events list" loading="lazy" /></div><p class="ph-cap">The list</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c03-event.webp" alt="Pottery and coffee social event page" loading="lazy" /></div><p class="ph-cap">The event</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c04-check.webp" alt="Reserve confirmed, check and confetti" loading="lazy" /></div><p class="ph-cap">Reserved</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c05-going.webp" alt="You're going, with calendar and share" loading="lazy" /></div><p class="ph-cap">You're going</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c07-create.webp" alt="Create an event form" loading="lazy" /></div><p class="ph-cap">Host</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c10-preview.webp" alt="Host preview of the event" loading="lazy" /></div><p class="ph-cap">Preview</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c13-published.webp" alt="Your event is sent for review" loading="lazy" /></div><p class="ph-cap">Sent for review</p></div>
+          </div>
+          <div class="three tr-anim">
+            <div class="decision"><span class="decision-k">Decision</span>Online events list instantly. In-person ones wait for approval, because a stranger's address needs a person to look at it first.</div>
+            <div class="decision"><span class="decision-k">Decision</span>Reserving costs coins. A free seat gets skipped; a seat paid for with a week of check-ins gets shown up to.</div>
+            <div class="decision"><span class="decision-k">Because I wrote the code</span>Both paths share one form and one approval state. The cover is suggested from the name and description, so a host never publishes a grey card. Thirteen Figma frames, thirteen build states.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ COINS ═══════════════════════════════════════════ -->
+      <section id="coins" data-has-content="true">
+        <div class="s">
+          <div class="s-head tr-anim">
+            <p class="eyebrow">The economy</p>
+            <h2 class="s-h">A coin you can earn, top up, share and spend.</h2>
+            <p class="s-p">Five coins a check-in, up to three a day. A reset once a day, past halfway. Two hundred when a friend checks in. Short of a reward, top up. Coins leave only through a labelled action, once, and the words stay about the feeling, not the balance.</p>
+          </div>
+          <div class="phones phones-4 tr-anim">
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/welcome-coins.webp" alt="Welcome to Stressie: coins to start with" loading="lazy" /></div><p class="ph-cap"><strong>Earn.</strong> The first coins arrive before the account does.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/coins-rewards.webp" alt="Rewards: balance, next reset and available rewards" loading="lazy" /></div><p class="ph-cap"><strong>Spend.</strong> Balance, the next reward, coins to go.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/topup-card.webp" alt="Top up: a card chosen" loading="lazy" /></div><p class="ph-cap"><strong>Top up.</strong> Four tiles, Apple Pay or a card, one CTA.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/referral-sheet.webp" alt="Invite a friend and earn reset coins" loading="lazy" /></div><p class="ph-cap"><strong>Share.</strong> The one flow allowed its own colour.</p></div>
+          </div>
+
+          <div class="sub-head tr-anim">
+            <p class="eyebrow">Designing the coin</p>
+            <h3 class="s-h3">Five studies before one coin was allowed on screen.</h3>
+            <p class="s-p">There is one coin, and everything that shows a coin shows that one. Getting there took an opal, an agate, a wreath and a rule.</p>
+          </div>
+          <div class="studies tr-anim">
+            <div class="study"><div class="study-img"><img src="images/stressie-v4/coin-opal-pattern.webp" alt="Opal pattern, the painted interior" loading="lazy" /></div><p class="study-t">01 · Opal gem</p><p class="study-p">A pattern wrapped in glass, refracted at the rim. Metal shaders. Beautiful, and not a coin.</p></div>
+            <div class="study"><div class="study-img"><img src="images/stressie-v4/coin-agate-stack.webp" alt="Orange agate coin stack" loading="lazy" /></div><p class="study-t">02 · Agate coin</p><p class="study-p">Real 3D meshes in RealityKit, gold rim, a fire-opal face. Read as lava on a calm screen.</p></div>
+            <div class="study"><div class="study-img"><img src="images/stressie-v4/coin-wreath-sheet.webp" alt="Wreath coin variants A to D" loading="lazy" /></div><p class="study-t">03 · Wreath</p><p class="study-p">Four leaf palettes around a centre. Closer, still two objects.</p></div>
+            <div class="study"><div class="study-img"><img src="images/stressie-v4/coin-wreath-centres.webp" alt="Wreath centres: world, plain, honey amber, teal glass" loading="lazy" /></div><p class="study-t">04 · Centres</p><p class="study-p">World, plain wash, honey amber, teal glass. Honey won the warmth, lost the shape.</p></div>
+            <div class="study"><div class="study-img"><img src="images/stressie-v4/coin-beat1.webp" alt="The bloom coin at rest" loading="lazy" /></div><p class="study-t">05 · The bloom coin</p><p class="study-p">Gold, three petals raised out of the face, real geometry. Rendered once, used everywhere.</p></div>
+          </div>
+          <div class="two two-tight tr-anim">
+            <div>
+              <div class="plate"><img src="images/stressie-v4/reward-lights.webp" alt="Reward moment: four lighting options side by side" loading="lazy" /></div>
+              <p class="cap">The reward moment, four lights: peach beam, gold beam, house light, rays. The sunrise fan won; a burst read as Duolingo.</p>
+            </div>
+            <div class="stack">
+              <p class="s-p">The reward moment was researched before it was drawn: Apple Fitness clears the stage and centres one object, Headspace celebrates with a breath, Robinhood dropped its confetti under regulator pressure. So: two beats. The coin rises and settles on a spring with no bounce in the rotation, then the words land.</p>
+              <div class="code-note"><span class="code-k">Because I wrote the code</span>The haptic fires from the coin's completion handler, on the visual landing. Under Reduce Motion the coin fades in already at rest, the progress bar still fills, and the haptic still plays.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ BUILD ═══════════════════════════════════════════ -->
+      <section id="build" data-has-content="true">
+        <div class="s">
+          <div class="s-head tr-anim">
+            <p class="eyebrow">Design to build</p>
+            <h2 class="s-h">One pair of hands, from the research read to the App Store build.</h2>
+            <p class="s-p">I designed V4 in Figma and built it in SwiftUI myself. The design system lives in code: screens never name a colour, a radius or a type size, and a lint fails the build when one does.</p>
+          </div>
+
+          <div class="orbit-wrap tr-anim">
+            <div class="orbit" id="orbit" aria-label="Research, design, build and validate, with the numbers behind each">
+              <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="ring r4"></div>
+              <div class="carrier c1">
+                <div class="arm" style="--a:20deg;  --r:calc(var(--w) * 0.22)"><div class="sat k1"><span class="dot"></span><b>3</b><i>pilots read</i></div></div>
+                <div class="arm" style="--a:200deg; --r:calc(var(--w) * 0.22)"><div class="sat k1"><span class="dot"></span><b>8</b><i>user quotes</i></div></div>
+              </div>
+              <div class="carrier c2">
+                <div class="arm" style="--a:300deg; --r:calc(var(--w) * 0.31)"><div class="sat k2"><span class="dot"></span><b>13 / 13</b><i>frames matched</i></div></div>
+                <div class="arm" style="--a:120deg; --r:calc(var(--w) * 0.31)"><div class="sat k2"><span class="dot"></span><b>37</b><i>logged decisions</i></div></div>
+                <div class="arm" style="--a:30deg;  --r:calc(var(--w) * 0.31)"><div class="sat k2"><span class="dot"></span><b>5</b><i>coin studies</i></div></div>
+              </div>
+              <div class="carrier c3">
+                <div class="arm" style="--a:70deg;  --r:calc(var(--w) * 0.40)"><div class="sat k3"><span class="dot"></span><b>171</b><i>Swift files</i></div></div>
+                <div class="arm" style="--a:190deg; --r:calc(var(--w) * 0.40)"><div class="sat k3"><span class="dot"></span><b>20M+</b><i>tokens burned</i></div></div>
+                <div class="arm" style="--a:310deg; --r:calc(var(--w) * 0.40)"><div class="sat k3"><span class="dot"></span><b>3</b><i>languages</i></div></div>
+              </div>
+              <div class="carrier c4">
+                <div class="arm" style="--a:250deg; --r:calc(var(--w) * 0.49)"><div class="sat k4"><span class="dot"></span><b>17.4%</b><i>the V2 bar</i></div></div>
+                <div class="arm" style="--a:100deg; --r:calc(var(--w) * 0.49)"><div class="sat k4"><span class="dot"></span><b>5</b><i>metrics in flight</i></div></div>
+              </div>
+              <div class="sun"><img src="images/stressie-v4/portrait.webp" alt="Bhanu Kowshik" loading="lazy" /></div>
+            </div>
+            <div class="orbit-key">
+              <span><i class="k1"></i>Research</span><span><i class="k2"></i>Design</span><span><i class="k3"></i>Build</span><span><i class="k4"></i>Validate</span>
+              <span class="orbit-hint">Hover to pause</span>
+            </div>
+          </div>
+
+          <div class="two tr-anim">
+            <div>
+              <div class="plate"><img src="images/stressie-v4/craft-sidebyside.webp" alt="The event page: Figma render beside the simulator build" loading="lazy" /></div>
+              <p class="cap">Event page, Figma render beside the build. Measured at 3 px/pt against one anchor per pane.</p>
+            </div>
+            <div>
+              <div class="plate"><img src="images/stressie-v4/craft-glass.webp" alt="Figma versus build: glass and glow on the Talk screen" loading="lazy" /></div>
+              <p class="cap">Talk, glass and glow. Real Liquid Glass on iOS 26 with material fallbacks.</p>
+            </div>
+          </div>
+
+          <ul class="rules tr-anim">
+            <li><strong>Amber is for action.</strong> One per screen. A second makes both weaker.</li>
+            <li><strong>Sage is for reassurance.</strong> Never an action colour.</li>
+            <li><strong>Never red.</strong> Stress is not an error. Red only ends something.</li>
+            <li><strong>Lora for the one thing the screen is about.</strong> Hanken for what you read.</li>
+            <li><strong>Every text is a Dynamic Type role.</strong> Screens never name a size.</li>
+            <li><strong>Pull-overs are the only presentation.</strong> Grabber, from a screen root, tab bar hidden.</li>
+          </ul>
+
+          <div class="phones phones-3 tr-anim">
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-en.webp" alt="Onboarding question in English" loading="lazy" /></div><p class="ph-cap"><strong>English.</strong> The language menu sits above the first question.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-es.webp" alt="Onboarding question in Spanish" loading="lazy" /></div><p class="ph-cap"><strong>Spanish.</strong> About 1,150 strings relocalise live, answers kept.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-sw.webp" alt="Onboarding question in Swahili" loading="lazy" /></div><p class="ph-cap"><strong>Swahili.</strong> Layout built for the longest translation first.</p></div>
+          </div>
+
+          <div class="honest tr-anim">
+            <p><strong>What I built:</strong> every screen and flow, the design system and its lint, the check-in, resets, map, community, coins, referral, Talk's voice UI, three languages, Reduce Motion and Dynamic Type across all of it.</p>
+            <p><strong>What I did not build:</strong> the backend, payments, and the model behind Talk. Accounts, events and coins are local stores with the seams marked for the team, and the handoff says so.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ FLOW ════════════════════════════════════════════ -->
+      <section id="flow" data-has-content="true">
+        <div class="s">
+          <div class="s-head tr-anim">
+            <p class="eyebrow">The real path</p>
+            <h2 class="s-h">Splash to a seat at a breathwork circle, on device, no switches.</h2>
+          </div>
+          <div class="strip tr-anim">
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/flow-splash.webp" alt="Splash" loading="lazy" /></div><p class="ph-cap">Splash</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/flow-q3.webp" alt="Third question" loading="lazy" /></div><p class="ph-cap">Three questions</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-shape.webp" alt="First check-in" loading="lazy" /></div><p class="ph-cap">First check-in</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-resources.webp" alt="Resources" loading="lazy" /></div><p class="ph-cap">Resources</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-reset.webp" alt="Reset" loading="lazy" /></div><p class="ph-cap">Reset</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/welcome-coins.webp" alt="Welcome coins" loading="lazy" /></div><p class="ph-cap">Welcome coins</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-map.webp" alt="Map" loading="lazy" /></div><p class="ph-cap">Off Work</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-place.webp" alt="Place" loading="lazy" /></div><p class="ph-cap">A place</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c03-event.webp" alt="Event" loading="lazy" /></div><p class="ph-cap">An event</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c05-going.webp" alt="You're going" loading="lazy" /></div><p class="ph-cap">You're going</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ OUTCOMES ════════════════════════════════════════ -->
+      <section id="outcomes" data-has-content="true">
+        <div class="s">
+          <div class="s-head tr-anim">
+            <p class="eyebrow">Outcomes so far</p>
+            <h2 class="s-h">Currently validating. Metrics will be updated soon.</h2>
+            <p class="s-p">V4 is in the hands of its first users. The numbers that matter are the ones V2 never had a way to earn, and they will be posted here as they land, not before. Until then, this is what is being measured and what it has to beat.</p>
+          </div>
+          <div class="two tr-anim">
+            <div class="measure-list">
+              <div class="measure"><strong>Off-work opens</strong>Share of sessions that start after work hours. V2 had almost none.</div>
+              <div class="measure"><strong>Events reserved</strong>Seats paid for with coins, and the show-up rate behind them.</div>
+              <div class="measure"><strong>Hosts</strong>People who publish an event, and how many pass approval.</div>
+              <div class="measure"><strong>Coin redemptions</strong>Codes shown at a front desk. The proof coins buy something.</div>
+              <div class="measure"><strong>Referral conversion</strong>Invited friends who complete a first check-in.</div>
+            </div>
+            <div class="stack">
+              <div class="bar bar-stack">
+                <span class="bar-label">The bar to beat, from V2</span>
+                <div class="bar-cell"><strong>17.4%</strong>retention, from the ~2% baseline</div>
+                <div class="bar-cell"><strong>12% → 56%</strong>daily engagement</div>
+                <div class="bar-cell"><strong>4m 20s</strong>average time engaged</div>
+                <div class="bar-cell"><strong>~$600K</strong>funding unlocked, pilots with Amazon's hardware team, InKind and 50 Austin PD officers</div>
+              </div>
+              <div class="reflect">
+                <p class="eyebrow">What I'd do next</p>
+                <ul>
+                  <li>Ship the approval queue to a real reviewer before the first in-person host arrives.</li>
+                  <li>Give Talk a model, and keep the crisis handoff exactly as blunt as it is.</li>
+                  <li>Designing and building alone was fast and honest; the next version needs a second pair of eyes on the code before the numbers do.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="next tr-anim">
+            <a class="next-card" href="stressie-studio.html"><span class="eyebrow">Previous</span><strong>Stressie V1 to V2</strong><span>The pilots, the redesign, and the numbers above.</span></a>
+            <a class="next-card" href="evertutor-live.html"><span class="eyebrow">Next</span><strong>EverTutor Live</strong><span>1:1 AI tutoring for 2,000 students a day.</span></a>
+          </div>
+        </div>
+      </section>
+
+      <div class="cs-thankyou"><span class="cs-thankyou-text">✦ THANK_YOU</span></div>
 
     </div><!-- /card -->
   </div><!-- /page -->
@@ -1012,7 +904,7 @@
     const CTA_SEL   = 'a[href]:not(.op-card), button, [role="button"], .op-card-cta';
     const TEXT_SEL  = [
       'p','h1','h2','h3','h4','h5','h6','li',
-      '.cs-heading','.section-title-text','.sec-title','.why-title','.status-line','.bet-line','.rule-title',
+      '.hero-h','.s-h','.s-h3','.bet-t','.insight-t','.insight-q','.study-t','.measure','.next-card strong',
       '.heading-orange','.heading-dark','.st-orange-italic',
       '.st-card-title','.pf-card-title','.principle-title',
       '.conv-name','.cw-orange','.cs-thankyou-text',
@@ -1099,57 +991,30 @@
 
 
   /* ═══════════════════════════════════════════════════════════
-     WORD-BY-WORD HEADING ANIMATION
+     HERO — headline word by word, then the block, then the rail
   ═══════════════════════════════════════════════════════════ */
   function splitWords(el) {
     const nodes = Array.from(el.childNodes);
     el.innerHTML = '';
     nodes.forEach(node => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        node.textContent.split(/(\s+)/).forEach(chunk => {
-          if (/^\s+$/.test(chunk)) { el.appendChild(document.createTextNode(chunk)); }
-          else if (chunk) {
-            const s = document.createElement('span');
-            s.className = 'word'; s.textContent = chunk;
-            el.appendChild(s);
-          }
-        });
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        const wrapper = node.cloneNode(false);
-        node.childNodes.forEach(child => {
-          if (child.nodeType === Node.TEXT_NODE) {
-            child.textContent.split(/(\s+)/).forEach(chunk => {
-              if (/^\s+$/.test(chunk)) { wrapper.appendChild(document.createTextNode(chunk)); }
-              else if (chunk) {
-                const s = document.createElement('span');
-                s.className = 'word'; s.textContent = chunk;
-                wrapper.appendChild(s);
-              }
-            });
-          }
-        });
-        el.appendChild(wrapper);
-      }
+      const wrap = node.nodeType === Node.ELEMENT_NODE ? node.cloneNode(false) : null;
+      const text = node.textContent;
+      const target = wrap || el;
+      text.split(/(\s+)/).forEach(chunk => {
+        if (/^\s+$/.test(chunk)) { target.appendChild(document.createTextNode(chunk)); }
+        else if (chunk) { const s = document.createElement('span'); s.className = 'word'; s.textContent = chunk; target.appendChild(s); }
+      });
+      if (wrap) el.appendChild(wrap);
     });
   }
-
-  document.getElementById('etBgImg').src = 'images/hero-bg-stressie.png';
-
-  const csHeading  = document.getElementById('csHeading');
-  const csSubtitle = document.getElementById('csSubtitle');
-  const heroTopRow = document.getElementById('heroTopRow');
-  const heroFacts  = document.getElementById('heroFacts');
-  const heroFan    = document.getElementById('heroFan');
-
+  const csHeading = document.getElementById('csHeading');
   splitWords(csHeading);
   const allWords = csHeading.querySelectorAll('.word');
-
-  setTimeout(() => heroTopRow.classList.add('visible'), 80);
-  allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 260 + i * 40));
-  const afterWords = 260 + allWords.length * 40 + 60;
-  setTimeout(() => csSubtitle.classList.add('visible'), afterWords);
-  setTimeout(() => heroFacts.classList.add('visible'),  afterWords + 130);
-  setTimeout(() => heroFan.classList.add('visible'),    afterWords + 340);
+  setTimeout(() => document.getElementById('heroEyebrow').classList.add('visible'), 60);
+  allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 220 + i * 45));
+  const afterWords = 220 + allWords.length * 45 + 40;
+  ['csSubtitle', 'heroMeta', 'heroRail'].forEach((id, i) => setTimeout(() => document.getElementById(id).classList.add('visible'), afterWords + i * 140));
+  setTimeout(() => document.querySelector('.credit').classList.add('visible'), afterWords + 520);
 
   /* ═══════════════════════════════════════════════════════════
      HAMBURGER MENU
@@ -1157,7 +1022,6 @@
   const hamburger  = document.getElementById('navHamburger');
   const mobileMenu = document.getElementById('mobileMenu');
   const backdrop   = document.getElementById('menuBackdrop');
-
   function toggleMenu(force) {
     const open = force !== undefined ? force : !hamburger.classList.contains('open');
     hamburger.classList.toggle('open', open);
@@ -1172,14 +1036,12 @@
       e.preventDefault();
       toggleMenu(false);
       const target = document.querySelector(a.getAttribute('href'));
-      if (target) setTimeout(() => smoothScrollTo(
-        target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight, 900
-      ), 400);
+      if (target) setTimeout(() => smoothScrollTo(target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight, 900), 400);
     });
   });
 
   /* ═══════════════════════════════════════════════════════════
-     SMOOTH ANCHOR SCROLL
+     SMOOTH ANCHOR SCROLL + SCROLL SPY
   ═══════════════════════════════════════════════════════════ */
   function easeOutExpo(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
   function smoothScrollTo(targetY, duration) {
@@ -1192,10 +1054,7 @@
     }
     requestAnimationFrame(step);
   }
-
   const nav = document.querySelector('.nav');
-  /* mobile-menu links already scroll via their own close-then-scroll handler
-     above — binding them here too fired two competing scroll animations */
   document.querySelectorAll('a[href^="#"]:not(.mobile-menu a)').forEach(a => {
     a.addEventListener('click', e => {
       const target = document.querySelector(a.getAttribute('href'));
@@ -1204,44 +1063,30 @@
       smoothScrollTo(target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight, 900);
     });
   });
-
-  /* ═══════════════════════════════════════════════════════════
-     NAV SCROLL SPY
-  ═══════════════════════════════════════════════════════════ */
   const navBtns = document.querySelectorAll('.nav-btn[data-section]');
-
   const spyObs = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) {
-        navBtns.forEach(b => b.classList.toggle('active', b.dataset.section === e.target.id));
-      }
+      if (!e.isIntersecting) return;
+      /* the flow strip has no nav item; it keeps Build lit */
+      const id = e.target.id === 'flow' ? 'build' : e.target.id;
+      navBtns.forEach(b => b.classList.toggle('active', b.dataset.section === id));
     });
   }, { rootMargin: '-40% 0px -55% 0px' });
-
-  document.querySelectorAll('section[id]').forEach(s => {
-    if (s.children.length > 0) spyObs.observe(s);
-  });
+  document.querySelectorAll('section[id]').forEach(s => { if (s.children.length > 0) spyObs.observe(s); });
 
   /* ═══════════════════════════════════════════════════════════
-     SECTION ENTRANCE ANIMATIONS
+     REVEALS — sections rise, then their children stagger
   ═══════════════════════════════════════════════════════════ */
   const childObs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      e.target.classList.add('visible');
-      childObs.unobserve(e.target);
-    });
+    entries.forEach(e => { if (!e.isIntersecting) return; e.target.classList.add('visible'); childObs.unobserve(e.target); });
   }, { threshold: 0.12 });
   document.querySelectorAll('.tr-anim').forEach(el => childObs.observe(el));
 
-  /* phones and cells fade up one by one once their row is in view */
   const STAGGER_PAIRS = [
-    { parent: '.phones',       child: '.ph'       },
-    { parent: '.film',         child: '.ph'       },
-    { parent: '.why-grid',     child: '.why-cell' },
-    { parent: '.trio',         child: '.trio-cell'},
-    { parent: '.rules',        child: '.rule'     },
-    { parent: '.decision-row', child: '.decision' },
+    { parent: '.phones',  child: '.ph' },   { parent: '.film',    child: '.ph' },
+    { parent: '.strip',   child: '.ph' },   { parent: '.bets',    child: '.bet' },
+    { parent: '.studies', child: '.study' },{ parent: '.three',   child: '.decision' },
+    { parent: '.insights',child: '.insight' },
   ];
   const animGroups = new Map();
   STAGGER_PAIRS.forEach(({ parent, child }) => {
@@ -1255,12 +1100,21 @@
   const elObs = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (!e.isIntersecting) return;
-      const kids = animGroups.get(e.target) || [];
-      kids.forEach((kid, i) => setTimeout(() => kid.classList.add('el-visible'), 120 + i * 90));
+      (animGroups.get(e.target) || []).forEach((kid, i) => setTimeout(() => kid.classList.add('el-visible'), 100 + i * 80));
       elObs.unobserve(e.target);
     });
   }, { threshold: 0.08 });
   animGroups.forEach((_, parentEl) => elObs.observe(parentEl));
+
+  /* ═══════════════════════════════════════════════════════════
+     ORBIT — the arms need the orbit's width in px
+  ═══════════════════════════════════════════════════════════ */
+  (function () {
+    const o = document.getElementById('orbit');
+    if (!o) return;
+    function fit() { o.style.setProperty('--w', o.clientWidth + 'px'); }
+    fit(); new ResizeObserver(fit).observe(o);
+  })();
   </script>
 
 
