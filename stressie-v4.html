@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stressie V4 · Bhanu Kowshik</title>
+
+  <!-- ── Social share meta (image source: og-image.html → images/og-image.jpg) ── -->
+  <meta name="description" content="Stressie V4 case study. Community, an Off Work map and a reset coin economy, designed and built in SwiftUI. By Bhanu Kowshik, AI Native Product Designer." />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Bhanu Kowshik" />
+  <meta property="og:title" content="Stressie V4 · Bhanu Kowshik" />
+  <meta property="og:description" content="Case study: turning a ninety-second check-in into something to do with the rest of your day." />
+  <meta property="og:url" content="https://bhanu.build/stressie-v4.html" />
+  <meta property="og:image" content="https://bhanu.build/images/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Stressie V4 · Bhanu Kowshik" />
+  <meta name="twitter:image" content="https://bhanu.build/images/og-image.jpg" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192.png" />
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
+    a[href], button, [role="button"] { cursor: pointer !important; }
+
+    /* ─── TOKENS ─────────────────────────────────────────────── */
+    :root {
+      --secondary:    #454545;
+      --bg:           #FFFCF8;
+      --white:        #FFFFFF;
+      --grey:         #9C9C9C;
+      --border:       #EFEFEF;
+      --orange:       #BF6212;
+      --orange-light: #FFF7E9;
+      --orange-badge: #8C4A0D;
+      --orange-rgb:   191,98,18;
+      /* small-text orange: --orange only clears AA at display sizes, so the
+         11–13px labels use this deeper cut (flips to the bright orange in dark) */
+      --orange-ink:   #8C4A0D;
+      /* ── TYPE — the portfolio's system, carried into the case study ──
+         Playfair and Poppins were this page's own pair; the site now has one.
+         The token names stay so the rules below need no edit — only what they
+         resolve to has changed. The display face is the serif, and it is
+         italic wherever it lands, exactly as on the home page. */
+      --font-display: 'Instrument Serif', Georgia, serif;
+      --font-heading: 'Instrument Sans', system-ui, sans-serif;
+      --font-mono:    'Urbanist', 'Instrument Sans', system-ui, sans-serif;
+      --font-serif:   'Instrument Serif', Georgia, serif;
+      /* one button, every page: white out of the top-left, azure across the rest */
+      --cta-grad: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #E4EFFF 9%, #93BEFF 26%, #4B8AF0 50%, #2463DC 76%, #1A4CB8 100%);
+      --cta-grad-hover: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #EDF4FF 11%, #A6CBFF 29%, #5A96F5 53%, #2C6FE8 79%, #1F57CA 100%);
+
+      /* ── Font scale ── */
+      --fs-xs:   11px;   /* eyebrow labels */
+      --fs-sm:   13px;   /* tags, small meta */
+      --fs-base: 16px;   /* body copy */
+      --fs-md:   18px;   /* subtitle, card sub-labels */
+      --fs-lg:   22px;   /* section titles, card headings */
+    }
+
+    /* ─── BODY ───────────────────────────────────────────────── */
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--bg);
+      min-height: 100vh;
+      font-family: var(--font-heading);
+      /* clip, not hidden — the off-canvas mobile menu otherwise leaves the
+         page horizontally pannable; hidden stays as the older-browser fallback */
+      overflow-x: hidden;
+      overflow-x: clip;
+      cursor: none;
+    }
+
+    /* Film grain — the ground hero-lab uses. Replaces the page-wide dot mesh,
+       which stamped one pattern across every section instead of letting each
+       section carry its own texture. Sits above content but under the nav
+       and the custom cursor. */
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ─── CUSTOM CURSOR ──────────────────────────────────────── */
+    html.cc-active * { cursor: none !important; }
+    #ccDot {
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 13000;
+      will-change: transform;
+      width: 12px; height: 12px;
+      border-radius: 9999px;
+      background: rgba(37,37,37,0.7);
+      opacity: 0;
+      transition:
+        width         0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+        height        0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.30s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background    0.26s ease,
+        opacity       0.18s ease;
+    }
+
+    /* ─── NAV ────────────────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 900;
+      background: rgba(255,252,248,0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0px 1px 0px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 40px;
+      height: 54px;
+      transform: translateY(0);
+      transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+    }
+    .nav.nav-hidden { transform: translateY(-100%); }
+
+    .nav-home {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; flex-shrink: 0; cursor: pointer !important;
+    }
+    .nav-home img {
+      width: 38px; height: 38px; display: block;
+      transform: rotate(200deg);
+      transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .nav-home:hover img { transform: rotate(180deg); }
+    .nav-home span {
+      font-family: var(--font-heading);
+      font-weight: 600; font-size: 15px;
+      color: var(--secondary); white-space: nowrap;
+    }
+
+    /* flex:1 + centre keeps the links visually centred now that the theme
+       toggle no longer sits on the right — space-between alone would shove
+       them against the edge */
+    .nav-sections { display: flex; align-items: center; justify-content: center; flex: 1; gap: 2px; }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      padding: 5px 10px;
+      border-radius: 5px; border: none; background: transparent;
+      font-family: var(--font-heading); font-weight: 500; font-size: 11px;
+      color: var(--secondary);
+      text-decoration: none; white-space: nowrap;
+      cursor: pointer !important;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .nav-btn:hover:not(.active) { background: #F2F2F2; }
+    .nav-btn.active { background: var(--secondary); color: var(--white); }
+
+    /* ─── HAMBURGER ──────────────────────────────────────────── */
+    .nav-hamburger {
+      display: none; flex-direction: column; justify-content: center;
+      gap: 5px; width: 36px; height: 36px; padding: 6px;
+      background: none; border: none; cursor: none; flex-shrink: 0;
+    }
+    .nav-hamburger span {
+      display: block; height: 2px; background: var(--secondary);
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ─── MOBILE MENU ────────────────────────────────────────── */
+    .mobile-menu-backdrop {
+      position: fixed; inset: 0;
+      z-index: 489;
+      background: rgba(37,37,37,0.35);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.38s ease;
+    }
+    .mobile-menu-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .mobile-menu {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 78vw; max-width: 320px;
+      z-index: 490;
+      background: var(--bg);
+      box-shadow: -8px 0 32px rgba(0,0,0,0.10);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 80px 32px 48px; gap: 4px;
+      transform: translateX(100%);
+      /* hidden while closed so keyboard focus can't land on off-screen links;
+         the delay holds visibility until the slide-out finishes */
+      visibility: hidden;
+      transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1),
+                  visibility 0s linear 0.38s;
+    }
+    .mobile-menu.open {
+      transform: translateX(0);
+      visibility: visible;
+      transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1), visibility 0s;
+    }
+
+    .mobile-menu a {
+      font-family: var(--font-mono);
+      font-weight: 500; font-size: 13px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--secondary); text-decoration: none;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      width: 100%;
+      opacity: 0; transform: translateX(16px);
+      transition: opacity 0.3s ease, transform 0.3s ease, color 0.15s ease;
+    }
+    .mobile-menu.open a { opacity: 1; transform: translateX(0); }
+    .mobile-menu a:nth-child(1) { transition-delay: 0.07s; }
+    .mobile-menu a:nth-child(2) { transition-delay: 0.11s; }
+    .mobile-menu a:nth-child(3) { transition-delay: 0.15s; }
+    .mobile-menu a:nth-child(4) { transition-delay: 0.19s; }
+    .mobile-menu a:nth-child(5) { transition-delay: 0.23s; }
+    .mobile-menu a:nth-child(6) { transition-delay: 0.27s; }
+    .mobile-menu a:nth-child(7) { transition-delay: 0.31s; }
+    .mobile-menu a:nth-child(8) { transition-delay: 0.35s; }
+    .mobile-menu a.active { font-weight: 700; color: var(--orange); }
+
+    /* ─── PAGE + CONTENT COLUMN ──────────────────────────────── */
+    /* frame retired — the column follows hero-lab's 1400px width system */
+    .page { display: flex; justify-content: center; padding: 74px 0 0; }
+    .card {
+      background: none; width: 100%; max-width: 1400px;
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+
+    /* ─── SHARED — section rhythm ────────────────────────────── */
+    /* every section is a header (number, italic serif title, one line of
+       intent) followed by screens; copy stays at two to four sentences */
+    .sec { padding: 0 48px 96px; }
+    .sec-head {
+      display: grid; grid-template-columns: 72px 1fr; gap: 0 24px;
+      align-items: baseline; margin-bottom: 36px;
+      padding-top: 28px; border-top: 1px solid rgba(37,37,37,0.12);
+    }
+    .sec-num {
+      font-family: var(--font-mono); font-weight: 500; font-size: var(--fs-sm);
+      letter-spacing: 0.08em; color: var(--orange-ink);
+    }
+    .sec-title {
+      font-family: var(--font-display); font-style: italic; font-weight: 400;
+      font-size: clamp(34px, 3.6vw, 52px); line-height: 1.1;
+      color: var(--secondary); letter-spacing: -0.01em;
+    }
+    .sec-title em { font-style: italic; color: var(--orange); }
+    .sec-lede {
+      grid-column: 2; margin-top: 14px; max-width: 720px;
+      font-family: var(--font-heading); font-weight: 400;
+      font-size: var(--fs-md); line-height: 1.65; color: rgba(37,37,37,0.72);
+    }
+    .sec-lede strong { font-weight: 600; color: var(--secondary); }
+
+    /* body copy beside or under screens */
+    .copy {
+      font-family: var(--font-heading); font-weight: 400;
+      font-size: var(--fs-base); line-height: 1.75; color: rgba(37,37,37,0.78);
+      max-width: 640px;
+    }
+    .copy strong { font-weight: 600; color: var(--secondary); }
+
+    /* the one "decision" per section — amber rail, plain words */
+    .decision {
+      position: relative; padding: 18px 22px 18px 26px;
+      border-radius: 14px; background: var(--orange-light);
+      font-family: var(--font-heading); font-size: 15px; line-height: 1.6;
+      color: var(--secondary); max-width: 640px;
+    }
+    .decision::before {
+      content: ''; position: absolute; left: 0; top: 14px; bottom: 14px;
+      width: 3px; border-radius: 3px; background: var(--orange);
+    }
+    .decision-label {
+      display: block; margin-bottom: 4px;
+      font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs);
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange-ink);
+    }
+    .decision-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .decision-row .decision { max-width: none; }
+
+    /* ─── PHONES ─────────────────────────────────────────────── */
+    /* the phone frame is the screenshot's own corners plus a soft shadow;
+       1206×2622 shots keep their aspect, so a row's height follows its width */
+    .phones { display: grid; gap: 20px; align-items: start; }
+    .phones-2 { grid-template-columns: repeat(2, 1fr); }
+    .phones-3 { grid-template-columns: repeat(3, 1fr); }
+    .phones-4 { grid-template-columns: repeat(4, 1fr); }
+    .ph { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .ph-img {
+      border-radius: 9.2% / 4.2%; overflow: hidden; aspect-ratio: 1206 / 2622;
+      background: #EDE7DE;
+      box-shadow: 0 18px 44px rgba(37,20,4,0.16), 0 2px 8px rgba(37,20,4,0.08);
+    }
+    .ph-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ph-cap {
+      font-family: var(--font-heading); font-size: var(--fs-sm); line-height: 1.5;
+      color: rgba(37,37,37,0.62); padding: 0 4px;
+    }
+    .ph-cap strong { font-weight: 600; color: var(--secondary); }
+
+    /* screens + copy, side by side */
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+    .split .stack { display: flex; flex-direction: column; gap: 22px; }
+
+    /* wide plates (side by sides, strips) */
+    .plate {
+      border-radius: 18px; overflow: hidden; background: #FFFFFF;
+      border: 1px solid rgba(37,37,37,0.08);
+    }
+    .plate img { width: 100%; display: block; }
+    .plate-cap {
+      display: flex; justify-content: space-between; gap: 16px;
+      padding: 12px 4px 0;
+      font-family: var(--font-heading); font-size: var(--fs-sm);
+      color: rgba(37,37,37,0.62);
+    }
+    .plate-cap span:first-child { white-space: nowrap; }
+    .plate-cap span:last-child { text-align: right; }
+
+    /* ─── HERO ───────────────────────────────────────────────── */
+    .cs-hero {
+      display: flex; flex-direction: column; gap: 24px;
+      padding: clamp(34px, 4.2vw, 64px) clamp(28px, 3.6vw, 52px) 0;
+      margin: 0 48px 56px; position: relative; isolation: isolate;
+      border-radius: 16px; overflow: hidden;
+    }
+    .cs-hero > .et-bg-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: 50% 86%;
+      display: none; pointer-events: none; z-index: 0;
+    }
+    [data-theme="dark"] .cs-hero > .et-bg-img { display: block; }
+    .hero-scrim {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(100deg, #FFFCF8 0%, #FEF9F2 58%, #FBEEDD 100%);
+    }
+    .cs-hero > *:not(.et-bg-img):not(.hero-scrim) { position: relative; z-index: 2; }
+
+    .hero-top-row { display: flex; align-items: center; justify-content: space-between; opacity: 0; }
+    .hero-top-row.visible { animation: fade-in 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
+    .hero-pills { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 0.8px solid rgba(191,98,18,0.55);
+      padding: 9px 18px; border-radius: 50px;
+      font-family: var(--font-heading); font-weight: 600; font-size: var(--fs-sm);
+      color: var(--secondary); white-space: nowrap; text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .hero-pill:hover { background: rgba(191,98,18,0.06); }
+    .hero-link-plain {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--font-heading); font-weight: 500; font-size: var(--fs-sm);
+      color: var(--orange-ink); text-decoration: none; white-space: nowrap; flex-shrink: 0;
+    }
+    .hero-link-plain:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .hero-link-plain .link-arrow { display: inline-flex; transition: transform 0.15s ease; }
+    .hero-link-plain:hover .link-arrow { transform: translate(2px, -2px); }
+
+    .cs-heading { font-size: 54px; line-height: 1.28; color: var(--secondary); max-width: 1040px; }
+    .cs-heading .word {
+      display: inline-block; opacity: 0; transform: translateY(22px); will-change: opacity, transform;
+    }
+    .cs-heading .word.visible { animation: word-rise 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
+    .heading-orange {
+      font-family: var(--font-display); font-style: italic; font-weight: 400;
+      font-size: 1.06em; color: var(--orange);
+    }
+    .heading-dark { font-family: var(--font-heading); font-weight: 600; color: var(--secondary); }
+
+    .cs-subtitle {
+      font-family: var(--font-heading); font-weight: 500;
+      font-size: var(--fs-md); line-height: 1.65;
+      color: rgba(37,37,37,0.72); max-width: 700px; opacity: 0;
+    }
+    .cs-subtitle.visible { animation: fade-in 0.6s cubic-bezier(0.22,0.61,0.36,1) both; }
+
+    /* ownership row — who did what, up front */
+    .hero-facts {
+      display: flex; flex-wrap: wrap; gap: 10px 28px; opacity: 0;
+    }
+    .hero-facts.visible { animation: fade-in 0.6s cubic-bezier(0.22,0.61,0.36,1) both; }
+    .hero-fact {
+      font-family: var(--font-heading); font-size: var(--fs-sm); color: rgba(37,37,37,0.62);
+    }
+    .hero-fact strong { display: block; font-weight: 600; font-size: var(--fs-base); color: var(--secondary); }
+
+    /* four fanned phones on a dark plate, the flagship screens first */
+    .hero-fan {
+      position: relative; margin-top: 8px; height: 520px;
+      border-radius: 30px 30px 0 0; overflow: hidden;
+      background:
+        radial-gradient(ellipse at 74% 30%, rgba(190,100,20,0.48) 0%, rgba(140,68,14,0.22) 36%, transparent 60%),
+        #1A0F06;
+      opacity: 0; transform: translateY(32px);
+    }
+    .hero-fan.visible { animation: card-rise 0.85s cubic-bezier(0.16,1,0.3,1) both; }
+    .fan-ph {
+      position: absolute; top: 56px; width: 21%; max-width: 250px;
+      border-radius: 9.2% / 4.2%; overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 6px 20px rgba(0,0,0,0.4);
+      transform-origin: 50% 120%;
+      transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .fan-ph img { width: 100%; display: block; }
+    .fan-ph:nth-child(1) { left: 9%;  transform: rotate(-7deg) translateY(24px); }
+    .fan-ph:nth-child(2) { left: 30%; transform: rotate(-2.5deg); }
+    .fan-ph:nth-child(3) { left: 51%; transform: rotate(2.5deg); }
+    .fan-ph:nth-child(4) { left: 72%; transform: rotate(7deg) translateY(24px); }
+    .hero-fan:hover .fan-ph { transform: rotate(0) translateY(-6px); }
+    .fan-labels {
+      position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 24px;
+      display: flex; justify-content: space-around; gap: 12px;
+      background: linear-gradient(to top, rgba(26,15,6,0.95), rgba(26,15,6,0));
+      font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,250,240,0.7);
+    }
+
+    /* ─── 01 WHY V4 ──────────────────────────────────────────── */
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+    .why-cell {
+      background: var(--orange-light); border-radius: 20px; padding: 26px 28px 28px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .why-label {
+      font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs);
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange-ink);
+    }
+    .why-title {
+      font-family: var(--font-display); font-style: italic; font-weight: 400;
+      font-size: 28px; line-height: 1.15; color: var(--secondary);
+    }
+    .why-body {
+      font-family: var(--font-heading); font-size: 15px; line-height: 1.7; color: rgba(37,37,37,0.74);
+    }
+    .why-body strong { font-weight: 600; color: var(--secondary); }
+    .why-bet {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+      margin-top: 40px;
+    }
+    .bet-line {
+      font-family: var(--font-heading); font-weight: 600; font-size: 28px; line-height: 1.45;
+      color: var(--secondary);
+    }
+    .bet-line em { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 1.12em; color: var(--orange); }
+
+    /* ─── 04 COMMUNITY FILMSTRIP ─────────────────────────────── */
+    .film {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px;
+      counter-reset: frame;
+    }
+    .film .ph { counter-increment: frame; }
+    .film .ph-cap::before {
+      content: counter(frame, decimal-leading-zero) '  ';
+      font-family: var(--font-mono); font-weight: 600; color: var(--orange-ink); letter-spacing: 0.08em;
+    }
+    .film-wrap { margin: 0 0 28px; }
+
+    /* ─── 05 COINS · TALK · INSIGHTS ─────────────────────────── */
+    .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .trio-cell {
+      background: var(--orange-light); border-radius: 22px; padding: 26px 26px 0;
+      display: flex; flex-direction: column; gap: 14px; overflow: hidden;
+    }
+    .trio-cell .why-title { font-size: 30px; }
+    .trio-cell .copy { font-size: 15px; max-width: none; }
+    .trio-shot {
+      margin: 10px -4px 0; border-radius: 22px 22px 0 0; overflow: hidden;
+      box-shadow: 0 -10px 30px rgba(37,20,4,0.12); aspect-ratio: 1206 / 1900; background: #EDE7DE;
+    }
+    .trio-shot img { width: 100%; display: block; }
+
+    /* ─── 06 CRAFT ───────────────────────────────────────────── */
+    .rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+    .rule {
+      border: 1px solid rgba(191,98,18,0.22); border-radius: 16px; padding: 20px 22px;
+      background: #FFFFFF; display: flex; flex-direction: column; gap: 8px;
+    }
+    .rule-swatch { display: flex; gap: 6px; }
+    .rule-swatch i { width: 18px; height: 18px; border-radius: 6px; display: block; }
+    .rule-title { font-family: var(--font-heading); font-weight: 600; font-size: var(--fs-base); color: var(--secondary); }
+    .rule-body { font-family: var(--font-heading); font-size: 14px; line-height: 1.6; color: rgba(37,37,37,0.7); }
+    .craft-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; align-items: start; margin-bottom: 20px; }
+    .craft-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
+    .stat {
+      background: var(--orange-light); border-radius: 16px; padding: 20px 22px;
+      font-family: var(--font-heading); font-size: var(--fs-sm); color: rgba(37,37,37,0.62);
+    }
+    .stat strong { display: block; font-weight: 700; font-size: 28px; line-height: 1.2; color: var(--secondary); margin-bottom: 4px; }
+
+    /* ─── 07 STATUS ──────────────────────────────────────────── */
+    .status-plate {
+      border-radius: 30px; padding: 48px 44px;
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(190,100,20,0.42) 0%, rgba(140,68,14,0.18) 40%, transparent 65%),
+        #1A0F06;
+      display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; color: #FFFCF8;
+    }
+    .status-line {
+      font-family: var(--font-display); font-style: italic; font-weight: 400;
+      font-size: clamp(30px, 3.2vw, 44px); line-height: 1.15; color: #FFFCF8;
+    }
+    .status-sub { font-family: var(--font-heading); font-size: var(--fs-base); line-height: 1.7; color: rgba(255,250,240,0.62); margin-top: 16px; max-width: 520px; }
+    .status-sub strong { color: rgba(255,250,240,0.95); font-weight: 600; }
+    .measure { list-style: none; margin-top: 22px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .measure li {
+      font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 8px 12px; border-radius: 100px; border: 1px solid rgba(255,250,240,0.22); color: rgba(255,250,240,0.85);
+    }
+    .bar-label { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,250,240,0.55); margin-bottom: 14px; }
+    .bar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .bar-cell {
+      background: rgba(255,252,248,0.07); border: 1px solid rgba(255,252,248,0.10);
+      border-radius: 16px; padding: 14px 16px;
+      font-family: var(--font-heading); font-size: 13px; line-height: 1.5; color: rgba(255,252,248,0.6);
+    }
+    .bar-cell strong { display: block; font-weight: 600; font-size: 22px; color: rgba(255,252,248,0.95); }
+    .bar-cell.wide { grid-column: 1 / -1; }
+    .bar-cell.wide strong { font-size: 16px; }
+    .v2-link {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 22px;
+      background: var(--cta-grad); color: #fff; text-decoration: none;
+      font-family: var(--font-heading); font-size: 13px; font-weight: 600;
+      padding: 12px 18px; border-radius: 12px; transition: transform 0.18s ease;
+    }
+    .v2-link:hover { background: var(--cta-grad-hover); transform: translateY(-3px); }
+
+    /* ─── THANK YOU BAR ──────────────────────────────────────── */
+    .cs-thankyou { background: var(--orange-badge); width: 100%; padding: 12px 40px; display: flex; align-items: center; justify-content: center; }
+    .cs-thankyou-text { font-family: var(--font-mono); font-weight: 500; font-size: 15px; letter-spacing: 0.08em; color: #FFFCF8; }
+
+    /* ─── REVEALS ────────────────────────────────────────────── */
+    .tr-anim { opacity: 0; transform: translateY(40px); }
+    .tr-anim.visible { animation: section-rise 1.1s cubic-bezier(0.16,1,0.3,1) both; }
+    .el-anim { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+    .el-anim.el-visible { opacity: 1; transform: translateY(0); }
+
+    @keyframes word-rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes card-rise { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes section-rise { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+    @media (hover: none) {
+      #ccDot { display: none; }
+      body { cursor: auto; }
+      a, button { cursor: pointer; }
+    }
+    @media (max-width: 1024px) {
+      .nav               { padding: 8px 24px; }
+      .nav-sections      { display: none; }
+      .nav-hamburger     { display: flex; }
+      .cs-hero           { margin: 0 28px 44px; gap: 20px; }
+      .cs-heading        { font-size: 42px; }
+      .hero-fan          { height: 420px; }
+      .sec               { padding: 0 28px 80px; }
+      .why-grid, .trio, .rules, .decision-row { grid-template-columns: 1fr 1fr; }
+      .film              { grid-template-columns: repeat(4, 1fr); }
+      .craft-grid        { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 767px) {
+      .page              { padding: 60px 0 0; }
+      .cs-hero           { margin: 0 5% 36px; gap: 16px; padding-left: 20px; padding-right: 20px; }
+      .cs-heading        { font-size: 30px; }
+      .cs-subtitle       { font-size: 15px; }
+      .hero-pill         { font-size: 12px; padding: 8px 14px; }
+      .hero-top-row      { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .hero-fan          { height: 300px; border-radius: 22px 22px 0 0; }
+      .fan-ph            { top: 36px; width: 26%; }
+      .fan-ph:nth-child(1) { left: 2%; }  .fan-ph:nth-child(2) { left: 25%; }
+      .fan-ph:nth-child(3) { left: 48%; } .fan-ph:nth-child(4) { left: 71%; }
+      .fan-labels        { display: none; }
+      .sec               { padding: 0 5% 64px; }
+      .sec-head          { grid-template-columns: 1fr; gap: 6px; margin-bottom: 24px; }
+      .sec-lede          { grid-column: 1; font-size: 16px; }
+      .phones-3, .phones-4, .phones-2 { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .split, .why-bet   { grid-template-columns: 1fr; gap: 24px; }
+      .why-grid, .trio, .rules, .decision-row, .craft-stats, .bar-grid { grid-template-columns: 1fr; }
+      .film              { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .status-plate      { grid-template-columns: 1fr; padding: 32px 24px; border-radius: 22px; }
+      .bet-line          { font-size: 22px; }
+      .why-title         { font-size: 24px; }
+    }
+
+    /* ─── DARK MODE TOKENS ───────────────────────────────────── */
+    [data-theme="dark"] {
+      --secondary:    #EFF3F8;
+      --bg:           #0A0E15;
+      --white:        #0E141D;
+      --grey:         #A9B4C2;
+      --border:       #222C3D;
+      --orange:       #FF8A3D;
+      --orange-light: #2A1A08;
+      --orange-rgb:   255,138,61;
+      --orange-ink:   #FF8A3D;
+    }
+    [data-theme="dark"] .nav-home img { filter: invert(1); }
+    [data-theme="dark"] .nav { background: rgba(26,26,26,0.92); box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.06); }
+    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #182130; }
+    [data-theme="dark"] .mobile-menu { box-shadow: -8px 0 32px rgba(0,0,0,0.40); }
+    [data-theme="dark"] .hero-pill { border-color: rgba(191,98,18,0.45); }
+    [data-theme="dark"] .hero-pill:hover { background: rgba(191,98,18,0.12); }
+    [data-theme="dark"] .hero-scrim {
+      background: linear-gradient(100deg, rgba(10,14,21,0.88) 0%, rgba(10,14,21,0.68) 38%, rgba(10,14,21,0.30) 64%, rgba(10,14,21,0.05) 88%);
+    }
+    [data-theme="dark"] .cs-subtitle, [data-theme="dark"] .sec-lede,
+    [data-theme="dark"] .copy, [data-theme="dark"] .why-body, [data-theme="dark"] .rule-body,
+    [data-theme="dark"] .ph-cap, [data-theme="dark"] .plate-cap, [data-theme="dark"] .hero-fact,
+    [data-theme="dark"] .stat { color: #A9B4C2; }
+    [data-theme="dark"] .sec-head { border-top-color: rgba(240,237,232,0.12); }
+    [data-theme="dark"] .rule, [data-theme="dark"] .plate { background: #0E141D; border-color: rgba(240,237,232,0.12); }
+    [data-theme="dark"] .ph-img, [data-theme="dark"] .trio-shot { background: #182130; box-shadow: 0 18px 44px rgba(0,0,0,0.5); }
+
+    /* ─── KEYBOARD FOCUS ─────────────────────────────────────── */
+    .nav-home:focus-visible, .nav-btn:focus-visible, .nav-hamburger:focus-visible,
+    .mobile-menu a:focus-visible, .hero-pill:focus-visible,
+    .hero-link-plain:focus-visible, .v2-link:focus-visible {
+      outline: 2px solid var(--secondary); outline-offset: 3px;
+    }
+    .nav-btn:focus-visible, .nav-hamburger:focus-visible { border-radius: 6px; }
+
+    /* ─── REDUCED MOTION ─────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+  <!-- Microsoft Clarity -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "xt8r81h0gs");
+  </script>
+</head>
+<body>
+
+  <!-- ── CURSOR ─────────────────────────────────────────────── -->
+  <div id="ccDot" aria-hidden="true"></div>
+
+  <!-- ── NAV ───────────────────────────────────────────────── -->
+  <nav class="nav">
+    <a href="/" class="nav-home">
+      <img src="cs-nav-logo.svg" alt="" />
+      <span>Stressie V4</span>
+    </a>
+    <div class="nav-sections">
+      <a href="#summary"   class="nav-btn active" data-section="summary">Summary</a>
+      <a href="#why"       class="nav-btn"        data-section="why">Why V4</a>
+      <a href="#checkin"   class="nav-btn"        data-section="checkin">Check in</a>
+      <a href="#offwork"   class="nav-btn"        data-section="offwork">Off Work</a>
+      <a href="#community" class="nav-btn"        data-section="community">Community</a>
+      <a href="#more"      class="nav-btn"        data-section="more">Coins · Talk · Insights</a>
+      <a href="#craft"     class="nav-btn"        data-section="craft">Craft</a>
+      <a href="#status"    class="nav-btn"        data-section="status">Status</a>
+    </div>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ── MOBILE MENU ────────────────────────────────────────── -->
+  <div class="mobile-menu-backdrop" id="menuBackdrop"></div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#summary">Summary</a>
+    <a href="#why">Why V4</a>
+    <a href="#checkin">Check in, then act</a>
+    <a href="#offwork">Off Work</a>
+    <a href="#community">Community</a>
+    <a href="#more">Coins · Talk · Insights</a>
+    <a href="#craft">Craft</a>
+    <a href="#status">Status</a>
+  </div>
+
+  <!-- ── PAGE ───────────────────────────────────────────────── -->
+  <div class="page">
+    <div class="card">
+
+      <!-- ══ SUMMARY (hero) ══════════════════════════════════ -->
+      <section id="summary" data-has-content="true">
+        <div class="cs-hero">
+
+          <img id="etBgImg" class="et-bg-img" alt="" />
+          <div class="hero-scrim" aria-hidden="true"></div>
+
+          <div class="hero-top-row" id="heroTopRow">
+            <div class="hero-pills">
+              <span class="hero-pill">Founding Product Designer</span>
+              <span class="hero-pill">2026</span>
+              <span class="hero-pill">iOS</span>
+              <span class="hero-pill">V4</span>
+              <span class="hero-pill">Wellness</span>
+              <span class="hero-pill">B2B / B2C</span>
+            </div>
+            <a href="https://www.stressieapp.com" class="hero-link-plain" target="_blank" rel="noopener">
+              www.stressieapp.com
+              <span class="link-arrow">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                  <path d="M2 11L11 2M11 2H4.5M11 2V8.5" stroke="#BF6212" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </a>
+          </div>
+
+          <div class="cs-heading" id="csHeading"><span class="heading-orange">Stressie V4 turns a ninety-second check-in</span><span class="heading-dark"> into something to do with the rest of your day.</span></div>
+
+          <p class="cs-subtitle" id="csSubtitle">V2 proved people stay for the quick resets and the calm UI. V4 gives them a reason to open the app after work: a community of wellness experiences, paid for with the coins their check-ins earn.</p>
+
+          <div class="hero-facts" id="heroFacts">
+            <div class="hero-fact"><strong>Designed and built it</strong>Figma to SwiftUI, one designer</div>
+            <div class="hero-fact"><strong>171 Swift files</strong>iOS 26, Liquid Glass, Dynamic Type</div>
+            <div class="hero-fact"><strong>3 languages</strong>English, Spanish, Swahili</div>
+            <div class="hero-fact"><strong>Currently validating</strong>Metrics will be updated soon</div>
+          </div>
+
+          <div class="hero-fan" id="heroFan">
+            <div class="fan-ph"><img src="images/stressie-v4/hero-atwork.webp" alt="At Work home: the stress shape and slider" /></div>
+            <div class="fan-ph"><img src="images/stressie-v4/hero-offwork.webp" alt="Off Work: a map of wellness experiences" /></div>
+            <div class="fan-ph"><img src="images/stressie-v4/hero-event.webp" alt="A community event page" /></div>
+            <div class="fan-ph"><img src="images/stressie-v4/hero-rewards.webp" alt="Rewards and the reset coin balance" /></div>
+            <div class="fan-labels" aria-hidden="true">
+              <span>At Work</span><span>Off Work</span><span>Community</span><span>Rewards</span>
+            </div>
+          </div>
+
+        </div><!-- /cs-hero -->
+      </section>
+
+      <!-- ══ 01 WHY V4 ═══════════════════════════════════════ -->
+      <section id="why" data-has-content="true">
+        <div class="sec">
+          <div class="sec-head tr-anim">
+            <span class="sec-num">01</span>
+            <h2 class="sec-title">Why <em>V4</em></h2>
+            <p class="sec-lede">V2 worked. The question was what people would do with an app that had earned ninety seconds of their day, and what the wellness space had become while we were measuring.</p>
+          </div>
+
+          <div class="why-grid tr-anim">
+            <div class="why-cell">
+              <span class="why-label">What V2 proved</span>
+              <h3 class="why-title">People stayed for the resets and the calm.</h3>
+              <p class="why-body">Retention went from the <strong>~2% industry baseline to 17.4%</strong>, daily engagement from <strong>12% to 56%</strong>, and the average session ran <strong>4m 20s</strong>. Quick resets and a quiet UI were the whole reason.</p>
+            </div>
+            <div class="why-cell">
+              <span class="why-label">What users asked for</span>
+              <h3 class="why-title">Ask for less, earlier. Give more, later.</h3>
+              <p class="why-body">Onboarding asked for <strong>trust before the app had done anything</strong>. Coping points piled up with <strong>no clear value</strong>. And once the workday ended there was <strong>nothing to do</strong> in the app at all.</p>
+            </div>
+            <div class="why-cell">
+              <span class="why-label">Where the space went</span>
+              <h3 class="why-title">Wellness left the app and went into the room.</h3>
+              <p class="why-body">Run clubs, sound baths, dinner nights, Luma and Partiful style events. <strong>The product that wins is the one that gets you there</strong>, not the one with the best breathing timer.</p>
+            </div>
+          </div>
+
+          <div class="why-bet tr-anim">
+            <p class="bet-line">The bet: <em>Community.</em> Make the check-in pay for something real, off work, with other people.</p>
+            <div>
+              <div class="plate"><img src="images/stressie-v4/before-after.webp" alt="Home screen, V2 beside V4" loading="lazy" /></div>
+              <div class="plate-cap"><span>Home, V2</span><span>Home, V4: the same shape, an Off Work mode and a way out of the screen</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ 02 CHECK IN, THEN ACT ═══════════════════════════ -->
+      <section id="checkin" data-has-content="true">
+        <div class="sec">
+          <div class="sec-head tr-anim">
+            <span class="sec-num">02</span>
+            <h2 class="sec-title">Check in, <em>then act</em></h2>
+            <p class="sec-lede">Slide to answer. The stress shape names the feeling instead of grading it, the release opens a panel of things to do, and finishing one lands a coin.</p>
+          </div>
+
+          <div class="phones phones-4 tr-anim">
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-shape.webp" alt="First check-in: the stress shape at extremely stressed" loading="lazy" /></div><p class="ph-cap"><strong>The shape.</strong> Seven levels, orange through green to violet. Never red.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-resources.webp" alt="The resources panel after a check-in" loading="lazy" /></div><p class="ph-cap"><strong>The panel.</strong> Two films, two quick resets, a way to talk.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-reset.webp" alt="A 45 second unclench reset" loading="lazy" /></div><p class="ph-cap"><strong>The reset.</strong> Forty-five seconds. Pause, or say you're done.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/checkin-reward.webp" alt="The reward moment: you just earned 10 coins" loading="lazy" /></div><p class="ph-cap"><strong>The coin.</strong> One beat for the coin, one for the words.</p></div>
+          </div>
+
+          <div class="split tr-anim" style="margin-top:36px">
+            <div class="plate"><img src="images/stressie-v4/shape-levels.webp" alt="The seven stress shape levels" loading="lazy" /></div>
+            <div class="stack">
+              <p class="copy">The shape is the one thing on the screen that changes with you. It sharpens and cools as stress climbs, so a bad day looks different without ever looking like an error. The words stay about the feeling: <strong>running hot</strong>, not stress level 7 of 10.</p>
+              <div class="decision"><span class="decision-label">Decision</span>A check-in that leads nowhere wastes the ninety seconds. Every check-in ends in something to do, and every reset ends in coins that are good for something.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ 03 OFF WORK ═════════════════════════════════════ -->
+      <section id="offwork" data-has-content="true">
+        <div class="sec">
+          <div class="sec-head tr-anim">
+            <span class="sec-num">03</span>
+            <h2 class="sec-title">Off Work: <em>the map</em></h2>
+            <p class="sec-lede">Flip Home from At Work to Off Work and it becomes a map of wellness experiences nearby. The coins from the workday spend here.</p>
+          </div>
+
+          <div class="phones phones-4 tr-anim">
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-map.webp" alt="Off Work map with partner pins" loading="lazy" /></div><p class="ph-cap"><strong>The map.</strong> Partners and open places, told apart by pin. Chips for spas, parks, movement, open now.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-list.webp" alt="The resources sheet listing nearby offers" loading="lazy" /></div><p class="ph-cap"><strong>The sheet.</strong> Wellness experiences and community events, one list, three stops.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-place.webp" alt="A place page with a coin offer" loading="lazy" /></div><p class="ph-cap"><strong>The place.</strong> Reviews, amenities, and one labelled action: redeem for 80 coins.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-redeem.webp" alt="Show code when you arrive" loading="lazy" /></div><p class="ph-cap"><strong>The code.</strong> A QR and a code for the front desk, valid until the date it says.</p></div>
+          </div>
+
+          <div class="split tr-anim" style="margin-top:36px">
+            <p class="copy">Every place carries a real offer with a real price in coins. Too few coins reads <strong>top up</strong>, never a dead button. A redeemed place keeps its code on the card so the front desk is a single tap away, and the map shows what's open right now before anything else.</p>
+            <div class="decision"><span class="decision-label">Decision</span>Trust arrives late, on purpose. Location is asked for the first time the map is useful, not on day one, and the first check-in happens before there is an account at all.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ 04 COMMUNITY ════════════════════════════════════ -->
+      <section id="community" data-has-content="true">
+        <div class="sec">
+          <div class="sec-head tr-anim">
+            <span class="sec-num">04</span>
+            <h2 class="sec-title">Community: <em>the flagship</em></h2>
+            <p class="sec-lede">Events on the same map. Breathwork circles, pottery socials, dinner nights, a quiet hour online. Reserve one with coins, or host your own.</p>
+          </div>
+
+          <div class="film-wrap tr-anim">
+            <div class="film">
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c01-list.webp" alt="Community events list" loading="lazy" /></div><p class="ph-cap">The list. Hosted by Stressie, partners and people.</p></div>
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c03-event.webp" alt="Pottery and coffee social event page" loading="lazy" /></div><p class="ph-cap">The event. When, where, how far, who's going.</p></div>
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c04-check.webp" alt="Reserve confirmed, check and confetti" loading="lazy" /></div><p class="ph-cap">Reserve. A check, then confetti.</p></div>
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c05-going.webp" alt="You're going, with calendar and share" loading="lazy" /></div><p class="ph-cap">You're going. Calendar, share, done.</p></div>
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c07-create.webp" alt="Create an event form" loading="lazy" /></div><p class="ph-cap">Host. Name, about, when, spots, price.</p></div>
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c10-preview.webp" alt="Host preview of the event" loading="lazy" /></div><p class="ph-cap">Preview. Exactly the page guests will see.</p></div>
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c13-published.webp" alt="Your event is sent for review" loading="lazy" /></div><p class="ph-cap">Sent for review. In person waits; online lists now.</p></div>
+            </div>
+          </div>
+
+          <p class="copy tr-anim" style="margin-bottom:22px">Reserving costs coins, and the coins came from check-ins, so a seat has a cost the person already paid in attention. Hosting is one form: a name, a line about it, when, capacity, in person or online, free or a price in coins. <strong>Thirteen Figma frames, thirteen build states, matched one to one.</strong></p>
+
+          <div class="decision-row tr-anim">
+            <div class="decision"><span class="decision-label">Decision</span>Online events list instantly. In-person ones wait for approval, because a stranger's address needs a person to look at it first.</div>
+            <div class="decision"><span class="decision-label">Decision</span>Reserving costs coins. A free seat gets skipped; a seat paid for with a week of check-ins gets shown up to.</div>
+            <div class="decision"><span class="decision-label">Decision</span>The cover is suggested from the name and the description, so a host never faces an empty photo well or publishes a grey card.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ 05 COINS · TALK · INSIGHTS ══════════════════════ -->
+      <section id="more" data-has-content="true">
+        <div class="sec">
+          <div class="sec-head tr-anim">
+            <span class="sec-num">05</span>
+            <h2 class="sec-title">Coins, <em>Talk</em> and Insights</h2>
+            <p class="sec-lede">Three more pieces, one screen each. The economy that pays for the map, a voice for the days a reset isn't enough, and the view a team lead gets.</p>
+          </div>
+
+          <div class="trio tr-anim">
+            <div class="trio-cell">
+              <span class="why-label">Reset coins</span>
+              <h3 class="why-title">A real economy, not points.</h3>
+              <p class="copy">Five coins a check-in, up to three a day. A reset once a day, past halfway. Two hundred when a friend checks in. Short of a reward, top up. Coins leave only through a labelled action, once.</p>
+              <div class="trio-shot"><img src="images/stressie-v4/coins-rewards.webp" alt="Rewards: balance, next reset and available rewards" loading="lazy" /></div>
+            </div>
+            <div class="trio-cell">
+              <span class="why-label">Talk</span>
+              <h3 class="why-title">An orb that listens.</h3>
+              <p class="copy">Resting, listening, thinking and speaking each have a colour; the light stays warm whatever the last check-in said. Anything that reads as crisis gets a handoff to 988, not a chat. It says so, and stops.</p>
+              <div class="trio-shot"><img src="images/stressie-v4/talk-listening.webp" alt="Talk, listening" loading="lazy" /></div>
+            </div>
+            <div class="trio-cell">
+              <span class="why-label">Insights, B2B</span>
+              <h3 class="why-title">Your team is steadier than it was.</h3>
+              <p class="copy">Stress across the team over time, the top stressors, and huddles to run. Managers get a fifth tab; nobody else sees it, and no individual is ever shown.</p>
+              <div class="trio-shot"><img src="images/stressie-v4/insights.webp" alt="Team insights: 44 members, top stressors, stress over time" loading="lazy" /></div>
+            </div>
+          </div>
+
+          <div class="plate tr-anim" style="margin-top:20px"><img src="images/stressie-v4/orb-states.webp" alt="The four orb states and their colour ramps" loading="lazy" /></div>
+          <div class="plate-cap tr-anim"><span>Talk orb states: resting, listening, thinking, speaking</span><span>Each ramp is five steps and a weight</span></div>
+        </div>
+      </section>
+
+      <!-- ══ 06 CRAFT ════════════════════════════════════════ -->
+      <section id="craft" data-has-content="true">
+        <div class="sec">
+          <div class="sec-head tr-anim">
+            <span class="sec-num">06</span>
+            <h2 class="sec-title">Craft: <em>the rules</em> that held</h2>
+            <p class="sec-lede">The design system lives in code. Screens never name a colour, a radius or a type size, and a lint fails the build when one does.</p>
+          </div>
+
+          <div class="rules tr-anim">
+            <div class="rule"><div class="rule-swatch"><i style="background:#F78521"></i><i style="background:#FFF0E3"></i></div><div class="rule-title">Amber is for action</div><div class="rule-body">One amber element per screen, the thing you want tapped. A second one makes both weaker.</div></div>
+            <div class="rule"><div class="rule-swatch"><i style="background:#5E7A4E"></i><i style="background:#EAF5E8"></i></div><div class="rule-title">Sage is for reassurance</div><div class="rule-body">Breathing, chat, you're fine. It is never an action colour.</div></div>
+            <div class="rule"><div class="rule-swatch"><i style="background:#F78521"></i><i style="background:#8E6BD9"></i><i style="background:#FF4545;opacity:.35"></i></div><div class="rule-title">Never red</div><div class="rule-body">Stress is not an error state. High stress runs amber through violet on the shape's own scale. Red only ends something.</div></div>
+            <div class="rule"><div class="rule-swatch"><i style="background:#252525"></i><i style="background:#9C9C9C"></i></div><div class="rule-title">Lora and Hanken</div><div class="rule-body">Serif for the one thing the screen is about. Sans for everything you read rather than look at. Sentence case everywhere.</div></div>
+            <div class="rule"><div class="rule-swatch"><i style="background:rgba(120,140,170,.35);border:1px solid rgba(120,140,170,.6)"></i><i style="background:#EDE7DE"></i></div><div class="rule-title">Liquid Glass, real glass</div><div class="rule-body">glassEffect on iOS 26 with material fallbacks. Nav carries no tint of ours; content passes under the floating tab bar.</div></div>
+            <div class="rule"><div class="rule-swatch"><i style="background:#BF6212"></i><i style="background:#E6F7EA"></i></div><div class="rule-title">Dynamic Type, and a lint</div><div class="rule-body">Every text is a role that scales with the reader. A build phase fails any screen that names a raw colour or size.</div></div>
+          </div>
+
+          <div class="craft-grid tr-anim">
+            <div>
+              <div class="plate"><img src="images/stressie-v4/craft-sidebyside.webp" alt="The event page: Figma render beside the simulator build" loading="lazy" /></div>
+              <div class="plate-cap"><span>Event page, Figma render beside the build</span><span>Measured at 3 px/pt, one anchor per pane</span></div>
+            </div>
+            <div>
+              <div class="plate"><img src="images/stressie-v4/craft-glass.webp" alt="Figma versus build: glass and glow on the Talk screen" loading="lazy" /></div>
+              <div class="plate-cap"><span>Talk, glass and glow</span></div>
+            </div>
+          </div>
+
+          <div class="phones phones-3 tr-anim">
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-en.webp" alt="Onboarding question in English" loading="lazy" /></div><p class="ph-cap"><strong>English.</strong> The language menu sits on the first screen, above the first question.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-es.webp" alt="Onboarding question in Spanish" loading="lazy" /></div><p class="ph-cap"><strong>Spanish.</strong> Every string relocalises live, mid-flow, answers kept.</p></div>
+            <div class="ph"><div class="ph-img"><img src="images/stressie-v4/lang-sw.webp" alt="Onboarding question in Swahili" loading="lazy" /></div><p class="ph-cap"><strong>Swahili.</strong> The layout was built for the longest translation first.</p></div>
+          </div>
+
+          <div class="craft-stats tr-anim">
+            <div class="stat"><strong>171</strong>Swift files, one designer, Figma to simulator</div>
+            <div class="stat"><strong>3</strong>languages, about 1,150 strings each</div>
+            <div class="stat"><strong>13 of 13</strong>community frames matched to build states</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ 07 STATUS ═══════════════════════════════════════ -->
+      <section id="status" data-has-content="true">
+        <div class="sec">
+          <div class="sec-head tr-anim">
+            <span class="sec-num">07</span>
+            <h2 class="sec-title">Where it <em>stands</em></h2>
+          </div>
+
+          <div class="status-plate tr-anim">
+            <div>
+              <p class="status-line">Currently validating. Metrics will be updated soon.</p>
+              <p class="status-sub">V4 is in the hands of its first users now. The numbers that matter are the ones V2 never had a way to earn, and they will be posted here as they land, <strong>not before</strong>.</p>
+              <ul class="measure">
+                <li>Off-work opens</li>
+                <li>Events reserved</li>
+                <li>Hosts</li>
+                <li>Coin redemptions</li>
+                <li>Referral conversion</li>
+              </ul>
+              <a class="v2-link" href="stressie-studio.html">Read the V1 to V2 case study →</a>
+            </div>
+            <div>
+              <div class="bar-label">The bar to beat: V2</div>
+              <div class="bar-grid">
+                <div class="bar-cell"><strong>17.4%</strong>retention, from the ~2% industry baseline</div>
+                <div class="bar-cell"><strong>12% → 56%</strong>daily engagement</div>
+                <div class="bar-cell"><strong>4m 20s</strong>average time engaged</div>
+                <div class="bar-cell"><strong>~$600K</strong>funding unlocked</div>
+                <div class="bar-cell wide"><strong>Pilots</strong>Amazon's hardware team, InKind, and 50 Austin PD officers</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Thank You bar ──────────────────────────────────── -->
+      <div class="cs-thankyou">
+        <span class="cs-thankyou-text">✦ THANK_YOU</span>
+      </div>
+
+    </div><!-- /card -->
+  </div><!-- /page -->
+
+  <script>
+  /* ── CUSTOM CURSOR (dot ↔ line) ─────────────────────────── */
+  (function initCursor() {
+    const dot = document.getElementById('ccDot');
+    document.documentElement.classList.add('cc-active');
+
+    const BLUE      = '#4361EE';
+    const DOT_COLOR = 'rgba(37,37,37,0.7)';
+    const CTA_SEL   = 'a[href]:not(.op-card), button, [role="button"], .op-card-cta';
+    const TEXT_SEL  = [
+      'p','h1','h2','h3','h4','h5','h6','li',
+      '.cs-heading','.section-title-text','.sec-title','.why-title','.status-line','.bet-line','.rule-title',
+      '.heading-orange','.heading-dark','.st-orange-italic',
+      '.st-card-title','.pf-card-title','.principle-title',
+      '.conv-name','.cw-orange','.cs-thankyou-text',
+    ].join(',');
+
+    let mx = -300, my = -300, visible = false, mode = 'dot';
+    let magnetEl = null, origCX = 0, origCY = 0, snapW = 0, snapH = 0;
+
+    function setShape(w, h, r, bg) {
+      dot.style.width        = w + 'px';
+      dot.style.height       = h + 'px';
+      dot.style.borderRadius = r + 'px';
+      dot.style.background   = bg;
+    }
+
+    function releaseMagnet() {
+      if (!magnetEl) return;
+      const el = magnetEl; magnetEl = null;
+      el.style.transition = 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+      el.style.transform  = 'translate(0px,0px)';
+      setTimeout(() => { el.style.transition = ''; el.style.transform = ''; }, 520);
+    }
+
+    function enterDot()  { releaseMagnet(); mode = 'dot';  setShape(12, 12, 9999, DOT_COLOR); }
+    function enterText() { releaseMagnet(); mode = 'text'; setShape(3,  33, 3,    BLUE); }
+
+    function isNearText(x, y) {
+      const PAD = 6;
+      for (const [px, py] of [[x,y],[x+PAD,y],[x-PAD,y],[x,y+PAD],[x,y-PAD]]) {
+        const h = document.elementFromPoint(px, py);
+        if (!h || h.closest(CTA_SEL)) continue;
+        if (!h.closest(TEXT_SEL)) continue;
+        const cr = document.caretRangeFromPoint ? document.caretRangeFromPoint(px, py) : null;
+        if (!cr || cr.startContainer.nodeType !== Node.TEXT_NODE) continue;
+        const txt = cr.startContainer, off = Math.min(cr.startOffset, txt.length - 1);
+        if (off < 0 || !txt.length) continue;
+        const r2 = document.createRange();
+        r2.setStart(txt, off); r2.setEnd(txt, Math.min(off + 1, txt.length));
+        const rects = r2.getClientRects();
+        if (!rects.length) continue;
+        const rc = rects[0];
+        if (px >= rc.left - PAD && px <= rc.right + PAD && py >= rc.top - PAD && py <= rc.bottom + PAD) return true;
+      }
+      return false;
+    }
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      if (!visible) { visible = true; dot.style.opacity = '1'; }
+
+      const el = document.elementFromPoint(mx, my);
+      const cta = el && el.closest(CTA_SEL);
+
+      if (cta) {
+        dot.style.opacity = '0';
+        if (magnetEl !== cta) {
+          releaseMagnet();
+          magnetEl = cta;
+          const rc = cta.getBoundingClientRect();
+          origCX = rc.left + rc.width / 2; origCY = rc.top + rc.height / 2;
+          snapW = rc.width; snapH = rc.height;
+        }
+        const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+        const moveX = clamp((mx - origCX) / (snapW / 2), -1, 1) * 5;
+        const moveY = clamp((my - origCY) / (snapH / 2), -1, 1) * 5;
+        magnetEl.style.transition = 'transform 0.12s ease-out';
+        magnetEl.style.transform  = `translate(${moveX}px,${moveY}px)`;
+      } else {
+        if (magnetEl) releaseMagnet();
+        dot.style.opacity = '1';
+        if (isNearText(mx, my)) { if (mode !== 'text') enterText(); dot.style.background = BLUE; }
+        else                    { if (mode !== 'dot')  enterDot();  dot.style.background = DOT_COLOR; }
+      }
+
+      dot.style.transform = `translate3d(${mx}px,${my}px,0) translate(-50%,-50%)`;
+    });
+
+    document.addEventListener('mouseleave', () => {
+      visible = false; dot.style.opacity = '0'; releaseMagnet();
+    });
+
+    (function tick() { dot.style.transform = `translate3d(${mx}px,${my}px,0) translate(-50%,-50%)`; requestAnimationFrame(tick); })();
+  })();
+
+
+  /* ═══════════════════════════════════════════════════════════
+     WORD-BY-WORD HEADING ANIMATION
+  ═══════════════════════════════════════════════════════════ */
+  function splitWords(el) {
+    const nodes = Array.from(el.childNodes);
+    el.innerHTML = '';
+    nodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        node.textContent.split(/(\s+)/).forEach(chunk => {
+          if (/^\s+$/.test(chunk)) { el.appendChild(document.createTextNode(chunk)); }
+          else if (chunk) {
+            const s = document.createElement('span');
+            s.className = 'word'; s.textContent = chunk;
+            el.appendChild(s);
+          }
+        });
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const wrapper = node.cloneNode(false);
+        node.childNodes.forEach(child => {
+          if (child.nodeType === Node.TEXT_NODE) {
+            child.textContent.split(/(\s+)/).forEach(chunk => {
+              if (/^\s+$/.test(chunk)) { wrapper.appendChild(document.createTextNode(chunk)); }
+              else if (chunk) {
+                const s = document.createElement('span');
+                s.className = 'word'; s.textContent = chunk;
+                wrapper.appendChild(s);
+              }
+            });
+          }
+        });
+        el.appendChild(wrapper);
+      }
+    });
+  }
+
+  document.getElementById('etBgImg').src = 'images/hero-bg-stressie.png';
+
+  const csHeading  = document.getElementById('csHeading');
+  const csSubtitle = document.getElementById('csSubtitle');
+  const heroTopRow = document.getElementById('heroTopRow');
+  const heroFacts  = document.getElementById('heroFacts');
+  const heroFan    = document.getElementById('heroFan');
+
+  splitWords(csHeading);
+  const allWords = csHeading.querySelectorAll('.word');
+
+  setTimeout(() => heroTopRow.classList.add('visible'), 80);
+  allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 260 + i * 40));
+  const afterWords = 260 + allWords.length * 40 + 60;
+  setTimeout(() => csSubtitle.classList.add('visible'), afterWords);
+  setTimeout(() => heroFacts.classList.add('visible'),  afterWords + 130);
+  setTimeout(() => heroFan.classList.add('visible'),    afterWords + 340);
+
+  /* ═══════════════════════════════════════════════════════════
+     HAMBURGER MENU
+  ═══════════════════════════════════════════════════════════ */
+  const hamburger  = document.getElementById('navHamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const backdrop   = document.getElementById('menuBackdrop');
+
+  function toggleMenu(force) {
+    const open = force !== undefined ? force : !hamburger.classList.contains('open');
+    hamburger.classList.toggle('open', open);
+    hamburger.setAttribute('aria-expanded', open);
+    mobileMenu.classList.toggle('open', open);
+    backdrop.classList.toggle('open', open);
+  }
+  hamburger.addEventListener('click', () => toggleMenu());
+  backdrop.addEventListener('click',  () => toggleMenu(false));
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      toggleMenu(false);
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) setTimeout(() => smoothScrollTo(
+        target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight, 900
+      ), 400);
+    });
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     SMOOTH ANCHOR SCROLL
+  ═══════════════════════════════════════════════════════════ */
+  function easeOutExpo(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
+  function smoothScrollTo(targetY, duration) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, targetY); return; }
+    const startY = window.scrollY, dist = targetY - startY, start = performance.now();
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      window.scrollTo(0, startY + dist * easeOutExpo(t));
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  const nav = document.querySelector('.nav');
+  /* mobile-menu links already scroll via their own close-then-scroll handler
+     above — binding them here too fired two competing scroll animations */
+  document.querySelectorAll('a[href^="#"]:not(.mobile-menu a)').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      smoothScrollTo(target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight, 900);
+    });
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     NAV SCROLL SPY
+  ═══════════════════════════════════════════════════════════ */
+  const navBtns = document.querySelectorAll('.nav-btn[data-section]');
+
+  const spyObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navBtns.forEach(b => b.classList.toggle('active', b.dataset.section === e.target.id));
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+
+  document.querySelectorAll('section[id]').forEach(s => {
+    if (s.children.length > 0) spyObs.observe(s);
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     SECTION ENTRANCE ANIMATIONS
+  ═══════════════════════════════════════════════════════════ */
+  const childObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('visible');
+      childObs.unobserve(e.target);
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.tr-anim').forEach(el => childObs.observe(el));
+
+  /* phones and cells fade up one by one once their row is in view */
+  const STAGGER_PAIRS = [
+    { parent: '.phones',       child: '.ph'       },
+    { parent: '.film',         child: '.ph'       },
+    { parent: '.why-grid',     child: '.why-cell' },
+    { parent: '.trio',         child: '.trio-cell'},
+    { parent: '.rules',        child: '.rule'     },
+    { parent: '.decision-row', child: '.decision' },
+  ];
+  const animGroups = new Map();
+  STAGGER_PAIRS.forEach(({ parent, child }) => {
+    document.querySelectorAll(parent).forEach(parentEl => {
+      const kids = Array.from(parentEl.querySelectorAll(':scope > ' + child));
+      if (!kids.length) return;
+      kids.forEach(k => k.classList.add('el-anim'));
+      animGroups.set(parentEl, kids);
+    });
+  });
+  const elObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const kids = animGroups.get(e.target) || [];
+      kids.forEach((kid, i) => setTimeout(() => kid.classList.add('el-visible'), 120 + i * 90));
+      elObs.unobserve(e.target);
+    });
+  }, { threshold: 0.08 });
+  animGroups.forEach((_, parentEl) => elObs.observe(parentEl));
+  </script>
+
+
+
+
+  <!-- ── Back to where you came from ───────────────────────────────────────
+       The nav-home href is "/", which is a fresh navigation: the homepage
+       loader replays and you arrive in the hero, having lost the card you
+       clicked to get here. When the previous history entry is this site,
+       step back through history instead — the browser restores the exact
+       scroll offset and the bfcache skips the loader entirely.
+       The href stays as the fallback, and is what still runs for a direct
+       link, a new tab, or an arrival from another site. -->
+  <script>
+  (function () {
+    var home = document.querySelector('.nav-home');
+    if (!home) return;
+    home.addEventListener('click', function (e) {
+      /* let cmd/ctrl/shift/middle clicks open a tab the way they should */
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (history.length <= 1) return;
+      var ref = document.referrer;
+      if (!ref) return;                       /* typed in, or opened cold */
+      try {
+        if (new URL(ref).origin !== location.origin) return;
+      } catch (_) { return; }
+      e.preventDefault();
+      history.back();
+    });
+  })();
+  </script>
+
+</body>
+</html>
