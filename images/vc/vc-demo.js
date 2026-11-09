@@ -31,7 +31,9 @@
         var a = d.getBoundingClientRect(), c = d.parentElement.getBoundingClientRect(), r = a.width / W;
         var L = Math.max(0, (c.left - a.left) / r), R = Math.min(W, (c.right - a.left) / r),
             T = Math.max(0, (c.top - a.top) / r), B = Math.min(H, (c.bottom - a.top) / r);
-        var p = local(el, .5, .5);
+        var p = local(el, .5, .5), s = stg.getBoundingClientRect(), b = el.getBoundingClientRect(), kk = s.width / W;
+        /* never zoom past the point where the target stops fitting */
+        k = Math.max(1, Math.min(k, (B - T) * .88 / (b.height / kk), (R - L) * .88 / (b.width / kk)));
         tx = Math.min(L, Math.max(R - W * k, (L + R) / 2 - p[0] * k));
         ty = Math.min(T, Math.max(B - H * k, (T + B) / 2 - p[1] * k));
       } else k = 1;
