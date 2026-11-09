@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stressie V4 · Bhanu Kowshik</title>
+
+  <!-- ── Social share meta (image source: og-image.html → images/og-image.jpg) ── -->
+  <meta name="description" content="Stressie V4 case study. A stress check-in that pays for your evening: coins, a map of wellness experiences, and community events. Designed in Figma and built in SwiftUI by Bhanu Kowshik." />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Bhanu Kowshik" />
+  <meta property="og:title" content="Stressie V4 · Bhanu Kowshik" />
+  <meta property="og:description" content="Case study: I designed and built Stressie V4, a stress check-in that pays for your evening." />
+  <meta property="og:url" content="https://bhanu.build/stressie-v4.html" />
+  <meta property="og:image" content="https://bhanu.build/images/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Stressie V4 · Bhanu Kowshik" />
+  <meta name="twitter:image" content="https://bhanu.build/images/og-image.jpg" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192.png" />
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
+    a[href], button, [role="button"] { cursor: pointer !important; }
+
+    /* ─── TOKENS ─────────────────────────────────────────────── */
+    :root {
+      --secondary:    #454545;
+      --bg:           #FFFCF8;
+      --white:        #FFFFFF;
+      --grey:         #9C9C9C;
+      --border:       #EFEFEF;
+      --orange:       #BF6212;
+      --orange-light: #FFF7E9;
+      --orange-badge: #8C4A0D;
+      --orange-rgb:   191,98,18;
+      /* small-text orange: --orange only clears AA at display sizes, so the
+         11–13px labels use this deeper cut (flips to the bright orange in dark) */
+      --orange-ink:   #8C4A0D;
+      /* ── TYPE — the portfolio's system, carried into the case study ──
+         Playfair and Poppins were this page's own pair; the site now has one.
+         The token names stay so the rules below need no edit — only what they
+         resolve to has changed. The display face is the serif, and it is
+         italic wherever it lands, exactly as on the home page. */
+      --font-display: 'Instrument Serif', Georgia, serif;
+      --font-heading: 'Instrument Sans', system-ui, sans-serif;
+      --font-mono:    'Urbanist', 'Instrument Sans', system-ui, sans-serif;
+      --font-serif:   'Instrument Serif', Georgia, serif;
+      /* one button, every page: white out of the top-left, azure across the rest */
+      --cta-grad: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #E4EFFF 9%, #93BEFF 26%, #4B8AF0 50%, #2463DC 76%, #1A4CB8 100%);
+      --cta-grad-hover: radial-gradient(125% 125% at 0% 0%,
+        #FFFFFF 0%, #EDF4FF 11%, #A6CBFF 29%, #5A96F5 53%, #2C6FE8 79%, #1F57CA 100%);
+
+      /* ── Font scale ── */
+      --fs-xs:   11px;   /* eyebrow labels */
+      --fs-sm:   13px;   /* tags, small meta */
+      --fs-base: 16px;   /* body copy */
+      --fs-md:   18px;   /* subtitle, card sub-labels */
+      --fs-lg:   22px;   /* section titles, card headings */
+    }
+
+    /* ─── BODY ───────────────────────────────────────────────── */
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--bg);
+      min-height: 100vh;
+      font-family: var(--font-heading);
+      /* clip, not hidden — the off-canvas mobile menu otherwise leaves the
+         page horizontally pannable; hidden stays as the older-browser fallback */
+      overflow-x: hidden;
+      overflow-x: clip;
+      cursor: none;
+    }
+
+    /* Film grain — the ground hero-lab uses. Replaces the page-wide dot mesh,
+       which stamped one pattern across every section instead of letting each
+       section carry its own texture. Sits above content but under the nav
+       and the custom cursor. */
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ─── CUSTOM CURSOR ──────────────────────────────────────── */
+    html.cc-active * { cursor: none !important; }
+    #ccDot {
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 13000;
+      will-change: transform;
+      width: 12px; height: 12px;
+      border-radius: 9999px;
+      background: rgba(37,37,37,0.7);
+      opacity: 0;
+      transition:
+        width         0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+        height        0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.30s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background    0.26s ease,
+        opacity       0.18s ease;
+    }
+
+    /* ─── NAV ────────────────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 900;
+      background: rgba(255,252,248,0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0px 1px 0px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 40px;
+      height: 54px;
+      transform: translateY(0);
+      transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+    }
+    .nav.nav-hidden { transform: translateY(-100%); }
+
+    .nav-home {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; flex-shrink: 0; cursor: pointer !important;
+    }
+    .nav-home img {
+      width: 38px; height: 38px; display: block;
+      transform: rotate(200deg);
+      transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .nav-home:hover img { transform: rotate(180deg); }
+    .nav-home span {
+      font-family: var(--font-heading);
+      font-weight: 600; font-size: 15px;
+      color: var(--secondary); white-space: nowrap;
+    }
+
+    /* flex:1 + centre keeps the links visually centred now that the theme
+       toggle no longer sits on the right — space-between alone would shove
+       them against the edge */
+    .nav-sections { display: flex; align-items: center; justify-content: center; flex: 1; gap: 2px; }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      padding: 5px 10px;
+      border-radius: 5px; border: none; background: transparent;
+      font-family: var(--font-heading); font-weight: 500; font-size: 11px;
+      color: var(--secondary);
+      text-decoration: none; white-space: nowrap;
+      cursor: pointer !important;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .nav-btn:hover:not(.active) { background: #F2F2F2; }
+    .nav-btn.active { background: var(--secondary); color: var(--white); }
+
+    /* ─── HAMBURGER ──────────────────────────────────────────── */
+    .nav-hamburger {
+      display: none; flex-direction: column; justify-content: center;
+      gap: 5px; width: 36px; height: 36px; padding: 6px;
+      background: none; border: none; cursor: none; flex-shrink: 0;
+    }
+    .nav-hamburger span {
+      display: block; height: 2px; background: var(--secondary);
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ─── MOBILE MENU ────────────────────────────────────────── */
+    .mobile-menu-backdrop {
+      position: fixed; inset: 0;
+      z-index: 489;
+      background: rgba(37,37,37,0.35);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.38s ease;
+    }
+    .mobile-menu-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .mobile-menu {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 78vw; max-width: 320px;
+      z-index: 490;
+      background: var(--bg);
+      box-shadow: -8px 0 32px rgba(0,0,0,0.10);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 80px 32px 48px; gap: 4px;
+      transform: translateX(100%);
+      /* hidden while closed so keyboard focus can't land on off-screen links;
+         the delay holds visibility until the slide-out finishes */
+      visibility: hidden;
+      transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1),
+                  visibility 0s linear 0.38s;
+    }
+    .mobile-menu.open {
+      transform: translateX(0);
+      visibility: visible;
+      transition: transform 0.38s cubic-bezier(0.22,0.61,0.36,1), visibility 0s;
+    }
+
+    .mobile-menu a {
+      font-family: var(--font-mono);
+      font-weight: 500; font-size: 13px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--secondary); text-decoration: none;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      width: 100%;
+      opacity: 0; transform: translateX(16px);
+      transition: opacity 0.3s ease, transform 0.3s ease, color 0.15s ease;
+    }
+    .mobile-menu.open a { opacity: 1; transform: translateX(0); }
+    .mobile-menu a:nth-child(1) { transition-delay: 0.07s; }
+    .mobile-menu a:nth-child(2) { transition-delay: 0.11s; }
+    .mobile-menu a:nth-child(3) { transition-delay: 0.15s; }
+    .mobile-menu a:nth-child(4) { transition-delay: 0.19s; }
+    .mobile-menu a:nth-child(5) { transition-delay: 0.23s; }
+    .mobile-menu a:nth-child(6) { transition-delay: 0.27s; }
+    .mobile-menu a:nth-child(7) { transition-delay: 0.31s; }
+    .mobile-menu a:nth-child(8) { transition-delay: 0.35s; }
+    .mobile-menu a.active { font-weight: 700; color: var(--orange); }
+
+    /* ─── PAGE + THE READING COLUMN ──────────────────────────── */
+    /* Rachel Chen's grammar: a small table of contents on the left, one
+       720px reading column, images in quiet plates, serif headings,
+       hairlines instead of boxes. */
+    .page { display: flex; justify-content: center; padding: 74px 0 0; }
+    .card { background: none; width: 100%; max-width: 1400px; overflow: hidden; display: flex; flex-direction: column; }
+    .article { display: grid; grid-template-columns: 200px 720px; gap: 0 64px; justify-content: center; padding: 56px 48px 0; }
+    .col { min-width: 0; }
+    .toc { position: sticky; top: 96px; align-self: start; display: flex; flex-direction: column; gap: 10px; padding-top: 6px; }
+    .toc a { font-family: var(--font-heading); font-size: 14px; color: var(--ink-3); text-decoration: none; transition: color 0.18s ease; }
+    .toc a.is-on { color: var(--secondary); }
+    .toc a:hover { color: var(--secondary); }
+
+    :root { --ink-2: rgba(37,37,37,0.74); --ink-3: rgba(37,37,37,0.55); --hair: rgba(37,37,37,0.12); --plate: #F6F1EA; --plate-2: #FFFFFF; }
+    [data-theme="dark"] {
+      --secondary: #EFF3F8; --bg: #0A0E15; --white: #0E141D; --grey: #A9B4C2; --border: #222C3D;
+      --orange: #FF8A3D; --orange-light: #2A1A08; --orange-rgb: 255,138,61; --orange-ink: #FF8A3D;
+      --ink-2: #C7CFDA; --ink-3: #A9B4C2; --hair: rgba(240,237,232,0.12); --plate: #131A24; --plate-2: #0E141D;
+    }
+    [data-theme="dark"] .nav-home img { filter: invert(1); }
+    [data-theme="dark"] .nav { background: rgba(26,26,26,0.92); box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.06); }
+    [data-theme="dark"] .nav-btn:hover:not(.active) { background: #182130; }
+    [data-theme="dark"] .mobile-menu { box-shadow: -8px 0 32px rgba(0,0,0,0.40); }
+
+    /* ─── TYPE ───────────────────────────────────────────────── */
+    .eyebrow { font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 14px; }
+    .title { font-family: var(--font-display); font-weight: 400; font-size: clamp(38px, 4.4vw, 56px); line-height: 1.1; letter-spacing: -0.01em; color: var(--secondary); margin-bottom: 28px; }
+    .title em { font-style: italic; color: var(--orange); }
+    .title .word { display: inline-block; opacity: 0; transform: translateY(14px); }
+    .title .word.visible { animation: word-rise 0.5s cubic-bezier(0.22,0.61,0.36,1) both; }
+    .h { font-family: var(--font-display); font-weight: 400; font-size: clamp(27px, 2.6vw, 34px); line-height: 1.22; letter-spacing: -0.005em; color: var(--secondary); margin-bottom: 16px; }
+    .h3 { font-family: var(--font-display); font-weight: 400; font-size: 23px; line-height: 1.25; color: var(--secondary); margin-bottom: 10px; }
+    .p { font-family: var(--font-heading); font-size: 15px; line-height: 1.7; color: var(--ink-2); }
+    .p strong { font-weight: 600; color: var(--secondary); }
+    .cap { font-family: var(--font-heading); font-size: 13px; line-height: 1.55; color: var(--ink-3); margin-top: 12px; }
+    .aside { font-family: var(--font-display); font-style: italic; font-size: 17px; line-height: 1.5; color: var(--ink-2); border-left: 2px solid var(--secondary); padding-left: 14px; margin-top: 28px; }
+    .hero-in { opacity: 0; }
+    .hero-in.visible { animation: fade-up 0.6s cubic-bezier(0.22,0.61,0.36,1) both; }
+
+    /* ─── RHYTHM ─────────────────────────────────────────────── */
+    section { padding-bottom: 32px; }
+    .block { padding-top: 56px; margin-top: 32px; border-top: 1px solid var(--hair); }
+    #overview .block { border-top: 0; padding-top: 72px; }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 36px; }
+    .cols-3 { grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+    .cols .eyebrow { margin-bottom: 8px; }
+    .cols .p { font-size: 14px; }
+    .cols + .p { margin-top: 32px; }
+
+    /* ─── META ───────────────────────────────────────────────── */
+    .meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin: 28px 0 0; }
+    .meta dt { font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+    .meta dd { font-family: var(--font-heading); font-size: 13px; line-height: 1.55; color: var(--ink-2); margin-top: 8px; }
+
+    /* ─── PLATES ─────────────────────────────────────────────── */
+    .plate { background: var(--plate); border-radius: 6px; padding: 40px 40px 0; overflow: hidden; margin-top: 28px; }
+    .plate-hero { display: flex; justify-content: center; padding-top: 48px; height: 560px; margin-top: 0; }
+    .plate-3 { display: grid; grid-template-columns: repeat(3, 176px); justify-content: center; gap: 36px; align-items: end; height: 420px; }
+    .plate-3 .ph:nth-child(2) { transform: translateY(-28px); }
+    .plate-quotes { display: grid; grid-template-columns: 200px 1fr; gap: 36px; align-items: center; padding: 40px; }
+    .plate-quotes .cap { margin-top: 18px; }
+    .qs { display: flex; flex-direction: column; gap: 18px; }
+    .q { font-family: var(--font-display); font-style: italic; font-size: 19px; line-height: 1.45; color: var(--secondary); }
+    .q span { display: block; margin-top: 6px; font-family: var(--font-heading); font-style: normal; font-size: 12px; color: var(--ink-3); }
+    /* the flagship earns a wider plate: it breaks out of the column */
+    .plate-wide { width: 1000px; margin-left: -140px; }
+    .plate-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; padding: 40px 40px 32px; }
+    .plate-6 .ph span { display: block; margin-top: 10px; font-family: var(--font-heading); font-size: 12px; color: var(--ink-3); }
+    .plate-toggle { display: flex; flex-direction: column; align-items: center; gap: 20px; height: 620px; }
+    .photo { margin: 28px 0 40px; }
+    .photo img { width: 100%; display: block; border-radius: 6px; max-height: 520px; object-fit: cover; object-position: 50% 22%; }
+    .photo figcaption { font-family: var(--font-heading); font-size: 13px; color: var(--ink-3); margin-top: 10px; }
+
+    /* outcomes: three figures, no boxes */
+    .figures { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .figures div { font-family: var(--font-heading); font-size: 13px; line-height: 1.5; color: var(--ink-3); }
+    .figures strong { display: block; font-family: var(--font-display); font-weight: 400; font-size: 34px; line-height: 1.1; color: var(--secondary); margin-bottom: 6px; }
+
+    /* ─── PHONES: a real frame, nothing the screenshot already has ─ */
+    .ph { min-width: 0; }
+    .ph-img { position: relative; aspect-ratio: 1206 / 2622; padding: 3%; border-radius: 17% / 7.8%; background: #0B0B0C;
+      box-shadow: 0 0 0 2px #8A8A8E, 0 0 0 3px rgba(0,0,0,0.30), 0 24px 48px rgba(30,20,10,0.20), 0 3px 10px rgba(30,20,10,0.10); }
+    .ph-img img, .ph-img video { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 15.4% / 7.1%; background: #EDE7DE; }
+    .ph-hero { width: 300px; }
+    .ph-old .ph-img { aspect-ratio: 588 / 1209; padding: 0; background: none; box-shadow: none; }
+    .ph-old .ph-img img { border-radius: 0; background: none; object-fit: contain; }
+    .ph-toggle { width: 250px; }
+    .ph-toggle .ph-img img.tv { position: absolute; inset: 3%; width: 94%; height: 94%; opacity: 0; transition: opacity 0.35s ease; }
+    .ph-toggle .ph-img img.tv.is-on { opacity: 1; }
+    .seg { display: inline-flex; padding: 4px; border-radius: 999px; border: 1px solid var(--hair); background: var(--plate-2); }
+    .seg-btn { border: 0; background: transparent; padding: 7px 14px; border-radius: 999px; font-family: var(--font-heading); font-weight: 600; font-size: 13px; color: var(--ink-3); cursor: pointer !important; transition: background 0.18s ease, color 0.18s ease; }
+    .seg-btn.is-on { background: var(--secondary); color: var(--bg); }
+
+    /* ─── NEXT + CREDIT ──────────────────────────────────────── */
+    .next { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 48px; }
+    .next-card { display: flex; flex-direction: column; gap: 4px; padding: 20px 0; border-top: 1px solid var(--hair); text-decoration: none; color: var(--secondary); }
+    .next-card .eyebrow { margin-bottom: 6px; }
+    .next-card strong { font-family: var(--font-display); font-weight: 400; font-size: 22px; }
+    .next-card span:last-child { font-family: var(--font-heading); font-size: 13px; color: var(--ink-3); }
+    .next-card:hover strong { color: var(--orange); }
+    .credit { font-family: var(--font-heading); font-size: 13px; color: var(--ink-3); margin: 56px 0 72px; }
+    .credit a { color: var(--orange-ink); text-decoration: none; }
+    .credit a:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .cs-thankyou { background: var(--orange-badge); width: 100%; padding: 12px 40px; display: flex; align-items: center; justify-content: center; }
+    .cs-thankyou-text { font-family: var(--font-mono); font-weight: 500; font-size: 15px; letter-spacing: 0.08em; color: #FFFCF8; }
+
+    /* ─── REVEALS ────────────────────────────────────────────── */
+    .tr-anim { opacity: 0; transform: translateY(24px); }
+    .tr-anim.visible { animation: section-rise 0.9s cubic-bezier(0.16,1,0.3,1) both; }
+    @keyframes word-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes section-rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+    @media (hover: none) { #ccDot { display: none; } body { cursor: auto; } a, button { cursor: pointer; } }
+    @media (max-width: 1100px) {
+      .nav { padding: 8px 24px; } .nav-sections { display: none; } .nav-hamburger { display: flex; }
+      .article { grid-template-columns: minmax(0, 720px); padding: 44px 28px 0; }
+      .toc { display: none; }
+      .plate-wide { width: 100%; margin-left: 0; }
+      .plate-6 { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 767px) {
+      .page { padding: 60px 0 0; }
+      .article { padding: 32px 5% 0; }
+      .title { font-size: 34px; }
+      .meta { grid-template-columns: 1fr 1fr; gap: 18px; }
+      .plate { padding: 24px 20px 0; }
+      .plate-hero { height: 440px; } .ph-hero { width: 220px; }
+      .plate-3 { grid-template-columns: repeat(3, 1fr); gap: 12px; height: auto; padding-bottom: 0; }
+      .plate-3 .ph:nth-child(2) { transform: none; }
+      .plate-quotes { grid-template-columns: 1fr; padding: 24px 20px; } .ph-old { max-width: 180px; }
+      .plate-6 { grid-template-columns: repeat(2, 1fr); gap: 14px; padding-bottom: 24px; }
+      .plate-toggle { height: auto; padding-bottom: 24px; } .ph-toggle { width: 220px; }
+      .cols, .cols-3, .figures, .next { grid-template-columns: 1fr; gap: 24px; }
+    }
+
+    /* ─── KEYBOARD FOCUS ─────────────────────────────────────── */
+    .nav-home:focus-visible, .nav-btn:focus-visible, .nav-hamburger:focus-visible, .mobile-menu a:focus-visible,
+    .next-card:focus-visible, .credit a:focus-visible, .seg-btn:focus-visible, .toc a:focus-visible { outline: 2px solid var(--secondary); outline-offset: 3px; }
+    .nav-btn:focus-visible, .nav-hamburger:focus-visible { border-radius: 6px; }
+
+    /* ─── REDUCED MOTION ─────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+  <!-- Microsoft Clarity -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "xt8r81h0gs");
+  </script>
+</head>
+<body>
+
+  <!-- ── CURSOR ─────────────────────────────────────────────── -->
+  <div id="ccDot" aria-hidden="true"></div>
+
+  <!-- ── NAV ───────────────────────────────────────────────── -->
+  <nav class="nav">
+    <a href="/" class="nav-home">
+      <img src="cs-nav-logo.svg" alt="" />
+      <span>Stressie V4</span>
+    </a>
+    <div class="nav-sections">
+      <a href="#overview"  class="nav-btn active" data-section="overview">Overview</a>
+      <a href="#problem"   class="nav-btn"        data-section="problem">Problem</a>
+      <a href="#checkin"   class="nav-btn"        data-section="checkin">At Work</a>
+      <a href="#offwork"   class="nav-btn"        data-section="offwork">Off Work</a>
+      <a href="#community" class="nav-btn"        data-section="community">Community</a>
+      <a href="#coins"     class="nav-btn"        data-section="coins">Coins</a>
+      <a href="#build"     class="nav-btn"        data-section="build">Build</a>
+      <a href="#reflection" class="nav-btn"       data-section="reflection">Reflection</a>
+    </div>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ── MOBILE MENU ────────────────────────────────────────── -->
+  <div class="mobile-menu-backdrop" id="menuBackdrop"></div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#overview">Overview</a>
+    <a href="#problem">Problem</a>
+    <a href="#checkin">At Work</a>
+    <a href="#offwork">Off Work</a>
+    <a href="#community">Community</a>
+    <a href="#coins">Coins</a>
+    <a href="#build">Build</a>
+    <a href="#reflection">Reflection</a>
+  </div>
+
+  <!-- ── PAGE ───────────────────────────────────────────────── -->
+  <div class="page">
+    <div class="card">
+      <div class="article">
+
+        <!-- the left rail: a small table of contents that follows the read -->
+        <aside class="toc" aria-label="On this page">
+          <a href="#overview"   data-section="overview"   class="is-on">Overview</a>
+          <a href="#problem"    data-section="problem">Problem</a>
+          <a href="#checkin"    data-section="checkin">At Work</a>
+          <a href="#offwork"    data-section="offwork">Off Work</a>
+          <a href="#community"  data-section="community">Community</a>
+          <a href="#coins"      data-section="coins">Coins</a>
+          <a href="#build"      data-section="build">Build</a>
+          <a href="#reflection" data-section="reflection">Reflection</a>
+        </aside>
+
+        <div class="col">
+
+          <!-- ══ OVERVIEW ════════════════════════════════════ -->
+          <section id="overview" data-has-content="true">
+            <p class="eyebrow hero-in" id="heroEyebrow">Stressie · iOS · 2026 · metrics being validated</p>
+            <h1 class="title" id="csHeading">A stress check-in that <em>pays for your evening</em></h1>
+
+            <div class="plate plate-hero hero-in" id="heroRail">
+              <div class="ph ph-hero"><div class="ph-img">
+                <video autoplay muted loop playsinline preload="metadata" poster="images/stressie-v4/hero-poster.webp" aria-label="Sliding the check-in: the shape changes with the answer, and the resources panel rises on release">
+                  <source src="images/stressie-v4/hero-loop.mp4" type="video/mp4" />
+                </video>
+              </div></div>
+            </div>
+
+            <dl class="meta hero-in" id="heroMeta">
+              <div><dt>Role</dt><dd>Founding product designer, and I built the iOS app</dd></div>
+              <div><dt>Timeline</dt><dd>2026, now with the team</dd></div>
+              <div><dt>Team</dt><dd>Me, with two founders as stakeholders</dd></div>
+              <div><dt>Skills</dt><dd>Product strategy, interaction design, SwiftUI, Metal</dd></div>
+            </dl>
+
+            <div class="block">
+              <p class="eyebrow">Overview</p>
+              <h2 class="h">I designed and built the next Stressie: coins for checking in, a map to spend them on, and events you can reserve or host.</h2>
+              <p class="p">Stressie is a workplace wellness app. V2 got people to check in and use quick resets, and its pilots ran with Amazon's hardware team, InKind and 50 Austin PD officers. V4 is what comes after the check-in, and I designed it in Figma and wrote it in SwiftUI myself.</p>
+              <figure class="photo">
+                <img src="images/stressie-v4/pilot-4.webp" alt="The Stressie booth at TechCrunch Startup Battlefield" loading="lazy" />
+                <figcaption>The pilot booth at TechCrunch Startup Battlefield. V2's numbers came from these pilots.</figcaption>
+              </figure>
+              <p class="eyebrow">Outcomes</p>
+              <div class="figures">
+                <div><strong>171</strong>Swift files, every screen and flow, built solo</div>
+                <div><strong>13 of 13</strong>Figma frames with a matching build state</div>
+                <div><strong>3</strong>languages, about 1,150 strings each</div>
+              </div>
+              <p class="aside">Note: usage metrics are being validated now. D30 retention and off-work opens go here when they land. The bar is V2's 17.4%.</p>
+            </div>
+          </section>
+
+          <!-- ══ PROBLEM ═════════════════════════════════════ -->
+          <section id="problem" data-has-content="true">
+            <div class="block">
+              <p class="eyebrow">The problem</p>
+              <h2 class="h">V2 got people to check in. Then it had nothing for them to do.</h2>
+              <p class="p">Retention went from about 2% to 17.4% and daily engagement from 12% to 56%, on quick resets and a calm screen. The same pilots said trust was asked for too early, the points had no value, and the app went quiet after work. Meanwhile wellness moved into the room: run clubs, sound baths, dinners on Luma and Partiful.</p>
+              <div class="plate plate-quotes">
+                <div class="ph ph-old"><div class="ph-img"><img src="images/stressie-v4/v2-home.webp" alt="Stressie V2's first screen" loading="lazy" /></div></div>
+                <div class="qs">
+                  <p class="q">"I haven't built trust with the app yet, so sharing personal feelings this early is uncomfortable."<span>Pilot participant, Amazon hardware team</span></p>
+                  <p class="q">"I didn't find the coping points compelling as an incentive. I don't know their value."<span>Pilot participant, InKind</span></p>
+                  <p class="cap">V2's first screen asked for five minutes of questions before the app had done anything for you.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ══ AT WORK ═════════════════════════════════════ -->
+          <section id="checkin" data-has-content="true">
+            <div class="block">
+              <p class="eyebrow">At Work</p>
+              <h2 class="h">The check-in ends in an action, not a score.</h2>
+              <p class="p">You slide to answer and the shape changes with you. Releasing the slider saves the check-in and opens a panel with two short films, two quick resets and a way to talk. Finishing a reset earns coins on the spot.</p>
+              <div class="plate plate-3">
+                <div class="ph"><div class="ph-img"><img src="images/stressie-v4/real-checkin.webp" alt="First check-in, extremely stressed" loading="lazy" /></div></div>
+                <div class="ph"><div class="ph-img"><img src="images/stressie-v4/real-panel.webp" alt="The resources panel" loading="lazy" /></div></div>
+                <div class="ph"><div class="ph-img"><img src="images/stressie-v4/real-reward.webp" alt="Plus 10 reset coins" loading="lazy" /></div></div>
+              </div>
+              <p class="cap">Check in, the panel, the coin. Seven shape levels run orange to violet, never red.</p>
+              <div class="cols">
+                <div><p class="eyebrow">Decision</p><p class="p">The release gesture is the commit. There is no Continue button, so the panel opens on the same drag.</p></div>
+                <div><p class="eyebrow">Cut</p><p class="p">The 0 to 10 score. The shape names the feeling, running hot, and never grades it.</p></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ══ OFF WORK ════════════════════════════════════ -->
+          <section id="offwork" data-has-content="true">
+            <div class="block">
+              <p class="eyebrow">Off Work</p>
+              <h2 class="h">Switch to Off Work and Home becomes a map. Only then does it ask where you are.</h2>
+              <p class="p">Partner venues and public places get different pins. Chips filter for open now, spas, parks and movement. Every place shows a real offer with a price in coins, and a redeemed offer becomes a code for the front desk.</p>
+              <div class="plate plate-3">
+                <div class="ph"><div class="ph-img"><img src="images/stressie-v4/real-location.webp" alt="Discover real-world ways to feel better: the location prompt" loading="lazy" /></div></div>
+                <div class="ph"><div class="ph-img"><img src="images/stressie-v4/real-map.webp" alt="The Off Work map" loading="lazy" /></div></div>
+                <div class="ph"><div class="ph-img"><img src="images/stressie-v4/offwork-redeem.webp" alt="Show this code at the front desk" loading="lazy" /></div></div>
+              </div>
+              <p class="cap">The location prompt, the map, the code you show at the desk.</p>
+              <div class="cols">
+                <div><p class="eyebrow">Decision</p><p class="p">The first check-in happens before there is an account, and location is requested by the map, not the onboarding.</p></div>
+                <div><p class="eyebrow">Cut</p><p class="p">Permission screens on day one. V2 asked for everything up front, and the pilots told us it cost trust.</p></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ══ COMMUNITY ═══════════════════════════════════ -->
+          <section id="community" data-has-content="true">
+            <div class="block">
+              <p class="eyebrow">Community</p>
+              <h2 class="h">Reserve a seat with your coins, or host an event with one form.</h2>
+              <p class="p">Events live on the same map: breathwork circles, pottery socials, dinner nights, a quiet hour online. Reserving costs coins. Hosting is name, description, time, capacity, in person or online, free or paid, then a preview of exactly what guests will see.</p>
+            </div>
+            <div class="plate plate-wide plate-6">
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c01-list.webp" alt="Community events list" loading="lazy" /></div><span>01 The list</span></div>
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c03-event.webp" alt="Event page" loading="lazy" /></div><span>02 The event</span></div>
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c05-going.webp" alt="You're going" loading="lazy" /></div><span>03 You're going</span></div>
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c07-create.webp" alt="Create an event" loading="lazy" /></div><span>04 Host</span></div>
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c10-preview.webp" alt="Host preview" loading="lazy" /></div><span>05 Preview</span></div>
+              <div class="ph"><div class="ph-img"><img src="images/stressie-v4/c13-published.webp" alt="Your event is sent for review" loading="lazy" /></div><span>06 Sent for review</span></div>
+            </div>
+            <div class="block">
+              <div class="cols">
+                <div><p class="eyebrow">Decision</p><p class="p">Online events publish instantly. In-person events wait for a human to approve the address.</p></div>
+                <div><p class="eyebrow">Cut</p><p class="p">Free seats. A seat paid for with a week of check-ins gets used; a free one gets skipped.</p></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ══ COINS ═══════════════════════════════════════ -->
+          <section id="coins" data-has-content="true">
+            <div class="block">
+              <p class="eyebrow">Coins</p>
+              <h2 class="h">One coin you can earn, top up, share and spend.</h2>
+              <p class="p">Five coins per check-in, up to three a day, more for a finished reset, 200 for a friend who checks in. Short of a reward, you top up. Coins leave only through a button that names the price. The coin itself took four rejected rounds, an opal gem, an agate coin, a wreath and a honey centre, before this one: gold, three raised petals, rendered once from one scene.</p>
+              <div class="plate plate-3">
+                <div class="ph"><div class="ph-img"><img src="images/stressie-v4/real-welcome.webp" alt="Welcome to Stressie: 200 coins to start" loading="lazy" /></div></div>
+                <div class="ph"><div class="ph-img"><img src="images/stressie-v4/coins-rewards.webp" alt="Rewards" loading="lazy" /></div></div>
+                <div class="ph"><div class="ph-img"><img src="images/stressie-v4/referral-sheet.webp" alt="Invite a friend" loading="lazy" /></div></div>
+              </div>
+              <p class="cap">The first coins arrive before the account. Rewards. The invite flow, the one screen with its own colour.</p>
+              <div class="cols">
+                <div><p class="eyebrow">Decision</p><p class="p">"Redeem for 80 coins", never "Continue". The price is on the button, every time.</p></div>
+                <div><p class="eyebrow">Cut</p><p class="p">Streaks and confetti. The reward is two beats: the coin settles, then the words. Nothing shouts.</p></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ══ DESIGNED AND BUILT ═════════════════════════ -->
+          <section id="build" data-has-content="true">
+            <div class="block">
+              <p class="eyebrow">Designed and built</p>
+              <h2 class="h">The same screen in Figma and in SwiftUI. Building it changed the design twice.</h2>
+              <div class="plate plate-toggle">
+                <div class="seg" role="tablist" aria-label="Design or build">
+                  <button class="seg-btn is-on" role="tab" aria-selected="true" data-view="design">Figma</button>
+                  <button class="seg-btn" role="tab" aria-selected="false" data-view="build">SwiftUI build</button>
+                </div>
+                <div class="ph ph-toggle"><div class="ph-img">
+                  <img class="tv tv-design is-on" src="images/stressie-v4/toggle-figma.webp" alt="The event page as designed in Figma" loading="lazy" />
+                  <img class="tv tv-build" src="images/stressie-v4/toggle-build.webp" alt="The event page as built in SwiftUI, on the simulator" loading="lazy" />
+                </div></div>
+              </div>
+              <p class="cap">The event page, Figma render and simulator build, measured against each other at 3 px/pt.</p>
+              <div class="cols">
+                <div><p class="eyebrow">What building it changed, 1</p><p class="p">The reward haptic fires from the coin's completion handler, on the visual landing. In Figma it was a note. In code it became the timing.</p></div>
+                <div><p class="eyebrow">What building it changed, 2</p><p class="p">The design system lives in code, and a lint fails the build if a screen names a colour, radius or type size. That rule exists because I was writing both.</p></div>
+              </div>
+              <p class="p"><strong>What I built:</strong> every screen and flow, the design system and its lint, check-in, resets, the map, community, coins, referral, Talk's voice UI, three languages, Reduce Motion and Dynamic Type. <strong>What I did not build:</strong> the backend, payments and the model behind Talk. Those run on local stores with the seams marked for the team.</p>
+
+              <p class="eyebrow" style="margin-top:48px">The call I owned</p>
+              <h3 class="h3">In-person events wait for approval. It costs every host a day.</h3>
+              <p class="p">The founders wanted every event live instantly. I held the line on in-person events because a stranger's address needs a human check before Stressie puts its name beside it. The cost is real: a host waits, and some will not come back. Whether I was right is one of the things being measured now.</p>
+            </div>
+          </section>
+
+          <!-- ══ REFLECTION ═════════════════════════════════ -->
+          <section id="reflection" data-has-content="true">
+            <div class="block">
+              <p class="eyebrow">Reflection</p>
+              <h2 class="h">What I would do differently</h2>
+              <div class="cols cols-3">
+                <div><p class="h3">Put a person behind the approval queue first.</p><p class="p">Right now the queue is a state, not a reviewer. The first in-person host will find that out.</p></div>
+                <div><p class="h3">Ship the sink with the coin.</p><p class="p">I shipped earning before redemptions were live. An economy with no exit is just points again.</p></div>
+                <div><p class="h3">Get a second engineer in early.</p><p class="p">Working alone was fast. The numbers should not be trusted until someone else has read the code.</p></div>
+              </div>
+              <div class="next">
+                <a class="next-card" href="stressie-studio.html"><span class="eyebrow">Read next</span><strong>Stressie V1 to V2</strong><span>The pilots, and the numbers V4 has to beat.</span></a>
+                <a class="next-card" href="evertutor-live.html"><span class="eyebrow">Read next</span><strong>EverTutor Live</strong><span>1:1 AI tutoring for 2,000 students a day.</span></a>
+              </div>
+              <p class="credit">Designed and built by Bhanu Kowshik · <a href="https://www.stressieapp.com" target="_blank" rel="noopener">stressieapp.com ↗</a></p>
+            </div>
+          </section>
+
+        </div><!-- /col -->
+      </div><!-- /article -->
+
+      <div class="cs-thankyou"><span class="cs-thankyou-text">✦ THANK_YOU</span></div>
+
+    </div><!-- /card -->
+  </div><!-- /page -->
+
+  <script>
+  /* ── CUSTOM CURSOR (dot ↔ line) ─────────────────────────── */
+  (function initCursor() {
+    const dot = document.getElementById('ccDot');
+    document.documentElement.classList.add('cc-active');
+
+    const BLUE      = '#4361EE';
+    const DOT_COLOR = 'rgba(37,37,37,0.7)';
+    const CTA_SEL   = 'a[href]:not(.op-card), button, [role="button"], .op-card-cta';
+    const TEXT_SEL  = [
+      'p','h1','h2','h3','h4','h5','h6','li',
+      '.title','.h','.h3','.q','.figures','.next-card strong',
+      '.heading-orange','.heading-dark','.st-orange-italic',
+      '.st-card-title','.pf-card-title','.principle-title',
+      '.conv-name','.cw-orange','.cs-thankyou-text',
+    ].join(',');
+
+    let mx = -300, my = -300, visible = false, mode = 'dot';
+    let magnetEl = null, origCX = 0, origCY = 0, snapW = 0, snapH = 0;
+
+    function setShape(w, h, r, bg) {
+      dot.style.width        = w + 'px';
+      dot.style.height       = h + 'px';
+      dot.style.borderRadius = r + 'px';
+      dot.style.background   = bg;
+    }
+
+    function releaseMagnet() {
+      if (!magnetEl) return;
+      const el = magnetEl; magnetEl = null;
+      el.style.transition = 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+      el.style.transform  = 'translate(0px,0px)';
+      setTimeout(() => { el.style.transition = ''; el.style.transform = ''; }, 520);
+    }
+
+    function enterDot()  { releaseMagnet(); mode = 'dot';  setShape(12, 12, 9999, DOT_COLOR); }
+    function enterText() { releaseMagnet(); mode = 'text'; setShape(3,  33, 3,    BLUE); }
+
+    function isNearText(x, y) {
+      const PAD = 6;
+      for (const [px, py] of [[x,y],[x+PAD,y],[x-PAD,y],[x,y+PAD],[x,y-PAD]]) {
+        const h = document.elementFromPoint(px, py);
+        if (!h || h.closest(CTA_SEL)) continue;
+        if (!h.closest(TEXT_SEL)) continue;
+        const cr = document.caretRangeFromPoint ? document.caretRangeFromPoint(px, py) : null;
+        if (!cr || cr.startContainer.nodeType !== Node.TEXT_NODE) continue;
+        const txt = cr.startContainer, off = Math.min(cr.startOffset, txt.length - 1);
+        if (off < 0 || !txt.length) continue;
+        const r2 = document.createRange();
+        r2.setStart(txt, off); r2.setEnd(txt, Math.min(off + 1, txt.length));
+        const rects = r2.getClientRects();
+        if (!rects.length) continue;
+        const rc = rects[0];
+        if (px >= rc.left - PAD && px <= rc.right + PAD && py >= rc.top - PAD && py <= rc.bottom + PAD) return true;
+      }
+      return false;
+    }
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      if (!visible) { visible = true; dot.style.opacity = '1'; }
+
+      const el = document.elementFromPoint(mx, my);
+      const cta = el && el.closest(CTA_SEL);
+
+      if (cta) {
+        dot.style.opacity = '0';
+        if (magnetEl !== cta) {
+          releaseMagnet();
+          magnetEl = cta;
+          const rc = cta.getBoundingClientRect();
+          origCX = rc.left + rc.width / 2; origCY = rc.top + rc.height / 2;
+          snapW = rc.width; snapH = rc.height;
+        }
+        const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+        const moveX = clamp((mx - origCX) / (snapW / 2), -1, 1) * 5;
+        const moveY = clamp((my - origCY) / (snapH / 2), -1, 1) * 5;
+        magnetEl.style.transition = 'transform 0.12s ease-out';
+        magnetEl.style.transform  = `translate(${moveX}px,${moveY}px)`;
+      } else {
+        if (magnetEl) releaseMagnet();
+        dot.style.opacity = '1';
+        if (isNearText(mx, my)) { if (mode !== 'text') enterText(); dot.style.background = BLUE; }
+        else                    { if (mode !== 'dot')  enterDot();  dot.style.background = DOT_COLOR; }
+      }
+
+      dot.style.transform = `translate3d(${mx}px,${my}px,0) translate(-50%,-50%)`;
+    });
+
+    document.addEventListener('mouseleave', () => {
+      visible = false; dot.style.opacity = '0'; releaseMagnet();
+    });
+
+    (function tick() { dot.style.transform = `translate3d(${mx}px,${my}px,0) translate(-50%,-50%)`; requestAnimationFrame(tick); })();
+  })();
+
+
+  /* ═══════════════════════════════════════════════════════════
+     HERO — headline word by word, then the stage, then the block
+  ═══════════════════════════════════════════════════════════ */
+  function splitWords(el) {
+    const nodes = Array.from(el.childNodes);
+    el.innerHTML = '';
+    nodes.forEach(node => {
+      const wrap = node.nodeType === Node.ELEMENT_NODE ? node.cloneNode(false) : null;
+      const target = wrap || el;
+      node.textContent.split(/(\s+)/).forEach(chunk => {
+        if (/^\s+$/.test(chunk)) { target.appendChild(document.createTextNode(chunk)); }
+        else if (chunk) { const s = document.createElement('span'); s.className = 'word'; s.textContent = chunk; target.appendChild(s); }
+      });
+      if (wrap) el.appendChild(wrap);
+    });
+  }
+  const csHeading = document.getElementById('csHeading');
+  splitWords(csHeading);
+  const allWords = csHeading.querySelectorAll('.word');
+  setTimeout(() => document.getElementById('heroEyebrow').classList.add('visible'), 60);
+  allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 200 + i * 40));
+  const afterWords = 200 + allWords.length * 40 + 40;
+  ['heroRail', 'heroMeta'].forEach((id, i) => setTimeout(() => document.getElementById(id).classList.add('visible'), afterWords + i * 140));
+
+  /* the loop only needs to run while it is on screen */
+  const heroVideo = document.querySelector('.plate-hero video');
+  if (heroVideo) {
+    new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { heroVideo.play().catch(() => {}); } else { heroVideo.pause(); } });
+    }, { threshold: 0.2 }).observe(heroVideo);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     DESIGN / BUILD TOGGLE
+  ═══════════════════════════════════════════════════════════ */
+  document.querySelectorAll('.seg-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const view = btn.dataset.view;
+      document.querySelectorAll('.seg-btn').forEach(b => { const on = b === btn; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); });
+      document.querySelectorAll('.tv').forEach(img => img.classList.toggle('is-on', img.classList.contains('tv-' + view)));
+    });
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     HAMBURGER MENU
+  ═══════════════════════════════════════════════════════════ */
+  const hamburger  = document.getElementById('navHamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const backdrop   = document.getElementById('menuBackdrop');
+  function toggleMenu(force) {
+    const open = force !== undefined ? force : !hamburger.classList.contains('open');
+    hamburger.classList.toggle('open', open);
+    hamburger.setAttribute('aria-expanded', open);
+    mobileMenu.classList.toggle('open', open);
+    backdrop.classList.toggle('open', open);
+  }
+  hamburger.addEventListener('click', () => toggleMenu());
+  backdrop.addEventListener('click',  () => toggleMenu(false));
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      toggleMenu(false);
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) setTimeout(() => smoothScrollTo(target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight, 900), 400);
+    });
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     SMOOTH ANCHOR SCROLL + SCROLL SPY
+  ═══════════════════════════════════════════════════════════ */
+  function easeOutExpo(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
+  function smoothScrollTo(targetY, duration) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, targetY); return; }
+    const startY = window.scrollY, dist = targetY - startY, start = performance.now();
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      window.scrollTo(0, startY + dist * easeOutExpo(t));
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  const nav = document.querySelector('.nav');
+  document.querySelectorAll('a[href^="#"]:not(.mobile-menu a)').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      smoothScrollTo(target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight, 900);
+    });
+  });
+  const navBtns = document.querySelectorAll('.nav-btn[data-section]');
+  const tocLinks = document.querySelectorAll('.toc a[data-section]');
+  const spyObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      navBtns.forEach(b => b.classList.toggle('active', b.dataset.section === e.target.id));
+      tocLinks.forEach(a => a.classList.toggle('is-on', a.dataset.section === e.target.id));
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => { if (s.children.length > 0) spyObs.observe(s); });
+
+  /* ═══════════════════════════════════════════════════════════
+     REVEALS
+  ═══════════════════════════════════════════════════════════ */
+  const childObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (!e.isIntersecting) return; e.target.classList.add('visible'); childObs.unobserve(e.target); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.block, .plate-wide').forEach(el => { el.classList.add('tr-anim'); childObs.observe(el); });
+  const STAGGER_PAIRS = [];
+  const animGroups = new Map();
+  STAGGER_PAIRS.forEach(({ parent, child }) => {
+    document.querySelectorAll(parent).forEach(parentEl => {
+      const kids = Array.from(parentEl.querySelectorAll(':scope > ' + child));
+      if (!kids.length) return;
+      kids.forEach(k => k.classList.add('el-anim'));
+      animGroups.set(parentEl, kids);
+    });
+  });
+  const elObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      (animGroups.get(e.target) || []).forEach((kid, i) => setTimeout(() => kid.classList.add('el-visible'), 100 + i * 80));
+      elObs.unobserve(e.target);
+    });
+  }, { threshold: 0.08 });
+  animGroups.forEach((_, parentEl) => elObs.observe(parentEl));
+  </script>
+
+
+
+
+  <!-- ── Back to where you came from ───────────────────────────────────────
+       The nav-home href is "/", which is a fresh navigation: the homepage
+       loader replays and you arrive in the hero, having lost the card you
+       clicked to get here. When the previous history entry is this site,
+       step back through history instead — the browser restores the exact
+       scroll offset and the bfcache skips the loader entirely.
+       The href stays as the fallback, and is what still runs for a direct
+       link, a new tab, or an arrival from another site. -->
+  <script>
+  (function () {
+    var home = document.querySelector('.nav-home');
+    if (!home) return;
+    home.addEventListener('click', function (e) {
+      /* let cmd/ctrl/shift/middle clicks open a tab the way they should */
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (history.length <= 1) return;
+      var ref = document.referrer;
+      if (!ref) return;                       /* typed in, or opened cold */
+      try {
+        if (new URL(ref).origin !== location.origin) return;
+      } catch (_) { return; }
+      e.preventDefault();
+      history.back();
+    });
+  })();
+  </script>
+
+</body>
+</html>

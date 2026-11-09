@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Bhanu Kowshik · Product Designer</title>
-<meta name="description" content="Product designer crafting AI-native experiences that scale, convert and connect. Conversational AI, agentic systems, 0→1. 5+ years, San Francisco." />
+<title>Bhanu Kowshik · Design Engineer and Founder, Verified Call</title>
+<meta name="description" content="Design engineer who designs and builds AI products. Founder of Verified Call. Sole designer at EverTutor, used by 2,000+ students a day. San Francisco." />
 <meta name="theme-color" content="#0A0E15" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Bhanu Kowshik · Product Designer" />
-<meta property="og:description" content="Designing products that scale, convert & connect, through first principles and obsessive detail to craft." />
+<meta property="og:title" content="Bhanu Kowshik · Design Engineer and Founder, Verified Call" />
+<meta property="og:description" content="I design AI products, and I build them too. Founder of Verified Call." />
 <link rel="canonical" href="https://bhanu.build/" />
 <meta property="og:url" content="https://bhanu.build/" />
 <meta property="og:image" content="https://bhanu.build/images/og-image.jpg" />
@@ -71,7 +71,7 @@
        1440px — otherwise the ladder collapses exactly where it matters: an
        untuned lead landed on 18px against a 16px body, a 1.125x step the
        eye reads as an accident rather than a level. */
-    --t-micro:10.24px;                           /* legal, timers          */
+    --t-micro:12px;                              /* legal, timers (12px floor) */
     --t-caption:12.8px;                          /* metric labels, chips   */
     --t-body:16px;                               /* body — fixed floor     */
     --t-lead:20px;                               /* lead sentences — fixed */
@@ -236,6 +236,17 @@
   }
 
   .hero{position:relative;height:100svh;overflow:clip;}
+  /* hero stack strip: what I ship with, one quiet line at the fold */
+  .stack{position:absolute;left:0;right:0;bottom:22px;z-index:3;overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);}
+  .stack-track{display:flex;width:max-content;animation:stackRun 60s linear infinite;}
+  .stack:hover .stack-track{animation-play-state:paused;}
+  .stack ul{display:flex;gap:28px;padding-right:28px;list-style:none;margin:0;}
+  .stack li{font-family:var(--sans);font-size:13px;letter-spacing:.02em;color:var(--ink-3);white-space:nowrap;display:flex;align-items:center;gap:10px;}
+  .stack li em{font-style:normal;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);padding:4px 8px;border:1px solid var(--line);border-radius:999px;}
+  @keyframes stackRun{to{transform:translateX(-50%)}}
+  @media (prefers-reduced-motion:reduce){.stack-track{animation:none}.stack{-webkit-mask-image:none;mask-image:none}.stack ul+ul{display:none}.stack ul{flex-wrap:wrap;justify-content:center;row-gap:8px;padding:0 5%}}
+
   /* atmosphere — focal light behind the headline + edge vignette for depth */
   .hero::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
     background:radial-gradient(135% 105% at 50% 46%, transparent 56%, rgba(3,6,12,0.5) 100%);}
@@ -380,7 +391,7 @@
     display:flex;flex-direction:column;opacity:0;pointer-events:none;white-space:nowrap;
     transition:opacity .3s ease,transform .3s ease;}
   .top-nav.scrolled .nav-callme{opacity:1;pointer-events:auto;transform:translateY(-50%);}
-  .nav-callme-label{font-size:clamp(10px,0.55vw,12px);font-weight:550;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);line-height:1.5;}
+  .nav-callme-label{font-size:12px;font-weight:550;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);line-height:1.5;}
   .nav-callme-name{font-family:var(--sans);font-size:16px;font-weight:550;letter-spacing:-0.005em;color:var(--ink);line-height:1.15;}
   /* ── ORB FAB — bottom-right. No scale in any state: mountVisual reads the
         element's transformed rect, so a scaled mount would size the canvas wrong. ── */
@@ -549,6 +560,12 @@
     margin-bottom:clamp(18px,2.8vh,28px);
     font-size:clamp(12.5px,0.72vw,15px);font-weight:520;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);}
   .eyebrow i{width:1px;height:11px;background:var(--line);}
+  .eyebrow-now{gap:10px;}
+  .eyebrow-now a{color:inherit;text-decoration:underline;text-decoration-color:color-mix(in srgb,currentColor 40%,transparent);text-underline-offset:4px;transition:text-decoration-color .3s;}
+  .eyebrow-now a:hover{text-decoration-color:currentColor;}
+  .now-dot{width:7px;height:7px;border-radius:50%;background:#8CC5FF;box-shadow:0 0 0 0 rgba(140,197,255,.5);animation:nowPulse 2.4s ease-out infinite;flex:none;}
+  @keyframes nowPulse{0%{box-shadow:0 0 0 0 rgba(140,197,255,.55)}70%,100%{box-shadow:0 0 0 9px rgba(140,197,255,0)}}
+  @media (prefers-reduced-motion:reduce){.now-dot{animation:none}}
   /* ── THE DISPLAY SCALE ────────────────────────────────────────────────
      Four steps, each 1.27× the one below it, and the vw coefficients sit in
      that same ratio — so the relationship holds at every width, not just at
@@ -573,15 +590,15 @@
     border:1px solid rgba(239,243,248,.22);}
   .hero-pill img{width:100%;height:100%;object-fit:cover;display:block;}
   /* stats band — one framed strip so the three facts read as a single unit */
-  .facts{margin-top:46px;display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:stretch;
-    padding:15px clamp(22px,2.6vw,32px);border:1px solid var(--line);border-radius:18px;
+  .facts{margin-top:clamp(26px,4vh,46px);display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:stretch;
+    padding:10px clamp(16px,1.6vw,28px);border:1px solid var(--line);border-radius:14px;
     background:rgba(13,18,27,.38);
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
-  .fact{display:flex;align-items:center;padding:3px clamp(20px,2.8vw,36px);}
+  .fact{display:flex;align-items:center;padding:2px clamp(14px,1.6vw,36px);}
   .fact:first-child{padding-left:0;}
   .fact:last-child{padding-right:0;}
   .fact+.fact{border-left:1px solid var(--line);}
-  .fact .v{font-size:clamp(16px,1.35vw,19.5px);font-weight:500;letter-spacing:-0.012em;color:rgba(239,243,248,.82);
+  .fact .v{font-size:clamp(14px,calc(0.55vw + 8.5px),19.5px);font-weight:500;letter-spacing:-0.012em;color:rgba(239,243,248,.82);
     font-variant-numeric:tabular-nums lining-nums;font-feature-settings:"tnum" 1;}
 
   /* ── IMAGE TRAIL — photos reveal one after another along the cursor path.
@@ -3927,7 +3944,7 @@ html:not([data-theme="dark"]) .abt-title { color: rgba(37,37,37,0.55); }
       .dna2-tile { min-height: 92px; padding: 10px 6px; }
       .dna2-tile-nm { font-size: 12.5px; }
     }
-    @media (max-width: 980px) {
+    @media (max-width: 1100px) {
       .dna2 { grid-template-columns: 1fr; }
       .dna2-aside {
         max-width: 640px;
@@ -4281,10 +4298,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .dna2-tile-ic { width: clamp(17px, 5.4vw, 26px); height: clamp(17px, 5.4vw, 26px); }
       .dna2-tile-nm {
         /* 10px legibility floor — 7px was decoration, not information */
-        font-size: clamp(10px, 2.6vw, 12px); line-height: 1.15; letter-spacing: -0.012em;
-        /* "Engineering" alone is wider than a fifth of the screen —
-           let it break instead of spilling out of the tile */
-        overflow-wrap: anywhere; hyphens: auto;
+        font-size: clamp(11px, 2.9vw, 12px); line-height: 1.15; letter-spacing: -0.012em;
+        /* long words carry soft hyphens in the markup, so they break as
+           "Engi- neering" instead of "Engineerin / g" */
+        overflow-wrap: normal; hyphens: manual;
       }
       .dna2-stem { gap: 5px; }
       /* out of columns 4-6, onto its own full-width row under the T */
@@ -4550,11 +4567,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
      plate's dark half — the hero's composition, mirrored */
   .ft-left{flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-start;gap:28px;}
 
-  .ft-k{display:block;font-size:clamp(11.5px,0.68vw,14px);font-weight:550;letter-spacing:.18em;
+  .ft-k{display:block;font-size:clamp(12px,0.68vw,14px);font-weight:550;letter-spacing:.18em;
     text-transform:uppercase;color:var(--ink-3);}
 
   .ft-status{display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:999px;
-    font-size:clamp(11.5px,0.68vw,14px);font-weight:550;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);
+    font-size:clamp(12px,0.68vw,14px);font-weight:550;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);
     background:rgba(239,243,248,.05);border:1px solid var(--line);}
   .ft-dot{width:7px;height:7px;border-radius:50%;background:#3b8cff;flex-shrink:0;
     box-shadow:0 0 8px rgba(59,140,255,.8);animation:pulse 1.4s infinite;}
@@ -4667,7 +4684,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .ft-note.is-live{opacity:1;transform:none;transition:none;}
   }
 
-  @media(max-width:1100px){
+  @media(max-width:960px){
     .ft-spread{flex-direction:column;align-items:center;justify-content:center;
       gap:clamp(40px,6vh,64px);text-align:center;}
     .ft-left{align-items:center;flex:0 0 auto;}
@@ -4693,7 +4710,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .ft-copy svg{width:16px;height:16px;}
   }
 
-  @media(max-width:760px){
+  @media(max-width:767px){
     /* the bar comes down to phone scale — 62/74px of chrome was eating the
        top of a 667px screen. The links themselves are gone from here: the
        burger takes over at 900px. */
@@ -4703,7 +4720,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .nav-nametext{min-width:0;}
     .nav-name{font-size:15px;}
     .nav-callme-name{font-size:14px;}
-    .nav-callme-label{font-size:10px;letter-spacing:.12em;}
+    .nav-callme-label{font-size:12px;letter-spacing:.1em;}
     .nav-brand{gap:10px;min-height:32px;}
     /* let the hero grow if the stack outruns a short viewport */
     .hero{height:auto;min-height:100svh;}
@@ -4724,21 +4741,28 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        without it the last headline line sits on the rim light and vanishes. */
     .hero-scrim{background:linear-gradient(180deg,
       rgba(10,14,21,.70) 0%, rgba(10,14,21,.56) 44%, rgba(10,14,21,.82) 100%);}
-    .eyebrow{gap:10px;padding:8px 14px;font-size:11.5px;letter-spacing:.07em;}
+    /* no frame on this row, so padding only stole width; the text balances
+       over two even lines instead of leaving "FOUNDER" alone */
+    .eyebrow{display:block;padding:0;font-size:12px;line-height:1.6;letter-spacing:.06em;text-wrap:balance;}
+    .eyebrow .now-dot{display:inline-block;vertical-align:.1em;margin-right:8px;}
     /* five lines of headline plus the stats band plus the button is the whole
        of a phone screen — the ceiling comes down so the fold can breathe */
     h1{font-size:clamp(26px,7.3vw,36px);}
     /* stats stack: centered column, dividers rotate to horizontal hairlines */
     /* align-self keeps the framed band full-width against a centred column,
        which would otherwise shrink it to its longest fact */
-    .facts{margin-top:32px;flex-direction:column;align-items:stretch;padding:4px 22px;
-      align-self:stretch;}
-    .fact{justify-content:center;text-align:center;padding:13px 0;}
-    .fact:first-child{padding-left:0;padding-top:13px;}
-    .fact:last-child{padding-right:0;padding-bottom:13px;}
+    /* compact on phones: tight rows, 14px type, about 110px tall instead of 170 */
+    .facts{margin-top:24px;flex-direction:column;align-items:stretch;padding:2px 16px;
+      align-self:stretch;border-radius:12px;}
+    .fact{justify-content:center;text-align:center;padding:8px 0;}
+    .fact:first-child{padding-left:0;padding-top:9px;}
+    .fact:last-child{padding-right:0;padding-bottom:9px;}
+    .fact .v{font-size:14px;line-height:1.35;text-wrap:balance;}
     .fact+.fact{border-left:none;border-top:1px solid var(--line);}
-    .cta-dock{margin-top:30px;}
-    .cta-text span{font-size:12.5px;}
+    .cta-dock{margin-top:24px;}
+    .cta-text span{font-size:13px;}
+    /* room under the button for the stack strip pinned at the fold */
+    .copy{padding-bottom:84px;}
   }
 
   /* ── THE PLATE ON A PHONE — put the cliff and the figure back in frame ──
@@ -4759,16 +4783,16 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
      Portrait-scoped: a landscape phone IS wider than the film, so it gets
      vertical slack back, and a 100% focal-y would drop it to the bottom
      of the frame. Landscape keeps the desktop framing. */
-  @media(max-width:760px) and (orientation:portrait){
+  @media(max-width:767px) and (orientation:portrait){
     .hero-plate{--plate-focal-x:88%;--plate-focal-y:100%;--plate-scale:1.5;}
   }
   /* iPad portrait has the same fault, far milder — the ridge survives the
      crop but the figure is left straddling the right edge. No zoom needed
      here; the focal point only has to stop cutting it in half. */
-  @media(min-width:761px) and (max-width:1023px) and (orientation:portrait){
+  @media(min-width:768px) and (max-width:1023px) and (orientation:portrait){
     .hero-plate{--plate-focal-x:90%;}
   }
-  @media(max-height:780px) and (min-width:761px){
+  @media(max-height:780px) and (min-width:768px){
     h1{font-size:clamp(32px,3.7vw,52px);}
     .facts{margin-top:26px;}
     .cta-dock{margin-top:28px;}
@@ -4821,7 +4845,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       background: var(--seam-deep);
       overflow: hidden; cursor: default;
       transform: translateY(0);
-      transition: transform 1s var(--ease-expo);
+      transition: transform .7s var(--ease-expo);
     }
     #v6Loader.is-up { transform: translateY(-102%); pointer-events: none; }
 
@@ -4893,7 +4917,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       height: min(56vh, 84vw); aspect-ratio: 3 / 4;
       opacity: 0;
       transform: translate(-50%, -50%) translateY(60vh) scale(1.04);
-      transition: transform 1.05s var(--ease-expo), opacity .55s ease;
+      transition: transform .55s var(--ease-expo), opacity .35s ease;
       will-change: transform, opacity;
       -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 84%, transparent 100%);
               mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 84%, transparent 100%);
@@ -4915,7 +4939,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       position: absolute; z-index: 3; left: 50%; top: 76%;
       width: min(92vw, 760px); text-align: center;
       opacity: 0; transform: translate(-50%, 14px);
-      transition: opacity .6s ease, transform .6s var(--ease-expo);
+      transition: opacity .3s ease, transform .3s var(--ease-expo);
     }
     #v6Loader.copy-live .v6l-copy { opacity: 1; transform: translate(-50%, 0); }
     .v6l-words {
@@ -4927,7 +4951,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       position: absolute; left: 0; right: 0; top: 0; text-align: center;
       white-space: nowrap;
       transform: translateY(135%); opacity: 0; filter: blur(10px);
-      transition: transform .72s var(--ease-expo), opacity .5s ease, filter .6s ease;
+      transition: transform .3s var(--ease-expo), opacity .22s ease, filter .25s ease;
     }
     .v6l-word.is-on   { transform: translateY(0);      opacity: 1; filter: blur(0); }
     .v6l-word.is-past { transform: translateY(-135%);  opacity: 0; filter: blur(6px); }
@@ -5028,6 +5052,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       var seen = false;
       try { seen = sessionStorage.getItem('v6loaderPlayed') === '1'; } catch (e) {}
       if (seen) { loader.style.display = 'none'; return; }
+      /* reduced motion: no title sequence at all, the hero shows on load */
+      if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        loader.style.display = 'none'; return;
+      }
       try { sessionStorage.setItem('v6loaderPlayed', '1'); } catch (e) {}
       loader.hidden = false;
       document.documentElement.classList.add('v6-loading');
@@ -5039,7 +5067,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       var pctEl  = document.getElementById('v6lPct');
       var words  = loader.querySelectorAll('.v6l-word');
 
-      var MAX_HOLD = 6500;   // ceiling: never trap the visitor on a stalled file
+      /* about 1.5 s in all: the hero poster is already painted underneath,
+         so the sequence is a short title card, not a wait for every file */
+      var MAX_HOLD = 1300;   // ceiling: never trap the visitor on a stalled file
       var t0 = performance.now();
 
       var isHidden = false;
@@ -5063,11 +5093,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       function imgIn() {
         if (imgShown) return; imgShown = true;
         loader.classList.add('img-in');
-        setTimeout(copyLive, 900);   // Act II starts as the slide settles
+        setTimeout(copyLive, 120);   // Act II starts as the slide settles
       }
       var pimg = loader.querySelector('.v6l-portrait img');
       if (pimg && pimg.decode) pimg.decode().then(imgIn, imgIn);
-      setTimeout(imgIn, 1400);       // slow network: enter anyway, fade covers it
+      setTimeout(imgIn, 250);        // slow network: enter anyway, fade covers it
 
       // ── Act III: the bar tracks the page's REAL artifacts — every image,
       // every video poster, the hero plate's canplay, and the fonts ──
@@ -5111,7 +5141,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
       // words appear only once the copy is live, and never faster than one
       // beat apiece — but their order is always progress-true
-      var WORD_AT = [0, 0.26, 0.52, 0.76], wordIdx = -1, WORD_BEAT = 700;
+      var WORD_AT = [0, 0.26, 0.52, 0.76], wordIdx = -1, WORD_BEAT = 150;
       function setWord(p) {
         if (!copyT) return;
         var n = 0, j;
@@ -5126,7 +5156,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         wordIdx = n;
       }
 
-      var shown = 0, exiting = false, RAMP = 2200;
+      var shown = 0, exiting = false, RAMP = 550;
       (function step() {
         var elapsed  = performance.now() - t0;
         var assetsIn = collected && assetDone >= assetTarget;
@@ -5139,7 +5169,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         var ramp   = copyT ? Math.min((performance.now() - copyT) / RAMP, 1) : 0;
         var real   = loaded ? 1 : Math.min(assetFraction(), 0.985);
         var target = Math.min(ramp, real);
-        shown += (target - shown) * 0.14;
+        shown += (target - shown) * 0.24;
         if (loaded && ramp >= 1 && shown > 0.995) shown = 1;
 
         if (barEl) barEl.style.transform = 'scaleX(' + shown.toFixed(4) + ')';
@@ -5149,19 +5179,19 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         // leave only when the bar is truly full AND "Repeat." has landed
         if (shown >= 1 && wordIdx === 3 && !exiting) {
           exiting = true;
-          setTimeout(hideLoader, 600);
+          setTimeout(hideLoader, 120);
         }
         if (!exiting) requestAnimationFrame(step);
       })();
 
       // hard safety net — never leave the loader stuck
-      setTimeout(hideLoader, MAX_HOLD + 2400);
+      setTimeout(hideLoader, MAX_HOLD + 900);
     })();
   </script>
 
   <section class="hero">
     <video class="hero-plate" id="heroPlate" autoplay muted loop playsinline
-           poster="images/silhouette-poster.webp" src="images/silhouette.mp4"
+           poster="images/silhouette-poster.webp" src="images/silhouette-1600.mp4"
            aria-hidden="true"></video>
     <div class="hero-scrim" aria-hidden="true"></div>
     <div class="hero-vig" aria-hidden="true"></div>
@@ -5181,7 +5211,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </span>
       </a>
       <div class="nav-links">
-        <a href="#s2FwHeader">Work</a><a href="#shortsSection">Shorts</a><a href="#aboutSection">About</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a>
+        <a href="#work">Work</a><a href="#shortsSection">Shorts</a><a href="#aboutSection">About</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a>
         <a href="#contactSection">Contact</a>
       </div>
       <button class="nav-burger" id="navBurger" aria-label="Open menu"
@@ -5191,15 +5221,17 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     </nav>
 
     <div class="copy">
-      <div class="eyebrow"><span>Product Designer</span><i aria-hidden="true"></i><span>Builder</span><i aria-hidden="true"></i><span>Explorer</span></div>
-      <h1>Designing products that scale, convert &amp; connect through first principles and <span class="serif">obsessive detail to craft.</span></h1>
-      <div class="facts">
-        <div class="fact"><span class="v">5+ Years</span></div>
-        <div class="fact"><span class="v">Conversational AI, Agentic Systems, 0→1</span></div>
-        <div class="fact"><span class="v">San Francisco</span></div>
+      <p class="eyebrow role-line"><span class="role">Design engineer</span><span class="sep" aria-hidden="true"></span><span>Currently building <a href="verified-call.html"><img src="images/vc/verified-badge.svg" alt="" width="18" height="18">Verified Call</a> as a founder</span></p>
+      <h1>I design AI products that <span class="serif">scale, convert, and connect.</span></h1>
+      <div class="proof">
+        <div><b>3 weeks</b><span>to design and build Verified Call, solo</span></div>
+        <div><b>2,000+</b><span>students a day on EverTutor, where I was the sole designer</span></div>
       </div>
 
       <div class="cta-dock">
+        <!-- one plain action plus the chat bar; Contact lives in the nav -->
+        <a class="btn-primary hero-btn" href="#work">See the work
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a>
 <!-- (orb canvas fill fix lives in CSS: the WebGL canvas keeps its
              mount-time pixel size, so it must stretch to the well) -->
         <button class="cta" id="cta" aria-label="Chat with Bhanu AI" aria-haspopup="dialog">
@@ -5215,6 +5247,22 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       </div>
     </div>
 
+    <div class="stack" aria-label="Tools I design and build with">
+      <div class="stack-track">
+        <ul>
+          <li>Figma</li><li>Motion &middot; GSAP</li><li>WebGL &middot; Three.js</li>
+          <li>React</li><li>TypeScript</li><li>Next.js</li><li>Electron</li><li>Chrome extensions</li><li>SwiftUI</li>
+          <li>MediaPipe</li><li>Transformers.js</li><li>PyTorch</li><li>AWS Rekognition</li>
+          <li>Claude API</li><li>ElevenLabs voice</li><li>Agentic workflows</li>
+        </ul>
+        <ul aria-hidden="true">
+          <li>Figma</li><li>Motion &middot; GSAP</li><li>WebGL &middot; Three.js</li>
+          <li>React</li><li>TypeScript</li><li>Next.js</li><li>Electron</li><li>Chrome extensions</li><li>SwiftUI</li>
+          <li>MediaPipe</li><li>Transformers.js</li><li>PyTorch</li><li>AWS Rekognition</li>
+          <li>Claude API</li><li>ElevenLabs voice</li><li>Agentic workflows</li>
+        </ul>
+      </div>
+    </div>
     <!-- The image trail is retired on this hero: the silhouette carries it
          alone. Its CSS and its spawn IIFE are both still in the file and
          both no-op without this element (`if (!layer) return`), so putting
@@ -5283,7 +5331,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        and outside .hero's overflow:clip. -->
   <div class="nav-sheet" id="navSheet">
     <nav class="nav-sheet-inner" aria-label="Main menu">
-      <a href="#s2FwHeader">Work</a>
+      <a href="#work">Work</a>
       <a href="#shortsSection">Shorts</a>
       <a href="#aboutSection">About</a>
       <a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a>
@@ -5332,341 +5380,275 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     })();
   </script>
 
-  <!-- ══ SECTION 2 — ported wholesale from index.html ══
-       Markup, CSS and behaviour are the shipping section, not a rebuild.
-       Its type and colour resolve through the alias tokens below, so it
-       adopts this page's system instead of importing Montserrat. -->
-      <!-- ── Featured Work heading — lives in the breath between the hero
-           and the work section: a band of bare page, the title alone in
-           it, serif on "Work" the way the hero emphasises. ── -->
-      <div class="s2-fw-header" id="s2FwHeader">
-        <div class="s2-fwh-row">
-          <h2 class="fw-title">Featured <span class="serif">Work</span></h2>
-        </div>
-        <!-- the spiral/grid toggle is gone: there is one view of the work now.
-             The JS that wired it is null-guarded, so it simply stands down. -->
+  <!-- WORK GRID (replaces the spiral helix) -->
+  <!-- ══ WORK — card grid (replaces the spiral helix, 2026-11-08) ═════════
+       Research-led: the real product UI is the picture, flat, on one soft
+       brand field, bleeding off an edge; little text on the image; muted
+       loops of the real product while a card is on screen. Two columns,
+       alternating 7/12 and 5/12. -->
+  <link rel="stylesheet" href="images/vc/vc-demo.css">
+  <style>
+    .wk{padding:clamp(88px,10vw,150px) 10% clamp(80px,9vw,140px);}
+    @media (max-width:767px){.wk{padding-left:5%;padding-right:5%;}}
+    .wk-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:clamp(32px,4vw,56px);}
+    .wk-eyebrow{font-family:var(--sans);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:14px;}
+    .wk-title{font-family:var(--sans);font-weight:500;font-size:clamp(34px,3.6vw,52px);letter-spacing:-.03em;line-height:1.04;color:var(--ink);}
+    .wk-title .serif{color:var(--ink-2);}
+    .wk-sub{font-size:16px;line-height:1.55;color:var(--ink-3);max-width:34ch;text-align:right;}
+    @media (max-width:767px){.wk-head{flex-direction:column;align-items:flex-start}.wk-sub{text-align:left}}
+
+    .wk-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(40px,4vw,64px) clamp(16px,2vw,28px);}
+    .wk-7{grid-column:span 7}.wk-5{grid-column:span 5}
+    @media (max-width:900px){.wk-7,.wk-5{grid-column:span 12}}
+
+    .wk-card{display:flex;flex-direction:column;gap:20px;color:inherit;text-decoration:none;min-width:0;}
+    .wk-card:focus-visible{outline:none}
+    .wk-card:focus-visible .wk-media{outline:2px solid var(--ink);outline-offset:4px;}
+    .wk-media{position:relative;aspect-ratio:4/3;border-radius:28px;overflow:hidden;background:var(--f);isolation:isolate;
+      transition:transform .7s cubic-bezier(.16,1,.3,1);}
+    .wk-card:hover .wk-media{transform:translateY(-4px);}
+    .wk-ui{position:absolute;transition:transform .9s cubic-bezier(.16,1,.3,1);}
+    .wk-card:hover .wk-ui{transform:translate(-1.2%,-1.6%);}
+    .wk-ui video,.wk-ui img{display:block;width:100%;height:auto;}
+    .wk-shot{left:9%;top:13%;width:118%;border-radius:14px 0 0 0;overflow:hidden;box-shadow:0 30px 60px -20px rgba(20,30,20,.35),0 0 0 1px rgba(0,0,0,.06);background:#fff;}
+    .wk-tag{position:absolute;left:22px;top:20px;z-index:3;font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(25,25,25,.62);}
+
+    .wk-meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--sans);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);}
+    .wk-name{font-family:var(--sans);font-weight:500;font-size:clamp(24px,2vw,30px);letter-spacing:-.025em;line-height:1.1;color:var(--ink);}
+    .wk-line{font-size:17px;line-height:1.5;color:var(--ink-2);max-width:46ch;}
+    .wk-line b{color:var(--ink);font-weight:600;}
+    .wk-links{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:var(--sans);font-size:15px;font-weight:500;}
+    .wk-links span{color:var(--ink);}
+    .wk-links span i{font-style:normal;display:inline-block;transition:transform .5s cubic-bezier(.16,1,.3,1);}
+    .wk-card:hover .wk-links span i{transform:translateX(4px);}
+    .wk-links a{color:var(--ink-3);text-decoration:none;}
+    .wk-links a:hover{color:var(--ink);}
+    .wk-body{display:flex;flex-direction:column;gap:10px;}
+
+    /* Verified Call: the real in-Meet panel over a call */
+    .wk-vc{--f:#EDEDEA;}
+    .wk-vc .vcshot{left:9%;top:13%;width:100%;border-radius:16px 0 0 0;overflow:hidden;box-shadow:0 30px 60px -20px rgba(0,0,0,.4),0 0 0 1px rgba(0,0,0,.06);background:#202124;}
+    .wk-vc .vcshot img{display:block;width:100%;height:auto;}
+    .wk-vc .vcshot .look{position:absolute;inset:0;opacity:0;animation:wkState 8s ease-in-out infinite;}
+
+    /* Verified Call: live demo, a cursor opens the panel in a Meet call */
+    .wk-vc .vcd{position:absolute;left:7%;top:14%;width:104%;border-radius:16px 0 0 0;
+      box-shadow:0 30px 60px -20px rgba(0,0,0,.4),0 0 0 1px rgba(0,0,0,.06);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+    .wk-vc .wk-still{display:none}
+    .wk-vc .vcd.vcd .pnl{right:14cqw}.wk-vc .vcd.vcd .vbar{right:auto;width:89cqw}
+    @media (prefers-reduced-motion:reduce){.wk-vc .vcd{display:none}.wk-vc .wk-still{display:block;position:absolute;left:9%;top:13%;width:100%;border-radius:16px 0 0 0}}
+    @keyframes wkState{0%,42%{opacity:0}50%,92%{opacity:1}100%{opacity:0}}
+
+
+    /* click and tap cues synced to each loop's own recorded cursor */
+    .wk-ui:has(video[data-taps]){overflow:hidden}
+    .wk-tap{position:absolute;z-index:4;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;pointer-events:none;opacity:0;
+      border:2px solid rgba(37,99,235,.85);background:rgba(92,169,255,.18)}
+    .wk-tap.go{animation:wkTap .7s cubic-bezier(.2,.7,.3,1)}
+    .wk-tap.hold{opacity:1;transform:scale(.8);transition:transform .2s}
+    .wk-tap.f{border:none;background:rgba(40,40,40,.32);box-shadow:0 0 0 2px rgba(255,255,255,.75) inset;width:38px;height:38px;margin:-19px 0 0 -19px}
+    @keyframes wkTap{0%{opacity:1;transform:scale(.35)}70%{opacity:.9}100%{opacity:0;transform:scale(1.25)}}
+    .wk-num{position:absolute;right:20px;top:15px;z-index:3;font-family:var(--sans);font-size:13px;font-weight:600;color:#191919;
+      background:rgba(255,255,255,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:6px 12px;border-radius:99px;box-shadow:0 0 0 1px rgba(0,0,0,.06)}
+    .wk-go{position:absolute;right:20px;bottom:20px;z-index:5;font-family:var(--sans);font-size:14px;font-weight:600;color:#fff;background:#111;
+      padding:10px 16px;border-radius:99px;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .5s cubic-bezier(.16,1,.3,1);pointer-events:none}
+    .wk-card:hover .wk-go,.wk-card:focus-visible .wk-go{opacity:1;transform:none}
+    @media (hover:none){.wk-go{display:none}}
+    @media (max-width:600px){.wk-media .wk-tag{display:none}.wk-num{left:16px;right:auto;top:14px;font-size:12px}}
+    /* phones */
+    .wk-phone{border-radius:34px;overflow:hidden;background:#fff;box-shadow:0 30px 60px -18px rgba(60,40,20,.35),0 0 0 1px rgba(0,0,0,.06);}
+    .wk-ss{--f:#F6EBDD;}
+    .wk-ss .wk-phone{left:33%;top:12%;width:34%;}
+    .wk-v4{--f:#F7DCCB;}
+    .wk-v4 .p1{left:18%;top:16%;width:30%;transform:rotate(-4deg);}
+    .wk-v4 .p2{left:46%;top:9%;width:32%;z-index:2;}
+    .wk-card:hover .wk-v4 .p1{transform:rotate(-6deg) translate(-3%,-1%);}
+    .wk-v4 .coin{position:absolute;left:72%;top:60%;width:18%;z-index:3;animation:wkCoin 6s ease-in-out infinite;filter:drop-shadow(0 18px 22px rgba(120,70,20,.35));}
+    @keyframes wkCoin{50%{transform:translateY(-8px) rotate(6deg)}}
+    .wk-live{--f:#E3EFE6;}
+    .wk-live .wk-shot{width:112%;}
+    .wk-studio{--f:#E8EEDF;}
+    .wk-dl img.cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .wk-dl video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s;}
+    .wk-card:hover .wk-dl video{opacity:1;}
+
+    @media (prefers-reduced-motion:reduce){
+        .wk-media,.wk-ui{transition:none}
+    }
+  </style>
+
+  <section class="wk" id="work" aria-labelledby="wkTitle">
+    <header class="wk-head">
+      <div>
+        <p class="wk-eyebrow">Selected work</p>
+        <h2 class="wk-title" id="wkTitle">Shipped products, <span class="serif">real numbers.</span></h2>
       </div>
+      <p class="wk-sub">I designed all six. I wrote the code for three.</p>
+    </header>
 
-      <section class="s2-section-wrap" id="s2Section">
+    <div class="wk-grid">
 
-<!-- Canvas covers full section — renders behind header and work container -->
-      <div class="s2-cards-zone" id="s2CardsZone">
-        <div id="spiral-root" style="width:100%;height:100%;position:relative;"></div>
-      </div>
-
-      <!-- Up/Down helix nav removed — the scroll pin owns the travel.
-           spiral.js and the tab-strip JS null-guard every reference. -->
-
-      <!-- ── Left / Right grid-view nav — hidden until grid view is active ── -->
-      <button class="s2-side-nav-btn s2-grid-nav-btn s2-grid-nav-prev" id="s2GridPrev" aria-label="Previous project" style="display:none;">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <button class="s2-side-nav-btn s2-grid-nav-btn s2-grid-nav-next" id="s2GridNext" aria-label="Next project" style="display:none;">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-
-      <!-- (the Featured Work heading now lives ABOVE this section, in the
-           gap between the hero and the pin — see s2FwHeader up there) -->
-
-      <!-- ── SECTION 2: FEATURED WORK — full-viewport spiral ── -->
-      <div class="s2-work-container">
-
-      <!-- Project info bar — slides up from bottom when front card changes -->
-      <div id="s2ProjectBar" class="s2-project-bar">
-        <!-- the plate: the hero's own ground, cropped to the bar. ONE image
-             for every project — section 2 standing on section 1's theme, so
-             the card belongs to the page instead of to whatever is floating
-             above it. Dark at the left where the title and lead sit, the
-             ridge rising to the glow at the right where only tags are. -->
-        <div class="s2-bar-plate" aria-hidden="true">
-          <img id="s2BarPlateImg" src="images/bar-plate.webp" alt=""
-               width="1800" height="500" decoding="async">
-        </div>
-        <div class="s2-bar-top-row">
-          <div class="s2-bar-title-col">
-            <h3 class="s2-bar-title" id="s2BarTitle"></h3>
-            <p class="s2-bar-desc" id="s2BarDesc"></p>
-          </div>
-          <div class="s2-bar-tags-col" id="s2BarTagsCol">
-            <div class="s2-bar-tags" id="s2BarTags"></div>
-            <div class="s2-bar-icon-tags" id="s2BarIconTags"></div>
-          </div>
-        </div>
-        <div class="s2-bar-rule"></div>
-        <div class="s2-bar-bottom-row">
-          <div class="s2-bar-metrics" id="s2BarMetrics"></div>
-          <a class="s2-bar-cta" id="s2BarCta" href="#">View Case Study →</a>
-        </div>
-      </div>
-
-      <!-- Mobile accordion — built by JS below s2 spiral, hidden on desktop -->
-      <div class="s2-mobile-accordion" id="s2MobileAccordion" aria-label="Project list"></div>
-
-      <!-- C: Blob + left/right content (static ws-section removed; content now in spiral gallery panels) -->
-      <div class="s2-glimpse-full" id="s2GlimpseFull" style="display:none">
-
-        <section class="ws-section" id="wsSection" style="display:none">
-
-        <!-- EverTutor hero: left title+metrics | center blob | right tags+desc -->
-        <div class="ws-et-hero">
-
-          <div class="ws-et-left">
-            <h2 class="ws-et-title">EverTutor AI System</h2>
-            <div class="ws-et-metrics">
-              <div class="ws-et-metric-row">
-                <div class="ws-et-metric">
-                  <span class="ws-et-val" data-count="2000" data-suffix="+">2000+</span>
-                  <span class="ws-et-lbl">Active Learners</span>
-                </div>
-                <div class="ws-et-mdivider"></div>
-                <div class="ws-et-metric">
-                  <span class="ws-et-val" data-count="96" data-prefix="−" data-suffix="%">−96%</span>
-                  <span class="ws-et-lbl">Workflow time</span>
-                </div>
-              </div>
-              <div class="ws-et-metric">
-                <span class="ws-et-val" data-count="500" data-prefix="0→$" data-suffix="k+ ARR">0→$500k+ ARR</span>
-                <span class="ws-et-lbl">as Sole Product Designer</span>
-              </div>
+      <a class="wk-card wk-12" href="verified-call.html" aria-labelledby="wk-n1">
+        <div class="wk-media wk-vc">
+          <span class="wk-num">30 of 30 AI tools caught</span>
+          <span class="wk-go">Read case study &rarr;</span>
+          <span class="wk-tag">Mac &middot; Windows &middot; Chrome</span>
+          <div class="wk-ui vcd" aria-hidden="true">
+            <div class="stg">
+            <div class="tile t1"><img src="images/vc/face-int.webp" alt="" loading="lazy"><span class="nm">You</span></div>
+            <div class="tile t2"><img src="images/vc/face-cand.webp" alt="" loading="lazy"><span class="nm">Alex Chen <i class="bdg"></i></span></div>
+            <div class="vbar"><i></i><i></i><i class="vf"></i><i></i><i class="end"></i></div>
+            <div class="pnl">
+              <div class="ph"><span class="brand"><i class="sh"></i>Verified Call</span><i class="x">&times;</i></div>
+              <div class="pn"><b>Alex Chen</b><span class="pst"><em class="c"><i class="sp"></i>Checking</em><em class="v">Verified</em><em class="a">Needs a look</em></span></div>
+              <ul><li class="r" data-k="cam"><i class="sp"></i><i class="ic"><svg viewBox="0 0 16 16"><path d="M4.5 8.3l2.3 2.2 4.7-5" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i><i class="am">!</i><p><b>Real camera</b> · <span class="st"><em class="c">Checking</em><em class="v">Verified</em><em class="a">Needs a look</em></span><span class="ago"> · 11s</span></p></li><li class="r" data-k="face"><i class="sp"></i><i class="ic"><svg viewBox="0 0 16 16"><path d="M4.5 8.3l2.3 2.2 4.7-5" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i><i class="am">!</i><p><b>Face match</b> · <span class="st"><em class="c">Checking</em><em class="v">Verified</em><em class="a">Needs a look</em></span><span class="ago"> · 11s</span></p></li><li class="r" data-k="voice"><i class="sp"></i><i class="ic"><svg viewBox="0 0 16 16"><path d="M4.5 8.3l2.3 2.2 4.7-5" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i><i class="am">!</i><p><b>Same voice</b> · <span class="st"><em class="c">Checking</em><em class="v">Verified</em><em class="a">Needs a look</em></span><span class="ago"> · 11s</span></p></li><li class="r" data-k="hid"><i class="sp"></i><i class="ic"><svg viewBox="0 0 16 16"><path d="M4.5 8.3l2.3 2.2 4.7-5" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i><i class="am">!</i><p><b>No hidden apps</b> · <span class="st"><em class="c">Checking</em><em class="v">Verified</em><em class="a">Needs a look</em></span><span class="ago"> · 11s</span></p></li><li class="r" data-k="open"><i class="sp"></i><i class="ic"><svg viewBox="0 0 16 16"><path d="M4.5 8.3l2.3 2.2 4.7-5" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></i><i class="am">!</i><p><b>Open apps</b> · <span class="st"><em class="c">Checking</em><em class="v">Verified</em><em class="a">Needs a look</em></span><span class="ago"> · 11s</span><small class="why">ChatGPT used the microphone at 9:07 PM</small></p></li></ul>
+            </div>
+            <i class="cur"><svg class="ca" viewBox="0 0 28 28"><path d="M7 3.5v16.6l4.2-4.1 2.7 6.3 2.9-1.2-2.7-6.2h5.9z" fill="#111" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/></svg><svg class="ch" viewBox="0 0 32 32"><path d="M11 18.5V6.2a2 2 0 0 1 4 0v6.6a2 2 0 0 1 4 0v.8a2 2 0 0 1 4 0v.8a2 2 0 0 1 4 0V21c0 4.4-3.1 8-7.5 8h-3c-2.4 0-4-1-5.4-2.9l-4.7-6.6a2 2 0 0 1 3.1-2.5z" fill="#fff" stroke="#111" stroke-width="1.5" stroke-linejoin="round"/><path d="M15 12.8v4.4M19 13.6v3.8M23 14.4v3.2" stroke="#111" stroke-width="1.3" stroke-linecap="round"/></svg></i>
             </div>
           </div>
-
-          <div class="ws-et-center">
-            <div class="ws-orb-wrap">
-              <div class="ws-orb-bg"></div>
-              <div class="ws-orb-glow"></div>
-              <svg class="ws-waveform" width="340" height="340" viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <g stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round" opacity="0.75">
-                  <line x1="170.00" y1="61.42" x2="170.00" y2="38.58" />
-                  <line x1="178.48" y1="62.29" x2="180.35" y2="38.44" />
-                  <line x1="187.05" y1="62.35" x2="190.49" y2="40.60" />
-                  <line x1="195.72" y1="62.88" x2="200.31" y2="43.75" />
-                  <line x1="204.19" y1="64.78" x2="209.97" y2="46.97" />
-                  <line x1="212.23" y1="68.05" x2="219.62" y2="50.22" />
-                  <line x1="219.91" y1="72.06" x2="229.05" y2="54.10" />
-                  <line x1="227.51" y1="76.16" x2="237.89" y2="59.21" />
-                  <line x1="235.19" y1="80.28" x2="245.88" y2="65.56" />
-                  <line x1="242.75" y1="84.83" x2="253.12" y2="72.68" />
-                  <line x1="249.73" y1="90.27" x2="259.98" y2="80.02" />
-                  <line x1="255.84" y1="96.68" x2="266.65" y2="87.45" />
-                  <line x1="261.23" y1="103.72" x2="272.93" y2="95.21" />
-                  <line x1="266.34" y1="110.96" x2="278.29" y2="103.64" />
-                  <line x1="271.47" y1="118.30" x2="282.37" y2="112.74" />
-                  <line x1="276.37" y1="125.94" x2="285.36" y2="122.22" />
-                  <line x1="280.34" y1="134.15" x2="287.91" y2="131.69" />
-                  <line x1="282.83" y1="142.91" x2="290.53" y2="141.06" />
-                  <line x1="283.99" y1="151.95" x2="293.06" y2="150.51" />
-                  <line x1="284.69" y1="160.97" x2="294.57" y2="160.20" />
-                  <line x1="285.96" y1="170.00" x2="294.04" y2="170.00" />
-                  <line x1="288.03" y1="179.29" x2="291.23" y2="179.54" />
-                  <line x1="287.04" y1="188.54" x2="290.00" y2="189.01" />
-                  <line x1="285.23" y1="197.66" x2="288.14" y2="198.36" />
-                  <line x1="282.70" y1="206.62" x2="285.55" y2="207.55" />
-                  <line x1="279.48" y1="215.35" x2="282.25" y2="216.50" />
-                  <line x1="273.22" y1="222.59" x2="280.62" y2="226.37" />
-                  <line x1="264.95" y1="228.19" x2="279.68" y2="237.21" />
-                  <line x1="257.72" y1="233.73" x2="276.44" y2="247.33" />
-                  <line x1="252.12" y1="240.14" x2="270.37" y2="255.73" />
-                  <line x1="246.37" y1="246.37" x2="263.34" y2="263.34" />
-                  <line x1="240.40" y1="252.43" x2="255.47" y2="270.07" />
-                  <line x1="233.83" y1="257.85" x2="247.24" y2="276.31" />
-                  <line x1="226.68" y1="262.49" x2="238.72" y2="282.15" />
-                  <line x1="219.32" y1="266.81" x2="229.63" y2="287.04" />
-                  <line x1="211.94" y1="271.26" x2="219.90" y2="290.47" />
-                  <line x1="204.38" y1="275.80" x2="209.79" y2="292.45" />
-                  <line x1="196.37" y1="279.85" x2="199.65" y2="293.52" />
-                  <line x1="187.86" y1="282.76" x2="189.69" y2="294.29" />
-                  <line x1="179.00" y1="284.34" x2="179.83" y2="294.92" />
-                  <line x1="170.00" y1="284.99" x2="170.00" y2="295.01" />
-                  <line x1="160.93" y1="285.28" x2="160.24" y2="293.98" />
-                  <line x1="151.74" y1="285.31" x2="150.72" y2="291.74" />
-                  <line x1="142.50" y1="284.57" x2="141.48" y2="288.80" />
-                  <line x1="133.52" y1="282.27" x2="132.32" y2="285.98" />
-                  <line x1="125.21" y1="278.13" x2="122.94" y2="283.60" />
-                  <line x1="117.68" y1="272.69" x2="113.36" y2="281.16" />
-                  <line x1="110.49" y1="267.11" x2="104.11" y2="277.52" />
-                  <line x1="102.91" y1="262.35" x2="96.02" y2="271.82" />
-                  <line x1="94.48" y1="258.42" x2="89.65" y2="264.07" />
-                  <line x1="86.21" y1="253.79" x2="84.09" y2="255.91" />
-                  <line x1="79.89" y1="246.96" x2="77.61" y2="248.91" />
-                  <line x1="74.13" y1="239.65" x2="71.70" y2="241.42" />
-                  <line x1="68.96" y1="231.92" x2="66.40" y2="233.48" />
-                  <line x1="67.19" y1="222.39" x2="58.97" y2="226.57" />
-                  <line x1="67.07" y1="212.63" x2="51.20" y2="219.21" />
-                  <line x1="66.60" y1="203.60" x2="45.15" y2="210.57" />
-                  <line x1="64.98" y1="195.21" x2="41.65" y2="200.81" />
-                  <line x1="63.33" y1="186.89" x2="39.63" y2="190.65" />
-                  <line x1="62.33" y1="178.47" x2="38.41" y2="180.36" />
-                  <line x1="62.00" y1="170.00" x2="38.00" y2="170.00" />
-                  <line x1="62.33" y1="161.53" x2="38.41" y2="159.64" />
-                  <line x1="63.33" y1="153.11" x2="39.63" y2="149.35" />
-                  <line x1="63.55" y1="144.44" x2="43.08" y2="139.53" />
-                  <line x1="63.85" y1="135.51" x2="47.89" y2="130.32" />
-                  <line x1="64.97" y1="126.49" x2="53.30" y2="121.66" />
-                  <line x1="67.39" y1="117.72" x2="58.76" y2="113.32" />
-                  <line x1="71.08" y1="109.38" x2="64.29" y2="105.22" />
-                  <line x1="75.52" y1="101.35" x2="70.32" y2="97.58" />
-                  <line x1="80.31" y1="93.40" x2="77.19" y2="90.74" />
-                  <line x1="86.21" y1="86.21" x2="84.09" y2="84.09" />
-                  <line x1="93.04" y1="79.89" x2="91.09" y2="77.61" />
-                  <line x1="100.35" y1="74.13" x2="98.58" y2="71.70" />
-                  <line x1="108.25" y1="69.23" x2="106.35" y2="66.14" />
-                  <line x1="117.68" y1="67.31" x2="113.37" y2="58.85" />
-                  <line x1="126.82" y1="65.76" x2="121.33" y2="52.50" />
-                  <line x1="135.32" y1="63.26" x2="130.52" y2="48.49" />
-                  <line x1="143.43" y1="59.32" x2="140.55" y2="47.31" />
-                  <line x1="151.75" y1="54.79" x2="150.70" y2="48.16" />
-                  <line x1="160.70" y1="51.87" x2="160.47" y2="48.87" />
-                </g>
-              </svg>
-              <!-- same blob the helix and the phone accordion use; the old
-                   Parallax-cards path exists in no commit and 404'd on every
-                   load even though this section is display:none -->
-              <img class="ws-orb-img" src="images/blob-dark.webp" alt="EverTutor AI System" loading="lazy" />
-            </div>
-          </div>
-
-          <div class="ws-et-right">
-            <div class="ws-et-tags">
-              <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Profile dark theme.svg" width="16" height="14" alt="" aria-hidden="true">Sole Product Designer</span>
-              <div class="ws-et-tag-row">
-                <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Thunder Dark Theme.svg" width="10" height="16" alt="" aria-hidden="true">0 to 1</span>
-                <span class="ws-role-tag"><img src="Parallax cards/EverTutor Glimpse/Portfolio icons SVG/Desktop Icon.svg" width="16" height="13" alt="" aria-hidden="true">Desktop &middot; B2B &middot; B2C</span>
-              </div>
-            </div>
-            <p class="ws-et-desc">
-              World&rsquo;s first multimodal 1:1, voice-first AI tutor powered by <em>3 tools working as one system</em> to enable a billion tutors for a billion minds.
-            </p>
-          </div>
-
+          <img class="wk-still" src="images/vc/meet-look.webp" alt="Verified Call panel inside Google Meet naming ChatGPT and when it used the microphone" loading="lazy" width="1200" height="1005">
         </div>
-
-        <!-- (sub-case studies and Stressie section removed — now in proj-cards below) -->
-        <div class="ws-sub-section" style="display:none">
-          <div class="ws-sub-row">
-            <div class="ws-sub-card">
-              <div class="ws-sub-video">
-                <video autoplay muted loop playsinline preload="none">
-                  <source data-src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
-                </video>
-              </div>
-              <div class="ws-sub-info">
-                <span class="ws-sub-num">1.1</span>
-                <p class="ws-sub-title">EverTutor Live</p>
-                <p class="ws-sub-desc">Voice-first AI tutor &middot; prototype to PMF</p>
-              </div>
-            </div>
-            <div class="ws-sub-card">
-              <div class="ws-sub-video">
-                <video autoplay muted loop playsinline preload="none">
-                  <source data-src="Projects videos/ET Studio Case study.mp4" type="video/mp4">
-                </video>
-              </div>
-              <div class="ws-sub-info">
-                <span class="ws-sub-num">1.2</span>
-                <p class="ws-sub-title">EverTutor Studio</p>
-                <p class="ws-sub-desc">100+ hrs &rarr; 4 hrs lesson creation</p>
-              </div>
-            </div>
-            <div class="ws-sub-card">
-              <div class="ws-sub-video">
-                <video autoplay muted loop playsinline preload="none">
-                  <source data-src="Projects videos/Et Analytics.mp4" type="video/mp4">
-                </video>
-              </div>
-              <div class="ws-sub-info">
-                <span class="ws-sub-num">1.3</span>
-                <p class="ws-sub-title">EverTutor Analytics</p>
-                <p class="ws-sub-desc">Real-time student insights for educators</p>
-              </div>
-            </div>
-          </div>
+        <div class="wk-body">
+          <p class="wk-meta"><span>Founder</span><span>Design + build, solo</span><span>3 weeks</span></p>
+          <h3 class="wk-name" id="wk-n1">Verified Call</h3>
+          <p class="wk-line">A desktop check and an in-Meet panel that confirm who is on a hiring call. In testing, <b>4 hidden AI tools</b> caught in <b>30 of 30</b> tries each. <b>20 companies</b> in the closed beta.</p>
+          <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
         </div>
+      </a>
 
-        <div class="ws-project-divider" style="display:none"></div>
-
-        <!-- Project 2: Stressie — now in proj-cards below -->
-        <div class="ws-project ws-project--alt" style="display:none">
-          <div class="ws-project-inner">
-
-            <div class="ws-info">
-              <span class="ws-num">02</span>
-              <h2 class="ws-title">Stressie</h2>
-              <div class="ws-roles">
-                <span class="ws-role-tag">Sole Product Designer</span>
-                <span class="ws-role-tag">0 to 1</span>
-                <span class="ws-role-tag">Mobile &middot; B2B</span>
-              </div>
-              <p class="ws-desc">From pilot research to a <strong>Harvard-incubated product</strong>, a full redesign of workplace stress management, now live at Amazon and InKind.</p>
-              <div class="ws-metrics">
-                <div class="ws-metric">
-                  <span class="ws-metric-val">17.4%</span>
-                  <span class="ws-metric-lbl">vs ~2% industry avg</span>
-                </div>
-                <div class="ws-metric">
-                  <span class="ws-metric-val">Harvard</span>
-                  <span class="ws-metric-lbl">Innovation Labs</span>
-                </div>
-                <div class="ws-metric">
-                  <span class="ws-metric-val">2 Pilots</span>
-                  <span class="ws-metric-lbl">Amazon &amp; InKind</span>
-                </div>
-              </div>
-              <a class="ws-cta" href="stressie-studio.html">View Case Study &rarr;</a>
-            </div>
-
-            <!-- These three carry data-src, not src, on purpose: this whole
-                 section is display:none, and loading="lazy" does NOT reliably
-                 defer inside a hidden container — the browser fetched ~1MB of
-                 them on every visit for something nobody could see. If this
-                 section is ever brought back, rename data-src to src (or
-                 assign it in JS) or the phones will render empty. -->
-            <div class="ws-visual ws-visual--phones">
-              <div class="ws-phones-row">
-                <img class="ws-phone-img" data-src="Stressie%20Case%20Study%20Updated%20Materials/Summary%20of%20the%20project/Home%20Screen%20Image.png" alt="Stressie home screen" loading="lazy" />
-                <img class="ws-phone-img" data-src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%201.png" alt="Stressie onboarding" loading="lazy" />
-                <img class="ws-phone-img" data-src="Stressie%20Case%20Study%20Updated%20Materials/Experience%20I%20have%20created%20with%20my%20approach/Onboarding%20Experience%201/On-Boarding%20Mockup%202.png" alt="Stressie onboarding 2" loading="lazy" />
-              </div>
-            </div>
-
-          </div>
+      <a class="wk-card wk-7" href="evertutor-live.html" aria-labelledby="wk-n2">
+        <div class="wk-media wk-live">
+          <span class="wk-num">2,000+ students a day</span>
+          <span class="wk-go">Read case study &rarr;</span>
+          <span class="wk-tag">Voice AI &middot; Web</span>
+          <div class="wk-ui wk-shot"><video data-wk src="images/thumbs/et-live.mp4" data-taps='[{"t":1.0,"x":51,"y":94,"d":3.3}]' poster="images/thumbs/et-live-poster.webp" muted loop playsinline preload="none"></video></div>
         </div>
-
-        </section>
-
-      </div><!-- /s2-glimpse-full -->
-
-      <!-- D: Video + content — EverTutor Live -->
-      <div class="s2-video-section" style="display:none">
-        <div class="s2-video-left">
-          <video autoplay muted loop playsinline preload="none">
-            <source data-src="Projects videos/ET Live Case Study.mp4" type="video/mp4">
-          </video>
+        <div class="wk-body">
+          <p class="wk-meta"><span>Sole product designer</span><span>EverTutor</span></p>
+          <h3 class="wk-name" id="wk-n2">EverTutor Live</h3>
+          <p class="wk-line">A voice AI tutor that took 1:1 tutoring from <b>$250 to $5</b> an hour. <b>2,000+</b> students a day.</p>
+          <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
         </div>
-        <div class="s2-video-right">
-          <p class="fw-card-eyebrow">1.1 EverTutor Live</p>
-          <h3 class="s2-video-title">First of its kind: a voice-first AI that gives every learner a fully adaptive 1:1 experience, taken from prototype to PMF.</h3>
-          <div class="proj-metrics">
-            <div class="proj-metric">
-              <span class="proj-metric-val">2000+</span>
-              <span class="proj-metric-lbl">Everyday Sessions</span>
-            </div>
-            <div class="proj-metric">
-              <span class="proj-metric-val">Proven 2x</span>
-              <span class="proj-metric-lbl">Performance Gain</span>
-            </div>
-            <div class="proj-metric">
-              <span class="proj-metric-val">$250&nbsp;&rarr;&nbsp;$5/hr</span>
-              <span class="proj-metric-lbl">Cost of 1:1 Support</span>
-            </div>
-          </div>
-          <a class="proj-cta" href="evertutor-live.html">View Case Study &rarr;</a>
+      </a>
+
+      <a class="wk-card wk-5" href="evertutor-studio.html" aria-labelledby="wk-n3">
+        <div class="wk-media wk-studio">
+          <span class="wk-num">104 hours to 4</span>
+          <span class="wk-go">Read case study &rarr;</span>
+          <span class="wk-tag">AI authoring &middot; Web</span>
+          <div class="wk-ui wk-shot"><video data-wk src="images/thumbs/et-studio.mp4" data-taps='[{"t":1.2,"x":40,"y":34},{"t":5.7,"x":72,"y":50,"d":0.9,"to":[72,62]},{"t":7.2,"x":72,"y":62,"d":0.8,"to":[72,50]},{"t":10.4,"x":72,"y":50,"d":0.7,"to":[72,62]},{"t":11.6,"x":72,"y":62,"d":0.5,"to":[72,50]}]' poster="images/thumbs/et-studio-poster.webp" muted loop playsinline preload="none"></video></div>
         </div>
-      </div>
+        <div class="wk-body">
+          <p class="wk-meta"><span>Sole product designer</span><span>EverTutor</span></p>
+          <h3 class="wk-name" id="wk-n3">EverTutor Studio</h3>
+          <p class="wk-line">Cut lesson creation from <b>104 hours to 4</b>. <b>3,000+</b> lessons made with it.</p>
+          <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
+        </div>
+      </a>
 
-      </div><!-- /s2-work-container -->
+      <a class="wk-card wk-5" href="stressie-studio.html" aria-labelledby="wk-n4">
+        <div class="wk-media wk-ss">
+          <span class="wk-num">12% to 56% engagement</span>
+          <span class="wk-go">Read case study &rarr;</span>
+          <span class="wk-tag">iOS &middot; Wellness</span>
+          <div class="wk-ui wk-phone"><video data-wk src="images/thumbs/stressie.mp4" data-taps='[{"t":5.95,"x":27,"y":86},{"t":10.2,"x":27,"y":47},{"t":12.7,"x":49,"y":64},{"t":15.2,"x":47,"y":78},{"t":15.95,"x":74,"y":85},{"t":19.2,"x":50,"y":93}]' poster="images/thumbs/stressie-poster.webp" muted loop playsinline preload="none"></video></div>
+        </div>
+        <div class="wk-body">
+          <p class="wk-meta"><span>Founding designer</span><span>Harvard-incubated</span></p>
+          <h3 class="wk-name" id="wk-n4">Stressie</h3>
+          <p class="wk-line">Rebuilt a workplace wellness app around daily use: engagement from <b>12% to 56%</b>. Helped unlock <b>$600K</b> in funding.</p>
+          <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
+        </div>
+      </a>
 
-      </section><!-- /s2-section-wrap -->
+      <a class="wk-card wk-7" href="stressie-v4.html" aria-labelledby="wk-n5">
+        <div class="wk-media wk-v4">
+          <span class="wk-num">Built in SwiftUI</span>
+          <span class="wk-go">Read case study &rarr;</span>
+          <span class="wk-tag">SwiftUI &middot; Designed + built</span>
+          <div class="wk-ui wk-phone p1"><img src="images/stressie-v4/hero-rewards.webp" alt="" loading="lazy"></div>
+          <div class="wk-ui wk-phone p2"><video data-wk src="images/stressie-v4/hero-loop.mp4" data-taps='[{"t":1.2,"x":59,"y":71.5,"d":0.6,"to":[15,71.5],"f":1},{"t":2.5,"x":15,"y":71.5,"d":1.7,"to":[79,71.5],"f":1}]' poster="images/thumbs/v4-poster.webp" muted loop playsinline preload="none"></video></div>
+          <img class="coin" src="images/thumbs/coin.webp" alt="" loading="lazy">
+        </div>
+        <div class="wk-body">
+          <p class="wk-meta"><span>Founding designer</span><span>Design + build</span></p>
+          <h3 class="wk-name" id="wk-n5">Stressie V4</h3>
+          <p class="wk-line">Designed in Figma, built in SwiftUI: a check-in that turns into plans after work, in <b>3 languages</b>.</p>
+          <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
+        </div>
+      </a>
+
+      <a class="wk-card wk-12" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener" aria-labelledby="wk-n6">
+        <div class="wk-media wk-dl">
+          <span class="wk-num">140+ letters sent</span>
+          <span class="wk-go">Visit Dearly &#8599;</span>
+          <img class="cover" src="images/card-dearly.webp" alt="" loading="lazy">
+          <video data-wk-hover src="images/thumbs/dearly.mp4" muted loop playsinline preload="none"></video>
+        </div>
+        <div class="wk-body">
+          <p class="wk-meta"><span>Solo build</span><span>48 hours</span></p>
+          <h3 class="wk-name" id="wk-n6">Dearly</h3>
+          <p class="wk-line">Voice letters you can hear and keep. <b>140+</b> sent, <b>35</b> five-star ratings.</p>
+          <p class="wk-links"><span>Visit Dearly <i>&#8599;</i></span></p>
+        </div>
+      </a>
+
+    </div>
+  </section>
+  <script>
+  /* tap cues: read data-taps on each loop, fire a ring at the recorded click time */
+  (function(){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    [].forEach.call(document.querySelectorAll('video[data-taps]'),function(v){
+      var ev; try{ev=JSON.parse(v.dataset.taps)}catch(e){return}
+      var box=v.parentNode, dots=ev.map(function(e){var i=document.createElement('i');i.className='wk-tap'+(e.f?' f':'');box.appendChild(i);return i});
+      var last=0;
+      function place(i,x,y){var r=v.getBoundingClientRect(),b=box.getBoundingClientRect();dots[i].style.left=(r.left-b.left+r.width*x/100)+'px';dots[i].style.top=(r.top-b.top+r.height*y/100)+'px'}
+      function tick(){
+        if(!v.paused){
+          var t=v.currentTime;
+          ev.forEach(function(e,i){
+            var d=dots[i];
+            if(e.d){
+              if(t>=e.t&&t<=e.t+e.d){var k=(t-e.t)/e.d,to=e.to||[e.x,e.y];place(i,e.x+(to[0]-e.x)*k,e.y+(to[1]-e.y)*k);d.classList.add('hold')}
+              else d.classList.remove('hold');
+            } else if(last<e.t&&t>=e.t&&t-last<.5){place(i,e.x,e.y);d.classList.remove('go');void d.offsetWidth;d.classList.add('go')}
+          });
+          last=t;
+        }
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  })();
+  </script>
+  <script src="images/vc/vc-demo.js" defer></script>
+  <script>
+  /* Loops play while their card is on screen and pause off screen; with
+     reduced motion they stay on their poster. Dearly plays on hover. */
+  (function () {
+    var rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var vids = [].slice.call(document.querySelectorAll('video[data-wk]'));
+    function play(v) { v.muted = true; if (v.preload === 'none') v.preload = 'auto'; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    if (!rm) {
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (es) {
+          es.forEach(function (e) { e.isIntersecting ? play(e.target) : e.target.pause(); });
+        }, { rootMargin: '150px 0px' });
+        vids.forEach(function (v) { io.observe(v); });
+      } else vids.forEach(play);
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) vids.forEach(function (v) { v.pause(); });
+      });
+    }
+    [].forEach.call(document.querySelectorAll('video[data-wk-hover]'), function (v) {
+      var c = v.closest('.wk-card');
+      c.addEventListener('mouseenter', function () { if (!rm) play(v); });
+      c.addEventListener('mouseleave', function () { v.pause(); });
+    });
+  })();
+  </script>
+
 
       <!-- ── work→about seam — an empty breath: the About statement now
            lives inside the section, to the left of the T ── -->
@@ -5812,7 +5794,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
       font-family:var(--sans);font-size:13px;font-weight:550;color:var(--ink);
       opacity:0;transform:translateX(8px);transition:opacity .35s ease,transform .5s var(--ease);}
-    .reel-fab-tip small{display:block;margin-top:2px;font-size:11px;font-weight:500;
+    .reel-fab-tip small{display:block;margin-top:2px;font-size:12px;font-weight:500;
       letter-spacing:.06em;color:var(--ink-3);}
     .reel-fab:hover .reel-fab-tip,.reel-fab:focus-visible .reel-fab-tip{opacity:1;transform:none;}
     /* a landscape short in the corner: the FAB turns 16:9 on desktop; on
@@ -5928,24 +5910,236 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .reel-section{padding:8vh var(--gutter) 10vh;}
       .reel-slot,.reel-ghost{width:64vw;}
       .reel-slot--wide{width:88vw;}
-      .reel-fab{width:84px;border-radius:10px;}
-      .reel-fab.wide{aspect-ratio:9/16;width:84px;}
+      /* phones: the film sliver lives in the empty sky under the nav, not
+         in the bottom corner, so it never sits on the chat bar, the facts
+         or the stack strip. It still leaves on scroll (slides up). */
+      .reel-fab{top:66px;bottom:auto;right:16px;width:64px;border-radius:10px;}
+      .reel-fab.wide{aspect-ratio:9/16;width:64px;}
+      .reel-fab.away,body.nav-open .reel-fab{transform:translateY(-28px);}
       .reel-fab-tip{display:none;}
-      /* the hero CTA pill hugs its cycling prompt and can run under the
-         FAB's corner on a phone. Cap the pill AND its text well (the
-         cycler sets an inline width) so both stop 132px short of the
-         right edge — long prompts clip behind the pill's own padding,
-         and a tap opens the chat either way. */
-      .hero .cta{max-width:calc(100vw - 132px);}
-      /* a constant text well (the !important outranks the cycler's inline
-         width) whose tail fades out — long prompts dissolve before the
-         FAB instead of hard-cutting at its edge; short ones end before
-         the fade zone and never feel it */
-      .hero .cta-text{width:calc(100vw - 226px) !important;
-        -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);
-                mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);}
+      /* with the corner free, the pill shows its whole prompt; the well is
+         only capped to the column so a long prompt can never widen the page */
+      .hero .cta{max-width:100%;}
+      .hero .cta-text{max-width:calc(100vw - 48px - 100px);}
+    }
+    @media (max-width:400px){
+      .hero .cta{gap:12px;padding-right:18px;}
+      .hero .cta-orb{width:48px;height:48px;}
+      .hero .cta-text span{font-size:12.5px;}
+    }
+    /* landscape phones have no empty sky to park the film in */
+    @media (max-width:767px) and (max-height:520px){
+      .reel-fab{display:none;}
+    }
+    @media (max-width:767px){
       .reel-ov-player{height:min(58dvh,520px);}
       .reel-ov-title{font-size:var(--t-head);}
+    }
+
+    /* ══ RESPONSIVE PASS (2026-11-08) ══════════════════════════════════
+       Kept together so each fix is easy to find and undo. */
+
+    /* hero stack strip: on desktop and tablet it ends before the film in
+       the corner, so the two never stack. Readable, still quiet. */
+    .stack li{font-size:13.5px;}
+    .stack li em{font-size:12px;letter-spacing:.12em;padding:3px 8px;color:var(--ink-3);}
+    @media (min-width:768px){
+      .stack{right:calc(clamp(168px,13vw,204px) + clamp(16px,2.4vw,32px) + 20px);}
+    }
+
+    /* film player on laptops: the close button pins to the window and the
+       landscape film takes what the copy column leaves, never more */
+    .reel-ov-close{position:fixed;}
+    @media (min-width:1024px){
+      .reel-ov-stage{grid-template-columns:minmax(260px,min(420px,34vw)) minmax(0,1fr);
+        width:100%;box-sizing:border-box;}
+      .reel-ov-player.wide{width:100%;max-width:960px;height:auto;}
+    }
+
+    /* shorts rail runs to the screen edge, so the next card reads as
+       "scroll for more" instead of a hard crop at the gutter */
+    .reel-rail{margin-left:calc(var(--gutter) * -1);margin-right:calc(var(--gutter) * -1);
+      padding-left:var(--gutter);padding-right:var(--gutter);scroll-padding-inline:var(--gutter);}
+    @media (max-width:767px){
+      /* the landscape film becomes a 9:16 card like its neighbours, so the
+         rail has no empty band above and below it */
+      .reel-slot--wide{width:64vw;}
+      .reel-slot--wide .reel-card{aspect-ratio:9/16;}
+      .reel-snd[hidden]{display:none;}
+      .reel-section{padding:5vh var(--gutter) 6vh;}
+    }
+
+    /* gaps between sections: one breath, not three stacked paddings */
+    .wk{padding-bottom:clamp(40px,5vw,88px);}
+    .sec-divider--empty{padding:3vh var(--gutter);}
+    @media (max-width:767px){ .sec-divider--empty{padding:2vh var(--gutter);} }
+
+    /* orb button: smaller on phones so it covers less of the page edge */
+    @media (max-width:767px){
+      .orb-fab,.orb-fab-mount{width:60px;height:60px;}
+    }
+
+    /* DNA tiles: the soft hyphens are for phone tiles only; wider tiles
+       break between words */
+    @media (min-width:768px){ .dna2-tile-nm{hyphens:none;-webkit-hyphens:none;} }
+
+    /* tablets and small laptops: three facts do not fit one row, so the
+       third takes its own line under a hairline instead of wrapping loose */
+    @media (min-width:768px) and (max-width:1100px){
+      .facts{padding:10px 16px;}
+      .fact{padding:2px 14px;}
+      .fact .v{font-size:14px;}
+      .fact:nth-child(3){flex-basis:100%;border-left:none;border-top:1px solid var(--line);
+        margin-top:8px;padding:9px 0 1px;}
+    }
+
+    /* work cards: in narrow cards the percentage offsets got smaller than the
+       corner tag, so the tag sat on the product UI. Keep the UI below it. */
+    .wk-shot,.wk-vc .meet{top:max(13%,50px);}
+    .wk-ss .wk-phone{top:max(12%,50px);}
+    .wk-v4 .p2{top:max(9%,50px);}
+    .wk-v4 .p1{top:max(16%,62px);}
+
+    /* headline keeps off the bright crest on tablets and short laptops */
+    @media (min-width:768px) and (max-width:1279px){
+      .hero h1{max-width:min(24ch,92vw);}
+      /* the eyebrow's tail can land on the light beam here; a soft shade keeps it readable */
+      .hero .eyebrow{text-shadow:0 1px 14px rgba(4,6,10,.85),0 0 2px rgba(4,6,10,.6);}
+    }
+
+
+    /* ══ HERO CLEANUP (2026-11-09) ══ one headline, one supporting line,
+       one action plus the chat; tools strip as a quiet footer; no film here */
+    .hero .facts.facts-line{display:flex;flex-direction:column;gap:2px;margin-top:clamp(18px,2.6vh,28px);padding:0;border:0;border-radius:0;background:none;
+      -webkit-backdrop-filter:none;backdrop-filter:none;font-family:var(--sans);font-size:clamp(16px,1.25vw,19px);line-height:1.5;
+      color:var(--ink-2);max-width:62ch;text-wrap:balance;}
+    .hero .facts-line i{font-style:normal;color:var(--ink-3);margin:0 .6em;}
+    .hero .cta-dock{margin-top:clamp(26px,4vh,40px);align-items:center;}
+    /* both hero actions share one height and type size */
+    .hero .cta-dock .hero-btn,.hero .cta-dock .cta{height:52px;box-sizing:border-box;font-size:15px;}
+    .hero .cta-dock .hero-btn{padding:0 26px;border-radius:14px;}
+    .hero .cta-dock .cta{padding:0 22px 0 6px;border-radius:14px;margin-left:0;}
+    .hero .cta-dock .cta-orb{width:40px;height:40px;}
+    .hero .cta-dock .cta-text span{font-size:15px;font-weight:500;}
+    .hero .stack{right:0;bottom:18px;opacity:.72;}
+    .hero .stack li{font-size:12.5px;letter-spacing:.03em;}
+    .hero .stack ul{gap:26px;padding-right:26px;}
+    .reel-fab{display:none}
+    @media (max-width:767px){
+      .hero .facts.facts-line{font-size:15px;margin-top:16px;text-align:center;align-items:center}
+      .hero .cta-dock{flex-direction:column;align-items:stretch;gap:10px}
+      .hero .cta-dock .hero-btn{flex:none;white-space:nowrap}
+      .hero .cta-dock .hero-btn,.hero .cta-dock .cta{width:100%;max-width:320px;align-self:center;justify-content:center}
+      .hero .cta-dock .cta{justify-content:center}
+      .hero .facts-line i{display:none}
+      .hero .facts.facts-line{display:flex;flex-direction:column;gap:2px}
+    }
+
+    /* role line: says design engineer outright and puts the founder line at reading size */
+    .hero .eyebrow.role-line{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0;padding:0;
+      font-family:var(--sans);font-size:clamp(15px,1.2vw,18px);font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink);}
+    .hero .role-line .role{font-size:clamp(12px,.9vw,13px);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8CC5FF;}
+    .hero .role-line .sep{width:1px;height:16px;background:rgba(226,238,252,.28);}
+    .hero .role-line a{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:600;text-decoration:none;
+      border-bottom:1px solid rgba(226,238,252,.35);padding-bottom:1px;transition:border-color .3s;}
+    .hero .role-line a:hover{border-color:var(--ink);}
+    .hero .role-line a img{width:18px;height:18px;flex:none;}
+    @media (max-width:767px){
+      .hero .eyebrow.role-line{justify-content:center;flex-direction:column;gap:6px;font-size:15px;text-align:center}
+      .hero .role-line .sep{display:none}
+    }
+    @media (max-width:360px){.ft-cta-dock .cta-text span{font-size:12.5px}}
+    /* ══ ROUND 2 (2026-11-08) ══ */
+
+    /* hero actions: See the work (primary), Email me (secondary), and the
+       chat bar as a smaller third option with its own look */
+    .hero .cta-dock{display:flex;flex-wrap:wrap;align-items:center;gap:12px 14px;}
+    .hero .hero-btn{padding:14px 24px;font-size:15px;}
+    .hero .cta{padding:6px 20px 6px 6px;border-radius:16px;margin-left:6px;}
+    .hero .cta-orb{width:44px;height:44px;}
+    .hero .cta-text span{font-size:14px;}
+    @media (max-width:767px){
+      .hero .cta-dock{align-self:stretch;justify-content:center;}
+      .hero .hero-btn{flex:1 1 0;justify-content:center;padding:13px 16px;}
+      .hero .cta{margin-left:0;}
+      .hero .cta-orb{width:40px;height:40px;}
+      .hero .cta-text span{font-size:13px;}
+    }
+
+    /* headline: the serif half takes its own line on desktop, so it ends
+       before the light beam instead of running across the crest */
+    @media (min-width:768px){
+      .hero h1 .serif{display:block;}
+    }
+
+    /* the work peeks into the first screen on laptops and desktops: the
+       hero gives up a band at the bottom, and the film moves up with it */
+    @media (min-width:1024px) and (min-height:700px){
+      .hero{--hero-cut:clamp(170px,28vh,260px);height:calc(100svh - var(--hero-cut));min-height:540px;}
+      .copy{padding-bottom:clamp(76px,9vh,110px);}
+      .reel-fab{bottom:calc(var(--hero-cut, 0px) + clamp(16px,2.4vw,32px) + 30px);}
+      .wk{padding-top:clamp(40px,4vw,72px);}
+      .wk-head{margin-bottom:clamp(24px,2.6vw,40px);}
+    }
+    /* the variable lives on .hero; the fixed film reads the same number */
+    @media (min-width:1024px) and (min-height:700px){
+      :root{--hero-cut:clamp(170px,28vh,260px);}
+    }
+
+    /* work grid: the 5-column media is taller, so both cards in a row end
+       together instead of leaving a hole under the narrow one */
+    .wk-5 .wk-media{aspect-ratio:15/16;}
+    @media (max-width:900px){ .wk-5 .wk-media{aspect-ratio:4/3;} }
+
+    /* the longer footer status stays on one line on phones */
+    @media (max-width:767px){ .ft-status{letter-spacing:.03em;padding:8px 14px;gap:8px;} }
+    @media (max-width:380px){ .ft-status{font-size:11.5px;letter-spacing:.02em;} }
+
+    /* nav links over the light beam keep their contrast */
+    .top-nav:not(.scrolled) .nav-links a{color:var(--ink);text-shadow:0 1px 12px rgba(4,6,10,.8),0 0 2px rgba(4,6,10,.5);}
+    /* a soft dark pool behind the link group, so every link passes AA even
+       where the sky is brightest */
+    .top-nav .nav-links{position:relative;isolation:isolate;}
+    /* (dark oval pool behind the links removed 2026-11-09; the text shadow holds contrast) */
+
+    /* Dearly hover film: crop to the letter on its sky, past the recording's
+       white side panel and rounded edge */
+    .wk-dl video{object-position:18% 50%;transform:scale(1.08);}
+    /* Stressie V4 laid flat, side by side, no floating coin */
+    .wk-v4 .p1{left:14%;top:max(12%,50px);width:32%;transform:none;}
+    .wk-v4 .p2{left:54%;top:max(12%,50px);width:32%;}
+    .wk-card:hover .wk-v4 .p1{transform:translate(-1.2%,-1.6%);}
+    .wk-v4 .coin{display:none;}
+    /* Verified Call: the name label on the light face gets a dark plate */
+
+    /* DNA tile labels on phones: whole words only, never "Engi-neering".
+       The tiles give up their side padding and the label scales with the
+       tile, so the longest word ("Engineering") still fits on one line */
+    @media (max-width:767px){
+      .dna2-tile{padding-left:1px;padding-right:1px;}
+      .dna2-tile-nm{font-size:clamp(10.5px,2.9vw,12px);letter-spacing:-0.03em;
+        hyphens:none;-webkit-hyphens:none;overflow-wrap:normal;word-break:normal;}
+    }
+
+    /* dev only: the Agentation toolbar (localhost) owns the bottom-right
+       corner, so the floating controls sit above it instead of on it */
+    body:has(> #agentation-root) .orb-fab,
+    body:has(> #agentation-root) .reel-fab{margin-bottom:64px;}
+
+    /* phones: the films carry burned-in subtitles along the bottom, so the
+       card title moves to the top, on its own shade */
+    @media (max-width:767px){
+      .reel-card-shade{top:0;bottom:auto;height:34%;
+        background:linear-gradient(0deg,transparent 0%,rgba(4,6,10,.78) 80%);}
+      .reel-card-t{top:16px;bottom:auto;right:64px;}
+    }
+
+    /* touch: 44px hit areas without changing what you see */
+    @media (pointer:coarse){
+      .nav-links a{padding:14px 0;margin:-14px 0;}
+      .ft-copy::after{content:'';position:absolute;inset:-10px;}
+      .reel-snd::after{content:'';position:absolute;inset:-4px;border-radius:50%;}
+      .nav-sheet a{padding-block:6px;}
     }
     /* ── reduced motion — crossfades, no travel, no pulse ────────────── */
     @media (prefers-reduced-motion:reduce){
@@ -5961,7 +6155,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <section class="reel-section" id="shortsSection" aria-label="Short-form films">
     <div class="reel-head">
       <div>
-        <h2 class="reel-title">Sharing what <span class="serif">good design</span> is.</h2>
+        <h2 class="reel-title">Short films on the <span class="serif">psychology</span> behind products people trust.</h2>
         <!-- (the lede and the "Playing in your feed" chip are out — the
              title stands alone now; .reel-lede/.reel-feed CSS remains,
              recoverable) -->
@@ -6006,7 +6200,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </button>
       </div>
       <div class="reel-ghost" aria-hidden="true">
-        <span class="g-t">in the edit bay</span>
+        <span class="g-t">Next film in edit</span>
       </div>
     </div>
 
@@ -6045,8 +6239,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
             <div class="dna2">
               <div class="dna2-aside">
                 <h2 class="dna2-heading">The shape of how I <span class="circled serif">work.</span></h2>
-                <p class="dna2-lede">I&rsquo;m a T-shaped designer, broad across strategy,
-                   research and engineering, deep where it matters most: experience design.</p>
+                <p class="dna2-lede">Strategy and research up front, craft at the core,
+                   and I build what I design.</p>
                 <div class="dna2-legend">
                   <span class="dna2-legend-icon"><span class="lt-top"></span><span class="lt-stem"></span></span>
                   <div class="dna2-legend-rows">
@@ -6060,15 +6254,15 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
                      and all — the legend rows above still name the axes) -->
                 <div class="dna2-bar">
                   <button class="dna2-tile" style="--c1:#86DE5C;--c2:#2FA24E;--lc:#43C167;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Customer.svg')">
-                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Customer Discovery</span>
-                    <span class="dna2-q" hidden>I don't trust what people <em>say</em> they want. I watch what they actually do. Most early calls are just listening.</span>
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Customer Dis&shy;covery</span>
+                    <span class="dna2-q" hidden>I listen to what people <em>say</em>, then watch what they do. Most early calls are just listening.</span>
                   </button>
                   <button class="dna2-tile" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Strategy.svg')">
                     <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Product Strategy</span>
                     <span class="dna2-q" hidden>Beautiful work that ships the wrong thing is still wrong. I sweat <em>what</em> we build before <em>how</em> it looks.</span>
                   </button>
                   <button class="dna2-tile" style="--c1:#B486F2;--c2:#7C3AED;--lc:#9D6BF0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Experience%20Design.svg')">
-                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Experience Design</span>
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Experi&shy;ence Design</span>
                     <span class="dna2-q" hidden>Home base. Flows, states, the tiny moments, the craft that makes a product feel <em>obvious</em>.</span>
                   </button>
                   <button class="dna2-tile" style="--c1:#FBB45A;--c2:#ED6C1A;--lc:#F2872E;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Build.svg')">
@@ -6076,7 +6270,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
                     <span class="dna2-q" hidden>I don't hand off and walk away. I sit with engineers until it's <em>real and shipped</em>.</span>
                   </button>
                   <button class="dna2-tile" style="--c1:#6FE0A0;--c2:#1FA55E;--lc:#34BE72;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg')">
-                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Engineering Collab</span>
+                    <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Engi&shy;neering Collab</span>
                     <span class="dna2-q" hidden>I speak enough engineering to know what's cheap, what's pricey, and when &ldquo;it's complicated&rdquo; means <em>no</em>.</span>
                   </button>
                 </div>
@@ -6087,7 +6281,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
                         <span class="dna2-q" hidden>I'd rather <em>kill my idea in a 20-minute interview</em> than defend it for six months in production.</span>
                       </button>
                       <button class="dna2-tile" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/First%20Principles.svg')">
-                        <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">First Principles</span>
+                        <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">First Prin&shy;ciples</span>
                         <span class="dna2-q" hidden>I break problems down to what's <em>actually true</em>, then build back up. Best practices are someone else's constraints.</span>
                       </button>
                       <button class="dna2-tile" style="--c1:#CD7CEE;--c2:#B0379E;--lc:#CB5AD0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg')">
@@ -6198,7 +6392,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
          the src was never attached and the footer video simply never played.
          Keep the src on the element — the browser's own deferral is the part
          that can be trusted. -->
-    <video class="ft-plate" id="ftPlate" autoplay muted loop playsinline preload="none"
+    <!-- no autoplay: autoplay overrides preload="none" and fetched ~4.6 MB at
+         load. The script below starts it when the footer comes into view. -->
+    <video class="ft-plate" id="ftPlate" muted loop playsinline preload="none"
            poster="images/footer-silhouette-poster.webp" src="images/footer-silhouette.mp4"
            aria-hidden="true"></video>
     <div class="ft-vig" aria-hidden="true"></div>
@@ -6221,11 +6417,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="ft-spread">
 
         <div class="ft-left">
-          <span class="ft-status"><i class="ft-dot" aria-hidden="true"></i>Open to the right team</span>
+          <span class="ft-status"><i class="ft-dot" aria-hidden="true"></i>Open to founding and senior design roles</span>
 
           <h2 class="ft-cta">
-            <span class="ft-line">Building something&nbsp;cool?</span>
-            <span class="ft-line serif">I&rsquo;m just a mail away.</span>
+            <span class="ft-line">Hiring a founding&nbsp;designer?</span>
+            <span class="ft-line serif">Email me.</span>
           </h2>
 
           <!-- the hero's own button, so the page closes on the same invitation
@@ -6244,7 +6440,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           </div>
 
           <div class="ft-contact">
-            <span class="ft-k">Shoot me a mail at</span>
+            <span class="ft-k">Email</span>
             <div class="ft-mail">
               <a href="mailto:kowshikbhanu1000@gmail.com">kowshikbhanu1000@gmail.com</a>
               <button class="ft-copy" id="ftCopy" type="button" data-copy="kowshikbhanu1000@gmail.com" aria-label="Copy email address">
@@ -6270,7 +6466,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <div class="ft-note" id="ftNote">
           <span class="ft-k">A small note for you</span>
           <div class="ft-paper">
-            <p class="ft-letter">If you made it this far, you&rsquo;ve probably noticed the pattern.<br>I like messy problems, ambitious ideas, and products that don&rsquo;t have an obvious answer yet.<br>Give me something complex. I&rsquo;ll figure out what matters, make it simple, and help ship it.</p>
+            <p class="ft-letter">You&rsquo;ve probably noticed the pattern.<br>I like messy problems with no obvious answer. Give me one.<br>I&rsquo;ll find what matters, make it simple, and ship it.</p>
           </div>
           <button class="ft-love" id="ftLove" type="button" aria-pressed="false" aria-label="Leave some love">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.9-10-9.3C.2 8.3 1.7 4.7 5 4.1 7 3.7 9 4.6 12 7.5c3-2.9 5-3.8 7-3.4 3.3.6 4.8 4.2 3 7.6C19.5 16.1 12 21 12 21z"/></svg>
@@ -6298,7 +6494,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <source media="(max-width:767px)" srcset="shorts/labor-illusion-poster.webp">
       <img src="shorts/labor-illusion-poster-wide.webp" alt="" width="1280" height="720">
     </picture>
-    <video id="reelFabVid" muted loop playsinline preload="auto"
+    <video id="reelFabVid" muted loop playsinline preload="metadata"
            src="shorts/labor-illusion-preview-wide.mp4" poster="shorts/labor-illusion-poster-wide.webp"
            aria-hidden="true" tabindex="-1"></video>
     <span class="reel-fab-shade" aria-hidden="true"></span>
@@ -6373,7 +6569,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         title: 'The Labor <span class="serif">Illusion.</span>',
         hook: 'Why effort you can watch makes the same result feel more trustworthy.',
         body: [
-          'A transfer that lands instantly reads as suspicious; add &ldquo;verifying bank details&hellip; securing transfer&rdquo; and the same two seconds feel safe. That is the labor illusion &mdash; and it is why AI products show you their thinking. Two minutes on where honest visible effort ends and theatre begins.'
+          'A transfer that lands instantly reads as suspicious; add &ldquo;verifying bank details&hellip; securing transfer&rdquo; and the same two seconds feel safe. That is the labor illusion, and it is why AI products show you their thinking. Two minutes on where honest visible effort ends and theatre begins.'
         ],
         src: 'shorts/labor-illusion.mp4',
         poster: 'shorts/labor-illusion-poster.webp',
@@ -6410,6 +6606,21 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       fabVid.src = 'shorts/labor-illusion-preview.mp4';
       fabVid.poster = 'shorts/labor-illusion-poster.webp';
     }
+    /* the same on the phone rail: the landscape card turns 9:16 there, so it
+       plays the vertical crop. That crop has no audio track, so its sound
+       button steps aside; a tap still opens the film with sound. */
+    if (matchMedia('(max-width:767px)').matches) {
+      [].forEach.call(document.querySelectorAll('.reel-slot--wide'), function (slot) {
+        var cimg = slot.querySelector('.reel-card img');
+        var cvid = slot.querySelector('.reel-card video');
+        var csnd = slot.querySelector('.reel-snd');
+        var ccard = slot.querySelector('.reel-card');
+        if (!ccard || ccard.dataset.reel !== 'labor-illusion') return;
+        if (cimg) cimg.src = 'shorts/labor-illusion-poster.webp';
+        if (cvid) { cvid.poster = 'shorts/labor-illusion-poster.webp'; cvid.src = 'shorts/labor-illusion-preview.mp4'; }
+        if (csnd) csnd.hidden = true;
+      });
+    }
 
     /* ── FAB: preview runs muted unless the visitor asked for stillness.
        play() can reject when the tab loads hidden or the policy is grumpy,
@@ -6441,6 +6652,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        decides when hero-go happens and rAF may be parked in hidden tabs */
     (function arm() {
       if (doc.classList.contains('hero-go')) {
+        /* 2026-11-09: the film stays out of the first screen; Shorts has its own section */
+        if (true) return;
         setTimeout(function () {
           fab.classList.add('in');
           try { fabVid.currentTime = 0; } catch (e) {}
@@ -6983,6 +7196,10 @@ window.__freezeHero = heroSmoke ? heroSmoke.freeze : function () {};
   function rate() { plate.playbackRate = RATE; }
   plate.addEventListener('loadedmetadata', rate);
   rate();
+  /* reduced motion: the plate holds still on its poster frame */
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    plate.removeAttribute('autoplay'); plate.pause(); return;
+  }
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) plate.pause();
     else { var p = plate.play(); if (p && p.catch) p.catch(function () {}); }
@@ -7001,6 +7218,20 @@ if (ftSmoke) {
     }, { threshold: 0.02 }).observe(ftEl);
   }
 }
+/* the footer plate video downloads and plays only while the footer is on
+   screen, and never under reduced motion */
+(function () {
+  var fp = document.getElementById('ftPlate');
+  var ft = document.querySelector('.ft');
+  if (!fp || !ft || !('IntersectionObserver' in window)) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { fp.preload = 'auto'; var p = fp.play(); if (p && p.catch) p.catch(function () {}); }
+      else fp.pause();
+    });
+  }, { rootMargin: '200px 0px', threshold: 0 }).observe(ft);
+})();
 })();
 
 /* ═══ CTA — cycling "Ask me…" prompts (fixed width, directional crossfade)
@@ -7508,7 +7739,7 @@ input.addEventListener('keydown', function (e) {
 
 /* ═══ TEXT CHAT — same proxy contract as index.html ═══ */
 var API_BASE = location.hostname === 'localhost' ? 'http://localhost:3001' : '';
-var SYSTEM = "You are Bhanu AI — the portfolio assistant for Bhanu Kowshik, a product designer in San Francisco (EverTutor Live, EverTutor Studio, Stressie, Dearly; conversational AI, agent systems, 0→1). Answer recruiters and visitors concisely and warmly, in first person as Bhanu's AI. If someone wants to schedule a meeting or call, ask for their email and tell them an input card will appear right below your message — when they submit it, Bhanu emails them to lock a time.";
+var SYSTEM = "You are Bhanu AI — the portfolio assistant for Bhanu Kowshik, a product designer in San Francisco (founder of Verified Call, verifiedcall.app: he designed and built it solo in 3 weeks, a Mac and Windows app, Chrome extension, web app, website and design system that flags hidden AI answer tools, face swaps and stand-ins in live video interviews; closed beta with 20 companies since October 2026; in published testing it caught 4 hidden AI answer tools in 30 of 30 tries each with 0 false alarms, let 0 of 3,990 face-swap sessions through, and read 20 of 20 live Google Meet calls correctly. Before that, sole product designer at EverTutor (Live, Studio, Analytics), founding designer at Stressie, solo build of Dearly). Answer recruiters and visitors concisely and warmly, in first person as Bhanu's AI. If someone wants to schedule a meeting or call, ask for their email and tell them an input card will appear right below your message — when they submit it, Bhanu emails them to lock a time.";
 var messages = [];
 
 function bubble(cls, text) {
@@ -7522,7 +7753,7 @@ function bubble(cls, text) {
 var chipsWrap = document.getElementById('chatChips');
 var CHIP_POOLS = {
   seed:    ["What should I know about you?", "Show me your best work", "Why should we hire you?", "How do you design with AI?"],
-  work:    ["Tell me about EverTutor Live", "What's Stressie?", "What did you build on Dearly?", "What results did you drive?"],
+  work:    ["What is Verified Call?", "Tell me about EverTutor Live", "What's Stressie?", "What results did you drive?"],
   project: ["What was the hardest problem there?", "What was your exact role?", "Show me another project", "What did you learn?"],
   hire:    ["What roles are you open to?", "How do you work with engineers?", "Can we schedule a call?"],
   contact: ["Can we schedule a meeting?", "What's the best way to reach you?"]
@@ -7531,7 +7762,7 @@ function routeChips(reply) {
   var r = (reply || '').toLowerCase();
   if (/hire|role|team|recruit|strength/.test(r)) return CHIP_POOLS.hire;
   if (/email|meeting|schedule|call|reach/.test(r)) return CHIP_POOLS.contact;
-  if (/evertutor|stressie|dearly|engine|project|case study/.test(r)) return CHIP_POOLS.project;
+  if (/verified call|evertutor|stressie|dearly|project|case study/.test(r)) return CHIP_POOLS.project;
   return CHIP_POOLS.work;
 }
 function renderChips(list) {
@@ -7552,11 +7783,12 @@ renderChips(CHIP_POOLS.seed);
 
 /* ── project recommendations — cards the answer can point at ─────────── */
 var REC_MAP = [
+  { re: /verified call|verifiedcall/i, name: 'Verified Call', href: 'verified-call.html', img: 'images/card-verified.webp' },
   { re: /evertutor live/i,    name: 'EverTutor Live',      href: 'evertutor-live.html',   img: 'images/card-et-live.webp' },
   { re: /evertutor studio/i,  name: 'EverTutor Studio',    href: 'evertutor-studio.html', img: 'images/card-et-studio.webp' },
+  { re: /stressie v4/i,       name: 'Stressie V4',         href: 'stressie-v4.html',      img: 'images/card-stressie-v4.webp' },
   { re: /stressie/i,          name: 'Stressie',            href: 'stressie-studio.html',  img: 'images/card-stressie.webp' },
-  { re: /dearly/i,            name: 'Dearly',              href: 'https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal', img: 'images/card-dearly.webp' },
-  { re: /the engine/i,        name: 'The Engine',          href: 'https://www.theengine.dev/', img: 'images/card-engine.webp' }
+  { re: /dearly/i,            name: 'Dearly',              href: 'https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal', img: 'images/card-dearly.webp' }
 ];
 function injectRecs(reply) {
   var hits = REC_MAP.filter(function (r) { return r.re.test(reply); }).slice(0, 2);
@@ -7804,9 +8036,28 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
 
   var fab = document.getElementById('orbFab');
   if (!fab || !('IntersectionObserver' in window)) return;
-  new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) { fab.classList.toggle('stand-down', e.isIntersecting); });
-  }, { threshold: 0.4 }).observe(ftTalk);
+  /* also steps aside for the mail pill, so it never sits on the copy button */
+  var seen = new Set();
+  var standIO = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) seen.add(e.target); else seen.delete(e.target); });
+    fab.classList.toggle('stand-down', seen.size > 0);
+  }, { threshold: 0.4 });
+  standIO.observe(ftTalk);
+  var ftMail = document.querySelector('.ft-mail');
+  if (ftMail) standIO.observe(ftMail);
+  /* while any card's text passes through the orb's bottom-right band, the
+     orb steps aside (only cards whose text reaches the right edge count) */
+  {
+    var bandIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var reaches = e.boundingClientRect.right > innerWidth - 130;
+        if (e.isIntersecting && reaches) seen.add(e.target); else seen.delete(e.target);
+      });
+      fab.classList.toggle('stand-down', seen.size > 0);
+    /* the band is the orb's height plus room for the dev toolbar lift on localhost */
+    }, { rootMargin: '-' + Math.max(0, innerHeight - 190) + 'px 0px 0px 0px', threshold: 0 });
+    [].forEach.call(document.querySelectorAll('.wk-body'), function (el) { bandIO.observe(el); });
+  }
 })();
 
 /* ═══ ORB FAB — the same orb, parked bottom-right ═══
@@ -8577,27 +8828,7 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
   root.setAttribute('data-driven', '');
 })();
 
-/* The gate decides ONCE. A resize that crosses it (DevTools, a tablet
-   rotation over 901px) leaves the page wearing the wrong furniture —
-   desktop bar + empty helix zone at phone width, or no helix on desktop.
-   The helix can't half-initialise, so the only honest re-decision is a
-   fresh load, taken after the resize settles. Never mid-call. */
-(function () {
-  var wasNoHelix = document.documentElement.classList.contains('s2-no-helix');
-  var t;
-  addEventListener('resize', function () {
-    clearTimeout(t);
-    t = setTimeout(function () {
-      var noHelixNow = !(innerWidth >= 901 &&
-        matchMedia('(pointer:fine)').matches &&
-        !matchMedia('(prefers-reduced-motion: reduce)').matches);
-      var chatEl = document.getElementById('chat');
-      if (noHelixNow !== wasNoHelix && !(chatEl && chatEl.classList.contains('open'))) {
-        location.reload();
-      }
-    }, 700);
-  });
-})();
+/* (helix resize gate removed with the helix) */
 
 /* ── the section is locked until the tail has played ──────────────────────
    Pin the section and map the pin's progress straight onto the reel, so the
@@ -8644,7 +8875,7 @@ addEventListener('load', function () {
   var st = ScrollTrigger.create({
     trigger: sec,
     start: 'top top',
-    end: function () { return '+=' + Math.round(innerHeight * 1.1 * 7); },
+    end: function () { return '+=' + Math.round(innerHeight * 1.1 * 8); },
     pin: true,
     pinSpacing: true,
     anticipatePin: 1,
@@ -8669,7 +8900,7 @@ addEventListener('load', function () {
        keeps window.__s2CursorSay current and the cursor system reads it.
      – hover: resting the pointer on any card PAUSES the drift; the reel
        is otherwise always rolling. */
-  var CARD_COUNT   = (window.S2_PROJECT_DATA || []).length || 7;
+  var CARD_COUNT   = (window.S2_PROJECT_DATA || []).length || 8;
   var HOLD_F       = 0;                 /* lockstep with the pin's mapping — no hold-off */
   var IDLE_MS      = 1500;              /* breath after real input before the roll resumes */
   var DRIFT_SLOT_S = 10;                /* seconds per card while drifting */
@@ -9018,6 +9249,25 @@ addEventListener('load', function () {
         href: 'stressie-studio.html'
       },
       {
+        tab: 'Stressie V4',
+        title: 'Stressie V4',
+
+        /* no invented numbers: V4 is in validation, so the tiles say what
+           is true today and the case study carries the V2 bar to beat */
+        metrics: [
+          { val: 'Validating', lbl: 'Metrics Coming Soon' },
+          { val: '171 files',  lbl: 'SwiftUI, Designed + Built' },
+          { val: '3',          lbl: 'Languages' }
+        ],
+        tags: ['In Validation', 'Community', 'Wellness', 'B2B/B2C'],
+        iconTags: [
+          { icon: 'profile', label: 'Founding Designer' },
+          { icon: 'thunder', label: 'Design + Build' }
+        ],
+        desc: 'Turned a ninety-second check-in into something to do after work: a community of wellness events, an Off Work map, and a reset-coin economy that pays for them. Designed in Figma, built in SwiftUI.',
+        href: 'stressie-v4.html'
+      },
+      {
         tab: 'Dearly',
         title: 'Dearly',
 
@@ -9334,6 +9584,7 @@ addEventListener('load', function () {
         { img: 'images/card-et-studio.webp',    video: 'images/et-studio.mp4',    ratio: 1.78 },
         { img: 'images/card-et-analytics.webp', video: 'images/et-analytics.mp4', ratio: 1.78 },
         { img: 'images/card-stressie.webp',     video: 'images/stressie.mp4',     ratio: 0.46, portrait: true },
+        { img: 'images/card-stressie-v4.webp',                                    ratio: 1.78 },
         { img: 'images/card-dearly.webp',       video: 'images/dearly.mp4',       ratio: 2.16 },
         { img: 'images/card-engine.webp',                                         ratio: 1.49 }
       ];
@@ -9467,7 +9718,7 @@ addEventListener('load', function () {
 <script src="vendor/three.min.js"></script>
 <!-- the ?v= is a cache-bust: this file is edited often and browsers hold on
      to it hard. Bump it whenever spiral.js changes. -->
-<script src="spiral-gallery/spiral.js?v=20260811-helix5"></script>
+<!-- spiral.js removed: the work section is a card grid now -->
 
 <script type="module" src="orb/bhanu-orb.js?v=15"></script>
 
@@ -9508,5 +9759,44 @@ addEventListener('load', function () {
   <input type="text" name="ua" />
   <input type="text" name="bot-field" />
 </form>
+
+  <style>
+    /* ══ 2026-11-09 round 3: full-height sections, bigger type, proof row ══ */
+    html .hero{height:100svh;min-height:600px;}
+    :root{--hero-cut:0px;}
+    html .hero .copy{padding-bottom:clamp(96px,14vh,150px);}
+    html .reel-fab{bottom:clamp(16px,2.4vw,32px);}
+    html .hero h1{font-size:clamp(42px,5.2vw,92px);line-height:1.02;letter-spacing:-0.035em;max-width:19ch;text-shadow:0 2px 28px rgba(4,6,10,.55);text-wrap:balance;margin-top:clamp(14px,2vh,22px);}
+    html .hero h1 .serif{display:inline;font-size:1.06em;letter-spacing:-0.01em;color:#CFE3FA;}
+    .hero .proof{display:flex;gap:clamp(24px,3vw,48px);margin-top:clamp(22px,3.4vh,36px);}
+    .hero .proof>div{display:flex;flex-direction:column;gap:4px;max-width:23ch;}
+    .hero .proof>div+div{padding-left:clamp(24px,3vw,48px);border-left:1px solid rgba(226,238,252,.18);}
+    .hero .proof b{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(30px,2.6vw,42px);line-height:1;color:var(--ink);letter-spacing:-.01em;}
+    .hero .proof span{font-family:var(--sans);font-size:clamp(14px,1vw,15.5px);line-height:1.45;color:var(--ink-2);}
+    @media (max-width:767px){
+      html .hero h1{font-size:clamp(36px,10.4vw,46px);max-width:none;}
+      .hero .proof{justify-content:center;text-align:center;gap:18px;}
+      .hero .proof>div{align-items:center;max-width:16ch;}
+      .hero .proof>div+div{padding-left:18px;}
+      .hero .proof b{font-size:30px;}
+      .hero .proof span{font-size:13px;}
+    }
+    /* section 2 takes more of the screen: wider gutters, featured cards span the row */
+    html .wk{padding-left:5vw;padding-right:5vw;padding-top:clamp(96px,12vh,140px);}
+    .wk-12{grid-column:span 12}
+    .wk-12 .wk-media{aspect-ratio:auto;height:min(78vh,56vw);min-height:360px;}
+    .wk-12 .wk-vc .vcd{left:50%;top:auto;bottom:0;width:min(78%,calc((78vh - 44px) * 1.6));transform:translateX(-50%);border-radius:16px 16px 0 0;}
+    .wk-card.wk-12:hover .wk-vc .vcd{transform:translate(-50%,-1.2%);}
+    .wk-12 .wk-vc .vcd.vcd .pnl{right:4cqw}.wk-12 .wk-vc .vcd.vcd .vbar{right:0;width:auto}
+    .wk-12 .wk-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);column-gap:48px;align-items:start}
+    .wk-12 .wk-body>*{grid-column:1}.wk-12 .wk-body .wk-line{grid-column:2;grid-row:1 / span 3}
+    @media (max-width:900px){
+      .wk-12 .wk-media{height:auto;aspect-ratio:4/3;min-height:0}
+      .wk-12 .wk-vc .vcd{width:104%;left:7%;top:14%;bottom:auto;transform:none;border-radius:16px 0 0 0}
+      .wk-12 .wk-vc .vcd.vcd .pnl{right:14cqw}.wk-12 .wk-vc .vcd.vcd .vbar{right:auto;width:89cqw}
+      .wk-12 .wk-body{display:flex}
+    }
+    @media (max-width:360px){.dna2{overflow-x:clip}.ft-cta-dock .cta{max-width:100%;}.ft-cta-dock .cta-text{min-width:0}.ft-cta-dock .cta-text span{white-space:normal}}
+  </style>
 </body>
 </html>

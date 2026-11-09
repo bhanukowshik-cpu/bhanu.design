@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golden Gate — 1:1 Steel · Bhanu Kowshik</title>
+<!-- A geometrically faithful Golden Gate Bridge. 1 unit = 1 metre.
+     Every headline dimension is the real one: 1,280.2 m main span, 342.9 m side spans,
+     227.4 m towers, 144.8 m cable sag, 27.4 m deck, 7.6 m truss, suspenders every 15.24 m.
+     Main cables are true parabolas (uniform deck load), not beziers. -->
+<meta name="description" content="A 1:1 digital Golden Gate Bridge — real spans, real sag, true parabolic cables. Built in Three.js.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌉</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #EFF3F8;
+    --ink-dim: rgba(239,243,248,0.55);
+    --orange: #F04A00;
+    --panel: rgba(14, 19, 26, 0.72);
+    --panel-border: rgba(255,255,255,0.10);
+    --font-heading: 'Montserrat', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; background: #9FBFD4; }
+  body { font-family: var(--font-heading); color: var(--ink); }
+
+  #gl { position: fixed; inset: 0; cursor: grab; }
+  #gl.dragging { cursor: grabbing; }
+  #gl canvas { display: block; }
+
+  .vignette {
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background: radial-gradient(120% 100% at 50% 44%, transparent 62%, rgba(8,14,20,0.30) 100%);
+  }
+
+  /* ─── TITLE PLATE ─────────────────────────────────────────── */
+  .plate {
+    position: fixed; top: clamp(18px, 3.5vh, 34px); left: clamp(18px, 3vw, 38px); z-index: 3;
+    background: var(--panel); border: 1px solid var(--panel-border);
+    border-radius: 14px; padding: 16px 20px 14px;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    max-width: min(340px, 82vw);
+  }
+  .plate h1 {
+    font-size: 1.02rem; font-weight: 700; letter-spacing: 0.14em;
+  }
+  .plate h1 span { color: var(--orange); }
+  .plate .sub {
+    font-family: var(--font-mono); font-size: 0.64rem; color: var(--ink-dim);
+    letter-spacing: 0.08em; margin-top: 4px;
+  }
+
+  /* ─── SPEC SHEET ──────────────────────────────────────────── */
+  .specs {
+    margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--panel-border);
+    font-family: var(--font-mono); font-size: 0.66rem; line-height: 1.85;
+    letter-spacing: 0.04em; color: var(--ink-dim);
+  }
+  .specs .row { display: flex; justify-content: space-between; gap: 18px; }
+  .specs .row b { color: var(--ink); font-weight: 500; white-space: nowrap; }
+  .specs .foot {
+    margin-top: 9px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.12);
+    font-size: 0.6rem; color: var(--ink-dim); line-height: 1.6;
+  }
+  .specs .foot i { color: var(--orange); font-style: normal; }
+
+  /* ─── CONTROL BUTTONS ─────────────────────────────────────── */
+  .ctrls {
+    position: fixed; right: clamp(18px, 3vw, 38px); top: clamp(18px, 3.5vh, 34px); z-index: 3;
+    display: flex; gap: 10px;
+  }
+  .btn {
+    font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500;
+    letter-spacing: 0.16em; color: var(--ink-dim);
+    background: var(--panel); border: 1px solid var(--panel-border);
+    border-radius: 999px; padding: 9px 16px; cursor: pointer;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    transition: color .25s ease, border-color .25s ease;
+  }
+  .btn:hover { color: var(--ink); }
+  .btn.on { color: var(--orange); border-color: rgba(240,74,0,0.5); }
+
+  /* ─── CONSTRUCTION TIMELINE ───────────────────────────────── */
+  .timeline {
+    position: fixed; bottom: clamp(14px, 3vh, 26px); left: 50%; transform: translateX(-50%);
+    z-index: 3; width: min(720px, 92vw);
+    display: flex; align-items: center; gap: 14px;
+    background: var(--panel); border: 1px solid var(--panel-border);
+    border-radius: 16px; padding: 12px 18px 14px;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  .tl-play {
+    flex: 0 0 auto; width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--panel-border); background: rgba(255,255,255,0.06);
+    color: var(--ink); font-size: 0.72rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .25s ease, color .25s ease;
+  }
+  .tl-play:hover { color: var(--orange); border-color: rgba(240,74,0,0.5); }
+  .tl-main { flex: 1; min-width: 0; }
+  .tl-top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: var(--font-mono); margin-bottom: 8px; gap: 12px;
+  }
+  .tl-date { font-size: 0.78rem; font-weight: 700; color: var(--orange); letter-spacing: 0.14em; flex: 0 0 auto; }
+  .tl-cap {
+    font-size: 0.62rem; color: var(--ink-dim); letter-spacing: 0.08em; text-align: right;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #tlSlider {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 4px; display: block;
+    background: linear-gradient(90deg, var(--orange) var(--fill, 100%), rgba(255,255,255,0.16) var(--fill, 100%));
+    border-radius: 999px; outline: none; cursor: pointer;
+  }
+  #tlSlider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%;
+    background: var(--orange); border: 2px solid #FFF7EF;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.4);
+  }
+  #tlSlider::-moz-range-thumb {
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--orange); border: 2px solid #FFF7EF;
+  }
+
+  @media (max-width: 700px) {
+    .specs .row:nth-child(n+6) { display: none; }
+    .tl-cap { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="gl"></div>
+<div class="vignette"></div>
+
+<div class="plate">
+  <h1>GOLDEN GATE <span>1:1</span></h1>
+  <div class="sub">digital steel · one unit = one metre</div>
+  <div class="specs" id="specs">
+    <div class="row"><span>main span</span><b>1,280.2 m</b></div>
+    <div class="row"><span>side spans</span><b>2 × 342.9 m</b></div>
+    <div class="row"><span>tower above water</span><b>227.4 m</b></div>
+    <div class="row"><span>cable sag</span><b>144.8 m</b></div>
+    <div class="row"><span>main cable ø</span><b>0.92 m</b></div>
+    <div class="row"><span>deck width</span><b>27.4 m</b></div>
+    <div class="row"><span>truss depth</span><b>7.6 m</b></div>
+    <div class="row"><span>suspenders</span><b id="suspCount">— × 15.24 m</b></div>
+    <div class="foot">cables solve <i>y = 82.6 + 144.8·(x/640.1)²</i> — the true parabola of a uniformly loaded span, not a bezier.</div>
+  </div>
+</div>
+
+<div class="ctrls">
+  <button class="btn on" id="btnDims">DIMS</button>
+  <button class="btn" id="btnNight">NIGHT</button>
+  <button class="btn" id="btnKarl">KARL</button>
+</div>
+
+<div class="timeline">
+  <button class="tl-play" id="tlPlay" aria-label="play the build">▶</button>
+  <div class="tl-main">
+    <div class="tl-top">
+      <span class="tl-date" id="tlDate">MAY 1937</span>
+      <span class="tl-cap" id="tlCap">may 27, 1937 — opening day</span>
+    </div>
+    <input type="range" id="tlSlider" min="0" max="1000" value="1000" aria-label="construction timeline">
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.min.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+/* ══════════════════════════ SETUP ══════════════════════════ */
+const RAFSHIM = new URLSearchParams(location.search).has('rafshim');
+const W = () => innerWidth  || document.documentElement.clientWidth  || 1280;
+const H = () => innerHeight || document.documentElement.clientHeight || 800;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.setSize(W(), H());
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.02;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const glHost = document.getElementById('gl');
+glHost.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xB6CEDD);
+scene.fog = new THREE.Fog(0xB6CEDD, 1200, 7000);
+
+const camera = new THREE.PerspectiveCamera(52, W() / H(), 1, 14000);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(W(), H()), 0.12, 0.55, 0.75);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+addEventListener('resize', () => {
+  camera.aspect = W() / H();
+  camera.updateProjectionMatrix();
+  renderer.setSize(W(), H());
+  composer.setSize(W(), H());
+});
+
+/* ═══════════ ENVIRONMENT — time of day + Karl ══════════════
+   dayMix 0 → 1 walks DAY → DUSK → NIGHT; every light, fog and
+   water colour is keyframed and lerped, so the transition itself
+   passes through golden hour. */
+const envKey = o => ({
+  zen: new THREE.Color(o.zen), hor: new THREE.Color(o.hor),
+  sun: new THREE.Vector3(...o.sun).normalize(),
+  sunC: new THREE.Color(o.sunC), sunI: o.sunI,
+  hSky: new THREE.Color(o.hSky), hGnd: new THREE.Color(o.hGnd), hI: o.hI,
+  fogC: new THREE.Color(o.fogC), fogN: o.fogN, fogF: o.fogF,
+  deep: new THREE.Color(o.deep), sky: new THREE.Color(o.sky),
+  karlC: new THREE.Color(o.karlC),
+  bloom: o.bloom, lamp: o.lamp, stars: o.stars, city: o.city, expo: o.expo,
+});
+const ENV_DAY = envKey({
+  zen: 0x447FB8, hor: 0xC2DAE8, sun: [-0.52, 0.60, 0.42], sunC: 0xFFF1DE, sunI: 2.3,
+  hSky: 0xBFD9EC, hGnd: 0x5E6357, hI: 0.95, fogC: 0xB6CEDD, fogN: 1200, fogF: 7000,
+  deep: 0x1E4356, sky: 0x8FB6CB, karlC: 0xCDD6DA,
+  bloom: 0.12, lamp: 0, stars: 0, city: 0, expo: 1.02,
+});
+const ENV_DUSK = envKey({
+  zen: 0x28386B, hor: 0xF0975C, sun: [-0.92, 0.10, 0.30], sunC: 0xFF9346, sunI: 1.55,
+  hSky: 0x8A7B8F, hGnd: 0x4A4038, hI: 0.6, fogC: 0xD8A47F, fogN: 1000, fogF: 6200,
+  deep: 0x16283A, sky: 0xDB8A55, karlC: 0x8E8B90,
+  bloom: 0.32, lamp: 0.55, stars: 0.12, city: 0.25, expo: 1.0,
+});
+const ENV_NIGHT = envKey({
+  zen: 0x04070F, hor: 0x0E1B30, sun: [0.35, 0.42, -0.55], sunC: 0xBFD2EE, sunI: 0.5,
+  hSky: 0x1A2740, hGnd: 0x0A0F14, hI: 0.35, fogC: 0x0A1220, fogN: 900, fogF: 6500,
+  deep: 0x04090F, sky: 0x14243A, karlC: 0x161C26,
+  bloom: 0.5, lamp: 1, stars: 1, city: 1, expo: 0.95,
+});
+const E = envKey({
+  zen: 0, hor: 0, sun: [0, 1, 0], sunC: 0, sunI: 0, hSky: 0, hGnd: 0, hI: 0,
+  fogC: 0, fogN: 0, fogF: 0, deep: 0, sky: 0, karlC: 0,
+  bloom: 0, lamp: 0, stars: 0, city: 0, expo: 1,
+});
+const ENV_COLORS = ['zen', 'hor', 'sunC', 'hSky', 'hGnd', 'fogC', 'deep', 'sky', 'karlC'];
+const ENV_SCALARS = ['sunI', 'hI', 'fogN', 'fogF', 'bloom', 'lamp', 'stars', 'city', 'expo'];
+function envAt(m) {
+  const a = m < 0.5 ? ENV_DAY : ENV_DUSK, b = m < 0.5 ? ENV_DUSK : ENV_NIGHT;
+  const t = m < 0.5 ? m * 2 : (m - 0.5) * 2;
+  for (const k of ENV_COLORS) E[k].lerpColors(a[k], b[k], t);
+  for (const k of ENV_SCALARS) E[k] = THREE.MathUtils.lerp(a[k], b[k], t);
+  E.sun.lerpVectors(a.sun, b.sun, t).normalize();
+  return E;
+}
+let dayMix = 0, dayGoal = 0, uT = 0;
+
+/* sky dome — gradient, sun/moon disc, stars, SF glow on the horizon */
+const skyU = {
+  uZen: { value: new THREE.Color() }, uHor: { value: new THREE.Color() },
+  uSunDir: { value: new THREE.Vector3(0, 1, 0) }, uSunC: { value: new THREE.Color() },
+  uStars: { value: 0 }, uCity: { value: 0 },
+};
+const sky = new THREE.Mesh(new THREE.SphereGeometry(8500, 32, 20), new THREE.ShaderMaterial({
+  uniforms: skyU, side: THREE.BackSide, depthWrite: false, fog: false,
+  vertexShader: `varying vec3 vDir;
+    void main() { vDir = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `
+    uniform vec3 uZen, uHor, uSunC, uSunDir;
+    uniform float uStars, uCity;
+    varying vec3 vDir;
+    float hash(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
+    void main() {
+      vec3 d = normalize(vDir);
+      float h = clamp(d.y, 0.0, 1.0);
+      vec3 col = mix(uHor, uZen, pow(h, 0.5));
+      float s = max(dot(d, uSunDir), 0.0);
+      col += uSunC * (pow(s, 1100.0) * 1.6 + pow(s, 14.0) * 0.16);
+      vec3 cell = floor(d * 220.0);
+      float st = step(0.998, hash(cell)) * uStars * smoothstep(0.03, 0.2, d.y);
+      col += vec3(st * (0.5 + 0.5 * hash(cell + 1.0)));
+      float cg = pow(max(dot(normalize(vec2(d.x, d.z)), vec2(-1.0, 0.0)), 0.0), 12.0) * exp(-abs(d.y) * 14.0);
+      col += vec3(1.0, 0.55, 0.28) * cg * uCity * 0.5;
+      gl_FragColor = vec4(col, 1.0);
+    }`,
+}));
+sky.renderOrder = -1;
+scene.add(sky);
+
+/* ══════════════════ THE REAL DIMENSIONS (m) ═════════════════ */
+const MAIN_HALF = 640.1;                 // half of the 1,280.2 m main span
+const SIDE      = 342.9;                 // each side span
+const X_TOWER   = MAIN_HALF;             // tower centrelines
+const X_END     = MAIN_HALF + SIDE;      // 983.0 — pylons / anchorage face
+const TOWER_TOP = 227.4;                 // tower height above water
+const SAG       = 144.8;                 // main-cable sag
+const CABLE_LOW = TOWER_TOP - SAG;       // 82.6 — cable low point above water
+const DECK_W    = 27.4;                  // deck width
+const TRUSS_D   = 7.6;                   // stiffening-truss depth
+const TRUSS_HALF= 11.5;                  // truss web planes
+const CABLE_Z   = 15.5;                  // cable planes / tower-leg centrelines
+const BAY       = 15.24;                 // suspender + truss bay spacing (50 ft)
+const CABLE_R   = 0.46;                  // main cable radius (0.92 m ø)
+const ANCH_Y    = 64;                    // cable elevation entering the anchorage
+const X_APPROACH= 1080;                  // approach deck runs on past the pylons
+
+/* deck top-of-roadway profile — crest at midspan (67.1 m clearance under the truss) */
+const deckY = x => 74.7 - 8 * Math.pow(x / X_END, 2);
+
+/* main cable elevation — true parabola in the main span, sagging chord in the side spans */
+function cableY(x) {
+  const ax = Math.abs(x);
+  if (ax <= X_TOWER) return CABLE_LOW + SAG * Math.pow(x / X_TOWER, 2);
+  const t = Math.min(1, (ax - X_TOWER) / SIDE);
+  const chord = TOWER_TOP + (ANCH_Y - TOWER_TOP) * t;
+  return chord - 24 * t * (1 - t);       // side-span cables sag ~6 m below their chord
+}
+
+/* ══════════════════════ MATERIALS ══════════════════════════ */
+const INTL_ORANGE = 0xF04A00;            // CMYK 0/69/100/6 — the district's own mix
+const matSteel   = new THREE.MeshStandardMaterial({ color: INTL_ORANGE, roughness: 0.58, metalness: 0.22 });
+const matCable   = new THREE.MeshStandardMaterial({ color: 0xE04400,   roughness: 0.5,  metalness: 0.3  });
+const matConcrete= new THREE.MeshStandardMaterial({ color: 0xB7B1A4,   roughness: 0.95, metalness: 0    });
+const matAsphalt = new THREE.MeshStandardMaterial({ color: 0x3B3E43,   roughness: 0.98, metalness: 0    });
+const matWalk    = new THREE.MeshStandardMaterial({ color: 0x8E8A82,   roughness: 0.95, metalness: 0    });
+const matStripe  = new THREE.MeshBasicMaterial({ color: 0xE8E4D8 });
+const matLand    = new THREE.MeshStandardMaterial({ color: 0x5C6B4C,   roughness: 1 });
+const matRock    = new THREE.MeshStandardMaterial({ color: 0x6E6659,   roughness: 1 });
+const matCat     = new THREE.MeshStandardMaterial({ color: 0x3E4247,   roughness: 1 });
+const matLamp    = new THREE.MeshStandardMaterial({ color: 0xD8CBA8,   emissive: 0xFFB25E, emissiveIntensity: 0.05 });
+const matBeacon  = new THREE.MeshStandardMaterial({ color: 0x2A0605,   emissive: 0xFF2418, emissiveIntensity: 0.35 });
+
+/* ── the paint sweep ─────────────────────────────────────────
+   during construction the steel wears its raw primer grey; in the
+   final weeks a plane of International Orange sweeps south → north.
+   uPaintX is the world-x frontier of the painted zone. */
+const paintU = { value: 1400 };
+function paintify(mat) {
+  mat.onBeforeCompile = sh => {
+    sh.uniforms.uPaintX = paintU;
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying float vPX;')
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        vec4 pwp = vec4(transformed, 1.0);
+        #ifdef USE_INSTANCING
+          pwp = instanceMatrix * pwp;
+        #endif
+        vPX = (modelMatrix * pwp).x;`);
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nuniform float uPaintX;\nvarying float vPX;')
+      .replace('#include <color_fragment>', `#include <color_fragment>
+        float pMix = 1.0 - smoothstep(uPaintX - 90.0, uPaintX + 90.0, vPX);
+        diffuseColor.rgb = mix(vec3(0.245, 0.255, 0.275), diffuseColor.rgb, pMix);`);
+  };
+}
+paintify(matSteel);
+paintify(matCable);
+/* after dark the real bridge is floodlit — the steel carries its own
+   orange glow at night (ramped in the frame loop, gated by the timeline) */
+matSteel.emissive = new THREE.Color(0xFF5A1E);
+matSteel.emissiveIntensity = 0;
+matCable.emissive = new THREE.Color(0xE84A14);
+matCable.emissiveIntensity = 0;
+
+/* ═══════════════ INSTANCED-MEMBER PLUMBING ═════════════════ */
+/* every straight steel member is one instance of a unit box, posed by a matrix */
+const unitBox = new THREE.BoxGeometry(1, 1, 1);
+const unitCyl = new THREE.CylinderGeometry(1, 1, 1, 8);
+const pierGeo = new THREE.CylinderGeometry(1, 1, 1, 40);
+const lampSphere = new THREE.SphereGeometry(0.5, 8, 6);
+const UP = new THREE.Vector3(0, 1, 0);
+
+function memberMatrix(ax, ay, az, bx, by, bz, sx, sz) {
+  const a = new THREE.Vector3(ax, ay, az), b = new THREE.Vector3(bx, by, bz);
+  const dir = b.clone().sub(a), len = dir.length();
+  const q = new THREE.Quaternion().setFromUnitVectors(UP, dir.normalize());
+  return new THREE.Matrix4().compose(
+    a.add(b.clone().sub(a).multiplyScalar(0)).lerp(b, 0.5),
+    q, new THREE.Vector3(sx, len, sz));
+}
+
+function bakeInstances(geo, mat, matrices) {
+  const m = new THREE.InstancedMesh(geo, mat, matrices.length);
+  matrices.forEach((mx, i) => m.setMatrixAt(i, mx));
+  m.instanceMatrix.needsUpdate = true;
+  scene.add(m);
+  return m;
+}
+
+const steel = [], slabs = [], walks = [], stripes = [], ropes = [], lampPosts = [], lampHeads = [];
+
+/* ═══════════════════ STIFFENING TRUSS + DECK ═══════════════ */
+const X0 = -X_APPROACH, X1 = X_APPROACH;
+const nBays = Math.round((X1 - X0) / BAY);
+let flip = 1;
+for (let i = 0; i < nBays; i++) {
+  const xa = X0 + i * BAY, xb = xa + BAY;
+  const ya = deckY(xa), yb = deckY(xb);
+  for (const s of [-1, 1]) {
+    const z = s * TRUSS_HALF;
+    steel.push(memberMatrix(xa, ya, z, xb, yb, z, 1.1, 1.1));                       // top chord
+    steel.push(memberMatrix(xa, ya - TRUSS_D, z, xb, yb - TRUSS_D, z, 1.1, 1.1));   // bottom chord
+    steel.push(memberMatrix(xb, yb - TRUSS_D, z, xb, yb, z, 0.75, 0.75));           // vertical
+    steel.push(flip > 0                                                              // diagonal
+      ? memberMatrix(xa, ya, z, xb, yb - TRUSS_D, z, 0.65, 0.65)
+      : memberMatrix(xa, ya - TRUSS_D, z, xb, yb, z, 0.65, 0.65));
+  }
+  /* floor beam — cantilevers out to the cable planes to catch the suspenders */
+  steel.push(memberMatrix(xa, ya - 1.2, -CABLE_Z, xa, ya - 1.2, CABLE_Z, 1.4, 2.0));
+  /* bottom lateral bracing, alternating */
+  if (i % 2 === 0) {
+    steel.push(memberMatrix(xa, ya - TRUSS_D + 0.4, -TRUSS_HALF, xb, yb - TRUSS_D + 0.4, TRUSS_HALF, 0.55, 0.55));
+    steel.push(memberMatrix(xa, ya - TRUSS_D + 0.4, TRUSS_HALF, xb, yb - TRUSS_D + 0.4, -TRUSS_HALF, 0.55, 0.55));
+  }
+  /* roadway slab + sidewalks ride the same grade */
+  slabs.push(memberMatrix(xa, ya, 0, xb, yb, 0, 0.55, 20.4));
+  for (const s of [-1, 1])
+    walks.push(memberMatrix(xa, ya + 0.28, s * 11.05, xb, yb + 0.28, s * 11.05, 0.5, 1.9));
+  /* lane striping — 6 lanes */
+  for (const lz of [-6.8, -3.4, 3.4, 6.8])
+    stripes.push(memberMatrix(xa + 3, ya + 0.34, lz, xa + 7.5, yb + 0.34, lz, 0.05, 0.3));
+  stripes.push(memberMatrix(xa, ya + 0.34, 0, xb, yb + 0.34, 0, 0.05, 0.32));       // centre line
+  /* the real bridge lights its walkways every ~46 m */
+  if (i % 3 === 0) {
+    for (const ls of [-1, 1]) {
+      lampPosts.push(memberMatrix(xa, ya + 0.3, ls * 10.9, xa, ya + 6.6, ls * 10.9, 0.32, 0.32));
+      lampHeads.push(new THREE.Matrix4().compose(
+        new THREE.Vector3(xa, ya + 6.9, ls * 10.9), new THREE.Quaternion(), new THREE.Vector3(1.1, 1.1, 1.1)));
+    }
+  }
+  flip = -flip;
+}
+
+/* ═══════════════════════ SUSPENDERS ════════════════════════ */
+let suspCount = 0;
+for (let x = -X_END + BAY; x <= X_END - BAY + 0.01; x += BAY) {
+  if (Math.abs(Math.abs(x) - X_TOWER) < BAY * 0.6) continue;   // towers take that panel
+  const yc = cableY(x), yd = deckY(x);
+  if (yc - yd < 2.2) continue;                                  // cable meets deck near anchorage
+  for (const s of [-1, 1])
+    ropes.push(memberMatrix(x, yd, s * CABLE_Z, x, yc, s * CABLE_Z, 0.18, 0.18));
+  suspCount += 2;
+}
+document.getElementById('suspCount').textContent = suspCount + ' × 15.24 m';
+
+/* ═══════════════════════ MAIN CABLES ═══════════════════════ */
+const cableMeshes = [];
+for (const s of [-1, 1]) {
+  const pts = [];
+  for (let x = -X_END; x <= X_END + 0.01; x += 4)
+    pts.push(new THREE.Vector3(x, cableY(x), s * CABLE_Z));
+  const curve = new THREE.CatmullRomCurve3(pts);
+  const cbl = new THREE.Mesh(new THREE.TubeGeometry(curve, 480, CABLE_R, 10), matCable);
+  cableMeshes.push(cbl);
+  scene.add(cbl);
+}
+/* spinning catwalks — strung autumn 1935, struck once the deck hangs */
+const catwalkMeshes = [];
+for (const s of [-1, 1]) {
+  const pts = [];
+  for (let x = -X_END; x <= X_END + 0.01; x += 6)
+    pts.push(new THREE.Vector3(x, cableY(x) - 3, s * CABLE_Z));
+  const cw = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 320, 0.5, 6), matCat);
+  catwalkMeshes.push(cw);
+  scene.add(cw);
+}
+
+/* ═══════════ CONSTRUCTION REGISTRY (timeline scrub) ════════ */
+/* every non-instanced mesh registers a build window in months since
+   Jan 1933; upright meshes grow from their base, rotated ones from
+   their centre. t = 1 restores the exact original transform. */
+const grown = [];
+function reg(mesh, t0, t1) {
+  const q = mesh.quaternion;
+  grown.push({
+    m: mesh, t0, t1: Math.max(t1, t0 + 0.1),
+    sx: mesh.scale.x, sy: mesh.scale.y, sz: mesh.scale.z,
+    baseY: mesh.position.y - mesh.scale.y / 2,
+    upright: Math.abs(q.x) + Math.abs(q.y) + Math.abs(q.z) < 1e-6,
+  });
+}
+function applyGrow(r, mth) {
+  const p = THREE.MathUtils.clamp((mth - r.t0) / (r.t1 - r.t0), 0, 1);
+  r.m.visible = p > 0.002;
+  if (!r.m.visible) return;
+  if (r.upright) {
+    r.m.scale.set(r.sx, r.sy * p, r.sz);
+    r.m.position.y = r.baseY + r.sy * p / 2;
+  } else {
+    r.m.scale.set(r.sx * p, r.sy * p, r.sz * p);
+  }
+}
+/* a tower's children build in height order inside the tower's window */
+function regTower(g, pier0, pier1, t0, t1) {
+  const dur = t1 - t0;
+  g.children.forEach(ch => {
+    if (ch.material === matConcrete) { reg(ch, pier0, pier1); return; }
+    const a = THREE.MathUtils.clamp(ch.position.y / (TOWER_TOP + 6), 0, 1);
+    reg(ch, t0 + dur * Math.max(0, a - 0.07), Math.min(t1, t0 + dur * (a + 0.07)));
+  });
+}
+
+/* ═══════════════════════════ TOWERS ════════════════════════ */
+/* legs taper 10.5→5.8 m longitudinally, 7.6→5.0 m transversally, in 6 stepped lifts */
+function buildTower(xc) {
+  const g = new THREE.Group();
+  const LIFTS = 6, h = TOWER_TOP / LIFTS;
+  for (const s of [-1, 1]) {
+    for (let i = 0; i < LIFTS; i++) {
+      const t0 = i / LIFTS, t1 = (i + 1) / LIFTS, tm = (t0 + t1) / 2;
+      const wx = 10.5 + (5.8 - 10.5) * tm;
+      const wz = 7.6  + (5.0 - 7.6)  * tm;
+      const seg = new THREE.Mesh(unitBox, matSteel);
+      seg.position.set(0, (i + 0.5) * h, s * CABLE_Z);
+      seg.scale.set(wx, h, wz);
+      g.add(seg);
+    }
+    /* cable saddle housing */
+    const saddle = new THREE.Mesh(unitBox, matSteel);
+    saddle.position.set(0, TOWER_TOP + 2.6, s * CABLE_Z);
+    saddle.scale.set(7.4, 5.2, 4.2);
+    g.add(saddle);
+  }
+  /* the four Art Deco portal struts above the roadway — stepped fascia in 3 layers */
+  const dk = deckY(xc);
+  for (const [y, depth, hgt] of [[dk + 22, 5.6, 13], [dk + 62, 5.0, 12], [dk + 99, 4.4, 11], [dk + 133, 3.8, 10]]) {
+    for (const [dScale, hScale] of [[1, 1], [0.62, 1.22], [0.3, 1.42]]) {
+      const strut = new THREE.Mesh(unitBox, matSteel);
+      strut.position.set(0, y, 0);
+      strut.scale.set(depth * dScale, hgt * hScale, CABLE_Z * 2 + 4);
+      g.add(strut);
+    }
+  }
+  /* below deck: one strut + X-bracing down to the pier */
+  const low = new THREE.Mesh(unitBox, matSteel);
+  low.position.set(0, dk - 22, 0); low.scale.set(4.6, 9, CABLE_Z * 2 + 3);
+  g.add(low);
+  const brace = [];
+  brace.push(memberMatrix(xc, 9, -CABLE_Z, xc, dk - 28, CABLE_Z, 1.6, 1.6));
+  brace.push(memberMatrix(xc, 9, CABLE_Z, xc, dk - 28, -CABLE_Z, 1.6, 1.6));
+  brace.forEach(mx => { const m = new THREE.Mesh(unitBox, matSteel); mx.decompose(m.position, m.quaternion, m.scale); m.position.x -= xc; g.add(m); });
+  /* beacon mast — the aircraft light above the top portal strut */
+  const mast = new THREE.Mesh(unitBox, matSteel);
+  mast.position.set(0, dk + 152, 0);
+  mast.scale.set(0.9, 28, 0.9);
+  g.add(mast);
+  const beacon = new THREE.Mesh(new THREE.SphereGeometry(1.4, 10, 8), matBeacon);
+  beacon.position.set(0, dk + 167.5, 0);
+  g.add(beacon);
+  /* pier + fender at the waterline */
+  const pier = new THREE.Mesh(pierGeo, matConcrete);
+  pier.position.set(0, 2.6, 0); pier.scale.set(31, 9, 23);
+  g.add(pier);
+  g.position.x = xc;
+  scene.add(g);
+  return g;
+}
+/* Marin (north, +x) went first: pier Jun'33, steel topped out May'34.
+   The SF pier was the open-ocean fight — done Jan'35, tower Jun'35. */
+regTower(buildTower(-X_TOWER), 8, 24, 24, 29.5);
+regTower(buildTower(X_TOWER), 3, 10, 10, 16.5);
+
+/* ══════════════ PYLONS + ANCHORAGES (both shores) ══════════ */
+for (const s of [-1, 1]) {
+  const xe = s * X_END, dk = deckY(xe);
+  /* steel portal pylon straddling the deck */
+  for (const z of [-1, 1]) {
+    const leg = new THREE.Mesh(unitBox, matSteel);
+    leg.position.set(xe, (dk + 14) / 2 + 4, z * (TRUSS_HALF + 2.6));
+    leg.scale.set(4.6, dk + 14 - 8, 3.6);
+    scene.add(leg);
+    reg(leg, 36, 40);
+  }
+  const cap = new THREE.Mesh(unitBox, matSteel);
+  cap.position.set(xe, dk + 12.4, 0); cap.scale.set(4.6, 4.4, TRUSS_HALF * 2 + 9);
+  scene.add(cap);
+  reg(cap, 39.5, 40.5);
+  /* stepped concrete anchorage block eating the cable */
+  const a1 = new THREE.Mesh(unitBox, matConcrete);
+  a1.position.set(xe + s * 38, 26, 0); a1.scale.set(58, 52, 46);
+  scene.add(a1);
+  reg(a1, 0, 9);
+  const a2 = new THREE.Mesh(unitBox, matConcrete);
+  a2.position.set(xe + s * 52, 55, 0); a2.scale.set(34, 22, 38);
+  scene.add(a2);
+  reg(a2, 6, 14);
+  /* approach trestle columns under the deck run-off */
+  for (let i = 1; i <= 2; i++) {
+    const xcol = s * (X_END + (X_APPROACH - X_END) * i / 3 + 20);
+    for (const z of [-1, 1]) {
+      const col = new THREE.Mesh(unitBox, matConcrete);
+      const yd = deckY(xcol) - TRUSS_D;
+      col.position.set(xcol, (yd + 8) / 2, z * 8.5);
+      col.scale.set(3.4, yd - 8, 3.4);
+      scene.add(col);
+      reg(col, 2, 6);
+    }
+  }
+}
+
+/* ═══════════════ WATER + HEADLANDS + CITY SIDE ═════════════ */
+/* the strait — analytic wave normals, fresnel, sun-glitter, and the
+   bridge's shadow caught via the shadow-mask chunks */
+const waterU = THREE.UniformsUtils.merge([
+  THREE.UniformsLib.lights, THREE.UniformsLib.fog,
+  { uTime: { value: 0 }, uSunDir: { value: new THREE.Vector3(0, 1, 0) },
+    uSunC: { value: new THREE.Color(0xFFF1DE) }, uDeep: { value: new THREE.Color(0x1E4356) },
+    uSky: { value: new THREE.Color(0x8FB6CB) }, uGlint: { value: 1 } },
+]);
+const waterMat = new THREE.ShaderMaterial({
+  uniforms: waterU, lights: true, fog: true,
+  vertexShader: `
+    #include <common>
+    #include <fog_pars_vertex>
+    #include <shadowmap_pars_vertex>
+    varying vec3 vW;
+    void main() {
+      #include <beginnormal_vertex>
+      #include <defaultnormal_vertex>
+      vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+      vW = worldPosition.xyz;
+      vec4 mvPosition = viewMatrix * worldPosition;
+      gl_Position = projectionMatrix * mvPosition;
+      #include <shadowmap_vertex>
+      #include <fog_vertex>
+    }`,
+  fragmentShader: `
+    #include <common>
+    #include <packing>
+    #include <fog_pars_fragment>
+    #include <bsdfs>
+    #include <lights_pars_begin>
+    #include <shadowmap_pars_fragment>
+    #include <shadowmask_pars_fragment>
+    uniform float uTime, uGlint;
+    uniform vec3 uSunDir, uSunC, uDeep, uSky;
+    varying vec3 vW;
+    float wh(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    float wvn(vec2 p) {
+      vec2 i = floor(p), f = fract(p);
+      f = f * f * (3.0 - 2.0 * f);
+      return mix(mix(wh(i), wh(i + vec2(1, 0)), f.x), mix(wh(i + vec2(0, 1)), wh(i + vec2(1, 1)), f.x), f.y);
+    }
+    void main() {
+      vec2 p = vW.xz;
+      float t = uTime;
+      /* amplitude varies across the surface so the sines never tile */
+      float amp = 0.45 + 0.85 * wvn(p * 0.006 + vec2(t * 0.02, 0.0));
+      vec2 gr = vec2(0.0);
+      vec2 dd;
+      dd = vec2(0.60, 0.80);  gr += cos(dot(p, dd) * 0.050 + t * 1.10) * 0.050 * 1.00 * dd;
+      dd = vec2(-0.85, 0.52); gr += cos(dot(p, dd) * 0.083 + t * 1.62) * 0.083 * 0.55 * dd;
+      dd = vec2(0.17, -0.98); gr += cos(dot(p, dd) * 0.140 + t * 2.30) * 0.140 * 0.30 * dd;
+      dd = vec2(-0.55, -0.83); gr += cos(dot(p, dd) * 0.310 + t * 3.10) * 0.310 * 0.14 * dd;
+      float att = 1.0 / (1.0 + length(cameraPosition - vW) * 0.002);
+      vec3 n = normalize(vec3(-gr.x * 11.0 * amp * att, 1.0, -gr.y * 11.0 * amp * att));
+      vec3 vdir = normalize(cameraPosition - vW);
+      float fres = pow(1.0 - max(dot(vdir, n), 0.0), 5.0);
+      vec3 col = mix(uDeep, uSky, 0.18 + 0.72 * fres);
+      vec3 rdir = reflect(-vdir, n);
+      float rd = max(dot(rdir, uSunDir), 0.0);
+      col += uSunC * (pow(rd, 260.0) * 2.2 + pow(rd, 36.0) * 0.25) * uGlint;
+      float sh = getShadowMask();
+      col *= mix(0.55, 1.0, sh);
+      gl_FragColor = vec4(col, 1.0);
+      #include <fog_fragment>
+    }`,
+});
+const water = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMat);
+water.rotation.x = -Math.PI / 2;
+water.receiveShadow = true;
+scene.add(water);
+
+/* Karl 2.0 — three drifting noise blankets riding low over the water,
+   so the towers rise out of the fog instead of into a grey wash */
+const karlSlabs = [];
+const slabGeo = new THREE.PlaneGeometry(9000, 6000);
+[[16, 0.0009, 0.6, 0.72], [30, 0.0013, 1.0, 0.82], [44, 0.0019, 1.5, 0.88]].forEach(([y, sc, sp, op]) => {
+  const u = {
+    uT: { value: 0 }, uOp: { value: 0 }, uMax: { value: op },
+    uCol: { value: new THREE.Color(0xE6EAEC) }, uScale: { value: sc }, uSpeed: { value: sp },
+  };
+  const m = new THREE.Mesh(slabGeo, new THREE.ShaderMaterial({
+    uniforms: u, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: false,
+    vertexShader: `varying vec2 vP;
+      void main() { vec4 wp = modelMatrix * vec4(position, 1.0); vP = wp.xz; gl_Position = projectionMatrix * viewMatrix * wp; }`,
+    fragmentShader: `
+      uniform float uT, uOp, uScale, uSpeed;
+      uniform vec3 uCol;
+      varying vec2 vP;
+      float h2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float vn(vec2 p) {
+        vec2 i = floor(p), f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(h2(i), h2(i + vec2(1, 0)), f.x), mix(h2(i + vec2(0, 1)), h2(i + vec2(1, 1)), f.x), f.y);
+      }
+      void main() {
+        vec2 q = vP * uScale + vec2(uT * 0.006 * uSpeed, uT * 0.014 * uSpeed);
+        float a = vn(q) * 0.5 + vn(q * 2.13) * 0.3 + vn(q * 4.7) * 0.2;
+        a = smoothstep(0.38, 0.72, a);
+        float edge = smoothstep(4500.0, 2600.0, length(vP * vec2(1.0, 1.45)));
+        gl_FragColor = vec4(uCol, a * edge * uOp);
+      }`,
+  }));
+  m.rotation.x = -Math.PI / 2;
+  m.position.y = y;
+  m.renderOrder = 5;
+  karlSlabs.push({ mesh: m, u });
+  scene.add(m);
+});
+
+/* noise-displaced headlands — golden Marin ridges north, greener
+   Presidio south, a low corridor carved for the bridge approach */
+const th = (x, z) => { const s = Math.sin(x * 127.1 + z * 311.7) * 43758.5453; return s - Math.floor(s); };
+function tvn(x, z) {
+  const ix = Math.floor(x), iz = Math.floor(z), fx = x - ix, fz = z - iz;
+  const ux = fx * fx * (3 - 2 * fx), uz = fz * fz * (3 - 2 * fz);
+  return th(ix, iz) * (1 - ux) * (1 - uz) + th(ix + 1, iz) * ux * (1 - uz)
+       + th(ix, iz + 1) * (1 - ux) * uz + th(ix + 1, iz + 1) * ux * uz;
+}
+const fbm2 = (x, z) => tvn(x, z) * 0.55 + tvn(x * 2.3, z * 2.3) * 0.28 + tvn(x * 5.1, z * 5.1) * 0.17;
+const sm01 = t => { t = THREE.MathUtils.clamp(t, 0, 1); return t * t * (3 - 2 * t); };
+function headlandH(side, x, z) {
+  const maxH = side > 0 ? 290 : 150;
+  const ax = Math.abs(x);
+  let h = maxH * sm01((ax - 950) / 290) * (0.62 + 0.38 * fbm2(x * 0.004, z * 0.004));
+  h += (side > 0 ? 40 : 18) * fbm2(x * 0.012 + 9, z * 0.012);
+  const corridor = sm01((Math.abs(z) - 60) / 180);
+  h = Math.min(h, THREE.MathUtils.lerp(12, 4000, corridor));
+  return THREE.MathUtils.lerp(-14, h, sm01((ax - 925) / 95));
+}
+function headland(side) {
+  const Wd = 2200, Dd = 4600;
+  const geo = new THREE.PlaneGeometry(Wd, Dd, 72, 52);
+  geo.rotateX(-Math.PI / 2);
+  const cx = side * (960 + Wd / 2 - 120);
+  const maxH = side > 0 ? 290 : 150;
+  const pos = geo.attributes.position;
+  const col = [];
+  const cHigh = new THREE.Color(side > 0 ? 0x8A7B4E : 0x5C6B4C);
+  const cLow  = new THREE.Color(side > 0 ? 0x6E7A52 : 0x4F6147);
+  const cRock = new THREE.Color(0x6E6659);
+  const cSand = new THREE.Color(0x4E5348);
+  const c = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i) + cx, z = pos.getZ(i);
+    const h = headlandH(side, x, z);
+    pos.setY(i, h);
+    const n = fbm2(x * 0.02 + 3, z * 0.02);
+    c.copy(cLow).lerp(cHigh, THREE.MathUtils.clamp(h / (maxH * 0.68) + n * 0.3 - 0.15, 0, 1));
+    if (h > maxH * 0.74) c.lerp(cRock, THREE.MathUtils.clamp((h - maxH * 0.74) / 60, 0, 0.7));
+    if (h < 4) c.copy(cSand);
+    col.push(c.r, c.g, c.b);
+  }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  geo.computeVertexNormals();
+  const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1 }));
+  m.position.x = cx;
+  m.receiveShadow = true;
+  scene.add(m);
+}
+headland(1);
+headland(-1);
+
+/* city lights — SF glitter to the south, a Sausalito sprinkle north;
+   they fade in with dusk and glow through the bloom pass */
+const CITY_N = 560;
+const cityMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
+const cityMesh = new THREE.InstancedMesh(unitBox, cityMat, CITY_N);
+{
+  const m4 = new THREE.Matrix4(), cq = new THREE.Quaternion(), cs = new THREE.Vector3(), cp = new THREE.Vector3();
+  const cc = new THREE.Color();
+  let placed = 0, tries = 0;
+  while (placed < CITY_N && tries < CITY_N * 8) {
+    tries++;
+    const r1 = th(tries * 7.31, 3.7), r2 = th(tries * 3.97, 11.2), r3 = th(tries * 5.53, 6.1);
+    const south = placed < CITY_N - 80;
+    const x = south ? -(1150 + r1 * 1550) : (1080 + r1 * 620);
+    const z = south ? (r2 * 2 - 1) * 2000 : (500 + r2 * 1300);
+    const y = headlandH(south ? -1 : 1, x, z);
+    if (y < 5) continue;
+    m4.compose(cp.set(x, y + 1.6, z), cq, cs.set(2.4, 1.4, 2.4));
+    cityMesh.setMatrixAt(placed, m4);
+    cc.setHex(r3 < 0.6 ? 0xFFD9A0 : r3 < 0.85 ? 0xFFB25E : 0xCFE0FF);
+    cityMesh.setColorAt(placed, cc);
+    placed++;
+  }
+  cityMesh.count = placed;
+}
+cityMesh.visible = false;
+scene.add(cityMesh);
+/* Fort Point, tucked under the south approach */
+const fort = new THREE.Mesh(unitBox, new THREE.MeshStandardMaterial({ color: 0x7A5548, roughness: 0.9 }));
+fort.position.set(-1015, 8, -34); fort.scale.set(48, 16, 32);
+scene.add(fort);
+
+/* ══════════════════ BAKE THE INSTANCED STEEL ═══════════════ */
+/* each instance also gets a build month, derived from where it sits:
+   deck steel hangs outward from whichever tower is nearer (Jun–Nov '36,
+   midspan closing last), paving sweeps south → north in early '37. */
+const bayMonth  = x => 41 + 5.5 * Math.pow(Math.min(Math.abs(x - X_TOWER), Math.abs(x + X_TOWER)) / MAIN_HALF, 0.9);
+const paveMonth = x => 47 + 2.6 * (x + X_APPROACH) / (2 * X_APPROACH);
+const mX = m => m.elements[12];
+const built = [
+  { mesh: bakeInstances(unitBox, matSteel, steel),    mats: steel,   times: steel.map(m => bayMonth(mX(m))) },
+  { mesh: bakeInstances(unitBox, matAsphalt, slabs),  mats: slabs,   times: slabs.map(m => paveMonth(mX(m))) },
+  { mesh: bakeInstances(unitBox, matWalk, walks),     mats: walks,   times: walks.map(m => paveMonth(mX(m)) + 0.15) },
+  { mesh: bakeInstances(unitBox, matStripe, stripes), mats: stripes, times: stripes.map(m => paveMonth(mX(m)) + 0.3) },
+  { mesh: bakeInstances(unitCyl, matCable, ropes),    mats: ropes,   times: ropes.map(m => Math.max(41, bayMonth(mX(m)) - 0.6)) },
+  { mesh: bakeInstances(unitCyl, matSteel, lampPosts),  mats: lampPosts, times: lampPosts.map(m => paveMonth(mX(m)) + 0.4) },
+  { mesh: bakeInstances(lampSphere, matLamp, lampHeads), mats: lampHeads, times: lampHeads.map(m => paveMonth(mX(m)) + 0.4) },
+];
+
+/* ═══════════════════════ LIGHTING ══════════════════════════ */
+const hemi = new THREE.HemisphereLight(0xBFD9EC, 0x5E6357, 0.95);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xFFF1DE, 2.3);
+sun.position.set(-1400, 1500, 900);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = -1600; sun.shadow.camera.right = 1600;
+sun.shadow.camera.top = 1600;   sun.shadow.camera.bottom = -1600;
+sun.shadow.camera.near = 100;   sun.shadow.camera.far = 6500;
+sun.shadow.bias = -0.0002;
+sun.shadow.normalBias = 3;
+scene.add(sun);
+scene.add(sun.target);
+const bounce = new THREE.DirectionalLight(0xAFC6D8, 0.5);
+bounce.position.set(900, 300, -1100);
+scene.add(bounce);
+
+/* the steel casts, the ground planes catch */
+scene.traverse(o => {
+  if (!o.isMesh) return;
+  if (o.material === matSteel || o.material === matCable || o.material === matConcrete || o.material === matAsphalt)
+    o.castShadow = true;
+  if (o.material === matAsphalt || o.material === matLand || o.material === matRock || o.material === matWalk)
+    o.receiveShadow = true;
+});
+
+/* ═══════════════ DIMENSION CALLOUTS (the flex) ═════════════ */
+const dims = new THREE.Group();
+scene.add(dims);
+const DIM_INK = 0x11313E;
+const dimLineMat = new THREE.LineBasicMaterial({ color: DIM_INK, transparent: true, opacity: 0.85 });
+
+function dimLine(pts) {
+  const g = new THREE.BufferGeometry().setFromPoints(pts.map(p => new THREE.Vector3(...p)));
+  dims.add(new THREE.Line(g, dimLineMat));
+}
+function label(text, x, y, z, scale = 1) {
+  const cv = document.createElement('canvas');
+  cv.width = 1024; cv.height = 160;
+  const cx = cv.getContext('2d');
+  const draw = () => {
+    cx.clearRect(0, 0, 1024, 160);
+    cx.font = '600 76px "JetBrains Mono", monospace';
+    cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.lineWidth = 14; cx.strokeStyle = 'rgba(236,243,247,0.9)';
+    cx.strokeText(text, 512, 84);
+    cx.fillStyle = '#11313E';
+    cx.fillText(text, 512, 84);
+    tex.needsUpdate = true;
+  };
+  const tex = new THREE.CanvasTexture(cv);
+  const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+  spr.position.set(x, y, z);
+  spr.scale.set(150 * scale, 23.4 * scale, 1);
+  dims.add(spr);
+  draw();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+}
+const DZ = 30;   /* dims float on the near side of the deck */
+/* main span, measured tower-to-tower under the deck */
+dimLine([[-X_TOWER, 34, DZ], [X_TOWER, 34, DZ]]);
+dimLine([[-X_TOWER, 28, DZ], [-X_TOWER, 40, DZ]]);
+dimLine([[X_TOWER, 28, DZ], [X_TOWER, 40, DZ]]);
+label('main span — 1,280.2 m', 0, 45, DZ, 1.35);
+/* tower height, beside the south tower */
+dimLine([[-X_TOWER - 46, 0, DZ], [-X_TOWER - 46, TOWER_TOP, DZ]]);
+dimLine([[-X_TOWER - 52, TOWER_TOP, DZ], [-X_TOWER - 22, TOWER_TOP, DZ]]);
+dimLine([[-X_TOWER - 52, 0.5, DZ], [-X_TOWER - 22, 0.5, DZ]]);
+label('227.4 m', -X_TOWER - 118, TOWER_TOP / 2, DZ, 0.85);
+/* cable sag at midspan */
+dimLine([[0, CABLE_LOW, DZ], [0, TOWER_TOP, DZ]]);
+dimLine([[-16, TOWER_TOP, DZ], [16, TOWER_TOP, DZ]]);
+label('sag 144.8 m', 66, (CABLE_LOW + TOWER_TOP) / 2 + 16, DZ, 0.85);
+/* clearance under midspan */
+dimLine([[110, 0.5, DZ], [110, deckY(110) - TRUSS_D, DZ]]);
+label('67.1 m clear', 178, 32, DZ, 0.8);
+
+/* ══════════════ CONSTRUCTION TIMELINE ENGINE ═══════════════ */
+/* T ∈ [0,1] ↔ Jan 1933 → late May 1937 (52.4 months) */
+const M_END = 52.4;
+const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const monthLabel = m => {
+  const mm = Math.min(52, Math.floor(m));
+  return MONTH_NAMES[mm % 12] + ' ' + (1933 + Math.floor(mm / 12));
+};
+const PHASES = [
+  [0,    'ground broken — anchorages begin'],
+  [3,    'marin pier rises in the strait'],
+  [10,   'marin tower climbs, lift by lift'],
+  [16.5, 'sf pier — the open-ocean fight'],
+  [24,   'sf tower climbs'],
+  [30,   'catwalks strung tower to tower'],
+  [34,   'spinning the cables — 27,572 wires each'],
+  [41,   'deck hangs outward from both towers'],
+  [46.4, 'midspan closes — nov 18, 1936'],
+  [47,   'paving the roadway'],
+  [50,   'the final coat of international orange'],
+  [52.2, 'may 27, 1937 — opening day'],
+];
+const tlSlider = document.getElementById('tlSlider');
+const tlPlay   = document.getElementById('tlPlay');
+const tlDate   = document.getElementById('tlDate');
+const tlCap    = document.getElementById('tlCap');
+let T = 1, Tgoal = 1, Tapplied = -1, playing = false, dimsUserOn = true;
+const ZERO_M = new THREE.Matrix4().makeScale(0, 0, 0);
+
+function applyConstruction(t) {
+  Tapplied = t;
+  const mth = t * M_END;
+  for (const r of grown) applyGrow(r, mth);
+  for (const b of built) {
+    for (let i = 0; i < b.mats.length; i++)
+      b.mesh.setMatrixAt(i, mth >= b.times[i] ? b.mats[i] : ZERO_M);
+    b.mesh.instanceMatrix.needsUpdate = true;
+  }
+  /* cables spin south → north, Nov '35 – May '36 */
+  const cp = THREE.MathUtils.clamp((mth - 34) / 6.5, 0, 1);
+  for (const c of cableMeshes) {
+    c.visible = cp > 0.001;
+    c.geometry.setDrawRange(0, Math.max(3, Math.floor(c.geometry.index.count * cp / 3) * 3));
+  }
+  const wp = THREE.MathUtils.clamp((mth - 30) / 2.5, 0, 1);
+  for (const c of catwalkMeshes) {
+    c.visible = wp > 0.001 && mth < 44;
+    c.geometry.setDrawRange(0, Math.max(3, Math.floor(c.geometry.index.count * wp / 3) * 3));
+  }
+  /* the orange frontier */
+  paintU.value = mth < 50 ? -1400
+    : THREE.MathUtils.lerp(-1400, 1400, THREE.MathUtils.clamp((mth - 50) / 2.2, 0, 1));
+  /* you only measure a finished bridge */
+  dims.visible = dimsUserOn && mth >= 52.1;
+  /* readouts */
+  tlDate.textContent = monthLabel(mth);
+  let cap = PHASES[0][1];
+  for (const [m0, c] of PHASES) if (mth >= m0) cap = c;
+  tlCap.textContent = cap;
+  tlSlider.style.setProperty('--fill', (t * 100).toFixed(1) + '%');
+}
+
+tlSlider.addEventListener('input', () => {
+  playing = false;
+  tlPlay.textContent = '▶';
+  Tgoal = tlSlider.value / 1000;
+});
+tlPlay.addEventListener('click', () => {
+  playing = !playing;
+  if (playing && Tgoal > 0.98) T = Tgoal = 0;
+  tlPlay.textContent = playing ? '❚❚' : '▶';
+});
+
+/* ═══════════════════════ TRAFFIC ═══════════════════════════
+   traffic starts the day the bridge opens; lights come on at dusk */
+const CAR_N = 26;
+const carsData = [];
+const carPalette = [0xC8CDD4, 0x2E3947, 0x8A2F2A, 0x39536B, 0xB8B29A, 0x4A4E55];
+for (let i = 0; i < CAR_N; i++) {
+  const dirn = i % 2 ? 1 : -1;
+  carsData.push({
+    dir: dirn,
+    lane: dirn * (i % 4 < 2 ? 2.0 : 5.4),
+    x: -1040 + (i * 379.7) % 2080,
+    v: 23 + (i * 7.3) % 9,
+  });
+}
+const carMesh = new THREE.InstancedMesh(unitBox, new THREE.MeshStandardMaterial({ roughness: 0.5, metalness: 0.4 }), CAR_N);
+const carLights = new THREE.InstancedMesh(unitBox, new THREE.MeshBasicMaterial(), CAR_N * 2);
+carsData.forEach((c, i) => {
+  carMesh.setColorAt(i, new THREE.Color(carPalette[i % carPalette.length]));
+  carLights.setColorAt(i * 2, new THREE.Color(0xFFF6D8));
+  carLights.setColorAt(i * 2 + 1, new THREE.Color(0xFF3826));
+});
+carMesh.castShadow = true;
+carMesh.visible = carLights.visible = false;
+scene.add(carMesh);
+scene.add(carLights);
+const carM4 = new THREE.Matrix4(), carQ = new THREE.Quaternion(), carS = new THREE.Vector3(), carP = new THREE.Vector3();
+function updateCars(dt, night) {
+  const open = Tapplied > 0.995;
+  carMesh.visible = open;
+  carLights.visible = open && night > 0.35;
+  if (!open) return;
+  for (let i = 0; i < CAR_N; i++) {
+    const c = carsData[i];
+    c.x += c.dir * c.v * dt;
+    if (c.x > 1050) c.x = -1050;
+    if (c.x < -1050) c.x = 1050;
+    const y = deckY(c.x) + 1.05;
+    carM4.compose(carP.set(c.x, y, c.lane), carQ, carS.set(4.6, 1.5, 2.1));
+    carMesh.setMatrixAt(i, carM4);
+    carM4.compose(carP.set(c.x + c.dir * 2.5, y, c.lane), carQ, carS.set(0.25, 0.5, 1.7));
+    carLights.setMatrixAt(i * 2, carM4);
+    carM4.compose(carP.set(c.x - c.dir * 2.5, y + 0.1, c.lane), carQ, carS.set(0.2, 0.4, 1.6));
+    carLights.setMatrixAt(i * 2 + 1, carM4);
+  }
+  carMesh.instanceMatrix.needsUpdate = true;
+  carLights.instanceMatrix.needsUpdate = true;
+}
+
+/* ═══════════════════ ORBIT CONTROLS (custom) ═══════════════ */
+const target = new THREE.Vector3(0, 80, 0);
+/* narrow viewports need to stand further back to hold the full span */
+const DIST0 = W() / H() >= 1.4 ? 1560 : W() / H() >= 0.9 ? 2250 : 2900;
+let azim = 0.32, elev = 0.24, dist = DIST0;
+let azimV = 0, elevV = 0, distGoal = dist;
+let lastPointer = 0;
+const pointers = new Map();
+let pinchD0 = 0, pinchDist0 = 0;
+
+glHost.addEventListener('pointerdown', e => {
+  glHost.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  glHost.classList.add('dragging');
+  if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()];
+    pinchD0 = Math.hypot(a.x - b.x, a.y - b.y);
+    pinchDist0 = distGoal;
+  }
+});
+glHost.addEventListener('pointermove', e => {
+  const p = pointers.get(e.pointerId);
+  if (!p) return;
+  lastPointer = performance.now();
+  if (pointers.size === 1) {
+    azimV += (e.clientX - p.x) * -0.000045;
+    elevV += (e.clientY - p.y) * 0.000045;
+  }
+  p.x = e.clientX; p.y = e.clientY;
+  if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y);
+    if (pinchD0 > 0) distGoal = THREE.MathUtils.clamp(pinchDist0 * pinchD0 / Math.max(40, d), 220, 4200);
+  }
+});
+const endPointer = e => {
+  pointers.delete(e.pointerId);
+  if (!pointers.size) glHost.classList.remove('dragging');
+};
+glHost.addEventListener('pointerup', endPointer);
+glHost.addEventListener('pointercancel', endPointer);
+glHost.addEventListener('wheel', e => {
+  e.preventDefault();
+  lastPointer = performance.now();
+  distGoal = THREE.MathUtils.clamp(distGoal * Math.exp(e.deltaY * 0.0011), 220, 4200);
+}, { passive: false });
+
+/* ═════════════════════════ TOGGLES ═════════════════════════ */
+const btnDims = document.getElementById('btnDims');
+const btnKarl = document.getElementById('btnKarl');
+const btnNight = document.getElementById('btnNight');
+let karl = false, karlMix = 0;
+btnNight.addEventListener('click', () => {
+  dayGoal = dayGoal > 0.5 ? 0 : 1;
+  btnNight.classList.toggle('on', dayGoal > 0.5);
+});
+btnDims.addEventListener('click', () => {
+  dimsUserOn = !dimsUserOn;
+  btnDims.classList.toggle('on', dimsUserOn);
+  applyConstruction(Math.max(0, Tapplied));
+});
+btnKarl.addEventListener('click', () => {
+  karl = !karl;
+  btnKarl.classList.toggle('on', karl);
+});
+
+/* ═══════════════════════════ LOOP ══════════════════════════ */
+let tPrev = 0;
+function frame(dtFixed) {
+  const now = performance.now() / 1000;
+  const dt = dtFixed !== undefined ? dtFixed : Math.min(0.05, now - tPrev || 0.016);
+  tPrev = now;
+
+  /* idle drift after 5 s of stillness */
+  if (performance.now() - lastPointer > 5000 && pointers.size === 0) azimV += 0.0000032;
+
+  /* construction time advances (≈34 s for the full four years) */
+  if (playing) {
+    Tgoal = Math.min(1, Tgoal + dt / 34);
+    if (Tgoal >= 1) { playing = false; tlPlay.textContent = '▶'; }
+    tlSlider.value = Tgoal * 1000;
+  }
+  T += (Tgoal - T) * Math.min(1, dt * 7);
+  if (Math.abs(Tgoal - T) < 0.001) T = Tgoal;
+  if (Math.abs(T - Tapplied) > 0.0004) applyConstruction(T);
+
+  azim += azimV; elev += elevV;
+  azimV *= 0.92; elevV *= 0.92;
+  elev = THREE.MathUtils.clamp(elev, 0.03, 1.25);
+  dist += (distGoal - dist) * Math.min(1, dt * 6);
+
+  camera.position.set(
+    target.x + dist * Math.cos(elev) * Math.sin(azim),
+    target.y + dist * Math.sin(elev),
+    target.z + dist * Math.cos(elev) * Math.cos(azim));
+  camera.lookAt(target);
+
+  /* environment — time of day walks its keyframes, Karl blends on top */
+  uT += dt;
+  karlMix += ((karl ? 1 : 0) - karlMix) * Math.min(1, dt * 1.6);
+  dayMix += THREE.MathUtils.clamp(dayGoal - dayMix, -dt / 4.5, dt / 4.5);
+  const e = envAt(dayMix);
+  scene.fog.color.copy(e.fogC).lerp(e.karlC, karlMix);
+  scene.fog.near = THREE.MathUtils.lerp(e.fogN, 520, karlMix);
+  scene.fog.far  = THREE.MathUtils.lerp(e.fogF, 4800, karlMix);
+  scene.background.copy(scene.fog.color);
+  sun.position.copy(e.sun).multiplyScalar(2600);
+  sun.color.copy(e.sunC);
+  sun.intensity = e.sunI * (1 - karlMix * 0.55);
+  hemi.color.copy(e.hSky);
+  hemi.groundColor.copy(e.hGnd);
+  hemi.intensity = e.hI;
+  bounce.intensity = 0.5 * (1 - dayMix * 0.7);
+  skyU.uZen.value.copy(e.zen).lerp(e.karlC, karlMix * 0.5);
+  skyU.uHor.value.copy(e.hor).lerp(e.karlC, karlMix * 0.85);
+  skyU.uSunDir.value.copy(e.sun);
+  skyU.uSunC.value.copy(e.sunC);
+  skyU.uStars.value = e.stars * (1 - karlMix * 0.8);
+  skyU.uCity.value = e.city * (1 - karlMix * 0.7);
+  waterU.uTime.value = uT;
+  waterU.uSunDir.value.copy(e.sun);
+  waterU.uSunC.value.copy(e.sunC);
+  waterU.uDeep.value.copy(e.deep).lerp(e.karlC, karlMix * 0.35);
+  waterU.uSky.value.copy(e.sky).lerp(e.karlC, karlMix * 0.7);
+  waterU.uGlint.value = 1 - karlMix * 0.85;
+  for (const s of karlSlabs) {
+    s.u.uT.value = uT;
+    s.u.uOp.value = karlMix * s.u.uMax.value;
+    s.u.uCol.value.copy(e.karlC);
+  }
+  bloom.strength = THREE.MathUtils.lerp(e.bloom, e.bloom * 0.6, karlMix);
+  renderer.toneMappingExposure = e.expo;
+  /* floodlit steel — towers glow international orange after dark,
+     but only once there's a finished bridge to floodlight */
+  const flood = e.lamp * (Tapplied >= 0.99 ? 1 : 0.15) * (1 - karlMix * 0.4);
+  matSteel.emissiveIntensity = flood * 0.38;
+  matCable.emissiveIntensity = flood * 0.2;
+  cityMat.opacity = e.city * (1 - karlMix * 0.8);
+  cityMesh.visible = cityMat.opacity > 0.02;
+  /* the measurement cards belong to daylight */
+  dims.visible = dimsUserOn && Tapplied >= 0.993 && dayMix < 0.5;
+  /* lamps warm up at dusk, the beacon blinks, road paint stops glowing */
+  matLamp.emissiveIntensity = 0.05 + e.lamp * 2.6;
+  matBeacon.emissiveIntensity = 0.25 + (Math.sin(uT * 2.2) > 0.15 ? 1 : 0.05) * (0.5 + 2.6 * e.lamp);
+  const sdim = 1 - dayMix * 0.62;
+  matStripe.color.setRGB(0.91 * sdim + 0.06, 0.89 * sdim + 0.06, 0.85 * sdim + 0.08);
+  updateCars(dt, dayMix);
+
+  composer.render();
+}
+
+if (RAFSHIM) {
+  window.__bridge = {
+    camera, target,
+    set: (a, e, d) => { azim = a; elev = e; dist = distGoal = d; },
+    karl: v => { karl = v; btnKarl.classList.toggle('on', v); },
+    night: v => { dayGoal = v ? 1 : 0; dayMix = dayGoal; btnNight.classList.toggle('on', v); },
+    dusk: () => { dayGoal = dayMix = 0.5; },
+    dims: v => { dimsUserOn = v; btnDims.classList.toggle('on', v); applyConstruction(Math.max(0, Tapplied)); },
+    build: t => { playing = false; T = Tgoal = t; applyConstruction(t); tlSlider.value = t * 1000; },
+    play: () => tlPlay.click(),
+    step: (n = 1) => { for (let i = 0; i < n; i++) frame(1 / 60); },
+  };
+  setInterval(() => frame(1 / 60), 16);
+} else {
+  renderer.setAnimationLoop(() => frame());
+}
+</script>
+</body>
+</html>

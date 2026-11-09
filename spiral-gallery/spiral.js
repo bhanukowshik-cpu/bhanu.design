@@ -24,6 +24,7 @@
       { label: 'ET Studio',    img: 'images/card-et-studio.webp',    video: 'images/et-studio.mp4'    },
       { label: 'ET Analytics', img: 'images/card-et-analytics.webp', video: 'images/et-analytics.mp4' },
       { label: 'Stressie',     img: 'images/card-stressie.webp',     video: 'images/stressie.mp4', portrait: true },
+      { label: 'Stressie V4',  img: 'images/card-stressie-v4.webp',  video: null                       },
       { label: 'Dearly',       img: 'images/card-dearly.webp',       video: 'images/dearly.mp4'       },
       { label: 'The Engine',   img: 'images/card-engine.webp',       video: null                       },
     ];
@@ -38,7 +39,7 @@
     // exposed by the inline script in index.html) so title/desc/metrics/href have a
     // single source of truth shared with the spiral. Media (img/video) still comes
     // from CARDS above — both arrays share the same 6-item order.
-    var POSTERS = [null, 'images/et-live.png', 'images/et-studio.png', 'images/et-analytics.png', null, 'images/dearly.png', null];
+    var POSTERS = [null, 'images/et-live.png', 'images/et-studio.png', 'images/et-analytics.png', null, null, 'images/dearly.png', null];
     var S2_SOURCE = window.S2_PROJECT_DATA || [];
     var GRID_CARDS = CARDS.map(function (c, i) {
       var d = S2_SOURCE[i] || {};

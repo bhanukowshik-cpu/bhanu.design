@@ -1,0 +1,135 @@
+/* Smoked glass primary CTA, ported from the approved glass material study. */
+.cta-glass {
+  --cta-glass-background:
+    radial-gradient(101.79% 101.79% at 65.61% 81.79%, #ffffff40, transparent),
+    radial-gradient(114.65% 114.65% at 9.73% 17.27%, #454545, #080808);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  border: 0;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -.13px;
+  color: #fff;
+  cursor: pointer;
+  background: var(--cta-glass-background);
+  box-shadow:
+    inset -3px -3px 4px #ffffff38,
+    inset 4px 4px 4px #0006;
+  transition: transform .16s ease-out;
+}
+
+.cta-glass .label,
+.cta-glass svg {
+  position: relative;
+  z-index: 3;
+}
+
+.cta-glass svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.cta-glass .edge-wrap {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  filter: blur(1px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cta-glass .edge {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 3px;
+  opacity: .45;
+  background: linear-gradient(176.87deg, #ffffff80 8.56%, #fff0 85.04%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+.cta-glass::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  z-index: 0;
+  opacity: 0;
+  background: rgba(255, 255, 255, .6);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+
+.cta-glass:hover {
+  background: var(--cta-glass-background);
+  transform: scale(1.03);
+}
+
+.cta-glass:hover::after { opacity: .4; }
+.cta-glass:active { transform: scale(.97); }
+
+.cta-glass:focus-visible {
+  outline: 2px solid #888;
+  outline-offset: 6px;
+}
+
+@media (min-width: 761px) {
+  .cta-glass { padding: 14px 23px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-glass,
+  .cta-glass::after { transition: none; }
+}
+
+/* Secondary: white glass, ported from the design system (verified-ds glass-cta.css, N6).
+   Same anatomy and light model as the primary, inverted body. */
+.cta-glass--light {
+  --cta-glass-background:
+    radial-gradient(101.79% 101.79% at 65.61% 81.79%, rgba(255, 255, 255, .88), #fff0),
+    radial-gradient(114.65% 114.65% at 9.73% 17.27%, #ffffff, #dadada);
+  color: var(--ink);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 0 0 .5px rgba(37, 37, 37, .20),
+    inset -3px -3px 4px #fff,
+    inset 4px 4px 4px rgba(37, 37, 37, .12);
+}
+.cta-glass--light .edge {
+  opacity: .9;
+  background: linear-gradient(176.87deg, #fff 8.56%, rgba(37, 37, 37, .08) 45%, rgba(37, 37, 37, .34) 92%);
+}
+.cta-glass--light::after {
+  inset: 0;
+  opacity: 0;
+  mix-blend-mode: normal;
+  background:
+    linear-gradient(105deg, #fff0 34%, rgba(255, 255, 255, .95) 50%, #fff0 66%) 100% 0 / 260% 100% no-repeat,
+    linear-gradient(rgba(255, 255, 255, .28), rgba(255, 255, 255, .28)) 0 0 / 100% 100% no-repeat;
+  transition: opacity .3s ease-out, background-position 0s linear .3s;
+}
+.cta-glass--light:hover::after {
+  opacity: 1;
+  background-position: 0 0, 0 0;
+  transition: opacity .16s ease-out, background-position .6s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cta-glass--light::after { display: none; }
+}
