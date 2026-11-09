@@ -145,6 +145,7 @@
     .sum dt { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-4); }
     .sum dd { font-size: 15px; line-height: 1.45; color: var(--ink); margin-top: 4px; }
     .sum dd span { color: var(--ink-3); }
+    .sum.sum-trim { grid-template-columns: .8fr 2fr; }
     .res-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
     .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 16px; }
     .kpi b { display: block; font-family: var(--font-display); font-weight: 400; font-size: clamp(34px, 3.2vw, 46px); line-height: 1; color: var(--ink); white-space: nowrap; }
@@ -436,6 +437,8 @@
       .grid3 { grid-template-columns: 1fr; }
       .seg [role="tab"] { padding: 0 11px; font-size: 12px; }
     }
+    @media (max-width: 1100px) { .sum.sum-trim > div:nth-child(2) { grid-column: auto; order: 0; border-top: 0; border-left: 1px solid var(--hair); padding-left: 30px; } }
+    @media (max-width: 860px) { .sum.sum-trim { grid-template-columns: 1fr; } .sum.sum-trim > div:nth-child(2) { border-left: 0; padding-left: 0; border-top: 1px solid var(--hair); } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
   </style>
 </head>
@@ -506,28 +509,20 @@
         </div>
 
         <!-- 30-second summary: the only place the numbers appear -->
-        <div class="sum in d4" id="summary">
+        <div class="sum sum-trim in d4" id="summary">
           <div>
             <dl>
-              <div><dt>Role</dt><dd>Founder. I did all the design and all the engineering.</dd></div>
+              <div><dt>Role</dt><dd>Founder, solo design and engineering</dd></div>
               <div><dt>Timeline</dt><dd>3 weeks, October 2026</dd></div>
-              <div><dt>Shipped</dt><dd>5 surfaces <span>· Mac app, Windows app, Chrome extension, web app, website, on one design system</span></dd></div>
+              <div><dt>Shipped</dt><dd>5 surfaces, one design system</dd></div>
             </dl>
           </div>
           <div>
-            <div class="res-head"><p class="eyebrow">Test results</p><a class="inline" href="https://verifiedcall.app/research" target="_blank" rel="noopener">Published at verifiedcall.app/research ↗</a></div>
+            <div class="res-head"><p class="eyebrow">Test results</p><a class="inline" href="https://verifiedcall.app/research" target="_blank" rel="noopener">verifiedcall.app/research ↗</a></div>
             <div class="kpis">
-              <div class="kpi"><b><span class="fade pre">30</span><i>/</i><span class="fade pre">30</span></b><span>tries caught, for each of 4 hidden AI answer tools</span><small>0 of 30 false alarms with no AI tool open. October 4, 2026.</small></div>
-              <div class="kpi"><b>0<i>/</i><span class="cu" data-to="3990">3,990</span></b><span>sessions with someone else's face got through</span><small>2,855 flagged, 1,135 held as "Can't confirm". Recordings of 70 people.</small></div>
-              <div class="kpi"><b><span class="fade pre">20</span><i>/</i><span class="fade pre">20</span></b><span>live Google Meet calls gave the right result</span><small>10 direct cameras verified, 10 face swaps through camera software flagged.</small></div>
-            </div>
-          </div>
-          <div>
-            <p class="eyebrow">Key decisions</p>
-            <div class="dlinks">
-              <a href="#d1">A result changes only when the fact does</a>
-              <a href="#d4">Tell the host, don't block the candidate</a>
-              <a href="#d3">Green only means verified</a>
+              <div class="kpi"><b><span class="fade pre">30</span><i>/</i><span class="fade pre">30</span></b><span>hidden AI tools caught</span></div>
+              <div class="kpi"><b>0<i>/</i><span class="cu" data-to="3990">3,990</span></b><span>face swaps got through</span></div>
+              <div class="kpi"><b><span class="fade pre">20</span><i>/</i><span class="fade pre">20</span></b><span>live Meet calls right</span></div>
             </div>
           </div>
         </div>
