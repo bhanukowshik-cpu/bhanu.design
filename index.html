@@ -5572,6 +5572,89 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     }
   </style>
 
+  <!-- ══ SECTION 2 · VERIFIED CALL (12 Nov) ══════════════════════════════════
+       Scrolling past the Golden Gate, the camera sinks through a cloud bank into downtown and
+       pushes in on the Verified Call tower; people walk the plaza, the floors light up, then the
+       card lands. The scene is vc-lab.html in a frame (layers in city/layers/vc/), driven by this
+       page's scroll (postMessage vc-scroll, 0..1 across the pinned run). The card is real HTML here
+       so it stays clickable while the frame ignores the pointer. Bump v= when vc-lab.html changes. -->
+  <section class="vcs" id="verifiedCall" aria-labelledby="vcsTitle">
+    <!-- the cloud bank's crown swells up over the bottom of the Golden Gate, so the scroll enters cloud, not a seam -->
+    <img class="vcs-fringe" src="city/layers/vc/cloud_a.webp" alt="" aria-hidden="true" decoding="async">
+    <div class="vcs-pin">
+      <iframe class="vcs-scene" id="vcScene" src="vc-lab.html?embed&amp;v=2" title="" aria-hidden="true" tabindex="-1" loading="lazy"></iframe>
+      <aside class="vcs-card" id="vcsCard">
+        <p class="vcs-meta"><span>Founder</span><span>Design + build, solo</span><span>3 weeks</span></p>
+        <h2 class="vcs-title" id="vcsTitle">Verified Call</h2>
+        <p class="vcs-line">Confirms the person on a hiring call is real, is who they say they are, and isn't reading answers from a hidden AI tool.</p>
+        <div class="vcs-stats">
+          <div><b>0 / 3,990</b><small>face swaps got through</small></div>
+          <div><b>30 / 30</b><small>hidden AI tools caught</small></div>
+          <div><b>20</b><small>companies in the closed beta</small></div>
+        </div>
+        <a class="vcs-go" href="verified-call.html">Read case study <span aria-hidden="true">&rarr;</span></a>
+      </aside>
+    </div>
+  </section>
+  <style>
+    .vcs{position:relative;z-index:2;height:400svh;background:#F2C9B8}
+    .vcs-fringe{position:absolute;left:50%;top:0;width:max(170vw,1500px);height:auto;max-width:none;z-index:3;
+                transform:translate(-50%,0);will-change:transform;pointer-events:none;user-select:none}
+    .vcs-pin{position:sticky;top:0;height:100svh;overflow:hidden}
+    .vcs-scene{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;background:#F2C9B8}
+    .vcs-card{position:absolute;right:clamp(16px,6vw,96px);top:50%;width:min(430px,calc(100vw - 32px));z-index:2;
+              padding:28px 28px 24px;border-radius:24px;color:#fff;font-family:var(--sans);
+              opacity:0;transform:translate(0,calc(-50% + 28px));pointer-events:none;
+              background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.04)),rgba(30,22,52,.3);
+              -webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);
+              box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 0 0 1px rgba(255,255,255,.14),0 24px 60px -20px rgba(30,16,48,.45);
+              transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+    .vcs-card.on{opacity:1;transform:translate(0,-50%);pointer-events:auto}
+    .vcs-meta{display:flex;flex-wrap:wrap;gap:10px;margin:0;font-family:var(--mono,'JetBrains Mono',monospace);font-size:11px;
+              letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+    .vcs-meta span+span::before{content:'·';margin-right:10px;opacity:.6}
+    .vcs-title{margin:14px 0 10px;font-size:clamp(28px,2.6vw,40px);font-weight:700;letter-spacing:-.01em;color:#fff}
+    .vcs-line{margin:0;font-size:15px;line-height:1.55;font-weight:500;color:rgba(255,255,255,.9)}
+    .vcs-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0;padding-top:18px;border-top:1px solid rgba(255,255,255,.2)}
+    .vcs-stats b{display:block;font-size:24px;font-weight:700;letter-spacing:-.01em}
+    .vcs-stats small{display:block;margin-top:4px;font-size:11.5px;line-height:1.35;color:rgba(255,255,255,.72);font-weight:500}
+    .vcs-go{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;color:#fff;text-decoration:none;
+            font-family:var(--mono,'JetBrains Mono',monospace);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+            background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.08));
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 0 0 1px rgba(255,255,255,.22);transition:background .3s}
+    .vcs-go:hover{background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.14))}
+    .vcs-go:focus-visible{outline:2px solid #fff;outline-offset:3px}
+    @media (max-width:767px){
+      .vcs-card{top:auto;bottom:16px;left:16px;right:16px;width:auto;padding:20px;transform:translate(0,28px)}
+      .vcs-card.on{transform:none}
+      .vcs-stats b{font-size:20px}
+    }
+    @media (prefers-reduced-motion:reduce){ .vcs-card{transition:none} }
+  </style>
+  <script>
+    (function () {   // pinned scroll → the scene (0..1) and the card
+      var sec = document.getElementById('verifiedCall'), f = document.getElementById('vcScene'),
+          card = document.getElementById('vcsCard'), fringe = sec && sec.querySelector('.vcs-fringe');
+      if (!sec || !f) return;
+      var raf = 0, last = -1;
+      function send() { raf = 0;
+        var r = sec.getBoundingClientRect(), run = Math.max(1, r.height - innerHeight);
+        var p = Math.min(1, Math.max(0, -r.top / run));
+        if (card) card.classList.toggle('on', p > 0.8);
+        // the crown starts tucked under the hero and swells up over the bay as the hero scrolls away
+        if (fringe) {
+          var k = Math.min(1, Math.max(0, 1 - r.top / innerHeight));
+          fringe.style.transform = 'translate(-50%,' + (-52 * (1 - Math.pow(1 - k, 2))).toFixed(2) + '%)';
+        }
+        if (Math.abs(p - last) < 0.0005) return; last = p;
+        try { f.contentWindow.postMessage({ type: 'vc-scroll', p: p }, location.origin); } catch (e) {}
+      }
+      addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(send); }, { passive: true });
+      addEventListener('resize', send);
+      f.addEventListener('load', function () { last = -1; send(); });
+    })();
+  </script>
+
   <section class="wk" id="work" aria-labelledby="wkTitle">
     <header class="wk-head">
       <div>
