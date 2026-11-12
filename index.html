@@ -5202,7 +5202,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .hero .hero-building{position:absolute;left:50%;top:16vh;transform:translateX(-50%);z-index:3;display:inline-flex;align-items:center;gap:6px;
         font-family:'JetBrains Mono',monospace;font-size:clamp(11px,.9vw,13px);letter-spacing:.12em;text-transform:uppercase;line-height:1.2;
         color:rgba(255,252,248,.88);text-decoration:none;white-space:nowrap;padding:4px 2px;transition:color .2s}
-      .hero .hero-building{margin:0;pointer-events:none}   /* status, not a CTA: the chat bar is the hero's one action (owner, 12 Nov) */
+      .hero .hero-building{display:none!important}   /* (12 Nov) cut: the first work card says it */
+      .hero .hero-building-old{margin:0;pointer-events:none}   /* status, not a CTA: the chat bar is the hero's one action (owner, 12 Nov) */
       .hero .hero-building b{font-weight:500;color:#FFFCF8}
       .hero .hero-building svg{width:1.1em;height:1.1em;transition:transform .25s}
       /* nav (owner, 12 Nov): no name, no avatar; About me · Work · Résumé · Contact on the right in one deep, colourless liquid-glass bar */
@@ -5249,7 +5250,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           var p = Math.min(1, Math.max(0, window.scrollY / Math.max(1, hero.offsetHeight)));
           try { f.contentWindow.postMessage({ type: 'poster-scroll', p: p }, location.origin); } catch (e) {}
           var hb = document.getElementById('heroBuilding');
-          if (hb) { var k = Math.min(1, p / 0.35); hb.style.opacity = String(1 - k * k * (3 - 2 * k));  }
+          if (hb) { var k = Math.min(1, p / 0.35);   }
         }
         addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(send); }, { passive: true });
         f.addEventListener('load', send);
@@ -5463,7 +5464,6 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <div class="nav-sheet" id="navSheet">
     <nav class="nav-sheet-inner" aria-label="Main menu">
       <a href="#work">Work</a>
-      <a href="#shortsSection">Shorts</a>
       <a href="#aboutSection">About</a>
       <a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a>
       <a href="#contactSection">Contact</a>
@@ -5721,7 +5721,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <header class="wk-head">
       <div>
         <p class="wk-eyebrow">Selected work</p>
-        <h2 class="wk-title" id="wkTitle">Shipped products, <span class="serif">real numbers.</span></h2>
+        <h2 class="wk-title" id="wkTitle">Selected work</h2>
         <button type="button" class="cm-pause" id="cmPause" aria-pressed="false">Pause motion</button>
       </div>
     </header>
@@ -5749,7 +5749,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <img class="wk-still" src="images/vc/meet-look.webp" alt="Verified Call panel inside Google Meet naming ChatGPT and when it used the microphone" loading="lazy" width="1200" height="1005">
         </div>
         <div class="wk-body">
-          <p class="wk-meta"><span>Founder</span><span>Design + build, solo</span><span>3 weeks</span></p>
+          <p class="wk-meta"><span>Founder</span></p>
           <h3 class="wk-name" id="wk-n1">Verified Call</h3>
           <p class="wk-line">I'm building Verified Call solo, to remove cheating from video calls.</p>
           <p class="cm-pills"><span><b>20 companies</b> in the closed beta</span><span><b>3 weeks</b> to build, solo</span><span><i></i>Now in go-to-market</span></p>
@@ -5789,7 +5789,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </div>
       </a>
 
-      <a class="wk-card wk-5" href="stressie-studio.html" aria-labelledby="wk-n4">
+      <a class="wk-card wk-5" href="stressie-studio.html" hidden aria-labelledby="wk-n4">
         <div class="wk-media wk-ss">
           <span class="wk-num">12% to 56% engagement</span>
           <span class="wk-go">Read case study &rarr;</span>
@@ -5804,7 +5804,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </div>
       </a>
 
-      <a class="wk-card wk-7" href="stressie-v4.html" aria-labelledby="wk-n5">
+      <a class="wk-card wk-12" href="stressie-v4.html" aria-labelledby="wk-n5">
         <div class="wk-media wk-v4">
           <span class="wk-num">Built in SwiftUI</span>
           <span class="wk-go">Read case study &rarr;</span>
@@ -5814,10 +5814,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <img class="coin" src="images/thumbs/coin.webp" alt="" loading="lazy">
         </div>
         <div class="wk-body">
-          <p class="wk-meta"><span>Founding designer</span><span>Design + build</span></p>
+          <p class="wk-meta"><span>Founding designer</span></p>
           <h3 class="wk-name" id="wk-n5">Stressie V4</h3>
           <p class="wk-line">A stress check-in that pays for your evening. Designed in Figma, built in SwiftUI by me.</p>
-          <p class="cm-pills"><span><b>171 Swift files</b> built solo</span><span><b>3 languages</b></span><span><i></i>Pilots: Amazon, InKind, Austin PD</span></p>
+          <p class="cm-pills"><span><b>12% → 56%</b> daily engagement</span><span><b>$600K</b> funding unlocked</span><span><b>171 Swift files</b> built solo</span><span><b>3 languages</b></span></p>
           <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
         </div>
       </a>
@@ -5830,7 +5830,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <video data-wk-hover src="images/thumbs/dearly.mp4" muted loop playsinline preload="none"></video>
         </div>
         <div class="wk-body">
-          <p class="wk-meta"><span>Solo build</span><span>48 hours</span></p>
+          <p class="wk-meta"><span>Solo build</span></p>
           <h3 class="wk-name" id="wk-n6">Dearly</h3>
           <p class="wk-line">Voice letters you can hear and keep.</p>
           <p class="cm-pills"><span><b>140+</b> letters sent</span><span><b>35</b> five-star ratings</span><span><b>48 hours</b>, built solo</span></p>
@@ -5851,6 +5851,13 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .cm-pause{align-self:flex-end;font:600 13px 'Montserrat',sans-serif;color:rgba(255,255,255,.7);background:none;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 14px;cursor:pointer}
     .cm-pause:hover,.cm-pause:focus-visible{color:#fff;border-color:rgba(255,255,255,.4);outline:none}
     html.motion-paused .cm *,html.motion-paused .cm *::before,html.motion-paused .cm *::after{animation-play-state:paused!important;transition:none!important}
+    /* content pass (12 Nov, owner-approved): hidden blocks stay in the file, one attribute to bring back */
+    .wk-card[hidden],#shortsSection[hidden],.dna2-tile[hidden],.ft-cta-dock[hidden],.ft-note[hidden]{display:none!important}
+    #work .wk-links{display:none!important}
+    #work .wk-eyebrow{display:none!important}   /* the heading now says it */
+    .reel-fab{display:none!important}           /* shorts are off the homepage */
+    .dna2-legend{display:none!important}
+    .ft-contact .ft-mail a{font-size:clamp(20px,2vw,28px);font-weight:600}
     /* one type family with the hero (owner, 12 Nov) */
     #work, #work .wk-title, #work .wk-title .serif, #work .wk-name, #work .wk-line, #work .wk-meta, #work .wk-links, #work .wk-eyebrow, #work .cm-pills{font-family:'Montserrat',sans-serif!important}
     #work .wk-title{font-weight:700;letter-spacing:-.025em}
@@ -6585,7 +6592,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     }
   </style>
 
-  <section class="reel-section" id="shortsSection" aria-label="Short-form films">
+  <section class="reel-section" id="shortsSection" aria-label="Short-form films" hidden>
     <div class="reel-head">
       <div>
         <h2 class="reel-title">Short films on the <span class="serif">psychology</span> behind products people trust.</h2>
@@ -6671,7 +6678,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <div class="abt-pane is-active" id="abt-dna">
             <div class="dna2">
               <div class="dna2-aside">
-                <h2 class="dna2-heading">The shape of how I <span class="circled serif">work.</span></h2>
+                <h2 class="dna2-heading">How I <span class="circled serif">work.</span></h2>
                 <p class="dna2-lede">Strategy and research up front, craft at the core,
                    and I build what I design.</p>
                 <div class="dna2-legend">
@@ -6690,7 +6697,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
                     <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Customer Dis&shy;covery</span>
                     <span class="dna2-q" hidden>I listen to what people <em>say</em>, then watch what they do. Most early calls are just listening.</span>
                   </button>
-                  <button class="dna2-tile" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Strategy.svg')">
+                  <button class="dna2-tile" data-cut hidden style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Strategy.svg')">
                     <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Product Strategy</span>
                     <span class="dna2-q" hidden>Beautiful work that ships the wrong thing is still wrong. I sweat <em>what</em> we build before <em>how</em> it looks.</span>
                   </button>
@@ -6702,22 +6709,22 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
                     <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Product Builder</span>
                     <span class="dna2-q" hidden>I don't hand off and walk away. I sit with engineers until it's <em>real and shipped</em>.</span>
                   </button>
-                  <button class="dna2-tile" style="--c1:#6FE0A0;--c2:#1FA55E;--lc:#34BE72;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg')">
+                  <button class="dna2-tile" data-cut hidden style="--c1:#6FE0A0;--c2:#1FA55E;--lc:#34BE72;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg')">
                     <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Engi&shy;neering Collab</span>
                     <span class="dna2-q" hidden>I speak enough engineering to know what's cheap, what's pricey, and when &ldquo;it's complicated&rdquo; means <em>no</em>.</span>
                   </button>
                 </div>
                 <div class="dna2-lower">
                   <div class="dna2-stem">
-                      <button class="dna2-tile" style="--c1:#5FD9B4;--c2:#149E78;--lc:#1FC096;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg')">
+                      <button class="dna2-tile" data-cut hidden style="--c1:#5FD9B4;--c2:#149E78;--lc:#1FC096;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg')">
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Research</span>
                         <span class="dna2-q" hidden>I'd rather <em>kill my idea in a 20-minute interview</em> than defend it for six months in production.</span>
                       </button>
-                      <button class="dna2-tile" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/First%20Principles.svg')">
+                      <button class="dna2-tile" data-cut hidden style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/First%20Principles.svg')">
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">First Prin&shy;ciples</span>
                         <span class="dna2-q" hidden>I break problems down to what's <em>actually true</em>, then build back up. Best practices are someone else's constraints.</span>
                       </button>
-                      <button class="dna2-tile" style="--c1:#CD7CEE;--c2:#B0379E;--lc:#CB5AD0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg')">
+                      <button class="dna2-tile" data-cut hidden style="--c1:#CD7CEE;--c2:#B0379E;--lc:#CB5AD0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg')">
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Systems Thinking</span>
                         <span class="dna2-q" hidden>I design the <em>system</em>, not the screen. One component should answer ten questions you haven't asked yet.</span>
                       </button>
@@ -6725,7 +6732,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">AI Native</span>
                         <span class="dna2-q" hidden>AI isn't a feature I bolt on. It's a <em>material I design with</em>. I prototype, ship, and think AI-native.</span>
                       </button>
-                      <button class="dna2-tile" style="--c1:#5FE0CE;--c2:#12A38E;--lc:#1FC0A8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')">
+                      <button class="dna2-tile" data-cut hidden style="--c1:#5FE0CE;--c2:#12A38E;--lc:#1FC0A8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')">
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Measured Impact</span>
                         <span class="dna2-q" hidden>If I can't tie it to a <em>number that moved</em>, it was decoration. I design for outcomes.</span>
                       </button>
@@ -6859,7 +6866,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
           <!-- the hero's own button, so the page closes on the same invitation
                it opened with rather than on a floating orb in the corner -->
-          <div class="ft-cta-dock">
+          <div class="ft-cta-dock" hidden>
             <button class="cta" id="ftTalk" aria-label="Chat with Bhanu AI" aria-haspopup="dialog">
               <span class="cta-orb" id="ftCtaOrb"><div id="ftOrbMount"></div></span>
               <span class="cta-text" id="ftCtaText">
@@ -6896,7 +6903,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           </div>
         </div>
 
-        <div class="ft-note" id="ftNote">
+        <div class="ft-note" id="ftNote" hidden>
           <span class="ft-k">A small note for you</span>
           <div class="ft-paper">
             <p class="ft-letter">You&rsquo;ve probably noticed the pattern.<br>I like messy problems with no obvious answer. Give me one.<br>I&rsquo;ll find what matters, make it simple, and ship it.</p>
