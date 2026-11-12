@@ -22,19 +22,17 @@
 <style>
   :root{--ink:#1F1B24;--paper:#FFFCF8;--muted:#6E6774;--pin:#D9483B;--font:'Montserrat',sans-serif;--mono:'JetBrains Mono',monospace}
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;overflow:hidden;background:#6E9FA3;font-family:var(--font);color:var(--ink)}
-  canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
-  canvas#gl.drag{cursor:grabbing}
+  html,body{background:#6E9FA3;font-family:var(--font);color:var(--ink);overflow-x:hidden}
+  #tour{height:900vh}                                  /* scroll length of the camera tour */
+  .hint{position:fixed;left:50%;bottom:58px;transform:translateX(-50%);z-index:5;font:600 13px var(--font);color:#fff;letter-spacing:.02em;
+        background:rgba(31,27,36,.35);padding:8px 14px;border-radius:999px;transition:opacity .5s;pointer-events:none}
+  canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
   .pill{position:fixed;z-index:5;background:var(--paper);border-radius:16px;box-shadow:0 2px 0 rgba(0,0,0,.08),0 10px 30px -12px rgba(20,30,40,.35)}
   .brand{left:20px;top:20px;padding:9px 18px 9px 9px;font-weight:700;font-size:17px;display:flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none}
   .brand canvas{width:40px;height:40px;border-radius:11px;background:#E6F28D;image-rendering:pixelated;image-rendering:crisp-edges}
   .nav{right:20px;top:20px;padding:12px 10px;display:flex;gap:4px}
   .nav a{color:var(--ink);text-decoration:none;font-weight:600;font-size:15px;padding:4px 12px;border-radius:10px}
   .nav a:hover{background:#F1ECE4}
-  /* zoom stays available but quiet: one small pill (scroll / pinch zoom anyway) */
-  .zoom{right:20px;bottom:20px;display:flex;flex-direction:column;padding:4px;border-radius:13px;opacity:.9}
-  .zoom button{width:34px;height:34px;border:0;border-radius:9px;background:none;font-size:18px;line-height:1;color:var(--ink);cursor:pointer}
-  .zoom button:hover{background:#F1ECE4}
   .status{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:5;font-family:var(--mono);font-size:12px;
           letter-spacing:.06em;color:#fff;opacity:.85;white-space:nowrap}
   /* labels that follow 3D anchors */
@@ -113,11 +111,8 @@
 
 <a class="pill brand" href="./" aria-label="Bhanu Kowshik, home"><canvas id="avatar" width="16" height="16" aria-hidden="true"></canvas>Bhanu Kowshik</a>
 <nav class="pill nav"><a href="./#about">About me</a><a href="./#work">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a><a href="./#contact">Contact</a></nav>
-<div class="pill zoom">
-  <button id="zin" aria-label="Zoom in">+</button>
-  <button id="zout" aria-label="Zoom out">−</button>
-  <button id="zhome" aria-label="Recenter">◎</button>
-</div>
+<div id="tour" aria-hidden="true"></div>
+<div class="hint" id="hint">Scroll to explore San Francisco</div>
 <div class="status" id="status"></div>
 
 <div class="cs-back" id="csBack"></div>
@@ -212,7 +207,11 @@ const STREETS = [
   { axis: 'z', at: 6,   w: 7,  name: 'Montgomery' },
   { axis: 'z', at: 40,  w: 9,  name: 'Embarcadero', rails: 'streetcar' },
 ];
-mesh(rbox(ISLAND + 1.2, 3, ISLAND + 1.2, 0.5), M('#B3A28B'), 0, -1.6, 0);
+// ONE landmass (owner: SF is a city, not islands): stone sides, asphalt top; paved blocks sit on it and the
+// streets are the gaps between them. Districts keep their real relative places; ordinary blocks fill the rest.
+const LAND = { x0: -164, x1: 54, z0: -154, z1: 154 };
+mesh(rbox(LAND.x1 - LAND.x0, 3, LAND.z1 - LAND.z0, 0.6), M('#B3A28B'), (LAND.x0 + LAND.x1) / 2, -1.6, (LAND.z0 + LAND.z1) / 2);
+mesh(box(LAND.x1 - LAND.x0, 0.2, LAND.z1 - LAND.z0), M('#666A72'), (LAND.x0 + LAND.x1) / 2, -0.02, (LAND.z0 + LAND.z1) / 2).castShadow = false;
 { const pave = canvasTex(256, 256, (g, w, h) => {
     g.fillStyle = '#E9DFCD'; g.fillRect(0, 0, w, h);
     g.strokeStyle = 'rgba(160,140,110,.22)'; g.lineWidth = 2;
@@ -254,7 +253,7 @@ const XS = [-50, -29.5, -22.5, 2.5, 9.5, 35.5, 44.5, 50], ZS = [-50, -25.5, -18.
 
 /* ══════════════ water ══════════════ */
 // district tiles (centre x, centre z, half-width, half-depth); downtown first, the others are added below
-const TILES = [new THREE.Vector4(0, 0, 50, 50)];
+const TILES = [new THREE.Vector4(-55, 0, 109, 154), new THREE.Vector4(56.5, 3, 6, 20)];   // the land + the Ferry Building pier
 const waterU = { uTime: { value: 0 }, uCol: { value: WATER.clone() }, uLight: { value: new THREE.Color('#9CC6C6') },
   uTiles: { value: Array.from({ length: 8 }, () => new THREE.Vector4(9999, 9999, 0, 0)) } };
 const water = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200), new THREE.ShaderMaterial({
@@ -264,14 +263,29 @@ const water = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200), new THREE.Shad
     float h(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
     float n(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f); return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y); }
     void main(){
-      vec2 p = vW * vec2(0.55, 1.6) + vec2(uTime * 0.25, uTime * 0.05);
-      float s = smoothstep(0.78, 0.93, n(p)) * 0.32 + smoothstep(0.84, 0.97, n(p * 2.3 - uTime * 0.1)) * 0.18;
-      // shoreline foam: distance to the island square
+      // distance to the shore (land rects), in world units
       float d = 1e5;
       for (int i = 0; i < 8; i++) { vec2 q = abs(vW - uTiles[i].xy) - uTiles[i].zw - 0.6; d = min(d, length(max(q, 0.)) + min(max(q.x, q.y), 0.)); }
-      float foam = (1. - smoothstep(0.0, 1.6, d)) * (0.55 + 0.45 * sin(d * 5. - uTime * 2.));
-      vec3 c = mix(uCol, uLight, s);
-      c = mix(c, vec3(0.96, 0.97, 0.95), clamp(foam, 0., 1.) * 0.7);
+      // depth: turquoise shallows along the shore, deepening teal further out
+      vec3 deep = uCol * 0.92, shallow = mix(uCol, uLight, 0.62) + 0.02;
+      vec3 c = mix(shallow, deep, smoothstep(1.0, 16.0, d));
+      // soft rolling crests: long, domain-warped bands, low contrast (no rain-like streaks)
+      float warp = n(vW * 0.035 + uTime * 0.02) * 6.0;
+      float b1 = sin(vW.x * 0.21 + vW.y * 0.13 + warp - uTime * 0.7);
+      float b2 = sin(vW.x * -0.12 + vW.y * 0.27 + warp * 0.7 + uTime * 0.5);
+      // broken into short soft dashes by a patchy mask, so they read as wavelets, not a net
+      float pmask = smoothstep(0.55, 0.85, n(vW * 0.14 + vec2(uTime * 0.06, 0.0)));   // (the word patch is reserved in GLSL ES 3)
+      float crest = smoothstep(0.95, 1.0, b1) * pmask;
+      crest += smoothstep(0.97, 1.0, b2) * smoothstep(0.6, 0.9, n(vW * 0.17 - uTime * 0.05)) * 0.7;
+      c = mix(c, uLight * 1.05 + 0.03, clamp(crest, 0., 1.) * 0.2);
+      // a few slow glints
+      c += vec3(1.0) * smoothstep(0.985, 1.0, n(vW * 0.6 + uTime * 0.35)) * 0.12 * smoothstep(3.0, 14.0, d);
+      // shore: a crisp foam lip, then lines of surf breaking toward the land
+      float lip = 1.0 - smoothstep(0.4, 1.5, d);
+      float surfPhase = fract(d * 0.16 + uTime * 0.22);
+      float surf = smoothstep(0.84, 0.93, surfPhase) * (1.0 - smoothstep(0.93, 1.0, surfPhase)) * (1.0 - smoothstep(1.5, 9.0, d));
+      surf *= 0.55 + 0.45 * n(vW * 0.5 + uTime * 0.3);
+      c = mix(c, vec3(0.97, 0.98, 0.96), clamp(lip * 0.95 + surf * 0.7, 0., 1.));
       gl_FragColor = vec4(c, 1.);
       #include <colorspace_fragment>
     }`
@@ -893,18 +907,11 @@ addWalker([[14, -16], [31, -16], [31, -15.9], [14, -15.9]], { shirt: '#E7E1D6' }
 // (owner, 12 Nov: "the whole of SF" — Lombard Street, the Palace of Fine Arts, the Painted Ladies,
 // the Mission). Laid out roughly where they really are: north = up-left on screen, west = left.
 function districtTile(cx, cz, hw, hd, name) {
-  TILES.push(new THREE.Vector4(cx, cz, hw, hd));
-  mesh(rbox(hw * 2 + 1.2, 3, hd * 2 + 1.2, 0.5), M('#B3A28B'), cx, -1.6, cz);
   const pave = canvasTex(256, 256, (g, w, h) => {
     g.fillStyle = '#E9DFCD'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(160,140,110,.22)'; g.lineWidth = 2;
     for (let i = 0; i <= 4; i++) { g.beginPath(); g.moveTo(i * 64, 0); g.lineTo(i * 64, h); g.stroke(); g.beginPath(); g.moveTo(0, i * 64); g.lineTo(w, i * 64); g.stroke(); } });
   pave.wrapS = pave.wrapT = THREE.RepeatWrapping; pave.repeat.set(hw / 2, hd / 2);
   mesh(box(hw * 2, 0.2, hd * 2), [M('#E9DFCD'), M('#E9DFCD'), new THREE.MeshStandardMaterial({ map: pave, roughness: 0.95 }), M('#E9DFCD'), M('#E9DFCD'), M('#E9DFCD')], cx, 0, cz).castShadow = false;
-  // the district's name, painted on the ground at its near edge (like a big street stencil)
-  const label = canvasTex(1024, 160, (g, w, h) => { g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(120,96,70,.55)';
-    g.font = '800 120px Montserrat, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(name.toUpperCase(), w / 2, h / 2 + 6); });
-  const lp = mesh(new THREE.PlaneGeometry(Math.min(hw * 1.5, 46), Math.min(hw * 1.5, 46) * 0.156), new THREE.MeshStandardMaterial({ map: label, transparent: true, roughness: 1 }),
-    cx, 0.13, cz + hd - 4); lp.rotation.x = -Math.PI / 2; lp.castShadow = false;
 }
 function road(x0, z0, x1, z1, w = 6) {                                     // a causeway between tiles
   const len = Math.hypot(x1 - x0, z1 - z0), g = new THREE.Group(); g.position.set((x0 + x1) / 2, 0, (z0 + z1) / 2);
@@ -944,7 +951,6 @@ function hedge(x, y, z, s = 1) {                                           // Lo
 
 /* — Russian Hill + North Beach: Lombard Street's switchbacks down a steep block, Coit Tower — */
 districtTile(-20, -112, 40, 35, 'Russian Hill');
-road(-26, -77, -26, -50, 7);                                              // Grant Ave runs north out of downtown
 const LOMB = { x0: -56, x1: -22, h0: 15, h1: 0.4, z0: -126, z1: -98 };      // the hill: high in the west, low in the east
 const hillY = x => THREE.MathUtils.clamp(LOMB.h1 + (LOMB.h0 - LOMB.h1) * (LOMB.x1 - x) / (LOMB.x1 - LOMB.x0), LOMB.h1, LOMB.h0);
 { const sh = new THREE.Shape(); sh.moveTo(LOMB.x0, 0); sh.lineTo(LOMB.x1, 0); sh.lineTo(LOMB.x1, LOMB.h1); sh.lineTo(LOMB.x0, LOMB.h0); sh.closePath();
@@ -992,7 +998,6 @@ cityBlock(27, -136, 10, 8, 9, '#C9B79E', { tank: 1 });
 
 /* — the Marina: the Palace of Fine Arts on its lagoon — */
 districtTile(-125, -118, 35, 30, 'Marina');
-road(-90, -112, -60, -112, 6);
 const swans = [];
 { // lagoon
   const lag = mesh(new THREE.CylinderGeometry(15, 15, 0.3, 40), new THREE.MeshStandardMaterial({ color: '#6FA3A6', roughness: 0.25, metalness: 0.05 }), -137, 0.12, -114);
@@ -1027,7 +1032,6 @@ for (let i = 0; i < 4; i++) victorian(-152 + i * 5, -142, HILLCOL[(i + 1) % 7], 
 
 /* — Alamo Square: the Painted Ladies across from the hilltop park — */
 districtTile(-120, -5, 35, 35, 'Alamo Square');
-road(-85, -22, -50, -22, 7);                                              // California St heads west
 mesh(rbox(40, 2.2, 20, 1), M('#8FB466'), -122, 1, 5);                      // the park, raised like the real hill
 for (const [x, z] of [[-138, 0], [-133, 11], [-120, 12], [-108, 4], [-106, 10], [-126, -2]]) { const t = tree(x, z, 1); t.position.y = 2.2; }
 for (const [x, z, c] of [[-128, 6, '#D9483B'], [-116, 7, '#3E6FB0'], [-111, 2, '#E7B54A']]) {
@@ -1041,7 +1045,6 @@ cityBlock(-96, -27, 8, 10, 8, '#D9C2A0', { awning: '#3F8F6B' });
 
 /* — the Mission: Dolores Park on its slope, Mission Dolores, murals, a taco truck, BART — */
 districtTile(-45, 112, 45, 35, 'Mission');
-road(-10, 50, -10, 77, 7);                                                // Mission St runs south-west out of downtown
 { // Dolores Park: a lawn sloping up to the west, with palms and people on blankets
   const sh = new THREE.Shape(); sh.moveTo(-88, 0); sh.lineTo(-56, 0); sh.lineTo(-56, 0.6); sh.lineTo(-88, 5); sh.closePath();
   const park = mesh(new THREE.ExtrudeGeometry(sh, { depth: 46, bevelEnabled: false }), M('#8FB466'), 0, 0.1, 82); park.castShadow = false;
@@ -1097,6 +1100,66 @@ addWalker([[-150, -100], [-110, -100], [-110, -99.9], [-150, -99.9]], { dog: '#E
 
 // a car winding down Lombard, one switchback at a time
 const lombardCar = car('#3E6FB0'); const lombardState = { d: 0 };
+
+/* ══════════════ the neighbourhoods in between (one continuous city) ══════════════ */
+// A grid of ordinary blocks fills every gap between the districts: rowhouse streets, mid-rises and
+// pocket parks, with Oracle Park on the south waterfront. Houses are two meshes each (cheap).
+const houseTex = canvasTex(128, 192, (g, w, h) => {
+  g.fillStyle = '#FFFFFF'; g.fillRect(0, 0, w, h);
+  for (const [x, y] of [[18, 22], [74, 22], [18, 84], [74, 84]]) { g.fillStyle = '#F6F2EA'; g.fillRect(x - 5, y - 5, 46, 52); g.fillStyle = '#4C6A8C'; g.fillRect(x, y, 36, 42); g.fillStyle = 'rgba(255,255,255,.3)'; g.fillRect(x + 4, y + 4, 8, 34); }
+  g.fillStyle = '#F6F2EA'; g.fillRect(44, 140, 40, 52); g.fillStyle = '#7A3B2E'; g.fillRect(50, 146, 28, 46);
+  g.fillStyle = '#F6F2EA'; g.fillRect(0, 0, w, 8);
+});
+const houseMats = {}, roofGeo = (() => { const sh = new THREE.Shape(); sh.moveTo(-2.25, 0); sh.lineTo(0, 1.9); sh.lineTo(2.25, 0); sh.closePath();
+  return new THREE.ExtrudeGeometry(sh, { depth: 6.3, bevelEnabled: false }); })();
+const ROOF = M('#5B4A5C');
+function rowhouse(x, z, col, ry, h) {
+  const g = new THREE.Group(); g.position.set(x, 0.1, z); g.rotation.y = ry; scene.add(g);
+  const front = houseMats[col] || (houseMats[col] = new THREE.MeshStandardMaterial({ color: col, map: houseTex, roughness: 0.9 }));
+  const side = M(col);
+  mesh(box(4, h, 6), [side, side, side, side, front, side], 0, h / 2, 0, g);
+  mesh(roofGeo, ROOF, 0, h, -3.15, g);
+}
+function oraclePark(x, z) {
+  const g = new THREE.Group(); g.position.set(x, 0.1, z); scene.add(g);
+  const BRICK = M('#A4533E'), STAND = M('#2F5A7A');
+  mesh(new THREE.CylinderGeometry(9, 9, 0.12, 40, 1, false, Math.PI * 0.75, Math.PI * 1.5), M('#7FB05A'), 0, 0.12, 0, g).castShadow = false;
+  const dirt = mesh(new THREE.BoxGeometry(4, 0.13, 4), M('#C99A6A'), 0, 0.14, 3.6, g); dirt.rotation.y = Math.PI / 4; dirt.castShadow = false;
+  for (let i = 0; i < 12; i++) { const a = Math.PI * 0.8 + i / 11 * Math.PI * 1.4;              // stands, stepping up
+    const st = new THREE.Group(); st.position.set(Math.cos(a) * 9.8, 0, Math.sin(a) * 9.8); st.rotation.y = -a + Math.PI / 2; g.add(st);
+    mesh(box(5.4, 2.4, 2.2), STAND, 0, 1.2, 0, st); mesh(box(5.4, 3.6, 1.6), BRICK, 0, 1.8, -1.6, st); }
+  for (const a of [Math.PI * 0.85, Math.PI * 2.15]) { mesh(new THREE.CylinderGeometry(0.12, 0.15, 10, 8), M('#C9CDD2'), Math.cos(a) * 11, 5, Math.sin(a) * 11, g);
+    mesh(box(2.2, 1.2, 0.3), M('#F7F4EE', { emissive: '#FFFFFF', emissiveIntensity: 0.2 }), Math.cos(a) * 11, 10.2, Math.sin(a) * 11, g); }
+  mesh(new THREE.CylinderGeometry(0.5, 0.8, 4.2, 12), M('#C23B2E'), 7.5, 2.2, -7.5, g);                    // the giant soda bottle
+  mesh(new THREE.SphereGeometry(1.6, 14, 10), M('#B98A4E'), 4, 1.6, -9, g).scale.set(1, 0.8, 0.6);         // and the glove
+  g.traverse(o => { if (o.isMesh) o.userData.card = 'oracle'; });
+}
+{
+  const DISTRICTS = [[-50, 50, -50, 50], [-60, 20, -147, -77], [-160, -90, -148, -88], [-155, -85, -40, 30], [-90, 0, 77, 147]];
+  const HC = ['#E7A7B6', '#9FC7C2', '#F2D18C', '#A9B8E0', '#C9E0A8', '#F0C4A0', '#B9D3E8', '#E8D9C4', '#D7C0E0'];
+  const pave = canvasTex(64, 64, (g, w, h) => { g.fillStyle = '#E9DFCD'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(160,140,110,.22)'; g.lineWidth = 2; g.strokeRect(0, 0, w, h); });
+  pave.wrapS = pave.wrapT = THREE.RepeatWrapping; pave.repeat.set(5, 5);
+  const paveTop = new THREE.MeshStandardMaterial({ map: pave, roughness: 0.95 }), paveSide = M('#E9DFCD');
+  const hits = (x0, x1, z0, z1) => DISTRICTS.some(([a, b, c, d]) => x0 < b + 2 && x1 > a - 2 && z0 < d + 2 && z1 > c - 2);
+  for (let cx = LAND.x0 + 13; cx + 13 <= LAND.x1 + 0.1; cx += 26) for (let cz = LAND.z0 + 13; cz + 13 <= LAND.z1 + 0.1; cz += 26) {
+    const B = 9.5; if (hits(cx - B, cx + B, cz - B, cz + B)) continue;
+    mesh(box(B * 2, 0.2, B * 2), [paveSide, paveSide, paveTop, paveSide, paveSide, paveSide], cx, 0, cz).castShadow = false;
+    if (Math.abs(cx - 31) < 1 && Math.abs(cz - 93) < 14) { oraclePark(cx, cz); continue; }
+    const r = rand();
+    if (r < 0.5) {                                                 // rowhouses: a front row facing the camera + a side row
+      for (let i = 0; i < 4; i++) rowhouse(cx - 6.6 + i * 4.4, cz + B - 3.4, HC[Math.floor(rand() * HC.length)], 0, 5 + Math.floor(rand() * 3));
+      for (let i = 0; i < 3; i++) rowhouse(cx + B - 3.4, cz - 6 + i * 4.4, HC[Math.floor(rand() * HC.length)], Math.PI / 2, 5 + Math.floor(rand() * 3));
+      tree(cx - 3, cz - 4, 0.8); tree(cx - 7, cz - 7, 0.7);
+    } else if (r < 0.78) {                                         // mid-rises
+      cityBlock(cx - 4, cz + 3, 9, 10, 7 + Math.floor(rand() * 9), HC[Math.floor(rand() * HC.length)], { tank: rand() > 0.5, awning: rand() > 0.5 ? '#3F8F6B' : undefined });
+      cityBlock(cx + 5, cz - 4, 7, 9, 6 + Math.floor(rand() * 6), '#D9CBB5', { tank: rand() > 0.6 });
+    } else {                                                       // pocket park
+      mesh(box(B * 2 - 2, 0.06, B * 2 - 2), M('#9EBB6A'), cx, 0.13, cz).castShadow = false;
+      for (let i = 0; i < 4; i++) tree(cx - 5 + rand() * 10, cz - 5 + rand() * 10, 0.9 + rand() * 0.3);
+      bench(cx, cz + 6, 0);
+    }
+  }
+}
 
 /* ══════════════ Chinatown lanterns across Grant Avenue (they move with the wind) ══════════════ */
 const lanternStrings = [];
@@ -1225,6 +1288,9 @@ const CARDS = {
   mission: { kind: 'Postcard', title: 'The Mission', html: `
       <div class="stamp">MISSION<br>DOLORES<br>1776</div><p class="eyebrow">A memory in San Francisco</p><h2>The Mission</h2>
       <p>Placeholder memory: Dolores Park on a sunny Saturday, a burrito, the murals on Clarion Alley.</p><div class="row"><span>San Francisco</span><span>Postcard</span></div>` },
+  oracle: { kind: 'Postcard', title: 'Oracle Park', html: `
+      <div class="stamp">GIANTS<br>⚾<br>SF</div><p class="eyebrow">A memory in San Francisco</p><h2>Oracle Park</h2>
+      <p>Placeholder memory: a Giants game at sunset, kayaks waiting in McCovey Cove.</p><div class="row"><span>San Francisco</span><span>Postcard</span></div>` },
   park: { kind: 'Postcard', title: 'Union Square', html: `
       <div class="stamp">DESIGN<br>+<br>BUILD</div>
       <p class="eyebrow">Union Square, where I work</p><h2>Hi, I'm Bhanu</h2>
@@ -1300,15 +1366,6 @@ function addTag(key, worldPos, post = false) {
   anchors.push({ el, p: worldPos.clone(), key });
 }
 pin3D(25, 37.5, -8, 'vc'); addTag('vc', new THREE.Vector3(21, 39, -9));
-addTag('ferry', new THREE.Vector3(56.5, 29, 3), true);
-addTag('transamerica', new THREE.Vector3(-6, 49, -41), true);
-addTag('chinatown', new THREE.Vector3(-26, 9, -10), true);
-addTag('park', new THREE.Vector3(-5.5, 3.2, -7.4), true);
-addTag('lombard', new THREE.Vector3(-35, 14, -112), true);
-addTag('coit', new THREE.Vector3(6, 29, -120), true);
-addTag('palace', new THREE.Vector3(-128, 25, -110), true);
-addTag('ladies', new THREE.Vector3(-128, 12, -24), true);
-addTag('mission', new THREE.Vector3(-38, 13, 100), true);
 
 const seen = new Set();
 const cardEl = document.getElementById('card'), cardBody = document.getElementById('cardBody');
@@ -1358,41 +1415,49 @@ updatePassport();
 /* ══════════════ controls: drag to pan, wheel / buttons to zoom ══════════════ */
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 let drag = null, moved = 0;
-canvas.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, tx: view.tx, tz: view.tz }; moved = 0; canvas.setPointerCapture(e.pointerId); canvas.classList.add('drag'); });
+// SCROLL-DRIVEN TOUR (owner, 12 Nov: no zoom controls, the whole thing is scroll-driven).
+// Keyframes: the whole city → downtown → the Verified Call tower → Lombard → the Palace → the
+// Painted Ladies → the Mission → back out. Eased between stops; clicks still open the Work pin.
+const TOUR = [
+  { tx: -55, tz: 0, zoom: 0.22 },  { tx: 4, tz: -2, zoom: 0.5 },     { tx: 21, tz: -9, zoom: 1.15 },
+  { tx: -34, tz: -112, zoom: 0.95 }, { tx: -130, tz: -112, zoom: 0.95 }, { tx: -122, tz: -14, zoom: 0.95 },
+  { tx: -45, tz: 104, zoom: 0.85 }, { tx: -55, tz: 0, zoom: 0.22 },
+];
+let tourP = 0, tourShown = 0;
+const easeIO = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+function tourAt(p) {
+  const f = THREE.MathUtils.clamp(p, 0, 1) * (TOUR.length - 1), i = Math.min(TOUR.length - 2, Math.floor(f)), k = easeIO(f - i);
+  const a = TOUR[i], b = TOUR[i + 1];
+  // zoom out a touch mid-flight between distant stops, like a camera lifting off
+  const lift = 1 - 0.35 * Math.sin(Math.PI * k) * Math.min(1, Math.hypot(b.tx - a.tx, b.tz - a.tz) / 80);
+  return { tx: a.tx + (b.tx - a.tx) * k, tz: a.tz + (b.tz - a.tz) * k, zoom: Math.exp(Math.log(a.zoom) + (Math.log(b.zoom) - Math.log(a.zoom)) * k) * lift };
+}
+function onScroll() {
+  const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+  tourP = THREE.MathUtils.clamp(scrollY / max, 0, 1);
+  document.getElementById('hint').style.opacity = tourP > 0.02 ? 0 : 1;
+}
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+if (Q.has('p')) tourP = tourShown = +Q.get('p');
+function stepTour() {
+  tourShown += (tourP - tourShown) * (REDUCED ? 1 : 0.09);
+  Object.assign(view, tourAt(tourShown)); placeCamera();
+}
+canvas.addEventListener('click', e => {
+  ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  ray.setFromCamera(ndc, cam);
+  const hit = ray.intersectObjects(scene.children, true).find(h => h.object.userData.card);
+  if (hit) openCard(hit.object.userData.card);
+});
 const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.1), hitP = new THREE.Vector3();
-canvas.addEventListener('pointermove', e => {
-  if (!drag) {                                                       // walking the cursor through the flock startles it
-    ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam);
-    if (ray.ray.intersectPlane(groundPlane, hitP)) for (const p of pigeons) {
-      const dx = p.g.position.x - hitP.x, dz = p.g.position.z - hitP.z, d = Math.hypot(dx, dz);
-      if (!p.fly && d < 2.2) { p.fly = { t: 0, dx: dx / (d || 1), dz: dz / (d || 1) }; p.g.rotation.y = Math.atan2(dx, dz); }
-    }
-    return;
+canvas.addEventListener('pointermove', e => {                         // the cursor still startles pigeons
+  ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam);
+  if (ray.ray.intersectPlane(groundPlane, hitP)) for (const p of pigeons) {
+    const dx = p.g.position.x - hitP.x, dz = p.g.position.z - hitP.z, d = Math.hypot(dx, dz);
+    if (!p.fly && d < 2.2) { p.fly = { t: 0, dx: dx / (d || 1), dz: dz / (d || 1) }; p.g.rotation.y = Math.atan2(dx, dz); }
   }
-  const dx = e.clientX - drag.x, dy = e.clientY - drag.y; moved = Math.max(moved, Math.hypot(dx, dy));
-  const k = (cam.right - cam.left) / (innerWidth || 1);                 // world units per pixel
-  // screen right = (sin az, -cos az) on the ground; screen up (into the screen) = (-cos az, -sin az) / sin el
-  const rx = -Math.sin(view.az), rz = Math.cos(view.az), fx = -Math.cos(view.az), fz = -Math.sin(view.az);
-  view.tx = drag.tx - (dx * rx) * k - (-dy * fx) * k / Math.sin(view.el);
-  view.tz = drag.tz - (dx * rz) * k - (-dy * fz) * k / Math.sin(view.el);
-  view.tx = THREE.MathUtils.clamp(view.tx, -170, 70); view.tz = THREE.MathUtils.clamp(view.tz, -160, 160);
-  placeCamera(); requestRender();
 });
-canvas.addEventListener('pointerup', e => {
-  canvas.classList.remove('drag');
-  if (drag && moved < 5) {                                             // a click: pins, tower, bench, houses
-    ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
-    ray.setFromCamera(ndc, cam);
-    const hit = ray.intersectObjects(scene.children, true).find(h => h.object.userData.card);
-    if (hit) openCard(hit.object.userData.card);
-  }
-  drag = null;
-});
-function zoomBy(f) { view.zoom = THREE.MathUtils.clamp(view.zoom * f, 0.2, 3); placeCamera(); requestRender(); }
-canvas.addEventListener('wheel', e => { e.preventDefault(); zoomBy(Math.exp(-e.deltaY * 0.0012)); }, { passive: false });
-document.getElementById('zin').onclick = () => zoomBy(1.25);
-document.getElementById('zout').onclick = () => zoomBy(0.8);
-document.getElementById('zhome').onclick = () => { Object.assign(view, HOME); placeCamera(); requestRender(); };
+window.__tour = { set p(v) { tourP = tourShown = v; stepTour(); } };
 
 /* ══════════════ animation ══════════════ */
 const clock = new THREE.Clock();
@@ -1515,6 +1580,7 @@ function project() {
 let lastSun = -1;
 function frame() {
   const dt = Math.min(0.05, clock.getDelta());
+  stepTour();
   if (!REDUCED) update(dt);
   if (performance.now() - lastSun > 60000 || lastSun < 0) { setTimeOfDay(sfHour()); lastSun = performance.now(); }
   sun.target.position.set(view.tx, 0, view.tz); sun.position.copy(sun.target.position).addScaledVector(sunDir, 160);
