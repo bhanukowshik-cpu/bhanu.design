@@ -272,7 +272,7 @@ def build_scene():
 
 def render(out):
     s = bpy.context.scene
-    cam = kit.camera((0, 58, 6.5), (4, -40, 15), lens=30)
+    cam = kit.camera((0, 58, 6.5), (4, -40, 15), lens=30, level=True)
     s.render.engine = "BLENDER_EEVEE"; s.render.resolution_x, s.render.resolution_y = RES
     try:
         s.eevee.taa_render_samples = 32; s.eevee.use_raytracing = True

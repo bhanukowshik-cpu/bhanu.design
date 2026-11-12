@@ -219,10 +219,18 @@ def light_rig(sun_elev=6, sun_az=-150, strength=3.5, sky=(0.06, 0.08, 0.20), hor
     fo = bpy.data.objects.new("fill", fill); bpy.context.scene.collection.objects.link(fo)
     fo.rotation_euler = Euler((math.radians(50), 0, math.radians(40)))
 
-def camera(loc, target, lens=50):
+def camera(loc, target, lens=50, level=False):
+    """level=True: architectural camera — no pitch (verticals stay vertical); the aim height is
+    reached with a lens shift instead of tilting, like a shift lens / poster perspective."""
     cam = bpy.data.cameras.new("cam"); cam.lens = lens; cam.clip_end = 3000
     co = bpy.data.objects.new("cam", cam); bpy.context.scene.collection.objects.link(co)
     co.location = loc
+    if level:
+        dx, dy, dz = target[0] - loc[0], target[1] - loc[1], target[2] - loc[2]
+        pitch = math.atan2(dz, math.hypot(dx, dy))
+        cam.sensor_fit = "HORIZONTAL"
+        cam.shift_y = math.tan(pitch) * lens / cam.sensor_width
+        target = (target[0], target[1], loc[2])
     tgt = bpy.data.objects.new("target", None); bpy.context.scene.collection.objects.link(tgt); tgt.location = target
     c = co.constraints.new("TRACK_TO"); c.target = tgt; c.track_axis = "TRACK_NEGATIVE_Z"; c.up_axis = "UP_Y"
     bpy.context.scene.camera = co

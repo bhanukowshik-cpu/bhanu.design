@@ -75,7 +75,7 @@ def main(out):
     os.makedirs(out, exist_ok=True)
     gp.build_scene(); gp.mirror_all()
     s = bpy.context.scene
-    cam = kit.camera(CAM["pos"], CAM["target"], lens=CAM["lens"])
+    cam = kit.camera(CAM["pos"], CAM["target"], lens=CAM["lens"], level=True)   # verticals stay vertical
     s.render.engine = "BLENDER_EEVEE"; s.render.resolution_x, s.render.resolution_y = gp.RES
     s.render.film_transparent = True; s.render.image_settings.file_format = "PNG"; s.render.image_settings.color_mode = "RGBA"
     s.eevee.taa_render_samples = 16
@@ -122,7 +122,8 @@ def main(out):
         layers.append({"name": name, "order": len(layers), "parallax": PARALLAX.get(name, 0.2), "kind": kind, "files": files, "anim": anim})
         print("LAYER", name, kind, len(objs))
     man = {"width": gp.RES[0], "height": gp.RES[1],
-           "camera": {"pos": list(CAM["pos"]), "target": list(CAM["target"]), "lens_mm": CAM["lens"], "sensor_mm": 36},
+           "camera": {"pos": list(CAM["pos"]), "target": [CAM["target"][0], CAM["target"][1], CAM["pos"][2]], "lens_mm": CAM["lens"], "sensor_mm": 36,
+                      "shift_y": round(cam.data.shift_y, 5), "note": "level camera + vertical lens shift (fraction of sensor width)"},
            "depth_near": NEAR, "depth_far": FAR, "horizon_y": uv((4, -1100, 0))[1], "layers": layers,
            "note": "ferry.anim.origin = where the sprite was rendered; translate the sprite by (pos - origin)."}
     with open(os.path.join(out, "manifest.json"), "w") as f: json.dump(man, f, indent=1)
