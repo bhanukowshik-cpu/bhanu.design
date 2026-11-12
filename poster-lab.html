@@ -313,7 +313,7 @@ const COMMON = /* glsl */`
    (cooler/brighter by day, navy and darker at night) instead of repainting. */
 const FS_PLATE = /* glsl */`
   ${COMMON}
-  uniform sampler2D tPlate; uniform float uSunAlt;   // degrees
+  uniform sampler2D tPlate, tPlateDay, tPlateNight; uniform float uSunAlt, uHasDay, uHasNight;   // degrees
   void main(){
     vec2 s = vS;
     if (s.y > uHorizon) {
@@ -324,7 +324,14 @@ const FS_PLATE = /* glsl */`
       s.x += ripple(s) * 0.9 + jit * 0.5;
       s.y += sin(py * 0.35 + uTime * 1.1) * 0.6 / 1080.0 * k;
     }
-    vec3 col = texture2D(tPlate, s).rgb;
+    // painted time-of-day variants (golden = the approved reference) cross-faded by SF's real sun;
+    // where a variant is missing, the golden plate is re-graded instead (below)
+    vec3 gold = texture2D(tPlate, s).rgb;
+    float wN = uHasNight * (1.0 - smoothstep(-9.0, -2.0, uSunAlt));
+    float wD = uHasDay * smoothstep(9.0, 24.0, uSunAlt);
+    vec3 col = gold;
+    if (wD > 0.0) col = mix(col, texture2D(tPlateDay, s).rgb, wD);
+    if (wN > 0.0) col = mix(col, texture2D(tPlateNight, s).rgb, wN);
     // dark ripple lines in the water (thin, broken), stronger near the viewer
     if (vS.y > uHorizon) {
       float k = clamp((vS.y - uHorizon) / (1.0 - uHorizon), 0.0, 1.0);
@@ -335,9 +342,9 @@ const FS_PLATE = /* glsl */`
     float day = smoothstep(4.0, 25.0, uSunAlt);                       // 0 at golden hour → 1 high sun
     vec3 lum = vec3(dot(col, vec3(0.299, 0.587, 0.114)));
     vec3 dayCol = mix(col, lum * vec3(0.92, 1.0, 1.08), 0.35) * 1.06;  // cooler, less orange by day
-    col = mix(col, dayCol, day);
+    col = mix(col, dayCol, day * (1.0 - uHasDay));
     float nightK = 1.0 - smoothstep(0.0, 0.7, uDayK);
-    col = mix(col, lum * NIGHT_TINT * 0.42, nightK * 0.85);
+    col = mix(col, lum * NIGHT_TINT * 0.42, nightK * 0.85 * (1.0 - uHasNight));
     if (grainN(11.0) < 0.04) col *= 0.97;
     gl_FragColor = vec4(col, 1.0);
   }`;
@@ -350,6 +357,7 @@ const FS_LIT = /* glsl */`
   uniform float uHasS, uHasN, uHasD, uHasMask, uMode, uAlpha, uClipY, uMirrorY, uSway, uSeed, uDepthGuess;
   uniform vec2  uOffset;
   uniform vec4  uBox;      // alpha bbox (scene UV) — sway weight grows toward the top of the shape
+  uniform sampler2D tLightNight; uniform float uHasNightL, uSunAlt;
   uniform vec4  uCrop;     // sub-rectangle of the source image this layer owns (default whole image)
   uniform vec3  uWater;
   void main(){
@@ -388,11 +396,16 @@ const FS_LIT = /* glsl */`
       vec3 shC  = S * mix(NIGHT_TINT * 0.42, vec3(1.0), smoothstep(0.0, 0.6, uDayK));
       col = mix(shC, litC, lam);
     } else {
-      // LIGHT-ONLY layer (AI-painted PNG, no normals): its lighting is baked, so we only
-      // re-tint it for the time of day — multiply by an ambient ↔ sun-colour mix keyed to altitude.
-      vec3 ambient = mix(NIGHT_TINT * 0.38, mix(uSkyHor, vec3(1.0), 0.55), smoothstep(0.0, 0.5, uDayK));
-      vec3 sunTint = mix(vec3(1.0), uSunCol, 0.32) * (0.82 + 0.18 * uDayK);
-      col = L.rgb * mix(ambient, sunTint, uDayK * uSunUp);
+      // LIGHT-ONLY layer (AI-painted PNG, no normals): its light is baked at golden hour (= the
+      // approved reference), so golden hour shows it untouched. Night uses a painted night variant
+      // when one exists (e.g. the laptop glow), otherwise a navy grade; high sun cools it slightly.
+      float wN = 1.0 - smoothstep(-9.0, -2.0, uSunAlt), wD = smoothstep(9.0, 24.0, uSunAlt);
+      vec3 base = L.rgb;
+      vec3 lumL = vec3(dot(base, vec3(0.299, 0.587, 0.114)));
+      base = mix(base, mix(base, lumL * vec3(0.92, 1.0, 1.08), 0.3) * 1.05, wD);
+      if (uHasNightL > 0.5) base = mix(base, texture2D(tLightNight, uv).rgb, wN);
+      else base = mix(base, lumL * NIGHT_TINT * 0.42, wN * 0.85);
+      col = base;
       lam = 0.72 + 0.2 * uDayK;               // stipple density only — AI art carries its own grain, keep ours light
     }
 
@@ -784,7 +797,9 @@ async function build() {
   const plateL = layers.find(L => L.kind === 'plate');
   if (plateL) {
     const t = tex(plateL, 'light');
-    platePass = addPass(FS_PLATE, { tPlate: { value: t || blank } }, { par: plateL.parallax || 0.02, name: 'plate' });
+    const tD = tex(plateL, 'day'), tN = tex(plateL, 'night');
+    platePass = addPass(FS_PLATE, { tPlate: { value: t || blank }, tPlateDay: { value: tD || blank }, tPlateNight: { value: tN || blank },
+      uHasDay: { value: tD ? 1 : 0 }, uHasNight: { value: tN ? 1 : 0 } }, { par: plateL.parallax || 0.02, name: 'plate' });
   }
   // ── sky first (skipped under a plate)
   if (!plateL) skyPass = addPass(FS_SKY, {
@@ -799,6 +814,7 @@ async function build() {
     return { box, u: {
       tLight: { value: tex(L, 'light') || blank }, tShadow: { value: tex(L, 'shadow') || blank },
       tNormal: { value: tex(L, 'normal') || blank }, tDepth: { value: tex(L, 'depth') || blank },
+      tLightNight: { value: tex(L, 'night') || blank }, uHasNightL: { value: imgs[L.name + ':night'] ? 1 : 0 },
       uHasS: { value: imgs[L.name + ':shadow'] ? 1 : 0 }, uHasN: { value: imgs[L.name + ':normal'] && !LIGHTONLY ? 1 : 0 },
       uHasD: { value: imgs[L.name + ':depth'] && !LIGHTONLY ? 1 : 0 },
       ...maskU, uMode: { value: mode }, uAlpha: { value: 1 }, uClipY: { value: 9 }, uMirrorY: { value: 0 },
