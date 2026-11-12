@@ -43,8 +43,9 @@
        box-shadow:0 2px 0 rgba(0,0,0,.08),0 10px 24px -10px rgba(20,30,40,.4);transition:opacity .25s}
   .tag small{display:block;font-size:11px;font-weight:500;color:var(--muted)}
   .tag b{font-size:15px}
-  .tag.post{padding:6px 8px;border-radius:9px}
-  .tag.post svg{display:block;width:18px;height:18px}
+  /* place labels (they open a small postcard card) */
+  .tag.post{padding:6px 11px 7px;border-radius:999px;font-size:13px;font-weight:600;background:rgba(255,252,248,.92)}
+  .tag.post::after{content:'';position:absolute;left:50%;bottom:-5px;width:8px;height:8px;background:inherit;transform:translateX(-50%) rotate(45deg);border-radius:1px}
   .tag.hide{opacity:0;pointer-events:none}
   /* card */
   .card{position:fixed;z-index:6;right:clamp(16px,6vw,110px);top:50%;width:min(390px,calc(100vw - 32px));transform:translate(0,calc(-50% + 16px));
@@ -1016,9 +1017,7 @@ function pin3D(x, y, z, key) {
 }
 function addTag(key, worldPos, post = false) {
   const el = document.createElement('div'); el.className = 'tag' + (post ? ' post' : '');
-  el.innerHTML = post
-    ? `<svg viewBox="0 0 24 24" fill="none" stroke="#D9483B" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>`
-    : `<small>${CARDS[key].kind}</small><b>${CARDS[key].title}</b>`;
+  el.innerHTML = post ? `<span>${CARDS[key].title}</span>` : `<small>${CARDS[key].kind}</small><b>${CARDS[key].title}</b>`;
   el.addEventListener('click', () => openCard(key));
   document.body.appendChild(el);
   anchors.push({ el, p: worldPos.clone(), key });
@@ -1045,25 +1044,27 @@ updatePassport();
 
 /* ══════════════ pixel avatar (Bhanu: swept-up hair, clear square glasses, stubble, dark shirt) ══════════════ */
 {
+  // friendly version (owner: the first one looked scary): thin soft frames, eyes visible, warm cheeks, a big smile
   const PX = [
-    '....HHHHHHH.....',
-    '...HHHHhhHHHH...',
-    '..HHHHHHHHhHHH..',
+    '.....HHHHHH.....',
+    '...HHHHHhhHHH...',
+    '..HHHHHHHHHhHH..',
     '..HHHHHHHHHHHH..',
     '..HHSSSSSSSSHH..',
     '..HSSSSSSSSSSH..',
-    '..SGGGGSSGGGGS..',
-    '..SGESGGGGESGS..',
-    '..SGGGGSSGGGGS..',
-    '..sSSSSssSSSSs..',
-    '...SBSSSSSSBS...',
-    '...BBSMMMMSBB...',
-    '....BBBBBBBB....',
-    '.....sSSSSs.....',
-    '..TTTTtSStTTTT..',
+    '..SFFFFSSFFFFS..',
+    '.SSFSESFFSESFSS.',
+    '..SFFFFSSFFFFS..',
+    '..SCSSSssSSSCS..',
+    '...SSSSSSSSSS...',
+    '...BSMWWWWMSB...',
+    '....BSMMMMSB....',
+    '.....BBBBBB.....',
+    '..TTTTsSSsTTTT..',
     '.TTTTTTttTTTTTT.',
   ];
-  const PAL = { H: '#1E1A1C', h: '#4A3F45', S: '#B47A55', s: '#96603F', G: '#F4F1EA', E: '#1E1A1C', B: '#6E4632', M: '#5E2F27', T: '#2A2730', t: '#16151A' };
+  const PAL = { H: '#241E21', h: '#4A3F45', S: '#C08660', s: '#A46F4D', F: '#A9A3AE', E: '#241E21', C: '#D98E72',
+                B: '#9A6A4E', M: '#6B342B', W: '#FFF6EC', T: '#2F3A4A', t: '#222B38' };
   const av = document.getElementById('avatar'), g = av.getContext('2d');
   const draw = (blink) => { g.clearRect(0, 0, 16, 16);
     PX.forEach((row, y) => [...row].forEach((ch, x) => { if (ch === '.') return;
