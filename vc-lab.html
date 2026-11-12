@@ -96,8 +96,8 @@
 
   // ── layers (depth: 0 = city/sky, 1 = plaza foreground; foreground zooms faster = flying in)
   // Floor slabs of the tower, top → bottom (scene v), and its outline (scene uv), measured on the reference.
-  const TOWER = { x0: 0.028, x1: 0.356, top: 0.0, bottom: 0.875 };
-  const FLOORS = [0.875, 0.79, 0.665, 0.555, 0.44, 0.33, 0.0];        // lit from the bottom up
+  const TOWER = { x0: 0.030, x1: 0.357, top: 0.0, bottom: 0.91 };    // measured on plate.webp
+  const FLOORS = [0.91, 0.69, 0.565, 0.445, 0.325, 0.165, 0.0];       // slabs, lit from the lobby up to the crown
 
   function img(src, cls) {
     return new Promise(res => {
@@ -223,7 +223,7 @@
     const d = ease(seg(p, 0.0, 0.42));        // descent through the clouds
     const z = ease(seg(p, 0.34, 0.86));       // push-in on the tower
     // focus x for the final framing: tower at ~35% of the screen (card on the right); centred on phones
-    const endX = mobile ? 0.19 : 0.27, endY = mobile ? 0.47 : 0.45, endZ = mobile ? 1.3 : 1.7;
+    const endX = mobile ? 0.2 : 0.27, endY = mobile ? 0.36 : 0.45, endZ = mobile ? 1.1 : 1.7;   // phone: logo + wordmark whole, above the card
     return {
       x: lerp(lerp(0.5, 0.46, d), endX, z),
       y: lerp(lerp(0.12, 0.5, d), endY, z),    // starts high (sky) and sinks to the street
