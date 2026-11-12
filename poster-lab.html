@@ -1458,6 +1458,10 @@ function glassRender() {           // returns true when it drew the frame
 
 /* ══════════════ hero text inside the scene (behind the bridge) ══════════════ */
 let textPass = null, textCanvas = null, textCtx = null, textTex = null, textKey = '';
+// intro (owner, 12 Nov): on load the text rises from low in the frame up behind the bridge into place
+let introT0 = 0;
+function startIntro() { if (!introT0) introT0 = performance.now(); }
+addEventListener('message', e => { if (e.origin === location.origin && e.data && e.data.type === 'hero-intro') startIntro(); });
 function makeTextPass() {
   textCanvas = document.createElement('canvas'); textCtx = textCanvas.getContext('2d');
   textTex = new THREE.CanvasTexture(textCanvas); textTex.colorSpace = THREE.NoColorSpace;
@@ -1480,20 +1484,28 @@ function drawSceneText() {
   const W = state.vw, H = state.vh, k = DPR, tagEl = document.getElementById('tagline');
   const op = heroEl.style.opacity === '' ? 1 : +heroEl.style.opacity;
   textPass.mat.uniforms.uA.value = op;
+  if (!introT0) {                                                  // embedded: wait for the homepage's loader to finish
+    let go = !Q.has('embed') || REDUCED;
+    try { go = go || parent.document.documentElement.classList.contains('hero-go'); } catch (e) { go = true; }
+    if (go) startIntro();
+  }
+  const ik = introT0 ? Math.min(1, (performance.now() - introT0) / 1800) : 0;
+  const ease = k => 1 - Math.pow(1 - Math.min(1, Math.max(0, k)), 3);
   const tr = titleEl.getBoundingClientRect(), gr = tagEl.getBoundingClientRect();
-  const key = [W, H, tr.left, tr.top, tr.width, tr.height, gr.top, gr.width, gr.height, titleEl.style.fontSize].map(v => Math.round(parseFloat(v) || 0)).join(',');
+  const key = [W, H, tr.left, tr.top, tr.width, tr.height, gr.top, gr.width, gr.height, titleEl.style.fontSize, ik * 400].map(v => Math.round(parseFloat(v) || 0)).join(',');
   if (key === textKey) return; textKey = key;
   textCanvas.width = Math.max(1, Math.round(W * k)); textCanvas.height = Math.max(1, Math.round(H * k));
   const g = textCtx; g.setTransform(k, 0, 0, k, 0, 0); g.clearRect(0, 0, W, H);
   g.textAlign = 'center'; g.textBaseline = 'middle';
-  for (const [el, r, alpha] of [[titleEl, tr, 1], [tagEl, gr, 0.92]]) {
+  for (const [el, r, alpha, delay] of [[titleEl, tr, 1, 0], [tagEl, gr, 0.92, 0.14]]) {
+    const kk = ease((ik - delay) / (1 - delay)), rise = (1 - kk) * H * 0.4;   // starts ~40% lower, behind the deck
     const cs = getComputedStyle(el), fs = parseFloat(cs.fontSize), lh = parseFloat(cs.lineHeight) || fs * 1.2;
     g.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
     try { g.letterSpacing = cs.letterSpacing === 'normal' ? '0px' : cs.letterSpacing; } catch (e) {}
-    g.fillStyle = `rgba(255,252,248,${alpha})`;
+    g.fillStyle = `rgba(255,252,248,${alpha * Math.min(1, kk * 2.2)})`;
     const lines = wrapLines(g, el.textContent.trim(), r.width + 2);
     const top = r.top + (r.height - lines.length * lh) / 2;
-    lines.forEach((ln, i) => g.fillText(ln, r.left + r.width / 2, top + lh * (i + 0.5)));
+    lines.forEach((ln, i) => g.fillText(ln, r.left + r.width / 2, top + rise + lh * (i + 0.5)));
   }
   textTex.needsUpdate = true;
 }

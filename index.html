@@ -5202,11 +5202,15 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         color:rgba(255,252,248,.88);text-decoration:none;white-space:nowrap;padding:4px 2px;transition:color .2s}
       .hero .hero-building b{font-weight:500;color:#FFFCF8;border-bottom:1px solid rgba(255,252,248,.55);padding-bottom:1px}
       .hero .hero-building svg{width:1.1em;height:1.1em;transition:transform .25s}
+      html.hero-wait .hero .hero-building{opacity:0}
+      html.hero-go .hero .hero-building{animation:hbIn .9s cubic-bezier(.2,.8,.2,1) 1.5s both}
+      @keyframes hbIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+      @media (prefers-reduced-motion:reduce){ html.hero-go .hero .hero-building{animation:none} }
       .hero .hero-building:hover b{border-bottom-color:#FFFCF8}
       .hero .hero-building:hover svg{transform:translate(2px,-2px)}
       @media (max-width:767px){ .hero .hero-building{top:16vh;font-size:10px;letter-spacing:.08em} }
     </style>
-    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=14" title="" aria-hidden="true"
+    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=15" title="" aria-hidden="true"
             tabindex="-1" loading="eager"></iframe>
     <style>
       .hero .hero-city{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:0;background:#0A1430}
@@ -5422,6 +5426,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         if (fired) return; fired = true;
         doc.classList.remove('hero-wait');
         doc.classList.add('hero-go');
+        try { var hc = document.getElementById('heroCity'); hc && hc.contentWindow.postMessage({ type: 'hero-intro' }, location.origin); } catch (e) {}
       }
       window.addEventListener('v6loaderhidden', reveal);
 
@@ -5598,7 +5603,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <div class="vcs-pin">
       <!-- (12 Nov) the scroll now flies into the isometric San Francisco city (sf-downtown.html); the painted
            vc-lab scene and its card below are kept but hidden -->
-      <iframe class="vcs-scene" id="vcScene" src="sf-downtown.html?embed&amp;v=2" title="San Francisco, with the Verified Call tower" loading="lazy"></iframe>
+      <iframe class="vcs-scene" id="vcScene" src="sf-downtown.html?embed&amp;v=3" title="San Francisco, with the Verified Call tower" loading="lazy"></iframe>
       <aside class="vcs-card" id="vcsCard">
         <p class="vcs-meta"><span>Founder</span><span>Design + build, solo</span><span>3 weeks</span></p>
         <h2 class="vcs-title" id="vcsTitle">Verified Call</h2>

@@ -126,25 +126,49 @@
   .decs p{font-size:14.5px;margin:6px 0 0}
   .decs p em{font-style:normal;font-weight:700;color:var(--ink)}
   /* the glimpse: appears beside the Verified Call tower when the tour arrives */
-  .glimpse{position:fixed;left:0;top:0;z-index:6;width:min(320px,calc(100vw - 32px));background:var(--paper);border-radius:20px;padding:16px 16px 14px;
-           box-shadow:0 2px 0 rgba(0,0,0,.06),0 24px 50px -18px rgba(20,30,40,.5);opacity:0;pointer-events:none;
-           transition:opacity .35s, translate .45s cubic-bezier(.2,.8,.2,1);translate:0 10px}
-  .glimpse.on{opacity:1;pointer-events:auto;translate:0 0}
-  .glimpse .gphone{display:grid;place-items:center;height:210px;border-radius:13px;margin-bottom:12px;background:linear-gradient(160deg,#EAF3E2,#D6E8CC)}
-  .glimpse .gphone img{height:190px;width:auto;border-radius:18px;border:4px solid #1F1B24;box-shadow:0 14px 26px -12px rgba(20,40,20,.5)}
-  .glimpse .gimg{display:block;width:100%;height:auto;border-radius:13px;margin-bottom:12px;box-shadow:0 8px 20px -10px rgba(20,30,40,.35)}
+  /* ── the glimpse (owner, 12 Nov): animated, employer facts first, a stack band, tinted by SF's time of day ── */
+  .glimpse{position:fixed;left:0;top:0;z-index:6;width:min(372px,calc(100vw - 32px));max-height:calc(100vh - 110px);overflow:hidden;
+           border-radius:22px;padding:14px 16px 16px;color:var(--g-ink);opacity:0;pointer-events:none;
+           --g-ink:#1F1B24;--g-sub:#4A4450;--g-mute:#6E6774;--g-line:rgba(31,27,36,.1);--g-chip:rgba(255,255,255,.55);--g-btn:#1F1B24;--g-btn-ink:#fff;
+           background:var(--paper);box-shadow:0 2px 0 rgba(0,0,0,.06),0 24px 50px -18px rgba(20,30,40,.5);transition:opacity .45s}
+  .glimpse.on{opacity:1;pointer-events:auto}
   html.lens-on .glimpse{background:transparent;box-shadow:none}         /* the WebGL lens draws the glass */
-  html.lens-on .glimpse .eb{color:#4A4450}
-  .glimpse .eb{font-size:12px;font-weight:600;color:var(--muted)}
-  .glimpse b{display:block;font-size:22px;letter-spacing:-.01em;margin:2px 0 6px}
-  .glimpse p{font-size:14px;line-height:1.45;color:#3D3843}
-  .glimpse .gm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-  .glimpse .gm span{font-size:12px;line-height:1.3;color:#3D3843}
-  .glimpse .gm b{display:block;font-size:18px;color:var(--ink);letter-spacing:-.01em}
-  .glimpse .st{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#2F4A1E;margin:10px 0 12px}
-  .glimpse .st i{width:7px;height:7px;border-radius:50%;background:#16845E}
-  .glimpse button{width:100%;border:0;border-radius:12px;background:var(--ink);color:#fff;font:600 14.5px var(--font);padding:11px 14px;cursor:pointer}
-  .glimpse button:hover{background:#000}
+  html.tod-night .glimpse{--g-ink:#F6F3EE;--g-sub:#D9D4DE;--g-mute:#B8B2C0;--g-line:rgba(255,255,255,.14);--g-chip:rgba(255,255,255,.1);--g-btn:#F6F3EE;--g-btn-ink:#1F1B24}
+  .glimpse > *{opacity:0;transform:translateY(10px);filter:blur(6px);transition:opacity .5s, transform .6s cubic-bezier(.2,.8,.2,1), filter .5s;transition-delay:calc(var(--i,0) * 55ms)}
+  .glimpse.on > *{opacity:1;transform:none;filter:none}
+  .g-top{display:flex;justify-content:space-between;align-items:center;font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--g-mute);margin-bottom:10px}
+  .g-time{display:inline-flex;align-items:center;gap:6px}
+  .g-time i{width:7px;height:7px;border-radius:50%;background:#F2B23C;box-shadow:0 0 0 3px rgba(242,178,60,.25)}
+  html.tod-night .g-time i{background:#A9B8E0;box-shadow:0 0 0 3px rgba(169,184,224,.25)}
+  .g-vis{position:relative;height:150px;border-radius:14px;overflow:hidden;margin-bottom:12px;background:var(--g-chip)}
+  .g-vis img.wide{width:100%;height:100%;object-fit:cover;object-position:50% 38%;animation:gKen 14s ease-in-out infinite alternate}
+  .g-vis.phone{display:grid;place-items:center;background:linear-gradient(160deg,#EAF3E2,#D6E8CC)}
+  .g-vis.phone img{height:136px;width:auto;border-radius:16px;border:3px solid #1F1B24;animation:gFloat 4.5s ease-in-out infinite}
+  .g-vis::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);
+                transform:translateX(-120%);animation:gSheen 5.5s ease-in-out infinite 1.2s;pointer-events:none}
+  @keyframes gKen{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.14) translate(-3%,2%)}}
+  @keyframes gFloat{50%{transform:translateY(-5px) rotate(-1.5deg)}}
+  @keyframes gSheen{0%,55%{transform:translateX(-120%)}80%,100%{transform:translateX(120%)}}
+  .g-eb{font-size:12px;font-weight:600;color:var(--g-mute)}
+  .g-title{font-size:24px;font-weight:700;letter-spacing:-.015em;margin:2px 0 4px}
+  .g-line{font-size:13.5px;line-height:1.45;color:var(--g-sub)}
+  .g-facts{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:12px 0 0;padding-top:10px;border-top:1px solid var(--g-line);font-size:12.5px}
+  .g-facts dt{color:var(--g-mute);font-weight:500}
+  .g-facts dd{margin:0;color:var(--g-ink);font-weight:600}
+  .g-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 0}
+  .g-metrics div{background:var(--g-chip);border-radius:12px;padding:8px 9px}
+  .g-metrics b{display:block;font-size:20px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .g-metrics span{display:block;font-size:11px;line-height:1.3;color:var(--g-sub);margin-top:2px}
+  .g-status{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--g-ink);margin:10px 0 0}
+  .g-status i{width:7px;height:7px;border-radius:50%;background:#16845E;animation:gPulse 2s ease-in-out infinite}
+  @keyframes gPulse{50%{box-shadow:0 0 0 5px rgba(22,132,94,.22)}}
+  .g-tech{margin:10px -16px 12px;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+  .g-track{display:flex;gap:6px;width:max-content;animation:gMarq 22s linear infinite}
+  .g-track span{font:500 11.5px var(--mono);letter-spacing:.02em;padding:5px 9px;border-radius:999px;background:var(--g-chip);border:1px solid var(--g-line);white-space:nowrap;color:var(--g-ink)}
+  @keyframes gMarq{to{transform:translateX(-50%)}}
+  .glimpse button{width:100%;border:0;border-radius:12px;background:var(--g-btn);color:var(--g-btn-ink);font:600 14.5px var(--font);padding:11px 14px;cursor:pointer;transition:transform .2s}
+  .glimpse button:hover{transform:translateY(-1px)}
+  @media (prefers-reduced-motion:reduce){ .glimpse *, .glimpse > *{animation:none!important;transition:none!important;filter:none!important} }
   @media (max-width:767px){
     .tiles{grid-template-columns:1fr 1fr}
     .tiles .tile:nth-child(3){grid-column:1 / -1}
@@ -167,24 +191,7 @@
 <div class="pill bar"><a class="brand" href="./" aria-label="Bhanu Kowshik, home"><canvas id="avatar" width="16" height="16" aria-hidden="true"></canvas>Bhanu Kowshik</a>
   <nav class="nav"><a href="./#about">About me</a><a href="./#work">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a><a href="./#contact">Contact</a></nav></div>
 <div id="tour" aria-hidden="true"></div>
-<aside class="glimpse" id="glimpse" aria-live="polite">
-  <img class="gimg" src="images/card-verified.webp" alt="The Verified Call panel inside a video call: Alex Chen, verified" width="800" height="670">
-  <div class="eb">Founder · design + build, solo</div>
-  <b>Verified Call</b>
-  <p>Confirms the person on a hiring call is real, is who they say they are, and isn't reading answers from a hidden AI tool.</p>
-  <div class="gm"><span><b>20 companies</b> in the closed beta</span><span><b>3 weeks</b> to build, solo</span></div>
-  <div class="st"><i></i>Now in go-to-market</div>
-  <button type="button" id="glimpseMore">Read full case study →</button>
-</aside>
-<aside class="glimpse" id="glimpseStressie" aria-live="polite">
-  <div class="gphone"><img src="images/stressie-v4/hero-poster.webp" alt="Stressie V4: the check-in screen, 'How are you feeling in this moment?'" width="720" height="1566"></div>
-  <div class="eb">Founding designer · Figma → SwiftUI</div>
-  <b>Stressie V4</b>
-  <p>A stress check-in that pays for your evening: coins, a map of wellness experiences, and events you can host.</p>
-  <div class="gm"><span><b>12% → 56%</b> daily engagement</span><span><b>171 Swift files</b> built solo</span></div>
-  <div class="st"><i></i>iOS app · mobile</div>
-  <button type="button" data-case="stressie">Read full case study →</button>
-</aside>
+<div id="glimpses"></div>
 <div class="hint" id="hint">Scroll to explore San Francisco</div>
 <div class="status" id="status"></div>
 
@@ -1379,6 +1386,13 @@ function setTimeOfDay(h) {
   lampHeads.forEach(l => l.material.emissiveIntensity = glow * 1.6);
   towerWindows.forEach(m => m.emissiveIntensity = 0.05 + glow * 0.42);
   shopFronts.forEach(m => m.emissiveIntensity = 0.04 + glow * 0.75);
+  const part = night > 0.5 ? 'night' : golden > 0.45 && day > 0.2 ? 'golden' : h < 11 ? 'morning' : 'day';
+  document.documentElement.classList.remove('tod-night', 'tod-golden', 'tod-morning', 'tod-day');
+  document.documentElement.classList.add('tod-' + part);
+  if (typeof glassU !== 'undefined') {
+    const T = { morning: [1.0, 0.975, 0.93, 0.48], day: [0.99, 0.99, 0.985, 0.44], golden: [1.0, 0.9, 0.8, 0.5], night: [0.1, 0.12, 0.18, 0.62] }[part];
+    glassU.uTint.value.set(T[0], T[1], T[2]); glassU.uTintK.value = T[3];
+  }
   crownLights.forEach(m => m.emissiveIntensity = night * 1.4);
   lanterns.forEach(l => l.material.emissiveIntensity = 0.2 + glow * 1.6);
   renderer.toneMappingExposure = 1.05 + night * 0.25;
@@ -1554,12 +1568,62 @@ function addTag(key, worldPos, post = false) {
   anchors.push({ el, p: worldPos.clone(), key });
 }
 pin3D(25, 37.5, -8, 'vc');
-const GLIMPSES = [
-  { el: document.getElementById('glimpse'), at: new THREE.Vector3(27, 30, -6), stop: 2 },
-  { el: document.getElementById('glimpseStressie'), at: new THREE.Vector3(-62, 9, 140), stop: 4 },
+// Each project's glimpse: what an employer checks first (role, timeline, platforms, outcomes, status,
+// stack), animated in when the tour reaches its building, glass tinted by SF's time of day.
+const GLIMPSE_DATA = [
+  { key: 'vc', idx: 'Work 01', stop: 2, at: new THREE.Vector3(27, 30, -6), ring: { x: 22.5, z: -10.5, r: 8 },
+    vis: '<img class="wide" src="images/card-verified.webp" alt="The Verified Call panel inside a video call: Alex Chen, verified">',
+    eb: 'Founder · design + engineering, solo', title: 'Verified Call',
+    line: 'Confirms the person on a hiring call is real, is who they say they are, and isn\'t reading answers from a hidden AI tool.',
+    facts: [['Role', 'Founder, solo design + build'], ['Timeline', '3 weeks · October 2026'], ['Platforms', 'Mac · Windows · Chrome · Meet']],
+    metrics: [{ to: 20, lab: 'companies in the closed beta' }, { to: 3, lab: 'weeks, idea to shipped' }, { to: 5, lab: 'surfaces, one design system' }],
+    status: 'Now in go-to-market',
+    tech: ['Figma', 'Electron', 'React', 'TypeScript', 'Next.js', 'Chrome extension', 'MediaPipe', 'Amazon Rekognition', 'Deepgram', 'GSAP', 'AI coding agents'] },
+  { key: 'stressie', idx: 'Work 02', stop: 4, at: new THREE.Vector3(-62, 9, 140), ring: { x: -70, z: 138, r: 10 },
+    vis: '<img src="images/stressie-v4/hero-poster.webp" alt="Stressie V4 check-in screen: how are you feeling in this moment?">', phone: 1,
+    eb: 'Founding product designer · Figma → SwiftUI', title: 'Stressie V4',
+    line: 'A stress check-in that pays for your evening: coins, a map of wellness experiences, and events you can host.',
+    facts: [['Role', 'Founding designer, built the iOS app'], ['Timeline', '2026 · with two founders'], ['Platforms', 'iOS · English, Spanish, Swahili']],
+    metrics: [{ to: 56, suf: '%', lab: 'daily engagement, up from 12%' }, { to: 171, lab: 'Swift files, built solo' }, { to: 13, suf: '/13', lab: 'Figma frames shipped as built' }],
+    status: 'Pilots: Amazon, InKind, Austin PD',
+    tech: ['Figma', 'SwiftUI', 'Swift', 'Metal', 'iOS', 'Localization', 'Prototyping', 'AI coding agents'] },
 ];
-document.getElementById('glimpseMore').onclick = () => openCase('vc');
-document.querySelectorAll('.glimpse [data-case]').forEach(b => b.onclick = () => openCase(b.dataset.case));
+const GLIMPSES = [];
+for (const d of GLIMPSE_DATA) {
+  const el = document.createElement('aside'); el.className = 'glimpse'; el.setAttribute('aria-live', 'polite');
+  const chips = d.tech.map(t => `<span>${t}</span>`).join('');
+  el.innerHTML = `
+    <div class="g-top" style="--i:0"><span>${d.idx}</span><span class="g-time"><i></i><em class="g-clock"></em></span></div>
+    <div class="g-vis${d.phone ? ' phone' : ''}" style="--i:1">${d.vis}</div>
+    <div class="g-eb" style="--i:2">${d.eb}</div>
+    <div class="g-title" style="--i:3">${d.title}</div>
+    <p class="g-line" style="--i:4">${d.line}</p>
+    <dl class="g-facts" style="--i:5">${d.facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+    <div class="g-metrics" style="--i:6">${d.metrics.map(m => `<div><b data-to="${m.to}" data-suf="${m.suf || ''}">0${m.suf || ''}</b><span>${m.lab}</span></div>`).join('')}</div>
+    <div class="g-status" style="--i:7"><i></i>${d.status}</div>
+    <div class="g-tech" style="--i:8" aria-label="Built with ${d.tech.join(', ')}"><div class="g-track">${chips}${chips}</div></div>
+    <button type="button" style="--i:9">Read full case study →</button>`;
+  el.querySelector('button').onclick = () => openCase(d.key);
+  document.getElementById('glimpses').appendChild(el);
+  // a soft light ring pulses at the building's base while its card is up
+  const ring = new THREE.Mesh(new THREE.RingGeometry(d.ring.r, d.ring.r + 1.4, 64), new THREE.MeshBasicMaterial({ color: '#FFE7A8', transparent: true, opacity: 0, depthWrite: false }));
+  ring.rotation.x = -Math.PI / 2; ring.position.set(d.ring.x, 0.2, d.ring.z); scene.add(ring);
+  GLIMPSES.push({ ...d, el, ringMesh: ring, shown: false });
+}
+// count the metrics up each time a card arrives
+function countUp(el) {
+  if (REDUCED) { el.querySelectorAll('[data-to]').forEach(b => b.textContent = b.dataset.to + b.dataset.suf); return; }
+  const t0 = performance.now();
+  (function tick() { const k = Math.min(1, (performance.now() - t0) / 1100), e = 1 - Math.pow(1 - k, 3);
+    el.querySelectorAll('[data-to]').forEach(b => b.textContent = Math.round(+b.dataset.to * e) + b.dataset.suf);
+    if (k < 1) setTimeout(tick, 16); })();
+}
+function sfClock() {
+  const h = sfHour(), hh = Math.floor(h), mm = Math.round((h - hh) * 60), tf = `${(hh + 11) % 12 + 1}:${String(mm).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`;
+  const part = h < 5 ? 'Night' : h < 11 ? 'Morning' : h < 16 ? 'Afternoon' : h < 18.5 ? 'Golden hour' : 'Evening';
+  document.querySelectorAll('.g-clock').forEach(e => e.textContent = `SF · ${tf} · ${part}`);
+}
+sfClock(); setInterval(sfClock, 30000);
 pin3D(-66, 13, 140, 'stressie');
 
 const seen = new Set();
@@ -1676,11 +1740,11 @@ window.__tour = { set p(v) { tourP = tourShown = v; stepTour(); } };
 // specular rim), then tone-maps to the screen. WebGL only, so it is the same in every browser.
 const glassRT = new THREE.WebGLRenderTarget(16, 16, { type: THREE.HalfFloatType, depthBuffer: true });
 const glassU = { tScene: { value: glassRT.texture }, uRes: { value: new THREE.Vector2() }, uRect: { value: new THREE.Vector4() },
-  uRad: { value: 0 }, uA: { value: 0 }, uDpr: { value: 1 } };
+  uRad: { value: 0 }, uA: { value: 0 }, uDpr: { value: 1 }, uTint: { value: new THREE.Vector3(0.99, 0.985, 0.97) }, uTintK: { value: 0.42 } };
 const glassScene = new THREE.Scene(), glassCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 glassScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({ uniforms: glassU, depthTest: false, depthWrite: false,
   vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
-  fragmentShader: `uniform sampler2D tScene; uniform vec2 uRes; uniform vec4 uRect; uniform float uRad, uA, uDpr; varying vec2 vUv;
+  fragmentShader: `uniform sampler2D tScene; uniform vec2 uRes; uniform vec4 uRect; uniform float uRad, uA, uDpr, uTintK; uniform vec3 uTint; varying vec2 vUv;
     float sdRR(vec2 p, vec2 b, float r){ vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
     vec3 tap(vec2 px){ return texture2D(tScene, clamp(px / uRes, 0.5 / uRes, 1.0 - 0.5 / uRes)).rgb; }
     void main(){
@@ -1699,7 +1763,7 @@ glassScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMat
             g.r += tap(gl_FragCoord.xy + off + o).r; g.g += tap(gl_FragCoord.xy + off * 1.08 + o).g; g.b += tap(gl_FragCoord.xy + off * 1.16 + o).b; }
           g /= 8.0;
           float l = dot(g, vec3(0.299, 0.587, 0.114)); g = mix(vec3(l), g, 1.2);
-          g = mix(g, vec3(0.99, 0.985, 0.97), 0.42 - 0.22 * bend);                      // clear glass with a light frost: the city shows through, dark text stays readable
+          g = mix(g, uTint, uTintK - 0.2 * bend);                                      // tinted by SF's time of day: cream morning, clear day, peach golden hour, smoked night
           g += smoothstep(0.1, 1.0, p.y / uRect.w) * 0.05;
           vec2 L = normalize(vec2(-0.55, 0.85)); float fc = max(dot(n, L), 0.0), bk = max(dot(n, -L), 0.0);
           float rim = 1.0 - smoothstep(0.0, 2.2 * uDpr, t);
@@ -1718,7 +1782,7 @@ function renderWithGlass() {
   const sz = renderer.getDrawingBufferSize(new THREE.Vector2()), k = sz.x / innerWidth;
   if (glassRT.width !== sz.x || glassRT.height !== sz.y) glassRT.setSize(sz.x, sz.y);
   const r = el.getBoundingClientRect();
-  glassU.uRes.value.copy(sz); glassU.uDpr.value = k; glassU.uA.value = a; glassU.uRad.value = 20 * k;
+  glassU.uRes.value.copy(sz); glassU.uDpr.value = k; glassU.uA.value = a; glassU.uRad.value = 22 * k;
   glassU.uRect.value.set((r.left + r.width / 2) * k, sz.y - (r.top + r.height / 2) * k, r.width / 2 * k, r.height / 2 * k);
   renderer.setRenderTarget(glassRT); renderer.render(scene, cam);
   renderer.setRenderTarget(null); renderer.render(glassScene, glassCam);
@@ -1806,11 +1870,17 @@ function project() {
   { // each project's glimpse rides beside its building while the tour is at that stop
     const f = tourShown * (TOUR.length - 1);
     for (const gl of GLIMPSES) {
-      gl.el.classList.toggle('on', Math.abs(f - gl.stop) < 0.42 && !csEl.classList.contains('on'));
+      const on = Math.abs(f - gl.stop) < 0.42 && !csEl.classList.contains('on');
+      if (on && !gl.shown) countUp(gl.el);
+      gl.shown = on; gl.el.classList.toggle('on', on);
+      const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 420);
+      gl.ringMesh.material.opacity += ((on ? 0.35 + 0.35 * pulse : 0) - gl.ringMesh.material.opacity) * 0.15;
+      gl.ringMesh.scale.setScalar(1 + (on ? pulse * 0.06 : 0));
       tmp.copy(gl.at).project(cam);
       const x = (tmp.x + 1) / 2 * W, y = (1 - tmp.y) / 2 * H;
       const gh = gl.el.offsetHeight || 420;                            // keep the whole card on screen
-      gl.el.style.transform = `translate(${Math.min(W - 340, x + 24).toFixed(1)}px,${Math.max(80, Math.min(H - gh - 24, y - 60)).toFixed(1)}px)`;
+      const gw = gl.el.offsetWidth || 372;
+      gl.el.style.transform = `translate(${Math.max(16, Math.min(W - gw - 20, x + 24)).toFixed(1)}px,${Math.max(80, Math.min(H - gh - 24, y - 60)).toFixed(1)}px)`;
     }
   }
   for (const a of anchors) {
