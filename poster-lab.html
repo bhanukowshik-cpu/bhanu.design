@@ -257,6 +257,22 @@ function alphaBox(img) {
   if (x1 < 0) return [0, 0, 1, 1];
   return [x0 / w, y0 / h, (x1 + 1) / w, (y1 + 1) / h];
 }
+// Opacity map of the foreground (rocks, shore) so a diving sea lion never resurfaces behind a rock.
+let OCC = null;
+function buildOcc(img) {
+  const w = 384, h = 216, c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(img, 0, 0, w, h);
+  const d = g.getImageData(0, 0, w, h).data; OCC = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) OCC[i] = d[i * 4 + 3];
+}
+function occluded(box, dx) {           // box in scene uv (v down); 2-cell margin around the body
+  if (!OCC) return false;
+  const w = 384, h = 216;
+  const x0 = Math.max(0, Math.floor((box[0] + dx) * w) - 2), x1 = Math.min(w - 1, Math.ceil((box[2] + dx) * w) + 2);
+  const y0 = Math.max(0, Math.floor(box[1] * h) - 2), y1 = Math.min(h - 1, Math.ceil(box[3] * h) + 2);
+  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (OCC[y * w + x] > 24) return true;
+  return false;
+}
 function makeTex(img) {
   let src = img;
   if (TEX_SCALE !== 1) {           // downscale once on the CPU for phones
@@ -806,6 +822,7 @@ async function build() {
   })));
   deferredVariants = layers.flatMap(L => Object.entries(L.files || {}).filter(([k]) => !needNow(k)).map(([k, f]) => ({ L, k, f })));
   deferredLoad = load;
+  if (imgs['foreground:light']) buildOcc(imgs['foreground:light']);
   const tex = (L, k) => imgs[L.name + ':' + k] ? makeTex(imgs[L.name + ':' + k]) : null;
   const blank = new THREE.Texture(); // placeholder sampler for absent maps
 
@@ -997,9 +1014,18 @@ function updateLife(t, dt) {
         s.nextDive -= dt;
         if (s.nextDive <= 0 && s.diveT <= 0 && !anyDiving) {
           s.diveT = 3 + Math.random() * 3; s.nextDive = 25 + Math.random() * 20; s.burst = 3;
-          // resurface 40–120 px away (kept within ±120 px of the art's home position)
-          const step = (40 + Math.random() * 80) / M.width * (Math.random() < 0.5 ? -1 : 1);
-          s.dxTarget = THREE.MathUtils.clamp(s.dxTarget + step, -120 / M.width, 120 / M.width);
+          // resurface 40–120 px away (kept within ±120 px of home), only in open water:
+          // never behind a foreground rock, never on top of another sea lion; else back home
+          const overlapsLion = dx => sprites.some(q => q !== s && q.anim.type === 'bob' &&
+            s.box[0] + dx < q.box[2] + q.dxTarget + 0.004 && s.box[2] + dx > q.box[0] + q.dxTarget - 0.004 &&
+            s.box[1] < q.box[3] && s.box[3] > q.box[1]);
+          let next = 0;
+          for (let t = 0; t < 12; t++) {
+            const step = (40 + Math.random() * 80) / M.width * (Math.random() < 0.5 ? -1 : 1);
+            const cand = THREE.MathUtils.clamp(s.dxTarget + step, -120 / M.width, 120 / M.width);
+            if (!occluded(s.box, cand) && !overlapsLion(cand)) { next = cand; break; }
+          }
+          s.dxTarget = next;
           Audio_.plip((s.box[0] + s.box[2]) / 2 + s.dx);
         }
         if (s.diveT > 0) { s.diveT -= dt; if (s.dive > 0.95) s.dx = s.dxTarget; }   // move while hidden
