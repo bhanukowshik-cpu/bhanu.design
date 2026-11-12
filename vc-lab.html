@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VC Scene Lab</title>
+<meta name="robots" content="noindex">
+<!--
+  Section 2 · Verified Call tower. The camera sinks through a cloud bank below the hero, the clouds
+  part over downtown, then it pushes in on the tower while the floors light up one by one.
+  Layers are AI-painted, pixel-aligned splits of city/assets/vc/reference_full.png (city/layers/vc/).
+  Missing layers fall back gracefully (plate → the reference itself; no dark tower → no floor reveal).
+  ?embed   → scene only, driven by the host page: postMessage({type:'vc-scroll', p}) with p in 0..1
+  ?p=0.5   → freeze the timeline (screenshots)
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--font-heading:'Montserrat',sans-serif;--font-mono:'JetBrains Mono',monospace}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#F4D2C2;font-family:var(--font-heading)}
+  html.embed,html.embed body{overflow:hidden;height:100%}
+  #stage{position:fixed;inset:0;overflow:hidden;
+         background:linear-gradient(180deg,#7C7DBB 0%,#A884B0 22%,#E08F98 48%,#F3B489 72%,#F6C77D 100%)}
+  #stage img.L{position:absolute;left:0;top:0;width:1672px;height:941px;max-width:none;
+               transform-origin:0 0;will-change:transform;user-select:none;pointer-events:none}
+  #stage .grp{position:absolute;left:0;top:0;width:1672px;height:941px;transform-origin:0 0;will-change:transform;pointer-events:none}
+  #stage .walker{position:absolute;left:0;top:0;transform-origin:50% 100%}
+  #stage img.cloud{position:absolute;left:50%;top:50%;max-width:none;will-change:transform,opacity;pointer-events:none}
+  #gulls{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  #spacer{height:420vh}
+  html.embed #spacer{display:none}
+
+  /* Standalone preview card (the homepage renders its own copy over the frame) */
+  .vc-card{position:fixed;right:clamp(16px,6vw,96px);top:50%;width:min(420px,calc(100vw - 32px));
+           transform:translate(0,calc(-50% + 24px));opacity:0;pointer-events:none;
+           padding:28px 28px 24px;border-radius:22px;color:#fff;
+           background:rgba(28,22,48,.34);border:1px solid rgba(255,255,255,.22);
+           -webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);
+           transition:opacity .6s cubic-bezier(.2,.7,.2,1),transform .6s cubic-bezier(.2,.7,.2,1)}
+  .vc-card.on{opacity:1;transform:translate(0,-50%);pointer-events:auto}
+  html.embed .vc-card{display:none}
+  .vc-card .meta{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11px;
+                 letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.72)}
+  .vc-card .meta span+span::before{content:'·';margin-right:10px;opacity:.6}
+  .vc-card h2{font-size:clamp(28px,3vw,38px);font-weight:700;letter-spacing:-.01em;margin:14px 0 10px}
+  .vc-card p.line{font-size:15px;line-height:1.55;font-weight:500;color:rgba(255,255,255,.88)}
+  .vc-card .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0 22px;
+                  padding-top:18px;border-top:1px solid rgba(255,255,255,.18)}
+  .vc-card .stats b{display:block;font-size:24px;font-weight:700;letter-spacing:-.01em}
+  .vc-card .stats small{display:block;margin-top:4px;font-size:11.5px;line-height:1.35;color:rgba(255,255,255,.7);font-weight:500}
+  .vc-card a{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;
+             font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+             padding:11px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.35)}
+  .vc-card a:hover{background:rgba(255,255,255,.12)}
+  @media (max-width:767px){
+    .vc-card{top:auto;bottom:16px;right:16px;left:16px;width:auto;transform:translate(0,24px);padding:20px 20px 18px}
+    .vc-card.on{transform:none}
+    .vc-card .stats b{font-size:20px}
+  }
+  .dbg{position:fixed;left:10px;bottom:10px;font:11px var(--font-mono);color:#fff;opacity:.7;display:none}
+  html.debug .dbg{display:block}
+</style>
+</head>
+<body>
+<div id="stage" aria-hidden="true">
+  <svg id="gulls" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+</div>
+<div id="spacer"></div>
+
+<aside class="vc-card" id="vcCard">
+  <p class="meta"><span>Founder</span><span>Design + build, solo</span><span>3 weeks</span></p>
+  <h2>Verified Call</h2>
+  <p class="line">Confirms the person on a hiring call is real, is who they say they are, and isn't reading answers from a hidden AI tool.</p>
+  <div class="stats">
+    <div><b>0 / 3,990</b><small>face swaps got through</small></div>
+    <div><b>30 / 30</b><small>hidden AI tools caught</small></div>
+    <div><b>20</b><small>companies in the closed beta</small></div>
+  </div>
+  <a href="verified-call.html" target="_top">Read case study <span aria-hidden="true">&rarr;</span></a>
+</aside>
+<div class="dbg" id="dbg"></div>
+
+<script>
+(() => {
+  const Q = new URLSearchParams(location.search);
+  const EMBED = Q.has('embed');
+  if (EMBED) document.documentElement.classList.add('embed');
+  if (Q.has('debug')) document.documentElement.classList.add('debug');
+  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const IW = 1672, IH = 941;
+  const DIR = 'city/layers/vc/';
+  const stage = document.getElementById('stage');
+  const card = document.getElementById('vcCard');
+
+  // ── layers (depth: 0 = city/sky, 1 = plaza foreground; foreground zooms faster = flying in)
+  // Floor slabs of the tower, top → bottom (scene v), and its outline (scene uv), measured on the reference.
+  const TOWER = { x0: 0.028, x1: 0.356, top: 0.0, bottom: 0.875 };
+  const FLOORS = [0.875, 0.79, 0.665, 0.555, 0.44, 0.33, 0.0];        // lit from the bottom up
+
+  function img(src, cls) {
+    return new Promise(res => {
+      const i = new Image(); i.className = cls; i.decoding = 'async'; i.alt = '';
+      i.onload = () => res(i); i.onerror = () => res(null); i.src = src;
+    });
+  }
+  const L = {};
+  async function load() {
+    let [plate, ref, dark, fg, ca, cb] = await Promise.all([
+      img(DIR + 'plate.webp', 'L'), img('city/assets/vc/reference_full.png', 'L'),
+      img(DIR + 'tower_dark.webp', 'L'), img(DIR + 'foreground.webp', 'L'),
+      img(DIR + 'cloud_a.webp', 'cloud'), img(DIR + 'cloud_b.webp', 'cloud')]);
+    if (!fg) fg = await img(DIR + 'foreground_people.webp', 'L');   // people still painted in (until the walkers exist)
+    L.plate = plate || ref;                        // without a split plate the reference carries everything
+    L.split = !!(plate && fg);
+    stage.insertBefore(L.plate, stage.firstChild);
+    if (dark) { L.dark = dark; stage.insertBefore(dark, L.plate.nextSibling); }
+    if (fg && L.split) {
+      // the plaza is a group (painted foreground + walkers) so the people ride the same depth push
+      const grp = document.createElement('div'); grp.className = 'L grp';
+      fg.className = ''; fg.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%';
+      grp.appendChild(fg); stage.appendChild(grp); L.fg = grp;
+      await addWalkers(grp);
+    }
+    L.clouds = [];
+    // two banks of the back sheet + one front sheet, each a different size/drift so they never read as copies
+    const sheets = [[cb || ca, 0.0, 1.0, 1], [ca || cb, 0.55, 1.18, -1], [cb || ca, 0.25, 1.38, 1]];
+    for (const [s, ph, sc, dir] of sheets) {
+      if (!s) continue;
+      const c = s.cloneNode(); c.className = 'cloud'; stage.appendChild(c);
+      L.clouds.push({ el: c, ph, sc, dir });
+    }
+    if (!L.clouds.length) {                        // CSS fallback bank until the painted clouds exist
+      const d = document.createElement('div');
+      d.style.cssText = 'position:absolute;inset:-10%;pointer-events:none;background:' +
+        'radial-gradient(40% 30% at 30% 60%,#FCE7DD 0,#FCE7DDcc 40%,transparent 70%),' +
+        'radial-gradient(45% 35% at 70% 50%,#F8DCD2 0,#F8DCD2cc 45%,transparent 72%),' +
+        'radial-gradient(60% 40% at 50% 80%,#FFF1E8 0,#FFF1E8 50%,transparent 75%)';
+      stage.appendChild(d); L.cssCloud = d;
+    }
+    stage.appendChild(document.getElementById('gulls'));
+    frame(true);
+  }
+
+  // ── walkers: AI-painted people (city/layers/vc/people.webp, crops in people.json) walking the plaza.
+  // Two poses alternate per stride, a small bob rides each step, and they turn at the end of their
+  // route. Positions are in painting px, inside the plaza group, so they move with its depth.
+  const walkers = [];
+  async function addWalkers(grp) {
+    let spec = null;
+    try { spec = await (await fetch(DIR + 'people.json', { cache: 'no-cache' })).json(); } catch (e) { return; }
+    const sheet = await img(DIR + spec.sheet, 'x'); if (!sheet) return;
+    // alpha of the sheet, to find each pose's hip centre (legs pivot around it)
+    const sc = document.createElement('canvas'); sc.width = sheet.naturalWidth; sc.height = sheet.naturalHeight;
+    const sg = sc.getContext('2d', { willReadFrequently: true }); sg.drawImage(sheet, 0, 0);
+    for (const w of spec.walkers) {
+      const cw = Math.max(...w.frames.map(f => f[2])) + 8, ch = Math.max(...w.frames.map(f => f[3])) + 6;
+      const cv = document.createElement('canvas'); cv.className = 'walker'; cv.width = cw; cv.height = ch;
+      const k = w.h / w.frames[0][3];                        // sheet px → painting px
+      cv.style.width = (cw * k) + 'px'; cv.style.height = (ch * k) + 'px';
+      grp.appendChild(cv);
+      const hips = w.frames.map(f => {                       // centre of the figure on its hip row
+        const hy = Math.round(f[1] + f[3] * 0.52), row = sg.getImageData(f[0], hy, f[2], 1).data;
+        let a = 0, s = 0; for (let x = 0; x < f[2]; x++) { const v = row[x * 4 + 3]; a += v; s += v * x; }
+        return a ? s / a : f[2] / 2;
+      });
+      const len = Math.hypot((w.to[0] - w.from[0]) * IW, (w.to[1] - w.from[1]) * IH);
+      walkers.push({ ...w, cv, g: cv.getContext('2d'), sheet, k, hips, cw, ch, len,
+                     sgn: Math.sign(w.to[0] - w.from[0]) || 1, d: (w.phase || 0) * len * 2 });
+    }
+  }
+  // A four-beat cycle from two painted strides: contact (pose A, legs open) → passing (legs drawn
+  // together row by row, body up ~2 px) → contact (pose B) → passing. Feet stay planted.
+  function drawWalker(w, steps) {
+    const g = w.g, beat = steps * Math.PI;                   // one stride = half a turn
+    const f = w.frames[Math.floor(steps) % w.frames.length], hip = w.hips[Math.floor(steps) % w.frames.length];
+    const open = Math.abs(Math.cos(beat));                   // 1 at contact, 0 at passing
+    const legK = 0.32 + 0.68 * open, lift = (1 - open) * 2.2;
+    const hy = Math.round(f[3] * 0.52);
+    const ox = w.cw / 2 - hip, oy = w.ch - 3 - f[3];        // hip centred, feet on the canvas floor
+    g.clearRect(0, 0, w.cw, w.ch);
+    g.save(); g.globalAlpha = 0.28 - 0.08 * (1 - open); g.fillStyle = '#2A1A34';      // contact shadow
+    g.beginPath(); g.ellipse(w.cw / 2, w.ch - 3, f[2] * (0.22 + 0.12 * open), 2.6, 0, 0, 7); g.fill(); g.restore();
+    g.drawImage(w.sheet, f[0], f[1], f[2], hy, ox, oy - lift, f[2], hy);          // head → hips
+    for (let r = hy; r < f[3]; r += 2) {                                          // legs, converging
+      const t = (r - hy) / (f[3] - hy), sx = 1 + (legK - 1) * Math.min(1, t * 1.15);
+      const dx = ox + hip - hip * sx;
+      g.drawImage(w.sheet, f[0], f[1] + r, f[2], 2, dx, oy + r - lift * (1 - t), f[2] * sx, 2.4);
+    }
+  }
+  function stepWalkers(dt) {
+    for (const w of walkers) {
+      w.d = (w.d + w.speed * dt) % (w.len * 2);              // there and back
+      const back = w.d > w.len, s = back ? 2 - w.d / w.len : w.d / w.len;
+      const x = (w.from[0] + (w.to[0] - w.from[0]) * s) * IW, y = (w.from[1] + (w.to[1] - w.from[1]) * s) * IH;
+      drawWalker(w, w.d / (w.stride || 10));
+      const dir = w.sgn * (back ? -1 : 1);                    // sheet faces right
+      const bw = w.cw * w.k, bh = w.ch * w.k;
+      w.cv.style.transform = `translate3d(${(x - bw / 2).toFixed(2)}px,${(y - bh + 3 * w.k).toFixed(2)}px,0) scaleX(${dir})`;
+    }
+  }
+
+  // ── gulls: small "M" strokes, flap then glide
+  const gullSvg = document.getElementById('gulls');
+  const gulls = Array.from({ length: 4 }, (_, i) => {
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('fill', 'none'); p.setAttribute('stroke', '#3D3550'); p.setAttribute('stroke-width', '2.2');
+    p.setAttribute('stroke-linecap', 'round'); p.setAttribute('vector-effect', 'non-scaling-stroke');
+    gullSvg.appendChild(p);
+    return { p, x: 0.55 + i * 0.1, y: 0.2 + (i % 2) * 0.07, v: 0.006 + i * 0.0015, ph: i * 1.7, s: 7 + (i % 3) * 2 };
+  });
+
+  // ── timeline
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const seg = (p, a, b) => clamp((p - a) / (b - a), 0, 1);
+  const lerp = (a, b, t) => a + (b - a) * t;
+  let P = Q.has('p') ? +Q.get('p') : 0, Pshown = P;
+
+  function camera(p, W, H) {
+    const mobile = W / H < 0.9;
+    const d = ease(seg(p, 0.0, 0.42));        // descent through the clouds
+    const z = ease(seg(p, 0.34, 0.86));       // push-in on the tower
+    // focus x for the final framing: tower at ~35% of the screen (card on the right); centred on phones
+    const endX = mobile ? 0.19 : 0.27, endY = mobile ? 0.47 : 0.45, endZ = mobile ? 1.3 : 1.7;
+    return {
+      x: lerp(lerp(0.5, 0.46, d), endX, z),
+      y: lerp(lerp(0.12, 0.5, d), endY, z),    // starts high (sky) and sinks to the street
+      z: lerp(lerp(1.18, 1.02, d), endZ, z),   // a little zoom gives the descent room to pan down
+      mobile
+    };
+  }
+
+  function place(el, cam, W, H, depth) {
+    // cover-fit at zoom 1, then zoom around the camera point; deeper layers push harder
+    const base = Math.max(W / IW, H / IH);
+    const zk = Math.pow(cam.z, 1 + depth * 0.9) * (1 + depth * 0.04);
+    const s = base * zk;
+    let tx = W / 2 - cam.x * IW * s, ty = H / 2 - cam.y * IH * s;
+    // never show past the painting's edges (a sky extension above read as a hard seam)
+    tx = clamp(tx, W - IW * s, 0);
+    ty = clamp(ty, H - IH * s, 0);
+    el.style.transform = `translate3d(${tx.toFixed(2)}px,${ty.toFixed(2)}px,0) scale(${s.toFixed(5)})`;
+  }
+
+  let t0 = performance.now(), lastLit = -1, flick = [], lastT = 0;
+  function frame(force) {
+    const now = performance.now(), t = (now - t0) / 1000;
+    const dt = Math.min(0.1, Math.max(0, t - lastT)); lastT = t;
+    if (!REDUCED) stepWalkers(dt); else if (force) stepWalkers(0);
+    const W = innerWidth, H = innerHeight;
+    Pshown += (P - Pshown) * (REDUCED ? 1 : 0.12);                // the lerp the hero reel uses
+    const p = Pshown;
+    const cam = camera(p, W, H);
+    if (L.plate) place(L.plate, cam, W, H, 0);
+    if (L.fg) {
+      place(L.fg, cam, W, H, 1);
+      L.fg.style.opacity = (1 - seg(p, 0.66, 0.84)).toFixed(3);  // plaza slides past and out
+    }
+
+    // floors light up bottom → top as we push in; each one flickers on like a real fluorescent bank
+    if (L.dark) {
+      place(L.dark, cam, W, H, 0);
+      const k = seg(p, 0.40, 0.78), lit = Math.floor(k * (FLOORS.length - 1) + 1e-6);
+      if (lit > lastLit && lastLit >= 0 && !REDUCED) flick.push({ at: t, f: lit });
+      lastLit = lit;
+      const yLine = FLOORS[lit];
+      const fl = flick.length ? flick[flick.length - 1] : null;
+      let y = yLine;
+      if (fl && t - fl.at < 0.35) {                                  // on-off-on in 350 ms
+        const q = (t - fl.at) / 0.35; if (q > 0.25 && q < 0.5) y = FLOORS[fl.f - 1];
+      }
+      // dark tower shows above the lit line, clipped to the tower outline
+      const top = TOWER.top * 100, r = (1 - TOWER.x1) * 100, l = TOWER.x0 * 100, b = (1 - y) * 100;
+      L.dark.style.clipPath = `inset(${top}% ${r}% ${b}% ${l}%)`;
+      L.dark.style.opacity = '1';
+    }
+
+    // clouds: a full bank at the top of the section that rises past the lens and tears apart
+    const c = seg(p, 0.0, 0.38);
+    const cover = 1 - ease(c);
+    if (L.clouds) L.clouds.forEach((k, i) => {
+      const s = Math.max(W / k.el.naturalWidth, H / k.el.naturalHeight) * k.sc * (1 + c * (0.5 + i * 0.35));
+      const drift = Math.sin(t * 0.03 + k.ph * 6) * 0.03 * W;
+      const rise = -c * H * (0.75 + i * 0.4);                         // camera sinking = clouds rising
+      const part = k.dir * c * W * (0.18 + i * 0.12);                 // and splitting sideways
+      k.el.style.transform = `translate(-50%,-50%) translate3d(${(drift + part).toFixed(1)}px,${(rise + H * 0.04 * i).toFixed(1)}px,0) scale(${s.toFixed(4)})`;
+      k.el.style.opacity = clamp(cover * 1.25 - i * 0.05, 0, 1).toFixed(3);
+    });
+    if (L.cssCloud) {
+      L.cssCloud.style.transform = `translate3d(0,${(-c * H).toFixed(1)}px,0) scale(${1 + c})`;
+      L.cssCloud.style.opacity = cover.toFixed(3);
+    }
+
+    // gulls drift right-to-left over the sky (screen space, fade out as we zoom into the glass)
+    const gz = 1 - seg(p, 0.5, 0.75);
+    gulls.forEach(g => {
+      const x = ((g.x - t * g.v) % 1.2 + 1.2) % 1.2 - 0.1;
+      const flap = Math.sin(t * 2.2 * Math.PI + g.ph);
+      const glide = (Math.sin(t * 0.4 + g.ph) > 0.3) ? 0.15 : 1;   // flap, then glide a few seconds
+      const w = g.s, hh = w * (0.35 + 0.35 * flap * glide);
+      const X = x * 1000, Y = (g.y + Math.sin(t * 0.5 + g.ph) * 0.01) * 1000;
+      g.p.setAttribute('d', `M${X - w} ${Y - hh}Q${X - w / 2} ${Y - hh * 0.2} ${X} ${Y}Q${X + w / 2} ${Y - hh * 0.2} ${X + w} ${Y - hh}`);
+      g.p.style.opacity = (gz * (1 - cover)).toFixed(3);
+    });
+
+    if (card) card.classList.toggle('on', p > 0.8);
+    if (Q.has('debug')) document.getElementById('dbg').textContent =
+      `p ${p.toFixed(3)} cam ${cam.x.toFixed(3)},${cam.y.toFixed(3)} z ${cam.z.toFixed(2)}`;
+  }
+
+  function loop() { frame(); requestAnimationFrame(loop); }
+
+  // ── scroll input
+  if (EMBED) {
+    addEventListener('message', e => {
+      if (e.origin !== location.origin || !e.data || e.data.type !== 'vc-scroll') return;
+      P = clamp(+e.data.p || 0, 0, 1);
+    });
+  } else if (!Q.has('p')) {
+    const onScroll = () => { P = clamp(scrollY / (document.documentElement.scrollHeight - innerHeight), 0, 1); };
+    addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  }
+  if (Q.has('p')) Pshown = P;
+  addEventListener('resize', () => frame(true));
+  window.__vc = { set p(v) { P = Pshown = v; frame(true); }, get p() { return P; }, frame };
+  load().then(loop);
+})();
+</script>
+</body>
+</html>
