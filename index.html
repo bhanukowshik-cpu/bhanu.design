@@ -5749,7 +5749,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <div class="wk-body">
           <p class="wk-meta"><span>Founder</span><span>Design + build, solo</span><span>3 weeks</span></p>
           <h3 class="wk-name" id="wk-n1">Verified Call</h3>
-          <p class="wk-line">Confirms the person on a hiring call is real, is who they say they are, and is not reading answers from a hidden AI tool. Face, voice, camera and apps, checked the whole call. In testing, <b>0 of 3,990</b> face swaps got through and hidden AI tools were caught <b>30 of 30</b> times. <b>20 companies</b> in the closed beta.</p>
+          <p class="wk-line">I'm building Verified Call solo, to remove cheating from video calls.</p>
+          <p class="cm-pills"><span><b>20 companies</b> in the closed beta</span><span><b>3 weeks</b> to build, solo</span><span><i></i>Now in go-to-market</span></p>
           <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
         </div>
       </a>
@@ -5811,7 +5812,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <div class="wk-body">
           <p class="wk-meta"><span>Founding designer</span><span>Design + build</span></p>
           <h3 class="wk-name" id="wk-n5">Stressie V4</h3>
-          <p class="wk-line">Designed in Figma, built in SwiftUI: a check-in that turns into plans after work, in <b>3 languages</b>.</p>
+          <p class="wk-line">A stress check-in that pays for your evening. Designed in Figma, built in SwiftUI by me.</p>
+          <p class="cm-pills"><span><b>171 Swift files</b> built solo</span><span><b>3 languages</b></span><span><i></i>Pilots: Amazon, InKind, Austin PD</span></p>
           <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
         </div>
       </a>
@@ -5833,6 +5835,148 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
     </div>
   </section>
+
+  <!-- ══ PROJECT COMMERCIALS (12 Nov, owner) ══════════════════════════════════════════
+       Each work card plays a short captioned "commercial" that explains the product in a few seconds:
+       Verified Call (remote interview → face swap + hidden AI → Verified Call flags it) and Stressie V4
+       (sign in → language → check in → coins → spend after work), on a phone. The old card media is hidden,
+       not deleted. Stages are drawn at a fixed design size and scaled to the card. -->
+  <style>
+    .wk-media.cm-on > :not(.cm):not(.wk-go){display:none!important}
+    .wk-media.cm-on{background:#EDE5D8!important}
+    /* show, don't tell (owner, 12 Nov): no captions, no step lists, no drop shadows; the product carries the story */
+    .cm{position:absolute;left:50%;top:50%;width:720px;height:420px;transform:translate(-50%,-50%) scale(var(--cs,1));transform-origin:50% 50%;
+        display:grid;place-items:center;font-family:var(--sans);color:#1F1B24}
+    .cm > .vcm{width:100%}
+    .cm .beats{list-style:none;margin:0;padding:0;display:grid;gap:14px;counter-reset:b}
+    .cm .beats li{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;font-size:17px;line-height:1.3;font-weight:600;color:rgba(31,27,36,.32);transition:color .3s}
+    .cm .beats li::before{counter-increment:b;content:counter(b);display:grid;place-items:center;width:26px;height:26px;border-radius:50%;
+        background:rgba(31,27,36,.1);color:rgba(31,27,36,.45);font-size:12.5px;font-weight:700}
+    .cm .beats li.on{color:#1F1B24}.cm .beats li.on::before{background:#1F1B24;color:#fff}
+    .cm .beats li > span{grid-column:2}
+    .cm .beats li small{display:block;font-size:13px;font-weight:500;color:rgba(31,27,36,.55);margin-top:3px;grid-column:2}
+    .cm > *{min-height:0;max-height:420px}
+    .cm-pills{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+    .cm-pills span{display:inline-flex;align-items:center;gap:6px;font-size:13px;line-height:1;padding:8px 11px;border-radius:999px;background:rgba(31,27,36,.06);color:var(--ink-2,#4A4450)}
+    .cm-pills b{color:var(--ink,#1F1B24);font-weight:700}
+    .cm-pills i{width:7px;height:7px;border-radius:50%;background:#16845E}
+    /* — Verified Call call screen — */
+    .vcm{position:relative;height:100%;border-radius:16px;overflow:hidden;background:#14171D;color:#fff}
+    .vcm .tile{position:absolute;border-radius:12px;overflow:hidden;background:#222;transition:right .6s cubic-bezier(.2,.8,.2,1),opacity .4s}
+    .vcm .tile img{width:100%;height:100%;object-fit:cover;display:block}
+    .vcm .nm{position:absolute;left:8px;bottom:8px;font-size:12px;font-weight:600;background:rgba(0,0,0,.5);padding:3px 8px;border-radius:6px}
+    .vcm .cand{left:12px;top:12px;right:12px;bottom:12px}
+    .vcm .you{right:24px;top:24px;width:24%;aspect-ratio:1;border:2px solid #14171D;z-index:2}
+    .vcm .swap{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);font-size:13px;font-weight:800;padding:4px 10px;border-radius:6px;background:#E85D4A;opacity:0;transition:opacity .3s}
+    .vcm .flag{position:absolute;left:10px;right:10px;top:10px;text-align:center;font-size:15px;font-weight:800;padding:8px;border-radius:9px;background:#D93B30;opacity:0;transform:translateY(-6px);transition:all .4s}
+    .vcm .ai{position:absolute;left:24px;bottom:46px;display:flex;align-items:center;gap:8px;font-size:13px;background:#fff;color:#1F1B24;padding:8px 12px;border-radius:10px;
+        opacity:0;transform:translateY(8px);transition:all .4s;z-index:3}
+    .vcm .ai b{color:#10A37F}
+    .vcm .panel{position:absolute;right:12px;top:12px;bottom:12px;width:44%;background:#FAF8F4;color:#1F1B24;border-radius:12px;padding:14px;transform:translateX(115%);transition:transform .6s cubic-bezier(.2,.8,.2,1);z-index:4}
+    .vcm .panel h5{display:flex;align-items:center;gap:7px;margin:0 0 12px;font-size:14px}
+    .vcm .panel h5 i{width:14px;height:15px;background:#16845E;clip-path:polygon(50% 0,100% 18%,92% 70%,50% 100%,8% 70%,0 18%)}
+    .vcm .panel ul{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+    .vcm .panel li{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600}
+    .vcm .panel li em{width:20px;height:20px;border-radius:50%;border:2px solid #C9C3B8;flex:none;display:grid;place-items:center;font-style:normal;font-size:12px;color:#fff;transition:all .3s}
+    .vcm .panel li.ok em{background:#16845E;border-color:#16845E}.vcm .panel li.ok em::after{content:'✓'}
+    .vcm .panel li.bad em{background:#D93B30;border-color:#D93B30}.vcm .panel li.bad em::after{content:'✕'}
+    .vcm .panel li.bad{color:#C0392B}
+    .vcm[data-s="2"] .face{animation:cmGlitch 1.4s steps(1) 1}
+    .vcm[data-s="2"] .swap,.vcm[data-s="3"] .swap{opacity:1}
+    .vcm[data-s="2"] .ai,.vcm[data-s="3"] .ai{opacity:1;transform:none}
+    .vcm[data-s="3"] .panel{transform:none}
+    .vcm[data-s="3"] .cand{right:calc(44% + 22px)}.vcm[data-s="3"] .you{opacity:0}
+    .vcm.flagged .flag{opacity:1;transform:none}
+    @keyframes cmGlitch{0%{filter:none}15%{filter:hue-rotate(40deg) contrast(1.6);transform:translateX(5px) skewX(4deg)}30%{transform:translateX(-5px)}45%{filter:contrast(1.3);transform:none}60%{transform:translateX(3px)}75%,100%{filter:none;transform:none}}
+    /* — Stressie phone — */
+    .stm{position:relative;height:100%;display:grid;place-items:center}
+    .stm{height:100%}
+    .stm .iph{position:relative;height:100%;aspect-ratio:71.6/147.6;border-radius:44px;padding:3px;
+      background:linear-gradient(135deg,#8E8A84 0%,#D6D2CB 18%,#7C7873 40%,#B9B4AC 62%,#6E6A65 85%,#A9A49C 100%)}  /* natural titanium */
+    .stm .iph::before{content:'';position:absolute;inset:3px;border-radius:41px;background:#0B0B0C}               /* black bezel */
+    .stm .iph > i.b{position:absolute;width:3px;border-radius:2px;background:linear-gradient(90deg,#6E6A65,#B9B4AC)}
+    .stm .iph > i.b1{left:-3px;top:17%;height:5%}.stm .iph > i.b2{left:-3px;top:25%;height:9%}.stm .iph > i.b3{left:-3px;top:36%;height:9%}
+    .stm .iph > i.b4{right:-3px;top:28%;height:14%}
+    .stm .isl{position:absolute;left:50%;top:22px;width:31%;height:20px;border-radius:12px;background:#000;transform:translateX(-50%);z-index:3}
+    .stm .scr{position:absolute;inset:12px;border-radius:33px;overflow:hidden;background:#F6F1E8}
+    .stm .scr img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:translateX(18%);transition:opacity .45s,transform .55s cubic-bezier(.2,.8,.2,1)}
+    .stm .scr img.on{opacity:1;transform:none}.stm .scr img.out{opacity:0;transform:translateX(-18%)}
+    .stm .lang{position:absolute;top:22%;left:calc(100% + 18px);display:grid;gap:7px;opacity:0;transition:opacity .3s}
+    .stm .lang span{font:700 13px var(--sans);padding:7px 12px;border-radius:999px;background:#fff;color:#4A4450;transition:all .25s}
+    .stm .lang span.on{background:#1F1B24;color:#fff}
+    .stm[data-s="2"] .lang{opacity:1}
+    .stm .finger{position:absolute;width:30px;height:30px;border-radius:50%;background:rgba(30,30,30,.22);border:2.5px solid rgba(255,255,255,.95);z-index:4;opacity:0;
+        transition:left .9s cubic-bezier(.4,0,.2,1),top .9s cubic-bezier(.4,0,.2,1),opacity .3s,transform .15s}
+    .stm .finger.press{transform:scale(.8)}
+    .stm .pop{position:absolute;left:50%;top:40%;transform:translate(-50%,0) scale(.6);font:800 22px var(--sans);color:#B98A1E;opacity:0;transition:all .5s cubic-bezier(.2,.8,.2,1);z-index:4}
+    .stm .pop.on{opacity:1;transform:translate(-50%,-40px) scale(1)}
+    @media (max-width:900px){ .cm{grid-template-columns:1fr;width:420px;height:560px}.cm .beats{grid-template-columns:repeat(3,auto);gap:8px}.cm .beats li{font-size:13px}.cm .beats li small{display:none} }
+  </style>
+  <script>
+    (function () {
+      var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function fit(media, stage) {                                         // scale the fixed-size stage to the card
+        function f() { var r = media.getBoundingClientRect(), w = stage.offsetWidth, h = stage.offsetHeight;
+          stage.style.setProperty('--cs', Math.min(r.width * 0.9 / w, r.height * 0.86 / h).toFixed(3)); }
+        f(); if (window.ResizeObserver) new ResizeObserver(f).observe(media); addEventListener('resize', f);
+      }
+      function mount(card, html) { var m = card.querySelector('.wk-media'); if (!m) return null;
+        m.classList.add('cm-on'); var d = document.createElement('div'); d.className = 'cm'; d.setAttribute('aria-hidden', 'true'); d.innerHTML = html; m.appendChild(d); fit(m, d); return d; }
+      // play a timeline only while the card is on screen
+      function run(stage, steps, loopMs) {
+        var timers = [], live = false;
+        function clear() { timers.forEach(clearTimeout); timers = []; }
+        function play() { clear(); steps.forEach(function (st) { timers.push(setTimeout(st[1], st[0])); }); timers.push(setTimeout(play, loopMs)); }
+        if (reduce) { steps.forEach(function (st) { st[1](); }); return; }
+        new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && !live) { live = true; play(); } else if (!e.isIntersecting && live) { live = false; clear(); } }); }, { threshold: 0.35 }).observe(stage);
+      }
+      function beat(stage, n) { stage.querySelectorAll('.beats li').forEach(function (li, i) { li.classList.toggle('on', i === n); }); }
+
+      // ── Verified Call ──
+      var vc = document.querySelector('.wk-card[href="verified-call.html"]');
+      if (vc) { var s1 = mount(vc, '<div class="vcm" data-s="1"><div class="tile cand"><img class="face" src="images/vc/face-cand.webp" alt=""><span class="nm">Alex · Candidate</span><span class="swap">Face swap</span><span class="flag">Cheating detected</span></div>' +
+          '<div class="tile you"><img src="images/vc/face-int.webp" alt=""><span class="nm">You</span></div>' +
+          '<div class="ai">✦ <span><b>ChatGPT</b> hidden · whispering answers</span></div>' +
+          '<div class="panel"><h5><i></i>Verified Call</h5><ul><li><em></em>Real camera</li><li><em></em>Face match</li><li><em></em>Same voice</li><li><em></em>Hidden apps</li></ul></div></div>');
+        if (s1) { var v = s1.querySelector('.vcm'), rows = v.querySelectorAll('.panel li');
+          run(s1, [
+            [0, function () { v.dataset.s = '1'; v.classList.remove('flagged'); rows.forEach(function (r) { r.className = ''; }); beat(s1, 0); }],
+            [2200, function () { v.dataset.s = '2'; beat(s1, 1); }],
+            [5200, function () { v.dataset.s = '3'; beat(s1, 2); }],
+            [6000, function () { rows[0].className = 'ok'; }], [6500, function () { rows[1].className = 'bad'; }],
+            [7000, function () { rows[2].className = 'ok'; }], [7500, function () { rows[3].className = 'bad'; }],
+            [8100, function () { v.classList.add('flagged'); }]
+          ], 11000); } }
+
+      // ── Stressie V4 ──
+      var st = document.querySelector('.wk-card[href="stressie-v4.html"]');
+      if (st) { var P = 'images/stressie-v4/';
+        var s2 = mount(st, '<div class="stm" data-s="1"><div class="iph"><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="isl"></i><div class="scr">' +
+          ['real-welcome', 'lang-en', 'lang-es', 'lang-sw', 'checkin-shape', 'checkin-reward', 'offwork-map', 'offwork-redeem'].map(function (n) { return '<img data-n="' + n + '" src="' + P + n + '.webp" alt="">'; }).join('') +
+          '<span class="pop">+10</span><i class="finger"></i></div><div class="lang"><span data-l="en">English</span><span data-l="es">Español</span><span data-l="sw">Kiswahili</span></div></div></div>');
+        if (s2) { var ph = s2.querySelector('.stm'), fin = ph.querySelector('.finger'), pop = ph.querySelector('.pop');
+          ph.querySelector('.scr img').classList.add('on');
+          function show(n) { ph.querySelectorAll('.scr img').forEach(function (im) { var on = im.dataset.n === n; if (im.classList.contains('on') && !on) { im.classList.add('out'); setTimeout(function () { im.classList.remove('out'); }, 500); } im.classList.toggle('on', on); }); }
+          function lang(l) { ph.querySelectorAll('.lang span').forEach(function (x) { x.classList.toggle('on', x.dataset.l === l); }); }
+          function finger(x, y, vis) { fin.style.left = x + '%'; fin.style.top = y + '%'; fin.style.opacity = vis ? 1 : 0; }
+          function tap() { fin.classList.add('press'); setTimeout(function () { fin.classList.remove('press'); }, 180); }
+          run(s2, [
+            [0, function () { ph.dataset.s = '1'; beat(s2, 0); show('real-welcome'); pop.classList.remove('on'); finger(50, 86, false); }],
+            [700, function () { finger(50, 70, true); }], [1500, tap],
+            [1900, function () { ph.dataset.s = '2'; beat(s2, 1); show('lang-en'); lang('en'); finger(50, 70, false); }],
+            [2900, function () { show('lang-es'); lang('es'); }],
+            [3900, function () { show('lang-sw'); lang('sw'); }],
+            [4900, function () { ph.dataset.s = '3'; beat(s2, 2); show('checkin-shape'); finger(18, 55, true); }],
+            [5300, function () { finger(70, 55, true); }],
+            [6400, function () { finger(70, 55, false); beat(s2, 3); show('checkin-reward'); }],
+            [6700, function () { pop.classList.add('on'); }],
+            [7800, function () { pop.classList.remove('on'); beat(s2, 4); show('offwork-map'); finger(60, 40, true); }],
+            [8700, tap],
+            [9000, function () { show('offwork-redeem'); finger(60, 40, false); }]
+          ], 11500); } }
+    })();
+  </script>
+
   <script>
   /* tap cues: read data-taps on each loop, fire a ring at the recorded click time */
   (function(){
