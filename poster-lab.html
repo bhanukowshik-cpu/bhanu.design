@@ -26,7 +26,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <!-- The outlined title needs a STATIC 700 cut: the variable font's overlapping contours show through
      -webkit-text-stroke (crossed lines inside A/R). A `text=` subset request is served as a static instance. -->
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&text=HI%2C%E2%80%99MBANU%20&display=block" rel="stylesheet" id="titleFont"><style>
+<style>
   :root{
     --ink:#FFFCF8;
     --ink-dim:rgba(255,252,248,.72);
@@ -54,11 +54,14 @@
   #hero{position:absolute;left:0;right:0;top:7.5vh;display:flex;flex-direction:column;align-items:center;
         text-align:center;will-change:opacity,transform}
   /* solid bold (owner, 12 Nov: "normal bold text" instead of the outline; still no text shadow) */
-  #title{white-space:nowrap;font-weight:700;font-size:clamp(26px,6.4vw,170px);line-height:1;letter-spacing:.03em;
-         color:#FFFCF8;
-         padding-left:.03em /* balances the trailing letter-space so the word sits optically centred */}
-  #tagline{margin-top:clamp(8px,1.1vw,18px);max-width:86vw;font-weight:500;font-size:clamp(16px,1.6vw,22px);
-           line-height:1.35;color:rgba(255,252,248,.9)}
+  /* recruiter pass (12 Nov, owner approved): name small, the value line is the headline, proof right under it */
+  #name{font-family:var(--font-mono);font-size:clamp(11px,.9vw,13px);letter-spacing:.12em;text-transform:uppercase;color:rgba(255,252,248,.85);margin-bottom:clamp(8px,1vw,14px)}
+  #title{white-space:nowrap;font-weight:700;font-size:clamp(26px,4.2vw,76px);line-height:1.04;letter-spacing:-.02em;color:#FFFCF8}
+  #tagline{margin-top:clamp(10px,1.2vw,18px);max-width:min(860px,86vw);font-weight:500;font-size:clamp(15px,1.25vw,19px);
+           line-height:1.5;color:rgba(255,252,248,.92)}
+  #tagline b{color:#FFFCF8;font-weight:700}
+  @media (max-width:767px){ #title{white-space:normal;max-width:92vw;font-size:clamp(28px,8.4vw,40px)}
+    #name{font-size:10px;letter-spacing:.08em;max-width:92vw;line-height:1.5} }
   .status{position:absolute;left:clamp(16px,3vw,44px);bottom:clamp(16px,2.6vw,34px);
           font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;color:var(--ink-dim)}
   .sound{position:absolute;right:clamp(16px,3vw,44px);bottom:clamp(14px,2.4vw,30px);display:flex;align-items:center;gap:10px}
@@ -100,8 +103,9 @@
     <filter id="outline10" x="-2%" y="-10%" width="104%" height="120%"><feMorphology in="SourceAlpha" operator="erode" radius="1" result="e"/><feComposite in="SourceGraphic" in2="e" operator="out"/></filter>
   </svg>
   <div id="hero">
-    <h1 id="title">HI, I’M BHANU</h1>
-    <p id="tagline">Design engineer in San Francisco, building products that convert and connect.</p>
+    <p id="name">Bhanu Kowshik · Design engineer, San Francisco</p>
+    <h1 id="title">I design and ship AI products, end to end.</h1>
+    <p id="tagline">Founder of <b>Verified Call</b>: built solo in 3 weeks, 20 companies in the beta. Before: <b>EverTutor</b>, 1:1 tutoring from $250 to $5 an hour for 2,000+ students a day, and <b>Stressie</b>, engagement from 12% to 56%.</p>
   </div>
   <div class="status" id="status">San Francisco · --:-- · …</div>
   <div class="sound">
@@ -156,7 +160,7 @@ const CFG = {
   reflSquash: 1.25,        // reflection vertical compression (sample H - y*1.25)
   reflRtScale: 0.5,        // reflection render-target resolution vs the canvas
   soundEnabled: false,     // SOUND PAUSED (owner decision): no audio plays, toggle hidden. Code kept for later.
-  titleFit: 0.70,          // title width as a fraction of the viewport
+  titleFit: 0.64,          // title width as a fraction of the viewport
   glowLike: /_lights$/,    // any layer named *_lights is treated as a glow layer, whatever its kind
   swayLike: /^(redwoods|ferns|flowers)/,
 };
@@ -1303,7 +1307,8 @@ function fitTitle() {
   titleEl.style.fontSize = '';                                   // start from the CSS clamp guess
   const fs = parseFloat(getComputedStyle(titleEl).fontSize);
   const w = titleEl.getBoundingClientRect().width;
-  if (w > 0) titleEl.style.fontSize = Math.min(fs * (vw * CFG.titleFit) / w, 190) + 'px';
+  if (vw < 768) return;                                          // phones: the headline wraps at its CSS size
+  if (w > 0) titleEl.style.fontSize = Math.min(fs * (vw * CFG.titleFit) / w, 76) + 'px';
 }
 document.fonts?.ready.then(fitTitle);
 addEventListener('resize', fitTitle);

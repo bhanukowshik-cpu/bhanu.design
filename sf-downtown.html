@@ -131,6 +131,9 @@
   .glimpse .eb{font-size:12px;font-weight:600;color:var(--muted)}
   .glimpse b{display:block;font-size:22px;letter-spacing:-.01em;margin:2px 0 6px}
   .glimpse p{font-size:14px;line-height:1.45;color:#3D3843}
+  .glimpse .gm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .glimpse .gm span{font-size:12px;line-height:1.3;color:#3D3843}
+  .glimpse .gm b{display:block;font-size:18px;color:var(--ink);letter-spacing:-.01em}
   .glimpse .st{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#2F4A1E;margin:10px 0 12px}
   .glimpse .st i{width:7px;height:7px;border-radius:50%;background:#16845E}
   .glimpse button{width:100%;border:0;border-radius:12px;background:var(--ink);color:#fff;font:600 14.5px var(--font);padding:11px 14px;cursor:pointer}
@@ -162,6 +165,7 @@
   <div class="eb">Founder · design + build, solo</div>
   <b>Verified Call</b>
   <p>Confirms the person on a hiring call is real, is who they say they are, and isn't reading answers from a hidden AI tool.</p>
+  <div class="gm"><span><b>0 / 3,990</b> face swaps got through</span><span><b>30 / 30</b> hidden AI tools caught</span></div>
   <div class="st"><i></i>Now in go-to-market · 20 companies in the beta</div>
   <button type="button" id="glimpseMore">View more →</button>
 </aside>
@@ -1629,13 +1633,13 @@ glassScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMat
           float t = -d, w = 26.0 * uDpr, x = clamp(t / w, 0.0, 1.0);
           vec2 n = vec2(sdRR(p + vec2(1, 0), uRect.zw, uRad) - sdRR(p - vec2(1, 0), uRect.zw, uRad), sdRR(p + vec2(0, 1), uRect.zw, uRad) - sdRR(p - vec2(0, 1), uRect.zw, uRad));
           n /= max(length(n), 1e-4);
-          float bend = pow(1.0 - x, 2.4); vec2 off = -n * bend * w * 0.95; float br = (2.2 + 3.0 * bend) * uDpr;
+          float bend = pow(1.0 - x, 2.2); vec2 off = -n * bend * w * 1.25; float br = (7.0 + 3.0 * bend) * uDpr;
           vec3 g = vec3(0.0);
           for (int i = 0; i < 8; i++) { float an = float(i) * 0.7853982 + 0.39; vec2 o = vec2(cos(an), sin(an)) * br;
             g.r += tap(gl_FragCoord.xy + off + o).r; g.g += tap(gl_FragCoord.xy + off * 1.08 + o).g; g.b += tap(gl_FragCoord.xy + off * 1.16 + o).b; }
           g /= 8.0;
           float l = dot(g, vec3(0.299, 0.587, 0.114)); g = mix(vec3(l), g, 1.2);
-          g = mix(g, vec3(0.99, 0.985, 0.97), 0.66 - 0.18 * bend);                      // light, milky glass: dark text stays crisp
+          g = mix(g, vec3(0.99, 0.985, 0.97), 0.42 - 0.22 * bend);                      // clear glass with a light frost: the city shows through, dark text stays readable
           g += smoothstep(0.1, 1.0, p.y / uRect.w) * 0.05;
           vec2 L = normalize(vec2(-0.55, 0.85)); float fc = max(dot(n, L), 0.0), bk = max(dot(n, -L), 0.0);
           float rim = 1.0 - smoothstep(0.0, 2.2 * uDpr, t);
