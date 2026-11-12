@@ -33,7 +33,12 @@
   canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
   .pill{position:fixed;z-index:5;background:var(--paper);border-radius:16px;box-shadow:0 2px 0 rgba(0,0,0,.08),0 10px 30px -12px rgba(20,30,40,.35)}
   /* name + nav share one bar on the left (owner, 12 Nov) */
-  .bar{left:20px;top:20px;display:flex;align-items:center;gap:6px;padding:7px 10px 7px 7px}
+  .bar{position:fixed;z-index:5;right:20px;top:20px;display:flex;padding:6px;border-radius:999px;
+        background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.03)),rgba(14,18,26,.18);
+        -webkit-backdrop-filter:blur(22px) saturate(1.9) brightness(1.05);backdrop-filter:blur(22px) saturate(1.9) brightness(1.05);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.12),inset 0 0 0 1px rgba(255,255,255,.16)}
+  .bar .nav a{text-shadow:none;color:#fff;padding:9px 16px;border-radius:999px}
+  .bar .nav a:hover{background:rgba(255,255,255,.14)}
   .brand{display:flex;align-items:center;gap:12px;padding:2px 14px 2px 2px;margin-right:4px;border-right:1px solid #ECE5DB;font-weight:700;font-size:17px;color:var(--ink);text-decoration:none}
   .brand canvas{width:40px;height:40px;border-radius:11px;background:#E6F28D;image-rendering:pixelated;image-rendering:crisp-edges}
   .nav{display:flex;gap:2px}
@@ -202,38 +207,53 @@
   .glimpse .g-glass:hover::after{transition:transform .7s;transform:translateX(120%)}
   .glimpse .g-glass:hover svg{transform:translateX(3px)}
   html.tod-night .glimpse .g-glass{background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.06))}
-  /* ── the Verified Call commercial: one 7 s loop ── */
-  .g-vis.sq{aspect-ratio:1/1;background:#0E1116}
-  .vfx{position:absolute;inset:0;overflow:hidden;font-family:var(--font)}
-  .vfx .face{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(.15);animation:vfFace 7s infinite}
-  .vfx .who{position:absolute;left:10px;bottom:10px;font-size:11.5px;font-weight:600;color:#fff;background:rgba(0,0,0,.45);padding:4px 8px;border-radius:6px}
-  .vfx .grid{position:absolute;inset:0;opacity:0;background:
-    linear-gradient(rgba(22,132,94,.35) 1px,transparent 1px) 0 0/22px 22px,linear-gradient(90deg,rgba(22,132,94,.35) 1px,transparent 1px) 0 0/22px 22px;animation:vfGrid 7s infinite}
-  .vfx .scan{position:absolute;left:0;right:0;height:38%;top:-40%;background:linear-gradient(180deg,transparent,rgba(46,204,140,.35) 70%,rgba(120,255,190,.9));opacity:0;animation:vfScan 7s infinite}
-  .vfx .state{position:absolute;left:50%;top:12px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
-    font-size:12.5px;font-weight:700;padding:7px 12px;border-radius:999px;opacity:0}
-  .vfx .state i{width:8px;height:8px;border-radius:50%}
-  .vfx .s-ver{background:rgba(255,255,255,.92);color:#1F1B24;animation:vfVer 7s infinite}
-  .vfx .s-ver i{border:2px solid #16845E;border-right-color:transparent;animation:spin .8s linear infinite}
-  .vfx .s-fake{background:#D93B30;color:#fff;animation:vfFake 7s infinite}
-  .vfx .s-fake i{background:#fff}
-  .vfx .proof{position:absolute;left:10px;right:10px;bottom:40px;list-style:none;margin:0;padding:0;display:grid;gap:5px}
-  .vfx .proof li{font-size:11.5px;line-height:1.25;color:#fff;background:rgba(18,20,26,.78);border-left:3px solid #E85D4A;padding:6px 8px;border-radius:6px;opacity:0;transform:translateY(6px)}
-  .vfx .proof b{color:#FFB4A8;margin-right:4px}
-  .vfx .proof li:nth-child(1){animation:vfP1 7s infinite}.vfx .proof li:nth-child(2){animation:vfP2 7s infinite}.vfx .proof li:nth-child(3){animation:vfP3 7s infinite}
-  .vfx .vbtn{position:absolute;right:12px;bottom:12px;font-size:12.5px;font-weight:700;color:#fff;background:#16845E;padding:7px 14px;border-radius:999px;animation:vfBtn 7s infinite}
-  .vfx .cur{position:absolute;width:24px;height:24px;left:70%;top:60%;animation:vfCur 7s infinite;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes vfCur{0%{left:30%;top:40%;opacity:0}6%{opacity:1}16%{left:calc(100% - 46px);top:calc(100% - 34px);transform:scale(1)}19%{transform:scale(.8)}22%{transform:scale(1)}30%,100%{left:calc(100% - 46px);top:calc(100% - 34px);opacity:0}}
-  @keyframes vfBtn{0%,18%{opacity:1;transform:scale(1)}20%{transform:scale(.92)}24%,100%{opacity:0;transform:scale(1)}}
-  @keyframes vfVer{0%,20%{opacity:0}24%,52%{opacity:1}55%,100%{opacity:0}}
-  @keyframes vfScan{0%,22%{top:-40%;opacity:0}24%{opacity:1}50%{top:100%;opacity:1}52%,100%{top:100%;opacity:0}}
-  @keyframes vfGrid{0%,22%{opacity:0}30%,50%{opacity:.6}56%,100%{opacity:0}}
-  @keyframes vfFace{0%,52%{filter:grayscale(.15)}54%{filter:grayscale(.15) hue-rotate(25deg) contrast(1.4);transform:translateX(3px)}56%{transform:translateX(-3px)}58%,100%{filter:grayscale(.35) contrast(1.05);transform:none}}
-  @keyframes vfFake{0%,54%{opacity:0;transform:translate(-50%,-6px)}58%,94%{opacity:1;transform:translate(-50%,0)}98%,100%{opacity:0}}
-  @keyframes vfP1{0%,60%{opacity:0;transform:translateY(6px)}64%,94%{opacity:1;transform:none}98%,100%{opacity:0}}
-  @keyframes vfP2{0%,66%{opacity:0;transform:translateY(6px)}70%,94%{opacity:1;transform:none}98%,100%{opacity:0}}
-  @keyframes vfP3{0%,72%{opacity:0;transform:translateY(6px)}76%,94%{opacity:1;transform:none}98%,100%{opacity:0}}
+  /* ── the Verified Call commercial: three captioned beats, one 9 s loop ── */
+  .g-vis.sq{aspect-ratio:1/1;background:#14171D}
+  .vfx{position:absolute;inset:0;overflow:hidden;font-family:var(--font);color:#fff}
+  .vfx .cap{position:absolute;left:10px;right:10px;top:10px;height:28px;z-index:5}
+  .vfx .cap span{position:absolute;left:0;top:0;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;opacity:0;white-space:nowrap}
+  .vfx .cap b{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#fff;color:#14171D;font-size:11px}
+  .vfx .c1{animation:cp1 9s infinite}.vfx .c2{animation:cp2 9s infinite}.vfx .c3{animation:cp3 9s infinite}
+  .vfx .c2 b{background:#E85D4A;color:#fff}.vfx .c3 b{background:#2ECC8C}
+  .vfx .call{position:absolute;left:10px;right:10px;top:46px;bottom:10px}
+  .vfx .tile{position:absolute;border-radius:10px;overflow:hidden;background:#222}
+  .vfx .tile img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(.1)}
+  .vfx .tile .nm{position:absolute;left:6px;bottom:6px;font-size:10.5px;font-weight:600;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:5px}
+  .vfx .cand{left:0;top:0;right:0;bottom:0;transition:right .6s;animation:vCand 9s infinite}
+  .vfx .you{right:8px;top:8px;width:28%;aspect-ratio:1/1;border:2px solid #14171D;z-index:2;animation:vYou 9s infinite}
+  .vfx .cand .face{animation:vFace 9s infinite}
+  .vfx .swap{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px;background:#E85D4A;opacity:0;animation:vSwap 9s infinite}
+  .vfx .flag{position:absolute;left:6px;right:6px;top:6px;text-align:center;font-size:12px;font-weight:800;padding:6px;border-radius:7px;background:#D93B30;opacity:0;animation:vFlag 9s infinite}
+  .vfx .ai{position:absolute;left:8px;bottom:30px;display:flex;align-items:center;gap:7px;font-size:11px;background:rgba(255,255,255,.95);color:#1F1B24;
+    padding:6px 9px;border-radius:9px;box-shadow:0 6px 14px rgba(0,0,0,.35);opacity:0;animation:vAi 9s infinite}
+  .vfx .ai i{font-style:normal;color:#10A37F;font-size:14px}
+  .vfx .vpanel{position:absolute;right:0;top:0;bottom:0;width:48%;background:#FAF8F4;color:#1F1B24;border-radius:10px;padding:9px 9px;transform:translateX(110%);animation:vPanel 9s infinite;z-index:3}
+  .vfx .vh{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;margin-bottom:8px}
+  .vfx .vh .sh{width:12px;height:13px;background:#16845E;clip-path:polygon(50% 0,100% 18%,92% 70%,50% 100%,8% 70%,0 18%)}
+  .vfx ul{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+  .vfx li{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600}
+  .vfx li em{width:16px;height:16px;border-radius:50%;border:2px solid #C9C3B8;flex:none;position:relative}
+  .vfx li em::after{content:'';position:absolute;inset:-2px;border-radius:50%;opacity:0}
+  .vfx .r1 em::after{background:#16845E url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.3l2.3 2.2 4.7-5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100%;animation:vR1 9s infinite}
+  .vfx .r3 em::after{background:#16845E url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.3l2.3 2.2 4.7-5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100%;animation:vR3 9s infinite}
+  .vfx .bad em::after{background:#D93B30 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5 5l6 6M11 5l-6 6' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center/100%}
+  .vfx .r2 em::after{animation:vR2 9s infinite}.vfx .r4 em::after{animation:vR4 9s infinite}
+  .vfx .bad{animation:vBad 9s infinite}
+  @keyframes cp1{0%,2%{opacity:0;transform:translateY(-6px)}5%,24%{opacity:1;transform:none}27%,100%{opacity:0}}
+  @keyframes cp2{0%,27%{opacity:0;transform:translateY(-6px)}30%,50%{opacity:1;transform:none}53%,100%{opacity:0}}
+  @keyframes cp3{0%,53%{opacity:0;transform:translateY(-6px)}56%,96%{opacity:1;transform:none}99%,100%{opacity:0}}
+  @keyframes vFace{0%,30%{filter:grayscale(.1)}32%{filter:grayscale(.1) hue-rotate(40deg) contrast(1.5);transform:translateX(4px) skewX(3deg)}34%{transform:translateX(-4px)}36%,40%{filter:grayscale(.1) contrast(1.2);transform:none}41%{transform:translateX(3px)}42%,100%{filter:grayscale(.1);transform:none}}
+  @keyframes vSwap{0%,31%{opacity:0}33%,50%{opacity:1}53%,100%{opacity:0}}
+  @keyframes vAi{0%,36%{opacity:0;transform:translateY(8px)}40%,95%{opacity:1;transform:none}98%,100%{opacity:0}}
+  @keyframes vPanel{0%,54%{transform:translateX(110%)}59%,96%{transform:none}100%{transform:translateX(110%)}}
+  @keyframes vCand{0%,54%{right:0}59%,96%{right:51%}100%{right:0}}
+  @keyframes vYou{0%,54%{opacity:1}57%,96%{opacity:0}100%{opacity:1}}
+  @keyframes vR1{0%,61%{opacity:0}63%,96%{opacity:1}100%{opacity:0}}
+  @keyframes vR2{0%,66%{opacity:0}68%,96%{opacity:1}100%{opacity:0}}
+  @keyframes vR3{0%,71%{opacity:0}73%,96%{opacity:1}100%{opacity:0}}
+  @keyframes vR4{0%,76%{opacity:0}78%,96%{opacity:1}100%{opacity:0}}
+  @keyframes vBad{0%,66%{color:#1F1B24}68%,96%{color:#C0392B}100%{color:#1F1B24}}
+  @keyframes vFlag{0%,80%{opacity:0;transform:translateY(-6px)}83%,96%{opacity:1;transform:none}99%,100%{opacity:0}}
   .g-vis.sq::after{display:none}
   @media (prefers-reduced-motion:reduce){ .glimpse *, .glimpse > *{animation:none!important;transition:none!important;filter:none!important} }
   @media (max-width:767px){
@@ -246,7 +266,8 @@
     .cs{max-height:92vh;border-radius:22px}
   }
   @media (max-width:767px){
-    .nav{display:none}
+    .bar{left:16px;right:16px;justify-content:center}
+    .bar .nav a{padding:8px 11px;font-size:14px}
     .card{top:auto;bottom:86px;right:16px;left:16px;width:auto;transform:translate(0,16px)}
     .card.on{transform:none}
   }
@@ -255,7 +276,7 @@
 <body>
 <canvas id="gl" aria-label="Isometric toy model of downtown San Francisco: Market Street, the Ferry Building, Salesforce Tower, the Transamerica Pyramid, Union Square, Chinatown and the Verified Call tower"></canvas>
 
-<div class="pill bar"><a class="brand" href="./" aria-label="Bhanu Kowshik, home"><canvas id="avatar" width="16" height="16" aria-hidden="true"></canvas>Bhanu Kowshik</a>
+<div class="bar"><canvas id="avatar" width="16" height="16" hidden></canvas>
   <nav class="nav"><a href="./#about">About me</a><a href="./#work">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a><a href="./#contact">Contact</a></nav></div>
 <div id="tour" aria-hidden="true"></div>
 <div id="glimpses"></div>
@@ -1830,21 +1851,22 @@ pin3D(25, 37.5, -8, 'vc');
 // Each project's glimpse: what an employer checks first (role, timeline, platforms, outcomes, status,
 // stack), animated in when the tour reaches its building, glass tinted by SF's time of day.
 const GLIMPSE_DATA = [
-  { key: 'vc', idx: 'Work 01', stop: 2, at: new THREE.Vector3(27, 30, -6), ring: { x: 22.5, z: -10.5, r: 8 },
+  { key: 'vc', idx: 'Work 01', stop: 1, at: new THREE.Vector3(27, 30, -6), ring: { x: 22.5, z: -10.5, r: 8 },
     // a looping commercial: a candidate tile, the cursor clicks Verify, a scan runs, it flags the deepfake with proof
-    vis: `<div class="vfx" aria-label="Animation: Verified Call checks a candidate on a video call and flags a deepfake, with the proof">
-      <img class="face" src="images/vc/face-cand.webp" alt="">
-      <span class="who">Alex Chen · Candidate</span>
-      <i class="scan"></i><i class="grid"></i>
-      <span class="state s-ver"><i></i>Verifying…</span>
-      <span class="state s-fake"><i></i>Deepfake detected</span>
-      <ul class="proof"><li><b>Face swap</b> edges flicker on head turns</li><li><b>Voice</b> doesn't match the enrolled voice</li><li><b>Camera</b> virtual, not a real device</li></ul>
-      <span class="vbtn">Verify</span>
-      <svg class="cur" viewBox="0 0 28 28"><path d="M7 3.5v16.6l4.2-4.1 2.7 6.3 2.9-1.2-2.7-6.2h5.9z" fill="#111" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/></svg>
+    vis: `<div class="vfx" aria-label="Animation: on a remote interview the candidate is a face swap reading answers from a hidden AI; Verified Call checks face, voice, camera and apps, and flags the cheating">
+      <div class="cap"><span class="c1"><b>1</b>A remote interview</span><span class="c2"><b>2</b>…but it's not who it seems</span><span class="c3"><b>3</b>Verified Call checks the call</span></div>
+      <div class="call">
+        <div class="tile cand"><img class="face" src="images/vc/face-cand.webp" alt=""><span class="nm">Alex · Candidate</span>
+          <span class="swap">Face swap</span><span class="flag">Cheating detected</span></div>
+        <div class="tile you"><img src="images/vc/face-int.webp" alt=""><span class="nm">You</span></div>
+        <div class="ai"><i>✦</i><span><b>ChatGPT</b> hidden · whispering answers</span></div>
+        <div class="vpanel"><div class="vh"><i class="sh"></i>Verified Call</div>
+          <ul><li class="r1"><em></em>Real camera</li><li class="r2 bad"><em></em>Face match</li><li class="r3"><em></em>Same voice</li><li class="r4 bad"><em></em>Hidden apps</li></ul></div>
+      </div>
     </div>`, square: 1,
     eb: 'Founder', title: 'I\'m building Verified Call solo, to remove cheating from video calls.', titleSm: 1,
     pills: ['<b>20 companies</b> in the closed beta', '<b>3 weeks</b> to build, solo', '<i class="dot"></i>Now in go-to-market'] },
-  { key: 'stressie', idx: 'Work 02', stop: 4, at: new THREE.Vector3(-62, 9, 140), ring: { x: -70, z: 138, r: 10 },
+  { key: 'stressie', idx: 'Work 02', stop: 3, at: new THREE.Vector3(-62, 9, 140), ring: { x: -70, z: 138, r: 10 },
     vis: '<img src="images/stressie-v4/hero-poster.webp" alt="Stressie V4 check-in screen: how are you feeling in this moment?">', phone: 1,
     eb: 'Founding product designer · Figma → SwiftUI', title: 'Stressie V4',
     line: 'A stress check-in that pays for your evening: coins, a map of wellness experiences, and events you can host.',
@@ -1934,11 +1956,11 @@ let drag = null, moved = 0;
 // SCROLL-DRIVEN TOUR (owner, 12 Nov: no zoom controls, the whole thing is scroll-driven).
 // Keyframes: the whole city → downtown → the Verified Call tower → Lombard → the Palace → the
 // Painted Ladies → the Mission → back out. Eased between stops; clicks still open the Work pin.
-const TOUR = [                                                        // always inside the city: never the whole island
-  { tx: -12, tz: -8, zoom: 0.46 }, { tx: 4, tz: -2, zoom: 0.62 }, { tx: 21, tz: -9, zoom: 1.15 },   // 2: Verified Call
-  { tx: -30, tz: 64, zoom: 0.62 }, { tx: -66, tz: 132, zoom: 1.2 },                               // 4: Stressie
+const TOUR = [                                                        // straight to the work: Verified Call is the first stop
+  { tx: 8, tz: -6, zoom: 0.7 }, { tx: 21, tz: -9, zoom: 1.15 },          // 1: Verified Call
+  { tx: -30, tz: 64, zoom: 0.62 }, { tx: -66, tz: 132, zoom: 1.2 },      // 3: Stressie
   { tx: -30, tz: 70, zoom: 0.48 },
-];
+]
 let tourP = 0, tourShown = 0;
 const easeIO = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
 function tourAt(p) {
@@ -2130,7 +2152,7 @@ function project() {
   { // each project's glimpse rides beside its building while the tour is at that stop
     const f = tourShown * (TOUR.length - 1);
     for (const gl of GLIMPSES) {
-      const on = Math.abs(f - gl.stop) < 0.42 && !csEl.classList.contains('on');
+      const on = Math.abs(f - gl.stop) < 0.45 && !csEl.classList.contains('on');
       if (on && !gl.shown) { countUp(gl.el);                           // replay the commercial from its first frame
         gl.el.querySelectorAll('.vfx *').forEach(n => { n.style.animation = 'none'; void n.offsetWidth; n.style.animation = ''; }); }
       gl.shown = on; gl.el.classList.toggle('on', on);
