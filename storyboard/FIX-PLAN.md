@@ -19,10 +19,15 @@ Rule: **AI art for anything organic or painterly · Blender for the relightable 
 | Flowers + ferns | 5 | **AI** corner clusters → 3 parallax layers + sprites | Sword ferns, poppies #F7B24A → #E0621C, lupine #B49AE8 → #4E3A8E, yarrow #F4EEDC, pink #E58AB2, scrub #D9A23A; gusts every 8–14 s synced to the wind sound; a monarch every ~45 s |
 | Skyline + hills | 4–5 | **AI** band (evoke the landmarks, don't copy them) + **code** ridges | 5 depth bands: #FAA48C → #9993AD → #7993AE → #6F95B9 → #335F75; ~35 slim towers above a hillside of pale houses, ~9% of the frame; ~400 window lights come on at dusk |
 | Alcatraz | 5 | **AI** sprite | ~6% of the frame width; peach-lit cellhouse #E7B498, lighthouse, water tower; lighthouse beam at night |
-| Title | 3 | **HTML** | Outlined geometric sans, fits on one line within ~86% of the width, in the clear sky band |
-| Sound | — | **Code** | ON by default with a toggle (owner); barks timed to surfacing, wind synced to gusts, foghorn only when foggy |
+| Title | 3 | **HTML** | Outlined geometric sans: **HI, I'M BHANU**; below it, in solid text: "Design engineer in San Francisco, building products that convert and connect." (owner, 12 Nov). Fits on one line within ~80% of the width, in the clear sky band |
+| Sound | — | **Code** | **PAUSED (owner, 12 Nov): no audio work until further notice.** When resumed: ON by default with a toggle; barks timed to surfacing, wind synced to gusts, foghorn only when foggy |
 
-## Ambient life: "looking into nature" (owner, 12 Nov)
+> **Scope (owner, 12 Nov):** work ONLY on what is visible in the hero right now: sky, title,
+> bridge, fog, city/hills, Alcatraz, water + reflections, ferry + wake, sea lions + ripples, gulls,
+> redwoods, rocks/lookout + bench, foreground flowers/ferns. The ambient-life table below is
+> **deferred** (backlog), and sound is paused.
+
+## Ambient life: "looking into nature" (owner, 12 Nov) [DEFERRED]
 The scene should feel like watching a real place, not a loop. Rules: **rare, randomised events**
 (never on a fixed beat), never two big moments at once, every creature small and in scale, all
 motion eased with layered noise, everything off under reduced motion. Animals that actually live

@@ -1,0 +1,1311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Poster Lab · Golden Gate</title>
+<!--
+  POSTER LAB — a live, layered park-poster of the Golden Gate.
+  ───────────────────────────────────────────────────────────────────────────
+  Pipeline (see storyboard/GAPS.md):
+    Blender renders each layer to city/layers/gg/<layer>_{light,shadow,normal,depth}.png
+    + manifest.json. This page composes those layers back→front in WebGL and
+    re-shades them from San Francisco's REAL sun, live.
+
+  Debug URL params:
+    ?hour=17.5        pretend it is 17:30 in SF (clock keeps ticking from there)
+    ?alt=5&az=245     force sun altitude / azimuth (degrees)
+    ?fog=0..1         force fog density (skips the weather fetch)
+    ?rafshim          drive the loop with setInterval (preview panes pause RAF)
+    ?scroll=0..1      force the scroll push-in progress
+    ?lightonly        ignore normal/depth maps (preview of light-only AI layers)
+  Console: window.__poster = { setHour(h), setSun(alt,az), setFog(f), state }
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- The outlined title needs a STATIC 700 cut: the variable font's overlapping contours show through
+     -webkit-text-stroke (crossed lines inside A/R). A `text=` subset request is served as a static instance. -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&text=HI%2C%E2%80%99MBANU%20&display=block" rel="stylesheet" id="titleFont"><style>
+  :root{
+    --ink:#FFFCF8;
+    --ink-dim:rgba(255,252,248,.72);
+    --font-heading:'Montserrat',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#0A1430;color:var(--ink);font-family:var(--font-heading)}
+  /* the stage is fixed; a tall spacer underneath gives Lenis/ScrollTrigger something to scroll */
+  #stage{position:fixed;inset:0;overflow:hidden;background:#0A1430}
+  #gl{position:absolute;inset:0;width:100%;height:100%;display:block}
+  #fallback{position:absolute;inset:0;display:none;background:linear-gradient(#4E8FBF,#CFE6EA 63%,#3d6f78 64%,#24434d)}
+  #fallback img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 50%}
+  #spacer{height:260vh;position:relative;pointer-events:none}
+
+  .ui{position:fixed;inset:0;pointer-events:none;z-index:2}
+  .topbar{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;
+          padding:clamp(16px,2.4vw,32px) clamp(16px,3vw,44px);font-weight:500;font-size:14px;letter-spacing:.04em}
+  .topbar a{color:inherit;text-decoration:none;pointer-events:auto}
+  .topbar nav{display:flex;gap:.6em;color:var(--ink-dim)}
+  .topbar nav a:hover{color:var(--ink)}
+  /* Title: one line, ≤ ~86% of the viewport width, in the upper sky band (top ~12–22%).
+     CSS clamp is the first guess (13 caps × ~0.8em ≈ 10.5em wide → 86vw / 10.5 ≈ 8.2vw);
+     fitTitle() in JS then measures the real glyphs and corrects it. */
+  #hero{position:absolute;left:0;right:0;top:13vh;display:flex;flex-direction:column;align-items:center;
+        text-align:center;will-change:opacity,transform}
+  #title{white-space:nowrap;font-weight:700;font-size:clamp(26px,6.4vw,170px);line-height:1;letter-spacing:.08em;
+         color:#FFFCF8;filter:url(#outline15);
+         padding-left:.08em /* balances the trailing letter-space so the word sits optically centred */}
+  #tagline{margin-top:clamp(12px,1.6vw,26px);max-width:86vw;font-weight:500;font-size:clamp(16px,1.6vw,22px);
+           line-height:1.35;color:rgba(255,252,248,.9)}
+  .status{position:absolute;left:clamp(16px,3vw,44px);bottom:clamp(16px,2.6vw,34px);
+          font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;color:var(--ink-dim)}
+  .sound{position:absolute;right:clamp(16px,3vw,44px);bottom:clamp(14px,2.4vw,30px);display:flex;align-items:center;gap:10px}
+  #sndBtn{pointer-events:auto;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,252,248,.45);
+          background:rgba(10,20,48,.22);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+          color:var(--ink);display:grid;place-items:center;cursor:pointer}
+  #sndBtn svg{width:18px;height:18px}
+  #sndBtn .waves{transition:opacity .2s}
+  #sndBtn[aria-pressed="false"] .waves{opacity:0}
+  #sndBtn[aria-pressed="true"] .mute{opacity:0}
+  #sndHint{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;color:var(--ink-dim);opacity:0;transition:opacity .4s}
+  #sndHint.show{opacity:1}
+  .badge{position:absolute;right:12px;top:56px;font-family:var(--font-mono);font-size:10px;color:#ffd;opacity:.7}
+  @media (max-width:767px){
+    .topbar{font-size:12px}
+    #hero{top:14vh}
+    #sndHint{position:absolute;right:0;bottom:calc(100% + 8px);white-space:nowrap}   /* keep clear of the clock line */
+    #title{filter:url(#outline10)}
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl" aria-label="Animated illustration: the Golden Gate Bridge seen from the Marin Headlands, lit by San Francisco's current sun"></canvas>
+  <div id="fallback" aria-hidden="true"></div>
+</div>
+
+<div class="ui">
+  <header class="topbar">
+    <a href="./">Bhanu Kowshik</a>
+    <nav><a href="./#work">Work</a><span>·</span><a href="./#about">About</a><span>·</span><a href="./#contact">Contact</a></nav>
+  </header>
+  <!-- Outline = solid glyphs minus an eroded copy. Unlike -webkit-text-stroke this traces the
+       glyph SILHOUETTE, so Montserrat's overlapping contours (crossed lines in H/A/M) never show. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="outline15" x="-2%" y="-10%" width="104%" height="120%"><feMorphology in="SourceAlpha" operator="erode" radius="1.5" result="e"/><feComposite in="SourceGraphic" in2="e" operator="out"/></filter>
+    <filter id="outline10" x="-2%" y="-10%" width="104%" height="120%"><feMorphology in="SourceAlpha" operator="erode" radius="1" result="e"/><feComposite in="SourceGraphic" in2="e" operator="out"/></filter>
+  </svg>
+  <div id="hero">
+    <h1 id="title">HI, I’M BHANU</h1>
+    <p id="tagline">Design engineer in San Francisco, building products that convert and connect.</p>
+  </div>
+  <div class="status" id="status">San Francisco · --:-- · …</div>
+  <div class="sound">
+    <span id="sndHint">tap for sound</span>
+    <button id="sndBtn" type="button" aria-pressed="true" aria-label="Sound on">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke="none"/>
+        <g class="waves"><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></g>
+        <g class="mute"><path d="M16 9.5l5 5M21 9.5l-5 5"/></g>
+      </svg>
+    </button>
+  </div>
+  <div class="badge" id="badge"></div>
+</div>
+<div id="spacer"></div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis.min.js"></script>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* ════════════════════════════════════════════════════════════════════════
+   0. CONFIG + FLAGS
+   ════════════════════════════════════════════════════════════════════════ */
+const Q        = new URLSearchParams(location.search);
+const BASE     = 'city/layers/gg/';
+const LAT = 37.8199, LON = -122.4783, TZ = 'America/Los_Angeles';
+const REDUCED  = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MOBILE   = matchMedia('(max-width: 767px), (pointer: coarse)').matches;
+const RAFSHIM  = Q.has('rafshim');
+const LIGHTONLY = Q.has('lightonly');  // test: ignore normal/depth maps (how AI-painted layers render)
+const DPR      = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.5 : 2);
+const TEX_SCALE = MOBILE ? 0.5 : 1;          // half-res layers on phones (GAPS.md #8)
+
+const CFG = {
+  portraitCenterX: 0.60,   // portrait crop centre (scene UV) — the bridge sits centre-right
+  zoomK: 1.5,              // scroll push-in: layer zoom = 1 + progress * parallax * zoomK
+  liftK: 0.07,             // scroll: layers also drift up a touch (× parallax)
+  sunDiscDeg: 1.7,         // art-directed sun radius (the real sun is 0.27°, invisible at 30mm)
+  grainCss: 1.0,           // stipple cell size in CSS px (pixel-locked)
+  swayPx: 3.5,             // vegetation sway amplitude in scene px (1920-wide)
+  ferryHornAt: 0.42,       // path fraction where the ferry slides under the bridge span
+  reflectFlipNz: true,     // (only if useBlenderReflection) mirrored-geometry normals → flip Z back
+  useBlenderReflection: false, // false = reflections are built in the water shader from the above-water layers
+  reflSquash: 1.25,        // reflection vertical compression (sample H - y*1.25)
+  reflRtScale: 0.5,        // reflection render-target resolution vs the canvas
+  soundEnabled: false,     // SOUND PAUSED (owner decision): no audio plays, toggle hidden. Code kept for later.
+  titleFit: 0.80,          // title width as a fraction of the viewport
+  glowLike: /_lights$/,    // any layer named *_lights is treated as a glow layer, whatever its kind
+  swayLike: /^(redwoods|ferns|flowers)/,
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   1. SUN — San Francisco's real sun (formula from the brief)
+   ════════════════════════════════════════════════════════════════════════ */
+const R = Math.PI / 180;
+function sunAltAz(ms, lat = LAT, lon = LON) {
+  const d    = ms / 864e5 + 2440587.5 - 2451545;
+  const g    = (357.529 + 0.98560028 * d) * R;
+  const q    = 280.459 + 0.98564736 * d;
+  const L    = (q + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * R;
+  const e    = (23.439 - 0.00000036 * d) * R;
+  const RA   = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
+  const dec  = Math.asin(Math.sin(e) * Math.sin(L));
+  const GMST = ((18.697374558 + 24.06570982441908 * d) % 24 + 24) % 24;
+  const HA   = (GMST * 15 + lon) * R - RA;
+  const p    = lat * R;
+  const alt  = Math.asin(Math.sin(p) * Math.sin(dec) + Math.cos(p) * Math.cos(dec) * Math.cos(HA));
+  const az   = Math.atan2(-Math.sin(HA), Math.tan(dec) * Math.cos(p) - Math.sin(p) * Math.cos(HA));
+  return { alt: alt / R, az: ((az / R) % 360 + 360) % 360 };
+}
+// world dir: +X east, +Y north, +Z up; az clockwise from north
+const sunVec = (alt, az) => new THREE.Vector3(Math.cos(alt*R)*Math.sin(az*R), Math.cos(alt*R)*Math.cos(az*R), Math.sin(alt*R));
+
+/* SF wall-clock helpers (DST-safe via Intl) */
+const fmtParts = new Intl.DateTimeFormat('en-US', { timeZone: TZ, hourCycle: 'h23',
+  year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+function laParts(ms) { const o = {}; for (const p of fmtParts.formatToParts(new Date(ms))) o[p.type] = +p.value; return o; }
+function tzOffset(ms) { const p = laParts(ms); return Date.UTC(p.year, p.month - 1, p.day, p.hour % 24, p.minute, p.second) - ms; }
+function msForSFHour(h) {             // today's date in SF, at local hour h
+  const p = laParts(Date.now());
+  const guess = Date.UTC(p.year, p.month - 1, p.day) + h * 3600e3;
+  let ms = guess - tzOffset(guess);
+  return guess - tzOffset(ms);       // second pass settles DST edges
+}
+const clockFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' });
+
+/* ════════════════════════════════════════════════════════════════════════
+   2. TIME-OF-DAY PALETTE (keyed by sun altitude, from the brief)
+   ════════════════════════════════════════════════════════════════════════ */
+const hex = h => new THREE.Color().setRGB(parseInt(h.slice(1,3),16)/255, parseInt(h.slice(3,5),16)/255, parseInt(h.slice(5,7),16)/255);
+const KEYS = [  // a = anchor altitude (centre of each band); k = direct-light intensity
+  { a: -16, top: '#0A1430', hor: '#1B2A55', sun: '#20284a', k: 0.00 },  // night  (< -12°)
+  { a:  -8, top: '#22305E', hor: '#7A6E9A', sun: '#8a6f9a', k: 0.06 },  // blue hour
+  { a:  -1, top: '#3E5A9A', hor: '#F2A26A', sun: '#FF9A5C', k: 0.45 },  // dusk
+  { a:   6, top: '#6FA7CF', hor: '#F7E3B0', sun: '#FFD9A0', k: 0.85 },  // golden
+  { a:  15, top: '#4E8FBF', hor: '#CFE6EA', sun: '#FFF7EC', k: 1.00 },  // day
+].map(k => ({ ...k, top: hex(k.top), hor: hex(k.hor), sun: hex(k.sun) }));
+function palette(alt) {
+  let i = 0; while (i < KEYS.length - 2 && alt > KEYS[i + 1].a) i++;
+  const A = KEYS[i], B = KEYS[i + 1];
+  let t = THREE.MathUtils.clamp((alt - A.a) / (B.a - A.a), 0, 1);
+  t = t * t * (3 - 2 * t);
+  return { top: A.top.clone().lerp(B.top, t), hor: A.hor.clone().lerp(B.hor, t),
+           sun: A.sun.clone().lerp(B.sun, t), k: THREE.MathUtils.lerp(A.k, B.k, t) };
+}
+const smooth = (a, b, x) => { const t = THREE.MathUtils.clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+
+/* ════════════════════════════════════════════════════════════════════════
+   3. STATE + DEBUG HANDLE
+   ════════════════════════════════════════════════════════════════════════ */
+const state = {
+  simStart: Q.has('hour') ? msForSFHour(+Q.get('hour')) : null, realStart: Date.now(),
+  forceAlt: Q.has('alt') ? +Q.get('alt') : null, forceAz: Q.has('az') ? +Q.get('az') : null,
+  alt: 0, az: 0, sunUV: [0, 0], sunInFrame: false, night: 0,
+  fog: Q.has('fog') ? +Q.get('fog') : 0.35, weather: Q.has('fog') ? (+Q.get('fog') > 0.6 ? 'Fog' : 'Clear') : '…',
+  windSpeed: 12, gust: 0.5,
+  scroll: Q.has('scroll') ? +Q.get('scroll') : 0,
+  vw: 0, vh: 0, ready: false, frames: 0, layers: [], errors: [],
+};
+const nowMs = () => state.simStart != null ? state.simStart + (Date.now() - state.realStart) : Date.now();
+window.__poster = {
+  state,
+  setHour(h) { state.simStart = msForSFHour(h); state.realStart = Date.now(); state.forceAlt = state.forceAz = null; renderOnce(); },
+  setSun(alt, az) { state.forceAlt = alt; state.forceAz = az; renderOnce(); },
+  setFog(f) { state.fog = f; state.weather = f > 0.6 ? 'Fog' : 'Clear'; renderOnce(); },
+  setScroll(p) { state.scroll = p; renderOnce(); },
+  get passes() { return passes.map(p => p.name); },
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   4. LOADING — manifest + images (+ alpha bounding boxes for sprites/sway)
+   ════════════════════════════════════════════════════════════════════════ */
+function loadImage(src) {
+  return new Promise((res, rej) => { const im = new Image(); im.decoding = 'async';
+    im.onload = () => res(im); im.onerror = () => rej(new Error('img ' + src)); im.src = src; });
+}
+// Alpha bbox in scene UV, measured on a small copy (cheap). Returns [x0,y0,x1,y1].
+function alphaBox(img) {
+  const w = 384, h = 216, c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(img, 0, 0, w, h);
+  const d = g.getImageData(0, 0, w, h).data;
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 8) {
+    if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  if (x1 < 0) return [0, 0, 1, 1];
+  return [x0 / w, y0 / h, (x1 + 1) / w, (y1 + 1) / h];
+}
+function makeTex(img) {
+  let src = img;
+  if (TEX_SCALE !== 1) {           // downscale once on the CPU for phones
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.naturalWidth * TEX_SCALE); c.height = Math.round(img.naturalHeight * TEX_SCALE);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); src = c;
+  }
+  const t = new THREE.Texture(src);
+  t.flipY = false;                 // sample with v pointing down, same as screen UV
+  t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter;
+  t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
+  t.colorSpace = THREE.NoColorSpace; // all maps used as raw display values (light/shadow are sRGB art colours)
+  t.needsUpdate = true;
+  return t;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   5. GLSL — shared chunks
+   ════════════════════════════════════════════════════════════════════════
+   Every pass is a quad covering a rect in SCENE UV (0..1 over the 1920×1080
+   poster, v pointing down). uView maps scene UV → viewport: this one transform
+   does cover-fit, the portrait crop and the scroll push-in (per layer parallax). */
+const VS = /* glsl */`
+  uniform vec4 uRect;   // x0,y0,x1,y1 in scene UV
+  uniform vec4 uView;   // scene = uView.xy + viewportUV * uView.zw
+  varying vec2 vS;
+  void main(){
+    vec2 s = mix(uRect.xy, uRect.zw, vec2(uv.x, 1.0 - uv.y));
+    vS = s;
+    vec2 vp = (s - uView.xy) / uView.zw;
+    gl_Position = vec4(vp.x * 2.0 - 1.0, 1.0 - vp.y * 2.0, 0.0, 1.0);
+  }`;
+const COMMON = /* glsl */`
+  varying vec2 vS;
+  uniform float uTime, uSunUp, uDayK, uNight, uFog, uGrain, uHorizon;
+  uniform vec3  uSunDir, uSunCol, uSkyTop, uSkyHor;
+  const vec3 NIGHT_TINT = vec3(0.50, 0.58, 0.92);
+  const vec3 STIPPLE    = vec3(0.60, 0.62, 0.80);   // grain darkens toward cool navy-violet
+  float hash12(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+  float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
+    return mix(mix(hash12(i), hash12(i+vec2(1,0)), f.x), mix(hash12(i+vec2(0,1)), hash12(i+vec2(1,1)), f.x), f.y); }
+  float fbm(vec2 p){ float a = 0.5, s = 0.0; for(int i=0;i<4;i++){ s += a*vnoise(p); p = p*2.03 + 17.1; a *= 0.5; } return s; }
+  // pixel-locked white noise (does not crawl when layers move)
+  float grainN(float seed){ return hash12(floor(gl_FragCoord.xy / uGrain) + seed); }
+  vec3 hazeCol(){ return mix(uSkyHor, vec3(0.86,0.91,0.88), 0.25 * uDayK); }
+  // reflection shimmer: horizontal displacement that grows away from the waterline
+  float ripple(vec2 s){
+    float k = clamp((s.y - uHorizon) / (1.0 - uHorizon), 0.0, 1.0);
+    float w = sin(s.y * 520.0 - uTime * 2.4 + sin(s.y * 61.0 + uTime * 0.9) * 2.5) * 0.0012
+            + (vnoise(vec2(s.y * 140.0, uTime * 0.7 + s.x * 3.0)) - 0.5) * 0.004;
+    return w * (0.35 + 1.8 * k);
+  }`;
+
+/* LIT layer (also used for sprites, reflection layers and mirrored sprite reflections).
+   uMode: 0 = lit/sprite, 1 = reflection layer, 3 = mirrored sprite reflection */
+const FS_LIT = /* glsl */`
+  ${COMMON}
+  uniform sampler2D tLight, tShadow, tNormal, tDepth, tMask;
+  uniform float uHasS, uHasN, uHasD, uHasMask, uMode, uAlpha, uClipY, uMirrorY, uSway, uSeed, uDepthGuess;
+  uniform vec2  uOffset;
+  uniform vec4  uBox;      // alpha bbox (scene UV) — sway weight grows toward the top of the shape
+  uniform vec3  uWater;
+  void main(){
+    vec2 s = vS;
+    float fade = 1.0;
+    if (uMode > 2.5) {                        // mirrored sprite: flipped, squashed to 0.6, wobbling
+      if (s.y < uMirrorY) discard;
+      float y = s.y - uMirrorY;               // below the waterline (scene UV)
+      float objH = max(uBox.w - uBox.y, 0.01);
+      fade = exp(-y / (0.9 * objH * 0.6)) * (1.0 - smoothstep(0.0, objH * 0.75, y));
+      float py = y * 1080.0;
+      float band = floor(py / 3.0);
+      s.x += (sin(py * 0.9 + uTime * 1.7 + hash12(vec2(band, 3.0)) * 6.28) * 1.4) / 1920.0;
+      s.y = uMirrorY - y / 0.6;
+    }
+    if (s.y > uClipY) discard;                // sprite clipped at its waterline (emerges from water)
+    vec2 uv = s - uOffset;
+    float sw = clamp((uBox.w - uv.y) / max(uBox.w - uBox.y, 1e-3), 0.0, 1.0);
+    uv.x += uSway * sw * sw;
+    if (uMode > 0.5 && uMode < 1.5) uv.x += ripple(s);
+    if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) discard;
+
+    vec4 L = texture2D(tLight, uv);
+    if (L.a < 0.004) discard;
+    float D = uHasD > 0.5 ? texture2D(tDepth, uv).r : uDepthGuess;
+    vec3 col; float lam;
+    if (uHasN > 0.5) {
+      // two-tone poster light: art-directed shadow → light colour by the live sun angle
+      vec3 S = uHasS > 0.5 ? texture2D(tShadow, uv).rgb : L.rgb * 0.62;
+      vec3 N = normalize(texture2D(tNormal, uv).rgb * 2.0 - 1.0 + 1e-4);
+      if (uMode > 0.5 && uMode < 1.5) N.z *= ${CFG.reflectFlipNz ? '-1.0' : '1.0'};
+      lam = smoothstep(-0.25, 0.85, dot(N, uSunDir)) * uSunUp;
+      lam = clamp(lam + 0.05 * uDayK, 0.0, 1.0);
+      vec3 litC = mix(S * 0.5 * NIGHT_TINT, L.rgb * mix(vec3(1.0), uSunCol, 0.28), uDayK);
+      vec3 shC  = S * mix(NIGHT_TINT * 0.42, vec3(1.0), smoothstep(0.0, 0.6, uDayK));
+      col = mix(shC, litC, lam);
+    } else {
+      // LIGHT-ONLY layer (AI-painted PNG, no normals): its lighting is baked, so we only
+      // re-tint it for the time of day — multiply by an ambient ↔ sun-colour mix keyed to altitude.
+      vec3 ambient = mix(NIGHT_TINT * 0.38, mix(uSkyHor, vec3(1.0), 0.55), smoothstep(0.0, 0.5, uDayK));
+      vec3 sunTint = mix(vec3(1.0), uSunCol, 0.32) * (0.82 + 0.18 * uDayK);
+      col = L.rgb * mix(ambient, sunTint, uDayK * uSunUp);
+      lam = 0.72 + 0.2 * uDayK;               // stipple density only — AI art carries its own grain, keep ours light
+    }
+
+    // stipple grain — denser in shadow
+    float dens = 0.42 * (1.0 - lam) + 0.04;
+    if (grainN(uSeed) < dens) col = mix(col, col * STIPPLE, 0.6);
+
+    // atmospheric haze toward the sky's horizon colour (thicker in fog)
+    float hz = clamp(pow(D, 0.7) * 0.9 * (1.0 + uFog * 0.45), 0.0, 0.97);
+    col = mix(col, hazeCol(), hz);
+
+    float a = L.a * uAlpha * fade;
+    if (uMode > 0.5) {                         // reflections sink into the water colour
+      float k = clamp((vS.y - uHorizon) / (1.0 - uHorizon), 0.0, 1.0);
+      col = mix(col, uWater, 0.38);
+      a *= mix(0.85, 0.3, k);
+      if (uHasMask > 0.5) a *= texture2D(tMask, vS).a;
+    }
+    gl_FragColor = vec4(col, a);
+  }`;
+
+/* GLOW layer — lamps/beacons. Additive, plus a soft 8-tap halo. Brighter at night. */
+const FS_GLOW = /* glsl */`
+  ${COMMON}
+  uniform sampler2D tLight; uniform float uGlowK; uniform vec2 uOffset;
+  void main(){
+    vec2 uv = vS - uOffset;
+    vec4 c = texture2D(tLight, uv);
+    // two rings of taps = a soft bloom around each lamp (stronger at night)
+    vec4 h = vec4(0.0);
+    for (int i = 0; i < 8; i++) { float a = float(i) * 0.785398;
+      h += texture2D(tLight, uv + vec2(cos(a), sin(a) * 1.78) * 0.0025);
+      h += 0.5 * texture2D(tLight, uv + vec2(cos(a + 0.39), sin(a + 0.39) * 1.78) * 0.006); }
+    h /= 12.0;
+    vec3 warm = vec3(1.0, 0.78, 0.48);
+    vec3 col = c.rgb * c.a + warm * h.a * 2.4 * uNight;
+    float flick = 0.94 + 0.06 * vnoise(vec2(uv.x * 400.0, uTime * 3.0));
+    gl_FragColor = vec4(col * uGlowK * flick, 1.0);
+  }`;
+
+/* SKY — gradient + sun disc/halo (true camera rays) + horizon warmth + stars */
+const FS_SKY = /* glsl */`
+  ${COMMON}
+  uniform vec3 uCamF, uCamR, uCamU; uniform vec2 uTan; uniform float uDisc, uTitleY, uTitleK, uShiftV;
+  void main(){
+    vec2 s = vS;
+    float t = clamp(s.y / uHorizon, 0.0, 1.0);
+    vec3 col = mix(uSkyTop, uSkyHor, pow(t, 1.45));
+    vec3 dir = normalize(uCamF + (s.x - 0.5) * 2.0 * uTan.x * uCamR - (s.y - uShiftV - 0.5) * 2.0 * uTan.y * uCamU);   // inverse of project(), incl. lens shift
+    float vis = smoothstep(-0.03, 0.01, uSunDir.z);
+    float ang = acos(clamp(dot(dir, uSunDir), -1.0, 1.0));
+    // horizon warmth on the sun's side (keeps dusk legible when the sun is off-frame)
+    vec2 hd = normalize(dir.xy + 1e-5), sd = normalize(uSunDir.xy + 1e-5);
+    float side = pow(max(dot(hd, sd), 0.0), 3.0) * exp(-max(dir.z, 0.0) * 9.0);
+    float dusk = smoothstep(-10.0, -1.0, degrees(asin(uSunDir.z))) * (1.0 - smoothstep(4.0, 18.0, degrees(asin(uSunDir.z))));
+    col = mix(col, uSunCol, side * dusk * 0.45);
+    // halo + disc
+    float halo = (exp(-ang * 5.5) * 0.45 + exp(-ang * 24.0) * 0.55) * vis;
+    col = mix(col, mix(uSunCol, vec3(1.0, 0.97, 0.9), 0.5), clamp(halo * (0.5 + 0.5 * uDayK), 0.0, 0.9));
+    float disc = (1.0 - smoothstep(uDisc * 0.93, uDisc, ang)) * vis;
+    col = mix(col, mix(uSunCol, vec3(1.0, 0.99, 0.95), 0.65), disc);
+    // stars
+    vec2 g = floor(gl_FragCoord.xy / (uGrain * 2.0));
+    float st = step(0.9965, hash12(g * 0.731 + 3.1));
+    float tw = 0.55 + 0.45 * sin(uTime * (1.5 + hash12(g) * 3.0) + hash12(g + 9.0) * 6.28);
+    col += vec3(0.9, 0.92, 1.0) * st * tw * uNight * (1.0 - smoothstep(0.35, 0.95, t)) * (1.0 - uFog * 0.7);
+    // calm the hero-type band (~10–32% of the frame): slightly deeper, less sun bloom, so flat
+    // white type stays legible without any text-shadow
+    float band = smoothstep(0.06, 0.14, uTitleY) * exp(-pow((s.y - uTitleY) / 0.11, 2.0));
+    col = mix(col, col * vec3(0.86, 0.88, 0.94), band * (0.35 + 0.65 * uDayK) * uTitleK);
+    // fine sky grain
+    if (grainN(5.0) < 0.05 + 0.1 * t) col *= 0.97;
+    gl_FragColor = vec4(col, 1.0);
+  }`;
+
+/* WATER — base bands + shader-built reflections (storyboard/component-reviews/03).
+   Reflections are NOT a mirrored Blender layer: every frame the above-water layers are
+   rendered into a small render target (tRefl, viewport space, alpha = object coverage),
+   and the water samples it mirrored about horizon_y, compressed ×1.25, broken into ripple
+   bands that jitter sideways, smeared vertically, and faded within ~1.2× each column's
+   object height (tColH: per-column height of the tallest above-water shape). */
+const FS_WATER = /* glsl */`
+  ${COMMON}
+  uniform sampler2D tMask, tRefl, tColH; uniform float uHasMask, uSquash, uGolden; uniform vec3 uWater;
+  uniform vec4 uView;   // this pass's scene→viewport transform (to look up tRefl)
+  // the reference's golden-hour bay ramp (waterline → foreground)
+  vec3 ramp(float t){
+    vec3 c0 = vec3(0.765,0.788,0.839), c1 = vec3(0.620,0.690,0.765), c2 = vec3(0.494,0.604,0.698),
+         c3 = vec3(0.310,0.498,0.588), c4 = vec3(0.243,0.420,0.510);
+    if (t < 0.15) return mix(c0, c1, t / 0.15);
+    if (t < 0.45) return mix(c1, c2, (t - 0.15) / 0.30);
+    if (t < 0.80) return mix(c2, c3, (t - 0.45) / 0.35);
+    return mix(c3, c4, (t - 0.80) / 0.20);
+  }
+  vec4 reflTap(vec2 sc){              // scene UV → reflection RT (premultiplied colour, coverage)
+    vec2 vp = (sc - uView.xy) / uView.zw;
+    if (vp.x < 0.0 || vp.x > 1.0 || vp.y < 0.0 || vp.y > 1.0) return vec4(0.0);
+    return texture2D(tRefl, vec2(vp.x, 1.0 - vp.y));
+  }
+  void main(){
+    vec2 s = vS;
+    float m = uHasMask > 0.5 ? texture2D(tMask, s).a : step(uHorizon, s.y);
+    if (m < 0.004) discard;
+    float t = clamp((s.y - uHorizon) / (1.0 - uHorizon), 0.0, 1.0);
+    float y = max(s.y - uHorizon, 0.0) * 1080.0;        // px below the waterline (1080p scene px)
+    float x = s.x * 1920.0;
+
+    // 1 · base bands, re-keyed to the time of day (pale sky at the waterline, navy at night)
+    vec3 col = ramp(t);
+    col = mix(col, uSkyHor, 0.35 * (1.0 - smoothstep(0.0, 0.25, t)));
+    col = mix(col, vec3(0.851,0.706,0.604), 0.35 * smoothstep(0.55, 1.0, s.x) * (1.0 - t) * uGolden);
+    col *= mix(NIGHT_TINT * 0.32, vec3(1.0), smoothstep(0.0, 0.7, uDayK));
+    col = mix(col, uWater, 0.15);
+
+    // 2 · ripple bands: each band jitters sideways with fbm + a per-band phased micro-sine
+    float bh = 6.0 + 0.08 * y;
+    float b = floor(y / bh);
+    float dx = (fbm(vec2(b * 0.37, uTime * 0.25)) - 0.5) * (2.0 + 0.04 * y)
+             + 1.2 * sin(y * 0.9 + uTime * 1.7 + hash12(vec2(b, 1.0)) * 6.28);
+    // 3 · mirrored + compressed sample, 5-tap vertical smear
+    vec2 src = vec2(x + dx, -y * uSquash) / vec2(1920.0, 1080.0) + vec2(0.0, uHorizon);
+    float sp = (3.0 + 0.05 * y) / 1080.0;
+    vec4 R = vec4(0.0);
+    for (int i = 0; i < 5; i++) R += reflTap(vec2(src.x, min(src.y + float(i) * sp, uHorizon - 0.001)));
+    R /= 5.0;
+    vec3 rc = R.a > 0.01 ? R.rgb / R.a : vec3(0.0);
+    // 4 · thin dark ripple breaks, spacing growing toward the viewer
+    float line = smoothstep(0.82, 0.95, fract(y / bh + 0.15 * fbm(vec2(x * 0.004, uTime * 0.1))));
+    // 5 · fade within ~1.2× the column's object height
+    float objH = max(texture2D(tColH, vec2(clamp(s.x, 0.0, 1.0), 0.5)).r * 0.5, 0.02) * 1080.0;
+    float ra = 0.75 * exp(-y / (0.9 * objH)) * (1.0 - smoothstep(0.6, 1.0, t)) * (1.0 - 0.35 * line);
+    rc = mix(rc, col, 0.22) * (1.0 - 0.18 * line);
+    col = mix(col, rc, clamp(R.a * ra, 0.0, 1.0));
+    // 6 · glitter inside bright reflection columns
+    float luma = dot(rc, vec3(0.299, 0.587, 0.114));
+    float gl = step(0.93, hash12(vec2(floor(x / 3.0), b) + floor(uTime * 6.0 + hash12(vec2(b, 7.0)) * 10.0)));
+    col = mix(col, vec3(1.0, 0.902, 0.761), 0.6 * gl * smoothstep(0.62, 0.75, luma) * R.a * ra * uDayK);
+    // 7 · faint long light lines drifting across open water
+    float sl = step(0.97, fbm(vec2(x * 0.002, y * 0.25 + uTime * 0.03)));
+    col += col * 0.06 * sl * 0.4 * (1.0 - t);
+    if (grainN(11.0) < 0.05 + 0.10 * t) col *= 0.94;
+    gl_FragColor = vec4(col, m);
+  }`;
+
+/* WATER FX — sea-lion ripples + contact, ferry wake, sun glitter path
+   (algorithms from storyboard/component-reviews/03 + 04; all distances in 1080p scene px) */
+const FS_FX = /* glsl */`
+  ${COMMON}
+  #define NR 12
+  #define NB 4
+  uniform sampler2D tMask; uniform float uHasMask;
+  uniform vec4 uRings[NR];      // x, y (scene UV), age (s), body width (px)   — one EVENT = 5 rings
+  uniform vec4 uBodies[NB];     // x, y (waterline), body width px, visibility — contact ring + shadow
+  uniform vec4 uFerry;          // stern x,y (scene UV) ; dir x,y (px space, normalised)
+  uniform vec2 uBow;            // bow x,y (scene UV)
+  uniform float uFerryA, uGlitter; uniform vec2 uSunUV;
+  const float LIFE = 3.2, ASPECT = 0.22;
+  const vec3 RING_LIGHT = vec3(0.839, 0.902, 0.918), TROUGH = vec3(0.235, 0.396, 0.467), CONTACT = vec3(0.180, 0.290, 0.345);
+  float aL = 0.0, aD = 0.0;      // light (foam / front arcs) and dark (troughs / contact) coverage
+  // shared ripple-band jitter, so rings + wake wobble with the water (same field as FS_WATER)
+  float bandDx(float y){ float bh = 6.0 + 0.08 * y; float b = floor(y / bh);
+    return (fbm(vec2(b * 0.37, uTime * 0.25)) - 0.5) * (2.0 + 0.04 * y) + 1.2 * sin(y * 0.9 + uTime * 1.7 + hash12(vec2(b, 1.0)) * 6.28); }
+  // one broken elliptical ring: light front arc over a faint dark trough
+  void ring(vec2 d, float r, float w, float a, float seed){
+    float th = atan(d.y, d.x);
+    float rr = r + 0.6 * (vnoise(vec2(th * 3.0 + seed, uTime * 0.4)) - 0.5) * 2.0;   // wobble
+    float dist = length(d);
+    float sinT = d.y / max(dist, 1e-3);                     // +1 = front (toward the viewer)
+    float front = pow(max(sinT, 0.0), 1.5) + 0.25 * max(-sinT, 0.0);
+    float brk = smoothstep(0.25, 0.55, vnoise(vec2(th * 2.2 + seed * 3.1, seed)));   // broken, not continuous
+    aL += smoothstep(w, 0.0, abs(dist - rr)) * a * front * mix(0.35, 1.0, brk);
+    aD += smoothstep(w * 1.2, 0.0, abs(dist - (rr - 1.5))) * a * 0.5 * mix(0.3, 1.0, front);
+  }
+  void main(){
+    vec2 s = vS;
+    float m = uHasMask > 0.5 ? texture2D(tMask, s).a : step(uHorizon, s.y);
+    if (m < 0.004) discard;
+    float k = clamp((s.y - uHorizon) / (1.0 - uHorizon), 0.0, 1.0);
+    vec2 P = s * vec2(1920.0, 1080.0);
+    float yW = max(s.y - uHorizon, 0.0) * 1080.0;
+    P.x += bandDx(yW) * 0.35;
+
+    // sea lions: contact shadow + pinned inner ring (persistent while above water)
+    for (int j = 0; j < NB; j++) {
+      vec4 B = uBodies[j]; if (B.w <= 0.0) continue;
+      vec2 d = P - B.xy * vec2(1920.0, 1080.0); d.y /= ASPECT;
+      float e = length(d) / (0.55 * B.z);
+      aD += 0.6 * B.w * smoothstep(1.0, 0.55, e) * step(0.0, d.y + 0.15 * B.z);   // contact band below the body
+      ring(d, 0.9 * B.z * (1.0 + 0.03 * sin(uTime * 1.3 + float(j))), 1.8, 0.85 * B.w, float(j) * 7.0);
+    }
+    // expanding ring events: 5 rings, fast-then-slow growth, inner strongest, outer thin + faint
+    for (int i = 0; i < NR; i++) {
+      vec4 r = uRings[i]; if (r.w <= 0.0) continue;
+      float age = r.z; if (age > LIFE) continue;
+      vec2 d = P - r.xy * vec2(1920.0, 1080.0); d.y /= ASPECT;
+      float life = age / LIFE;
+      float aBase = 0.9 * exp(-2.2 * life);
+      for (int n = 0; n < 5; n++) {
+        float fn = float(n);
+        float rad = 0.6 * r.w + fn * (7.0 + 3.0 * fn) * (0.6 + 0.4 * pow(age, 0.6)) + 34.0 * pow(age, 0.6);
+        float w = (0.6 + 2.2 * pow(1.0 - life, 0.8)) * (1.0 - fn * 0.13);
+        ring(d, rad, w, aBase * mix(1.0, 0.17, fn / 4.0), float(i) * 3.3 + fn);
+      }
+    }
+
+    // ferry wake (ferry-local px): very shallow V (~8°), broken foam streaks, inner trail, bow crescent
+    if (uFerryA > 0.0) {
+      vec2 dir = uFerry.zw;
+      vec2 p = P - uFerry.xy * vec2(1920.0, 1080.0);
+      float u = dot(p, -dir), v = dot(p, vec2(-dir.y, dir.x));
+      if (u > 0.0 && u < 900.0) {
+        float arm = 2.0 + u * 0.0699;                 // tan(4°)
+        float w = 1.5 + 0.02 * u;
+        float thr = u > 200.0 ? 0.6 : 0.45;            // breaks into dashes further back
+        float n = fbm(vec2(u * 0.05 - uTime * 1.2, v * 0.3));
+        float fade = exp(-u / 260.0);
+        float foam = smoothstep(w, 0.0, abs(abs(v) - arm)) * step(thr, n);
+        float inner = smoothstep(w, 0.0, abs(abs(v) - arm * 0.5)) * step(thr + 0.05, fbm(vec2(u * 0.06 - uTime * 1.4, v * 0.4 + 5.0)));
+        aL += (foam + 0.7 * inner) * fade * uFerryA;
+      }
+      vec2 q = P - uBow * vec2(1920.0, 1080.0);
+      float ub = dot(q, dir), vb = dot(q, vec2(-dir.y, dir.x));
+      aL += 0.8 * smoothstep(6.0, 0.0, length(vec2(ub + 2.0, 2.0 * vb)) - 2.0) * uFerryA;   // bow crescent
+    }
+
+    vec3 col = mix(RING_LIGHT, uSkyHor, 0.2) * mix(0.4, 1.0, uDayK);
+    vec3 dark = TROUGH * mix(0.4, 1.0, uDayK);
+    float a = 0.0;
+
+    // sun glitter path (only when the sun is low and its column is in frame)
+    if (uGlitter > 0.0) {
+      float width = 0.012 + k * 0.10;
+      float col_ = exp(-pow((s.x - uSunUV.x) / width, 2.0));
+      vec2 cell = floor(s * vec2(620.0, 1500.0 / (0.3 + k)));
+      float sp = step(0.9 - col_ * 0.1, hash12(cell + floor(uTime * 6.0 + hash12(cell) * 7.0)));
+      float g = (sp * 0.9 + col_ * 0.18) * col_ * uGlitter;
+      col = mix(col, mix(uSunCol, vec3(1.0, 0.98, 0.9), 0.5), clamp(g * 2.0, 0.0, 1.0));
+      aL += g;
+    }
+    aL = clamp(aL, 0.0, 0.95); aD = clamp(aD, 0.0, 0.8);
+    a = clamp(aL + aD * (1.0 - aL), 0.0, 0.95);
+    if (a < 0.003) discard;
+    vec3 outc = (col * aL + dark * aD * (1.0 - aL)) / max(a, 1e-3);
+    gl_FragColor = vec4(outc, a * m);
+  }`;
+
+/* FOG band — soft, noisy, drifting; density from live weather */
+const FS_FOG = /* glsl */`
+  ${COMMON}
+  uniform vec4 uBand;   // centre y, half-height, speed, seed
+  uniform float uDens;
+  void main(){
+    vec2 s = vS;
+    float y = (s.y - uBand.x) / uBand.y;
+    float prof = exp(-y * y * 2.6);
+    float n = fbm(vec2(s.x * 2.6 + uTime * uBand.z, s.y * 11.0 + uBand.w));
+    float n2 = fbm(vec2(s.x * 7.0 - uTime * uBand.z * 1.7, s.y * 26.0 + uBand.w * 2.0));
+    float a = prof * smoothstep(0.28, 0.78, n * 0.75 + n2 * 0.35 + prof * 0.25) * uDens;
+    vec3 col = mix(hazeCol(), vec3(0.97, 0.97, 0.95), 0.35 * uDayK) * mix(0.5, 1.0, uDayK);
+    if (grainN(23.0 + uBand.w) < 0.05) a *= 0.7;
+    gl_FragColor = vec4(col, a);
+  }`;
+
+/* GULLS — flapping V shapes (SDF segments) */
+const FS_GULLS = /* glsl */`
+  ${COMMON}
+  #define NG 5
+  uniform vec4 uGulls[NG];  // x, y, size, flap (−1..1)
+  float seg(vec2 p, vec2 a, vec2 b){ vec2 pa = p - a, ba = b - a; float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0); return length(pa - ba * h); }
+  void main(){
+    float a = 0.0;
+    for (int i = 0; i < NG; i++) {
+      vec4 g = uGulls[i]; if (g.z <= 0.0) continue;
+      vec2 p = (vS - g.xy) * vec2(1.7778, 1.0) / g.z; p.y = -p.y; p.x = abs(p.x);
+      float f = g.w;
+      vec2 elbow = vec2(0.42, 0.10 + 0.30 * f), tip = vec2(1.0, -0.05 + 0.55 * f);
+      float d = min(seg(p, vec2(0.0), elbow), seg(p, elbow, tip));
+      a = max(a, smoothstep(0.10, 0.04, d - (1.0 - p.x) * 0.03));
+    }
+    if (a < 0.003) discard;
+    vec3 col = mix(vec3(0.16, 0.18, 0.26), uSkyHor, 0.25);
+    gl_FragColor = vec4(col, a * mix(0.4, 0.9, uDayK));
+  }`;
+
+/* ════════════════════════════════════════════════════════════════════════
+   6. RENDERER + PASS LIST
+   ════════════════════════════════════════════════════════════════════════ */
+const canvas = document.getElementById('gl');
+let renderer;
+const scene = new THREE.Scene();
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1); // unused by our VS, required by three
+const QUAD = new THREE.PlaneGeometry(1, 1);
+
+// uniforms shared (by reference) by every pass
+const U = {
+  uTime: { value: 0 }, uSunUp: { value: 1 }, uDayK: { value: 1 }, uNight: { value: 0 }, uFog: { value: 0.3 },
+  uGrain: { value: 1 }, uHorizon: { value: 0.62 },
+  uSunDir: { value: new THREE.Vector3(0, -1, 0.3) }, uSunCol: { value: new THREE.Color(1, 1, 1) },
+  uSkyTop: { value: new THREE.Color() }, uSkyHor: { value: new THREE.Color() },
+  uWater: { value: new THREE.Color() },
+};
+const passes = [];   // { mesh, par, update?(p) }
+let order = 0;
+function addPass(fs, uniforms, { rect = [0, 0, 1, 1], par = 0, blending = THREE.NormalBlending, name = '' } = {}) {
+  const mat = new THREE.ShaderMaterial({
+    vertexShader: VS, fragmentShader: fs, transparent: true, depthTest: false, depthWrite: false,
+    side: THREE.DoubleSide, blending,
+    uniforms: { ...U, uRect: { value: new THREE.Vector4(...rect) }, uView: { value: new THREE.Vector4(0, 0, 1, 1) }, ...uniforms },
+  });
+  if (blending === THREE.AdditiveBlending) {   // add colour, leave alpha (coverage) untouched
+    mat.blending = THREE.CustomBlending; mat.blendSrc = THREE.OneFactor; mat.blendDst = THREE.OneFactor;
+    mat.blendSrcAlpha = THREE.ZeroFactor; mat.blendDstAlpha = THREE.OneFactor; }
+  const mesh = new THREE.Mesh(QUAD, mat);
+  mesh.frustumCulled = false; mesh.renderOrder = order++; mesh.name = name;
+  scene.add(mesh);
+  const p = { mesh, mat, par, name };
+  passes.push(p);
+  return p;
+}
+
+/* cover-fit + portrait crop + scroll push-in → uView for a given parallax */
+function viewFor(par) {
+  const A = state.vw / state.vh, S = 16 / 9;
+  let sx = 1, sy = 1, cx = 0.5, cy = 0.5;
+  if (A > S) sy = S / A; else sx = A / S;
+  if (A < S) cx = THREE.MathUtils.clamp(A < 1 ? CFG.portraitCenterX : 0.5, sx / 2, 1 - sx / 2);
+  const p = REDUCED ? 0 : state.scroll;
+  const z = 1 + p * par * CFG.zoomK;
+  const fx = 0.5, fy = U.uHorizon.value;             // push toward the waterline / bridge
+  cx = fx + (cx - fx) / z; cy = fy + (cy - fy) / z + p * par * CFG.liftK;
+  sx /= z; sy /= z;
+  return [cx - sx / 2, cy - sy / 2, sx, sy];
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   7. CAMERA PROJECTION (manifest camera → screen UV of the sun)
+   ════════════════════════════════════════════════════════════════════════ */
+const cam = { F: new THREE.Vector3(), Rt: new THREE.Vector3(), Up: new THREE.Vector3(), tanH: 0.6, tanV: 0.3375, shiftV: 0 };
+function setupCamera(m) {
+  const c = m.camera, pos = new THREE.Vector3(...c.pos), tgt = new THREE.Vector3(...c.target);
+  cam.F.copy(tgt).sub(pos).normalize();
+  cam.Rt.crossVectors(cam.F, new THREE.Vector3(0, 0, 1)).normalize();
+  cam.Up.crossVectors(cam.Rt, cam.F).normalize();
+  cam.tanH = (c.sensor_mm / 2) / c.lens_mm;            // Blender sensor fit AUTO → width for landscape
+  cam.tanV = cam.tanH * m.height / m.width;
+  // Blender lens shift (fraction of the sensor WIDTH, horizontal fit). A level camera with +shift_y
+  // frames higher, so everything lands LOWER in the image: v += shift_y · W/H.
+  // (Check: level horizon → v = 0.5 + 0.07222·1.778 = 0.628 ≈ manifest horizon_y 0.637.)
+  cam.shiftV = (c.shift_y || 0) * m.width / m.height;
+}
+function project(dir) {
+  const z = dir.dot(cam.F);
+  if (z <= 1e-4) return null;
+  return [0.5 + dir.dot(cam.Rt) / z / (2 * cam.tanH), 0.5 - dir.dot(cam.Up) / z / (2 * cam.tanV) + cam.shiftV];
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   8. BUILD THE SCENE FROM THE MANIFEST
+   ════════════════════════════════════════════════════════════════════════ */
+let M, skyPass, waterPass, fxPass, gullPass;
+const sprites = [], swayers = [], fogPasses = [], glowPasses = [];
+const ringData = Array.from({ length: 12 }, () => new THREE.Vector4(0, 0, 0, 0));
+const bodyData = Array.from({ length: 4 }, () => new THREE.Vector4(0, 0, 0, 0));
+const reflectables = new Set();   // meshes rendered into the reflection RT (above-water layers)
+let reflRT = null, colHTex = null;
+const gullData = Array.from({ length: 5 }, () => new THREE.Vector4(0, 0, 0, 0));
+
+async function build() {
+  M = await (await fetch(BASE + 'manifest.json', { cache: 'no-cache' })).json();
+  U.uHorizon.value = M.horizon_y ?? 0.62;
+  setupCamera(M);
+  const layers = [...M.layers].sort((a, b) => a.order - b.order);
+
+  // load every image in parallel
+  const imgs = {};
+  await Promise.all(layers.flatMap(L => Object.entries(L.files || {}).map(async ([k, f]) => {
+    try { imgs[L.name + ':' + k] = await loadImage(BASE + f); }
+    catch (e) { state.errors.push('missing ' + f); }
+  })));
+  const tex = (L, k) => imgs[L.name + ':' + k] ? makeTex(imgs[L.name + ':' + k]) : null;
+  const blank = new THREE.Texture(); // placeholder sampler for absent maps
+
+  const maskL = layers.find(L => L.kind === 'water_mask');
+  const maskTex = maskL ? tex(maskL, 'light') : null;
+  const maskU = { tMask: { value: maskTex || blank }, uHasMask: { value: maskTex ? 1 : 0 } };
+  const waterPar = maskL ? maskL.parallax : 0.1;
+
+  // ── sky first
+  skyPass = addPass(FS_SKY, {
+    uCamF: { value: cam.F }, uCamR: { value: cam.Rt }, uCamU: { value: cam.Up },
+    uTan: { value: new THREE.Vector2(cam.tanH, cam.tanV) }, uDisc: { value: CFG.sunDiscDeg * R },
+    uTitleY: { value: 0.2 }, uTitleK: { value: 1 }, uShiftV: { value: cam.shiftV },
+  }, { par: 0, name: 'sky' });
+
+  const litUniforms = (L, mode) => {
+    const box = imgs[L.name + ':light'] ? alphaBox(imgs[L.name + ':light']) : [0, 0, 1, 1];
+    return { box, u: {
+      tLight: { value: tex(L, 'light') || blank }, tShadow: { value: tex(L, 'shadow') || blank },
+      tNormal: { value: tex(L, 'normal') || blank }, tDepth: { value: tex(L, 'depth') || blank },
+      uHasS: { value: imgs[L.name + ':shadow'] ? 1 : 0 }, uHasN: { value: imgs[L.name + ':normal'] && !LIGHTONLY ? 1 : 0 },
+      uHasD: { value: imgs[L.name + ':depth'] && !LIGHTONLY ? 1 : 0 },
+      ...maskU, uMode: { value: mode }, uAlpha: { value: 1 }, uClipY: { value: 9 }, uMirrorY: { value: 0 },
+      uSway: { value: 0 }, uSeed: { value: L.order * 7.13 }, uOffset: { value: new THREE.Vector2() },
+      uBox: { value: new THREE.Vector4(...box) },
+      // haze depth when there is no depth map: manifest `depth` if given, else guessed from parallax
+      uDepthGuess: { value: L.depth ?? THREE.MathUtils.clamp(0.012 / Math.max(L.parallax || 0.05, 1e-3) - 0.02, 0, 0.9) },
+    } };
+  };
+  // ── reflection sources: every non-sprite layer that rises above the waterline and is NOT a
+  //    foreground frame (its alpha bbox doesn't reach the bottom of the poster). Note the Blender
+  //    layers continue below horizon_y (hidden by the water), so we can't require bbox ≈ horizon.
+  //    Their per-column height above the waterline drives the reflection fade length.
+  const H = U.uHorizon.value;
+  const isReflectable = L => !['sprite', 'water_mask', 'reflection'].includes(L.kind) && imgs[L.name + ':light'] && (() => {
+    const b = alphaBox(imgs[L.name + ':light']); return b[1] < H - 0.005 && b[3] < 0.9; })();
+  const colH = new Float32Array(256);
+  {
+    const w = 256, h = 144, c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d', { willReadFrequently: true });
+    for (const L of layers.filter(isReflectable)) g.drawImage(imgs[L.name + ':light'], 0, 0, w, h);
+    const d = g.getImageData(0, 0, w, h).data, hy = Math.floor(H * h);
+    for (let x = 0; x < w; x++) { let top = hy; for (let y = 0; y < hy; y++) if (d[(y * w + x) * 4 + 3] > 20) { top = y; break; } colH[x] = (hy - top) / h; }
+  }
+  const colBytes = new Uint8Array(256 * 4);
+  colH.forEach((v, i) => { colBytes[i * 4] = Math.round(Math.min(1, v * 2) * 255); colBytes[i * 4 + 3] = 255; });
+  colHTex = new THREE.DataTexture(colBytes, 256, 1, THREE.RGBAFormat);
+  colHTex.magFilter = colHTex.minFilter = THREE.LinearFilter; colHTex.needsUpdate = true;
+  reflRT = new THREE.WebGLRenderTarget(16, 16, { depthBuffer: false });
+  const pad = (b, p = 0.012) => [Math.max(0, b[0] - p), Math.max(0, b[1] - p), Math.min(1, b[2] + p), Math.min(1, b[3] + p)];
+
+  let waterDone = false;
+  const spriteReflQueue = [];
+  const insertWater = () => {
+    if (waterDone) return; waterDone = true;
+    waterPass = addPass(FS_WATER, { ...maskU, tRefl: { value: reflRT.texture }, tColH: { value: colHTex },
+      uSquash: { value: CFG.reflSquash }, uGolden: { value: 0 } },
+      { rect: [0, U.uHorizon.value - 0.03, 1, 1], par: waterPar, name: 'water' });
+    for (const L of layers.filter(l => l.kind === 'reflection' && CFG.useBlenderReflection)) {
+      const { u } = litUniforms(L, 1);
+      addPass(FS_LIT, u, { rect: [0, U.uHorizon.value - 0.03, 1, 1], par: L.parallax, name: L.name });
+    }
+    fxPass = addPass(FS_FX, {
+      ...maskU, uRings: { value: ringData }, uBodies: { value: bodyData }, uFerry: { value: new THREE.Vector4(0, 0, -1, 0) },
+      uBow: { value: new THREE.Vector2() }, uFerryA: { value: 0 }, uGlitter: { value: 0 }, uSunUV: { value: new THREE.Vector2() },
+    }, { rect: [0, U.uHorizon.value - 0.03, 1, 1], par: waterPar, name: 'water-fx' });
+    // mirrored reflections of the moving sprites (ferry, sea lions) sit in the water too
+    for (const L of layers.filter(l => l.kind === 'sprite' && l.anim)) {
+      const { u } = litUniforms(L, 3); u.uAlpha.value = 0.3;
+      spriteReflQueue.push({ L, pass: addPass(FS_LIT, u, { rect: [0, U.uHorizon.value - 0.03, 1, 1], par: L.parallax, name: L.name + '-refl' }) });
+    }
+  };
+  const addFog = (y, h, speed, seed, par, k) =>
+    fogPasses.push({ k, pass: addPass(FS_FOG, { uBand: { value: new THREE.Vector4(y, h, speed, seed) }, uDens: { value: 0.3 } },
+      { rect: [0, Math.max(0, y - h * 2.2), 1, Math.min(1, y + h * 2.2)], par, name: 'fog' }) });
+
+  for (const L of layers) {
+    const kind = CFG.glowLike.test(L.name) ? 'glow' : L.kind;
+    if (kind === 'water_mask' || kind === 'reflection') { insertWater(); continue; }
+    if (kind === 'sprite' && !waterDone) insertWater();
+
+    if (kind === 'glow') {
+      const t = tex(L, 'light'); if (!t) continue;
+      const box = alphaBox(imgs[L.name + ':light']);
+      const p = addPass(FS_GLOW, { tLight: { value: t }, uGlowK: { value: 1 }, uOffset: { value: new THREE.Vector2() } },
+        { rect: pad(box, 0.02), par: L.parallax, blending: THREE.AdditiveBlending, name: L.name });
+      glowPasses.push(p);
+      if (isReflectable(L)) reflectables.add(p.mesh);
+    } else {
+      const { u, box } = litUniforms(L, 0);
+      const animated = kind === 'sprite' && L.anim;
+      const p = addPass(FS_LIT, u, { rect: animated ? [0, 0, 1, 1] : pad(box), par: L.parallax, name: L.name });
+      if (animated) {
+        const s = { L, pass: p, box, anim: L.anim, refl: spriteReflQueue.find(q => q.L === L)?.pass,
+                    dive: 0, diveT: 0, nextDive: 8 + Math.random() * 20, wasUnder: false, prevV: 0, prevY: 0,
+                    dx: 0, dxTarget: 0, burst: 0, body: sprites.length };
+        sprites.push(s);
+      }
+      if (!animated && isReflectable(L)) reflectables.add(p.mesh);
+      if (CFG.swayLike.test(L.name)) swayers.push({ pass: p, phase: Math.random() * 6.28, w: L.parallax });
+    }
+    state.layers.push(L.name + ':' + kind);
+
+    // fog bands + gulls are slotted between layers by name (fallbacks: by order)
+    if (L.name === 'sf' || /city/.test(L.name)) addFog(U.uHorizon.value - 0.045, 0.035, 0.010, 1.7, L.parallax, 0.8);
+    if (L.name === 'alcatraz') addFog(U.uHorizon.value - 0.012, 0.022, -0.006, 5.3, L.parallax, 0.55);
+    if (L.name === (layers.some(l => l.name === 'bridge_lights') ? 'bridge_lights' : 'bridge')) {
+      addFog(U.uHorizon.value + 0.004, 0.026, 0.016, 9.1, L.parallax, 1.0);
+      gullPass = addPass(FS_GULLS, { uGulls: { value: gullData } }, { rect: [0, 0.02, 1, 0.62], par: 0.1, name: 'gulls' });
+    }
+  }
+  if (!waterDone) insertWater();
+  if (!gullPass) gullPass = addPass(FS_GULLS, { uGulls: { value: gullData } }, { rect: [0, 0.02, 1, 0.62], par: 0.1, name: 'gulls' });
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   9. LIFE — sea lions, ferry, rings, gulls, sway (all in scene UV)
+   ════════════════════════════════════════════════════════════════════════ */
+const rings = [];   // {x,y,age,str}
+function spawnRing(x, y, bodyPx) {     // one ring EVENT (the shader draws 5 rings per event)
+  if (rings.length >= 12) rings.shift();
+  rings.push({ x, y, age: 0, str: Math.max(8, bodyPx) });
+}
+// cheap 1-D fbm for motion (layered noise, never a lone sine)
+const h1 = n => { const x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); };
+const n1 = x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return h1(i) * (1 - u) + h1(i + 1) * u; };
+const fbm1 = x => 0.5 * n1(x) + 0.3 * n1(x * 2.1 + 5) + 0.2 * n1(x * 4.3 + 11);
+const gulls = Array.from({ length: 4 }, (_, i) => ({
+  x: Math.random(), y: 0.12 + Math.random() * 0.28, v: (0.008 + Math.random() * 0.012) * (Math.random() < 0.5 ? -1 : 1),
+  size: 0.010 + Math.random() * 0.008, f: 3.2 + Math.random() * 1.6, ph: Math.random() * 6.28, glide: 0, seed: i * 3.7,
+}));
+let ferryPrevT = 0;
+
+function updateLife(t, dt) {
+  const still = REDUCED;
+  // ── sprites
+  const anyDiving = sprites.some(q => q.diveT > 0);
+  for (const s of sprites) {
+    const u = s.pass.mat.uniforms, a = s.anim;
+    if (a.type === 'bob') {
+      // Bob = manifest sine + layered noise (never a lone sine); dives every 25–45 s, never two at once,
+      // resurfacing 40–120 px away. Rings spawn when the bob velocity crosses zero going down.
+      const clip = a.clip_y ?? 9;
+      const amp = (a.amp_px ?? 6) / M.height;
+      const hgt = s.box[3] - s.box[1];
+      const bw = (s.box[2] - s.box[0]) * M.width;
+      if (!still) {
+        s.nextDive -= dt;
+        if (s.nextDive <= 0 && s.diveT <= 0 && !anyDiving) {
+          s.diveT = 3 + Math.random() * 3; s.nextDive = 25 + Math.random() * 20; s.burst = 3;
+          // resurface 40–120 px away (kept within ±120 px of the art's home position)
+          const step = (40 + Math.random() * 80) / M.width * (Math.random() < 0.5 ? -1 : 1);
+          s.dxTarget = THREE.MathUtils.clamp(s.dxTarget + step, -120 / M.width, 120 / M.width);
+          Audio_.plip((s.box[0] + s.box[2]) / 2 + s.dx);
+        }
+        if (s.diveT > 0) { s.diveT -= dt; if (s.dive > 0.95) s.dx = s.dxTarget; }   // move while hidden
+        const k = s.diveT > 0 ? Math.min(1, dt / 0.5) : Math.min(1, dt / 0.6);       // under .5 s, up .6 s
+        s.dive += ((s.diveT > 0 ? 1 : 0) - s.dive) * k * 2.2;
+      }
+      const ph = 2 * Math.PI * t / a.period_s + (a.phase || 0);
+      const n = still ? 0 : (fbm1(t * 0.35 + s.body * 7) - 0.5) * 2;
+      const bob = still ? 0 : (0.65 * Math.sin(ph) + 0.35 * n);
+      const offY = -amp * bob + s.dive * hgt * 1.1;               // + = down (scene v)
+      u.uOffset.value.set(s.dx, offY); u.uClipY.value = clip;
+      if (s.refl) { const r = s.refl.mat.uniforms; r.uOffset.value.set(s.dx, offY); r.uClipY.value = clip; r.uMirrorY.value = clip;
+                    r.uAlpha.value = 0.3 * (1 - s.dive); }
+      const cx = (s.box[0] + s.box[2]) / 2 + s.dx;
+      const vel = (offY - s.prevY) / Math.max(dt, 1e-3); s.prevY = offY;
+      // dive: a 3-ring burst 80 ms apart
+      if (s.burst > 0) { s.burstT = (s.burstT || 0) - dt; if (s.burstT <= 0) { spawnRing(cx, clip, bw); s.burst--; s.burstT = 0.08; } }
+      // surfacing: crown back above the water → 2 rings + a bark 150 ms later
+      const under = s.box[1] + offY > clip - hgt * 0.12;
+      if (s.wasUnder && !under) { spawnRing(cx, clip, bw * 0.8); setTimeout(() => spawnRing(cx, clip, bw * 0.8), 160); setTimeout(() => Audio_.bark(cx), 150); }
+      s.wasUnder = under;
+      // bob ring: velocity crosses zero going down (top of the bob)
+      if (!still && s.prevV < 0 && vel >= 0 && !under && s.dive < 0.1) spawnRing(cx, clip, bw);
+      s.prevV = vel;
+      bodyData[s.body % 4].set(cx, clip, bw * 0.5, Math.max(0, 1 - s.dive * 1.4));
+    } else if (a.type === 'path') {
+      const T = still ? 0.35 : (t / a.period_s) % 1;
+      const pos = [a.from[0] + (a.to[0] - a.from[0]) * T, a.from[1] + (a.to[1] - a.from[1]) * T];
+      const org = a.origin || [(s.box[0] + s.box[2]) / 2, s.box[3]];   // fallback: bbox bottom-centre
+      const bob = still ? 0 : (fbm1(t * 0.4 + 3) - 0.5) * 1.2 / M.height;  // ~0.6 px bob
+      const off = [pos[0] - org[0], pos[1] - org[1] + bob];
+      const alpha = smooth(0, 0.04, T) * (1 - smooth(0.93, 1, T));
+      u.uOffset.value.set(...off); u.uAlpha.value = alpha;
+      const keel = s.box[3] + off[1];
+      if (s.refl) { const r = s.refl.mat.uniforms; r.uOffset.value.set(...off); r.uMirrorY.value = keel - 0.002; r.uAlpha.value = 0.3 * alpha; }
+      // wake from the stern, bow crescent at the bow (direction in px space)
+      let dx = (a.to[0] - a.from[0]) * M.width, dy = (a.to[1] - a.from[1]) * M.height; const l = Math.hypot(dx, dy) || 1; dx /= l; dy /= l;
+      const half = (s.box[2] - s.box[0]) / 2;
+      const cx = (s.box[0] + s.box[2]) / 2 + off[0];
+      fxPass.mat.uniforms.uFerry.value.set(cx - Math.sign(dx) * half * 0.92, keel - 0.003, dx, dy);
+      fxPass.mat.uniforms.uBow.value.set(cx + Math.sign(dx) * half * 0.95, keel - 0.003);
+      fxPass.mat.uniforms.uFerryA.value = alpha;
+      if (ferryPrevT < CFG.ferryHornAt && T >= CFG.ferryHornAt) Audio_.ferryHorn(cx);
+      ferryPrevT = T;
+    }
+  }
+  // ── rings
+  for (const r of rings) r.age += dt;
+  while (rings.length && rings[0].age > 3.2) rings.shift();
+  ringData.forEach((v, i) => { const r = rings[i]; r ? v.set(r.x, r.y, r.age, r.str) : v.set(0, 0, 0, 0); });
+  // ── gulls (drift, flap with glides, wrap around)
+  gulls.forEach((g, i) => {
+    if (!still) {
+      g.x += g.v * dt; g.y += Math.sin(t * 0.3 + g.seed) * 0.002 * dt;
+      if (g.x > 1.08) g.x = -0.08; if (g.x < -0.08) g.x = 1.08;
+    }
+    const glide = Math.sin(t * 0.21 + g.seed) > 0.4;
+    const flap = still ? 0.3 : (glide ? 0.15 + 0.05 * Math.sin(t * 2) : Math.sin(t * g.f + g.ph));
+    gullData[i].set(g.x, g.y, g.size, flap);
+  });
+  // ── vegetation sway, following a slow gust envelope (also drives the wind audio)
+  const gust = 0.5 + 0.5 * (0.6 * Math.sin(t * 0.13) * Math.sin(t * 0.071 + 1.3) + 0.4 * Math.sin(t * 0.37 + 0.8));
+  state.gust = THREE.MathUtils.clamp(gust * (0.6 + Math.min(state.windSpeed, 40) / 40), 0, 1);
+  for (const w of swayers) {
+    const px = still ? 0 : CFG.swayPx * (0.35 + 0.9 * state.gust) * (Math.sin(t * 0.8 + w.phase) * 0.75 + Math.sin(t * 1.9 + w.phase * 2) * 0.25);
+    w.pass.mat.uniforms.uSway.value = px / M.width;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   10. SOUND — synthesized, swappable for real files via SOUNDS[*].src
+   ════════════════════════════════════════════════════════════════════════ */
+const SOUNDS = {        // set src to an audio URL to replace a synth with a recording
+  ocean:     { src: null, gain: 0.55 },
+  wind:      { src: null, gain: 0.35 },
+  bark:      { src: null, gain: 0.45 },
+  plip:      { src: null, gain: 0.25 },
+  gull:      { src: null, gain: 0.22 },
+  foghorn:   { src: null, gain: 0.55 },
+  ferryHorn: { src: null, gain: 0.3 },
+};
+const Audio_ = (() => {
+  let ctx = null, master, oceanG, oceanLP, hissG, windG, windBP, verb, started = false;
+  const buffers = {};
+  let want = CFG.soundEnabled;
+  try { const v = localStorage.getItem('posterSound'); if (v != null && CFG.soundEnabled) want = v === '1'; } catch (e) {}
+  const btn = document.getElementById('sndBtn'), hint = document.getElementById('sndHint');
+  const reflect = () => {
+    btn.setAttribute('aria-pressed', String(want)); btn.setAttribute('aria-label', want ? 'Sound on' : 'Sound off');
+    hint.classList.toggle('show', want && !(ctx && ctx.state === 'running'));
+  };
+  function noiseBuf(sec = 3, brown = false) {
+    const b = ctx.createBuffer(1, ctx.sampleRate * sec, ctx.sampleRate), d = b.getChannelData(0);
+    let last = 0; for (let i = 0; i < d.length; i++) { const w = Math.random() * 2 - 1;
+      if (brown) { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; } else d[i] = w; }
+    return b;
+  }
+  function loop(buf) { const s = ctx.createBufferSource(); s.buffer = buf; s.loop = true; s.start(); return s; }
+  async function loadSrcs() {
+    for (const [k, v] of Object.entries(SOUNDS)) if (v.src) {
+      try { buffers[k] = await ctx.decodeAudioData(await (await fetch(v.src)).arrayBuffer()); } catch (e) {}
+    }
+  }
+  function playBuffer(k, pan = 0) {
+    const s = ctx.createBufferSource(); s.buffer = buffers[k];
+    const g = ctx.createGain(); g.gain.value = SOUNDS[k].gain; const p = ctx.createStereoPanner(); p.pan.value = pan;
+    s.connect(g).connect(p).connect(master); s.start(); return true;
+  }
+  function init() {
+    if (ctx) return;
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+    // a cheap "distance" echo for horns
+    verb = ctx.createDelay(1); verb.delayTime.value = 0.33; const fb = ctx.createGain(); fb.gain.value = 0.32;
+    const vlp = ctx.createBiquadFilter(); vlp.type = 'lowpass'; vlp.frequency.value = 900;
+    verb.connect(fb).connect(vlp).connect(verb); vlp.connect(master);
+    loadSrcs().then(() => {
+      // ocean: brown noise → lowpass, swells driven in update(); plus a thin hiss of foam
+      const oceanSrc = buffers.ocean ? loop(buffers.ocean) : loop(noiseBuf(4, true));
+      oceanLP = ctx.createBiquadFilter(); oceanLP.type = 'lowpass'; oceanLP.frequency.value = 520;
+      oceanG = ctx.createGain(); oceanG.gain.value = 0;
+      oceanSrc.connect(oceanLP).connect(oceanG).connect(master);
+      if (!buffers.ocean) { const h = loop(noiseBuf(2)); const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3000;
+        hissG = ctx.createGain(); hissG.gain.value = 0; h.connect(hp).connect(hissG).connect(master); }
+      // wind: band-passed noise; level follows the redwood sway gust
+      const windSrc = buffers.wind ? loop(buffers.wind) : loop(noiseBuf(3));
+      windBP = ctx.createBiquadFilter(); windBP.type = 'bandpass'; windBP.frequency.value = 600; windBP.Q.value = 0.8;
+      windG = ctx.createGain(); windG.gain.value = 0;
+      windSrc.connect(windBP).connect(windG).connect(master);
+      started = true;
+    });
+  }
+  function unlock() {
+    if (!want || !CFG.soundEnabled) return;
+    init();
+    ctx.resume().then(reflect);
+  }
+  if (CFG.soundEnabled) ['pointerdown', 'keydown', 'touchend'].forEach(ev => addEventListener(ev, unlock, { passive: true }));
+  else document.querySelector('.sound').style.display = 'none';
+  btn.addEventListener('click', e => {
+    want = !want; try { localStorage.setItem('posterSound', want ? '1' : '0'); } catch (err) {}
+    if (want) unlock(); reflect();
+  });
+  reflect();
+
+  const live = () => ctx && started && want && ctx.state === 'running' && !document.hidden;
+  const env = (g, t0, a, peak, d) => { g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(peak, t0 + a); g.gain.exponentialRampToValueAtTime(0.0001, t0 + a + d); };
+  const panFor = x => THREE.MathUtils.clamp(x * 2 - 1, -1, 1);
+  let nextGull = 6, nextHorn = 8, lastBark = -9;
+
+  return {
+    SOUNDS,
+    update(t, dt) {
+      if (!ctx || !started) return;
+      const now = ctx.currentTime, on = want && !document.hidden;
+      master.gain.setTargetAtTime(on ? 0.8 : 0, now, on ? 0.6 : 0.15);       // duck when hidden / off
+      const swell = 0.5 + 0.5 * Math.sin(t * 2 * Math.PI / 9.5) * (0.7 + 0.3 * Math.sin(t * 0.23));
+      oceanG.gain.setTargetAtTime(SOUNDS.ocean.gain * (0.35 + 0.65 * swell), now, 0.4);
+      oceanLP.frequency.setTargetAtTime(380 + 520 * swell, now, 0.4);
+      if (hissG) hissG.gain.setTargetAtTime(0.02 * swell * swell, now, 0.4);
+      windG.gain.setTargetAtTime(SOUNDS.wind.gain * (0.08 + 0.5 * state.gust), now, 0.5);
+      windBP.frequency.setTargetAtTime(380 + 700 * state.gust, now, 0.5);
+      if (!live()) return;
+      nextGull -= dt; if (nextGull < 0) { nextGull = 9 + Math.random() * 16; const g = gulls[Math.floor(Math.random() * gulls.length)]; this.gull(g.x); }
+      nextHorn -= dt; if (nextHorn < 0) { nextHorn = 30; if (state.fog > 0.6) this.foghorn(); }
+    },
+    bark(x) {
+      if (!live() || Math.random() > 0.65 || performance.now() / 1000 - lastBark < 2.5) return;
+      lastBark = performance.now() / 1000;
+      if (buffers.bark) return playBuffer('bark', panFor(x));
+      const p = ctx.createStereoPanner(); p.pan.value = panFor(x); p.connect(master);
+      const ws = ctx.createWaveShaper(); const c = new Float32Array(256); for (let i = 0; i < 256; i++) { const v = i / 128 - 1; c[i] = Math.tanh(v * 4); } ws.curve = c;
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1100; ws.connect(lp).connect(p);
+      const n = 2 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < n; i++) {
+        const t0 = ctx.currentTime + i * (0.24 + Math.random() * 0.08);
+        const o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sawtooth'; o2.type = 'square';
+        o.frequency.setValueAtTime(200, t0); o.frequency.exponentialRampToValueAtTime(115, t0 + 0.17);
+        o2.frequency.setValueAtTime(207, t0); o2.frequency.exponentialRampToValueAtTime(110, t0 + 0.17);
+        env(g, t0, 0.015, SOUNDS.bark.gain, 0.16);
+        o.connect(g); o2.connect(g); g.connect(ws); o.start(t0); o2.start(t0); o.stop(t0 + 0.25); o2.stop(t0 + 0.25);
+      }
+    },
+    gull(x) {
+      if (!live()) return;
+      if (buffers.gull) return playBuffer('gull', panFor(x));
+      const p = ctx.createStereoPanner(); p.pan.value = panFor(x); p.connect(master);
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1700; bp.Q.value = 1.2; bp.connect(p);
+      const n = 2 + Math.floor(Math.random() * 2);
+      for (let i = 0; i < n; i++) {
+        const t0 = ctx.currentTime + i * 0.32, o = ctx.createOscillator(), g = ctx.createGain(), vib = ctx.createOscillator(), vg = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(1300, t0); o.frequency.linearRampToValueAtTime(2100, t0 + 0.07); o.frequency.exponentialRampToValueAtTime(1150, t0 + 0.28);
+        vib.frequency.value = 28; vg.gain.value = 60; vib.connect(vg).connect(o.frequency);
+        env(g, t0, 0.03, SOUNDS.gull.gain, 0.24);
+        o.connect(g).connect(bp); o.start(t0); vib.start(t0); o.stop(t0 + 0.32); vib.stop(t0 + 0.32);
+      }
+    },
+    plip(x) {                                     // sea lion slipping under: a short wet drop
+      if (!live()) return;
+      if (buffers.plip) return playBuffer('plip', panFor(x));
+      const t0 = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain(), p = ctx.createStereoPanner();
+      p.pan.value = panFor(x); o.type = 'sine';
+      o.frequency.setValueAtTime(900, t0); o.frequency.exponentialRampToValueAtTime(260, t0 + 0.09);
+      env(g, t0, 0.005, SOUNDS.plip.gain, 0.12);
+      o.connect(g).connect(p).connect(master); o.start(t0); o.stop(t0 + 0.16);
+    },
+    foghorn() {
+      if (!live()) return;
+      if (buffers.foghorn) return playBuffer('foghorn');
+      // the SF "bee-oh": a high-ish then lower tone, sine + filtered saw
+      [[110, 0, 2.0], [87, 2.1, 2.6]].forEach(([f, dt0, dur]) => {
+        const t0 = ctx.currentTime + dt0, g = ctx.createGain(), lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass'; lp.frequency.value = 340;
+        const s1 = ctx.createOscillator(), s2 = ctx.createOscillator(); s1.type = 'sine'; s2.type = 'sawtooth';
+        s1.frequency.value = f; s2.frequency.value = f * 1.003;
+        g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(SOUNDS.foghorn.gain, t0 + 0.25);
+        g.gain.setValueAtTime(SOUNDS.foghorn.gain, t0 + dur - 0.4); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        s1.connect(g); s2.connect(lp).connect(g); g.connect(master); g.connect(verb);
+        s1.start(t0); s2.start(t0); s1.stop(t0 + dur + 0.05); s2.stop(t0 + dur + 0.05);
+      });
+    },
+    ferryHorn(x) {
+      if (!live()) return;
+      if (buffers.ferryHorn) return playBuffer('ferryHorn', panFor(x));
+      const t0 = ctx.currentTime, g = ctx.createGain(), lp = ctx.createBiquadFilter(), p = ctx.createStereoPanner();
+      lp.type = 'lowpass'; lp.frequency.value = 650; p.pan.value = panFor(x);
+      [147, 185].forEach(f => { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.connect(lp); o.start(t0); o.stop(t0 + 1.6); });
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(SOUNDS.ferryHorn.gain, t0 + 0.12);
+      g.gain.setValueAtTime(SOUNDS.ferryHorn.gain, t0 + 1.1); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.55);
+      lp.connect(g).connect(p); p.connect(master); g.connect(verb);
+    },
+    get ctx() { return ctx; },
+  };
+})();
+window.__poster.audio = Audio_;
+
+/* ════════════════════════════════════════════════════════════════════════
+   11. WEATHER — Open-Meteo, live (fog codes 45/48 → dense fog)
+   ════════════════════════════════════════════════════════════════════════ */
+const WX = c => c == null ? '' : c === 0 ? 'Clear' : c <= 2 ? 'Partly cloudy' : c === 3 ? 'Overcast' : (c === 45 || c === 48) ? 'Fog'
+  : c <= 57 ? 'Drizzle' : c <= 67 ? 'Rain' : c <= 77 ? 'Snow' : c <= 82 ? 'Showers' : 'Thunderstorm';
+async function fetchWeather() {
+  if (Q.has('fog')) return;
+  try {
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.8199&longitude=-122.4783&current=weather_code,visibility,wind_speed_10m');
+    const j = await r.json(), c = j.current || {};
+    const code = c.weather_code, vis = c.visibility ?? 20000;
+    let fog = 0.22;                                        // SF almost always has a little marine haze
+    if (code === 45 || code === 48) fog = 0.95;
+    else if (vis < 1000) fog = 0.9; else if (vis < 4000) fog = 0.65; else if (vis < 10000) fog = 0.42;
+    if (code === 3) fog = Math.max(fog, 0.4);
+    state.fog = fog; state.weather = fog > 0.85 && code !== 45 && code !== 48 ? 'Fog' : WX(code);
+    state.windSpeed = c.wind_speed_10m ?? 12;
+  } catch (e) { state.weather = ''; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   12. FRAME
+   ════════════════════════════════════════════════════════════════════════ */
+const statusEl = document.getElementById('status'), titleEl = document.getElementById('title'), heroEl = document.getElementById('hero');
+
+/* Fit the outlined title to CFG.titleFit of the viewport width (one line), measuring real glyphs. */
+function fitTitle() {
+  const vw = innerWidth || 1600;
+  titleEl.style.fontSize = '';                                   // start from the CSS clamp guess
+  const fs = parseFloat(getComputedStyle(titleEl).fontSize);
+  const w = titleEl.getBoundingClientRect().width;
+  if (w > 0) titleEl.style.fontSize = Math.min(fs * (vw * CFG.titleFit) / w, 190) + 'px';
+}
+document.fonts?.ready.then(fitTitle);
+addEventListener('resize', fitTitle);
+fitTitle();
+let t0 = performance.now(), lastT = 0, simT = 0;
+
+function resize() {
+  state.vw = innerWidth || 1600; state.vh = innerHeight || 900;   // preview panes can report 0×0
+  if (!renderer) return;
+  renderer.setPixelRatio(DPR);
+  renderer.setSize(state.vw, state.vh, false);
+  U.uGrain.value = DPR * CFG.grainCss;
+  if (reflRT) reflRT.setSize(Math.max(16, Math.round(state.vw * DPR * CFG.reflRtScale)), Math.max(16, Math.round(state.vh * DPR * CFG.reflRtScale)));
+}
+
+function updateSun() {
+  const ms = nowMs();
+  let { alt, az } = sunAltAz(ms);
+  if (state.forceAlt != null) alt = state.forceAlt;
+  if (state.forceAz != null) az = state.forceAz;
+  state.alt = alt; state.az = az;
+  const dir = sunVec(alt, az);
+  U.uSunDir.value.copy(dir);
+  const P = palette(alt);
+  U.uSkyTop.value.copy(P.top); U.uSkyHor.value.copy(P.hor); U.uSunCol.value.copy(P.sun);
+  U.uDayK.value = P.k;
+  U.uSunUp.value = smooth(-3, 3, alt);
+  state.night = 1 - smooth(-12, -2, alt);
+  U.uNight.value = state.night;
+  U.uFog.value = state.fog;
+  // water colour: teal by day, deep navy at night
+  U.uWater.value.setRGB(0.29, 0.53, 0.55).lerp(new THREE.Color(0.06, 0.10, 0.22), state.night * 0.9)
+    .lerp(new THREE.Color().copy(P.hor), 0.12);
+  // sun on screen
+  const uv = project(dir);
+  state.sunUV = uv; state.sunInFrame = !!uv && uv[0] > -0.02 && uv[0] < 1.02 && uv[1] > -0.05 && alt > -1;
+  if (waterPass) waterPass.mat.uniforms.uGolden.value = smooth(-4, 2, alt) * (1 - smooth(10, 20, alt));
+  if (fxPass) {
+    const low = smooth(-1, 2, alt) * (1 - smooth(10, 16, alt));
+    const inX = uv ? smooth(-0.06, 0.02, uv[0]) * (1 - smooth(0.98, 1.06, uv[0])) : 0;
+    fxPass.mat.uniforms.uGlitter.value = low * inX * (1 - state.fog * 0.6);
+    if (uv) fxPass.mat.uniforms.uSunUV.value.set(uv[0], uv[1]);
+  }
+  for (const g of glowPasses) g.mat.uniforms.uGlowK.value = 0.12 + 1.9 * smooth(-6, 3, -alt);   // lamps on at dusk
+  for (const f of fogPasses) f.pass.mat.uniforms.uDens.value = Math.min(1, state.fog * f.k * 1.05);
+  // clock + weather line
+  const time = clockFmt.format(new Date(ms));
+  statusEl.textContent = ['San Francisco', time, state.weather].filter(Boolean).join(' · ');
+}
+
+function frame() {
+  if (!state.ready) return;
+  const now = performance.now();
+  const t = (now - t0) / 1000;
+  const dt = Math.min(0.1, Math.max(0, t - lastT)); lastT = t;
+  if (!REDUCED) simT += dt;
+  U.uTime.value = simT;
+  updateSun();
+  updateLife(simT, REDUCED ? 0 : dt);
+  Audio_.update(simT, dt);
+  for (const p of passes) p.mat.uniforms.uView.value.set(...viewFor(p.par));
+  const fadeP = REDUCED ? 0 : state.scroll;
+  heroEl.style.opacity = String(1 - smooth(0, 0.35, fadeP));
+  heroEl.style.transform = `translateY(${-fadeP * 12}vh)`;
+  // sky: calm band sits behind the hero type (viewport → scene UV through the sky's view)
+  if (skyPass) {
+    const r = heroEl.getBoundingClientRect(), v = skyPass.mat.uniforms.uView.value;
+    const vy = (r.top + r.height * 0.5) / state.vh;
+    skyPass.mat.uniforms.uTitleY.value = v.y + vy * v.w;
+    skyPass.mat.uniforms.uTitleK.value = 1 - smooth(0, 0.35, fadeP);
+  }
+  // reflection pre-pass: only the above-water layers, into a small RT (alpha = coverage)
+  if (reflRT) {
+    for (const p of passes) p.mesh.visible = reflectables.has(p.mesh);
+    renderer.setRenderTarget(reflRT); renderer.setClearColor(0x000000, 0); renderer.clear();
+    renderer.render(scene, camera);
+    renderer.setRenderTarget(null); renderer.setClearColor(0x0A1430, 1);
+    for (const p of passes) p.mesh.visible = true;
+  }
+  renderer.render(scene, camera);
+  state.frames++;
+}
+function renderOnce() { if (state.ready) frame(); }
+
+/* loop: RAF normally; setInterval under ?rafshim; slow tick under reduced motion; paused when hidden */
+let rafId = 0, shimId = 0;
+function loopStart() {
+  loopStop();
+  if (document.hidden) return;
+  if (REDUCED) { frame(); shimId = setInterval(frame, 20000); return; }
+  if (RAFSHIM) { shimId = setInterval(frame, 33); return; }
+  const tick = () => { frame(); rafId = requestAnimationFrame(tick); }; rafId = requestAnimationFrame(tick);
+}
+function loopStop() { cancelAnimationFrame(rafId); clearInterval(shimId); }
+document.addEventListener('visibilitychange', () => { document.hidden ? loopStop() : loopStart(); });
+
+/* ════════════════════════════════════════════════════════════════════════
+   13. SCROLL — Lenis + ScrollTrigger over the spacer (hero push-in)
+   ════════════════════════════════════════════════════════════════════════ */
+function setupScroll() {
+  if (Q.has('scroll') || !window.gsap || !window.ScrollTrigger || !window.Lenis) return;
+  gsap.registerPlugin(ScrollTrigger);
+  const lenis = new Lenis({ lerp: 0.09 });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(time => lenis.raf(time * 1000)); gsap.ticker.lagSmoothing(0);
+  ScrollTrigger.create({ trigger: '#spacer', start: 'top top', end: 'bottom bottom',
+    onUpdate: st => { state.scroll = st.progress; if (REDUCED) renderOnce(); } });
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   14. FALLBACK — no WebGL: stack the light PNGs as plain images
+   ════════════════════════════════════════════════════════════════════════ */
+async function showFallback(reason) {
+  console.warn('[poster-lab] fallback:', reason);
+  canvas.style.display = 'none';
+  const fb = document.getElementById('fallback'); fb.style.display = 'block';
+  try {
+    const m = M || await (await fetch(BASE + 'manifest.json')).json();
+    for (const L of [...m.layers].sort((a, b) => a.order - b.order)) {
+      if (L.kind === 'water_mask' || !L.files?.light) continue;
+      const im = document.createElement('img'); im.alt = ''; im.src = BASE + L.files.light;
+      if (L.kind === 'reflection') im.style.opacity = '0.5';
+      fb.appendChild(im);
+    }
+  } catch (e) {}
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   15. BOOT
+   ════════════════════════════════════════════════════════════════════════ */
+(async function boot() {
+  resize();
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
+    renderer.outputColorSpace = THREE.LinearSRGBColorSpace;   // shaders already work in display values
+    renderer.setClearColor(0x0A1430, 1);
+  } catch (e) { return showFallback('WebGL unavailable'); }
+  resize();
+  addEventListener('resize', () => { resize(); renderOnce(); });
+  canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); loopStop(); showFallback('context lost'); });
+  try { await build(); }
+  catch (e) { console.error('[poster-lab] build failed', e); return showFallback('layers failed to load'); }
+  resize();   // sizes the reflection RT now that it exists
+  if (state.errors.length) console.warn('[poster-lab]', state.errors.join(', '));
+  state.ready = true;
+  setupScroll();
+  fetchWeather().then(renderOnce);
+  setInterval(fetchWeather, 10 * 60 * 1000);
+  loopStart();
+})();
+</script>
+</body>
+</html>
