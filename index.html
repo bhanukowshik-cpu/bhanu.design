@@ -5197,16 +5197,16 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <!-- "Currently building Verified Call" sits here (not in the frame) so it can be a real link -->
     <a class="hero-building" id="heroBuilding" href="verified-call.html">Currently building <b>Verified Call</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
     <style>
-      .hero .hero-building{position:absolute;left:50%;top:7.5vh;transform:translateX(-50%);z-index:3;display:inline-flex;align-items:center;gap:6px;
+      .hero .hero-building{position:absolute;left:50%;top:21vh;transform:translateX(-50%);z-index:3;display:inline-flex;align-items:center;gap:6px;
         font-family:'JetBrains Mono',monospace;font-size:clamp(11px,.9vw,13px);letter-spacing:.12em;text-transform:uppercase;line-height:1.2;
         color:rgba(255,252,248,.88);text-decoration:none;white-space:nowrap;padding:4px 2px;transition:color .2s}
       .hero .hero-building b{font-weight:500;color:#FFFCF8;border-bottom:1px solid rgba(255,252,248,.55);padding-bottom:1px}
       .hero .hero-building svg{width:1.1em;height:1.1em;transition:transform .25s}
       .hero .hero-building:hover b{border-bottom-color:#FFFCF8}
       .hero .hero-building:hover svg{transform:translate(2px,-2px)}
-      @media (max-width:767px){ .hero .hero-building{top:14vh;font-size:10px;letter-spacing:.08em} }
+      @media (max-width:767px){ .hero .hero-building{top:19vh;font-size:10px;letter-spacing:.08em} }
     </style>
-    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=12" title="" aria-hidden="true"
+    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=13" title="" aria-hidden="true"
             tabindex="-1" loading="eager"></iframe>
     <style>
       .hero .hero-city{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:0;background:#0A1430}
@@ -5596,7 +5596,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <!-- the cloud bank's crown swells up over the bottom of the Golden Gate, so the scroll enters cloud, not a seam -->
     <img class="vcs-fringe" src="city/layers/vc/cloud_a.webp" alt="" aria-hidden="true" decoding="async">
     <div class="vcs-pin">
-      <iframe class="vcs-scene" id="vcScene" src="vc-lab.html?embed&amp;v=6" title="" aria-hidden="true" tabindex="-1" loading="lazy"></iframe>
+      <!-- (12 Nov) the scroll now flies into the isometric San Francisco city (sf-downtown.html); the painted
+           vc-lab scene and its card below are kept but hidden -->
+      <iframe class="vcs-scene" id="vcScene" src="sf-downtown.html?embed&amp;v=2" title="San Francisco, with the Verified Call tower" loading="lazy"></iframe>
       <aside class="vcs-card" id="vcsCard">
         <p class="vcs-meta"><span>Founder</span><span>Design + build, solo</span><span>3 weeks</span></p>
         <h2 class="vcs-title" id="vcsTitle">Verified Call</h2>
@@ -5611,11 +5613,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     </div>
   </section>
   <style>
-    .vcs{position:relative;z-index:2;height:300svh;background:#F2C9B8}
+    .vcs{position:relative;z-index:2;height:700svh;background:#6E9FA3}
     .vcs-fringe{position:absolute;left:50%;top:0;width:max(170vw,1500px);height:auto;max-width:none;z-index:3;
                 transform:translate(-50%,0);will-change:transform;pointer-events:none;user-select:none}
     .vcs-pin{position:sticky;top:0;height:100svh;overflow:hidden}
-    .vcs-scene{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;background:#F2C9B8}
+    .vcs-scene{position:absolute;inset:0;width:100%;height:100%;border:0;background:#6E9FA3}
+    .vcs-card{display:none!important}                     /* the city's own glimpse replaces it */
     .vcs-card{position:absolute;right:clamp(16px,6vw,96px);top:50%;width:min(430px,calc(100vw - 32px));z-index:2;
               padding:28px 28px 24px;border-radius:24px;color:#fff;font-family:var(--sans);
               opacity:0;transform:translate(0,calc(-50% + 28px));pointer-events:none;
@@ -5667,6 +5670,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       addEventListener('resize', send);
       f.addEventListener('load', function () { last = -1; send(); });
     })();
+    addEventListener('message', function (e) {   // scrolling over the city scrolls the page
+      if (e.origin !== location.origin || !e.data || e.data.type !== 'world-wheel') return;
+      var l = window.__lenis, dy = +e.data.dy || 0;
+      if (l && l.scrollTo) l.scrollTo((l.targetScroll != null ? l.targetScroll : scrollY) + dy);
+      else window.scrollBy(0, dy);
+    });
   </script>
 
   <section class="wk" id="work" aria-labelledby="wkTitle">

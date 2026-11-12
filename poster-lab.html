@@ -51,13 +51,14 @@
   /* Title: one line, ≤ ~86% of the viewport width, in the upper sky band (top ~12–22%).
      CSS clamp is the first guess (13 caps × ~0.8em ≈ 10.5em wide → 86vw / 10.5 ≈ 8.2vw);
      fitTitle() in JS then measures the real glyphs and corrects it. */
-  #hero{position:absolute;left:0;right:0;top:7.5vh;display:flex;flex-direction:column;align-items:center;
+  #hero{position:absolute;left:0;right:0;top:21vh;display:flex;flex-direction:column;align-items:center;
         text-align:center;will-change:opacity,transform}
   /* solid bold (owner, 12 Nov: "normal bold text" instead of the outline; still no text shadow) */
   /* recruiter pass (12 Nov, owner approved): name small, the value line is the headline, proof right under it */
   #name{font-family:var(--font-mono);font-size:clamp(11px,.9vw,13px);letter-spacing:.12em;text-transform:uppercase;color:rgba(255,252,248,.85);margin-bottom:clamp(8px,1vw,14px)}
   #title{white-space:nowrap;font-weight:700;font-size:clamp(36px,7vw,150px);line-height:1;letter-spacing:-.02em;color:#FFFCF8}
   #name b{color:#FFFCF8;font-weight:500}
+  html.text-in-scene #title, html.text-in-scene #tagline{visibility:hidden}   /* drawn in WebGL behind the bridge */
   #tagline{margin-top:clamp(10px,1.2vw,18px);max-width:min(860px,86vw);font-weight:500;font-size:clamp(16px,1.6vw,22px);
            line-height:1.5;color:rgba(255,252,248,.92)}
   #tagline b{color:#FFFCF8;font-weight:700}
@@ -82,7 +83,7 @@
   .badge{position:absolute;right:12px;top:56px;font-family:var(--font-mono);font-size:10px;color:#ffd;opacity:.7}
   @media (max-width:767px){
     .topbar{font-size:12px}
-    #hero{top:14vh}
+    #hero{top:19vh}
     #sndHint{position:absolute;right:0;bottom:calc(100% + 8px);white-space:nowrap}   /* keep clear of the clock line */
   }
 </style>
@@ -852,6 +853,9 @@ async function build() {
     const tD = tex(plateL, 'day'), tN = tex(plateL, 'night');
     platePass = addPass(FS_PLATE, { tPlate: { value: t || blank }, tPlateDay: { value: tD || blank }, tPlateNight: { value: tN || blank },
       uHasDay: { value: tD ? 1 : 0 }, uHasNight: { value: tN ? 1 : 0 } }, { par: plateL.parallax || 0.02, name: 'plate' });
+    // the hero title + line live INSIDE the scene, between the plate and the cut-out bridge, so the
+    // towers and cables pass in front of them (owner, 12 Nov: "move Hi, this is Bhanu behind the bridge")
+    if (layers.some(L => L.name === 'bridge_fg')) textPass = makeTextPass();
   }
   // ── sky first (skipped under a plate)
   if (!plateL) skyPass = addPass(FS_SKY, {
@@ -1452,8 +1456,51 @@ function glassRender() {           // returns true when it drew the frame
   return true;
 }
 
+/* ══════════════ hero text inside the scene (behind the bridge) ══════════════ */
+let textPass = null, textCanvas = null, textCtx = null, textTex = null, textKey = '';
+function makeTextPass() {
+  textCanvas = document.createElement('canvas'); textCtx = textCanvas.getContext('2d');
+  textTex = new THREE.CanvasTexture(textCanvas); textTex.colorSpace = THREE.NoColorSpace;
+  const mat = new THREE.ShaderMaterial({ transparent: true, depthTest: false, depthWrite: false,
+    uniforms: { tText: { value: textTex }, uA: { value: 1 } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy * 2.0, 0.0, 1.0); }',
+    fragmentShader: 'uniform sampler2D tText; uniform float uA; varying vec2 vUv; void main(){ vec4 c = texture2D(tText, vUv); gl_FragColor = vec4(c.rgb, c.a * uA); }' });
+  const mesh = new THREE.Mesh(QUAD, mat); mesh.frustumCulled = false; mesh.renderOrder = order++; mesh.name = 'hero-text'; scene.add(mesh);
+  document.documentElement.classList.add('text-in-scene');
+  document.fonts?.ready.then(() => { textKey = ''; });
+  return { mesh, mat };
+}
+function wrapLines(g, text, maxW) {
+  const words = text.split(' '), out = []; let line = '';
+  for (const w of words) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; }
+  if (line) out.push(line); return out;
+}
+function drawSceneText() {
+  if (!textPass) return;
+  const W = state.vw, H = state.vh, k = DPR, tagEl = document.getElementById('tagline');
+  const op = heroEl.style.opacity === '' ? 1 : +heroEl.style.opacity;
+  textPass.mat.uniforms.uA.value = op;
+  const tr = titleEl.getBoundingClientRect(), gr = tagEl.getBoundingClientRect();
+  const key = [W, H, tr.left, tr.top, tr.width, tr.height, gr.top, gr.width, gr.height, titleEl.style.fontSize].map(v => Math.round(parseFloat(v) || 0)).join(',');
+  if (key === textKey) return; textKey = key;
+  textCanvas.width = Math.max(1, Math.round(W * k)); textCanvas.height = Math.max(1, Math.round(H * k));
+  const g = textCtx; g.setTransform(k, 0, 0, k, 0, 0); g.clearRect(0, 0, W, H);
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  for (const [el, r, alpha] of [[titleEl, tr, 1], [tagEl, gr, 0.92]]) {
+    const cs = getComputedStyle(el), fs = parseFloat(cs.fontSize), lh = parseFloat(cs.lineHeight) || fs * 1.2;
+    g.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    try { g.letterSpacing = cs.letterSpacing === 'normal' ? '0px' : cs.letterSpacing; } catch (e) {}
+    g.fillStyle = `rgba(255,252,248,${alpha})`;
+    const lines = wrapLines(g, el.textContent.trim(), r.width + 2);
+    const top = r.top + (r.height - lines.length * lh) / 2;
+    lines.forEach((ln, i) => g.fillText(ln, r.left + r.width / 2, top + lh * (i + 0.5)));
+  }
+  textTex.needsUpdate = true;
+}
+
 function frame() {
   if (!state.ready) return;
+  drawSceneText();
   const now = performance.now();
   const t = (now - t0) / 1000;
   const dt = Math.min(0.1, Math.max(0, t - lastT)); lastT = t;

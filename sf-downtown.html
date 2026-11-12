@@ -24,13 +24,18 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:#6E9FA3;font-family:var(--font);color:var(--ink);overflow-x:hidden}
   #tour{height:900vh}                                  /* scroll length of the camera tour */
+  /* embedded in the homepage: the host owns nav, scroll and the page; the city keeps its glimpse + pop-up */
+  html.embed .bar, html.embed .hint, html.embed #tour, html.embed .status{display:none}
+  html.embed, html.embed body{overflow:hidden;height:100%}
   .hint{position:fixed;left:50%;bottom:58px;transform:translateX(-50%);z-index:5;font:600 13px var(--font);color:#fff;letter-spacing:.02em;
         background:rgba(31,27,36,.35);padding:8px 14px;border-radius:999px;transition:opacity .5s;pointer-events:none}
   canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
   .pill{position:fixed;z-index:5;background:var(--paper);border-radius:16px;box-shadow:0 2px 0 rgba(0,0,0,.08),0 10px 30px -12px rgba(20,30,40,.35)}
-  .brand{left:20px;top:20px;padding:9px 18px 9px 9px;font-weight:700;font-size:17px;display:flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none}
+  /* name + nav share one bar on the left (owner, 12 Nov) */
+  .bar{left:20px;top:20px;display:flex;align-items:center;gap:6px;padding:7px 10px 7px 7px}
+  .brand{display:flex;align-items:center;gap:12px;padding:2px 14px 2px 2px;margin-right:4px;border-right:1px solid #ECE5DB;font-weight:700;font-size:17px;color:var(--ink);text-decoration:none}
   .brand canvas{width:40px;height:40px;border-radius:11px;background:#E6F28D;image-rendering:pixelated;image-rendering:crisp-edges}
-  .nav{right:20px;top:20px;padding:12px 10px;display:flex;gap:4px}
+  .nav{display:flex;gap:2px}
   .nav a{color:var(--ink);text-decoration:none;font-weight:600;font-size:15px;padding:4px 12px;border-radius:10px}
   .nav a:hover{background:#F1ECE4}
   .status{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:5;font-family:var(--mono);font-size:12px;
@@ -125,6 +130,8 @@
            box-shadow:0 2px 0 rgba(0,0,0,.06),0 24px 50px -18px rgba(20,30,40,.5);opacity:0;pointer-events:none;
            transition:opacity .35s, translate .45s cubic-bezier(.2,.8,.2,1);translate:0 10px}
   .glimpse.on{opacity:1;pointer-events:auto;translate:0 0}
+  .glimpse .gphone{display:grid;place-items:center;height:210px;border-radius:13px;margin-bottom:12px;background:linear-gradient(160deg,#EAF3E2,#D6E8CC)}
+  .glimpse .gphone img{height:190px;width:auto;border-radius:18px;border:4px solid #1F1B24;box-shadow:0 14px 26px -12px rgba(20,40,20,.5)}
   .glimpse .gimg{display:block;width:100%;height:auto;border-radius:13px;margin-bottom:12px;box-shadow:0 8px 20px -10px rgba(20,30,40,.35)}
   html.lens-on .glimpse{background:transparent;box-shadow:none}         /* the WebGL lens draws the glass */
   html.lens-on .glimpse .eb{color:#4A4450}
@@ -157,17 +164,26 @@
 <body>
 <canvas id="gl" aria-label="Isometric toy model of downtown San Francisco: Market Street, the Ferry Building, Salesforce Tower, the Transamerica Pyramid, Union Square, Chinatown and the Verified Call tower"></canvas>
 
-<a class="pill brand" href="./" aria-label="Bhanu Kowshik, home"><canvas id="avatar" width="16" height="16" aria-hidden="true"></canvas>Bhanu Kowshik</a>
-<nav class="pill nav"><a href="./#about">About me</a><a href="./#work">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a><a href="./#contact">Contact</a></nav>
+<div class="pill bar"><a class="brand" href="./" aria-label="Bhanu Kowshik, home"><canvas id="avatar" width="16" height="16" aria-hidden="true"></canvas>Bhanu Kowshik</a>
+  <nav class="nav"><a href="./#about">About me</a><a href="./#work">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a><a href="./#contact">Contact</a></nav></div>
 <div id="tour" aria-hidden="true"></div>
 <aside class="glimpse" id="glimpse" aria-live="polite">
   <img class="gimg" src="images/card-verified.webp" alt="The Verified Call panel inside a video call: Alex Chen, verified" width="800" height="670">
   <div class="eb">Founder · design + build, solo</div>
   <b>Verified Call</b>
   <p>Confirms the person on a hiring call is real, is who they say they are, and isn't reading answers from a hidden AI tool.</p>
-  <div class="gm"><span><b>0 / 3,990</b> face swaps got through</span><span><b>30 / 30</b> hidden AI tools caught</span></div>
-  <div class="st"><i></i>Now in go-to-market · 20 companies in the beta</div>
-  <button type="button" id="glimpseMore">View more →</button>
+  <div class="gm"><span><b>20 companies</b> in the closed beta</span><span><b>3 weeks</b> to build, solo</span></div>
+  <div class="st"><i></i>Now in go-to-market</div>
+  <button type="button" id="glimpseMore">Read full case study →</button>
+</aside>
+<aside class="glimpse" id="glimpseStressie" aria-live="polite">
+  <div class="gphone"><img src="images/stressie-v4/hero-poster.webp" alt="Stressie V4: the check-in screen, 'How are you feeling in this moment?'" width="720" height="1566"></div>
+  <div class="eb">Founding designer · Figma → SwiftUI</div>
+  <b>Stressie V4</b>
+  <p>A stress check-in that pays for your evening: coins, a map of wellness experiences, and events you can host.</p>
+  <div class="gm"><span><b>12% → 56%</b> daily engagement</span><span><b>171 Swift files</b> built solo</span></div>
+  <div class="st"><i></i>iOS app · mobile</div>
+  <button type="button" data-case="stressie">Read full case study →</button>
 </aside>
 <div class="hint" id="hint">Scroll to explore San Francisco</div>
 <div class="status" id="status"></div>
@@ -1156,6 +1172,28 @@ cityBlock(-20, 128, 12, 8, 9, '#C98F6B', { awning: '#D9483B' }); cityBlock(-4, 1
   for (const [x, z] of [[-2, -1.5], [2, -1.5], [-2, 1.5], [2, 1.5]]) mesh(box(0.1, 2.8, 0.1), M('#2F3236'), x, 1.4, z, g);
   const sign = canvasTex(256, 96, (c, w, h) => { c.fillStyle = '#1F3F7A'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = '800 64px Montserrat'; c.textAlign = 'center'; c.fillText('BART', w / 2, 70); });
   mesh(new THREE.PlaneGeometry(2, 0.75), new THREE.MeshBasicMaterial({ map: sign }), 0, 3.4, 1.71, g).castShadow = false; }
+/* — Stressie: a calm wellness studio just south of Dolores Park (project stop 2) — */
+const STRESSIE_AT = new THREE.Vector3(-70, 0.1, 138);
+{ const g = new THREE.Group(); g.position.copy(STRESSIE_AT); scene.add(g);
+  const SAGE = M('#B5CDA9'), WOOD = M('#B98A5E'), GLASS = M('#FFE9C2', { emissive: '#FFD9A0', emissiveIntensity: 0.35, roughness: 0.3 });
+  mesh(rbox(15, 4.4, 9, 0.25), SAGE, 0, 2.2, 0, g);                                   // ground floor
+  mesh(rbox(11, 3.6, 8, 0.25), M('#CFE0C3'), -1.5, 6.2, -0.3, g);                     // upper floor, set back
+  for (let x = -6.6; x <= 6.6; x += 0.55) mesh(box(0.22, 4.2, 0.12), WOOD, x, 2.2, 4.56, g); // wood slats
+  mesh(box(9.2, 2.6, 0.1), GLASS, -1.6, 2.1, 4.6, g);                                  // the big studio window
+  for (let i = 0; i < 5; i++) { const p = person({ shirt: ['#E7E1D6', '#A9C8E0', '#F2D18C', '#E7A7B6', '#C9E0A8'][i] });   // a class inside
+    p.position.set(-5 + i * 2.1, 0.15, 3.4); p.rotation.y = Math.PI; p.scale.setScalar(0.85);
+    p.userData.arms.forEach(a => a.rotation.z = (a.position.x < 0 ? 1 : -1) * 2.6); }
+  mesh(box(8.4, 2.4, 0.1), GLASS, -1.5, 6.3, 3.75, g);
+  for (const [x, z] of [[-6, -3], [-3, -3.4], [1, -2.6], [3, -3.2]]) mesh(new THREE.IcosahedronGeometry(0.8, 1), M('#6FA048', { flatShading: true }), x - 1.5, 8.6, z + 2, g);  // rooftop garden
+  mesh(rbox(11, 0.3, 8, 0.1), M('#8FB466'), -1.5, 8.15, -0.3, g);
+  for (const x of [-7.6, 7.6]) { mesh(new THREE.CylinderGeometry(0.55, 0.45, 0.9, 12), M('#E8DCC6'), x, 0.45, 5.2, g);
+    mesh(new THREE.IcosahedronGeometry(0.75, 1), M('#5E9A4E', { flatShading: true }), x, 1.4, 5.2, g); }
+  const sign = canvasTex(512, 128, (c, w, h) => { c.fillStyle = '#2F5A3C'; c.fillRect(0, 0, w, h);
+    c.fillStyle = '#F4F1EA'; c.font = '700 74px Montserrat, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('stressie', w / 2, h / 2 + 4); });
+  mesh(new THREE.PlaneGeometry(5, 1.25), new THREE.MeshStandardMaterial({ map: sign, emissive: '#FFFFFF', emissiveMap: sign, emissiveIntensity: 0.15 }), 4.4, 3.9, 4.64, g).castShadow = false;
+  g.traverse(o => { if (o.isMesh) o.userData.card = 'stressie'; });
+  for (let i = 0; i < 3; i++) addWalker([[-80, 131.5], [-58, 131.5], [-58, 131.6], [-80, 131.6]], i === 1 ? { dog: '#C58B52', speed: 0.8 } : { speed: 0.9 });
+}
 for (let i = 0; i < 6; i++) addWalker([[-50 + i * 6, 115], [-2, 115], [-2, 115.1], [-50 + i * 6, 115.1]], i === 2 ? { dog: '#3A3330' } : {});
 addWalker([[-50, -112], [-30, -112], [-30, -111.9], [-50, -111.9]]);
 for (let i = 0; i < 3; i++) addWalker([[-150, -28 + i * 0.2], [-100, -28 + i * 0.2], [-100, -27.9 + i * 0.2], [-150, -27.9 + i * 0.2]]);
@@ -1460,13 +1498,14 @@ const CASES = [
       { img: 'images/thumbs/et-studio-poster.webp', vid: 'images/thumbs/et-studio.mp4', tint: '#E8EEDF', num: '104h → 4h', lab: 'to create a lesson; 3,000+ lessons made with it', ft: 'EverTutor Studio' } ],
     story: 'A voice AI tutor and the studio teachers use to build its lessons. I was the sole product designer across Live, Studio and Analytics.',
     href: 'evertutor-live.html' },
-  { key: 'stressie', title: 'Stressie', meta: 'Founding designer · Harvard-incubated · iOS, built in SwiftUI',
+  { key: 'stressie', title: 'Stressie V4', meta: 'Founding product designer · designed in Figma, built in SwiftUI · iOS · 2026',
+    status: 'iOS app · V2 pilots with Amazon, InKind and 50 Austin PD officers',
     tiles: [
-      { img: 'images/thumbs/stressie-poster.webp', vid: 'images/thumbs/stressie.mp4', tint: '#EEE6F2', num: '12% → 56%', lab: 'daily engagement after rebuilding around daily use', ft: 'Daily check-in' },
-      { img: 'images/thumbs/coin.webp', pad: 1, tint: '#F4EBD8', num: '$600K', lab: 'in funding the redesign helped unlock', ft: 'Rewards' },
-      { img: 'images/thumbs/v4-poster.webp', vid: 'images/stressie-v4/hero-loop.mp4', tint: '#E6EEF0', num: '3 languages', lab: 'designed in Figma, built in SwiftUI', ft: 'Stressie V4' } ],
-    story: 'A workplace wellness app rebuilt around a check-in people actually come back to every day, turning how you feel after work into a plan.',
-    href: 'stressie-studio.html' },
+      { img: 'images/stressie-v4/hero-poster.webp', pad: 1, tint: '#E6F0E2', num: '12% → 56%', lab: 'daily engagement in V2, on quick resets and a calm screen', ft: 'The check-in' },
+      { img: 'images/stressie-v4/hero-rewards.webp', pad: 1, tint: '#F4EBD8', num: '2% → 17.4%', lab: 'retention in V2; V4 gives the check-in somewhere to go', ft: 'Coins + rewards' },
+      { img: 'images/stressie-v4/hero-offwork.webp', pad: 1, tint: '#E6EEF0', num: '171 Swift files', lab: 'every screen and flow, built solo, in 3 languages', ft: 'Off work' } ],
+    story: 'A stress check-in that pays for your evening: coins for checking in, a map of wellness experiences to spend them on, and events you can reserve or host. I designed it in Figma and wrote it in SwiftUI myself.',
+    href: 'stressie-v4.html' },
 ];
 let csI = 0;
 const csEl = document.getElementById('cs'), csBack = document.getElementById('csBack'), csBody = document.getElementById('csBody');
@@ -1515,8 +1554,13 @@ function addTag(key, worldPos, post = false) {
   anchors.push({ el, p: worldPos.clone(), key });
 }
 pin3D(25, 37.5, -8, 'vc');
-const glimpseEl = document.getElementById('glimpse'), glimpseAt = new THREE.Vector3(27, 30, -6);
+const GLIMPSES = [
+  { el: document.getElementById('glimpse'), at: new THREE.Vector3(27, 30, -6), stop: 2 },
+  { el: document.getElementById('glimpseStressie'), at: new THREE.Vector3(-62, 9, 140), stop: 4 },
+];
 document.getElementById('glimpseMore').onclick = () => openCase('vc');
+document.querySelectorAll('.glimpse [data-case]').forEach(b => b.onclick = () => openCase(b.dataset.case));
+pin3D(-66, 13, 140, 'stressie');
 
 const seen = new Set();
 const cardEl = document.getElementById('card'), cardBody = document.getElementById('cardBody');
@@ -1569,11 +1613,11 @@ let drag = null, moved = 0;
 // SCROLL-DRIVEN TOUR (owner, 12 Nov: no zoom controls, the whole thing is scroll-driven).
 // Keyframes: the whole city → downtown → the Verified Call tower → Lombard → the Palace → the
 // Painted Ladies → the Mission → back out. Eased between stops; clicks still open the Work pin.
-const TOUR = [
-  { tx: -55, tz: 0, zoom: 0.22 },  { tx: 4, tz: -2, zoom: 0.5 },     { tx: 21, tz: -9, zoom: 1.15 },
-  { tx: -34, tz: -112, zoom: 0.95 }, { tx: -130, tz: -112, zoom: 0.95 }, { tx: -122, tz: -14, zoom: 0.95 },
-  { tx: -45, tz: 104, zoom: 0.85 }, { tx: -55, tz: 0, zoom: 0.22 },
-];
+const TOUR = [                                                        // the city, then one project per stop
+  { tx: -55, tz: 0, zoom: 0.22 }, { tx: 4, tz: -2, zoom: 0.5 }, { tx: 21, tz: -9, zoom: 1.15 },    // 2: Verified Call
+  { tx: -40, tz: 70, zoom: 0.55 }, { tx: -66, tz: 136, zoom: 1.2 },                              // 4: Stressie
+  { tx: -55, tz: 0, zoom: 0.22 },
+]
 let tourP = 0, tourShown = 0;
 const easeIO = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
 function tourAt(p) {
@@ -1588,7 +1632,23 @@ function onScroll() {
   tourP = THREE.MathUtils.clamp(scrollY / max, 0, 1);
   document.getElementById('hint').style.opacity = tourP > 0.02 ? 0 : 1;
 }
-addEventListener('scroll', onScroll, { passive: true }); onScroll();
+const EMBED = Q.has('embed');
+if (EMBED) {
+  document.documentElement.classList.add('embed');
+  addEventListener('message', e => {
+    if (e.origin !== location.origin || !e.data || e.data.type !== 'vc-scroll') return;
+    tourP = THREE.MathUtils.clamp(+e.data.p || 0, 0, 1);
+  });
+  // the frame takes clicks (glimpse, pop-up, pigeons), so hand wheel + touch scrolling back to the page,
+  // except inside the open case study, which scrolls itself
+  const inCase = t => !!(t && t.closest && t.closest('#cs'));
+  addEventListener('wheel', e => { if (inCase(e.target)) return; e.preventDefault();
+    parent.postMessage({ type: 'world-wheel', dy: e.deltaMode === 1 ? e.deltaY * 32 : e.deltaY }, location.origin); }, { passive: false });
+  let ty = null;
+  addEventListener('touchstart', e => { ty = inCase(e.target) ? null : e.touches[0].clientY; }, { passive: true });
+  addEventListener('touchmove', e => { if (ty === null) return; const y = e.touches[0].clientY; e.preventDefault();
+    parent.postMessage({ type: 'world-wheel', dy: (ty - y) * 1.6 }, location.origin); ty = y; }, { passive: false });
+} else { addEventListener('scroll', onScroll, { passive: true }); onScroll(); }
 if (Q.has('p')) tourP = tourShown = +Q.get('p');
 function stepTour() {
   tourShown += (tourP - tourShown) * (REDUCED ? 1 : 0.09);
@@ -1653,8 +1713,8 @@ glassScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMat
     }` })));
 glassScene.children[0].material.toneMapped = true;
 function renderWithGlass() {
-  const el = document.getElementById('glimpse'), a = +getComputedStyle(el).opacity;
-  if (a < 0.01 || !el.classList.contains('on')) { renderer.render(scene, cam); return; }
+  const el = document.querySelector('.glimpse.on'), a = el ? +getComputedStyle(el).opacity : 0;
+  if (!el || a < 0.01) { renderer.render(scene, cam); return; }
   const sz = renderer.getDrawingBufferSize(new THREE.Vector2()), k = sz.x / innerWidth;
   if (glassRT.width !== sz.x || glassRT.height !== sz.y) glassRT.setSize(sz.x, sz.y);
   const r = el.getBoundingClientRect();
@@ -1743,12 +1803,15 @@ function update(dt) {
 }
 function project() {
   const W = innerWidth, H = innerHeight;
-  { // the Verified Call glimpse rides beside the tower while the tour is there
-    const f = tourShown * (TOUR.length - 1), on = Math.abs(f - 2) < 0.42;
-    glimpseEl.classList.toggle('on', on && !csEl.classList.contains('on'));
-    tmp.copy(glimpseAt).project(cam);
-    const x = (tmp.x + 1) / 2 * W, y = (1 - tmp.y) / 2 * H;
-    glimpseEl.style.transform = `translate(${Math.min(W - 320, x + 24).toFixed(1)}px,${Math.max(80, y - 60).toFixed(1)}px)`;
+  { // each project's glimpse rides beside its building while the tour is at that stop
+    const f = tourShown * (TOUR.length - 1);
+    for (const gl of GLIMPSES) {
+      gl.el.classList.toggle('on', Math.abs(f - gl.stop) < 0.42 && !csEl.classList.contains('on'));
+      tmp.copy(gl.at).project(cam);
+      const x = (tmp.x + 1) / 2 * W, y = (1 - tmp.y) / 2 * H;
+      const gh = gl.el.offsetHeight || 420;                            // keep the whole card on screen
+      gl.el.style.transform = `translate(${Math.min(W - 340, x + 24).toFixed(1)}px,${Math.max(80, Math.min(H - gh - 24, y - 60)).toFixed(1)}px)`;
+    }
   }
   for (const a of anchors) {
     tmp.copy(a.p).project(cam);
