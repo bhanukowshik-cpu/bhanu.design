@@ -23,6 +23,7 @@ def npr(name, light, shadow, haze_k=1.0, grain=0.42, lift=0.18):
     if name in bpy.data.materials:
         return bpy.data.materials[name]
     m = bpy.data.materials.new(name); m.use_nodes = True
+    m["light"], m["shadow"] = list(light), list(shadow)          # read by layers_export.py
     nt = m.node_tree; nt.nodes.clear(); N, L = nt.nodes, nt.links
     out = N.new("ShaderNodeOutputMaterial")
     emit = N.new("ShaderNodeEmission")
@@ -64,6 +65,7 @@ def npr(name, light, shadow, haze_k=1.0, grain=0.42, lift=0.18):
 
 def glow(name, col, strength=4.0):
     m = bpy.data.materials.new(name); m.use_nodes = True
+    m["glow"] = list(col)
     b = m.node_tree.nodes["Principled BSDF"]
     b.inputs["Base Color"].default_value = (*col, 1); b.inputs["Emission Color"].default_value = (*col, 1)
     b.inputs["Emission Strength"].default_value = strength
