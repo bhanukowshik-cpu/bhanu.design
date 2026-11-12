@@ -22,6 +22,7 @@
 <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400..800;1,400..700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&family=Caveat:wght@600&display=swap" rel="stylesheet" />
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -5194,6 +5195,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
          silhouette video. Its own WebGL page in a frame, so it can't collide with this page's
          scripts; pointer-events off so wheel/touch scroll the homepage. The host posts hero
          scroll progress to it (poster-scroll) for the push-in. -->
+    <h1 class="sr-only">Hi, this is Bhanu Kowshik: product engineer shipping AI products from problem to code. Currently building Verified Call.</h1>
     <!-- "Currently building Verified Call": plain status line over the scene; the chat bar is the one action -->
     <p class="hero-building" id="heroBuilding">Currently building <b>Verified Call</b></p>
     <style>
@@ -5205,7 +5207,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .hero .hero-building svg{width:1.1em;height:1.1em;transition:transform .25s}
       /* nav (owner, 12 Nov): no name, no avatar; About me · Work · Résumé · Contact on the right in one deep, colourless liquid-glass bar */
       .top-nav .nav-brand{display:none!important}
-      .top-nav,.top-nav.scrolled,.top-nav.is-scrolled,.top-nav.solid{justify-content:flex-end!important;background:none!important;box-shadow:none!important;
+      .top-nav,.top-nav.scrolled,.top-nav.is-scrolled,.top-nav.solid{justify-content:center!important;   /* centred (owner, 12 Nov) */background:none!important;box-shadow:none!important;
         -webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:0!important}
       .top-nav .nav-links{display:flex;align-items:center;gap:2px;padding:6px;border-radius:999px;
         background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.03)),rgba(14,18,26,.18);
@@ -5341,7 +5343,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </span>
       </a>
       <div class="nav-links">
-        <a href="#aboutSection">About me</a><a href="#work">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a>
+        <a href="#aboutSection">About me</a><a href="#work">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé<span class="sr-only"> (opens in a new tab)</span></a>
         <a href="#contactSection">Contact</a>
       </div>
       <button class="nav-burger" id="navBurger" aria-label="Open menu"
@@ -5362,7 +5364,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <!-- recruiter pass (12 Nov): the chat bar opens with pointed prompts (See work / Résumé pills tried, removed by owner) -->
 <!-- (orb canvas fill fix lives in CSS: the WebGL canvas keeps its
              mount-time pixel size, so it must stretch to the well) -->
-        <button class="cta" id="cta" aria-label="Chat with Bhanu AI" aria-haspopup="dialog">
+        <button class="cta" id="cta" aria-describedby="ctaHint" aria-haspopup="dialog"><span id="ctaHint" class="sr-only">Opens a chat with Bhanu AI</span>
           <span class="cta-orb" id="ctaOrb"><div id="ctaOrbMount"></div></span>
           <span class="cta-text" id="ctaText">
             <span class="on" data-q="How did you build Verified Call in 3 weeks?">Ask how I built Verified Call in 3 weeks</span>
@@ -5720,8 +5722,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div>
         <p class="wk-eyebrow">Selected work</p>
         <h2 class="wk-title" id="wkTitle">Shipped products, <span class="serif">real numbers.</span></h2>
+        <button type="button" class="cm-pause" id="cmPause" aria-pressed="false">Pause motion</button>
       </div>
-      <p class="wk-sub">I designed all six. I wrote the code for three.</p>
     </header>
 
     <div class="wk-grid">
@@ -5823,7 +5825,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <a class="wk-card wk-12" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener" aria-labelledby="wk-n6">
         <div class="wk-media wk-dl">
           <span class="wk-num">140+ letters sent</span>
-          <span class="wk-go">Visit Dearly &#8599;</span>
+          <span class="wk-go">Visit Dearly &#8599;<span class="sr-only"> (opens in a new tab)</span></span>
           <img class="cover" src="images/card-dearly.webp" alt="" loading="lazy">
           <video data-wk-hover src="images/thumbs/dearly.mp4" muted loop playsinline preload="none"></video>
         </div>
@@ -5845,6 +5847,16 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        (sign in → language → check in → coins → spend after work), on a phone. The old card media is hidden,
        not deleted. Stages are drawn at a fixed design size and scaled to the card. -->
   <style>
+    .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+    .cm-pause{align-self:flex-end;font:600 13px 'Montserrat',sans-serif;color:rgba(255,255,255,.7);background:none;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 14px;cursor:pointer}
+    .cm-pause:hover,.cm-pause:focus-visible{color:#fff;border-color:rgba(255,255,255,.4);outline:none}
+    html.motion-paused .cm *,html.motion-paused .cm *::before,html.motion-paused .cm *::after{animation-play-state:paused!important;transition:none!important}
+    /* one type family with the hero (owner, 12 Nov) */
+    #work, #work .wk-title, #work .wk-title .serif, #work .wk-name, #work .wk-line, #work .wk-meta, #work .wk-links, #work .wk-eyebrow, #work .cm-pills{font-family:'Montserrat',sans-serif!important}
+    #work .wk-title{font-weight:700;letter-spacing:-.025em}
+    #work .wk-title .serif{font-style:normal;font-weight:700}
+    #work .wk-name{font-weight:700;letter-spacing:-.02em}
+    #work .wk-line{font-size:clamp(17px,1.3vw,20px);line-height:1.5}
     .wk-media.cm-on > :not(.cm):not(.wk-go){display:none!important}
     .wk-media.cm-on{background:#EDE5D8!important}
     /* show, don't tell (owner, 12 Nov): no captions, no step lists, no drop shadows; the product carries the story */
@@ -5859,9 +5871,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .cm .beats li > span{grid-column:2}
     .cm .beats li small{display:block;font-size:13px;font-weight:500;color:rgba(31,27,36,.55);margin-top:3px;grid-column:2}
     .cm > *{min-height:0;max-height:420px}
-    .cm-pills{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
-    .cm-pills span{display:inline-flex;align-items:center;gap:6px;font-size:13px;line-height:1;padding:8px 11px;border-radius:999px;background:rgba(31,27,36,.06);color:var(--ink-2,#4A4450)}
-    .cm-pills b{color:var(--ink,#1F1B24);font-weight:700}
+    .cm-pills{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 6px}
+    .cm-pills span{display:inline-flex;align-items:center;gap:8px;font-size:clamp(15px,1.1vw,17px);line-height:1;padding:11px 16px;border-radius:999px;
+      background:rgba(255,255,255,.08);color:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.12)}
+    .cm-pills b{color:#fff;font-weight:700}
     .cm-pills i{width:7px;height:7px;border-radius:50%;background:#16845E}
     /* — Verified Call call screen — */
     .vcm{position:relative;height:100%;border-radius:16px;overflow:hidden;background:#14171D;color:#fff}
@@ -5894,7 +5907,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* — Stressie phone — */
     .stm{position:relative;height:100%;display:grid;place-items:center}
     .stm{height:100%}
-    .stm .iph{position:relative;height:100%;aspect-ratio:71.6/147.6;border-radius:44px;padding:3px;
+    /* the SwiftUI screenshots already include the rounded screen and Dynamic Island, so no drawn device frame */
+    .stm .iph{position:relative;height:100%;aspect-ratio:720/1565;background:none!important;padding:0!important}
+    .stm .iph::before,.stm .iph > i.b,.stm .isl{display:none!important}
+    .stm .scr{inset:0!important;border-radius:0!important;background:none!important;overflow:visible!important}
+    .stm .scr img{object-fit:cover!important;border-radius:13% / 6%;box-shadow:0 0 0 4px #161618,0 0 0 5px #8E8A84}   /* thin bezel + titanium hairline, no drop shadow */
+    .stm .iph-old{position:relative;height:100%;aspect-ratio:71.6/147.6;border-radius:44px;padding:3px;
       background:linear-gradient(135deg,#8E8A84 0%,#D6D2CB 18%,#7C7873 40%,#B9B4AC 62%,#6E6A65 85%,#A9A49C 100%)}  /* natural titanium */
     .stm .iph::before{content:'';position:absolute;inset:3px;border-radius:41px;background:#0B0B0C}               /* black bezel */
     .stm .iph > i.b{position:absolute;width:3px;border-radius:2px;background:linear-gradient(90deg,#6E6A65,#B9B4AC)}
@@ -5942,12 +5960,19 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       function run(stage, steps, loopMs) {
         var timers = [], live = false;
         function clear() { timers.forEach(clearTimeout); timers = []; }
-        function play() { clear(); steps.forEach(function (st) { timers.push(setTimeout(st[1], st[0])); }); timers.push(setTimeout(play, loopMs)); }
+        function play() { clear(); if (document.documentElement.classList.contains('motion-paused')) { timers.push(setTimeout(play, 600)); return; } steps.forEach(function (st) { timers.push(setTimeout(st[1], st[0])); }); timers.push(setTimeout(play, loopMs)); }
         if (reduce) { steps.forEach(function (st) { st[1](); }); return; }
         new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && !live) { live = true; play(); } else if (!e.isIntersecting && live) { live = false; clear(); } }); }, { threshold: 0.35 }).observe(stage);
       }
       function beat(stage, n) { stage.querySelectorAll('.beats li').forEach(function (li, i) { li.classList.toggle('on', i === n); }); }
 
+      // pause / play all project motion (WCAG 2.2.2)
+      var pb = document.getElementById('cmPause');
+      if (pb) pb.addEventListener('click', function () {
+        var on = document.documentElement.classList.toggle('motion-paused');
+        pb.setAttribute('aria-pressed', on ? 'true' : 'false'); pb.textContent = on ? 'Play motion' : 'Pause motion';
+        document.querySelectorAll('.cm video').forEach(function (v) { if (on) v.pause(); else if (v.getBoundingClientRect().top < innerHeight) v.play().catch(function () {}); });
+      });
       // ── Verified Call ──
       var vc = document.querySelector('.wk-card[href="verified-call.html"]');
       if (vc) { var s1 = mount(vc, '<div class="vcm" data-s="1"><div class="tile cand"><img class="face" src="images/vc/face-cand.webp" alt=""><span class="nm">Alex · Candidate</span><span class="swap">Face swap</span><span class="flag">Cheating detected</span></div>' +
@@ -5967,7 +5992,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       // ── real recordings in device frames, playing only while on screen ──
       function playWhenVisible(stage) { var v = stage.querySelector('video'); if (!v) return;
         if (reduce) { v.removeAttribute('autoplay'); return; }
-        new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { v.play().catch(function () {}); } else v.pause(); }); }, { threshold: 0.3 }).observe(stage); }
+        new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && !document.documentElement.classList.contains('motion-paused')) { v.play().catch(function () {}); } else v.pause(); }); }, { threshold: 0.3 }).observe(stage); }
       [['evertutor-live.html', '<div class="mbp"><div class="lid"><video src="images/et-live.mp4" poster="images/et-live.png" muted loop playsinline preload="metadata"></video></div><div class="base"></div></div>'],
        ['evertutor-studio.html', '<div class="mbp"><div class="lid"><video src="images/et-studio.mp4" poster="images/et-studio.png" muted loop playsinline preload="metadata"></video></div><div class="base"></div></div>'],
        ['https://dearly-rho.vercel.app', '<div class="bwin"><div class="bar"><i></i><i></i><i></i><span>dearly-rho.vercel.app</span></div><video src="images/thumbs/dearly.mp4" poster="images/card-dearly.webp" muted loop playsinline preload="metadata"></video></div>']
@@ -7343,8 +7368,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        right, with the chat blob at the bottom. Built from the existing nav links + orb button (moved, not copied). -->
   <nav class="rail" id="rail" aria-label="Main"></nav>
   <style>
-    .top-nav .nav-links{display:none!important}
-    .rail{position:fixed;right:clamp(14px,1.8vw,26px);top:50%;transform:translateY(-50%);z-index:calc(var(--z-fab) + 1);
+    .rail{display:none!important}
+    .rail--retired{position:fixed;right:clamp(14px,1.8vw,26px);top:50%;transform:translateY(-50%);z-index:calc(var(--z-fab) + 1);
       display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:8px;border-radius:26px;
       background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.03)),rgba(14,18,26,.18);
       -webkit-backdrop-filter:blur(22px) saturate(1.9) brightness(1.05);backdrop-filter:blur(22px) saturate(1.9) brightness(1.05);
@@ -7373,6 +7398,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   </style>
   <script>
     (function () {
+      return;   // (12 Nov, owner) back to the top nav bar; the vertical rail is retired
       var rail = document.getElementById('rail'), links = document.querySelector('.top-nav .nav-links'), fab = document.getElementById('orbFab');
       if (!rail || !links) return;
       Array.prototype.forEach.call(links.querySelectorAll('a'), function (a) { rail.appendChild(a); });
