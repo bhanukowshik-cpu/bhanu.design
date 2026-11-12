@@ -150,7 +150,7 @@
   .decs p em{font-style:normal;font-weight:700;color:var(--ink)}
   /* the glimpse: appears beside the Verified Call tower when the tour arrives */
   /* ── the glimpse (owner, 12 Nov): animated, employer facts first, a stack band, tinted by SF's time of day ── */
-  .glimpse{position:fixed;left:0;top:0;z-index:6;width:min(372px,calc(100vw - 32px));max-height:calc(100vh - 110px);overflow:hidden;
+  .glimpse{position:fixed;left:0;top:0;z-index:6;width:min(372px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:hidden;
            border-radius:22px;padding:14px 16px 16px;color:var(--g-ink);opacity:0;pointer-events:none;
            --g-ink:#1F1B24;--g-sub:#4A4450;--g-mute:#6E6774;--g-line:rgba(31,27,36,.1);--g-chip:rgba(255,255,255,.55);--g-btn:#1F1B24;--g-btn-ink:#fff;
            background:var(--paper);box-shadow:0 2px 0 rgba(0,0,0,.06),0 24px 50px -18px rgba(20,30,40,.5);transition:opacity .45s}
@@ -210,7 +210,7 @@
   .glimpse .g-glass:hover svg{transform:translateX(3px)}
 
   /* ── the Verified Call commercial: three captioned beats, one 9 s loop ── */
-  .g-vis.sq{aspect-ratio:1/1;background:#14171D}
+  .g-vis.sq{aspect-ratio:1/.84;background:#14171D}
   .vfx{position:absolute;inset:0;overflow:hidden;font-family:var(--font);color:#fff}
   .vfx .cap{position:absolute;left:10px;right:10px;top:10px;height:28px;z-index:5}
   .vfx .cap span{position:absolute;left:0;top:0;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;opacity:0;white-space:nowrap}
@@ -258,6 +258,9 @@
   @keyframes vFlag{0%,80%{opacity:0;transform:translateY(-6px)}83%,96%{opacity:1;transform:none}99%,100%{opacity:0}}
   .g-vis.sq::after{display:none}
   .g-vis.plain{background:#EDE5D8}
+  #focusDim{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0;transition:opacity .5s;
+    background:radial-gradient(circle at var(--fx,30%) var(--fy,50%),transparent 0,transparent var(--fr,160px),rgba(18,22,30,.42) calc(var(--fr,160px) * 2.2))}
+  #focusDim.on{opacity:1}
   .flow{position:absolute;inset:0;display:grid;place-items:center}
   .flow.et .d-win{width:90%;border-radius:8px;background:#fff;overflow:hidden;box-shadow:0 16px 26px -16px rgba(40,30,20,.5)}
   .flow.et video{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
@@ -308,6 +311,7 @@
 <div class="bar"><canvas id="avatar" width="16" height="16" hidden></canvas>
   <nav class="nav"><a href="./#about">About me</a><a href="./#work">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a><a href="./#contact">Contact</a></nav></div>
 <div id="tour" aria-hidden="true"></div>
+<div id="focusDim" aria-hidden="true"></div>
 <div id="glimpses"></div>
 <div class="hint" id="hint">Scroll to explore San Francisco</div>
 <div class="status" id="status"></div>
@@ -543,7 +547,9 @@ function dog(col) {
   mesh(box(0.06, 0.06, 0.32), M(col), 0, 0.08, -0.12, tail).rotation.x = 0.6;
   g.userData = { legs, tail }; return g;
 }
+let walkerSeq = 0;
 function addWalker(path, o = {}) {
+  if (!(o.scale < 1) && (walkerSeq++ % 2)) return;                    // half the adults/dog walkers (owner, 12 Nov); kids always walk
   const p = person(o); const segs = [];
   let len = 0;
   for (let i = 0; i < path.length; i++) { const a = path[i], b = path[(i + 1) % path.length]; const l = Math.hypot(b[0] - a[0], b[1] - a[1]); segs.push({ a, b, l, s: len }); len += l; }
@@ -1100,7 +1106,7 @@ const LANES = [
 const CARCOL = ['#F2C23C', '#3E6FB0', '#E7E1D6', '#F2C23C', '#D9483B', '#2F3440', '#8FB3A0'];
 LANES.forEach(([name, off, dir], i) => {
   const st = STREETS.find(s => s.name === name);
-  for (let k = 0; k < (name === 'Grant' ? 1 : 2); k++) {
+  for (let k = 0; k < 1; k++) {                                      // one car per lane (traffic halved, owner 12 Nov)
     const col = CARCOL[(i + k * 3) % CARCOL.length];
     cars.push({ g: car(col, col === '#F2C23C'), st, lane: st.at + off, dir, s: -45 + rand() * 90, v: 4.4 + rand() * 1.6 });
   }
@@ -1447,6 +1453,13 @@ const STRESSIE_AT = new THREE.Vector3(-70, 0.1, 138);
   const sign = canvasTex(512, 128, (c, w, h) => { c.fillStyle = '#2F5A3C'; c.fillRect(0, 0, w, h);
     c.fillStyle = '#F4F1EA'; c.font = '700 74px Montserrat, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('stressie', w / 2, h / 2 + 4); });
   mesh(new THREE.PlaneGeometry(5, 1.25), new THREE.MeshStandardMaterial({ map: sign, emissive: '#FFFFFF', emissiveMap: sign, emissiveIntensity: 0.15 }), 4.4, 3.9, 4.64, g).castShadow = false;
+  { const mascot = new THREE.TextureLoader().load('images/stressie-v4/mascot.webp'); mascot.colorSpace = THREE.SRGBColorSpace;
+    const word = canvasTex(1024, 300, (c, w, h) => { c.clearRect(0, 0, w, h); c.fillStyle = '#F4F1EA'; c.beginPath(); c.roundRect(0, 0, w, h, 60); c.fill();
+      c.fillStyle = '#2F5A3C'; c.font = '800 190px Montserrat, sans-serif'; c.textAlign = 'left'; c.textBaseline = 'middle'; c.fillText('stressie', 290, h / 2 + 10); });
+    const sg = new THREE.Group(); sg.position.set(-1.5, 9.2, 0); sg.rotation.y = Math.PI / 4; g.add(sg);   // faces the camera
+    for (const lx of [-3.6, 3.6]) mesh(box(0.2, 1.6, 0.2), M('#3A3F45'), lx, 0.8, 0, sg);
+    mesh(new THREE.PlaneGeometry(9.6, 2.8), new THREE.MeshStandardMaterial({ map: word, transparent: true, emissive: '#FFFFFF', emissiveMap: word, emissiveIntensity: 0.25, side: THREE.DoubleSide }), 0, 2.6, 0.12, sg).castShadow = false;
+    mesh(new THREE.PlaneGeometry(2.3, 2.3), new THREE.MeshStandardMaterial({ map: mascot, transparent: true, side: THREE.DoubleSide }), -3.3, 2.6, 0.16, sg).castShadow = false; }
   g.traverse(o => { if (o.isMesh) o.userData.card = 'stressie'; });
   for (let i = 0; i < 3; i++) addWalker([[-80, 131.5], [-58, 131.5], [-58, 131.6], [-80, 131.6]], i === 1 ? { dog: '#C58B52', speed: 0.8 } : { speed: 0.9 });
 }
@@ -1972,7 +1985,7 @@ for (const d of GLIMPSE_DATA) {
   document.getElementById('glimpses').appendChild(el);
   // a soft light ring pulses at the building's base while its card is up
   const ring = new THREE.Mesh(new THREE.RingGeometry(d.ring.r, d.ring.r + 1.4, 64), new THREE.MeshBasicMaterial({ color: '#FFE7A8', transparent: true, opacity: 0, depthWrite: false }));
-  ring.rotation.x = -Math.PI / 2; ring.position.set(d.ring.x, 0.2, d.ring.z); scene.add(ring);
+  ring.rotation.x = -Math.PI / 2; ring.position.set(d.ring.x, 0.2, d.ring.z); ring.visible = false;   // (ring retired by owner, 12 Nov)
   GLIMPSES.push({ ...d, el, ringMesh: ring, shown: false });
 }
 // count the metrics up each time a card arrives
@@ -2043,16 +2056,33 @@ let drag = null, moved = 0;
 // Keyframes: the whole city → downtown → the Verified Call tower → Lombard → the Palace → the
 // Painted Ladies → the Mission → back out. Eased between stops; clicks still open the Work pin.
 const TOUR = [                                                        // straight to the work, one stop per scroll
-  { tx: 8, tz: -6, zoom: 0.7 }, { tx: 21, tz: -9, zoom: 1.15 },          // 1: Verified Call
-  { tx: -114, tz: 60, zoom: 1.05 },                                       // 2: EverTutor
-  { tx: -66, tz: 132, zoom: 1.2 },                                        // 3: Stressie
+  { tx: 8, tz: -6, zoom: 0.7 },
+  { focus: { x: 22.5, z: -10.5, h: 33 } },                                // 1: Verified Call (whole tower in frame)
+  { focus: { x: -122, z: 64, h: 14, w: 26 } },                            // 2: EverTutor
+  { focus: { x: -70, z: 138, h: 10, w: 18 } },                            // 3: Stressie
   { tx: -60, tz: 80, zoom: 0.5 },
 ];
 let tourP = 0, tourShown = 0;
 const easeIO = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+// a focus stop puts the whole building in frame: its mid-height at the vertical centre, at ~1/3 of the
+// width on wide screens (the card takes the right), centred in the top half on phones
+function resolveStop(st) {
+  if (!st.focus) return st;
+  const { x, z, h, w = 14 } = st.focus, W = innerWidth || 1200, H = innerHeight || 800, a = W / H;
+  const fitH = (h * Math.cos(view.el) + w * 0.7) / 0.62;                 // world units of screen height we need
+  const fitW = w * 1.6 / (a < 1 ? 0.85 : 0.4);
+  const span = Math.max(fitH, fitW / Math.max(a, 0.5));
+  const zoom = 62 * (W < H ? 1.25 : 1) / span;
+  const back = (h / 2) / Math.tan(view.el);                             // mid-height → equivalent ground offset
+  let tx = x - Math.cos(view.az) * back, tz = z - Math.sin(view.az) * back;
+  const side = a < 1 ? 0 : span * a * 0.17;                              // building left of centre
+  tx += Math.sin(view.az) * side; tz -= Math.cos(view.az) * side;      // move the view right → the building sits left
+  if (a < 1) { const up = span / a * 0.18; tx += Math.cos(view.az) * up; tz += Math.sin(view.az) * up; }
+  return { tx, tz, zoom };
+}
 function tourAt(p) {
   const f = THREE.MathUtils.clamp(p, 0, 1) * (TOUR.length - 1), i = Math.min(TOUR.length - 2, Math.floor(f)), k = easeIO(f - i);
-  const a = TOUR[i], b = TOUR[i + 1];
+  const a = resolveStop(TOUR[i]), b = resolveStop(TOUR[i + 1]);
   // zoom out a touch mid-flight between distant stops, like a camera lifting off
   const lift = 1 - 0.35 * Math.sin(Math.PI * k) * Math.min(1, Math.hypot(b.tx - a.tx, b.tz - a.tz) / 80);
   return { tx: a.tx + (b.tx - a.tx) * k, tz: a.tz + (b.tz - a.tz) * k, zoom: Math.exp(Math.log(a.zoom) + (Math.log(b.zoom) - Math.log(a.zoom)) * k) * lift };
@@ -2238,12 +2268,19 @@ function project() {
   const W = innerWidth, H = innerHeight;
   { // each project's glimpse rides beside its building while the tour is at that stop
     const f = tourShown * (TOUR.length - 1);
+    let anyFocus = false;
     for (const gl of GLIMPSES) {
       const on = Math.abs(f - gl.stop) < 0.45 && !csEl.classList.contains('on');
       if (on && !gl.shown) { countUp(gl.el);                           // replay the commercial from its first frame
         gl.el.querySelectorAll('.vfx *').forEach(n => { n.style.animation = 'none'; void n.offsetWidth; n.style.animation = ''; }); }
       gl.shown = on; gl.el.classList.toggle('on', on);
+      if (on) {                                                         // spotlight the building, dim the rest
+        const fd = document.getElementById('focusDim'), c = new THREE.Vector3(gl.ring.x, ((TOUR[gl.stop] && TOUR[gl.stop].focus && TOUR[gl.stop].focus.h) || 12) / 2, gl.ring.z).project(cam);
+        fd.style.setProperty('--fx', ((c.x + 1) / 2 * W).toFixed(0) + 'px'); fd.style.setProperty('--fy', ((1 - c.y) / 2 * H).toFixed(0) + 'px');
+        fd.style.setProperty('--fr', Math.round(Math.min(W, H) * 0.22) + 'px'); fd.classList.add('on'); anyFocus = true;
+      }
       const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 420);
+      // (ring retired)
       gl.ringMesh.material.opacity += ((on ? 0.35 + 0.35 * pulse : 0) - gl.ringMesh.material.opacity) * 0.15;
       gl.ringMesh.scale.setScalar(1 + (on ? pulse * 0.06 : 0));
       tmp.copy(gl.at).project(cam);
@@ -2251,8 +2288,10 @@ function project() {
       const gh = gl.el.offsetHeight || 420;                            // keep the whole card on screen
       const gw = gl.el.offsetWidth || 372;
       const railGap = W > 767 ? 170 : 20;                             // keep clear of the vertical glass nav rail
-      gl.el.style.transform = `translate(${Math.max(16, Math.min(W - gw - railGap, x + 24)).toFixed(1)}px,${Math.max(80, Math.min(H - gh - 24, y - 60)).toFixed(1)}px)`;
+      // the building has the left third; the card sits on the right, vertically centred (phones: bottom)
+      gl.el.style.transform = W > 767 ? `translate(${(W - gw - railGap).toFixed(1)}px,${Math.max(16, (H - gh) / 2).toFixed(1)}px)` : `translate(16px,${Math.max(16, H - gh - 16).toFixed(1)}px)`;
     }
+    if (!anyFocus) document.getElementById('focusDim').classList.remove('on');
   }
   for (const a of anchors) {
     tmp.copy(a.p).project(cam);
