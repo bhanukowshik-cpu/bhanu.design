@@ -53,9 +53,10 @@
      fitTitle() in JS then measures the real glyphs and corrects it. */
   #hero{position:absolute;left:0;right:0;top:7.5vh;display:flex;flex-direction:column;align-items:center;
         text-align:center;will-change:opacity,transform}
-  #title{white-space:nowrap;font-weight:700;font-size:clamp(26px,6.4vw,170px);line-height:1;letter-spacing:.08em;
-         color:#FFFCF8;filter:url(#outline15);
-         padding-left:.08em /* balances the trailing letter-space so the word sits optically centred */}
+  /* solid bold (owner, 12 Nov: "normal bold text" instead of the outline; still no text shadow) */
+  #title{white-space:nowrap;font-weight:700;font-size:clamp(26px,6.4vw,170px);line-height:1;letter-spacing:.03em;
+         color:#FFFCF8;
+         padding-left:.03em /* balances the trailing letter-space so the word sits optically centred */}
   #tagline{margin-top:clamp(8px,1.1vw,18px);max-width:86vw;font-weight:500;font-size:clamp(16px,1.6vw,22px);
            line-height:1.35;color:rgba(255,252,248,.9)}
   .status{position:absolute;left:clamp(16px,3vw,44px);bottom:clamp(16px,2.6vw,34px);
@@ -78,7 +79,6 @@
     .topbar{font-size:12px}
     #hero{top:14vh}
     #sndHint{position:absolute;right:0;bottom:calc(100% + 8px);white-space:nowrap}   /* keep clear of the clock line */
-    #title{filter:url(#outline10)}
   }
 </style>
 </head>
@@ -343,8 +343,13 @@ const FS_PLATE = /* glsl */`
       float py = (s.y - uHorizon) * 1080.0;
       float band = floor(py / (2.0 + 6.0 * k));                       // ripple bands widen toward the viewer
       float jit = (hash12(vec2(band, floor(uTime * 1.3))) - 0.5) * (0.6 + 3.0 * k) / 1920.0;
-      s.x += ripple(s) * 0.9 + jit * 0.5;
-      s.y += sin(py * 0.35 + uTime * 1.1) * 0.6 / 1080.0 * k;
+      // solid things standing in the water stay put (owner, 12 Nov: ripples were shearing the south
+      // tower's pier): the ripple eases in below the waterline, and the pier + fender are masked out
+      float gate = smoothstep(uHorizon + 0.006, uHorizon + 0.05, s.y);
+      float pier = (smoothstep(0.165, 0.185, s.x) - smoothstep(0.28, 0.32, s.x)) * (1.0 - smoothstep(0.638, 0.662, s.y));
+      gate *= 1.0 - pier;
+      s.x += (ripple(s) * 0.9 + jit * 0.5) * gate;
+      s.y += sin(py * 0.35 + uTime * 1.1) * 0.6 / 1080.0 * k * gate;
     }
     // painted time-of-day variants (golden = the approved reference) cross-faded by SF's real sun;
     // where a variant is missing, the golden plate is re-graded instead (below)
@@ -358,7 +363,8 @@ const FS_PLATE = /* glsl */`
     if (vS.y > uHorizon) {
       float k = clamp((vS.y - uHorizon) / (1.0 - uHorizon), 0.0, 1.0);
       float line = smoothstep(0.82, 1.0, vnoise(vec2(vS.x * 90.0 + uTime * 0.25, vS.y * 1080.0 / (2.5 + 7.0 * k))));
-      col *= 1.0 - line * 0.10 * (0.4 + k);
+      float pierL = (smoothstep(0.165, 0.185, vS.x) - smoothstep(0.28, 0.32, vS.x)) * (1.0 - smoothstep(0.638, 0.662, vS.y));
+      col *= 1.0 - line * 0.10 * (0.4 + k) * (1.0 - pierL) * smoothstep(uHorizon + 0.004, uHorizon + 0.02, vS.y);
     }
     // re-grade from the painted golden hour to the live SF sun
     float day = smoothstep(4.0, 25.0, uSunAlt);                       // 0 at golden hour → 1 high sun

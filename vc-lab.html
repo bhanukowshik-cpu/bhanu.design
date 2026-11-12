@@ -27,6 +27,7 @@
                transform-origin:0 0;will-change:transform;user-select:none;pointer-events:none}
   #stage .grp{position:absolute;left:0;top:0;width:1672px;height:941px;transform-origin:0 0;will-change:transform;pointer-events:none}
   #stage .walker{position:absolute;left:0;top:0;transform-origin:50% 100%}
+  #stage .occ{position:absolute;display:block;pointer-events:none}
   #stage img.cloud{position:absolute;left:50%;top:50%;max-width:none;will-change:transform,opacity;pointer-events:none}
   #gulls{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
   #spacer{height:420vh}
@@ -151,6 +152,15 @@
     let spec = null;
     try { spec = await (await fetch(DIR + 'people.json', { cache: 'no-cache' })).json(); } catch (e) { return; }
     const sheet = await img(DIR + spec.sheet, 'x'); if (!sheet) return;
+    // occluders: tight crops of the painted plaza (lamps, planters, trunks) stacked by where they
+    // meet the ground, so a person whose feet are further back passes behind them
+    const fgSrc = grp.querySelector('img').src;
+    for (const o of spec.occluders || []) {
+      const [x0, y0, x1, y1] = o.rect, el = document.createElement('i'); el.className = 'occ';
+      el.style.cssText = `left:${x0 * IW}px;top:${y0 * IH}px;width:${(x1 - x0) * IW}px;height:${(y1 - y0) * IH}px;` +
+        `background:url(${fgSrc}) ${-x0 * IW}px ${-y0 * IH}px / ${IW}px ${IH}px no-repeat;z-index:${Math.round(y1 * 10000)}`;
+      grp.appendChild(el);
+    }
     // alpha of the sheet, to find each pose's hip centre (legs pivot around it)
     const sc = document.createElement('canvas'); sc.width = sheet.naturalWidth; sc.height = sheet.naturalHeight;
     const sg = sc.getContext('2d', { willReadFrequently: true }); sg.drawImage(sheet, 0, 0);
@@ -197,6 +207,7 @@
       drawWalker(w, w.d / (w.stride || 10));
       const dir = w.sgn * (back ? -1 : 1);                    // sheet faces right
       const bw = w.cw * w.k, bh = w.ch * w.k;
+      w.cv.style.zIndex = Math.round(y / IH * 10000);         // depth-sorted against the occluders
       w.cv.style.transform = `translate3d(${(x - bw / 2).toFixed(2)}px,${(y - bh + 3 * w.k).toFixed(2)}px,0) scaleX(${dir})`;
     }
   }
@@ -221,9 +232,9 @@
   function camera(p, W, H) {
     const mobile = W / H < 0.9;
     const d = ease(seg(p, 0.0, 0.42));        // descent through the clouds
-    const z = ease(seg(p, 0.34, 0.86));       // push-in on the tower
+    const z = ease(seg(p, 0.30, 0.62));       // settle on the full scene (owner: no zoom into the building)
     // focus x for the final framing: tower at ~35% of the screen (card on the right); centred on phones
-    const endX = mobile ? 0.2 : 0.27, endY = mobile ? 0.36 : 0.45, endZ = mobile ? 1.1 : 1.7;   // phone: logo + wordmark whole, above the card
+    const endX = mobile ? 0.2 : 0.5, endY = mobile ? 0.5 : 0.5, endZ = 1.0;   // whole scene; phones centre the tower
     return {
       x: lerp(lerp(0.5, 0.46, d), endX, z),
       y: lerp(lerp(0.12, 0.5, d), endY, z),    // starts high (sky) and sinks to the street
@@ -256,13 +267,12 @@
     if (L.plate) place(L.plate, cam, W, H, 0);
     if (L.fg) {
       place(L.fg, cam, W, H, 1);
-      L.fg.style.opacity = (1 - seg(p, 0.66, 0.84)).toFixed(3);  // plaza slides past and out
     }
 
     // floors light up bottom → top as we push in; each one flickers on like a real fluorescent bank
     if (L.dark) {
       place(L.dark, cam, W, H, 0);
-      const k = seg(p, 0.40, 0.78), lit = Math.floor(k * (FLOORS.length - 1) + 1e-6);
+      const k = seg(p, 0.30, 0.68), lit = Math.floor(k * (FLOORS.length - 1) + 1e-6);
       if (lit > lastLit && lastLit >= 0 && !REDUCED) flick.push({ at: t, f: lit });
       lastLit = lit;
       const yLine = FLOORS[lit];
@@ -294,7 +304,7 @@
     }
 
     // gulls drift right-to-left over the sky (screen space, fade out as we zoom into the glass)
-    const gz = 1 - seg(p, 0.5, 0.75);
+    const gz = 1;
     gulls.forEach(g => {
       const x = ((g.x - t * g.v) % 1.2 + 1.2) % 1.2 - 0.1;
       const flap = Math.sin(t * 2.2 * Math.PI + g.ph);
@@ -305,7 +315,7 @@
       g.p.style.opacity = (gz * (1 - cover)).toFixed(3);
     });
 
-    if (card) card.classList.toggle('on', p > 0.8);
+    if (card) card.classList.toggle('on', p > 0.62);
     if (Q.has('debug')) document.getElementById('dbg').textContent =
       `p ${p.toFixed(3)} cam ${cam.x.toFixed(3)},${cam.y.toFixed(3)} z ${cam.z.toFixed(2)}`;
   }
@@ -324,7 +334,7 @@
   }
   if (Q.has('p')) Pshown = P;
   addEventListener('resize', () => frame(true));
-  window.__vc = { set p(v) { P = Pshown = v; frame(true); }, get p() { return P; }, frame };
+  window.__vc = { set p(v) { P = Pshown = v; frame(true); }, get p() { return P; }, frame, walkers };
   load().then(loop);
 })();
 </script>
