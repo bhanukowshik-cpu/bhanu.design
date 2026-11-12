@@ -70,6 +70,8 @@
   #sndBtn[aria-pressed="true"] .mute{opacity:0}
   #sndHint{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;color:var(--ink-dim);opacity:0;transition:opacity .4s}
   #sndHint.show{opacity:1}
+  html.embed .topbar, html.embed #spacer{display:none}
+  html.embed, html.embed body{overflow:hidden}
   .badge{position:absolute;right:12px;top:56px;font-family:var(--font-mono);font-size:10px;color:#ffd;opacity:.7}
   @media (max-width:767px){
     .topbar{font-size:12px}
@@ -114,6 +116,7 @@
   <div class="badge" id="badge"></div>
 </div>
 <div id="spacer"></div>
+<script>if (/[?&]embed\b/.test(location.search)) document.documentElement.classList.add('embed');</script>
 
 <script src="vendor/gsap.min.js"></script>
 <script src="vendor/ScrollTrigger.min.js"></script>
@@ -1383,6 +1386,14 @@ document.addEventListener('visibilitychange', () => { document.hidden ? loopStop
    13. SCROLL — Lenis + ScrollTrigger over the spacer (hero push-in)
    ════════════════════════════════════════════════════════════════════════ */
 function setupScroll() {
+  // embed mode (homepage hero): the host page owns scrolling and posts its hero progress (0..1)
+  if (Q.has('embed')) {
+    addEventListener('message', e => {
+      if (e.origin !== location.origin || !e.data || e.data.type !== 'poster-scroll') return;
+      state.scroll = Math.max(0, Math.min(1, +e.data.p || 0)); if (REDUCED) renderOnce();
+    });
+    return;
+  }
   if (Q.has('scroll') || !window.gsap || !window.ScrollTrigger || !window.Lenis) return;
   gsap.registerPlugin(ScrollTrigger);
   const lenis = new Lenis({ lerp: 0.09 });
