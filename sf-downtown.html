@@ -121,10 +121,13 @@
   .decs p{font-size:14.5px;margin:6px 0 0}
   .decs p em{font-style:normal;font-weight:700;color:var(--ink)}
   /* the glimpse: appears beside the Verified Call tower when the tour arrives */
-  .glimpse{position:fixed;left:0;top:0;z-index:6;width:min(300px,calc(100vw - 32px));background:var(--paper);border-radius:20px;padding:16px 16px 14px;
+  .glimpse{position:fixed;left:0;top:0;z-index:6;width:min(320px,calc(100vw - 32px));background:var(--paper);border-radius:20px;padding:16px 16px 14px;
            box-shadow:0 2px 0 rgba(0,0,0,.06),0 24px 50px -18px rgba(20,30,40,.5);opacity:0;pointer-events:none;
            transition:opacity .35s, translate .45s cubic-bezier(.2,.8,.2,1);translate:0 10px}
   .glimpse.on{opacity:1;pointer-events:auto;translate:0 0}
+  .glimpse .gimg{display:block;width:100%;height:auto;border-radius:13px;margin-bottom:12px;box-shadow:0 8px 20px -10px rgba(20,30,40,.35)}
+  html.lens-on .glimpse{background:transparent;box-shadow:none}         /* the WebGL lens draws the glass */
+  html.lens-on .glimpse .eb{color:#4A4450}
   .glimpse .eb{font-size:12px;font-weight:600;color:var(--muted)}
   .glimpse b{display:block;font-size:22px;letter-spacing:-.01em;margin:2px 0 6px}
   .glimpse p{font-size:14px;line-height:1.45;color:#3D3843}
@@ -155,10 +158,11 @@
 <nav class="pill nav"><a href="./#about">About me</a><a href="./#work">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a><a href="./#contact">Contact</a></nav>
 <div id="tour" aria-hidden="true"></div>
 <aside class="glimpse" id="glimpse" aria-live="polite">
-  <div class="eb">Work · Founder, solo</div>
+  <img class="gimg" src="images/card-verified.webp" alt="The Verified Call panel inside a video call: Alex Chen, verified" width="800" height="670">
+  <div class="eb">Founder · design + build, solo</div>
   <b>Verified Call</b>
-  <p>Know who is on the other side of the call: face, voice, camera and apps, checked the whole interview.</p>
-  <div class="st"><i></i>Now: go-to-market · 20 companies in the beta</div>
+  <p>Confirms the person on a hiring call is real, is who they say they are, and isn't reading answers from a hidden AI tool.</p>
+  <div class="st"><i></i>Now in go-to-market · 20 companies in the beta</div>
   <button type="button" id="glimpseMore">View more →</button>
 </aside>
 <div class="hint" id="hint">Scroll to explore San Francisco</div>
@@ -1252,16 +1256,51 @@ const fireTruck = (() => {
   g.userData.lights = lightBar(g, 2.4, 1.8); g.userData.lights.forEach(l => l.position.x += 2.6);
   return g;
 })();
-// patrol loops around downtown blocks (street centre-lines, driving on the right)
-const loopA = [[-26, -20.3], [-26, 1.2], [38.2, 1.2], [38.2, -20.3]].map(([x, z]) => new THREE.Vector3(x, 0.12, z));   // police: Grant → Market → Embarcadero → California
-const loopB = [[-24.3, 29.7], [-24.3, 7.1], [42.4, 7.1], [42.4, 29.7]].map(([x, z]) => new THREE.Vector3(x, 0.12, z));      // fire engine: Grant → Market → Embarcadero → Mission
-const patrols = [{ g: police, path: loopA, d: 0, v: 9 }, { g: fireTruck, path: loopB, d: 40, v: 7.5 }];
-for (const pt of patrols) { pt.len = 0; pt.segs = pt.path.map((a, i) => { const b = pt.path[(i + 1) % pt.path.length], l = a.distanceTo(b), s = { a, b, l, s: pt.len }; pt.len += l; return s; }); }
+// police + fire engine join regular traffic (lane vehicles below), lights flashing
 
 // wind: every palm frond and tree blob remembers its rest pose, then sways with the same gusts
 const swayers = [];
 scene.traverse(o => { if (o.isMesh && o.userData.sway !== undefined) swayers.push({ o, rx: o.rotation.x, rz: o.rotation.z, ph: o.userData.sway }); });
 waterU.uTiles.value.forEach((v, i) => TILES[i] && v.copy(TILES[i]));
+
+/* ══════════════ traffic: one signal cycle, every vehicle in a lane, nobody overlaps ══════════════ */
+// x-streets go while z-streets wait (7 s), all-red (1 s), then the other way. Vehicles stop at the
+// stop line on red, clear an intersection they are already in, and keep a gap behind the one ahead.
+const VEH = [];
+const streetBy = n => STREETS.find(q => q.name === n);
+for (const c of cars) VEH.push({ g: c.g, st: c.st, lane: c.lane, dir: c.dir, s: c.s, v: c.v, half: 1.4 });
+VEH.push({ g: cc, st: streetBy('California'), lane: -22, dir: 1, s: -30, v: 2.4, half: 2.5, rotY: Math.PI / 2 });
+for (const tr of trams) { const st = streetBy(tr.st); VEH.push({ g: tr.g, st, lane: st.at + tr.off, dir: tr.dir, s: tr.s, v: tr.v, half: 4.6, tram: 1 }); }
+VEH.push({ g: police, st: streetBy('Market'), lane: 3 - 4.1, dir: 1, s: 10, v: 7.5, half: 1.4, siren: police.userData.lights });
+VEH.push({ g: fireTruck, st: streetBy('Mission'), lane: 28 + 1.7, dir: -1, s: 20, v: 6.5, half: 3.6, siren: fireTruck.userData.lights });
+const signalPhase = t => { const k = t % 16; return k < 7 ? 'x' : k < 8 ? '-' : k < 15 ? 'z' : '-'; };
+function stepTraffic(dt) {
+  const ph = signalPhase(t);
+  for (const v of VEH) {
+    const st = v.st, step = v.v * v.dir * dt, ns = v.s + step;
+    let wait = false;
+    if (ph !== st.axis) for (const o of STREETS) {                     // red for us: stop before each crossing
+      if (o.axis === st.axis) continue;
+      const stop = o.at - v.dir * (o.w / 2 + 1.1 + v.half);
+      if ((v.s - stop) * v.dir <= 0 && (ns - stop) * v.dir > 0) { wait = true; break; }
+    }
+    if (!wait) for (const o of VEH) {                                   // keep a gap behind whoever is ahead
+      if (o === v || o.st !== st || Math.abs(o.lane - v.lane) > 0.6) continue;
+      const gap = (o.s - v.s) * v.dir;
+      if (gap > 0 && gap < v.half + o.half + 1.3) { wait = true; break; }
+    }
+    if (!wait) v.s = ns;
+    if (v.s > 53) v.s = -53; if (v.s < -53) v.s = 53;
+    const ry = (st.axis === 'x' ? (v.dir > 0 ? 0 : Math.PI) : (v.dir > 0 ? -Math.PI / 2 : Math.PI / 2)) + (v.rotY ? (v.dir > 0 ? 0 : Math.PI) + v.rotY - (st.axis === 'x' ? 0 : 0) : 0);
+    if (st.axis === 'x') v.g.position.set(v.s, 0.12, v.lane); else v.g.position.set(v.lane, 0.12, v.s);
+    v.g.rotation.y = v.tram ? (st.axis === 'x' ? 0 : Math.PI / 2) : v.rotY !== undefined ? Math.PI / 2 : ry;
+    const edge = THREE.MathUtils.clamp((50.5 - Math.abs(v.s)) / 2.5, 0, 1);          // ease in and out at the district edge
+    v.g.scale.setScalar(Math.max(0.001, edge)); v.g.visible = edge > 0.01;
+    if (v.siren) { const f = Math.floor(t * 6) % 2, b = Math.sin(t * 40) > 0 ? 1 : 0.4;
+      v.siren[0].material.emissiveIntensity = f ? 2.6 * b : 0.15; v.siren[1].material.emissiveIntensity = f ? 0.15 : 2.6 * b; }
+  }
+  return ph;
+}
 
 /* ══════════════ lights: SF's real sun ══════════════ */
 const hemi = new THREE.HemisphereLight('#E9F1FF', '#B9A88F', 1.0); scene.add(hemi);
@@ -1567,6 +1606,61 @@ canvas.addEventListener('pointermove', e => {                         // the cur
 });
 window.__tour = { set p(v) { tourP = tourShown = v; stepTour(); } };
 
+/* ══════════════ LIQUID GLASS for the glimpse (same lens as the hero's chat bar) ══════════════ */
+// The scene renders into an HDR target; a final pass bends it through a rounded-rect slab where the
+// glimpse sits (squircle-bezel refraction, dispersion, frost, a light milky tint for dark text, a
+// specular rim), then tone-maps to the screen. WebGL only, so it is the same in every browser.
+const glassRT = new THREE.WebGLRenderTarget(16, 16, { type: THREE.HalfFloatType, depthBuffer: true });
+const glassU = { tScene: { value: glassRT.texture }, uRes: { value: new THREE.Vector2() }, uRect: { value: new THREE.Vector4() },
+  uRad: { value: 0 }, uA: { value: 0 }, uDpr: { value: 1 } };
+const glassScene = new THREE.Scene(), glassCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+glassScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({ uniforms: glassU, depthTest: false, depthWrite: false,
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+  fragmentShader: `uniform sampler2D tScene; uniform vec2 uRes; uniform vec4 uRect; uniform float uRad, uA, uDpr; varying vec2 vUv;
+    float sdRR(vec2 p, vec2 b, float r){ vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
+    vec3 tap(vec2 px){ return texture2D(tScene, clamp(px / uRes, 0.5 / uRes, 1.0 - 0.5 / uRes)).rgb; }
+    void main(){
+      vec3 col = texture2D(tScene, vUv).rgb;
+      if (uA > 0.002) {
+        vec2 p = gl_FragCoord.xy - uRect.xy; float d = sdRR(p, uRect.zw, uRad);
+        float dS = sdRR(p + vec2(0.0, 12.0 * uDpr), uRect.zw, uRad);
+        col *= 1.0 - (1.0 - smoothstep(-6.0 * uDpr, 34.0 * uDpr, dS)) * 0.22 * uA * step(0.0, d);
+        if (d < 1.0 * uDpr) {
+          float t = -d, w = 26.0 * uDpr, x = clamp(t / w, 0.0, 1.0);
+          vec2 n = vec2(sdRR(p + vec2(1, 0), uRect.zw, uRad) - sdRR(p - vec2(1, 0), uRect.zw, uRad), sdRR(p + vec2(0, 1), uRect.zw, uRad) - sdRR(p - vec2(0, 1), uRect.zw, uRad));
+          n /= max(length(n), 1e-4);
+          float bend = pow(1.0 - x, 2.4); vec2 off = -n * bend * w * 0.95; float br = (2.2 + 3.0 * bend) * uDpr;
+          vec3 g = vec3(0.0);
+          for (int i = 0; i < 8; i++) { float an = float(i) * 0.7853982 + 0.39; vec2 o = vec2(cos(an), sin(an)) * br;
+            g.r += tap(gl_FragCoord.xy + off + o).r; g.g += tap(gl_FragCoord.xy + off * 1.08 + o).g; g.b += tap(gl_FragCoord.xy + off * 1.16 + o).b; }
+          g /= 8.0;
+          float l = dot(g, vec3(0.299, 0.587, 0.114)); g = mix(vec3(l), g, 1.2);
+          g = mix(g, vec3(0.99, 0.985, 0.97), 0.66 - 0.18 * bend);                      // light, milky glass: dark text stays crisp
+          g += smoothstep(0.1, 1.0, p.y / uRect.w) * 0.05;
+          vec2 L = normalize(vec2(-0.55, 0.85)); float fc = max(dot(n, L), 0.0), bk = max(dot(n, -L), 0.0);
+          float rim = 1.0 - smoothstep(0.0, 2.2 * uDpr, t);
+          g += rim * (0.5 * fc + 0.22 * bk + 0.06);
+          col = mix(col, g, (1.0 - smoothstep(-0.7 * uDpr, 0.7 * uDpr, d)) * uA);
+        }
+      }
+      gl_FragColor = vec4(col, 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }` })));
+glassScene.children[0].material.toneMapped = true;
+function renderWithGlass() {
+  const el = document.getElementById('glimpse'), a = +getComputedStyle(el).opacity;
+  if (a < 0.01 || !el.classList.contains('on')) { renderer.render(scene, cam); return; }
+  const sz = renderer.getDrawingBufferSize(new THREE.Vector2()), k = sz.x / innerWidth;
+  if (glassRT.width !== sz.x || glassRT.height !== sz.y) glassRT.setSize(sz.x, sz.y);
+  const r = el.getBoundingClientRect();
+  glassU.uRes.value.copy(sz); glassU.uDpr.value = k; glassU.uA.value = a; glassU.uRad.value = 20 * k;
+  glassU.uRect.value.set((r.left + r.width / 2) * k, sz.y - (r.top + r.height / 2) * k, r.width / 2 * k, r.height / 2 * k);
+  renderer.setRenderTarget(glassRT); renderer.render(scene, cam);
+  renderer.setRenderTarget(null); renderer.render(glassScene, glassCam);
+}
+document.documentElement.classList.add('lens-on');
+
 /* ══════════════ animation ══════════════ */
 const clock = new THREE.Clock();
 let t = 0, needsRender = true;
@@ -1576,32 +1670,7 @@ function update(dt) {
   t += dt;
   waterU.uTime.value = t;
   stepWalkers(dt);
-  // traffic on every street; cars queue behind each other and yield to the cable car on California
-  for (const c of cars) {
-    const ns = c.s + c.v * c.dir * dt, st = c.st;
-    let wait = cars.some(o => o !== c && o.st === st && o.lane === c.lane && (o.s - c.s) * c.dir > 0 && (o.s - c.s) * c.dir < 4);
-    if (st.axis === 'z') {                                               // crossing California at z = -22
-      const near = Math.abs(cc.position.x - c.lane) < 7, edge = c.dir > 0 ? -27.2 : -16.8;
-      const ahead = c.dir > 0 ? (c.s < edge && ns >= edge) : (c.s > edge && ns <= edge);
-      if (near && (ahead || c.held)) { wait = true; c.held = true; } else c.held = false;
-    }
-    if (!wait) c.s = ns;
-    if (c.s > 52) c.s = -52; if (c.s < -52) c.s = 52;
-    if (st.axis === 'x') { c.g.position.set(c.s, 0.12, c.lane); c.g.rotation.y = c.dir > 0 ? 0 : Math.PI; }
-    else { c.g.position.set(c.lane, 0.12, c.s); c.g.rotation.y = c.dir > 0 ? -Math.PI / 2 : Math.PI / 2; }
-    c.g.visible = Math.abs(c.s) < 50;
-  }
-  // the cable car climbs California and back, pausing at each end
-  ccState.s += ccState.dir * 2.2 * dt;
-  if (ccState.s > 44 || ccState.s < -44) ccState.dir *= -1;
-  cc.position.set(ccState.s, 0.12, -22);
-  // F-line streetcars on Market and the Embarcadero
-  for (const tr of trams) {
-    tr.s += tr.v * tr.dir * dt; if (tr.s > 44 || tr.s < -44) tr.dir *= -1;
-    const st = STREETS.find(q => q.name === tr.st);
-    if (st.axis === 'x') { tr.g.position.set(tr.s, 0.12, st.at + tr.off); tr.g.rotation.y = 0; }
-    else { tr.g.position.set(st.at + tr.off, 0.12, tr.s); tr.g.rotation.y = Math.PI / 2; }
-  }
+  const sigPh = stepTraffic(dt);
   // ferries shuttle out from the Ferry Building
   const fa = t * 0.03;
   boat.position.set(76 + Math.cos(fa) * 12, -0.55 + Math.sin(t * 1.3) * 0.05, 3 + Math.sin(fa) * 30);
@@ -1613,8 +1682,10 @@ function update(dt) {
     const hr = (d.getHours() % 12 + d.getMinutes() / 60) / 12 * Math.PI * 2, mn = d.getMinutes() / 60 * Math.PI * 2;
     clockHands.forEach(h => { h.hh.rotation.z = -hr; h.mh.rotation.z = -mn; }); }
   // traffic lights cycle (12 s), the VC flag ripples, sailboats tack across the bay, gulls circle the pier
-  const ph = (t % 12) / 12, st = ph < 0.45 ? 2 : ph < 0.55 ? 1 : 0;
-  trafficLamps.forEach((L, i) => L.forEach((m, k) => m.material.emissiveIntensity = (k === ((i % 2) ? (st === 2 ? 0 : st === 0 ? 2 : 1) : st) ? 2.2 : 0)));
+  // lamps facing x-traffic (even) and z-traffic (odd) show the real phase: 0 red, 1 amber, 2 green
+  const k16 = t % 16;
+  trafficLamps.forEach((L, i) => { const mine = i % 2 ? 'z' : 'x', go = sigPh === mine, amber = (mine === 'x' && k16 > 6 && k16 < 7) || (mine === 'z' && k16 > 14 && k16 < 15);
+    const lit = amber ? 1 : go ? 2 : 0; L.forEach((m, k) => m.material.emissiveIntensity = k === lit ? 2.2 : 0); });
   if (flagCloth) { const pa = flagCloth.geometry.attributes.position, b = flagCloth.userData.base;
     for (let i = 0; i < pa.count; i++) { const x = b[i * 3] + 1.1; pa.array[i * 3 + 2] = Math.sin(x * 2.6 - t * 4) * 0.16 * x / 2.2; }
     pa.needsUpdate = true; flagCloth.geometry.computeVertexNormals(); }
@@ -1636,16 +1707,6 @@ function update(dt) {
     else { const a = L[i], b = L[i + 1], k = rem / a.distanceTo(b);
       lombardCar.position.set(a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k - 0.12, a.z + (b.z - a.z) * k);
       lombardCar.rotation.set(0, Math.atan2(b.x - a.x, b.z - a.z) - Math.PI / 2, 0); } }
-  // police + fire engine: patrol loops with flashing light bars
-  for (const pt of patrols) {
-    pt.d = (pt.d + pt.v * dt) % pt.len;
-    const sg = pt.segs.find(q => pt.d >= q.s && pt.d < q.s + q.l) || pt.segs[0], k = (pt.d - sg.s) / sg.l;
-    pt.g.position.lerpVectors(sg.a, sg.b, k);
-    pt.g.rotation.y = Math.atan2(sg.b.x - sg.a.x, sg.b.z - sg.a.z) - Math.PI / 2;
-    const flash = Math.floor(t * 6) % 2, burst = Math.sin(t * 40) > 0 ? 1 : 0.4;
-    pt.g.userData.lights[0].material.emissiveIntensity = flash ? 2.6 * burst : 0.15;
-    pt.g.userData.lights[1].material.emissiveIntensity = flash ? 0.15 : 2.6 * burst;
-  }
   // pigeons peck and shuffle; startled ones fly off and land somewhere new
   for (const p of pigeons) if (p.fly) {
     p.fly.t += dt; const k = p.fly.t / 2.6;
@@ -1699,7 +1760,7 @@ function frame() {
   if (!REDUCED) update(dt);
   if (performance.now() - lastSun > 60000 || lastSun < 0) { setTimeOfDay(sfHour()); lastSun = performance.now(); }
   sun.target.position.set(view.tx, 0, view.tz); sun.position.copy(sun.target.position).addScaledVector(sunDir, 160);
-  renderer.render(scene, cam);
+  renderWithGlass();
   project();
 }
 function loop() { frame(); requestAnimationFrame(loop); }
