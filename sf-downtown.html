@@ -25,7 +25,8 @@
   html,body{background:#6E9FA3;font-family:var(--font);color:var(--ink);overflow-x:hidden}
   #tour{height:900vh}                                  /* scroll length of the camera tour */
   /* embedded in the homepage: the host owns nav, scroll and the page; the city keeps its glimpse + pop-up */
-  html.embed .bar, html.embed .hint, html.embed #tour, html.embed .status{display:none}
+  html.embed .bar, html.embed .hint, html.embed #tour{display:none}
+  .status{display:none!important}                         /* owner: the SF clock line isn't needed */
   html.embed, html.embed body{overflow:hidden;height:100%}
   .hint{position:fixed;left:50%;bottom:58px;transform:translateX(-50%);z-index:5;font:600 13px var(--font);color:#fff;letter-spacing:.02em;
         background:rgba(31,27,36,.35);padding:8px 14px;border-radius:999px;transition:opacity .5s;pointer-events:none}
@@ -140,13 +141,13 @@
   .g-time{display:inline-flex;align-items:center;gap:6px}
   .g-time i{width:7px;height:7px;border-radius:50%;background:#F2B23C;box-shadow:0 0 0 3px rgba(242,178,60,.25)}
   html.tod-night .g-time i{background:#A9B8E0;box-shadow:0 0 0 3px rgba(169,184,224,.25)}
-  .g-vis{position:relative;height:150px;border-radius:14px;overflow:hidden;margin-bottom:12px;background:var(--g-chip)}
-  .g-vis img.wide{width:100%;height:100%;object-fit:cover;object-position:50% 38%;animation:gKen 14s ease-in-out infinite alternate}
-  .g-vis.phone{display:grid;place-items:center;background:linear-gradient(160deg,#EAF3E2,#D6E8CC)}
+  .g-vis{position:relative;border-radius:14px;overflow:hidden;margin-bottom:12px;background:var(--g-chip)}
+  .g-vis img.wide{display:block;width:100%;height:auto;aspect-ratio:800/670;animation:gKen 16s ease-in-out infinite alternate}   /* the whole graphic, never cropped */
+  .g-vis.phone{display:grid;place-items:center;height:170px;background:linear-gradient(160deg,#EAF3E2,#D6E8CC)}
   .g-vis.phone img{height:136px;width:auto;border-radius:16px;border:3px solid #1F1B24;animation:gFloat 4.5s ease-in-out infinite}
   .g-vis::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);
                 transform:translateX(-120%);animation:gSheen 5.5s ease-in-out infinite 1.2s;pointer-events:none}
-  @keyframes gKen{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.14) translate(-3%,2%)}}
+  @keyframes gKen{from{transform:scale(1)}to{transform:scale(1.035)}}
   @keyframes gFloat{50%{transform:translateY(-5px) rotate(-1.5deg)}}
   @keyframes gSheen{0%,55%{transform:translateX(-120%)}80%,100%{transform:translateX(120%)}}
   .g-eb{font-size:12px;font-weight:600;color:var(--g-mute)}
@@ -155,7 +156,7 @@
   .g-facts{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:12px 0 0;padding-top:10px;border-top:1px solid var(--g-line);font-size:12.5px}
   .g-facts dt{color:var(--g-mute);font-weight:500}
   .g-facts dd{margin:0;color:var(--g-ink);font-weight:600}
-  .g-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 0}
+  .g-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 0}
   .g-metrics div{background:var(--g-chip);border-radius:12px;padding:8px 9px}
   .g-metrics b{display:block;font-size:20px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
   .g-metrics span{display:block;font-size:11px;line-height:1.3;color:var(--g-sub);margin-top:2px}
@@ -289,7 +290,7 @@ const STREETS = [
 ];
 // ONE landmass (owner: SF is a city, not islands): stone sides, asphalt top; paved blocks sit on it and the
 // streets are the gaps between them. Districts keep their real relative places; ordinary blocks fill the rest.
-const LAND = { x0: -164, x1: 54, z0: -154, z1: 154 };
+const LAND = { x0: -164, x1: 54, z0: -154, z1: 180 };   // runs on south past the frame: the city never ends in view
 mesh(rbox(LAND.x1 - LAND.x0, 3, LAND.z1 - LAND.z0, 0.6), M('#B3A28B'), (LAND.x0 + LAND.x1) / 2, -1.6, (LAND.z0 + LAND.z1) / 2);
 mesh(box(LAND.x1 - LAND.x0, 0.2, LAND.z1 - LAND.z0), M('#666A72'), (LAND.x0 + LAND.x1) / 2, -0.02, (LAND.z0 + LAND.z1) / 2).castShadow = false;
 { const pave = canvasTex(256, 256, (g, w, h) => {
@@ -333,7 +334,7 @@ const XS = [-50, -29.5, -22.5, 2.5, 9.5, 35.5, 44.5, 50], ZS = [-50, -25.5, -18.
 
 /* ══════════════ water ══════════════ */
 // district tiles (centre x, centre z, half-width, half-depth); downtown first, the others are added below
-const TILES = [new THREE.Vector4(-55, 0, 109, 154), new THREE.Vector4(56.5, 3, 6, 20)];   // the land + the Ferry Building pier
+const TILES = [new THREE.Vector4(-55, 13, 109, 167), new THREE.Vector4(56.5, 3, 6, 20)];   // the land + the Ferry Building pier
 const waterU = { uTime: { value: 0 }, uCol: { value: WATER.clone() }, uLight: { value: new THREE.Color('#9CC6C6') },
   uTiles: { value: Array.from({ length: 8 }, () => new THREE.Vector4(9999, 9999, 0, 0)) } };
 const water = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200), new THREE.ShaderMaterial({
@@ -1715,7 +1716,7 @@ const GLIMPSE_DATA = [
     eb: 'Founder · design + engineering, solo', title: 'Verified Call',
     line: 'Confirms the person on a hiring call is real, is who they say they are, and isn\'t reading answers from a hidden AI tool.',
     facts: [['Role', 'Founder, solo design + build'], ['Timeline', '3 weeks · October 2026'], ['Platforms', 'Mac · Windows · Chrome · Meet']],
-    metrics: [{ to: 20, lab: 'companies in the closed beta' }, { to: 3, lab: 'weeks, idea to shipped' }, { to: 5, lab: 'surfaces, one design system' }],
+    metrics: [{ to: 20, lab: 'companies in the closed beta' }, { to: 3, lab: 'weeks to build, solo' }],
     status: 'Now in go-to-market',
     tech: ['Figma', 'Electron', 'React', 'TypeScript', 'Next.js', 'Chrome extension', 'MediaPipe', 'Amazon Rekognition', 'Deepgram', 'GSAP', 'AI coding agents'] },
   { key: 'stressie', idx: 'Work 02', stop: 4, at: new THREE.Vector3(-62, 9, 140), ring: { x: -70, z: 138, r: 10 },
@@ -1723,7 +1724,7 @@ const GLIMPSE_DATA = [
     eb: 'Founding product designer · Figma → SwiftUI', title: 'Stressie V4',
     line: 'A stress check-in that pays for your evening: coins, a map of wellness experiences, and events you can host.',
     facts: [['Role', 'Founding designer, built the iOS app'], ['Timeline', '2026 · with two founders'], ['Platforms', 'iOS · English, Spanish, Swahili']],
-    metrics: [{ to: 56, suf: '%', lab: 'daily engagement, up from 12%' }, { to: 171, lab: 'Swift files, built solo' }, { to: 13, suf: '/13', lab: 'Figma frames shipped as built' }],
+    metrics: [{ to: 56, suf: '%', lab: 'daily engagement, up from 12%' }, { to: 171, lab: 'Swift files, built solo' }],
     status: 'Pilots: Amazon, InKind, Austin PD',
     tech: ['Figma', 'SwiftUI', 'Swift', 'Metal', 'iOS', 'Localization', 'Prototyping', 'AI coding agents'] },
 ];
@@ -1732,12 +1733,10 @@ for (const d of GLIMPSE_DATA) {
   const el = document.createElement('aside'); el.className = 'glimpse'; el.setAttribute('aria-live', 'polite');
   const chips = d.tech.map(t => `<span>${t}</span>`).join('');
   el.innerHTML = `
-    <div class="g-top" style="--i:0"><span>${d.idx}</span><span class="g-time"><i></i><em class="g-clock"></em></span></div>
     <div class="g-vis${d.phone ? ' phone' : ''}" style="--i:1">${d.vis}</div>
     <div class="g-eb" style="--i:2">${d.eb}</div>
     <div class="g-title" style="--i:3">${d.title}</div>
     <p class="g-line" style="--i:4">${d.line}</p>
-    <dl class="g-facts" style="--i:5">${d.facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
     <div class="g-metrics" style="--i:6">${d.metrics.map(m => `<div><b data-to="${m.to}" data-suf="${m.suf || ''}">0${m.suf || ''}</b><span>${m.lab}</span></div>`).join('')}</div>
     <div class="g-status" style="--i:7"><i></i>${d.status}</div>
     <div class="g-tech" style="--i:8" aria-label="Built with ${d.tech.join(', ')}"><div class="g-track">${chips}${chips}</div></div>
@@ -1816,11 +1815,11 @@ let drag = null, moved = 0;
 // SCROLL-DRIVEN TOUR (owner, 12 Nov: no zoom controls, the whole thing is scroll-driven).
 // Keyframes: the whole city → downtown → the Verified Call tower → Lombard → the Palace → the
 // Painted Ladies → the Mission → back out. Eased between stops; clicks still open the Work pin.
-const TOUR = [                                                        // the city, then one project per stop
-  { tx: -55, tz: 0, zoom: 0.22 }, { tx: 4, tz: -2, zoom: 0.5 }, { tx: 21, tz: -9, zoom: 1.15 },    // 2: Verified Call
-  { tx: -40, tz: 70, zoom: 0.55 }, { tx: -66, tz: 136, zoom: 1.2 },                              // 4: Stressie
-  { tx: -55, tz: 0, zoom: 0.22 },
-]
+const TOUR = [                                                        // always inside the city: never the whole island
+  { tx: -12, tz: -8, zoom: 0.46 }, { tx: 4, tz: -2, zoom: 0.62 }, { tx: 21, tz: -9, zoom: 1.15 },   // 2: Verified Call
+  { tx: -30, tz: 64, zoom: 0.62 }, { tx: -66, tz: 132, zoom: 1.2 },                               // 4: Stressie
+  { tx: -30, tz: 70, zoom: 0.48 },
+];
 let tourP = 0, tourShown = 0;
 const easeIO = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
 function tourAt(p) {
