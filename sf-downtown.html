@@ -88,6 +88,22 @@
   .cs h2{font-size:clamp(34px,4.4vw,54px);font-weight:700;letter-spacing:-.025em;margin:18px 0 6px}
   .cs .meta{font-size:15px;color:var(--muted);font-weight:500}
   .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,1.6vw,20px);margin:26px 0 30px}
+  .tile .dv{aspect-ratio:4/3.6;border-radius:20px;background:#EDE5D8;display:grid;place-items:center;overflow:hidden;position:relative;
+            box-shadow:inset 0 -3px 0 rgba(0,0,0,.05)}
+  .tile:hover .dv > div{transform:translateY(-4px)}
+  .dv > div{transition:transform .5s cubic-bezier(.2,.8,.2,1);box-shadow:0 22px 34px -18px rgba(40,30,20,.45)}
+  .d-phone{position:relative;height:84%;aspect-ratio:9/19.4;border-radius:22px;background:#111;padding:5px}
+  .d-phone img{width:100%;height:100%;object-fit:cover;border-radius:17px;display:block}
+  .d-phone i{position:absolute;left:50%;top:9px;width:34%;height:12px;border-radius:9px;background:#111;transform:translateX(-50%);z-index:1}
+  .d-win{width:88%;border-radius:10px;background:#fff;overflow:hidden}
+  .d-win img{display:block;width:100%;height:auto}
+  .d-pop{height:84%;aspect-ratio:760/1260;border-radius:10px;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+  .d-pop img{display:block;width:100%;flex:1;object-fit:cover;object-position:top}
+  .d-bar{display:flex;align-items:center;gap:5px;height:20px;padding:0 8px;background:#F1EEE9;border-bottom:1px solid #E4DED4}
+  .d-bar i{width:7px;height:7px;border-radius:50%;background:#E0574F}.d-bar i:nth-child(2){background:#E6B33C}.d-bar i:nth-child(3){background:#5CB85C}
+  .d-bar span{margin-left:10px;flex:1;font:500 9.5px var(--mono);color:#8B8478;background:#fff;border-radius:5px;padding:2px 8px;text-align:center}
+  .tile figcaption .ttl{display:block;font-size:17px;font-weight:700;margin-top:14px}
+  .tile figcaption .lab b{color:var(--ink);font-weight:700}
   .tile .vis{aspect-ratio:4/4.4;border-radius:20px;background:var(--tint,#EFE8DD);overflow:hidden;display:grid;place-items:center;position:relative}
   .tile .vis img,.tile .vis video{width:100%;height:100%;object-fit:var(--fit,cover);display:block}
   .tile .vis.pad img{width:86%;height:86%;object-fit:contain;filter:drop-shadow(0 18px 24px rgba(30,30,40,.18))}
@@ -231,7 +247,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 
 const scene = new THREE.Scene();
-const WATER = new THREE.Color('#6E9FA3');
+const WATER = new THREE.Color('#5E9199');   // a touch deeper teal, like the reference
 scene.background = WATER.clone();
 
 const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, -500, 500);
@@ -362,11 +378,17 @@ const water = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200), new THREE.Shad
       // a few slow glints
       c += vec3(1.0) * smoothstep(0.985, 1.0, n(vW * 0.6 + uTime * 0.35)) * 0.12 * smoothstep(3.0, 14.0, d);
       // shore: a crisp foam lip, then lines of surf breaking toward the land
-      float lip = 1.0 - smoothstep(0.4, 1.5, d);
-      float surfPhase = fract(d * 0.16 + uTime * 0.22);
-      float surf = smoothstep(0.84, 0.93, surfPhase) * (1.0 - smoothstep(0.93, 1.0, surfPhase)) * (1.0 - smoothstep(1.5, 9.0, d));
-      surf *= 0.55 + 0.45 * n(vW * 0.5 + uTime * 0.3);
-      c = mix(c, vec3(0.97, 0.98, 0.96), clamp(lip * 0.95 + surf * 0.7, 0., 1.));
+      // shore: a crisp white lip, then two or three thin foam lines that follow the coast and breathe in/out
+      float lip = 1.0 - smoothstep(0.35, 1.0, d);
+      float bands = 0.0;
+      for (int k = 0; k < 3; k++) {
+        float fk = float(k), off = 1.8 + fk * 1.9 + sin(uTime * 0.8 + fk * 1.7) * 0.35;
+        float line = 1.0 - smoothstep(0.0, 0.16 + fk * 0.05, abs(d - off));
+        line *= smoothstep(0.25, 0.6, n(vW * (0.35 - fk * 0.07) + vec2(uTime * 0.12, fk * 4.0)));   // broken, not a solid outline
+        bands += line * (0.85 - fk * 0.22);
+      }
+      c = mix(c, c * 1.08 + 0.03, (1.0 - smoothstep(0.5, 7.0, d)) * 0.5);   // the lighter shallow band under the foam
+      c = mix(c, vec3(0.97, 0.98, 0.96), clamp(lip * 0.95 + bands * 0.75, 0., 1.));
       gl_FragColor = vec4(c, 1.);
       #include <colorspace_fragment>
     }`
@@ -789,12 +811,29 @@ function cableCar() {
   return g;
 }
 function ferry() {
+  // a Golden Gate-style commuter ferry: pointed white hull with a navy stripe, two decks of windows,
+  // rails, a wheelhouse, a funnel and a flag (owner: "his ships have more character")
   const g = new THREE.Group(); scene.add(g);
-  mesh(rbox(3.2, 1, 9, 0.4), M('#F4F1EA'), 0, -0.6, 0, g);
-  mesh(rbox(3.25, 0.25, 9.05, 0.1), M('#2F5A7A'), 0, -0.95, 0, g);
-  mesh(rbox(2.6, 0.9, 6, 0.15), M('#F7F4EE'), 0, 0.3, -0.4, g);
-  mesh(rbox(2.62, 0.3, 6.02, 0.1), M('#5F86A8', { roughness: 0.2 }), 0, 0.35, -0.4, g);
-  mesh(rbox(1.8, 0.8, 2.4, 0.12), M('#F7F4EE'), 0, 1.1, -1.4, g);
+  const WHITE = M('#F6F3EC'), NAVY = M('#24456B'), WIN = M('#3E5A78', { roughness: 0.2, emissive: '#FFD9A0', emissiveIntensity: 0.05 }), RAIL = M('#E7E2D8');
+  const hs = new THREE.Shape(); hs.moveTo(-1.7, -5.2); hs.lineTo(1.7, -5.2); hs.lineTo(1.75, 3.2); hs.quadraticCurveTo(1.4, 5.4, 0, 6.2); hs.quadraticCurveTo(-1.4, 5.4, -1.75, 3.2); hs.closePath();
+  const hull = mesh(new THREE.ExtrudeGeometry(hs, { depth: 1.3, bevelEnabled: true, bevelSize: 0.15, bevelThickness: 0.15, bevelSegments: 2 }), WHITE, 0, -1.05, 0, g); hull.rotation.x = -Math.PI / 2;
+  const st = mesh(new THREE.ExtrudeGeometry(hs, { depth: 0.32, bevelEnabled: false }), NAVY, 0, -0.95, 0, g); st.rotation.x = -Math.PI / 2; st.scale.set(1.04, 1.01, 1);
+  mesh(rbox(3.2, 0.12, 10, 0.05), M('#C9B79A'), 0, 0.33, 0.2, g);                        // main deck
+  mesh(rbox(2.9, 1.1, 7.2, 0.15), WHITE, 0, 0.95, -0.5, g);                               // lower cabin
+  mesh(rbox(2.94, 0.45, 7.24, 0.08), WIN, 0, 1.05, -0.5, g);                              // its window band
+  for (let z = -3.8; z <= 2.8; z += 0.55) for (const x of [-1.48, 1.48]) mesh(box(0.04, 0.48, 0.08), WHITE, x, 1.05, z, g);   // mullions
+  mesh(rbox(2.6, 0.9, 5.2, 0.15), WHITE, 0, 1.95, -1, g);                                 // upper cabin
+  mesh(rbox(2.64, 0.38, 5.24, 0.08), WIN, 0, 2.02, -1, g);
+  for (let z = -3.3; z <= 1.4; z += 0.55) for (const x of [-1.33, 1.33]) mesh(box(0.04, 0.4, 0.08), WHITE, x, 2.02, z, g);
+  for (const x of [-1.5, 1.5]) mesh(box(0.05, 0.3, 9.6, 0.02), RAIL, x, 0.55, 0.3, g);    // deck rails
+  mesh(rbox(1.5, 0.8, 1.5, 0.12), WHITE, 0, 2.8, 0.6, g);                                 // wheelhouse
+  mesh(rbox(1.54, 0.3, 1.54, 0.06), WIN, 0, 2.9, 0.6, g);
+  mesh(new THREE.CylinderGeometry(0.32, 0.38, 1.1, 14), NAVY, 0, 3.1, -2.6, g);           // funnel
+  mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.18, 14), M('#D9483B'), 0, 3.6, -2.6, g);
+  mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.4, 6), M('#8A8F96'), 0, 3.8, 0.6, g);      // mast + flag
+  mesh(box(0.02, 0.32, 0.5), M('#D9483B'), 0, 4.3, 0.35, g);
+  for (let i = 0; i < 4; i++) { const p = person(); p.scale.setScalar(0.55); p.position.set(-0.8 + i * 0.55, 0.38, 4 - (i % 2) * 0.4); p.rotation.y = rand() * 6; g.add(p); }
+  g.scale.setScalar(1.05);
   return g;
 }
 
@@ -1010,6 +1049,28 @@ function stepWakes() {
     }
     w.m.geometry.attributes.position.needsUpdate = true; w.m.geometry.attributes.aAge.needsUpdate = true; w.m.geometry.attributes.aSide.needsUpdate = true;
   }
+}
+// ripple rings expanding around each pier piling (the reference's signature water detail)
+const ringMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, uniforms: { uTime: { value: 0 } },
+  vertexShader: 'attribute float aPh; varying vec2 vUv; varying float vPh; void main(){ vUv = uv; vPh = aPh; gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0); }',
+  fragmentShader: `uniform float uTime; varying vec2 vUv; varying float vPh;
+    void main(){ vec2 p = vUv - 0.5; float r = length(p) * 2.0; float a = 0.0;
+      for (int k = 0; k < 2; k++) { float t = fract(uTime * 0.35 + vPh + float(k) * 0.5); a += (1.0 - smoothstep(0.0, 0.06, abs(r - (0.18 + t * 0.8)))) * (1.0 - t); }
+      if (r > 1.0) discard; gl_FragColor = vec4(vec3(0.97, 0.98, 0.97), a * 0.7); }` });
+{ const posts = [];
+  for (let zz = -18; zz <= 18; zz += 4) for (const xx of [-5.4, 5.4]) posts.push([56.5 + xx * 1.0, 3 + zz]);   // Ferry Building pier
+  const geo = new THREE.PlaneGeometry(2.6, 2.6); geo.rotateX(-Math.PI / 2);
+  const ph = new Float32Array(posts.length); posts.forEach((_, i) => ph[i] = rand());
+  geo.setAttribute('aPh', new THREE.InstancedBufferAttribute(ph, 1));
+  const im = new THREE.InstancedMesh(geo, ringMat, posts.length); const o = new THREE.Object3D();
+  posts.forEach(([x, z], i) => { o.position.set(x, -1.13, z); o.updateMatrix(); im.setMatrixAt(i, o.matrix); });
+  im.renderOrder = 1; scene.add(im); }
+const clouds = [];
+for (let i = 0; i < 7; i++) {
+  const g = new THREE.Group(), puffs = 3 + Math.floor(rand() * 3);
+  for (let k = 0; k < puffs; k++) { const r = 1.4 + rand() * 1.3; const m = mesh(new THREE.IcosahedronGeometry(r, 2), M('#FBF8F2', { roughness: 1 }), k * 1.9 - puffs, (rand() - 0.3) * 0.8, (rand() - 0.5) * 1.4, g); m.scale.y = 0.7; m.receiveShadow = false; }
+  g.position.set(-150 + rand() * 260, 30 + rand() * 10, -150 + rand() * 300); scene.add(g);
+  clouds.push({ g, v: 1.2 + rand() * 1.2 });
 }
 const boat = ferry(); boat.position.y = -0.6;
 const boat2 = ferry(); boat2.position.y = -0.6;
@@ -1591,9 +1652,9 @@ const V = 'verified-call/screens/';                                    // case-s
 const CASES = [
   { key: 'vc', title: 'Verified Call', meta: 'Founder · Design + build, solo · Mac, Windows, Chrome · 2026',
     tiles: [
-      { img: 'verified-call/screens/meet-panel-verified-crop-2x.webp', pad: 1, tint: '#E3EFE8', num: '0 / 3,990', lab: 'face-swap sessions got through in published testing', ft: 'Face match' },
-      { img: 'verified-call/screens/meet-panel-look-crop-2x.webp', pad: 1, tint: '#F4E9DC', num: '30 / 30', lab: 'hidden AI answer tools caught, with 0 false alarms', ft: 'Open apps' },
-      { img: 'verified-call/screens/a2/desk-home.webp', pad: 1, tint: '#E6EAF2', num: '20', lab: 'companies in the closed beta since October', ft: 'Desktop app' } ],
+      { img: 'verified-call/screens/in-meet-panel-final-verified-2x.webp', dev: 'browser', url: 'meet.google.com', num: '30 / 30', lab: 'hidden AI tools caught', ft: 'Panel inside Google Meet' },
+      { img: 'verified-call/screens/a2/desk-done.webp', dev: 'mac', num: '0 / 3,990', lab: 'face swaps got through', ft: 'Desktop app · Mac + Windows' },
+      { img: 'verified-call/screens/extension-calls-final-2x.webp', dev: 'popup', num: '20 companies', lab: 'in the closed beta', ft: 'Chrome extension' } ],
     status: 'Now: go-to-market · closed beta with 20 companies since October 2026',
     facts: '<span><b>3 weeks</b>, designed and built solo</span><span><b>5 surfaces</b>, one design system</span><span><b>20 / 20</b> live Meet calls read right</span>',
     story: 'I designed and built Verified Call alone in three weeks: a Mac and Windows app that checks the candidate, and a panel inside Google Meet that shows the interviewer what it found.',
@@ -1655,23 +1716,31 @@ const CASES = [
   { key: 'stressie', title: 'Stressie V4', meta: 'Founding product designer · designed in Figma, built in SwiftUI · iOS · 2026',
     status: 'iOS app · V2 pilots with Amazon, InKind and 50 Austin PD officers',
     tiles: [
-      { img: 'images/stressie-v4/hero-poster.webp', pad: 1, tint: '#E6F0E2', num: '12% → 56%', lab: 'daily engagement in V2, on quick resets and a calm screen', ft: 'The check-in' },
-      { img: 'images/stressie-v4/hero-rewards.webp', pad: 1, tint: '#F4EBD8', num: '2% → 17.4%', lab: 'retention in V2; V4 gives the check-in somewhere to go', ft: 'Coins + rewards' },
-      { img: 'images/stressie-v4/hero-offwork.webp', pad: 1, tint: '#E6EEF0', num: '171 Swift files', lab: 'every screen and flow, built solo, in 3 languages', ft: 'Off work' } ],
+      { img: 'images/stressie-v4/hero-poster.webp', dev: 'phone', num: '12% → 56%', lab: 'daily engagement in V2, on quick resets and a calm screen', ft: 'The check-in' },
+      { img: 'images/stressie-v4/hero-rewards.webp', dev: 'phone', num: '2% → 17.4%', lab: 'retention in V2; V4 gives the check-in somewhere to go', ft: 'Coins + rewards' },
+      { img: 'images/stressie-v4/hero-offwork.webp', dev: 'phone', num: '171 Swift files', lab: 'every screen and flow, built solo, in 3 languages', ft: 'Off work' } ],
     story: 'A stress check-in that pays for your evening: coins for checking in, a map of wellness experiences to spend them on, and events you can reserve or host. I designed it in Figma and wrote it in SwiftUI myself.',
     href: 'stressie-v4.html' },
 ];
 let csI = 0;
 const csEl = document.getElementById('cs'), csBack = document.getElementById('csBack'), csBody = document.getElementById('csBody');
+// the product shown in a real device frame on a warm card, crisp and whole (after the reference's case cards)
+function deviceTile(t) {
+  const img = `<img src="${t.img}" alt="" loading="lazy">`;
+  if (t.dev === 'phone') return `<div class="dv"><div class="d-phone"><i></i>${img}</div></div>`;
+  if (t.dev === 'mac') return `<div class="dv"><div class="d-win"><div class="d-bar"><i></i><i></i><i></i></div>${img}</div></div>`;
+  if (t.dev === 'popup') return `<div class="dv"><div class="d-pop"><div class="d-bar"><i></i><i></i><i></i></div>${img}</div></div>`;
+  return `<div class="dv"><div class="d-win"><div class="d-bar"><i></i><i></i><i></i><span>${t.url || ''}</span></div>${img}</div></div>`;
+}
 function renderCase() {
   const c = CASES[csI];
   document.getElementById('csIdx').textContent = `${csI + 1} of ${CASES.length}`;
   csBody.innerHTML = `
     <h2 id="csTitle">${c.title}</h2><p class="meta">${c.meta}</p>${c.status ? `<span class="status"><i></i>${c.status}</span>` : ''}
     <div class="tiles">${c.tiles.map(t => `
-      <figure class="tile"><div class="vis${t.pad ? ' pad' : ''}" style="--tint:${t.tint}">
-        ${t.vid ? `<video src="${t.vid}" poster="${t.img}" muted loop playsinline autoplay preload="metadata"></video>` : `<img src="${t.img}" alt="" loading="lazy">`}</div>
-        <figcaption><span class="ft">${t.ft}</span><b class="num">${t.num}</b><span class="lab">${t.lab}</span></figcaption></figure>`).join('')}</div>
+      <figure class="tile">${t.dev ? deviceTile(t) : `<div class="vis${t.pad ? ' pad' : ''}" style="--tint:${t.tint}">
+        ${t.vid ? `<video src="${t.vid}" poster="${t.img}" muted loop playsinline autoplay preload="metadata"></video>` : `<img src="${t.img}" alt="" loading="lazy">`}</div>`}
+        <figcaption>${t.dev ? `<b class="ttl">${t.ft}</b><span class="lab"><b>${t.num}</b> ${t.lab}</span>` : `<span class="ft">${t.ft}</span><b class="num">${t.num}</b><span class="lab">${t.lab}</span>`}</figcaption></figure>`).join('')}</div>
     ${c.facts ? `<p class="facts">${c.facts}</p>` : ''}
     <p class="story">${c.story}</p>${c.full || ''}
     <div class="cta" style="${c.full ? 'margin-top:44px' : ''}"><a class="pri" href="${c.href}">${c.full ? 'Open the case study page →' : 'Read the full case study →'}</a>${c.ext ? `<a class="sec" href="${c.ext[1]}" target="_blank" rel="noopener">${c.ext[0]} ↗</a>` : ''}</div>`;
@@ -1939,7 +2008,8 @@ function update(dt) {
   stepWalkers(dt);
   const sigPh = stepTraffic(dt);
   // ferries shuttle out from the Ferry Building
-  stepWakes();
+  stepWakes(); ringMat.uniforms.uTime.value = t;
+  for (const c of clouds) { c.g.position.x += c.v * dt; if (c.g.position.x > 130) c.g.position.x = -190; }
   const fa = t * 0.03;
   boat.position.set(76 + Math.cos(fa) * 12, -0.55 + Math.sin(t * 1.3) * 0.05, 3 + Math.sin(fa) * 30);
   boat.rotation.y = -fa + Math.PI; boat.rotation.z = Math.sin(t * 0.9) * 0.02;
