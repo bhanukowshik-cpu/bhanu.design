@@ -968,10 +968,54 @@ LANES.forEach(([name, off, dir], i) => {
 const cc = cableCar(); cc.rotation.y = Math.PI / 2; const ccState = { s: -30, dir: 1 };          // California St, along x
 const trams = [{ g: streetcar('#3F7D5C', '#F2E3BF'), st: 'Market', off: 1.5, s: -30, dir: 1, v: 3.2 },
                { g: streetcar('#D9792E', '#F2E3BF'), st: 'Embarcadero', off: -1.5, s: 20, dir: -1, v: 3 }];
+/* wakes (owner, 12 Nov: "the ships need tails behind them"): a ribbon of recent positions on the water,
+   narrow at the stern and opening into a V, foam on both arms + broken turbulence down the middle */
+const wakes = [];
+const wakeMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, uniforms: { uTime: { value: 0 } },
+  vertexShader: `attribute float aAge; attribute float aSide; varying float vAge; varying float vSide;
+    void main(){ vAge = aAge; vSide = aSide; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `uniform float uTime; varying float vAge; varying float vSide;
+    float h(float x){ return fract(sin(x * 91.7) * 4375.5); }
+    void main(){
+      float edge = smoothstep(0.55, 0.95, abs(vSide));                        // the two V arms
+      float core = (1.0 - smoothstep(0.0, 0.35, abs(vSide))) * 0.55;          // churned water behind the stern
+      float dash = 0.55 + 0.45 * sin(vAge * 70.0 - uTime * 6.0 + h(floor(vAge * 30.0)) * 6.0);
+      float a = (edge + core * dash) * pow(1.0 - vAge, 1.6);
+      gl_FragColor = vec4(vec3(0.97, 0.98, 0.97), a * 0.85);
+    }` });
+function addWake(obj, w0, w1, n = 46) {
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 2 * 3), 3));
+  geo.setAttribute('aAge', new THREE.BufferAttribute(new Float32Array(n * 2), 1));
+  geo.setAttribute('aSide', new THREE.BufferAttribute(new Float32Array(n * 2), 1));
+  const idx = []; for (let i = 0; i < n - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  geo.setIndex(idx);
+  const m = new THREE.Mesh(geo, wakeMat); m.frustumCulled = false; m.renderOrder = 1; scene.add(m);
+  wakes.push({ obj, w0, w1, n, pts: [], m });
+}
+function stepWakes() {
+  wakeMat.uniforms.uTime.value = t;
+  for (const w of wakes) {
+    const p = w.obj.position, last = w.pts[0];
+    if (!last || Math.hypot(p.x - last.x, p.z - last.z) > 0.45) { w.pts.unshift({ x: p.x, z: p.z }); if (w.pts.length > w.n) w.pts.pop(); }
+    const pos = w.m.geometry.attributes.position.array, age = w.m.geometry.attributes.aAge.array, side = w.m.geometry.attributes.aSide.array;
+    for (let i = 0; i < w.n; i++) {
+      const a = w.pts[Math.min(i, w.pts.length - 1)] || { x: p.x, z: p.z }, b = w.pts[Math.min(i + 1, w.pts.length - 1)] || a;
+      let dx = a.x - b.x, dz = a.z - b.z; const L = Math.hypot(dx, dz) || 1; dx /= L; dz /= L;
+      const k = i / (w.n - 1), wd = w.w0 + (w.w1 - w.w0) * Math.sqrt(k);
+      for (const s of [0, 1]) { const sg = s ? 1 : -1, j = i * 2 + s;
+        pos[j * 3] = a.x + -dz * wd * sg; pos[j * 3 + 1] = -1.12; pos[j * 3 + 2] = a.z + dx * wd * sg;
+        age[j] = i < w.pts.length ? k : 1; side[j] = sg; }
+    }
+    w.m.geometry.attributes.position.needsUpdate = true; w.m.geometry.attributes.aAge.needsUpdate = true; w.m.geometry.attributes.aSide.needsUpdate = true;
+  }
+}
 const boat = ferry(); boat.position.y = -0.6;
 const boat2 = ferry(); boat2.position.y = -0.6;
+addWake(boat, 0.9, 5.5); addWake(boat2, 0.9, 5.5);
 const sails = [sailboat('#F7F4EE'), sailboat('#E8B4A8')];
 for (let i = 0; i < 5; i++) gull(i);
+sails.forEach(b => addWake(b, 0.35, 2.2, 30));
 
 // walkers on the sidewalks: back and forth along a stretch of one sidewalk line
 for (let i = 0; i < 26; i++) {
@@ -1715,6 +1759,7 @@ if (EMBED) {
 } else { addEventListener('scroll', onScroll, { passive: true }); onScroll(); }
 if (Q.has('p')) tourP = tourShown = +Q.get('p');
 function stepTour() {
+  if (Q.has('cam')) { const [x, z, zm] = Q.get('cam').split(',').map(Number); Object.assign(view, { tx: x, tz: z, zoom: zm || 0.6 }); placeCamera(); return; }   // debug: pin the camera
   tourShown += (tourP - tourShown) * (REDUCED ? 1 : 0.09);
   Object.assign(view, tourAt(tourShown)); placeCamera();
 }
@@ -1800,6 +1845,7 @@ function update(dt) {
   stepWalkers(dt);
   const sigPh = stepTraffic(dt);
   // ferries shuttle out from the Ferry Building
+  stepWakes();
   const fa = t * 0.03;
   boat.position.set(76 + Math.cos(fa) * 12, -0.55 + Math.sin(t * 1.3) * 0.05, 3 + Math.sin(fa) * 30);
   boat.rotation.y = -fa + Math.PI; boat.rotation.z = Math.sin(t * 0.9) * 0.02;
