@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Bhanu Kowshik · The Ridge</title>
+<meta name="robots" content="noindex" />
+<!--
+  WORLD LAB — prototype, not linked from index.html.
+  Concept: the ridge from the hero plate, at night. Six products sit along
+  the crest as dark lanterns; walking to one lights it. Verified Call is the
+  beacon at the summit ("currently building"). "Take the tour" walks the
+  figure light to light. Counter = lights lit (remembered per browser).
+  Verify in the preview pane with ?rafshim (RAF is paused there); the
+  window.__world handle exposes step(), walkTo(i), state.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#060A13; --ink:#EAF1FF; --ink-2:rgba(226,238,252,.72); --ink-3:rgba(226,238,252,.5);
+    --line:rgba(150,190,245,.16); --glass:rgba(12,18,30,.72); --azure:#8CC5FF; --lamp:#FFC98A;
+    --sans:'Instrument Sans',system-ui,sans-serif; --serif:'Instrument Serif',Georgia,serif;
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    overflow:hidden;-webkit-font-smoothing:antialiased;}
+  #gl{position:fixed;inset:0}
+  #gl canvas{display:block;width:100%;height:100%;cursor:crosshair}
+  button{font:inherit;color:inherit}
+  a{color:inherit}
+
+  /* chrome — glass chips over the scene */
+  .chip{background:var(--glass);border:1px solid var(--line);border-radius:16px;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.35);}
+  .brand{position:fixed;top:20px;left:20px;z-index:5;display:flex;align-items:center;gap:10px;
+    padding:10px 16px 10px 10px;text-decoration:none;font-weight:600;font-size:16px}
+  .brand img{width:30px;height:30px;border-radius:50%;object-fit:cover}
+  .nav{position:fixed;top:20px;right:20px;z-index:5;display:flex;gap:4px;padding:6px}
+  .nav a,.nav button{padding:9px 14px;border-radius:11px;text-decoration:none;font-size:15px;font-weight:500;
+    background:none;border:0;cursor:pointer;color:var(--ink-2);transition:color .2s,background .2s}
+  .nav a:hover,.nav button:hover{color:var(--ink);background:rgba(150,190,245,.1)}
+
+  /* intro card */
+  .intro{position:fixed;left:50%;top:50%;z-index:6;width:min(440px,calc(100vw - 32px));
+    transform:translate(-50%,-50%);padding:28px 28px 24px;transition:opacity .5s var(--ease),transform .5s var(--ease)}
+  .intro.gone{opacity:0;transform:translate(-50%,-46%);pointer-events:none}
+  .intro h1{margin:0 0 12px;font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.1}
+  .intro h1 em{font-family:var(--serif);font-weight:400;font-size:1.12em;color:var(--lamp)}
+  .intro p{margin:0 0 10px;color:var(--ink-2);font-size:16px;line-height:1.55}
+  .intro .hint{font-size:14px;color:var(--ink-3);margin:14px 0 20px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:13px 18px;border-radius:13px;cursor:pointer;
+    font-weight:600;font-size:15px;border:1px solid var(--line);background:rgba(150,190,245,.08);text-decoration:none;
+    transition:transform .2s var(--ease),background .2s}
+  .btn:hover{transform:translateY(-1px);background:rgba(150,190,245,.14)}
+  .btn.primary{background:var(--ink);color:#0A0E15;border-color:transparent}
+  .btn.primary:hover{background:#fff}
+  .kbd{font-size:11px;font-weight:600;padding:3px 7px;border-radius:6px;background:rgba(10,14,21,.12);letter-spacing:.02em}
+
+  /* pins — projected each frame */
+  .pins{position:fixed;inset:0;z-index:3;pointer-events:none}
+  .pin{position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;white-space:nowrap;
+    display:flex;align-items:center;gap:7px;padding:7px 12px 7px 9px;border-radius:999px;font-size:13px;font-weight:600;
+    background:rgba(10,14,22,.66);border:1px solid var(--line);color:var(--ink-2);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    transition:opacity .3s,color .3s,border-color .3s,background .3s;will-change:transform}
+  .pin i{width:8px;height:8px;border-radius:50%;background:rgba(226,238,252,.3);transition:background .4s,box-shadow .4s}
+  .pin.lit{color:var(--ink);border-color:rgba(255,201,138,.4)}
+  .pin.lit i{background:var(--lamp);box-shadow:0 0 10px var(--lamp)}
+  .pin.now{background:rgba(255,201,138,.16)}
+  .pin.summit{font-size:14px}
+  .pin.summit small{font-weight:500;color:var(--azure);letter-spacing:.08em;text-transform:uppercase;font-size:10px}
+  .pin:hover{color:var(--ink);border-color:rgba(226,238,252,.4)}
+
+  /* project card */
+  .card{position:fixed;right:20px;top:50%;z-index:6;width:min(400px,calc(100vw - 32px));padding:24px;
+    transform:translate(24px,-50%);opacity:0;pointer-events:none;transition:opacity .45s var(--ease),transform .45s var(--ease)}
+  .card.open{opacity:1;transform:translate(0,-50%);pointer-events:auto}
+  .card .meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;font-weight:600;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--azure);margin-bottom:10px}
+  .card h2{margin:0 0 6px;font-size:28px;letter-spacing:-.02em;font-weight:600}
+  .card .stat{font-family:var(--serif);font-style:italic;font-size:24px;color:var(--lamp);margin:0 0 12px}
+  .card p{margin:0 0 20px;color:var(--ink-2);font-size:15.5px;line-height:1.55}
+  .card p b{color:var(--ink);font-weight:600}
+  .card .x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:10px;border:0;cursor:pointer;
+    background:rgba(150,190,245,.08);color:var(--ink-2);font-size:18px;line-height:1}
+
+  /* bottom-left: lights lit + help */
+  .hud{position:fixed;left:20px;bottom:20px;z-index:5;display:flex;gap:10px}
+  .count{display:flex;align-items:center;gap:10px;padding:10px 16px 10px 10px;font-weight:600;font-size:15px}
+  .count .lamp{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:rgba(255,201,138,.14)}
+  .count .lamp svg{width:16px;height:16px;color:var(--lamp)}
+  .tour{padding:10px 16px;font-weight:600;font-size:14px;cursor:pointer;border:1px solid var(--line)}
+  /* bottom-right: camera */
+  .cam{position:fixed;right:20px;bottom:20px;z-index:5;display:flex;flex-direction:column;gap:8px}
+  .cam button{width:44px;height:44px;border-radius:12px;cursor:pointer;font-size:20px;display:grid;place-items:center}
+  .cam svg{width:18px;height:18px}
+
+  /* list view — the plain-HTML path to every project (also the no-WebGL fallback) */
+  .list{position:fixed;inset:0;z-index:8;display:none;place-items:center;background:rgba(4,7,13,.7);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:16px}
+  .list.open{display:grid}
+  .list .chip{width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:22px}
+  .list h2{margin:0 0 14px;font-size:22px}
+  .list a{display:flex;justify-content:space-between;gap:16px;padding:14px 4px;border-top:1px solid var(--line);text-decoration:none}
+  .list a span{color:var(--ink-3);font-size:14px;text-align:right}
+  .list a:hover b{color:var(--lamp)}
+
+  .toast{position:fixed;left:50%;bottom:24px;z-index:5;transform:translateX(-50%);padding:10px 16px;font-size:14px;
+    color:var(--ink-2);opacity:0;transition:opacity .4s;pointer-events:none}
+  .toast.on{opacity:1}
+
+  @media (max-width:767px){
+    .brand span{display:none}
+    .brand{padding:10px}
+    .nav a,.nav button{padding:8px 10px;font-size:14px}
+    .card{right:16px;left:16px;width:auto;top:auto;bottom:16px;transform:translateY(24px)}
+    .card.open{transform:translateY(0)}
+    .hud{left:16px;bottom:16px}
+    .cam{right:16px;bottom:16px}
+    .cam .zoom{display:none}
+    .intro h1{font-size:26px}
+  }
+  @media (prefers-reduced-motion:reduce){ .intro,.card,.pin{transition:none} }
+</style>
+</head>
+<body>
+<div id="gl" aria-hidden="true"></div>
+<div class="pins" id="pins"></div>
+
+<a class="brand chip" href="index.html"><img src="images/loader-portrait.webp?v=2" alt=""><span>Bhanu Kowshik</span></a>
+<nav class="nav chip" aria-label="Site">
+  <button type="button" id="openList">Work</button>
+  <a href="index.html#aboutSection">About</a>
+  <a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a>
+</nav>
+
+<section class="intro chip" id="intro" aria-labelledby="introTitle">
+  <h1 id="introTitle">Hi, I'm Bhanu. <em>Six lights so far.</em></h1>
+  <p>I design and build AI products. This ridge is my work: every lantern on it is a product I shipped, and the beacon at the top is the one I'm building now.</p>
+  <p class="hint">Click anywhere to walk. Reach a lantern to light it.</p>
+  <div class="row">
+    <button class="btn primary" id="tourBtn" type="button">Take the tour <span class="kbd">Enter</span></button>
+    <button class="btn" id="lookBtn" type="button">Wander</button>
+  </div>
+</section>
+
+<aside class="card chip" id="card" aria-live="polite">
+  <button class="x" id="cardX" type="button" aria-label="Close">×</button>
+  <div class="meta" id="cMeta"></div>
+  <h2 id="cName"></h2>
+  <p class="stat" id="cStat"></p>
+  <p id="cLine"></p>
+  <div class="row">
+    <a class="btn primary" id="cLink" href="#">Read case study →</a>
+    <button class="btn" id="cNext" type="button">Next light →</button>
+  </div>
+</aside>
+
+<div class="hud">
+  <div class="count chip" aria-live="polite">
+    <span class="lamp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2h6M12 2v3M7 9a5 5 0 0 1 10 0v7a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3z M10 22h4"/></svg></span>
+    <span><b id="litN">0</b>/<span id="litT">6</span> lit</span>
+  </div>
+  <button class="tour chip" id="tourBtn2" type="button">Tour</button>
+</div>
+<div class="cam">
+  <button class="chip zoom" id="zIn" type="button" aria-label="Zoom in">+</button>
+  <button class="chip zoom" id="zOut" type="button" aria-label="Zoom out">−</button>
+  <button class="chip" id="recenter" type="button" aria-label="Back to the figure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg></button>
+</div>
+<div class="toast chip" id="toast"></div>
+
+<div class="list" id="list" role="dialog" aria-modal="true" aria-labelledby="listTitle">
+  <div class="chip">
+    <h2 id="listTitle">All work</h2>
+    <nav id="listItems"></nav>
+    <div class="row" style="margin-top:16px"><button class="btn" id="listClose" type="button">Back to the ridge</button>
+      <a class="btn" href="index.html">Classic site</a></div>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": {
+    "three": "./vendor/three/three.module.min.js",
+    "three/addons/": "./vendor/three/addons/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+/* ══ DATA — copy mirrors the Work cards on index.html ══════════════════ */
+const WORK = [
+  { name:'Stressie', x:-56, stat:'12% → 56% engagement', meta:['Founding designer','Harvard-incubated'],
+    line:'Rebuilt a workplace wellness app around daily use: engagement from <b>12% to 56%</b>. Helped unlock <b>$600K</b> in funding.',
+    href:'stressie-studio.html' },
+  { name:'Stressie V4', x:-38, stat:'Built in SwiftUI', meta:['Founding designer','Design + build'],
+    line:'Designed in Figma, built in SwiftUI: a check-in that turns into plans after work, in <b>3 languages</b>.',
+    href:'stressie-v4.html' },
+  { name:'EverTutor Studio', x:-19, stat:'104 hours → 4', meta:['Sole product designer','EverTutor'],
+    line:'Cut lesson creation from <b>104 hours to 4</b>. <b>3,000+</b> lessons made with it.',
+    href:'evertutor-studio.html' },
+  { name:'EverTutor Live', x:0, stat:'2,000+ students a day', meta:['Sole product designer','EverTutor'],
+    line:'A voice AI tutor that took 1:1 tutoring from <b>$250 to $5</b> an hour. <b>2,000+</b> students a day.',
+    href:'evertutor-live.html' },
+  { name:'Dearly', x:20, stat:'140+ letters sent', meta:['Solo build','48 hours'],
+    line:'Voice letters you can hear and keep. <b>140+</b> sent, <b>35</b> five-star ratings.',
+    href:'https://dearly-rho.vercel.app', ext:true },
+  { name:'Verified Call', x:46, summit:true, stat:'0 of 3,990 face swaps got through', meta:['Founder','Design + build, solo','3 weeks'],
+    line:'Confirms the person on a hiring call is real, is who they say they are, and is not reading answers from a hidden AI tool. Hidden AI tools caught <b>30 of 30</b> times. <b>20 companies</b> in the closed beta.',
+    href:'verified-call.html' },
+];
+
+/* ══ STATE / UI refs ═══════════════════════════════════════════════════ */
+const $ = (id) => document.getElementById(id);
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const RAFSHIM = new URLSearchParams(location.search).has('rafshim');
+const W = () => innerWidth  || document.documentElement.clientWidth  || 1280;
+const H = () => innerHeight || document.documentElement.clientHeight || 800;
+let lit = new Set();
+try { lit = new Set(JSON.parse(localStorage.getItem('ridgeLit') || '[]')); } catch (e) {}
+const saveLit = () => { try { localStorage.setItem('ridgeLit', JSON.stringify([...lit])); } catch (e) {} };
+
+/* list view (always works, even with no WebGL) */
+$('listItems').innerHTML = WORK.map((w) =>
+  `<a href="${w.href}"${w.ext ? ' target="_blank" rel="noopener"' : ''}><b>${w.name}</b><span>${w.stat}</span></a>`).join('');
+const openList = () => $('list').classList.add('open');
+const closeList = () => $('list').classList.remove('open');
+$('openList').onclick = openList; $('listClose').onclick = closeList;
+$('list').addEventListener('click', (e) => { if (e.target === $('list')) closeList(); });
+$('litT').textContent = WORK.length;
+
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ antialias: true }); }
+catch (e) { document.body.classList.add('no-gl'); $('intro').classList.add('gone'); openList(); throw e; }
+
+/* ══ RENDERER / SCENE ══════════════════════════════════════════════════ */
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.setSize(W(), H());
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+$('gl').appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const SKY = new THREE.Color('#081224');
+scene.background = SKY;
+scene.fog = new THREE.FogExp2(SKY, 0.0105);
+
+const camera = new THREE.PerspectiveCamera(34, W() / H(), 0.5, 900);
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(W(), H()), 0.85, 0.6, 0.62);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+addEventListener('resize', () => {
+  camera.aspect = W() / H(); camera.updateProjectionMatrix();
+  renderer.setSize(W(), H()); composer.setSize(W(), H());
+});
+
+/* light — the hero's cold moon wash from behind the summit */
+scene.add(new THREE.HemisphereLight('#3a5a92', '#05080f', 0.55));
+const moon = new THREE.DirectionalLight('#a9cbff', 2.4);
+moon.position.set(60, 40, -70); scene.add(moon);
+
+/* ══ TERRAIN — a rising ridge with dunes falling off both flanks ══════ */
+const crestZ = (x) => 10 * Math.sin(x * 0.04) - 3 * Math.sin(x * 0.11);
+const crestY = (x) => 3 + Math.max(0, (x + 80) / 140) ** 1.6 * 15;
+function heightAt(x, z) {
+  const d = z - crestZ(x);
+  const ridge = crestY(x) * Math.exp(-(d * d) / (2 * 16 * 16));
+  const dunes = 0.9 * Math.sin(x * 0.13 + z * 0.09) * Math.cos(z * 0.12 - x * 0.03)
+              + 0.4 * Math.sin(x * 0.31 - z * 0.27);
+  return ridge + dunes * (0.4 + 0.6 * Math.min(1, Math.abs(d) / 14)) - 1.5;
+}
+const TW = 260, TS = 220;
+const tGeo = new THREE.PlaneGeometry(TW, TW, TS, TS);
+tGeo.rotateX(-Math.PI / 2);
+{
+  const p = tGeo.attributes.position, col = [];
+  const lo = new THREE.Color('#0b1426'), hi = new THREE.Color('#2b4a7c'), c = new THREE.Color();
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), z = p.getZ(i), y = heightAt(x, z);
+    p.setY(i, y);
+    c.copy(lo).lerp(hi, THREE.MathUtils.clamp((y + 1) / 18, 0, 1));
+    col.push(c.r, c.g, c.b);
+  }
+  tGeo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  tGeo.computeVertexNormals();
+}
+const terrain = new THREE.Mesh(tGeo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0 }));
+scene.add(terrain);
+
+/* the glow behind the summit — the hero plate's light source */
+function glowTex(inner, outer) {
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const g = c.getContext('2d'), r = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  r.addColorStop(0, inner); r.addColorStop(0.35, outer); r.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = r; g.fillRect(0, 0, 256, 256);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex('rgba(190,220,255,.9)', 'rgba(70,130,230,.28)'),
+  blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
+halo.scale.set(150, 150, 1); halo.position.set(95, 30, -60); scene.add(halo);
+
+/* stars */
+{
+  const n = 1400, pos = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    const th = Math.random() * Math.PI * 2, ph = Math.random() * 0.45 * Math.PI, r = 380;
+    pos[i * 3] = r * Math.cos(th) * Math.cos(ph); pos[i * 3 + 1] = 20 + r * Math.sin(ph); pos[i * 3 + 2] = r * Math.sin(th) * Math.cos(ph);
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: '#cfe1ff', size: 1.1, sizeAttenuation: false, fog: false, transparent: true, opacity: .8 })));
+}
+
+/* rocks scattered off the crest */
+{
+  const geo = new THREE.DodecahedronGeometry(1, 0), mat = new THREE.MeshStandardMaterial({ color: '#1a2740', roughness: 1, flatShading: true });
+  const rocks = new THREE.InstancedMesh(geo, mat, 70), m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3();
+  for (let i = 0; i < 70; i++) {
+    const x = -90 + Math.random() * 170, z = crestZ(x) + (Math.random() < .5 ? -1 : 1) * (8 + Math.random() * 30);
+    const k = 0.4 + Math.random() * 1.4;
+    q.setFromEuler(new THREE.Euler(Math.random() * 3, Math.random() * 3, Math.random() * 3));
+    m.compose(new THREE.Vector3(x, heightAt(x, z) + k * .3, z), q, s.set(k, k * .7, k));
+    rocks.setMatrixAt(i, m);
+  }
+  scene.add(rocks);
+}
+
+/* trail — faint markers along the crest, between the lanterns */
+const trail = [];
+{
+  const geo = new THREE.SphereGeometry(0.12, 8, 6);
+  for (let x = -66; x <= 48; x += 2.2) {
+    const mat = new THREE.MeshBasicMaterial({ color: '#7fa8e6', transparent: true, opacity: .35 });
+    const mk = new THREE.Mesh(geo, mat); const z = crestZ(x);
+    mk.position.set(x, heightAt(x, z) + 0.12, z); scene.add(mk); trail.push({ x, mat });
+  }
+}
+
+/* ══ LANTERNS — one per product; dark until visited ═══════════════════ */
+const LAMP = new THREE.Color('#FFC98A');
+const stoneMat = new THREE.MeshStandardMaterial({ color: '#223452', roughness: .9, flatShading: true });
+const posts = WORK.map((w, i) => {
+  const g = new THREE.Group(); const z = crestZ(w.x) + (i % 2 ? 2.4 : -2.4) * (w.summit ? 0 : 1);
+  const y = heightAt(w.x, z); g.position.set(w.x, y, z);
+  const tall = w.summit ? 2.2 : 1;
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.4, .6, 7), stoneMat); base.position.y = .1; g.add(base);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(.12, .16, 2.6 * tall, 6), stoneMat); pole.position.y = 1.3 * tall + .3; g.add(pole);
+  const glassMat = new THREE.MeshStandardMaterial({ color: '#2a2f3a', emissive: LAMP, emissiveIntensity: .05, roughness: .4 });
+  const lamp = new THREE.Mesh(new THREE.BoxGeometry(.8, .95, .8), glassMat); lamp.position.y = 2.6 * tall + .75; g.add(lamp);
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(.75, .55, 4), stoneMat); roof.rotation.y = Math.PI / 4; roof.position.y = 2.6 * tall + 1.5; g.add(roof);
+  const light = new THREE.PointLight(LAMP, 0, w.summit ? 34 : 18, 1.6); light.position.y = 2.6 * tall + .75; g.add(light);
+  let beam = null;
+  if (w.summit) { // the beacon throws a soft column into the sky
+    beam = new THREE.Mesh(new THREE.CylinderGeometry(.35, 1.6, 60, 16, 1, true),
+      new THREE.MeshBasicMaterial({ color: '#9cc6ff', transparent: true, opacity: .0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+    beam.position.y = 2.6 * tall + 31; g.add(beam);
+  }
+  scene.add(g);
+  return { w, g, glassMat, light, beam, glow: lit.has(i) ? 1 : 0, top: 2.6 * tall + 2.3 };
+});
+const hitTargets = posts.map((p) => p.g);
+
+/* ══ THE FIGURE — the silhouette from the hero, carrying a small light ══ */
+const fig = new THREE.Group();
+{
+  const dark = new THREE.MeshStandardMaterial({ color: '#05070c', roughness: .7 });
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(.28, .85, 4, 10), dark); body.position.y = .95; fig.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(.22, 14, 10), dark); head.position.y = 1.78; fig.add(head);
+  const hand = new THREE.Mesh(new THREE.SphereGeometry(.09, 10, 8), new THREE.MeshBasicMaterial({ color: '#FFE2B8' }));
+  hand.position.set(.42, .85, .1); fig.add(hand);
+  const carry = new THREE.PointLight('#FFD3A0', 2.2, 7, 1.8); carry.position.set(.5, 1, .2); fig.add(carry);
+}
+scene.add(fig);
+const start = new THREE.Vector3(-68, 0, crestZ(-68)); start.y = heightAt(start.x, start.z);
+fig.position.copy(start);
+
+/* ══ PINS (HTML) ═══════════════════════════════════════════════════════ */
+const pinsEl = $('pins');
+posts.forEach((p, i) => {
+  const el = document.createElement('button'); el.type = 'button';
+  el.className = 'pin' + (p.w.summit ? ' summit' : '') + (lit.has(i) ? ' lit' : '');
+  el.innerHTML = `<i></i>${p.w.summit ? '<span>' + p.w.name + '</span><small>Building now</small>' : p.w.name}`;
+  el.addEventListener('click', (e) => { e.stopPropagation(); goTo(i); });
+  pinsEl.appendChild(el); p.pin = el;
+});
+const v3 = new THREE.Vector3();
+function placePins() {
+  const w = W(), h = H();
+  posts.forEach((p) => {
+    v3.set(p.g.position.x, p.g.position.y + p.top, p.g.position.z).project(camera);
+    const vis = v3.z < 1 && Math.abs(v3.x) < 1.1 && Math.abs(v3.y) < 1.1;
+    p.pin.style.opacity = vis ? 1 : 0;
+    p.pin.style.transform = `translate(${(v3.x * .5 + .5) * w}px,${(-v3.y * .5 + .5) * h}px) translate(-50%,-100%)`;
+  });
+}
+
+/* ══ MOVEMENT ══════════════════════════════════════════════════════════ */
+let target = null, arriveAt = -1, current = -1, touring = false, introDone = false;
+const SPEED = 8.5;
+function standPoint(i) { // just in front of the lantern, on the crest side
+  const p = posts[i].g.position, z = crestZ(p.x), dz = Math.sign(z - p.z) || 1;
+  const x = p.x - 1.6; const zz = p.z + dz * 1.8; return new THREE.Vector3(x, heightAt(x, zz), zz);
+}
+function walkTo(pt, idx = -1) {
+  target = pt.clone(); arriveAt = idx; closeCard();
+  if (REDUCED) { fig.position.copy(target); arrive(); }
+}
+function goTo(i) { dismissIntro(); walkTo(standPoint(i), i); }
+function arrive() {
+  target = null;
+  if (arriveAt < 0) return;
+  const i = arriveAt; arriveAt = -1; current = i;
+  if (!lit.has(i)) { lit.add(i); saveLit(); posts[i].pin.classList.add('lit'); updateCount(true); }
+  posts.forEach((p, k) => p.pin.classList.toggle('now', k === i));
+  openCard(i);
+}
+function updateCount(bump) {
+  $('litN').textContent = lit.size;
+  if (bump && lit.size === WORK.length) toast('All six lit. That\'s the ridge so far.');
+}
+updateCount(false);
+
+/* ══ CARD ══════════════════════════════════════════════════════════════ */
+function openCard(i) {
+  const w = WORK[i];
+  $('cMeta').innerHTML = w.meta.map((m) => `<span>${m}</span>`).join('');
+  $('cName').textContent = w.name; $('cStat').textContent = w.stat; $('cLine').innerHTML = w.line;
+  const a = $('cLink'); a.href = w.href; a.textContent = w.ext ? 'Open Dearly ↗' : 'Read case study →';
+  if (w.ext) { a.target = '_blank'; a.rel = 'noopener'; } else { a.removeAttribute('target'); a.removeAttribute('rel'); }
+  $('cNext').textContent = i === WORK.length - 1 ? 'Back to the start' : 'Next light →';
+  $('card').classList.add('open');
+}
+function closeCard() { $('card').classList.remove('open'); }
+$('cardX').onclick = () => { closeCard(); touring = false; };
+$('cNext').onclick = () => { touring = true; goTo(current >= WORK.length - 1 ? 0 : current + 1); };
+
+/* ══ INTRO / TOUR ══════════════════════════════════════════════════════ */
+function dismissIntro() { if (introDone) return; introDone = true; $('intro').classList.add('gone'); }
+function tour() { dismissIntro(); touring = true; goTo(current < 0 ? 0 : (current + 1) % WORK.length); }
+$('tourBtn').onclick = tour; $('tourBtn2').onclick = tour;
+$('lookBtn').onclick = () => { dismissIntro(); toast('Click the ground to walk. Pins are projects.'); };
+addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !introDone && document.activeElement === document.body) { e.preventDefault(); tour(); }
+  if (e.key === 'Escape') { closeCard(); closeList(); }
+  if (e.key === 'ArrowRight' && introDone) goTo(Math.min(WORK.length - 1, current + 1));
+  if (e.key === 'ArrowLeft' && introDone) goTo(Math.max(0, current - 1));
+});
+let tt; function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('on'), 2600); }
+
+/* ══ INPUT — click to walk, drag to look, wheel to zoom ═══════════════ */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let down = null, yaw = 0, zoom = 1;
+const cv = renderer.domElement;
+cv.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY, yaw, moved: false }; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', (e) => {
+  if (!down) return; const dx = e.clientX - down.x;
+  if (Math.abs(dx) > 5) down.moved = true;
+  if (down.moved) yaw = down.yaw - dx * 0.004;
+});
+cv.addEventListener('pointerup', (e) => {
+  const d = down; down = null; if (!d || d.moved) return;
+  const r = cv.getBoundingClientRect();
+  ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const hp = ray.intersectObjects(hitTargets, true)[0];
+  if (hp) { let o = hp.object; while (o.parent && !hitTargets.includes(o)) o = o.parent; goTo(hitTargets.indexOf(o)); return; }
+  const ht = ray.intersectObject(terrain)[0];
+  if (ht) { dismissIntro(); touring = false; walkTo(ht.point); }
+});
+cv.addEventListener('wheel', (e) => { e.preventDefault(); zoom = THREE.MathUtils.clamp(zoom * (1 + e.deltaY * 0.001), .45, 2.2); }, { passive: false });
+$('zIn').onclick = () => { zoom = Math.max(.45, zoom * .8); };
+$('zOut').onclick = () => { zoom = Math.min(2.2, zoom * 1.25); };
+$('recenter').onclick = () => { yaw = 0; zoom = 1; };
+
+/* ══ LOOP ══════════════════════════════════════════════════════════════ */
+const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), tmp = new THREE.Vector3();
+let t = 0, first = true;
+function step(dt) {
+  t += dt;
+  // walk
+  if (target) {
+    tmp.subVectors(target, fig.position); tmp.y = 0;
+    const dist = tmp.length();
+    if (dist < 0.15) { fig.position.copy(target); arrive(); }
+    else {
+      const s = Math.min(dist, SPEED * dt); tmp.normalize();
+      fig.position.x += tmp.x * s; fig.position.z += tmp.z * s;
+      fig.rotation.y = THREE.MathUtils.lerp(fig.rotation.y, Math.atan2(tmp.x, tmp.z), 0.2);
+    }
+  }
+  const walking = !!target;
+  fig.position.y = heightAt(fig.position.x, fig.position.z) + (walking ? Math.abs(Math.sin(t * 11)) * .09 : 0);
+
+  // lanterns ease toward lit; the summit beam breathes
+  posts.forEach((p, i) => {
+    p.glow += ((lit.has(i) ? 1 : 0) - p.glow) * Math.min(1, dt * 2.2);
+    const flick = 1 + Math.sin(t * 7 + i * 2) * .04 + Math.sin(t * 13 + i) * .03;
+    p.glassMat.emissiveIntensity = .05 + p.glow * 3.2 * flick;
+    p.light.intensity = p.glow * (p.w.summit ? 60 : 22) * flick;
+    if (p.beam) p.beam.material.opacity = .05 + p.glow * (.16 + Math.sin(t * 1.4) * .03);
+  });
+  // trail markers brighten up to the furthest lit lantern
+  const reach = lit.size ? Math.max(...[...lit].map((i) => WORK[i].x)) : -999;
+  trail.forEach((m) => { m.mat.opacity += ((m.x <= reach ? .9 : .28) - m.mat.opacity) * Math.min(1, dt * 2); });
+
+  // camera — high three-quarter view over the figure's shoulder toward the summit
+  const dist = 40 * zoom;
+  camLook.set(fig.position.x + 6, fig.position.y + 1.5, fig.position.z);
+  tmp.set(-Math.cos(yaw) * dist * .62, dist * .58, Math.sin(-yaw) * dist * .62 + dist * .55);
+  tmp.applyAxisAngle(new THREE.Vector3(0, 1, 0), 0);
+  const want = camLook.clone().add(tmp);
+  if (first) { camPos.copy(want); first = false; } else camPos.lerp(want, Math.min(1, dt * (REDUCED ? 20 : 2.4)));
+  camera.position.copy(camPos); camera.lookAt(camLook);
+
+  composer.render();
+  placePins();
+}
+
+let last = performance.now();
+function frame(now) {
+  now = now || performance.now();
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  step(dt);
+  if (!RAFSHIM) requestAnimationFrame(frame);
+}
+if (RAFSHIM) setInterval(() => frame(performance.now()), 16); else requestAnimationFrame(frame);
+
+window.__world = {
+  step: (dt = 1 / 60, n = 1) => { for (let k = 0; k < n; k++) step(dt); },
+  walkTo: (i) => goTo(i), tour,
+  get state() { return { fig: fig.position.toArray().map((v) => +v.toFixed(2)), lit: [...lit], current, walking: !!target, introDone }; },
+  reset: () => { lit.clear(); saveLit(); location.reload(); },
+};
+</script>
+</body>
+</html>
