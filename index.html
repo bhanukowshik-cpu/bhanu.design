@@ -5603,7 +5603,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <div class="vcs-pin">
       <!-- (12 Nov) the scroll now flies into the isometric San Francisco city (sf-downtown.html); the painted
            vc-lab scene and its card below are kept but hidden -->
-      <iframe class="vcs-scene" id="vcScene" src="sf-downtown.html?embed&amp;v=6" title="San Francisco, with the Verified Call tower" loading="lazy"></iframe>
+      <!-- the way in: the cloud bank from the hero fills the frame, then parts as the camera drops into the city -->
+      <div class="vcs-veil" id="vcsVeil" aria-hidden="true"><img class="vl" src="city/layers/vc/cloud_a.webp" alt=""><img class="vl" src="city/layers/vc/cloud_a.webp" alt=""><img class="vl" src="city/layers/vc/cloud_a.webp" alt=""></div>
+      <iframe class="vcs-scene" id="vcScene" src="sf-downtown.html?embed&amp;v=7" title="San Francisco, with the Verified Call tower" loading="lazy"></iframe>
       <aside class="vcs-card" id="vcsCard">
         <p class="vcs-meta"><span>Founder</span><span>Design + build, solo</span><span>3 weeks</span></p>
         <h2 class="vcs-title" id="vcsTitle">Verified Call</h2>
@@ -5624,6 +5626,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .vcs-pin{position:sticky;top:0;height:100svh;overflow:hidden}
     .vcs-scene{position:absolute;inset:0;width:100%;height:100%;border:0;background:#6E9FA3}
     .vcs-card{display:none!important}                     /* the city's own glimpse replaces it */
+    .vcs-veil{position:absolute;inset:0;z-index:3;pointer-events:none}
+    .vcs-veil .vl{position:absolute;left:50%;top:50%;width:max(190vw,1700px);max-width:none;transform:translate(-50%,-50%);will-change:transform,opacity}
     .vcs-card{position:absolute;right:clamp(16px,6vw,96px);top:50%;width:min(430px,calc(100vw - 32px));z-index:2;
               padding:28px 28px 24px;border-radius:24px;color:#fff;font-family:var(--sans);
               opacity:0;transform:translate(0,calc(-50% + 28px));pointer-events:none;
@@ -5662,7 +5666,17 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       function send() { raf = 0;
         var r = sec.getBoundingClientRect(), run = Math.max(1, r.height - innerHeight);
         var p = Math.min(1, Math.max(0, -r.top / run));
-        if (card) card.classList.toggle('on', p > 0.62);   // the card lands once the clouds have parted on the full scene
+        var veil = document.getElementById('vcsVeil');
+        if (veil) {   // clouds part sideways and lift away over the first ~12% of the run, while the city appears beneath
+          var k = Math.min(1, Math.max(0, p / 0.12)), e = k * k * (3 - 2 * k), vh = innerHeight, vw = innerWidth;
+          veil.style.background = 'linear-gradient(180deg,rgba(246,231,218,' + (1 - e) + '),rgba(239,217,204,' + (0.9 * (1 - e)) + ') 60%,rgba(239,217,204,0))';
+          var L = veil.children;
+          L[0].style.transform = 'translate(calc(-50% - ' + (e * vw * 0.8).toFixed(1) + 'px),calc(-50% - ' + (e * vh * 0.35).toFixed(1) + 'px)) scale(' + (1 + e * 0.6).toFixed(3) + ')';
+          L[1].style.transform = 'translate(calc(-50% + ' + (e * vw * 0.8).toFixed(1) + 'px),calc(-50% + ' + (e * vh * 0.1).toFixed(1) + 'px)) scaleX(-1) scale(' + (1 + e * 0.6).toFixed(3) + ')';
+          L[2].style.transform = 'translate(-50%,calc(-50% + ' + (vh * 0.3 + e * vh * 0.9).toFixed(1) + 'px)) scale(' + (1.2 + e * 0.8).toFixed(3) + ')';
+          for (var i = 0; i < 3; i++) L[i].style.opacity = String(Math.max(0, 1 - e * 1.15));
+          veil.style.visibility = e >= 0.999 ? 'hidden' : '';
+        }
         // the crown starts tucked under the hero and swells up over the bay as the hero scrolls away
         if (fringe) {
           var k = Math.min(1, Math.max(0, 1 - r.top / innerHeight));
