@@ -767,6 +767,8 @@ function project(dir) {
    8. BUILD THE SCENE FROM THE MANIFEST
    ════════════════════════════════════════════════════════════════════════ */
 let M, skyPass, waterPass, fxPass, gullPass, platePass;
+let deferredVariants = [], deferredLoad = null;
+const layerPasses = {};   // layer name → its FS_LIT passes (to bind late-arriving variants)
 const sprites = [], swayers = [], fogPasses = [], glowPasses = [];
 const ringData = Array.from({ length: 12 }, () => new THREE.Vector4(0, 0, 0, 0));
 const bodyData = Array.from({ length: 4 }, () => new THREE.Vector4(0, 0, 0, 0));
@@ -782,10 +784,20 @@ async function build() {
 
   // load every image in parallel
   const imgs = {};
-  await Promise.all(layers.flatMap(L => Object.entries(L.files || {}).map(async ([k, f]) => {
-    try { imgs[L.name + ':' + k] = await loadImage(BASE + f); }
+  // PROGRESSIVE LOADING — first paint needs only the base layer art plus the time-of-day variant
+  // that is visible right now (SF's live sun); the other variants stream in after the first frame
+  // and are bound to their passes when they arrive (deferredVariants below).
+  const altNow = state.forceAlt != null ? state.forceAlt : sunAltAz(nowMs()).alt;
+  const needNow = k => k === 'light' || (k === 'night' && altNow < -1) || (k === 'day' && altNow > 8)
+                    || !['day', 'night'].includes(k);
+  const fileCache = {};                                     // shared images (sea lions share one PNG)
+  const load = f => (fileCache[f] = fileCache[f] || loadImage(BASE + f));
+  await Promise.all(layers.flatMap(L => Object.entries(L.files || {}).filter(([k]) => needNow(k)).map(async ([k, f]) => {
+    try { imgs[L.name + ':' + k] = await load(f); }
     catch (e) { state.errors.push('missing ' + f); }
   })));
+  deferredVariants = layers.flatMap(L => Object.entries(L.files || {}).filter(([k]) => !needNow(k)).map(([k, f]) => ({ L, k, f })));
+  deferredLoad = load;
   const tex = (L, k) => imgs[L.name + ':' + k] ? makeTex(imgs[L.name + ':' + k]) : null;
   const blank = new THREE.Texture(); // placeholder sampler for absent maps
 
@@ -891,6 +903,7 @@ async function build() {
       const { u, box } = litUniforms(L, 0);
       const animated = kind === 'sprite' && L.anim;
       const p = addPass(FS_LIT, u, { rect: animated ? [0, 0, 1, 1] : pad(box), par: L.parallax, name: L.name });
+      (layerPasses[L.name] = layerPasses[L.name] || []).push(p);
       if (animated) {
         const s = { L, pass: p, box, anim: L.anim, refl: spriteReflQueue.find(q => q.L === L)?.pass,
                     dive: 0, diveT: 0, nextDive: 8 + Math.random() * 20, wasUnder: false, prevV: 0, prevY: 0,
@@ -913,6 +926,26 @@ async function build() {
   if (!waterDone) insertWater();
   if (!gullPass) gullPass = addPass(FS_GULLS, { uGulls: { value: gullData } }, { rect: [0, 0.02, 1, 0.62], par: 0.1, name: 'gulls' });
 
+}
+
+// stream the remaining time-of-day variants after first paint, one at a time, at idle priority
+async function streamVariants() {
+  for (const { L, k, f } of deferredVariants) {
+    await new Promise(r => (window.requestIdleCallback || setTimeout)(r, { timeout: 1500 }));
+    let img; try { img = await deferredLoad(f); } catch (e) { state.errors.push('missing ' + f); continue; }
+    const t = makeTex(img);
+    if (L.kind === 'plate' && platePass) {
+      const u = platePass.mat.uniforms;
+      if (k === 'day') { u.tPlateDay.value = t; u.uHasDay.value = 1; }
+      if (k === 'night') { u.tPlateNight.value = t; u.uHasNight.value = 1; }
+    }
+    for (const p of layerPasses[L.name] || []) {
+      const u = p.mat.uniforms;
+      if (k === 'day' && u.tLightDay) { u.tLightDay.value = t; u.uHasDayL.value = 1; }
+      if (k === 'night' && u.tLightNight) { u.tLightNight.value = t; u.uHasNightL.value = 1; }
+    }
+    state.streamed = (state.streamed || 0) + 1;
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -1295,8 +1328,9 @@ function frame() {
     skyPass.mat.uniforms.uTitleY.value = v.y + vy * v.w;
     skyPass.mat.uniforms.uTitleK.value = 1 - smooth(0, 0.35, fadeP);
   }
-  // reflection pre-pass: only the above-water layers, into a small RT (alpha = coverage)
-  if (reflRT) {
+  // reflection pre-pass: only the above-water layers, into a small RT (alpha = coverage).
+  // Skipped under a painted plate: its reflections are painted (and shimmered in FS_PLATE).
+  if (reflRT && !platePass) {
     for (const p of passes) p.mesh.visible = reflectables.has(p.mesh);
     renderer.setRenderTarget(reflRT); renderer.setClearColor(0x000000, 0); renderer.clear();
     renderer.render(scene, camera);
@@ -1373,6 +1407,7 @@ async function showFallback(reason) {
   fetchWeather().then(renderOnce);
   setInterval(fetchWeather, 10 * 60 * 1000);
   loopStart();
+  setTimeout(streamVariants, 700);   // other times of day arrive after first paint
 })();
 </script>
 </body>
