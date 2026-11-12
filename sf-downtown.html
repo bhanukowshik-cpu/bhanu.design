@@ -33,7 +33,7 @@
   canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
   .pill{position:fixed;z-index:5;background:var(--paper);border-radius:16px;box-shadow:0 2px 0 rgba(0,0,0,.08),0 10px 30px -12px rgba(20,30,40,.35)}
   /* name + nav share one bar on the left (owner, 12 Nov) */
-  .bar{position:fixed;z-index:5;right:20px;top:20px;display:flex;padding:6px;border-radius:999px;
+  .bar{position:fixed;z-index:5;right:20px;top:50%;transform:translateY(-50%);display:flex;padding:8px;border-radius:26px;
         background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.03)),rgba(14,18,26,.18);
         -webkit-backdrop-filter:blur(22px) saturate(1.9) brightness(1.05);backdrop-filter:blur(22px) saturate(1.9) brightness(1.05);
         box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.12),inset 0 0 0 1px rgba(255,255,255,.16)}
@@ -41,7 +41,8 @@
   .bar .nav a:hover{background:rgba(255,255,255,.14)}
   .brand{display:flex;align-items:center;gap:12px;padding:2px 14px 2px 2px;margin-right:4px;border-right:1px solid #ECE5DB;font-weight:700;font-size:17px;color:var(--ink);text-decoration:none}
   .brand canvas{width:40px;height:40px;border-radius:11px;background:#E6F28D;image-rendering:pixelated;image-rendering:crisp-edges}
-  .nav{display:flex;gap:2px}
+  .nav{display:flex;flex-direction:column;gap:2px}
+  .bar .nav a{text-align:center}
   .nav a{color:var(--ink);text-decoration:none;font-weight:600;font-size:15px;padding:4px 12px;border-radius:10px}
   .nav a:hover{background:#F1ECE4}
   .status{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:5;font-family:var(--mono);font-size:12px;
@@ -166,8 +167,7 @@
   .g-vis img.wide{display:block;width:100%;height:auto;aspect-ratio:800/670;animation:gKen 16s ease-in-out infinite alternate}   /* the whole graphic, never cropped */
   .g-vis.phone{display:grid;place-items:center;height:170px;background:linear-gradient(160deg,#EAF3E2,#D6E8CC)}
   .g-vis.phone img{height:136px;width:auto;border-radius:16px;border:3px solid #1F1B24;animation:gFloat 4.5s ease-in-out infinite}
-  .g-vis::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);
-                transform:translateX(-120%);animation:gSheen 5.5s ease-in-out infinite 1.2s;pointer-events:none}
+
   @keyframes gKen{from{transform:scale(1)}to{transform:scale(1.035)}}
   @keyframes gFloat{50%{transform:translateY(-5px) rotate(-1.5deg)}}
   @keyframes gSheen{0%,55%{transform:translateX(-120%)}80%,100%{transform:translateX(120%)}}
@@ -195,18 +195,20 @@
   .g-pills b{color:var(--g-ink);font-weight:700}
   .g-pills .dot{width:7px;height:7px;border-radius:50%;background:#16845E;animation:gPulse 2s ease-in-out infinite}
   /* the button is glass too: a clear pill with a bright rim, a sheen that sweeps on hover, ink text */
+  .g-strip{margin:12px -16px -4px;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+  .g-strack{display:flex;width:max-content;animation:gMarq 26s linear infinite}
+  .g-strack span{white-space:pre;font:500 11.5px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--g-mute)}
   .glimpse .g-glass{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
-    padding:12px 16px;border-radius:14px;font:650 14.5px var(--font);color:var(--g-ink);cursor:pointer;border:0;
-    background:linear-gradient(180deg,rgba(255,255,255,.62),rgba(255,255,255,.22));
+    padding:12px 16px;border-radius:14px;font:650 14.5px var(--font);color:#fff;cursor:pointer;border:0;
+    background:#141218;   /* solid black (owner, 12 Nov) */
     -webkit-backdrop-filter:blur(10px) saturate(1.6);backdrop-filter:blur(10px) saturate(1.6);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,255,255,.55),
-               0 10px 24px -12px rgba(20,30,40,.45);transition:transform .25s, box-shadow .25s}
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18);transition:transform .25s, box-shadow .25s}
   .glimpse .g-glass svg{width:16px;height:16px;transition:transform .25s}
-  .glimpse .g-glass::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.7) 50%,transparent 70%);transform:translateX(-120%)}
-  .glimpse .g-glass:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 #fff,inset 0 0 0 1px rgba(255,255,255,.75),0 14px 28px -12px rgba(20,30,40,.5)}
+  .glimpse .g-glass::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);transform:translateX(-120%)}
+  .glimpse .g-glass:hover{transform:translateY(-1px);background:#000}
   .glimpse .g-glass:hover::after{transition:transform .7s;transform:translateX(120%)}
   .glimpse .g-glass:hover svg{transform:translateX(3px)}
-  html.tod-night .glimpse .g-glass{background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.06))}
+
   /* ── the Verified Call commercial: three captioned beats, one 9 s loop ── */
   .g-vis.sq{aspect-ratio:1/1;background:#14171D}
   .vfx{position:absolute;inset:0;overflow:hidden;font-family:var(--font);color:#fff}
@@ -255,6 +257,33 @@
   @keyframes vBad{0%,66%{color:#1F1B24}68%,96%{color:#C0392B}100%{color:#1F1B24}}
   @keyframes vFlag{0%,80%{opacity:0;transform:translateY(-6px)}83%,96%{opacity:1;transform:none}99%,100%{opacity:0}}
   .g-vis.sq::after{display:none}
+  .g-vis.plain{background:#EDE5D8}
+  .flow{position:absolute;inset:0;display:grid;place-items:center}
+  .flow.et .d-win{width:90%;border-radius:8px;background:#fff;overflow:hidden;box-shadow:0 16px 26px -16px rgba(40,30,20,.5)}
+  .flow.et video{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+  .flow .d-bar{display:flex;align-items:center;gap:5px;height:18px;padding:0 8px;background:#F1EEE9;border-bottom:1px solid #E4DED4}
+  .flow .d-bar i{width:6px;height:6px;border-radius:50%;background:#E0574F}.flow .d-bar i:nth-child(2){background:#E6B33C}.flow .d-bar i:nth-child(3){background:#5CB85C}
+  .flow .d-bar span{margin-left:8px;flex:1;font:500 9px var(--mono);color:#8B8478;background:#fff;border-radius:4px;padding:1px 6px;text-align:center}
+  /* Stressie flow: three captioned steps, one real iPhone (tighter corners, thin bezel, dynamic island) */
+  .flow.st .steps{position:absolute;left:10px;right:10px;top:10px;height:22px}
+  .flow.st .steps span{position:absolute;left:0;top:0;display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#1F1B24;opacity:0;white-space:nowrap}
+  .flow.st .steps b{display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:#2F5A3C;color:#fff;font-size:10.5px}
+  .flow.st .s1{animation:st1 9s infinite}.flow.st .s2{animation:st2 9s infinite}.flow.st .s3{animation:st3 9s infinite}
+  .flow.st .iph{position:relative;margin-top:24px;height:78%;aspect-ratio:9/19.5;border-radius:16px;background:#1A1A1C;padding:3px;box-shadow:0 18px 28px -16px rgba(30,40,30,.55)}
+  .flow.st .isl{position:absolute;left:50%;top:7px;width:30%;height:8px;border-radius:6px;background:#000;transform:translateX(-50%);z-index:3}
+  .flow.st .scr{position:relative;width:100%;height:100%;border-radius:13px;overflow:hidden;background:#F6F1E8}
+  .flow.st .scr img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .flow.st .f1{animation:sf1 9s infinite}.flow.st .f2{animation:sf2 9s infinite}.flow.st .f3{animation:sf3 9s infinite}
+  .flow.st .tap{position:absolute;width:22px;height:22px;border-radius:50%;background:rgba(30,30,30,.25);border:2px solid rgba(255,255,255,.9);z-index:4;animation:sTap 9s infinite}
+  @keyframes st1{0%,2%{opacity:0}5%,30%{opacity:1}33%,100%{opacity:0}}
+  @keyframes st2{0%,33%{opacity:0}36%,63%{opacity:1}66%,100%{opacity:0}}
+  @keyframes st3{0%,66%{opacity:0}69%,96%{opacity:1}99%,100%{opacity:0}}
+  @keyframes sf1{0%,31%{opacity:1;transform:none}35%,100%{opacity:0;transform:translateX(-30%)}}
+  @keyframes sf2{0%,31%{opacity:0;transform:translateX(30%)}35%,64%{opacity:1;transform:none}68%,100%{opacity:0;transform:translateX(-30%)}}
+  @keyframes sf3{0%,64%{opacity:0;transform:translateX(30%)}68%,97%{opacity:1;transform:none}100%{opacity:0}}
+  /* the finger: drags the stress slider, taps Rewards, then swipes to the map */
+  @keyframes sTap{0%{left:30%;top:63%;opacity:0}6%{opacity:1;left:30%;top:63%}20%{left:68%;top:63%}26%{opacity:1}29%,36%{opacity:0;left:62%;top:91%}
+    42%{opacity:1;left:62%;top:91%;transform:scale(.8)}46%{transform:scale(1)}52%,64%{opacity:0}66%{opacity:1;left:75%;top:50%}74%{left:25%;top:50%;opacity:1}78%,100%{opacity:0}}
   @media (prefers-reduced-motion:reduce){ .glimpse *, .glimpse > *{animation:none!important;transition:none!important;filter:none!important} }
   @media (max-width:767px){
     .tiles{grid-template-columns:1fr 1fr}
@@ -1356,6 +1385,49 @@ cityBlock(-20, 128, 12, 8, 9, '#C98F6B', { awning: '#D9483B' }); cityBlock(-4, 1
   for (const [x, z] of [[-2, -1.5], [2, -1.5], [-2, 1.5], [2, 1.5]]) mesh(box(0.1, 2.8, 0.1), M('#2F3236'), x, 1.4, z, g);
   const sign = canvasTex(256, 96, (c, w, h) => { c.fillStyle = '#1F3F7A'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = '800 64px Montserrat'; c.textAlign = 'center'; c.fillText('BART', w / 2, 70); });
   mesh(new THREE.PlaneGeometry(2, 0.75), new THREE.MeshBasicMaterial({ map: sign }), 0, 3.4, 1.71, g).castShadow = false; }
+/* — EverTutor: a school, kids walking in and out, a yellow bus at the curb (project stop 2) — */
+const EVERTUTOR_AT = new THREE.Vector3(-122, 0.1, 64);
+{ const g = new THREE.Group(); g.position.copy(EVERTUTOR_AT); scene.add(g);
+  const BRICK = M('#B9653F'), TRIM = M('#F2EBDD'), ROOF = M('#5B4A5C'), WIN = M('#4C6A8C', { roughness: 0.3, emissive: '#FFD9A0', emissiveIntensity: 0.06 });
+  mesh(rbox(24, 7, 10, 0.2), BRICK, 0, 3.5, -3, g);                                                  // main hall
+  for (let fl = 0; fl < 2; fl++) for (let i = 0; i < 8; i++) { if (i === 3 || i === 4) continue;
+    mesh(rbox(1.5, 1.7, 0.1, 0.05), WIN, -10.2 + i * 2.9, 1.9 + fl * 3.1, 2.03, g); mesh(box(1.8, 0.18, 0.3), TRIM, -10.2 + i * 2.9, 0.95 + fl * 3.1, 2.1, g); }
+  mesh(rbox(5.4, 9.5, 2.2, 0.15), TRIM, 0, 4.75, 2.6, g);                                            // entrance block
+  mesh(rbox(2.6, 3, 0.15, 0.06), M('#5B3A2E'), 0, 1.55, 3.72, g);                                    // doors
+  for (let i = 0; i < 4; i++) mesh(box(6 - i * 0.6, 0.3, 0.6), TRIM, 0, 0.15 + i * 0.3, 5.3 - i * 0.5, g);   // steps
+  const sh = new THREE.Shape(); sh.moveTo(-12.3, 0); sh.lineTo(0, 2.6); sh.lineTo(12.3, 0); sh.closePath();
+  mesh(new THREE.ExtrudeGeometry(sh, { depth: 10.4, bevelEnabled: false }), ROOF, 0, 7, -8.2, g);
+  mesh(rbox(3, 3.2, 3, 0.1), TRIM, 0, 10.4, -1, g);                                                   // bell tower
+  mesh(new THREE.ConeGeometry(2.3, 2.6, 4), ROOF, 0, 13.3, -1, g).rotation.y = Math.PI / 4;
+  const clk = canvasTex(128, 128, (c, w, h) => { c.fillStyle = '#FFFDF6'; c.beginPath(); c.arc(64, 64, 56, 0, 7); c.fill(); c.strokeStyle = '#2F3236'; c.lineWidth = 6; c.stroke();
+    c.beginPath(); c.moveTo(64, 64); c.lineTo(64, 26); c.moveTo(64, 64); c.lineTo(92, 64); c.stroke(); });
+  mesh(new THREE.CircleGeometry(1, 24), new THREE.MeshStandardMaterial({ map: clk }), 0, 10.5, 0.52, g).castShadow = false;
+  const sign = canvasTex(1024, 160, (c, w, h) => { c.fillStyle = '#F2EBDD'; c.fillRect(0, 0, w, h); c.fillStyle = '#2F5A7A';
+    c.font = '800 96px Montserrat, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('EverTutor School', w / 2, h / 2 + 4); });
+  mesh(new THREE.PlaneGeometry(9, 1.4), new THREE.MeshStandardMaterial({ map: sign }), 0, 7.6, 3.73, g).castShadow = false;
+  mesh(box(16, 0.06, 9), M('#9EBB6A'), -2, 0.14, 11, g).castShadow = false;                           // schoolyard
+  for (const x of [-9, -5]) { mesh(box(0.12, 2.6, 0.12), M('#D9483B'), x, 1.3, 13, g); mesh(box(0.12, 2.6, 0.12), M('#D9483B'), x + 2.4, 1.3, 13, g);
+    mesh(box(2.6, 0.12, 0.12), M('#D9483B'), x + 1.2, 2.6, 13, g); mesh(box(0.8, 0.08, 0.4), M('#2F3236'), x + 1.2, 0.9, 13, g); }   // swings
+  mesh(new THREE.CylinderGeometry(0.06, 0.06, 7, 6), M('#C9CDD2'), 9, 3.5, 6, g);
+  mesh(box(0.02, 1, 1.6), M('#3E6FB0'), 9, 6.4, 5.2, g);
+  const bus = new THREE.Group(); bus.position.set(6, 0, 16.5); g.add(bus);                            // yellow school bus
+  mesh(rbox(8, 2.6, 2.4, 0.4), M('#F2B71C', { roughness: 0.5 }), 0, 1.8, 0, bus);
+  for (let x = -2.8; x <= 2.4; x += 1.2) mesh(box(0.9, 0.8, 0.05), M('#3E5A78'), x, 2.3, 1.22, bus);
+  mesh(box(8.02, 0.18, 2.42), M('#1F1B24'), 0, 1.3, 0, bus);
+  for (const [x, z] of [[-2.6, -1.2], [2.6, -1.2], [-2.6, 1.2], [2.6, 1.2]]) mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.3, 14), M('#26282C'), x, 0.45, z, bus).rotation.x = Math.PI / 2;
+  g.traverse(o => { if (o.isMesh) o.userData.card = 'et'; });
+  // kids: out of the doors, across the yard, back in (and a few walking home with a parent)
+  const KID = { scale: 0.62, speed: 0.75 };
+  const X = EVERTUTOR_AT.x, Z = EVERTUTOR_AT.z;
+  addWalker([[X, Z + 4.4], [X, Z + 9], [X - 7, Z + 10], [X - 7, Z + 9.9], [X - 0.1, Z + 8.9], [X - 0.1, Z + 4.4]], { ...KID, bag: '#D9483B' });
+  addWalker([[X + 0.6, Z + 4.4], [X + 0.6, Z + 14.5], [X + 4, Z + 14.5], [X + 4, Z + 14.4], [X + 0.7, Z + 14.4], [X + 0.7, Z + 4.4]], { ...KID, bag: '#3E6FB0' });
+  addWalker([[X - 0.6, Z + 4.4], [X - 0.6, Z + 12], [X - 4, Z + 13], [X - 4, Z + 12.9], [X - 0.7, Z + 11.9], [X - 0.7, Z + 4.4]], { ...KID, bag: '#F2B71C', speed: 0.9 });
+  addWalker([[X - 10, Z + 9], [X - 6, Z + 12], [X - 3, Z + 9], [X - 6, Z + 7]], { ...KID, speed: 1.1 });
+  addWalker([[X - 4, Z + 7.5], [X + 3, Z + 7.5], [X + 3, Z + 7.6], [X - 4, Z + 7.6]], { ...KID, bag: '#3F8F6B' });
+  addWalker([[X + 1.2, Z + 17.6], [X + 16, Z + 17.6], [X + 16, Z + 17.7], [X + 1.2, Z + 17.7]], { speed: 0.8 });
+  addWalker([[X + 1.9, Z + 17.6], [X + 16.6, Z + 17.6], [X + 16.6, Z + 17.7], [X + 1.9, Z + 17.7]], { ...KID, speed: 0.8 });
+}
+
 /* — Stressie: a calm wellness studio just south of Dolores Park (project stop 2) — */
 const STRESSIE_AT = new THREE.Vector3(-70, 0.1, 138);
 { const g = new THREE.Group(); g.position.copy(STRESSIE_AT); scene.add(g);
@@ -1468,6 +1540,7 @@ function oraclePark(x, z) {
     [-160, -114, -132, -96], [-155, -134, -146, -135],                                                                                  // Marina
     [-143, -101, -6, 16], [-144, -111, -28, -17], [-153, -129, 22, 34], [-101, -91, -33, -21],                                         // Alamo Square
     [-89, -55, 81, 129], [-45, -31, 83, 115], [-27, 2, 100, 108], [-27, 2, 123, 133], [-28, -8, 113, 121], [-79, -60, 129, 144],        // Mission
+    [-140, -104, 52, 80],                                                                                                               // EverTutor school
   ];
   const DISTRICTS = [[-50, 50, -50, 50], ...CONTENT];
   { const plz = canvasTex(64, 64, (g, w, h) => { g.fillStyle = '#E9DFCD'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(160,140,110,.22)'; g.lineWidth = 2; g.strokeRect(0, 0, w, h); });
@@ -1521,7 +1594,7 @@ function oraclePark(x, z) {
 {
   const RES = [[-50, 50, -50, 50], [-60, -18, -136, -90], [-8, 20, -138, -106], [-6, 14, -102, -86], [-13, -3, -145, -135], [22, 34, -117, -103], [21, 33, -141, -131],
     [-160, -114, -132, -96], [-155, -134, -146, -135], [-143, -101, -6, 16], [-144, -111, -28, -17], [-153, -129, 22, 34], [-101, -91, -33, -21],
-    [-89, -55, 81, 129], [-45, -31, 83, 115], [-27, 2, 100, 108], [-27, 2, 123, 133], [-28, -8, 113, 121], [-79, -60, 129, 144]];
+    [-89, -55, 81, 129], [-45, -31, 83, 115], [-27, 2, 100, 108], [-27, 2, 123, 133], [-28, -8, 113, 121], [-79, -60, 129, 144], [-140, -104, 52, 80]];
   const blocked = (x0, x1, z0, z1) => RES.some(([a, b, c, d]) => x0 < b && x1 > a && z0 < d && z1 > c);
   const XS2 = [], ZS2 = [];
   for (let x = LAND.x0 + 26; x < LAND.x1; x += 26) XS2.push(x);
@@ -1865,23 +1938,36 @@ const GLIMPSE_DATA = [
       </div>
     </div>`, square: 1,
     eb: 'Founder', title: 'I\'m building Verified Call solo, to remove cheating from video calls.', titleSm: 1,
-    pills: ['<b>20 companies</b> in the closed beta', '<b>3 weeks</b> to build, solo', '<i class="dot"></i>Now in go-to-market'] },
-  { key: 'stressie', idx: 'Work 02', stop: 3, at: new THREE.Vector3(-62, 9, 140), ring: { x: -70, z: 138, r: 10 },
-    vis: '<img src="images/stressie-v4/hero-poster.webp" alt="Stressie V4 check-in screen: how are you feeling in this moment?">', phone: 1,
-    eb: 'Founding product designer · Figma → SwiftUI', title: 'Stressie V4',
-    line: 'A stress check-in that pays for your evening: coins, a map of wellness experiences, and events you can host.',
-    pills: ['<b>12% → 56%</b> daily engagement', '<b>171 Swift files</b> built solo', '<b>3 languages</b>', '<i class="dot"></i>Pilots: Amazon, InKind, Austin PD'] },
+    pills: ['<b>20 companies</b> in the closed beta', '<b>3 weeks</b> to build, solo', '<i class="dot"></i>Now in go-to-market'],
+    tech: ['Figma', 'Electron', 'React', 'TypeScript', 'Next.js', 'Chrome extension', 'MediaPipe', 'Amazon Rekognition', 'Deepgram', 'GSAP', 'AI coding agents'] },
+  { key: 'et', idx: 'Work 02', stop: 2, at: new THREE.Vector3(-112, 16, 62), ring: { x: -122, z: 64, r: 14 },
+    vis: `<div class="flow et"><div class="d-win"><div class="d-bar"><i></i><i></i><i></i><span>evertutor · Live</span></div>
+      <video src="images/thumbs/et-live.mp4" poster="images/thumbs/et-live-poster.webp" muted loop playsinline autoplay preload="metadata"></video></div></div>`, square: 1, plain: 1,
+    eb: 'Sole product designer · voice AI', title: 'EverTutor: a voice AI tutor that took 1:1 tutoring from $250 to $5 an hour.', titleSm: 1,
+    pills: ['<b>~2,000</b> learners', '<b>8+</b> schools', '<b>$9.5M</b> seed-funded', '<i class="dot"></i>Mar 2025 – May 2026'],
+    tech: ['Figma', 'Voice UX', 'Interaction design', 'Curriculum tooling', 'Design system', 'AI coding agents'] },
+  { key: 'stressie', idx: 'Work 03', stop: 3, at: new THREE.Vector3(-62, 9, 140), ring: { x: -70, z: 138, r: 10 },
+    // an interaction flow in a real iPhone: check in (drag the slider) → earn coins → spend them after work
+    vis: `<div class="flow st">
+      <div class="steps"><span class="s1"><b>1</b>Check in</span><span class="s2"><b>2</b>Earn coins</span><span class="s3"><b>3</b>Spend them after work</span></div>
+      <div class="iph"><i class="isl"></i><div class="scr">
+        <img class="f1" src="images/stressie-v4/hero-poster.webp" alt=""><img class="f2" src="images/stressie-v4/hero-rewards.webp" alt=""><img class="f3" src="images/stressie-v4/hero-offwork.webp" alt="">
+        <i class="tap"></i></div></div></div>`, square: 1, plain: 1,
+    eb: 'Founding product designer · Figma → SwiftUI', title: 'Stressie V4: a stress check-in that pays for your evening.', titleSm: 1,
+    pills: ['<b>12% → 56%</b> daily engagement', '<b>171 Swift files</b> built solo', '<b>3 languages</b>', '<i class="dot"></i>Pilots: Amazon, InKind, Austin PD'],
+    tech: ['Figma', 'SwiftUI', 'Swift', 'Metal', 'iOS', 'Localization', 'AI coding agents'] },
 ];
 const GLIMPSES = [];
 for (const d of GLIMPSE_DATA) {
   const el = document.createElement('aside'); el.className = 'glimpse'; el.setAttribute('aria-live', 'polite');
   el.innerHTML = `
-    <div class="g-vis${d.phone ? ' phone' : ''}${d.square ? ' sq' : ''}" style="--i:1">${d.vis}</div>
+    <div class="g-vis${d.phone ? ' phone' : ''}${d.square ? ' sq' : ''}${d.plain ? ' plain' : ''}" style="--i:1">${d.vis}</div>
     <div class="g-eb" style="--i:2">${d.eb}</div>
     <div class="g-title${d.titleSm ? ' sm' : ''}" style="--i:3">${d.title}</div>
     ${d.line ? `<p class="g-line" style="--i:4">${d.line}</p>` : ''}
     <div class="g-pills" style="--i:5">${d.pills.map(p => `<span>${p}</span>`).join('')}</div>
-    <button type="button" class="g-glass" style="--i:6"><span>Read full case study</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>`;
+    <button type="button" class="g-glass" style="--i:6"><span>Read full case study</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    ${d.tech ? `<div class="g-strip" style="--i:7" aria-label="Built with ${d.tech.join(', ')}"><div class="g-strack"><span>${d.tech.join('  ·  ')}  ·  </span><span>${d.tech.join('  ·  ')}  ·  </span></div></div>` : ''}`;
   el.querySelector('button').onclick = () => openCase(d.key);
   document.getElementById('glimpses').appendChild(el);
   // a soft light ring pulses at the building's base while its card is up
@@ -1956,11 +2042,12 @@ let drag = null, moved = 0;
 // SCROLL-DRIVEN TOUR (owner, 12 Nov: no zoom controls, the whole thing is scroll-driven).
 // Keyframes: the whole city → downtown → the Verified Call tower → Lombard → the Palace → the
 // Painted Ladies → the Mission → back out. Eased between stops; clicks still open the Work pin.
-const TOUR = [                                                        // straight to the work: Verified Call is the first stop
+const TOUR = [                                                        // straight to the work, one stop per scroll
   { tx: 8, tz: -6, zoom: 0.7 }, { tx: 21, tz: -9, zoom: 1.15 },          // 1: Verified Call
-  { tx: -30, tz: 64, zoom: 0.62 }, { tx: -66, tz: 132, zoom: 1.2 },      // 3: Stressie
-  { tx: -30, tz: 70, zoom: 0.48 },
-]
+  { tx: -114, tz: 60, zoom: 1.05 },                                       // 2: EverTutor
+  { tx: -66, tz: 132, zoom: 1.2 },                                        // 3: Stressie
+  { tx: -60, tz: 80, zoom: 0.5 },
+];
 let tourP = 0, tourShown = 0;
 const easeIO = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
 function tourAt(p) {
@@ -1995,7 +2082,7 @@ if (EMBED) {
 if (Q.has('p')) tourP = tourShown = +Q.get('p');
 function stepTour() {
   if (Q.has('cam')) { const [x, z, zm] = Q.get('cam').split(',').map(Number); Object.assign(view, { tx: x, tz: z, zoom: zm || 0.6 }); placeCamera(); return; }   // debug: pin the camera
-  tourShown += (tourP - tourShown) * (REDUCED ? 1 : 0.09);
+  tourShown += (tourP - tourShown) * (REDUCED ? 1 : 0.16);           // follows the scroll closely
   Object.assign(view, tourAt(tourShown)); placeCamera();
 }
 canvas.addEventListener('click', e => {
@@ -2163,7 +2250,8 @@ function project() {
       const x = (tmp.x + 1) / 2 * W, y = (1 - tmp.y) / 2 * H;
       const gh = gl.el.offsetHeight || 420;                            // keep the whole card on screen
       const gw = gl.el.offsetWidth || 372;
-      gl.el.style.transform = `translate(${Math.max(16, Math.min(W - gw - 20, x + 24)).toFixed(1)}px,${Math.max(80, Math.min(H - gh - 24, y - 60)).toFixed(1)}px)`;
+      const railGap = W > 767 ? 170 : 20;                             // keep clear of the vertical glass nav rail
+      gl.el.style.transform = `translate(${Math.max(16, Math.min(W - gw - railGap, x + 24)).toFixed(1)}px,${Math.max(80, Math.min(H - gh - 24, y - 60)).toFixed(1)}px)`;
     }
   }
   for (const a of anchors) {
