@@ -5765,7 +5765,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <div class="wk-body">
           <p class="wk-meta"><span>Sole product designer</span><span>EverTutor</span></p>
           <h3 class="wk-name" id="wk-n2">EverTutor Live</h3>
-          <p class="wk-line">A voice AI tutor that took 1:1 tutoring from <b>$250 to $5</b> an hour. <b>2,000+</b> students a day.</p>
+          <p class="wk-line">A voice AI tutor that took 1:1 tutoring from $250 to $5 an hour.</p>
+          <p class="cm-pills"><span><b>2,000+</b> students a day</span><span><b>8+</b> schools</span><span><b>$9.5M</b> seed-funded</span></p>
           <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
         </div>
       </a>
@@ -5780,7 +5781,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <div class="wk-body">
           <p class="wk-meta"><span>Sole product designer</span><span>EverTutor</span></p>
           <h3 class="wk-name" id="wk-n3">EverTutor Studio</h3>
-          <p class="wk-line">Cut lesson creation from <b>104 hours to 4</b>. <b>3,000+</b> lessons made with it.</p>
+          <p class="wk-line">The studio teachers use to build EverTutor's lessons.</p>
+          <p class="cm-pills"><span><b>104h → 4h</b> to make a lesson</span><span><b>3,000+</b> lessons made</span></p>
           <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
         </div>
       </a>
@@ -5828,7 +5830,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <div class="wk-body">
           <p class="wk-meta"><span>Solo build</span><span>48 hours</span></p>
           <h3 class="wk-name" id="wk-n6">Dearly</h3>
-          <p class="wk-line">Voice letters you can hear and keep. <b>140+</b> sent, <b>35</b> five-star ratings.</p>
+          <p class="wk-line">Voice letters you can hear and keep.</p>
+          <p class="cm-pills"><span><b>140+</b> letters sent</span><span><b>35</b> five-star ratings</span><span><b>48 hours</b>, built solo</span></p>
           <p class="wk-links"><span>Visit Dearly <i>&#8599;</i></span></p>
         </div>
       </a>
@@ -5910,6 +5913,19 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .stm .finger.press{transform:scale(.8)}
     .stm .pop{position:absolute;left:50%;top:40%;transform:translate(-50%,0) scale(.6);font:800 22px var(--sans);color:#B98A1E;opacity:0;transition:all .5s cubic-bezier(.2,.8,.2,1);z-index:4}
     .stm .pop.on{opacity:1;transform:translate(-50%,-40px) scale(1)}
+    /* — MacBook (EverTutor) and browser window (Dearly): real product recordings, code-built frames, no shadows — */
+    .mbp{width:600px;display:flex;flex-direction:column;align-items:center}
+    .mbp .lid{width:100%;padding:12px 12px 16px;border-radius:18px 18px 4px 4px;background:#0B0B0C;position:relative;
+      box-shadow:inset 0 0 0 1.5px #3A3A3D}
+    .mbp .lid::before{content:'';position:absolute;left:50%;top:5px;width:5px;height:5px;border-radius:50%;background:#1E1E22;transform:translateX(-50%)}
+    .mbp video{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top;border-radius:4px;background:#fff}
+    .mbp .base{width:116%;height:14px;border-radius:0 0 14px 14px;background:linear-gradient(180deg,#E3E3E6 0%,#C9C9CD 55%,#A9A9AE 100%);position:relative}
+    .mbp .base::before{content:'';position:absolute;left:50%;top:0;width:15%;height:5px;border-radius:0 0 7px 7px;background:#B4B4B9;transform:translateX(-50%)}
+    .bwin{width:680px;border-radius:12px;overflow:hidden;background:#fff;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+    .bwin .bar{display:flex;align-items:center;gap:7px;height:30px;padding:0 12px;background:#F1EEE9;border-bottom:1px solid #E4DED4}
+    .bwin .bar i{width:10px;height:10px;border-radius:50%;background:#E0574F}.bwin .bar i:nth-child(2){background:#E6B33C}.bwin .bar i:nth-child(3){background:#5CB85C}
+    .bwin .bar span{margin-left:14px;flex:1;max-width:360px;font:500 12px var(--sans);color:#8B8478;background:#fff;border-radius:7px;padding:4px 10px;text-align:center}
+    .bwin video,.wk-dl .bwin video{display:block;position:static!important;inset:auto!important;opacity:1!important;transform:none!important;width:100%!important;height:auto!important;aspect-ratio:1280/592;object-fit:cover!important;object-position:50% 50%!important}
     @media (max-width:900px){ .cm{grid-template-columns:1fr;width:420px;height:560px}.cm .beats{grid-template-columns:repeat(3,auto);gap:8px}.cm .beats li{font-size:13px}.cm .beats li small{display:none} }
   </style>
   <script>
@@ -5947,6 +5963,15 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
             [7000, function () { rows[2].className = 'ok'; }], [7500, function () { rows[3].className = 'bad'; }],
             [8100, function () { v.classList.add('flagged'); }]
           ], 11000); } }
+
+      // ── real recordings in device frames, playing only while on screen ──
+      function playWhenVisible(stage) { var v = stage.querySelector('video'); if (!v) return;
+        if (reduce) { v.removeAttribute('autoplay'); return; }
+        new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { v.play().catch(function () {}); } else v.pause(); }); }, { threshold: 0.3 }).observe(stage); }
+      [['evertutor-live.html', '<div class="mbp"><div class="lid"><video src="images/et-live.mp4" poster="images/et-live.png" muted loop playsinline preload="metadata"></video></div><div class="base"></div></div>'],
+       ['evertutor-studio.html', '<div class="mbp"><div class="lid"><video src="images/et-studio.mp4" poster="images/et-studio.png" muted loop playsinline preload="metadata"></video></div><div class="base"></div></div>'],
+       ['https://dearly-rho.vercel.app', '<div class="bwin"><div class="bar"><i></i><i></i><i></i><span>dearly-rho.vercel.app</span></div><video src="images/thumbs/dearly.mp4" poster="images/card-dearly.webp" muted loop playsinline preload="metadata"></video></div>']
+      ].forEach(function (d) { var card = document.querySelector('.wk-card[href="' + d[0] + '"]'); if (!card) return; var st = mount(card, d[1]); if (st) playWhenVisible(st); });
 
       // ── Stressie V4 ──
       var st = document.querySelector('.wk-card[href="stressie-v4.html"]');
