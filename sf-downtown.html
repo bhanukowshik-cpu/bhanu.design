@@ -93,10 +93,52 @@
   .cs .cta a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:600;font-size:15px;padding:13px 20px;border-radius:14px}
   .cs .cta a.pri{background:var(--ink);color:#fff}
   .cs .cta a.sec{background:#F2EDE5;color:var(--ink)}
+  .cs .status{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:7px 12px;border-radius:999px;background:#EAF3D4;color:#2F4A1E;font-size:13px;font-weight:600}
+  .cs .status i{width:8px;height:8px;border-radius:50%;background:#16845E;box-shadow:0 0 0 4px rgba(22,132,94,.18)}
+  .cs .facts{display:flex;flex-wrap:wrap;gap:8px 22px;margin:-8px 0 30px;font-size:14px;color:#4A4450}
+  .cs .facts b{color:var(--ink)}
+  .cs-sec{margin-top:54px;padding-top:28px;border-top:1px solid #ECE5DB}
+  .cs-sec .k{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .cs-sec h3{font-size:clamp(24px,2.6vw,32px);font-weight:700;letter-spacing:-.015em;margin:8px 0 12px;max-width:26ch}
+  .cs-sec h4{font-size:17px;font-weight:700;margin:26px 0 4px}
+  .cs-sec p{font-size:16px;line-height:1.6;color:#3D3843;max-width:64ch}
+  .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  .cards3>div{background:#F4EFE7;border-radius:18px;padding:18px}
+  .cards3 b{display:block;font-size:16px;margin-bottom:6px}
+  .cards3 span{font-size:14.5px;line-height:1.5;color:#4A4450}
+  .shots{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+  .shots.three{grid-template-columns:repeat(3,1fr)}
+  .shots figure{margin:0}
+  .shots .im{border-radius:14px;overflow:hidden;background:#EFE9DF;aspect-ratio:4/3;display:grid;place-items:center}
+  .shots img{width:100%;height:100%;object-fit:cover;display:block}
+  .shots.contain img{object-fit:contain;padding:8px}
+  .shots figcaption{font-size:13px;line-height:1.4;color:#4A4450;margin-top:8px}
+  .shots figcaption b{color:var(--ink);display:block}
+  .decs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+  .decs>div{border:1px solid #ECE5DB;border-radius:18px;padding:18px 18px 16px}
+  .decs .n{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#16845E}
+  .decs b{display:block;font-size:18px;margin:6px 0 10px;letter-spacing:-.01em}
+  .decs p{font-size:14.5px;margin:6px 0 0}
+  .decs p em{font-style:normal;font-weight:700;color:var(--ink)}
+  /* the glimpse: appears beside the Verified Call tower when the tour arrives */
+  .glimpse{position:fixed;left:0;top:0;z-index:6;width:min(300px,calc(100vw - 32px));background:var(--paper);border-radius:20px;padding:16px 16px 14px;
+           box-shadow:0 2px 0 rgba(0,0,0,.06),0 24px 50px -18px rgba(20,30,40,.5);opacity:0;pointer-events:none;
+           transition:opacity .35s, translate .45s cubic-bezier(.2,.8,.2,1);translate:0 10px}
+  .glimpse.on{opacity:1;pointer-events:auto;translate:0 0}
+  .glimpse .eb{font-size:12px;font-weight:600;color:var(--muted)}
+  .glimpse b{display:block;font-size:22px;letter-spacing:-.01em;margin:2px 0 6px}
+  .glimpse p{font-size:14px;line-height:1.45;color:#3D3843}
+  .glimpse .st{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#2F4A1E;margin:10px 0 12px}
+  .glimpse .st i{width:7px;height:7px;border-radius:50%;background:#16845E}
+  .glimpse button{width:100%;border:0;border-radius:12px;background:var(--ink);color:#fff;font:600 14.5px var(--font);padding:11px 14px;cursor:pointer}
+  .glimpse button:hover{background:#000}
   @media (max-width:767px){
     .tiles{grid-template-columns:1fr 1fr}
     .tiles .tile:nth-child(3){grid-column:1 / -1}
     .tiles .tile:nth-child(3) .vis{aspect-ratio:16/9}
+    .cards3,.decs{grid-template-columns:1fr}
+    .shots,.shots.three{grid-template-columns:1fr 1fr}
+    .glimpse{left:16px!important;top:auto!important;bottom:16px;transform:none!important}
     .cs{max-height:92vh;border-radius:22px}
   }
   @media (max-width:767px){
@@ -112,6 +154,13 @@
 <a class="pill brand" href="./" aria-label="Bhanu Kowshik, home"><canvas id="avatar" width="16" height="16" aria-hidden="true"></canvas>Bhanu Kowshik</a>
 <nav class="pill nav"><a href="./#about">About me</a><a href="./#work">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a><a href="./#contact">Contact</a></nav>
 <div id="tour" aria-hidden="true"></div>
+<aside class="glimpse" id="glimpse" aria-live="polite">
+  <div class="eb">Work · Founder, solo</div>
+  <b>Verified Call</b>
+  <p>Know who is on the other side of the call: face, voice, camera and apps, checked the whole interview.</p>
+  <div class="st"><i></i>Now: go-to-market · 20 companies in the beta</div>
+  <button type="button" id="glimpseMore">View more →</button>
+</aside>
 <div class="hint" id="hint">Scroll to explore San Francisco</div>
 <div class="status" id="status"></div>
 
@@ -900,7 +949,13 @@ for (let i = 0; i < 26; i++) {
   const o = i % 5 === 0 ? { bag: '#7A4E32' } : i % 7 === 0 ? { dog: '#C58B52', speed: 0.9 } : {};
   addWalker([p0, p1, [p1[0] + (sw.axis === 'z' ? 0.1 : 0), p1[1] + (sw.axis === 'x' ? 0.1 : 0)], [p0[0] + (sw.axis === 'z' ? 0.1 : 0), p0[1] + (sw.axis === 'x' ? 0.1 : 0)]], o);
 }
-addWalker([[-18, -14.4], [-2, -14.4], [-2, -6.6], [-18, -6.6]], { speed: 0.8 });                 // around Union Square
+addWalker([[-18, -14.4], [-2, -14.4], [-2, -6.6], [-18, -6.6]], { speed: 0.8 });
+// more dog walkers around town
+for (const [path, col] of [
+  [[[-17, -6.6], [-3, -6.6], [-3, -6.5], [-17, -6.5]], '#E7E1D6'], [[[12, 10.2], [34, 10.2], [34, 10.3], [12, 10.3]], '#3A3330'],
+  [[[-48, -27.2], [-31, -27.2], [-31, -27.1], [-48, -27.1]], '#C58B52'], [[[11.2, -44], [11.2, -27], [11.3, -27], [11.3, -44]], '#8C7A62'],
+  [[[-12, 34], [-1, 34], [-1, 47], [-12, 47]], '#F1E3C8'], [[[46.5, -40], [46.5, -10], [46.6, -10], [46.6, -40]], '#3A3330'],
+  [[[46.5, 12], [46.5, 44], [46.6, 44], [46.6, 12]], '#C58B52']]) addWalker(path, { dog: col, speed: 0.85 });                 // around Union Square
 addWalker([[14, -16], [31, -16], [31, -15.9], [14, -15.9]], { shirt: '#E7E1D6' });             // behind the VC tower
 
 /* ══════════════ the rest of the city: districts on their own tiles ══════════════ */
@@ -1297,13 +1352,63 @@ const CARDS = {
       <p>Design engineer in San Francisco, building products that convert and connect. Most of it starts on a bench like this one, with a laptop.</p>
       <div class="row"><a href="./#about">About me →</a><span>Postcard</span></div>` },
 };
+const V = 'verified-call/screens/';                                    // case-study image root
 const CASES = [
   { key: 'vc', title: 'Verified Call', meta: 'Founder · Design + build, solo · Mac, Windows, Chrome · 2026',
     tiles: [
       { img: 'verified-call/screens/meet-panel-verified-crop-2x.webp', pad: 1, tint: '#E3EFE8', num: '0 / 3,990', lab: 'face-swap sessions got through in published testing', ft: 'Face match' },
       { img: 'verified-call/screens/meet-panel-look-crop-2x.webp', pad: 1, tint: '#F4E9DC', num: '30 / 30', lab: 'hidden AI answer tools caught, with 0 false alarms', ft: 'Open apps' },
       { img: 'verified-call/screens/a2/desk-home.webp', pad: 1, tint: '#E6EAF2', num: '20', lab: 'companies in the closed beta since October', ft: 'Desktop app' } ],
-    story: 'Confirms the person on a hiring call is real, is who they say they are, and isn\'t reading answers from a hidden AI tool. Face, voice, camera and apps, checked for the whole call. I designed and built it solo in three weeks: the Mac and Windows app, the Chrome extension, the website and the design system.',
+    status: 'Now: go-to-market · closed beta with 20 companies since October 2026',
+    facts: '<span><b>3 weeks</b>, designed and built solo</span><span><b>5 surfaces</b>, one design system</span><span><b>20 / 20</b> live Meet calls read right</span>',
+    story: 'I designed and built Verified Call alone in three weeks: a Mac and Windows app that checks the candidate, and a panel inside Google Meet that shows the interviewer what it found.',
+    full: `
+      <section class="cs-sec"><div class="k">01 · The problem</div><h3>The person on the call may not be the person you hire.</h3>
+        <div class="cards3"><div><b>Someone else sits in</b><span>A stand-in takes the interview, or a recording plays where the webcam should be.</span></div>
+          <div><b>A hidden AI reads answers</b><span>An overlay the call cannot see listens and suggests what to say.</span></div>
+          <div><b>A face swap</b><span>A live filter turns one person into another, in real time.</span></div></div>
+        <h4>Why I built it</h4><p>I was the founding designer at SigIQ, the team behind EverTutor. To be sure of who we hired, we flew candidates in and sat next to them during the interview. It worked, and it was slow and costly. Verified Call brings that check to remote calls.</p></section>
+      <section class="cs-sec"><div class="k">02 · The interfaces</div><h3>Every screen, every state.</h3>
+        <p>Real screens, rendered from the shipped code with demo data.</p>
+        <h4>The candidate's side: one calm flow, from invite to join</h4>
+        <div class="shots">
+          <figure><div class="im"><img src="${V}a2/desk-home.webp" alt="" loading="lazy"></div><figcaption><b>Home</b>Calls arrive from the invite link and open 5 minutes before.</figcaption></figure>
+          <figure><div class="im"><img src="${V}a2/desk-checking.webp" alt="" loading="lazy"></div><figcaption><b>Setup check</b>About 30 seconds. One progress line, one hint.</figcaption></figure>
+          <figure><div class="im"><img src="${V}a2/desk-restore.webp" alt="" loading="lazy"></div><figcaption><b>Hidden app open</b>Plain words, no blame. The one amber state.</figcaption></figure>
+          <figure><div class="im"><img src="${V}a2/desk-done.webp" alt="" loading="lazy"></div><figcaption><b>Verified</b>A countdown to the call and one big Join.</figcaption></figure></div>
+        <h4>The interviewer's side: a badge on the tile, details on demand</h4>
+        <div class="shots three contain">
+          <figure><div class="im"><img src="${V}meet-panel-checking-crop-2x.webp" alt="" loading="lazy"></div><figcaption><b>Checking</b>First results within a minute.</figcaption></figure>
+          <figure><div class="im"><img src="${V}meet-panel-verified-crop-2x.webp" alt="" loading="lazy"></div><figcaption><b>Verified</b>Each row with its time.</figcaption></figure>
+          <figure><div class="im"><img src="${V}meet-panel-look-crop-2x.webp" alt="" loading="lazy"></div><figcaption><b>Needs a look</b>Amber, with the fact named.</figcaption></figure></div>
+        <h4>Chrome extension: set up a verified call from your calendar</h4>
+        <div class="shots contain">
+          <figure><div class="im"><img src="${V}a2/ext-home.webp" alt="" loading="lazy"></div><figcaption><b>Popup home</b></figcaption></figure>
+          <figure><div class="im"><img src="${V}a2/ext-calls.webp" alt="" loading="lazy"></div><figcaption><b>Upcoming</b></figcaption></figure>
+          <figure><div class="im"><img src="${V}a2/ext-past.webp" alt="" loading="lazy"></div><figcaption><b>Past</b></figcaption></figure>
+          <figure><div class="im"><img src="${V}a2/ext-calendar.webp" alt="" loading="lazy"></div><figcaption><b>In Google Calendar</b>The badge is the switch.</figcaption></figure></div></section>
+      <section class="cs-sec"><div class="k">03 · Six decisions</div><h3>A product that checks people has to earn trust.</h3>
+        <div class="decs">
+          <div><span class="n">01 · Calm</span><b>A result changes only when the fact does</b><p><em>Decision</em> A result stays put until a newer check changes it.</p><p><em>Why</em> Warnings that keep firing cause fatigue, and people start ignoring them.</p><p><em>Tried first</em> Rows that redrew on every check.</p></div>
+          <div><span class="n">02 · Words</span><b>Say what it saw, never blame</b><p><em>Decision</em> The panel names which app was open and when it was used: "ChatGPT (used 9:07 PM)".</p><p><em>Why</em> A vague "Can't confirm" read as the product failing.</p></div>
+          <div><span class="n">03 · Colour</span><b>Green only means verified</b><p><em>Decision</em> The switch is the badge: graphite off, silver on, green only when verified.</p><p><em>Tried first</em> A switch that glowed green when on. Dropped on purpose.</p></div>
+          <div><span class="n">04 · Flow</span><b>Tell the host, don't block the candidate</b><p><em>Decision</em> One amber note for the candidate; "Needs a look" for the host.</p><p><em>Why</em> A check that waits for a click can be skipped by never clicking.</p></div>
+          <div><span class="n">05 · Presence</span><b>Never join the call</b><p><em>Decision</em> The check runs on the candidate's computer. No bot in the participant list.</p><p><em>Trade-off</em> The candidate installs a small app once.</p></div>
+          <div><span class="n">06 · System</span><b>Black only for the main action</b><p><em>Decision</em> Light panels everywhere; black is kept for the one main button.</p><p><em>Tried first</em> An all-black popup, then a flat black tab.</p></div></div></section>
+      <section class="cs-sec"><div class="k">04 · How it is built</div><h3>An app, an extension and a server, on one design system.</h3>
+        <div class="cards3"><div><b>Mine</b><span>All product design, the brand and the design system. All the engineering: the Mac and Windows app, the Chrome extension, the server and web app, and the website.</span></div>
+          <div><b>Borrowed</b><span>MediaPipe for face landmarks, Amazon Rekognition for face match, Deepgram for speech to text, GSAP for site motion, and two open fonts.</span></div>
+          <div><b>AI as a tool</b><span>I wrote the specs and made every design call. Agents drafted code to them, and a separate fresh agent checked each result before I accepted it.</span></div></div></section>
+      <section class="cs-sec"><div class="k">05 · Versions</div><h3>What I tried before the final.</h3>
+        <div class="shots">
+          <figure><div class="im"><img src="${V}a2/website-home-v1-t.webp" alt="" loading="lazy"></div><figcaption><b>Bento waitlist</b>v1</figcaption></figure>
+          <figure><div class="im"><img src="${V}a2/website-home-v2-t.webp" alt="" loading="lazy"></div><figcaption><b>Three-column rails</b>v2</figcaption></figure>
+          <figure><div class="im"><img src="${V}a2/website-home-v3-t.webp" alt="" loading="lazy"></div><figcaption><b>Hero with film</b>v3</figcaption></figure>
+          <figure><div class="im"><img src="${V}a2/website-home-final-t.webp" alt="" loading="lazy"></div><figcaption><b>Built to stop</b>Final: one headline, one board, one button.</figcaption></figure></div></section>
+      <section class="cs-sec"><div class="k">06 · What I learned</div><h3>Calm is a feature.</h3>
+        <div class="cards3"><div><b>Still concepts before motion</b><span>The particle-face hero read as uncanny. Now I show two or three still options before anything moves.</span></div>
+          <div><b>Calm is a feature</b><span>The panel got better each time it did less. A signal that stays still is a signal people trust.</span></div>
+          <div><b>No check may wait on a click</b><span>A check that can be skipped by not clicking is not a check.</span></div></div></section>`,
     href: 'verified-call.html', ext: ['verifiedcall.app', 'https://verifiedcall.app'] },
   { key: 'et', title: 'EverTutor', meta: 'Sole product designer · Live, Studio, Analytics · Voice AI',
     tiles: [
@@ -1326,13 +1431,14 @@ function renderCase() {
   const c = CASES[csI];
   document.getElementById('csIdx').textContent = `${csI + 1} of ${CASES.length}`;
   csBody.innerHTML = `
-    <h2 id="csTitle">${c.title}</h2><p class="meta">${c.meta}</p>
+    <h2 id="csTitle">${c.title}</h2><p class="meta">${c.meta}</p>${c.status ? `<span class="status"><i></i>${c.status}</span>` : ''}
     <div class="tiles">${c.tiles.map(t => `
       <figure class="tile"><div class="vis${t.pad ? ' pad' : ''}" style="--tint:${t.tint}">
         ${t.vid ? `<video src="${t.vid}" poster="${t.img}" muted loop playsinline autoplay preload="metadata"></video>` : `<img src="${t.img}" alt="" loading="lazy">`}</div>
         <figcaption><span class="ft">${t.ft}</span><b class="num">${t.num}</b><span class="lab">${t.lab}</span></figcaption></figure>`).join('')}</div>
-    <p class="story">${c.story}</p>
-    <div class="cta"><a class="pri" href="${c.href}">Read the full case study →</a>${c.ext ? `<a class="sec" href="${c.ext[1]}" target="_blank" rel="noopener">${c.ext[0]} ↗</a>` : ''}</div>`;
+    ${c.facts ? `<p class="facts">${c.facts}</p>` : ''}
+    <p class="story">${c.story}</p>${c.full || ''}
+    <div class="cta" style="${c.full ? 'margin-top:44px' : ''}"><a class="pri" href="${c.href}">${c.full ? 'Open the case study page →' : 'Read the full case study →'}</a>${c.ext ? `<a class="sec" href="${c.ext[1]}" target="_blank" rel="noopener">${c.ext[0]} ↗</a>` : ''}</div>`;
   csEl.scrollTop = 0;
 }
 function openCase(key) {
@@ -1365,7 +1471,9 @@ function addTag(key, worldPos, post = false) {
   document.body.appendChild(el);
   anchors.push({ el, p: worldPos.clone(), key });
 }
-pin3D(25, 37.5, -8, 'vc'); addTag('vc', new THREE.Vector3(21, 39, -9));
+pin3D(25, 37.5, -8, 'vc');
+const glimpseEl = document.getElementById('glimpse'), glimpseAt = new THREE.Vector3(27, 30, -6);
+document.getElementById('glimpseMore').onclick = () => openCase('vc');
 
 const seen = new Set();
 const cardEl = document.getElementById('card'), cardBody = document.getElementById('cardBody');
@@ -1570,6 +1678,13 @@ function update(dt) {
 }
 function project() {
   const W = innerWidth, H = innerHeight;
+  { // the Verified Call glimpse rides beside the tower while the tour is there
+    const f = tourShown * (TOUR.length - 1), on = Math.abs(f - 2) < 0.42;
+    glimpseEl.classList.toggle('on', on && !csEl.classList.contains('on'));
+    tmp.copy(glimpseAt).project(cam);
+    const x = (tmp.x + 1) / 2 * W, y = (1 - tmp.y) / 2 * H;
+    glimpseEl.style.transform = `translate(${Math.min(W - 320, x + 24).toFixed(1)}px,${Math.max(80, y - 60).toFixed(1)}px)`;
+  }
   for (const a of anchors) {
     tmp.copy(a.p).project(cam);
     const x = (tmp.x + 1) / 2 * W, y = (1 - tmp.y) / 2 * H;
