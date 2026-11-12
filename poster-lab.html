@@ -1339,6 +1339,21 @@ function frame() {
   }
   renderer.render(scene, camera);
   state.frames++;
+  if (fpsEl) fpsTick(now);
+}
+// ?fps — on-device frame-rate readout (avg fps + worst frame over the last second)
+const fpsEl = new URLSearchParams(location.search).has('fps') ? Object.assign(document.body.appendChild(document.createElement('div')), {
+  style: 'position:fixed;left:8px;top:64px;z-index:99;padding:6px 9px;border-radius:8px;background:rgba(0,0,0,.6);color:#fff;font:12px/1.3 ui-monospace,monospace;pointer-events:none'
+}) : null;
+let fpsN = 0, fpsT0 = 0, fpsLast = 0, fpsWorst = 0;
+function fpsTick(now) {
+  if (fpsLast) fpsWorst = Math.max(fpsWorst, now - fpsLast);
+  fpsLast = now; fpsN++;
+  if (!fpsT0) fpsT0 = now;
+  if (now - fpsT0 >= 1000) {
+    fpsEl.textContent = `${Math.round(fpsN * 1000 / (now - fpsT0))} fps · worst ${Math.round(fpsWorst)} ms · DPR ${DPR}`;
+    fpsN = 0; fpsT0 = now; fpsWorst = 0;
+  }
 }
 function renderOnce() { if (state.ready) frame(); }
 
