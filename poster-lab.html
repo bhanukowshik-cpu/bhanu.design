@@ -71,7 +71,7 @@
   #sndHint{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;color:var(--ink-dim);opacity:0;transition:opacity .4s}
   #sndHint.show{opacity:1}
   html.embed .topbar, html.embed #spacer{display:none}
-  @media (max-width:767px){ html.embed .status{display:none} }   /* the host's chat bar owns the phone's bottom edge */
+  @media (max-width:1099px){ html.embed .status{display:none} }  /* the host's centred chat bar would overlap it below ~1100px */
   html.embed, html.embed body{overflow:hidden}
   .badge{position:absolute;right:12px;top:56px;font-family:var(--font-mono);font-size:10px;color:#ffd;opacity:.7}
   @media (max-width:767px){
@@ -315,8 +315,9 @@ const COMMON = /* glsl */`
   float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
     return mix(mix(hash12(i), hash12(i+vec2(1,0)), f.x), mix(hash12(i+vec2(0,1)), hash12(i+vec2(1,1)), f.x), f.y); }
   float fbm(vec2 p){ float a = 0.5, s = 0.0; for(int i=0;i<4;i++){ s += a*vnoise(p); p = p*2.03 + 17.1; a *= 0.5; } return s; }
-  // pixel-locked white noise (does not crawl when layers move)
-  float grainN(float seed){ return hash12(floor(gl_FragCoord.xy / uGrain) + seed); }
+  // pixel-locked white noise, re-seeded 12×/s like film grain (a frozen pattern read as dirt on the
+  // screen over the moving scene — owner, 12 Nov); uTime stands still under reduced motion
+  float grainN(float seed){ return hash12(floor(gl_FragCoord.xy / uGrain) + seed + mod(floor(uTime * 12.0), 61.0) * 7.31); }
   vec3 hazeCol(){ return mix(uSkyHor, vec3(0.86,0.91,0.88), 0.25 * uDayK); }
   // reflection shimmer: horizontal displacement that grows away from the waterline
   float ripple(vec2 s){
@@ -436,7 +437,7 @@ const FS_LIT = /* glsl */`
 
     // stipple grain — denser in shadow
     float dens = 0.42 * (1.0 - lam) + 0.04;
-    if (grainN(uSeed) < dens) col = mix(col, col * STIPPLE, 0.6);
+    if (grainN(uSeed) < dens) col = mix(col, col * STIPPLE, 0.42);
 
     // atmospheric haze toward the sky's horizon colour (thicker in fog)
     float hz = clamp(pow(D, 0.7) * 0.9 * (1.0 + uFog * 0.45), 0.0, 0.97);
