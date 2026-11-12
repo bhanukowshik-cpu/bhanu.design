@@ -110,7 +110,7 @@
   async function load() {
     let [plate, ref, dark, fg, ca, cb] = await Promise.all([
       img(DIR + 'plate.webp', 'L'), img('city/assets/vc/reference_full.png', 'L'),
-      img(DIR + 'tower_dark.webp', 'L'), img(DIR + 'foreground.webp', 'L'),
+      null /* floors-lighting retired (owner, 12 Nov): tower stays lit; tower_dark.webp kept on disk */, img(DIR + 'foreground.webp', 'L'),
       img(DIR + 'cloud_a.webp', 'cloud'), img(DIR + 'cloud_b.webp', 'cloud')]);
     if (!fg) fg = await img(DIR + 'foreground_people.webp', 'L');   // people still painted in (until the walkers exist)
     L.plate = plate || ref;                        // without a split plate the reference carries everything
