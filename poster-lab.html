@@ -350,6 +350,7 @@ const FS_LIT = /* glsl */`
   uniform float uHasS, uHasN, uHasD, uHasMask, uMode, uAlpha, uClipY, uMirrorY, uSway, uSeed, uDepthGuess;
   uniform vec2  uOffset;
   uniform vec4  uBox;      // alpha bbox (scene UV) — sway weight grows toward the top of the shape
+  uniform vec4  uCrop;     // sub-rectangle of the source image this layer owns (default whole image)
   uniform vec3  uWater;
   void main(){
     vec2 s = vS;
@@ -370,6 +371,7 @@ const FS_LIT = /* glsl */`
     uv.x += uSway * sw * sw;
     if (uMode > 0.5 && uMode < 1.5) uv.x += ripple(s);
     if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) discard;
+    if (uv.x < uCrop.x || uv.y < uCrop.y || uv.x > uCrop.z || uv.y > uCrop.w) discard;   // shared-image sprites
 
     vec4 L = texture2D(tLight, uv);
     if (L.a < 0.004) discard;
@@ -793,7 +795,7 @@ async function build() {
   if (!skyPass) skyPass = { mat: { uniforms: { uTitleY: { value: 0 }, uTitleK: { value: 0 }, uDisc: { value: 0 }, uShiftV: { value: 0 }, uView: { value: new THREE.Vector4(0, 0, 1, 1) } } }, mesh: { visible: false } };
 
   const litUniforms = (L, mode) => {
-    const box = imgs[L.name + ':light'] ? alphaBox(imgs[L.name + ':light']) : [0, 0, 1, 1];
+    const box = L.crop || (imgs[L.name + ':light'] ? alphaBox(imgs[L.name + ':light']) : [0, 0, 1, 1]);
     return { box, u: {
       tLight: { value: tex(L, 'light') || blank }, tShadow: { value: tex(L, 'shadow') || blank },
       tNormal: { value: tex(L, 'normal') || blank }, tDepth: { value: tex(L, 'depth') || blank },
@@ -801,7 +803,7 @@ async function build() {
       uHasD: { value: imgs[L.name + ':depth'] && !LIGHTONLY ? 1 : 0 },
       ...maskU, uMode: { value: mode }, uAlpha: { value: 1 }, uClipY: { value: 9 }, uMirrorY: { value: 0 },
       uSway: { value: 0 }, uSeed: { value: L.order * 7.13 }, uOffset: { value: new THREE.Vector2() },
-      uBox: { value: new THREE.Vector4(...box) },
+      uBox: { value: new THREE.Vector4(...box) }, uCrop: { value: new THREE.Vector4(...(L.crop ? [L.crop[0] - 0.004, L.crop[1] - 0.004, L.crop[2] + 0.004, L.crop[3] + 0.004] : [0, 0, 1, 1])) },
       // haze depth when there is no depth map: manifest `depth` if given, else guessed from parallax
       uDepthGuess: { value: L.depth ?? THREE.MathUtils.clamp(0.012 / Math.max(L.parallax || 0.05, 1e-3) - 0.02, 0, 0.9) },
     } };
