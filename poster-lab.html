@@ -51,12 +51,12 @@
   /* Title: one line, ≤ ~86% of the viewport width, in the upper sky band (top ~12–22%).
      CSS clamp is the first guess (13 caps × ~0.8em ≈ 10.5em wide → 86vw / 10.5 ≈ 8.2vw);
      fitTitle() in JS then measures the real glyphs and corrects it. */
-  #hero{position:absolute;left:0;right:0;top:13vh;display:flex;flex-direction:column;align-items:center;
+  #hero{position:absolute;left:0;right:0;top:7.5vh;display:flex;flex-direction:column;align-items:center;
         text-align:center;will-change:opacity,transform}
   #title{white-space:nowrap;font-weight:700;font-size:clamp(26px,6.4vw,170px);line-height:1;letter-spacing:.08em;
          color:#FFFCF8;filter:url(#outline15);
          padding-left:.08em /* balances the trailing letter-space so the word sits optically centred */}
-  #tagline{margin-top:clamp(12px,1.6vw,26px);max-width:86vw;font-weight:500;font-size:clamp(16px,1.6vw,22px);
+  #tagline{margin-top:clamp(8px,1.1vw,18px);max-width:86vw;font-weight:500;font-size:clamp(16px,1.6vw,22px);
            line-height:1.35;color:rgba(255,252,248,.9)}
   .status{position:absolute;left:clamp(16px,3vw,44px);bottom:clamp(16px,2.6vw,34px);
           font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;color:var(--ink-dim)}
@@ -129,7 +129,8 @@ import * as THREE from 'three';
    0. CONFIG + FLAGS
    ════════════════════════════════════════════════════════════════════════ */
 const Q        = new URLSearchParams(location.search);
-const BASE     = 'city/layers/gg/';
+// ?scene=gg (Blender layers) | gg_ai (layers split from the approved AI reference — the North Star look)
+const BASE     = 'city/layers/' + (new URLSearchParams(location.search).get('scene') || 'gg_ai').replace(/[^a-z0-9_]/g, '') + '/';
 const LAT = 37.8199, LON = -122.4783, TZ = 'America/Los_Angeles';
 const REDUCED  = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const MOBILE   = matchMedia('(max-width: 767px), (pointer: coarse)').matches;
@@ -151,7 +152,7 @@ const CFG = {
   reflSquash: 1.25,        // reflection vertical compression (sample H - y*1.25)
   reflRtScale: 0.5,        // reflection render-target resolution vs the canvas
   soundEnabled: false,     // SOUND PAUSED (owner decision): no audio plays, toggle hidden. Code kept for later.
-  titleFit: 0.80,          // title width as a fraction of the viewport
+  titleFit: 0.70,          // title width as a fraction of the viewport
   glowLike: /_lights$/,    // any layer named *_lights is treated as a glow layer, whatever its kind
   swayLike: /^(redwoods|ferns|flowers)/,
 };
@@ -303,6 +304,42 @@ const COMMON = /* glsl */`
     float w = sin(s.y * 520.0 - uTime * 2.4 + sin(s.y * 61.0 + uTime * 0.9) * 2.5) * 0.0012
             + (vnoise(vec2(s.y * 140.0, uTime * 0.7 + s.x * 3.0)) - 0.5) * 0.004;
     return w * (0.35 + 1.8 * k);
+  }`;
+
+/* PLATE — an opaque painted background (sky, distance, bridge, water, reflections all painted).
+   Above the waterline it is drawn as painted; below it, the water is brought to life by sampling
+   the plate through the shared ripple() displacement plus fine streak jitter, so the painted
+   reflections shimmer. Time of day: the plate was painted at golden hour; other hours re-grade it
+   (cooler/brighter by day, navy and darker at night) instead of repainting. */
+const FS_PLATE = /* glsl */`
+  ${COMMON}
+  uniform sampler2D tPlate; uniform float uSunAlt;   // degrees
+  void main(){
+    vec2 s = vS;
+    if (s.y > uHorizon) {
+      float k = clamp((s.y - uHorizon) / (1.0 - uHorizon), 0.0, 1.0);
+      float py = (s.y - uHorizon) * 1080.0;
+      float band = floor(py / (2.0 + 6.0 * k));                       // ripple bands widen toward the viewer
+      float jit = (hash12(vec2(band, floor(uTime * 1.3))) - 0.5) * (0.6 + 3.0 * k) / 1920.0;
+      s.x += ripple(s) * 0.9 + jit * 0.5;
+      s.y += sin(py * 0.35 + uTime * 1.1) * 0.6 / 1080.0 * k;
+    }
+    vec3 col = texture2D(tPlate, s).rgb;
+    // dark ripple lines in the water (thin, broken), stronger near the viewer
+    if (vS.y > uHorizon) {
+      float k = clamp((vS.y - uHorizon) / (1.0 - uHorizon), 0.0, 1.0);
+      float line = smoothstep(0.82, 1.0, vnoise(vec2(vS.x * 90.0 + uTime * 0.25, vS.y * 1080.0 / (2.5 + 7.0 * k))));
+      col *= 1.0 - line * 0.10 * (0.4 + k);
+    }
+    // re-grade from the painted golden hour to the live SF sun
+    float day = smoothstep(4.0, 25.0, uSunAlt);                       // 0 at golden hour → 1 high sun
+    vec3 lum = vec3(dot(col, vec3(0.299, 0.587, 0.114)));
+    vec3 dayCol = mix(col, lum * vec3(0.92, 1.0, 1.08), 0.35) * 1.06;  // cooler, less orange by day
+    col = mix(col, dayCol, day);
+    float nightK = 1.0 - smoothstep(0.0, 0.7, uDayK);
+    col = mix(col, lum * NIGHT_TINT * 0.42, nightK * 0.85);
+    if (grainN(11.0) < 0.04) col *= 0.97;
+    gl_FragColor = vec4(col, 1.0);
   }`;
 
 /* LIT layer (also used for sprites, reflection layers and mirrored sprite reflections).
@@ -650,7 +687,7 @@ const QUAD = new THREE.PlaneGeometry(1, 1);
 // uniforms shared (by reference) by every pass
 const U = {
   uTime: { value: 0 }, uSunUp: { value: 1 }, uDayK: { value: 1 }, uNight: { value: 0 }, uFog: { value: 0.3 },
-  uGrain: { value: 1 }, uHorizon: { value: 0.62 },
+  uGrain: { value: 1 }, uHorizon: { value: 0.62 }, uSunAlt: { value: 3 },
   uSunDir: { value: new THREE.Vector3(0, -1, 0.3) }, uSunCol: { value: new THREE.Color(1, 1, 1) },
   uSkyTop: { value: new THREE.Color() }, uSkyHor: { value: new THREE.Color() },
   uWater: { value: new THREE.Color() },
@@ -713,7 +750,7 @@ function project(dir) {
 /* ════════════════════════════════════════════════════════════════════════
    8. BUILD THE SCENE FROM THE MANIFEST
    ════════════════════════════════════════════════════════════════════════ */
-let M, skyPass, waterPass, fxPass, gullPass;
+let M, skyPass, waterPass, fxPass, gullPass, platePass;
 const sprites = [], swayers = [], fogPasses = [], glowPasses = [];
 const ringData = Array.from({ length: 12 }, () => new THREE.Vector4(0, 0, 0, 0));
 const bodyData = Array.from({ length: 4 }, () => new THREE.Vector4(0, 0, 0, 0));
@@ -741,12 +778,19 @@ async function build() {
   const maskU = { tMask: { value: maskTex || blank }, uHasMask: { value: maskTex ? 1 : 0 } };
   const waterPar = maskL ? maskL.parallax : 0.1;
 
-  // ── sky first
-  skyPass = addPass(FS_SKY, {
+  // ── plate mode: an opaque painted background replaces the procedural sky + water
+  const plateL = layers.find(L => L.kind === 'plate');
+  if (plateL) {
+    const t = tex(plateL, 'light');
+    platePass = addPass(FS_PLATE, { tPlate: { value: t || blank } }, { par: plateL.parallax || 0.02, name: 'plate' });
+  }
+  // ── sky first (skipped under a plate)
+  if (!plateL) skyPass = addPass(FS_SKY, {
     uCamF: { value: cam.F }, uCamR: { value: cam.Rt }, uCamU: { value: cam.Up },
     uTan: { value: new THREE.Vector2(cam.tanH, cam.tanV) }, uDisc: { value: CFG.sunDiscDeg * R },
     uTitleY: { value: 0.2 }, uTitleK: { value: 1 }, uShiftV: { value: cam.shiftV },
   }, { par: 0, name: 'sky' });
+  if (!skyPass) skyPass = { mat: { uniforms: { uTitleY: { value: 0 }, uTitleK: { value: 0 }, uDisc: { value: 0 }, uShiftV: { value: 0 }, uView: { value: new THREE.Vector4(0, 0, 1, 1) } } }, mesh: { visible: false } };
 
   const litUniforms = (L, mode) => {
     const box = imgs[L.name + ':light'] ? alphaBox(imgs[L.name + ':light']) : [0, 0, 1, 1];
@@ -788,7 +832,8 @@ async function build() {
   const spriteReflQueue = [];
   const insertWater = () => {
     if (waterDone) return; waterDone = true;
-    waterPass = addPass(FS_WATER, { ...maskU, tRefl: { value: reflRT.texture }, tColH: { value: colHTex },
+    if (plateL) waterPass = { mat: { uniforms: { uGolden: { value: 0 }, uView: { value: new THREE.Vector4() }, tRefl: { value: null } } }, mesh: { visible: false } };
+    else waterPass = addPass(FS_WATER, { ...maskU, tRefl: { value: reflRT.texture }, tColH: { value: colHTex },
       uSquash: { value: CFG.reflSquash }, uGolden: { value: 0 } },
       { rect: [0, U.uHorizon.value - 0.03, 1, 1], par: waterPar, name: 'water' });
     for (const L of layers.filter(l => l.kind === 'reflection' && CFG.useBlenderReflection)) {
@@ -810,6 +855,7 @@ async function build() {
       { rect: [0, Math.max(0, y - h * 2.2), 1, Math.min(1, y + h * 2.2)], par, name: 'fog' }) });
 
   for (const L of layers) {
+    if (L.kind === 'plate') continue;
     const kind = CFG.glowLike.test(L.name) ? 'glow' : L.kind;
     if (kind === 'water_mask' || kind === 'reflection') { insertWater(); continue; }
     if (kind === 'sprite' && !waterDone) insertWater();
@@ -846,6 +892,7 @@ async function build() {
   }
   if (!waterDone) insertWater();
   if (!gullPass) gullPass = addPass(FS_GULLS, { uGulls: { value: gullData } }, { rect: [0, 0.02, 1, 0.62], par: 0.1, name: 'gulls' });
+  window.__dbg = { passes, platePass, renderer };
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -1183,6 +1230,7 @@ function updateSun() {
   U.uSkyTop.value.copy(P.top); U.uSkyHor.value.copy(P.hor); U.uSunCol.value.copy(P.sun);
   U.uDayK.value = P.k;
   U.uSunUp.value = smooth(-3, 3, alt);
+  U.uSunAlt.value = alt;
   state.night = 1 - smooth(-12, -2, alt);
   U.uNight.value = state.night;
   U.uFog.value = state.fog;
