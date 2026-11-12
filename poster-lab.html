@@ -357,7 +357,7 @@ const FS_LIT = /* glsl */`
   uniform float uHasS, uHasN, uHasD, uHasMask, uMode, uAlpha, uClipY, uMirrorY, uSway, uSeed, uDepthGuess;
   uniform vec2  uOffset;
   uniform vec4  uBox;      // alpha bbox (scene UV) — sway weight grows toward the top of the shape
-  uniform sampler2D tLightNight; uniform float uHasNightL, uSunAlt;
+  uniform sampler2D tLightNight, tLightDay; uniform float uHasNightL, uHasDayL, uSunAlt;
   uniform vec4  uCrop;     // sub-rectangle of the source image this layer owns (default whole image)
   uniform vec3  uWater;
   void main(){
@@ -402,7 +402,8 @@ const FS_LIT = /* glsl */`
       float wN = 1.0 - smoothstep(-9.0, -2.0, uSunAlt), wD = smoothstep(9.0, 24.0, uSunAlt);
       vec3 base = L.rgb;
       vec3 lumL = vec3(dot(base, vec3(0.299, 0.587, 0.114)));
-      base = mix(base, mix(base, lumL * vec3(0.92, 1.0, 1.08), 0.3) * 1.05, wD);
+      if (uHasDayL > 0.5) base = mix(base, texture2D(tLightDay, uv).rgb, wD);
+      else base = mix(base, mix(base, lumL * vec3(0.92, 1.0, 1.08), 0.3) * 1.05, wD);
       if (uHasNightL > 0.5) base = mix(base, texture2D(tLightNight, uv).rgb, wN);
       else base = mix(base, lumL * NIGHT_TINT * 0.42, wN * 0.85);
       col = base;
@@ -815,6 +816,7 @@ async function build() {
       tLight: { value: tex(L, 'light') || blank }, tShadow: { value: tex(L, 'shadow') || blank },
       tNormal: { value: tex(L, 'normal') || blank }, tDepth: { value: tex(L, 'depth') || blank },
       tLightNight: { value: tex(L, 'night') || blank }, uHasNightL: { value: imgs[L.name + ':night'] ? 1 : 0 },
+      tLightDay: { value: tex(L, 'day') || blank }, uHasDayL: { value: imgs[L.name + ':day'] ? 1 : 0 },
       uHasS: { value: imgs[L.name + ':shadow'] ? 1 : 0 }, uHasN: { value: imgs[L.name + ':normal'] && !LIGHTONLY ? 1 : 0 },
       uHasD: { value: imgs[L.name + ':depth'] && !LIGHTONLY ? 1 : 0 },
       ...maskU, uMode: { value: mode }, uAlpha: { value: 1 }, uClipY: { value: 9 }, uMirrorY: { value: 0 },
