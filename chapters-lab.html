@@ -49,14 +49,20 @@
     animation:bay 7s linear infinite}
   @keyframes bay{from{background-position:0 0}to{background-position:-120px 0}}
 
+  /* legibility (owner, 12 Nov): the painting dims softly behind the copy, like dusk gathering in that corner of the sky;
+     not a panel, no blur, no text shadow. Stronger by day (brighter sky), lighter at night. */
+  .ch-pin::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(62% 78% at 14% 34%,rgba(26,14,38,calc(.62 * var(--shade,1))) 0%,rgba(26,14,38,calc(.38 * var(--shade,1))) 45%,rgba(26,14,38,0) 75%)}
+  /* the plate's time-of-day variants (golden = base), cross-faded by SF's real sun like the hero */
+  .ch-stage > img.tod{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.2s ease}
   /* the copy lives in the window sky, set like the hero title: white Montserrat, no panel, no shadow */
   .ch-copy{position:absolute;left:clamp(24px,6vw,110px);top:clamp(88px,16vh,170px);width:min(40vw,560px);z-index:2}
-  .ch-role{margin:0 0 10px;font:500 clamp(13px,1vw,15px)/1 'Montserrat',sans-serif;color:rgba(255,252,248,.82)}
+  .ch-role{margin:0 0 12px;font:600 clamp(15px,1.1vw,17px)/1.2 'Montserrat',sans-serif;color:#FFFCF8}
   .ch-title{margin:0;font:800 clamp(44px,5.6vw,96px)/.95 'Montserrat',sans-serif;letter-spacing:-.04em;color:var(--ink)}
-  .ch-line{margin:16px 0 0;font:500 clamp(17px,1.35vw,22px)/1.4 'Montserrat',sans-serif;color:rgba(255,252,248,.92);max-width:26ch}
+  .ch-line{margin:16px 0 0;font:600 clamp(18px,1.4vw,23px)/1.4 'Montserrat',sans-serif;color:#FFFCF8;max-width:26ch}
   .ch-proof{display:flex;gap:clamp(20px,2.4vw,40px);margin:26px 0 0;padding:0;list-style:none}
   .ch-proof b{display:block;font:700 clamp(28px,2.6vw,44px)/1 'Montserrat',sans-serif;letter-spacing:-.03em;color:var(--ink)}
-  .ch-proof span{display:block;margin-top:6px;font:500 13px/1.3 'Montserrat',sans-serif;color:rgba(255,252,248,.8)}
+  .ch-proof span{display:block;margin-top:8px;font:600 15px/1.3 'Montserrat',sans-serif;color:#FFFCF8}
   .ch-go{display:inline-flex;align-items:center;gap:10px;margin-top:28px;padding:13px 22px;border-radius:999px;color:var(--ink);text-decoration:none;
     font:600 15px 'Montserrat',sans-serif;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.06));
     -webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
@@ -69,6 +75,7 @@
     .ch-pin{position:relative;height:auto;padding-top:62vh}
     .ch-stage{top:31vh;left:calc(50vw - (var(--fx,1270) - 836) * var(--cover,1) * 1px)}
     .ch-copy{position:relative;left:auto;top:auto;width:auto;padding:28px 20px 56px}
+    .ch-pin::before{display:none}
     .ch-line{max-width:none}
   }
   @media (prefers-reduced-motion:reduce){.lamp,.steam i,.bay{animation:none}}
@@ -96,7 +103,39 @@
     </div>
   </section>
 
-  <div class="spacer">next chapter: EverTutor Live</div>
+  <section class="ch" id="chETL" aria-labelledby="chETLt">
+    <div class="ch-pin">
+      <div class="ch-stage" aria-hidden="true">
+        <img class="plate" src="city/layers/chapters/et-live-kitchen.webp" alt="">
+        <div class="ch-screen" data-quad="754,433 1089,417 1132,651 791,692"><iframe src="films/et-live-launch.html" title="EverTutor Live launch film" loading="lazy" tabindex="-1"></iframe></div>
+      </div>
+      <div class="ch-copy">
+        <p class="ch-role">Sole product designer · EverTutor</p>
+        <h2 class="ch-title" id="chETLt">EverTutor Live</h2>
+        <p class="ch-line">A voice AI tutor that took 1:1 tutoring from $250 to $5 an hour.</p>
+        <ul class="ch-proof"><li><b>2,000+</b><span>students a day</span></li><li><b>$9.5M</b><span>seed-funded</span></li></ul>
+        <a class="ch-go" href="evertutor-live.html">Read case study <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="ch" id="chETS" aria-labelledby="chETSt">
+    <div class="ch-pin">
+      <div class="ch-stage" aria-hidden="true">
+        <img class="plate" src="city/layers/chapters/et-studio-classroom.webp" alt="">
+        <div class="ch-screen" data-quad="793,372 1241,348 1224,654 771,639"><iframe src="films/et-studio-launch.html" title="EverTutor Studio launch film" loading="lazy" tabindex="-1"></iframe></div>
+      </div>
+      <div class="ch-copy">
+        <p class="ch-role">Sole product designer · EverTutor</p>
+        <h2 class="ch-title" id="chETSt">EverTutor Studio</h2>
+        <p class="ch-line">The studio teachers use to build EverTutor's lessons.</p>
+        <ul class="ch-proof"><li><b>104h → 4h</b><span>to make a lesson</span></li><li><b>3,000+</b><span>lessons made</span></li></ul>
+        <a class="ch-go" href="evertutor-studio.html">Read case study <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <div class="spacer">next chapter: Stressie V4</div>
 
 <script>
 (function () {
@@ -111,7 +150,34 @@
     var a11 = x1 - x0 + a13 * x1, a21 = x3 - x0 + a23 * x3, a12 = y1 - y0 + a13 * y1, a22 = y3 - y0 + a23 * y3;
     el.style.transform = 'matrix3d(' + [a11 / w, a12 / w, 0, a13 / w, a21 / h, a22 / h, 0, a23 / h, 0, 0, 1, 0, x0, y0, 0, 1].join(',') + ')';
   }
+  // ── time of day: SF's real sun (same formula and weights as the hero, poster-lab.html); ?alt=N forces it ──
+  function sunAlt(ms) {
+    var R = Math.PI / 180, d = ms / 864e5 + 2440587.5 - 2451545, g = (357.529 + .98560028 * d) * R, q = 280.459 + .98564736 * d;
+    var L = (q + 1.915 * Math.sin(g) + .02 * Math.sin(2 * g)) * R, e = (23.439 - .00000036 * d) * R;
+    var RA = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e) * Math.sin(L));
+    var GMST = ((18.697374558 + 24.06570982441908 * d) % 24 + 24) % 24, HA = (GMST * 15 - 122.4194) * R - RA, p = 37.7749 * R;
+    return Math.asin(Math.sin(p) * Math.sin(dec) + Math.cos(p) * Math.cos(dec) * Math.cos(HA)) / R;
+  }
+  function ss(a, b, v) { var t = cl((v - a) / (b - a)); return t * t * (3 - 2 * t); }
+  function tod() {
+    var f = new URLSearchParams(location.search).get('alt'), alt = f != null ? +f : sunAlt(Date.now());
+    var wN = 1 - ss(-9, -2, alt), wD = ss(9, 24, alt);
+    chs.forEach(function (ch) {
+      var plate = ch.querySelector('img.plate'), stage = ch.querySelector('.ch-stage'), scr = ch.querySelector('.ch-screen[data-quad]');
+      ['day', 'night'].forEach(function (k) {
+        var src = plate.dataset[k]; if (!src) return;
+        var im = stage.querySelector('img.tod-' + k);
+        if (!im) { im = document.createElement('img'); im.className = 'tod tod-' + k; im.alt = ''; im.src = src; stage.insertBefore(im, plate.nextSibling); }
+        im.style.opacity = (k === 'day' ? wD : wN).toFixed(3);
+      });
+      // the screen follows whichever painting dominates (variants are separate paintings, the laptop can shift a few px)
+      if (scr) { var use = wN > .5 && scr.dataset.quadNight ? scr.dataset.quadNight : wD > .5 && scr.dataset.quadDay ? scr.dataset.quadDay : scr.dataset.quadGold || scr.dataset.quad;
+        if (!scr.dataset.quadGold) scr.dataset.quadGold = scr.dataset.quad; scr.dataset.quad = use; quad(scr); }
+      ch.style.setProperty('--shade', (1 + .25 * wD - .3 * wN).toFixed(3));
+    });
+  }
   [].forEach.call(document.querySelectorAll('.ch-screen[data-quad]'), quad);
+  tod(); setInterval(tod, 60000);
   function cover() {
     var phone = innerWidth <= 767;
     chs.forEach(function (ch) {
