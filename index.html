@@ -5079,6 +5079,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
          which still plays its own word cascade on load */
       var seen = false;
       try { seen = sessionStorage.getItem('v6loaderPlayed') === '1'; } catch (e) {}
+      seen = true;   // (12 Nov, owner) loader switched off: the hero's own title drop is the opening; block kept, never shown
       if (seen) { loader.style.display = 'none'; return; }
       /* reduced motion: no title sequence at all, the hero shows on load */
       if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -5837,7 +5838,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </div>
       </a>
 
-      <a class="wk-card wk-12" href="stressie-v4.html" aria-labelledby="wk-n5">
+      <a class="wk-card wk-5" href="stressie-v4.html" aria-labelledby="wk-n5">
         <div class="wk-media wk-v4">
           <span class="wk-num">Built in SwiftUI</span>
           <span class="wk-go">Read case study &rarr;</span>
@@ -5856,7 +5857,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </div>
       </a>
 
-      <a class="wk-card wk-12" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener" aria-labelledby="wk-n6">
+      <a class="wk-card wk-7" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener" aria-labelledby="wk-n6">
         <div class="wk-media wk-dl">
           <span class="wk-num">140+ letters sent</span>
           <span class="wk-go">Visit Dearly &#8599;<span class="sr-only"> (opens in a new tab)</span></span>
@@ -10386,5 +10387,47 @@ html.motion-paused #work.wk-rv .wk-card,html.motion-paused #work.wk-rv .wk-card 
   w.querySelectorAll('.wk-card:not([hidden])').forEach(function (c) { io.observe(c); });
 })();
 </script>
+<style>
+/* ══ WORK: reviewer fixes (12 Nov). Stages use the hero's own painting (plate.webp, already cached by the hero), cropped
+   per card and softened, instead of CSS sky gradients; full-width stages shorter with the device inset so the sky reads;
+   role line quiet; tools row readable without hover; header bigger, Pause demoted to text. Pitch stays under the title (owner). ══ */
+#work .wk-card .wk-media.cm-on::before{content:'';inset:-8%;opacity:1;mix-blend-mode:normal;
+  background:url(city/layers/gg_ai/plate.webp) var(--sp,50% 30%)/cover no-repeat;filter:blur(22px) saturate(1.08) brightness(.92);transform:scale(1.06)}
+#work .wk-card .wk-media.cm-on.wk-vc{--sp:50% 8%}
+#work .wk-card .wk-media.cm-on.wk-live{--sp:96% 18%}
+#work .wk-card .wk-media.cm-on.wk-studio{--sp:28% 52%}
+#work .wk-card .wk-media.cm-on.wk-v4{--sp:55% 86%}
+#work .wk-card .wk-media.cm-on.wk-dl{--sp:6% 24%}
+#work .wk-card .wk-media.cm-on::before{background-size:220% auto}   /* zoom into the painting so each card gets its own passage, not the same bridge */
+#work .wk-5 .wk-media.cm-on::before,#work .wk-7 .wk-media.cm-on::before{background-size:auto 200%}
+#work .wk-12 .wk-media.cm-on{height:min(64vh,46vw)}
+#work .wk-12 .wk-media.cm-on > .cm{transform:translate(-50%,-50%) scale(calc(var(--cs,1) * .84))}
+#work .wk-card .wk-meta{font-family:'Montserrat',sans-serif!important;font-size:15px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink-2);margin:0 0 8px}
+#work .wk-card .wk-meta span+span{color:var(--ink-3)}
+#work .wk-tools{font-size:13px;letter-spacing:0;color:#8A95A3;border-top:0;padding-top:0;margin-top:18px}
+#work .wk-card:hover .wk-tools{color:#8A95A3}
+#work .wk-title{font-size:clamp(48px,7vw,124px);letter-spacing:-.04em}
+#work .cm-pause{font:500 13px 'Montserrat',sans-serif;letter-spacing:0;text-transform:none;color:var(--ink-3);background:none;border:0;padding:6px 0;
+  -webkit-backdrop-filter:none;backdrop-filter:none;text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(239,243,248,.25)}
+#work .cm-pause:hover{color:var(--ink)}
+#work .cm-pause:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+@media (max-width:767px){
+  #work .wk-12 .wk-media.cm-on{height:auto}
+  #work .wk-12 .wk-media.cm-on > .cm{transform:translate(-50%,-50%) scale(var(--cs,1))}
+  #work .wk-card .wk-meta{font-size:14px}
+  #work .wk-tools{font-size:12.5px;margin-top:14px;padding-top:0}
+  #work .wk-title{font-size:clamp(40px,12vw,52px)}
+  #work .cm-pause{font-size:13px;padding:6px 0}
+}
+</style>
+<style>
+/* ══ WORK (12 Nov, owner): no painted/gradient sky behind the projects; devices sit on a quiet graphite stage lit from above.
+   Stressie V4 is a tall card paired with Dearly (one phone no longer floats in a landscape stage). ══ */
+#work .wk-card .wk-media.cm-on::before{content:none!important}
+#work .wk-card .wk-media.cm-on.cm-on{background:radial-gradient(90% 70% at 50% 0%,#262A33 0%,#181B21 55%,#121419 100%)!important}
+#work .wk-5 .cm:has(.stm){width:400px;height:620px;grid-template-rows:100%;grid-template-columns:100%}
+#work .wk-5 .cm .stm{height:620px;max-height:none}
+@media (max-width:900px){#work .wk-5 .wk-media.cm-on:has(.stm){aspect-ratio:4/5;height:auto}}   /* stacked: the phone stays tall */
+</style>
 </body>
 </html>
