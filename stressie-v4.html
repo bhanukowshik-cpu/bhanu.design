@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -25,7 +25,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <style>
     /* ─── RESET ─────────────────────────────────────────────── */
@@ -103,7 +103,7 @@
       will-change: transform;
       width: 12px; height: 12px;
       border-radius: 9999px;
-      background: rgba(37,37,37,0.7);
+      background: rgba(255,252,248,0.8);
       opacity: 0;
       transition:
         width         0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -263,8 +263,11 @@
     .eyebrow { font-family: var(--font-mono); font-weight: 600; font-size: var(--fs-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 14px; }
     .title { font-family: var(--font-display); font-weight: 400; font-size: clamp(38px, 4.4vw, 56px); line-height: 1.1; letter-spacing: -0.01em; color: var(--secondary); margin-bottom: 28px; }
     .title em { font-style: italic; color: var(--orange); }
-    .title .word { display: inline-block; opacity: 0; transform: translateY(14px); }
-    .title .word.visible { animation: word-rise 0.5s cubic-bezier(0.22,0.61,0.36,1) both; }
+    /* (12 Nov) pure-CSS stagger (--d per word), so no JS timer can leave the title hidden; failsafe for the rest of the hero */
+    .title .word { display: inline-block; animation: word-rise 0.5s cubic-bezier(0.22,0.61,0.36,1) both; animation-delay: var(--d, 0s); }
+    @keyframes cs-failsafe { to { opacity: 1; transform: none; } }
+    #heroEyebrow:not(.visible), #heroRail:not(.visible), #heroMeta:not(.visible) { animation: cs-failsafe .6s ease 2.5s forwards; }
+    @media (prefers-reduced-motion: reduce) { .title .word { animation: none; } }
     .h { font-family: var(--font-display); font-weight: 400; font-size: clamp(27px, 2.6vw, 34px); line-height: 1.22; letter-spacing: -0.005em; color: var(--secondary); margin-bottom: 16px; }
     .h3 { font-family: var(--font-display); font-weight: 400; font-size: 23px; line-height: 1.25; color: var(--secondary); margin-bottom: 10px; }
     .p { font-family: var(--font-heading); font-size: 15px; line-height: 1.7; color: var(--ink-2); }
@@ -381,6 +384,190 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
     }
+
+    /* ═══ CASE STUDY v6 — the homepage's language (12 Nov 2026) ══════════════
+       case-study-v6.css (linked last in <head>) re-points the font tokens to
+       Montserrat / JetBrains Mono. This block moves the page onto the night
+       ground and maps each type role to the shared sheet's values. Product
+       screenshots and phone frames are untouched. */
+    [data-theme="dark"] {
+      --secondary: #FFFCF8; --bg: #0E0B12; --white: #0E0B12; --grey: rgba(255,252,248,.52); --border: rgba(255,252,248,.12);
+      --ink-2: rgba(255,252,248,.74); --ink-3: rgba(255,252,248,.56); --hair: rgba(255,252,248,.12);
+      --plate: #17121D; --plate-2: #141019;
+    }
+    body { background-color: #0E0B12; color: #FFFCF8; }
+    [data-theme="dark"] .nav { background: rgba(14,11,18,.62); box-shadow: 0 1px 0 rgba(255,252,248,.06); height: 64px; }
+    .nav-home span { font-weight: 700; letter-spacing: -.01em; color: #FFFCF8; }
+    /* the section links: the homepage's glass pill, centred in the bar */
+    .nav-sections.cs-navpill { position: absolute; left: 50%; transform: translateX(-50%); flex: none; gap: 2px; }
+    .nav .cs-navpill .nav-btn { font: 600 13px/1 var(--font-heading); padding: 9px 13px; color: #fff; border-radius: 999px; }
+    .nav .cs-navpill .nav-btn.active { background: rgba(255,255,255,.2); color: #fff; }
+    [data-theme="dark"] .nav .cs-navpill .nav-btn:hover:not(.active) { background: rgba(255,255,255,.14); }
+    .page { padding-top: 84px; }
+
+    /* type roles */
+    .eyebrow, .meta dt { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: .14em; color: var(--cs-ink-3, rgba(255,252,248,.56)); }
+    .title { font-family: var(--font-display); font-weight: 800; font-size: clamp(44px, 5vw, 76px); line-height: .98; letter-spacing: -.04em; color: #FFFCF8; margin-bottom: 36px; }
+    .title em { font-style: normal; color: inherit; }
+    .h { font-weight: 800; font-size: clamp(26px, 2.35vw, 36px); line-height: 1.1; letter-spacing: -.032em; color: #FFFCF8; margin-bottom: 18px; }
+    .h3 { font-weight: 700; font-size: 21px; line-height: 1.25; letter-spacing: -.015em; color: #FFFCF8; }
+    .p { font-weight: 500; font-size: 16px; line-height: 1.65; color: var(--ink-2); }
+    .p strong { font-weight: 700; color: #FFFCF8; }
+    .cols .p { font-size: 15px; }
+    .cap, .photo figcaption, .meta dd { font-weight: 500; }
+    .meta dd { font-size: 14px; }
+    .aside { font-family: var(--font-body); font-style: normal; font-weight: 600; font-size: 16px; line-height: 1.5; color: #FFFCF8; border-left-color: rgba(255,252,248,.4); }
+    .q { font-family: var(--font-body); font-style: normal; font-weight: 600; font-size: 18px; line-height: 1.45; letter-spacing: -.005em; color: #FFFCF8; }
+    .q span { font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-top: 8px; }
+    .figures div { font-weight: 500; font-size: 14px; color: var(--ink-2); }
+    .figures strong { font-weight: 700; font-size: clamp(34px, 3vw, 46px); line-height: 1; letter-spacing: -.03em; color: #FFFCF8; margin-bottom: 10px; white-space: nowrap; }
+    .toc a { font-weight: 500; }
+    .toc a.is-on, .toc a:hover { color: #FFFCF8; font-weight: 600; }
+    .plate-6 .ph span { font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+
+    /* the design/build switch: the nav's glass pill */
+    .seg.cs-navpill { border: 0; padding: 5px; }
+    .seg.cs-navpill .seg-btn { font: 600 14px/1 var(--font-heading); padding: 10px 16px; color: rgba(255,255,255,.7); }
+    .seg.cs-navpill .seg-btn.is-on { background: rgba(255,255,255,.2); color: #fff; }
+
+    /* read-next: the hero chat bar's glass */
+    .next .next-card.cs-glass { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 0; padding: 22px 26px 24px; border-top: 0; color: #fff; }
+    .next .next-card.cs-glass .eyebrow { margin-bottom: 4px; }
+    .next-card strong { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; line-height: 1.15; }
+    .next-card:hover strong { color: #fff; }
+    .next-card span:last-child { font-weight: 500; font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+    .credit { font-weight: 500; }
+    .credit a { color: #FFFCF8; font-weight: 600; text-decoration: underline; text-decoration-color: rgba(255,252,248,.35); text-underline-offset: 3px; }
+    .cs-thankyou { background: #141019; border-top: 1px solid rgba(255,252,248,.08); }
+    .cs-thankyou-text { font-weight: 500; font-size: 13px; letter-spacing: .14em; color: rgba(255,252,248,.74); }
+    .nav-home:focus-visible, .nav-btn:focus-visible, .nav-hamburger:focus-visible, .mobile-menu a:focus-visible,
+    .next-card:focus-visible, .credit a:focus-visible, .seg-btn:focus-visible, .toc a:focus-visible { outline-color: #A6CBFF; }
+    @media (max-width: 767px) {
+      .title { font-size: 40px; line-height: 1; }
+      .h { font-size: 26px; }
+      .next .next-card.cs-glass { padding: 20px 22px; }
+    }
+
+    /* ═══ ROUND 2 — chapter layout: painted hero, one centred column, glass cards ═══ */
+    :root { --cs-wide: min(1100px, 100vw - 48px); --cs-glass-bg: linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.03)),rgba(14,18,26,.30);
+      --cs-glass-sh: inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.14); }
+    .page { padding-top: 0; }
+    .card { max-width: none; overflow: visible; }
+    .toc { display: none; }
+    .article { grid-template-columns: minmax(0, 760px); padding: 0 24px; gap: 0; }
+
+    /* hero: full-bleed painted scene, copy top-left, the phone standing on the right */
+    .cs-hero { position: relative; width: 100vw; margin-left: calc(50% - 50vw); height: 100vh; min-height: 720px; overflow: hidden; isolation: isolate; }
+    .cs-scene-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+    .cs-hero::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+      background: linear-gradient(180deg, rgba(14,11,18,0) 45%, rgba(14,11,18,.7) 80%, #0E0B12 100%),
+                  linear-gradient(90deg, rgba(14,11,18,.55) 0%, rgba(14,11,18,.3) 40%, rgba(14,11,18,0) 65%); }
+    .cs-hero-copy { position: absolute; left: clamp(24px, 6vw, 110px); top: clamp(88px, 16vh, 170px); width: calc(100% - clamp(24px, 6vw, 110px) - clamp(260px, 26vw, 460px)); }
+    .cs-hero .eyebrow { color: rgba(255,252,248,.8); margin-bottom: 20px; }
+    .cs-hero .title { font-size: clamp(56px, 5.6vw, 112px); line-height: .95; letter-spacing: -.04em; margin: 0; text-shadow: 0 2px 30px rgba(14,11,18,.35); }
+    .cs-hero .plate-hero { position: absolute; left: auto; right: clamp(24px, 6vw, 110px); bottom: 6vh; width: auto; margin: 0; padding: 0; height: auto; background: none; overflow: visible; }
+    .cs-hero .ph-hero { width: clamp(230px, 19vw, 320px); }
+    .cs-hero .ph-hero .ph-img { box-shadow: 0 0 0 2px #8A8A8E, 0 0 0 3px rgba(0,0,0,0.30), 0 40px 80px rgba(0,0,0,.45), 0 6px 18px rgba(0,0,0,.3); }
+
+    /* meta: one glass strip under the hero */
+    .meta { width: var(--cs-wide); margin: 40px 0 0 calc((100% - var(--cs-wide)) / 2); padding: 26px 32px; border-radius: 22px; gap: 32px;
+      background: rgba(255,255,255,.05); box-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 1px rgba(255,252,248,.10); }
+    .meta dd { font-weight: 600; font-size: 15px; line-height: 1.45; color: #FFFCF8; }
+
+    /* rhythm: no rules, space is the separator */
+    section { padding: clamp(120px, 16vh, 200px) 0 0; }
+    #overview { padding-top: 0; }
+    #overview .block { padding-top: clamp(120px, 16vh, 200px); }
+    .block, #overview .block { margin-top: 0; border-top: 0; }
+    .block { padding-top: 0; }
+    .eyebrow { margin-bottom: 16px; }
+    .h { font-size: clamp(34px, 3.8vw, 56px); line-height: 1; letter-spacing: -.035em; max-width: 18ch; margin-bottom: 24px; }
+    .p, .h + .p { font-weight: 500; font-size: clamp(16px, 1.08vw, 18px); line-height: 1.65; color: var(--ink-2); letter-spacing: 0; }
+    .cols .p { font-size: 16px; }
+    .cols { margin-top: 48px; }
+    .plate-wide + .block .cols { margin-top: 48px; }
+
+    /* media: off the grey plates, standing on the ground over a soft glow, up to 1100px */
+    .plate, .photo { width: var(--cs-wide); margin-left: calc((100% - var(--cs-wide)) / 2); margin-top: 56px; border-radius: 0; overflow: visible;
+      background: radial-gradient(55% 60% at 50% 55%, rgba(166,203,255,.08), rgba(166,203,255,0) 70%); }
+    .photo { background: none; margin-bottom: 0; }
+    .photo img { border-radius: 18px; }
+    .plate-3 { height: auto; padding: 48px 0 8px; grid-template-columns: repeat(3, 210px); gap: 48px; }
+    .plate-6 { padding: 40px 0 8px; }
+    .plate-toggle { height: auto; gap: 24px; padding: 8px 0; }
+    .plate-quotes { --cs-wide: 100%; background: none; padding: 0; }
+    .plate-6 .ph span { font-family: var(--font-mono); font-weight: 500; font-size: 11px; line-height: 1.5; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,252,248,.56); }
+    .cap, .photo figcaption { font-family: var(--font-body); font-weight: 500; font-size: 14px; line-height: 1.5; letter-spacing: 0; text-transform: none; color: rgba(255,252,248,.56); }
+    .plate + .cap, .plate-wide ~ .cap { text-align: center; margin-top: 20px; }
+    .photo figcaption { margin-top: 14px; }
+    .plate-6 .ph span { margin-top: 12px; }
+
+    /* outcomes: the homepage proof row */
+    .photo + .eyebrow { margin-top: 56px; }
+    .figures { display: flex; flex-wrap: wrap; gap: clamp(20px, 2.4vw, 40px); }
+    .figures > div { flex: 1 1 140px; font-weight: 500; font-size: 14px; line-height: 1.45; color: rgba(255,252,248,.78); }
+    .figures strong { font-size: clamp(36px, 3.4vw, 60px); font-weight: 700; letter-spacing: -.03em; margin-bottom: 10px; }
+    .aside { margin-top: 40px; padding: 18px 22px; border: 0; border-radius: 16px; font-weight: 500; font-size: 15px; color: rgba(255,252,248,.86);
+      background: rgba(255,255,255,.05); box-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 1px rgba(255,252,248,.10); }
+    .aside-label { display: block; margin-bottom: 8px; font: 500 11px/1.3 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: rgba(255,252,248,.56); }
+
+    /* glass squircles: quotes and the Decision / Cut pair (not clickable, no lift) */
+    .qs .q, .cols:not(.cols-3) > div { position: relative; padding: 24px 26px; border-radius: 22px;
+      background: rgba(255,255,255,.05); box-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 1px rgba(255,252,248,.10); }
+    .qs .q { font-size: 20px; line-height: 1.4; }
+    .qs .q span { margin-top: 12px; }
+    .qs .cap { text-align: left; }
+    .ph-old .ph-img { border-radius: 13.5% / 6.6%; overflow: hidden; }
+    .cols-3 .h3 { margin-bottom: 12px; }
+    .next { margin-top: 120px; }
+    .cs-thankyou { background: transparent; border-top: 0; padding: 32px 40px 48px; }
+
+    /* ═══ ROUND 3 — review fixes ═══ */
+    /* hero eyebrow = the homepage chapter role line; proof numbers from the homepage Stressie chapter */
+    .cs-hero .eyebrow { font: 600 clamp(15px, 1.1vw, 17px)/1.3 var(--font-heading); letter-spacing: 0; text-transform: none; color: rgba(255,252,248,.86); white-space: normal; }
+    .cs-hero-proof { display: flex; gap: clamp(20px, 2.4vw, 40px); margin: 32px 0 0; padding: 0; list-style: none; }
+    .cs-hero-proof li { flex: none; }
+    .cs-hero-proof b { display: block; white-space: nowrap; font: 700 clamp(28px, 2.6vw, 44px)/1 var(--font-display); letter-spacing: -.03em; color: #FFFCF8; }
+    .cs-hero-proof span { display: block; margin-top: 8px; font: 600 15px/1.3 var(--font-heading); color: rgba(255,252,248,.86); }
+    /* overview statement: shared .cs-statement sets the type; keep the section spacing */
+    .h.cs-statement { margin-bottom: 24px; }
+    /* nav controls: 44px glass squircles */
+    .nav .nav-home.cs-glass { gap: 10px; padding: 0 16px 0 9px; border-radius: 16px; }
+    .nav .nav-home.cs-glass img { width: 26px; height: 26px; filter: invert(1); }
+    .nav .nav-home.cs-glass span { font-size: 15px; }
+    .nav .nav-hamburger.cs-glass { width: 44px; height: 44px; min-height: 44px; padding: 0 13px; border-radius: 16px; flex-direction: column; justify-content: center; align-items: stretch; gap: 5px; }
+    .nav .nav-hamburger.cs-glass span { background: #fff; }
+    .nav .nav-home.cs-glass:focus-visible, .nav .nav-hamburger.cs-glass:focus-visible { border-radius: 16px; outline-color: #A6CBFF; }
+    /* mobile menu: a glass drawer, Montserrat sentence case, no rules */
+    .mobile-menu-backdrop { background: rgba(14,11,18,.42); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+    [data-theme="dark"] .mobile-menu { width: min(86vw, 360px); max-width: none; padding: 96px 28px 48px; gap: 2px; justify-content: flex-start;
+      background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.03)), rgba(14,11,18,.62);
+      -webkit-backdrop-filter: blur(28px) saturate(1.7); backdrop-filter: blur(28px) saturate(1.7);
+      box-shadow: inset 1px 0 0 rgba(255,255,255,.35), inset 0 1px 0 rgba(255,255,255,.2), -24px 0 60px rgba(0,0,0,.45);
+      border-radius: 28px 0 0 28px; }
+    .mobile-menu a { font: 600 22px/1.2 var(--font-heading); letter-spacing: -.01em; text-transform: none; color: #FFFCF8; border-bottom: 0; padding: 12px 0; }
+    .mobile-menu a.active { color: #FFFCF8; font-weight: 700; }
+    /* footer */
+    .cs-thankyou-text { font: 600 16px/1.2 var(--font-heading); letter-spacing: -.005em; color: rgba(255,252,248,.74); }
+
+    @media (max-width: 767px) {
+      :root { --cs-wide: calc(100vw - 40px); }
+      .article { padding: 0 20px; }
+      .cs-hero { height: auto; min-height: 78vh; display: flex; flex-direction: column; padding: 96px 20px 48px; }
+      .cs-hero-copy { position: static; width: auto; }
+      .cs-scene-img { object-position: 15% 50%; }
+      .cs-hero .title { font-size: 44px; line-height: .98; }
+      .cs-hero .plate-hero { position: static; align-self: center; margin-top: 36px; width: auto; }
+      .cs-hero .ph-hero { width: 210px; }
+      .meta { width: auto; margin: 32px 0 0; padding: 0; border-radius: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; grid-template-columns: 1fr 1fr; gap: 22px 18px; }
+      .h { font-size: 34px; }
+      .plate-wide { --cs-wide: calc(100vw - 40px); }
+      .plate-3 { padding: 32px 0 4px; gap: 10px; grid-template-columns: repeat(3, 1fr); }
+      .plate-6 { padding: 28px 0 4px; }
+      .plate-toggle { padding-bottom: 8px; }
+      .plate-quotes { gap: 24px; }
+      .next { margin-top: 96px; }
+    }
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
@@ -390,6 +577,7 @@
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "xt8r81h0gs");
   </script>
+  <link rel="stylesheet" href="case-study-v6.css">
 </head>
 <body>
 
@@ -398,11 +586,11 @@
 
   <!-- ── NAV ───────────────────────────────────────────────── -->
   <nav class="nav">
-    <a href="/" class="nav-home">
+    <a href="/" class="nav-home cs-glass is-small">
       <img src="cs-nav-logo.svg" alt="" />
       <span>Stressie V4</span>
     </a>
-    <div class="nav-sections">
+    <div class="nav-sections cs-navpill">
       <a href="#overview"  class="nav-btn active" data-section="overview">Overview</a>
       <a href="#problem"   class="nav-btn"        data-section="problem">Problem</a>
       <a href="#checkin"   class="nav-btn"        data-section="checkin">At Work</a>
@@ -412,7 +600,7 @@
       <a href="#build"     class="nav-btn"        data-section="build">Build</a>
       <a href="#reflection" class="nav-btn"       data-section="reflection">Reflection</a>
     </div>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
+    <button class="nav-hamburger cs-glass is-small" id="navHamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </nav>
@@ -451,8 +639,14 @@
 
           <!-- ══ OVERVIEW ════════════════════════════════════ -->
           <section id="overview" data-has-content="true">
+            <header class="cs-hero">
+            <img class="cs-scene-img" data-scene="city/layers/chapters/stressie-park" alt="" decoding="async" fetchpriority="high">
+            <script src="case-study-v6.js"></script>
+            <div class="cs-hero-copy">
             <p class="eyebrow hero-in" id="heroEyebrow">Stressie · iOS · 2026 · metrics being validated</p>
             <h1 class="title" id="csHeading">A stress check-in that <em>pays for your evening</em></h1>
+            <ul class="cs-hero-proof"><li><b>12% → 56%</b><span>daily engagement</span></li><li><b>$600K</b><span>funding unlocked</span></li></ul>
+            </div>
 
             <div class="plate plate-hero hero-in" id="heroRail">
               <div class="ph ph-hero"><div class="ph-img">
@@ -461,6 +655,7 @@
                 </video>
               </div></div>
             </div>
+            </header>
 
             <dl class="meta hero-in" id="heroMeta">
               <div><dt>Role</dt><dd>Founding product designer, and I built the iOS app</dd></div>
@@ -471,7 +666,7 @@
 
             <div class="block">
               <p class="eyebrow">Overview</p>
-              <h2 class="h">I designed and built the next Stressie: coins for checking in, a map to spend them on, and events you can reserve or host.</h2>
+              <h2 class="h cs-statement">I designed and built the next Stressie: coins for checking in, a map to spend them on, and events you can reserve or host.</h2>
               <p class="p">Stressie is a workplace wellness app. V2 got people to check in and use quick resets, and its pilots ran with Amazon's hardware team, InKind and 50 Austin PD officers. V4 is what comes after the check-in, and I designed it in Figma and wrote it in SwiftUI myself.</p>
               <figure class="photo">
                 <img src="images/stressie-v4/pilot-4.webp" alt="The Stressie booth at TechCrunch Startup Battlefield" loading="lazy" />
@@ -483,7 +678,7 @@
                 <div><strong>13 of 13</strong>Figma frames with a matching build state</div>
                 <div><strong>3</strong>languages, about 1,150 strings each</div>
               </div>
-              <p class="aside">Note: usage metrics are being validated now. D30 retention and off-work opens go here when they land. The bar is V2's 17.4%.</p>
+              <p class="aside"><span class="aside-label">Note</span>Usage metrics are being validated now. D30 retention and off-work opens go here when they land. The bar is V2's 17.4%.</p>
             </div>
           </section>
 
@@ -590,7 +785,7 @@
               <p class="eyebrow">Designed and built</p>
               <h2 class="h">The same screen in Figma and in SwiftUI. Building it changed the design twice.</h2>
               <div class="plate plate-toggle">
-                <div class="seg" role="tablist" aria-label="Design or build">
+                <div class="seg cs-navpill" role="tablist" aria-label="Design or build">
                   <button class="seg-btn is-on" role="tab" aria-selected="true" data-view="design">Figma</button>
                   <button class="seg-btn" role="tab" aria-selected="false" data-view="build">SwiftUI build</button>
                 </div>
@@ -623,8 +818,8 @@
                 <div><p class="h3">Get a second engineer in early.</p><p class="p">Working alone was fast. The numbers should not be trusted until someone else has read the code.</p></div>
               </div>
               <div class="next">
-                <a class="next-card" href="stressie-studio.html"><span class="eyebrow">Read next</span><strong>Stressie V1 to V2</strong><span>The pilots, and the numbers V4 has to beat.</span></a>
-                <a class="next-card" href="evertutor-live.html"><span class="eyebrow">Read next</span><strong>EverTutor Live</strong><span>1:1 AI tutoring for 2,000 students a day.</span></a>
+                <a class="next-card cs-glass" href="stressie-studio.html"><span class="eyebrow">Read next</span><strong>Stressie V1 to V2</strong><span>The pilots, and the numbers V4 has to beat.</span></a>
+                <a class="next-card cs-glass" href="evertutor-live.html"><span class="eyebrow">Read next</span><strong>EverTutor Live</strong><span>1:1 AI tutoring for 2,000 students a day.</span></a>
               </div>
               <p class="credit">Designed and built by Bhanu Kowshik · <a href="https://www.stressieapp.com" target="_blank" rel="noopener">stressieapp.com ↗</a></p>
             </div>
@@ -633,7 +828,7 @@
         </div><!-- /col -->
       </div><!-- /article -->
 
-      <div class="cs-thankyou"><span class="cs-thankyou-text">✦ THANK_YOU</span></div>
+      <div class="cs-thankyou"><span class="cs-thankyou-text">Thank you</span></div>
 
     </div><!-- /card -->
   </div><!-- /page -->
@@ -645,7 +840,7 @@
     document.documentElement.classList.add('cc-active');
 
     const BLUE      = '#4361EE';
-    const DOT_COLOR = 'rgba(37,37,37,0.7)';
+    const DOT_COLOR = 'rgba(255,252,248,0.8)';
     const CTA_SEL   = 'a[href]:not(.op-card), button, [role="button"], .op-card-cta';
     const TEXT_SEL  = [
       'p','h1','h2','h3','h4','h5','h6','li',
@@ -755,7 +950,7 @@
   splitWords(csHeading);
   const allWords = csHeading.querySelectorAll('.word');
   setTimeout(() => document.getElementById('heroEyebrow').classList.add('visible'), 60);
-  allWords.forEach((w, i) => setTimeout(() => w.classList.add('visible'), 200 + i * 40));
+  allWords.forEach((w, i) => w.style.setProperty('--d', ((200 + i * 40) / 1000).toFixed(3) + 's'));   // CSS runs the stagger
   const afterWords = 200 + allWords.length * 40 + 40;
   ['heroRail', 'heroMeta'].forEach((id, i) => setTimeout(() => document.getElementById(id).classList.add('visible'), afterWords + i * 140));
 
@@ -766,6 +961,27 @@
       entries.forEach(e => { if (e.isIntersecting) { heroVideo.play().catch(() => {}); } else { heroVideo.pause(); } });
     }, { threshold: 0.2 }).observe(heroVideo);
   }
+
+  /* the hero phone stands on the painting's own phone (screen quad 860,146 → 1165,795
+     in the 1672×941 plate, same quad the homepage maps its film onto); desktop only */
+  (function placeHeroPhone() {
+    const hero = document.querySelector('.cs-hero'), rail = document.getElementById('heroRail'), ph = rail && rail.querySelector('.ph-hero'), copy = document.querySelector('.cs-hero-copy');
+    if (!hero || !ph) return;
+    function place() {
+      if (window.innerWidth < 768) { rail.style.left = rail.style.top = rail.style.right = rail.style.bottom = ph.style.width = ''; if (copy) copy.style.width = ''; return; }
+      const W = hero.clientWidth, H = hero.clientHeight, s = Math.max(W / 1672, H / 941);
+      const ox = (W - 1672 * s) / 2, oy = (H - 941 * s) / 2;
+      const sw = 305 * s, w = sw / 0.94, h = w * 2622 / 1206;
+      rail.style.right = rail.style.bottom = 'auto';
+      rail.style.left = (ox + 860 * s - 0.03 * w) + 'px';
+      rail.style.top  = (oy + (146 + 795) / 2 * s - h / 2) + 'px';
+      ph.style.width  = w + 'px';
+      if (copy) copy.style.width = Math.max(320, ox + 860 * s - 0.03 * w - copy.offsetLeft - 40) + 'px';
+    }
+    place(); window.addEventListener('resize', place);
+    window.addEventListener('load', place); document.addEventListener('visibilitychange', () => { if (!document.hidden) place(); });
+    if (window.ResizeObserver) new ResizeObserver(() => place()).observe(hero);
+  })();
 
   /* ═══════════════════════════════════════════════════════════
      DESIGN / BUILD TOGGLE
@@ -793,6 +1009,7 @@
   }
   hamburger.addEventListener('click', () => toggleMenu());
   backdrop.addEventListener('click',  () => toggleMenu(false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && hamburger.classList.contains('open')) { toggleMenu(false); hamburger.focus(); } });
   mobileMenu.querySelectorAll('a').forEach(a => {
     a.addEventListener('click', e => {
       e.preventDefault();

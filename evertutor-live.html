@@ -25,7 +25,9 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&family=Shantell+Sans:wght@400;700&display=swap" rel="stylesheet" />
+  <!-- v6 language: Montserrat + JetBrains Mono only. Instrument Sans/Serif, Urbanist
+       and Shantell Sans retired (Shantell only labelled the Bloom chart axis, not product art) -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <style>
     /* ─── RESET ─────────────────────────────────────────────── */
@@ -244,8 +246,11 @@
 
     /* Main heading */
     .cs-heading { font-family: var(--font-heading); font-weight: 600; font-size: 30px; line-height: 1.5; letter-spacing: -0.8px; color: var(--secondary); }
-    .cs-heading .word { display: inline-block; opacity: 0; transform: translateY(22px); will-change: opacity, transform; }
-    .cs-heading .word.visible { animation: word-rise 0.28s cubic-bezier(0.22,0.61,0.36,1) both; }
+    /* (12 Nov) pure-CSS stagger (--d per word), so no JS timer can leave the headline hidden; failsafe for the rest of the hero */
+    .cs-heading .word { display: inline-block; animation: word-rise 0.28s cubic-bezier(0.22,0.61,0.36,1) both; animation-delay: var(--d, 0s); }
+    @keyframes cs-failsafe { to { opacity: 1; transform: none; } }
+    #desigRow:not(.visible), #heroSubtext:not(.visible), #liveFrame:not(.visible) { animation: cs-failsafe .6s ease 2.5s forwards; }
+    @media (prefers-reduced-motion: reduce) { .cs-heading .word { animation: none; } }
 
     @keyframes word-rise  { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fade-in    { from { opacity: 0; } to { opacity: 1; } }
@@ -1159,6 +1164,477 @@
       }
     }
 
+    /* ═══ v6 LANGUAGE (12 Nov 2026) ══════════════════════════════════════════
+       case-study-v6.css (linked last in <head>) re-points the font tokens and
+       supplies .cs-glass / .cs-navpill. The page is permanently data-theme="dark",
+       so every rule below is prefixed with it — that outranks both the old dark
+       rules above and the shared sheet's single-class rules, without touching
+       either. Mono stays only on small uppercase labels; everything else that
+       used --font-mono for prose/UI is Montserrat 500/600/700 here.
+       Emphasis = weight + white: lime highlighter wipes, serif italics and <em>
+       italics are neutralised (markup kept). Product screenshots/video untouched. */
+    [data-theme="dark"] {
+      --secondary: #FFFCF8;
+      --bg:        #0E0B12;
+      --white:     #141019;
+      --grey:      rgba(255,252,248,.74);
+      --border:    rgba(255,252,248,.12);
+    }
+    [data-theme="dark"] body { background-color: var(--cs-ground); color: var(--cs-ink); }
+
+    /* nav — transparent bar, links in the homepage's glass pill */
+    [data-theme="dark"] .nav {
+      height: 72px; padding: 0 40px;
+      /* a frosted night band, not a fade: on a long reading page the copy
+         scrolling under the brand mark otherwise reads straight through it */
+      background: rgba(14,11,18,.72);
+      box-shadow: 0 1px 0 rgba(255,252,248,.06);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4);
+    }
+    [data-theme="dark"] .nav-home span { font: 700 16px/1 var(--font-heading); letter-spacing: -.015em; color: var(--cs-ink); }
+    [data-theme="dark"] .nav .nav-sections {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      flex: none; justify-content: center; gap: 2px;
+    }
+    [data-theme="dark"] .nav .nav-btn {
+      text-transform: none; font: 600 14px/1 var(--font-heading); letter-spacing: -.005em;
+      padding: 10px 16px; border-radius: 999px; color: #fff; background: transparent;
+    }
+    [data-theme="dark"] .nav .nav-btn:hover:not(.active) { background: rgba(255,255,255,.14); }
+    [data-theme="dark"] .nav .nav-btn.active { background: rgba(255,255,255,.2); color: #fff; }
+    [data-theme="dark"] .nav .nav-btn:focus-visible { border-radius: 999px; outline-color: #A6CBFF; }
+    [data-theme="dark"] .page { padding-top: 92px; }
+
+    /* hero */
+    [data-theme="dark"] .cs-hero .cs-heading {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(34px, 9.2cqi, 76px); line-height: .98; letter-spacing: -.04em;
+      max-width: none; color: var(--cs-ink);
+    }
+    [data-theme="dark"] .serif { font-family: inherit; font-style: normal; font-weight: inherit; color: inherit; }
+    [data-theme="dark"] .cs-hero #heroSubtext {
+      font: 600 clamp(17px, 1.35vw, 21px)/1.45 var(--font-body); letter-spacing: -.005em;
+      color: var(--cs-ink); max-width: 36ch; margin-top: 26px;
+    }
+    [data-theme="dark"] .hero-pills { border-color: var(--cs-line); }
+    [data-theme="dark"] .desig-pill {
+      font: 600 13px/1 var(--font-body); color: var(--cs-ink); padding: 9px 14px;
+      background: rgba(255,252,248,.07); box-shadow: inset 0 0 0 1px rgba(255,252,248,.12);
+    }
+    [data-theme="dark"] .hero-scrim {
+      background: linear-gradient(100deg,
+        rgba(14,11,18,.88) 0%, rgba(14,11,18,.64) 30%,
+        rgba(14,11,18,.18) 55%, rgba(14,11,18,0) 74%);
+    }
+
+    /* section panels on the night ground */
+    [data-theme="dark"] .problem-card,
+    [data-theme="dark"] .challenges-card,
+    [data-theme="dark"] .system-card,
+    [data-theme="dark"] .impact-card,
+    [data-theme="dark"] .growth-card,
+    [data-theme="dark"] .team-card { background: var(--cs-ground-2); border-color: var(--cs-line); box-shadow: none; }
+    [data-theme="dark"] .what-if-card,
+    [data-theme="dark"] .sys-card { background: rgba(255,252,248,.04); border-color: var(--cs-line); }
+    [data-theme="dark"] .sys-card-img { background: #1A1620; border-color: rgba(255,252,248,.05); }
+    [data-theme="dark"] .insight-box { background: rgba(255,252,248,.05); box-shadow: inset 0 0 0 1px var(--cs-line); }
+    [data-theme="dark"] .prob-dot,
+    [data-theme="dark"] .out-title-row .prob-dot { background: var(--cs-ink); }
+
+    /* type roles */
+    [data-theme="dark"] .section-label,
+    [data-theme="dark"] .impact-stat-num {
+      font: 500 12px/1.3 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--cs-ink-3);
+    }
+    [data-theme="dark"] .problem-statement {
+      font: 700 clamp(19px, 1.9vw, 30px)/1.28 var(--font-display); letter-spacing: -.025em; color: var(--cs-ink); max-width: 46ch;
+    }
+    [data-theme="dark"] .prob-title,
+    [data-theme="dark"] .chal-title,
+    [data-theme="dark"] .what-if-header {
+      font: 700 clamp(19px, 1.5vw, 24px)/1.25 var(--font-display); letter-spacing: -.015em; color: var(--cs-ink);
+    }
+    [data-theme="dark"] .chal-statement {
+      font: 600 clamp(17px, 1.3vw, 20px)/1.45 var(--font-body); letter-spacing: -.005em; color: var(--cs-ink);
+    }
+    [data-theme="dark"] .what-if-title,
+    [data-theme="dark"] .sys-card-title,
+    [data-theme="dark"] .out-section-title,
+    [data-theme="dark"] .caps-label {
+      font: 700 clamp(16px, 1.15vw, 18px)/1.4 var(--font-body); letter-spacing: -.01em; color: var(--cs-ink);
+    }
+    [data-theme="dark"] .prob-body,
+    [data-theme="dark"] .what-if-body,
+    [data-theme="dark"] .chal-body,
+    [data-theme="dark"] .sys-card-desc,
+    [data-theme="dark"] .impact-stat-desc {
+      font: 500 clamp(15px, 1.05vw, 17px)/1.65 var(--font-body); color: var(--cs-ink-2);
+    }
+    [data-theme="dark"] .chal-body em { font-style: normal; font-weight: 600; color: var(--cs-ink); }
+    [data-theme="dark"] .insight-box p {
+      font: 600 clamp(16px, 1.2vw, 19px)/1.5 var(--font-body); font-style: normal; color: var(--cs-ink);
+    }
+    [data-theme="dark"] .out-item { font: 500 clamp(15px, 1.05vw, 16px)/1.6 var(--font-body); color: var(--cs-ink); }
+    [data-theme="dark"] .out-item strong { font-weight: 600; }
+    [data-theme="dark"] .out-item .dim { font-weight: 500; color: var(--cs-ink-2); }
+    [data-theme="dark"] .cs-link { color: var(--cs-ink); text-decoration-color: rgba(255,252,248,.4); }
+
+    /* emphasis = weight and white (lime highlighter retired; reveal classes still toggle harmlessly) */
+    [data-theme="dark"] .et-hl,
+    [data-theme="dark"] .et-hl.revealed,
+    [data-theme="dark"] .hl,
+    [data-theme="dark"] .hl.revealed { background: none; color: var(--cs-ink); padding: 0; font-weight: 700; }
+    [data-theme="dark"] .what-if-title .et-hl { font-weight: 800; }
+
+    /* impact */
+    [data-theme="dark"] .impact-stat-hl {
+      font: 600 clamp(20px, 1.7vw, 26px)/1.2 var(--font-display); letter-spacing: -.02em; color: var(--cs-ink-2);
+    }
+    [data-theme="dark"] .impact-stat-hl.hi { background: none; color: var(--cs-ink); font-weight: 800; }
+
+    /* growth chart chrome (data colours untouched) */
+    [data-theme="dark"] .growth-legend-item { font: 600 15px/1 var(--font-body); color: var(--cs-ink); }
+    [data-theme="dark"] .growth-axis-label { font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: .06em; fill: rgba(255,252,248,.52); }
+    [data-theme="dark"] .growth-point-label,
+    [data-theme="dark"] .growth-callout-badge-label { font-family: var(--font-body); font-weight: 700; }
+    /* the Bloom chart labels were set as SVG attributes (Urbanist / Shantell) — CSS outranks them */
+    [data-theme="dark"] #bloomsGraph text { font-family: var(--font-body); }
+    [data-theme="dark"] #bloomsGraph > text { font-weight: 500; }
+
+    /* team */
+    [data-theme="dark"] .team-role-hl {
+      background: none; color: var(--cs-ink);
+      font: 700 clamp(19px, 1.5vw, 24px)/1.25 var(--font-display); letter-spacing: -.015em;
+    }
+    [data-theme="dark"] .team-role-body { font: 500 clamp(15px, 1.05vw, 17px)/1.65 var(--font-body); color: var(--cs-ink); }
+    [data-theme="dark"] .team-role-body strong { font-weight: 700; }
+    [data-theme="dark"] .team-role-body .dim { font-weight: 500; color: var(--cs-ink-2); }
+
+    /* system: phase accordion — active item is the highlighted pill (warm white) */
+    [data-theme="dark"] .phase-left { background: transparent !important; }
+    [data-theme="dark"] .phase-item { background: rgba(255,252,248,.04); border-color: var(--cs-line); }
+    [data-theme="dark"] .phase-item.active { background: var(--cs-ink); }
+    [data-theme="dark"] .phase-num { font-family: var(--font-heading); font-weight: 700; color: var(--cs-ink-2); }
+    [data-theme="dark"] .phase-tag { font: 500 10.5px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+    [data-theme="dark"] .phase-expand-title { font: 700 17px/1.4 var(--font-body); letter-spacing: -.01em; }
+    [data-theme="dark"] .phase-expand-desc { font: 500 15px/1.55 var(--font-body); }
+    [data-theme="dark"] .phase-progress-track { background: rgba(14,11,18,.1); }
+    [data-theme="dark"] .phase-progress-fill { background: #0E0B12; }
+    [data-theme="dark"] .hint-chip { background: rgba(255,252,248,.05); border-color: var(--cs-line); }
+    [data-theme="dark"] .nudge-btn,
+    [data-theme="dark"] .nudge-btn:hover { color: #fff; font: 600 15px/1 var(--font-heading); letter-spacing: -.005em; }
+    [data-theme="dark"] .nudge-thanks { font: 500 13px/1.6 var(--font-body); letter-spacing: 0; color: var(--cs-ink-3); }
+
+    /* the one in-card CTA — hero chat-bar glass (cs-glass is-small) */
+    [data-theme="dark"] .card-cta.cs-glass {
+      border: 0; color: #fff; margin-top: 10px;
+      font: 600 15px/1 var(--font-heading); letter-spacing: -.005em;
+    }
+    [data-theme="dark"] .card-cta.cs-glass:hover {
+      border-color: transparent;
+      background: linear-gradient(180deg,rgba(255,255,255,.3) 0%,rgba(255,255,255,.1) 100%),linear-gradient(rgba(120,140,190,.14),rgba(120,140,190,.14));
+    }
+
+    /* footer — quiet hairline + mono sign-off instead of the lime band */
+    [data-theme="dark"] .thankyou-footer { background: transparent; border-top: 1px solid var(--cs-line); padding: 32px 0 40px; margin-top: 24px; }
+    [data-theme="dark"] .thankyou-footer .ty-text {
+      font: 500 12px/1.3 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--cs-ink-3);
+    }
+
+    /* mobile menu */
+    [data-theme="dark"] .mobile-menu { background: var(--cs-ground-2); }
+    [data-theme="dark"] .mobile-menu a {
+      font: 600 20px/1.2 var(--font-heading); letter-spacing: -.015em; text-transform: none;
+      color: var(--cs-ink); border-bottom-color: var(--cs-line);
+    }
+    [data-theme="dark"] .mobile-menu a.active { font-weight: 800; }
+
+    @media (max-width: 1023px) {
+      [data-theme="dark"] .nav { padding: 0 24px; }
+      [data-theme="dark"] .nav .nav-hamburger {
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+        width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 16px;
+      }
+      [data-theme="dark"] .nav .nav-hamburger span { width: 18px; background: #fff; }
+    }
+    @media (max-width: 767px) {
+      [data-theme="dark"] .nav { height: 64px; padding: 0 16px; }
+      [data-theme="dark"] .page { padding-top: 76px; }
+      [data-theme="dark"] .phase-left { background: rgba(255,252,248,.06) !important; }
+      [data-theme="dark"] .phase-mobile-detail { background: rgba(255,252,248,.05); }
+      [data-theme="dark"] .phase-mobile-tag { font: 500 10.5px/1.3 var(--font-mono); letter-spacing: .12em; color: var(--cs-ink-3); }
+      [data-theme="dark"] .phase-mobile-title { font: 700 16px/1.4 var(--font-body); color: var(--cs-ink); }
+      [data-theme="dark"] .phase-mobile-desc { font: 500 14px/1.6 var(--font-body); color: var(--cs-ink-2); }
+      [data-theme="dark"] .section-label { font-size: 11px; }
+    }
+
+    /* ═══ v6 ROUND 2 — open sections, painted hero, glass panels ═══════════════
+       Same-specificity rules as round 1, placed later, so they win where they overlap. */
+    [data-theme="dark"] {
+      --cs-gut:  clamp(24px, 6vw, 110px);                 /* the homepage .chp-copy inset */
+      --cs-edge: max(0px, calc((100vw - 1400px) / 2));    /* where the 1400px column starts */
+      --cs-glass-bg: rgba(255,255,255,.06);
+      --cs-glass-hi: inset 0 1px 0 rgba(255,255,255,.22);
+    }
+    [data-theme="dark"] .page { padding: 0; }
+    [data-theme="dark"] .card { overflow: visible; }   /* the hero bleeds past the 1400px column; body already clips x */
+
+    /* hero — full-bleed painted kitchen, copy where the homepage chapter puts it */
+    [data-theme="dark"] .cs-hero {
+      width: 100vw; margin: 0 calc(50% - 50vw); border-radius: 0; overflow: hidden;
+      min-height: 100vh; min-height: 100svh; display: flex; align-items: center;
+      padding: clamp(112px, 15vh, 170px) var(--cs-gut) clamp(72px, 10vh, 120px) calc(var(--cs-edge) + var(--cs-gut));
+    }
+    [data-theme="dark"] .cs-hero > .et-bg-img { display: none; }   /* old generated glow plate — hidden, not removed */
+    [data-theme="dark"] .cs-scene-img {
+      position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0;
+      object-fit: cover; object-position: 50% 50%; display: block; pointer-events: none;
+    }
+    [data-theme="dark"] .hero-scrim {
+      background:
+        linear-gradient(180deg, rgba(14,11,18,0) 62%, #0E0B12 100%),
+        linear-gradient(90deg, rgba(10,20,48,.85) 0, rgba(10,20,48,.4) 45%, transparent 70%);
+    }
+    [data-theme="dark"] .hero-grid {
+      width: 100%; grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: clamp(32px, 5vw, 96px);
+    }
+    [data-theme="dark"] .cs-role {
+      margin: 0 0 14px; font: 500 clamp(15px, 1.1vw, 17px)/1.2 var(--font-body); color: rgba(255,252,248,.78);
+    }
+    [data-theme="dark"] .cs-hero #heroSubtext { margin-top: 20px; }
+    [data-theme="dark"] .hero-pills { display: block; border: 0; padding: 0; margin-top: 0; }
+    [data-theme="dark"] .hero-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+    [data-theme="dark"] .desig-pill {
+      font: 500 11px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--cs-ink-2);
+      padding: 9px 12px; border-radius: 999px; background: rgba(255,255,255,.07);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.2), inset 0 0 0 1px rgba(255,255,255,.08);
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    }
+    /* the homepage's proof pair */
+    [data-theme="dark"] .chp-proof { display: flex; flex-wrap: wrap; gap: 18px clamp(24px, 2.6vw, 44px); margin: 30px 0 0; padding: 0; list-style: none; }
+    [data-theme="dark"] .chp-proof li { flex: none; }
+    [data-theme="dark"] .chp-proof b { display: block; white-space: nowrap; font: 700 clamp(28px, 2.6vw, 44px)/1 var(--font-display); letter-spacing: -.03em; color: var(--cs-ink); }
+    [data-theme="dark"] .chp-proof span { display: block; margin-top: 8px; font: 600 15px/1.3 var(--font-body); color: var(--cs-ink); }
+    /* the product, pixels untouched, held in a glass rim instead of floating on a glow */
+    [data-theme="dark"] .hero-visual .et-live-frame {
+      padding: 8px; border-radius: 20px; background: rgba(255,255,255,.08);
+      -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 0 0 1px rgba(255,255,255,.18), 0 30px 80px -20px rgba(0,0,0,.6);
+    }
+
+    /* sections — open on the ground, no frames, gutter matching the hero */
+    [data-theme="dark"] .cs-section-wrap { padding: clamp(96px, 12vh, 160px) var(--cs-gut) 0; }
+    [data-theme="dark"] .problem-card,
+    [data-theme="dark"] .challenges-card,
+    [data-theme="dark"] .system-card,
+    [data-theme="dark"] .impact-card,
+    [data-theme="dark"] .growth-card,
+    [data-theme="dark"] .team-card { background: none; border: 0; border-radius: 0; padding: 0; box-shadow: none; gap: clamp(40px, 5vh, 64px); }
+    [data-theme="dark"] .problem-img,
+    [data-theme="dark"] .chal-img { display: none; }   /* grayscale stock thumbnails — hidden, not removed */
+    [data-theme="dark"] .problem-header,
+    [data-theme="dark"] .chal-header { padding-top: 0; gap: 16px; }
+    [data-theme="dark"] .problem-statement {
+      font: 700 clamp(20px, 1.9vw, 30px)/1.28 var(--font-display); letter-spacing: -.025em; max-width: 40ch;
+    }
+    [data-theme="dark"] .prob-dot,
+    [data-theme="dark"] .team-item-dot { display: none; }
+    [data-theme="dark"] .prob-bullet,
+    [data-theme="dark"] .chal-item,
+    [data-theme="dark"] .team-item,
+    [data-theme="dark"] .out-title-row { gap: 0; }
+    [data-theme="dark"] .problem-points { gap: 28px; }
+
+    /* glass panels */
+    [data-theme="dark"] .what-if-card,
+    [data-theme="dark"] .insight-box,
+    [data-theme="dark"] .sys-card,
+    [data-theme="dark"] .phase-item {
+      background: var(--cs-glass-bg); border: 0; border-radius: 22px; box-shadow: var(--cs-glass-hi);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4);
+    }
+    [data-theme="dark"] .what-if-card { padding: 24px; }
+    [data-theme="dark"] .insight-box { padding: 24px 26px; }
+    [data-theme="dark"] .insight-box p { font: 600 clamp(18px, 1.4vw, 23px)/1.45 var(--font-body); }
+    [data-theme="dark"] .what-if-header { font: 700 clamp(26px, 2.4vw, 40px)/1.15 var(--font-display); letter-spacing: -.03em; }
+    [data-theme="dark"] .what-if-grid { gap: 16px; }
+    [data-theme="dark"] #bloomsGraph > text {
+      font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; fill: var(--cs-ink-3);
+    }
+
+    /* challenges */
+    [data-theme="dark"] .chal-items { gap: 56px; }
+    [data-theme="dark"] .chal-statement { font-weight: 700; }
+
+    /* system — glass phase rows; the active one is brighter glass with the bright rim */
+    [data-theme="dark"] .phase-left { gap: 12px; }
+    [data-theme="dark"] .phase-item.active {
+      background: rgba(255,255,255,.14);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.75), inset 0 0 0 1px rgba(255,255,255,.3), 0 18px 40px -18px rgba(0,0,0,.6);
+    }
+    [data-theme="dark"] .phase-num { color: var(--cs-ink-2); }
+    [data-theme="dark"] .phase-item.active .phase-num { color: var(--cs-ink); }
+    [data-theme="dark"] .phase-tag,
+    [data-theme="dark"] .phase-item.active .phase-tag {
+      background: rgba(255,255,255,.08); color: var(--cs-ink-2); box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    [data-theme="dark"] .phase-plus-circle { border-color: rgba(255,252,248,.3); color: var(--cs-ink-2); }
+    [data-theme="dark"] .phase-item.active .phase-expand-title { color: var(--cs-ink); }
+    [data-theme="dark"] .phase-item.active .phase-expand-desc { color: var(--cs-ink-2); }
+    [data-theme="dark"] .phase-progress-track { background: rgba(255,255,255,.1); }
+    [data-theme="dark"] .phase-progress-fill { background: var(--cs-ink); }
+    [data-theme="dark"] .phase-cards { gap: 16px; }
+    [data-theme="dark"] .sys-card { padding: 16px 16px 22px; gap: 16px; }
+    [data-theme="dark"] .sys-card-img { border-radius: 14px; }
+    [data-theme="dark"] .sys-card-body { padding: 0 6px; }
+    [data-theme="dark"] .sys-card-title,
+    [data-theme="dark"] .out-section-title { font: 700 clamp(19px, 1.5vw, 24px)/1.25 var(--font-display); letter-spacing: -.015em; }
+    [data-theme="dark"] .out-section { gap: 14px; margin-top: 12px; }
+    [data-theme="dark"] .out-item { color: var(--cs-ink-2); }
+    [data-theme="dark"] .out-item strong { color: var(--cs-ink); font-weight: 600; }
+
+    /* impact */
+    [data-theme="dark"] .impact-proof { margin: 0; }
+    [data-theme="dark"] .impact-stats-grid { gap: 48px; }
+    [data-theme="dark"] .impact-stats-row { gap: clamp(24px, 3vw, 48px); }
+    [data-theme="dark"] .impact-stat { gap: 12px; }
+    [data-theme="dark"] .impact-stat-hl { font-size: clamp(19px, 1.5vw, 24px); line-height: 1.25; }
+
+    /* growth — chart capped so its SVG type lands at a readable size; data untouched */
+    [data-theme="dark"] .growth-chart-wrap { max-width: 960px; }
+    [data-theme="dark"] .growth-legend-item { font: 500 12px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--cs-ink-2); }
+    [data-theme="dark"] .growth-axis-label { font-size: 7.5px; letter-spacing: .08em; }
+    [data-theme="dark"] .growth-point-label { font-size: 9px; }
+    [data-theme="dark"] .growth-callout-badge-label { font-size: 8.5px; font-weight: 600; fill: var(--cs-ink); }
+    [data-theme="dark"] #growthChart rect[fill="#E6F28D"] { fill: rgba(255,255,255,.1); stroke: rgba(255,255,255,.45); stroke-width: .8; }
+    [data-theme="dark"] #growthChart circle[fill="#E6F28D"] { fill: rgba(255,255,255,.5); }
+
+    /* team — h3 role lines, body below, hairlines between rows */
+    [data-theme="dark"] .team-items { gap: 0; }
+    [data-theme="dark"] .team-item { padding: 24px 0; border-top: 1px solid var(--cs-line); }
+    [data-theme="dark"] .team-item:first-child { border-top: 0; padding-top: 0; }
+    [data-theme="dark"] .team-role-hl { font-weight: 700; }
+    [data-theme="dark"] .team-role-body strong {
+      display: block; margin-bottom: 10px; color: var(--cs-ink);
+      font: 700 clamp(19px, 1.5vw, 24px)/1.25 var(--font-display); letter-spacing: -.015em;
+    }
+
+    /* close — a closing line and the next step, in the chat-bar glass */
+    [data-theme="dark"] .thankyou-footer.cs-close {
+      flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 32px;
+      margin: 0; border: 0; background: none;
+      padding: clamp(120px, 16vh, 200px) var(--cs-gut) clamp(96px, 14vh, 180px);
+    }
+    [data-theme="dark"] .cs-close-ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+
+    @media (max-width: 1023px) {
+      [data-theme="dark"] .impact-stats-row { flex-wrap: wrap; }
+      [data-theme="dark"] .impact-stat { flex: 1 1 220px; }
+    }
+    /* phones + narrow tablets: painting as a band on top, copy below on the ground */
+    @media (max-width: 900px) {
+      [data-theme="dark"] .cs-hero { display: block; min-height: 0; padding: calc(56vh + 12px) var(--cs-gut) 56px; }
+      [data-theme="dark"] .cs-scene-img { height: 56vh; bottom: auto; }
+      [data-theme="dark"] .hero-scrim { height: 56vh; bottom: auto; background: linear-gradient(180deg, rgba(14,11,18,0) 50%, #0E0B12 100%); }
+      [data-theme="dark"] .hero-visual { margin-top: 8px; }
+    }
+    @media (max-width: 767px) {
+      [data-theme="dark"] .cs-section-wrap { padding: 88px 20px 0; }
+      [data-theme="dark"] .cs-hero { padding-left: 20px; padding-right: 20px; }
+      [data-theme="dark"] .thankyou-footer.cs-close { padding: 112px 20px 96px; }
+      [data-theme="dark"] .phase-left { background: rgba(255,255,255,.06) !important; border-radius: 18px; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); }
+      [data-theme="dark"] .phase-item { border-radius: 12px; box-shadow: none; }
+      [data-theme="dark"] .phase-item.active { background: rgba(255,255,255,.16); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 0 0 1px rgba(255,255,255,.28); }
+      [data-theme="dark"] .phase-item .phase-pill::before { color: rgba(255,252,248,.5); }
+      [data-theme="dark"] .phase-item .phase-pill::after  { color: rgba(255,252,248,.8); }
+      [data-theme="dark"] .phase-item.active .phase-pill::before { color: rgba(255,252,248,.75); }
+      [data-theme="dark"] .phase-item.active .phase-pill::after  { color: #fff; }
+      [data-theme="dark"] .phase-mobile-detail { border-radius: 22px; background: var(--cs-glass-bg); box-shadow: var(--cs-glass-hi); }
+      [data-theme="dark"] .what-if-card { padding: 20px; }
+      /* the chart shrinks to ~0.55×, so its SVG type is set larger here */
+      [data-theme="dark"] .growth-axis-label { font-size: 14px; letter-spacing: .02em; }
+      [data-theme="dark"] .growth-point-label { font-size: 14px; }
+    }
+    /* touch screens: no custom cursor (now warm-white, it would otherwise park visibly where a tap landed) */
+    @media (hover: none) { #ccDot { display: none !important; } }
+
+    /* ═══ v6 ROUND 3 — video on the painted laptop, bookend, split statements ══════ */
+    /* hero copy + nav share the homepage gutter (no 1400px column offset up here) */
+    [data-theme="dark"] .nav { padding-left: var(--cs-gut); padding-right: var(--cs-gut); }
+    [data-theme="dark"] .cs-hero { padding-left: var(--cs-gut); padding-right: var(--cs-gut); }
+    [data-theme="dark"] .cs-hero .cs-heading { font-size: clamp(40px, 5.2vw, 92px); }
+    [data-theme="dark"] .cs-scene-img { object-position: 30% 50%; }
+    /* the live frame becomes a hero-sized layer; JS (placeLiveScreen) warps the video onto the painted screen */
+    [data-theme="dark"] .hero-grid { position: static; }
+    [data-theme="dark"] .hero-copy { position: relative; z-index: 2; }
+    [data-theme="dark"] .hero-visual { perspective: none; }
+    [data-theme="dark"] .hero-tilt { transform: none; transform-style: flat; }   /* preserve-3d would trap the frame's containing block */
+    [data-theme="dark"] .hero-visual .et-live-frame {
+      position: absolute; inset: 0; z-index: 1; width: auto; height: auto; aspect-ratio: auto;
+      display: block; overflow: visible; pointer-events: none;
+      padding: 0; border-radius: 0; background: none; box-shadow: none;
+      -webkit-backdrop-filter: none; backdrop-filter: none;
+    }
+    [data-theme="dark"] .hero-visual .et-screen-img {
+      position: absolute; left: 0; top: 0; transform-origin: 0 0; max-width: none;
+      object-fit: contain; background: #0B0B0F; border-radius: 6px; box-shadow: none;
+    }
+
+    /* split statement: first sentence the 800 headline, the rest a 600 lead (no new words) */
+    [data-theme="dark"] .st-head { font-size: clamp(32px, 3.4vw, 52px); max-width: 22ch; }
+    [data-theme="dark"] .st-lead { max-width: 46ch; }
+
+    /* bell curve labels ≥11px and brighter */
+    [data-theme="dark"] #bloomsGraph .bloom-label text:first-child { font-size: 14px; font-weight: 600; fill: var(--cs-ink); }
+    [data-theme="dark"] #bloomsGraph .bloom-label text:last-child  { font-size: 13px; fill: var(--cs-ink-2); }
+    [data-theme="dark"] #bloomsGraph > text { font-size: 13px; fill: var(--cs-ink-2); }
+
+    /* system: the active phase keeps its icon slot so "PHASE 1" aligns */
+    [data-theme="dark"] .phase-item.active .phase-plus-circle { width: 22px; margin-right: 10px; border-width: 1.5px; opacity: 0; }
+
+    /* growth: full column width, type in chart units sized for ~2× scale */
+    [data-theme="dark"] .growth-chart-wrap { max-width: none; }
+    [data-theme="dark"] .growth-axis-label { font-size: 6.5px; }
+    [data-theme="dark"] .growth-point-label { font-size: 7px; }
+    [data-theme="dark"] .growth-callout-badge-label { font-size: 7px; }
+
+    /* closing bookend — the kitchen again, heavily dimmed, full-bleed */
+    [data-theme="dark"] .thankyou-footer.cs-close {
+      position: relative; isolation: isolate; overflow: hidden;
+      width: 100vw; margin: 0 calc(50% - 50vw);
+      padding-left: calc(var(--cs-edge) + var(--cs-gut)); padding-right: var(--cs-gut);
+      min-height: 70vh; justify-content: center;
+    }
+    [data-theme="dark"] .close-scene { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+    [data-theme="dark"] .close-scene .cs-scene-img { opacity: .32; object-position: 70% 50%; }
+    [data-theme="dark"] .close-scene::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, #0E0B12 0, rgba(14,11,18,.35) 30%, rgba(14,11,18,.55) 60%, #0E0B12 92%);
+    }
+
+    @media (max-width: 900px) {
+      [data-theme="dark"] .cs-scene-img { object-position: 56% 50%; }
+      [data-theme="dark"] .close-scene .cs-scene-img { height: 100%; bottom: 0; object-position: 56% 50%; }
+    }
+    @media (max-width: 767px) {
+      [data-theme="dark"] .nav { padding-left: 16px; padding-right: 16px; }
+      [data-theme="dark"] .cs-hero { padding-left: 20px; padding-right: 20px; }
+      [data-theme="dark"] .cs-section-wrap { padding-top: 72px; }
+      [data-theme="dark"] .thankyou-footer.cs-close { padding: 112px 20px 96px; min-height: 60vh; }
+      /* sticky phase tabs: opaque ground so card text never shows through */
+      [data-theme="dark"] .phase-left { background: #17131D !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 10px 24px -10px rgba(0,0,0,.7); }
+      /* growth on a phone: only the story labels, at ≥11px; tooltip copy and minor ticks go */
+      [data-theme="dark"] #growthChart .gp-minor,
+      [data-theme="dark"] #growthChart .growth-callout-badge-label,
+      [data-theme="dark"] #growthChart rect[fill="#E6F28D"] { display: none; }
+      [data-theme="dark"] .growth-axis-label { font-size: 19px; letter-spacing: 0; }
+      [data-theme="dark"] .growth-point-label { font-size: 19px; }
+      [data-theme="dark"] #growthChart { overflow: visible; }
+      [data-theme="dark"] #bloomsGraph .bloom-label text:first-child { font-size: 19px; }
+      [data-theme="dark"] #bloomsGraph .bloom-label text:last-child  { font-size: 17px; }
+      [data-theme="dark"] #bloomsGraph > text { font-size: 17px; letter-spacing: 0; text-transform: none; }
+    }
+
   </style>
   <!-- Microsoft Clarity -->
   <script type="text/javascript">
@@ -1168,6 +1644,7 @@
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "xt8r81h0gs");
   </script>
+  <link rel="stylesheet" href="case-study-v6.css">
 </head>
 <body>
 
@@ -1178,15 +1655,15 @@
       <img src="cs-nav-logo.svg" alt="" />
       <span>EverTutor Live</span>
     </a>
-    <div class="nav-sections">
-      <a href="#overview"    class="nav-btn active" data-section="overview">OVERVIEW</a>
-      <a href="#problem"     class="nav-btn"        data-section="problem">THE PROBLEM</a>
-      <a href="#challenges"  class="nav-btn"        data-section="challenges">CHALLENGES</a>
-      <a href="#system"      class="nav-btn"        data-section="system">SYSTEM</a>
-      <a href="#impact"      class="nav-btn"        data-section="impact">IMPACT</a>
-      <a href="#team"        class="nav-btn"        data-section="team">TEAM</a>
+    <div class="nav-sections cs-navpill">
+      <a href="#overview"    class="nav-btn active" data-section="overview">Overview</a>
+      <a href="#problem"     class="nav-btn"        data-section="problem">The Problem</a>
+      <a href="#challenges"  class="nav-btn"        data-section="challenges">Challenges</a>
+      <a href="#system"      class="nav-btn"        data-section="system">System</a>
+      <a href="#impact"      class="nav-btn"        data-section="impact">Impact</a>
+      <a href="#team"        class="nav-btn"        data-section="team">Team</a>
     </div>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
+    <button class="nav-hamburger cs-glass is-small" id="navHamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </nav>
@@ -1209,11 +1686,15 @@
 
         <!-- the 2240×800 panorama is the hero's own backdrop, uncropped -->
         <img id="etBgImg" class="et-bg-img" alt="" />
+        <!-- v6: the homepage's painted EverTutor Live kitchen, time-true to SF's sun (golden/day/night picked by case-study-v6.js) -->
+        <img class="cs-scene-img" data-scene="city/layers/chapters/et-live-kitchen" alt="" decoding="async" fetchpriority="high">
+        <script src="case-study-v6.js"></script>
         <div class="hero-scrim" aria-hidden="true"></div>
 
         <div class="hero-grid">
           <div class="hero-copy">
 
+            <p class="chp-role cs-role">Sole product designer · EverTutor</p>
             <h1 class="cs-heading" id="csHeading">Designed a 0→1 AI Tutor that <span class="serif">actually scales.</span></h1>
             <p class="chal-body" id="heroSubtext">I owned interaction design, voice UX, and the curriculum tooling system, end to end.</p>
 
@@ -1222,11 +1703,15 @@
                  the file rather than introducing a second one. -->
             <!-- keeps #desigRow so the existing reveal timing still finds it -->
             <div class="hero-pills" id="desigRow">
-              <span class="desig-pill">Sole Product Designer</span>
-              <span class="desig-pill">Mar 2025 – May 2026</span>
-              <span class="desig-pill">$9.5M seed-funded</span>
-              <span class="desig-pill">8+ schools</span>
-              <span class="desig-pill">~2,000 learners</span>
+              <!-- v6: the two big facts as the homepage's proof pair; the rest stay as small label chips -->
+              <ul class="chp-proof">
+                <li><b>$9.5M</b><span>seed-funded</span></li>
+                <li><b>~2,000</b><span>learners</span></li>
+              </ul>
+              <div class="hero-chips">
+                <span class="desig-pill">Mar 2025 – May 2026</span>
+                <span class="desig-pill">8+ schools</span>
+              </div>
             </div>
 
           </div>
@@ -1258,7 +1743,8 @@
             </div>
             <div class="problem-header">
               <span class="section-label">The Problem</span>
-              <p class="problem-statement">1:1 tutoring drives significantly better outcomes. But modern classrooms and ed-tech systems rely on fixed, linear instruction, failing to adapt to individual learners and creating a gap between time spent and true mastery.</p>
+              <h2 class="cs-h2 st-head">1:1 tutoring drives significantly better outcomes.</h2>
+              <p class="cs-lead st-lead">But modern classrooms and ed-tech systems rely on fixed, linear instruction, failing to adapt to individual learners and creating a gap between time spent and true mastery.</p>
             </div>
           </div>
 
@@ -1375,7 +1861,7 @@
             <div class="chal-img"><img id="etChalImg" alt="Challenges" /></div>
             <div class="chal-header">
               <div class="section-label">Challenges</div>
-              <div class="problem-statement">To make 1:1 tutoring scalable, I had to rethink how teaching works across classroom dynamics, interaction patterns, content design, and system behavior from the ground up.</div>
+              <div class="problem-statement cs-statement">To make 1:1 tutoring scalable, I had to rethink how teaching works across classroom dynamics, interaction patterns, content design, and system behavior from the ground up.</div>
             </div>
           </div>
 
@@ -1423,7 +1909,7 @@
             <div class="chal-img"><img id="etSysImg" alt="System" /></div>
             <div class="chal-header">
               <div class="section-label">System</div>
-              <div class="problem-statement">Evolution of the AI Tutor System: Designing, Scaling, and Learning in Real Classrooms.</div>
+              <div class="problem-statement cs-statement">Evolution of the AI Tutor System: Designing, Scaling, and Learning in Real Classrooms.</div>
             </div>
           </div>
 
@@ -1513,9 +1999,9 @@
               <!-- Panel 1 -->
               <div class="phase-panel active" data-phase="1">
                 <div class="phase-cards">
-                  <div class="sys-card"><div class="sys-card-img"><img id="p1c1" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">1). Designing for Human-Like Tutoring</div><p class="sys-card-desc">I replaced text-heavy static slides with this: a whiteboard-style interface using handwritten visuals that mimic exactly how a human tutor explains concepts step-by-step.</p></div></div>
-                  <div class="sys-card"><div class="sys-card-img"><img id="p1c2" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">2). Driving Engagement Through Progress</div><p class="sys-card-desc">Added a simple progress-based interaction layer that advances on correct responses to reinforce momentum and participation.</p></div></div>
-                  <div class="sys-card"><div class="sys-card-img"><img id="p1c3" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">3). Enabling Natural, Low-Friction Interaction</div><p class="sys-card-desc">Refined voice interaction with a "hold to speak" mechanism, making it easier and more natural for students to talk to the tutor.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p1c1" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">Designing for Human-Like Tutoring</div><p class="sys-card-desc">I replaced text-heavy static slides with this: a whiteboard-style interface using handwritten visuals that mimic exactly how a human tutor explains concepts step-by-step.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p1c2" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">Driving Engagement Through Progress</div><p class="sys-card-desc">Added a simple progress-based interaction layer that advances on correct responses to reinforce momentum and participation.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p1c3" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">Enabling Natural, Low-Friction Interaction</div><p class="sys-card-desc">Refined voice interaction with a "hold to speak" mechanism, making it easier and more natural for students to talk to the tutor.</p></div></div>
                 </div>
                 <div class="out-section">
                   <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Outcomes:</div></div>
@@ -1535,9 +2021,9 @@
               <!-- Panel 2 -->
               <div class="phase-panel" data-phase="2">
                 <div class="phase-cards">
-                  <div class="sys-card"><div class="sys-card-img"><img id="p2c1" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">1). Enabling Personalization Through Voice</div><p class="sys-card-desc">Gave students the ability to connect with their AI tutor through a personalized voice, increasing their sense of ownership and lowering engagement barriers.</p></div></div>
-                  <div class="sys-card"><div class="sys-card-img"><img id="p2c2" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">2). Expanding Selection of Voices</div><p class="sys-card-desc">Introduced a wider range of voice options, allowing schools to select the tutor voice that best matched their classroom culture and student preferences.</p></div></div>
-                  <div class="sys-card"><div class="sys-card-img"><img id="p2c3" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">3). From Manual Creation to Scalable Production (~104 hrs to ~4 hrs)</div><p class="sys-card-desc">Redesigned the content creation workflow from manual authoring to a tool-assisted pipeline, significantly reducing production time per topic.</p><a href="evertutor-studio.html" class="card-cta">View Case Study <span class="cta-arrow">↗</span></a></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p2c1" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">Enabling Personalization Through Voice</div><p class="sys-card-desc">Gave students the ability to connect with their AI tutor through a personalized voice, increasing their sense of ownership and lowering engagement barriers.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p2c2" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">Expanding Selection of Voices</div><p class="sys-card-desc">Introduced a wider range of voice options, allowing schools to select the tutor voice that best matched their classroom culture and student preferences.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p2c3" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">From Manual Creation to Scalable Production (~104 hrs to ~4 hrs)</div><p class="sys-card-desc">Redesigned the content creation workflow from manual authoring to a tool-assisted pipeline, significantly reducing production time per topic.</p><a href="evertutor-studio.html" class="card-cta cs-glass is-small">View Case Study <span class="cta-arrow">↗</span></a></div></div>
                 </div>
                 <div class="out-section">
                   <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Outcomes:</div></div>
@@ -1556,11 +2042,11 @@
               <!-- Panel 3 -->
               <div class="phase-panel" data-phase="3">
                 <div class="phase-cards">
-                  <div class="sys-card"><div class="sys-card-img"><img id="p3c1" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">1). Introducing Guardrail-Controlled Progression</div><p class="sys-card-desc">Added mastery-gated progression that prevents students from advancing without demonstrated understanding, enforcing mastery step-by-step.</p></div></div>
-                  <div class="sys-card"><div class="sys-card-img"><img id="p3c2" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">2). Strengthening AI Response Quality</div><p class="sys-card-desc">Improved the consistency and quality of AI tutor responses through tighter curriculum alignment and iterative refinement based on live classroom feedback.</p></div></div>
-                  <div class="sys-card"><div class="sys-card-img"><img id="p3c3" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">3). Aligning with Familiar Learning Behaviors</div><p class="sys-card-desc">Introduced patterns students already recognize from classrooms (pacing cues, structured prompts) to lower cognitive friction and ease the transition.</p></div></div>
-                  <div class="sys-card"><div class="sys-card-img"><img id="p3c4" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">4). Making Learning Progress Visible</div><p class="sys-card-desc">Built real-time progress indicators into the student experience, helping learners track mastery trajectory and reducing anxiety about performance.</p></div></div>
-                  <div class="sys-card"><div class="sys-card-img"><img id="p3c5" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">5). Evolving Pedagogy with Teacher Collaboration</div><p class="sys-card-desc">Co-developed instructional sequences with teachers in the loop, incorporating direct classroom observations into the AI tutor's pedagogical approach.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p3c1" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">Introducing Guardrail-Controlled Progression</div><p class="sys-card-desc">Added mastery-gated progression that prevents students from advancing without demonstrated understanding, enforcing mastery step-by-step.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p3c2" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">Strengthening AI Response Quality</div><p class="sys-card-desc">Improved the consistency and quality of AI tutor responses through tighter curriculum alignment and iterative refinement based on live classroom feedback.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p3c3" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">Aligning with Familiar Learning Behaviors</div><p class="sys-card-desc">Introduced patterns students already recognize from classrooms (pacing cues, structured prompts) to lower cognitive friction and ease the transition.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p3c4" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">Making Learning Progress Visible</div><p class="sys-card-desc">Built real-time progress indicators into the student experience, helping learners track mastery trajectory and reducing anxiety about performance.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p3c5" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">Evolving Pedagogy with Teacher Collaboration</div><p class="sys-card-desc">Co-developed instructional sequences with teachers in the loop, incorporating direct classroom observations into the AI tutor's pedagogical approach.</p></div></div>
                 </div>
                 <div class="out-section">
                   <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Outcomes:</div></div>
@@ -1579,8 +2065,8 @@
               <!-- Panel 4 -->
               <div class="phase-panel" data-phase="4">
                 <div class="phase-cards">
-                  <div class="sys-card"><div class="sys-card-img"><img id="p4c1" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">1). Auto Ingress &amp; Egress</div><p class="sys-card-desc">Designed an automated student join/leave system that eliminated manual teacher intervention, reducing session setup time and enabling seamless classroom transitions.</p></div></div>
-                  <div class="sys-card"><div class="sys-card-img"><img id="p4c2" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">2). Canvas-Style Layout</div><p class="sys-card-desc">Introduced a canvas-based spatial layout for tutoring sessions, enabling flexible concept explanation and multi-step problem solving beyond linear instruction.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p4c1" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">Auto Ingress &amp; Egress</div><p class="sys-card-desc">Designed an automated student join/leave system that eliminated manual teacher intervention, reducing session setup time and enabling seamless classroom transitions.</p></div></div>
+                  <div class="sys-card"><div class="sys-card-img"><img id="p4c2" alt="" /></div><div class="sys-card-body"><div class="sys-card-title">Canvas-Style Layout</div><p class="sys-card-desc">Introduced a canvas-based spatial layout for tutoring sessions, enabling flexible concept explanation and multi-step problem solving beyond linear instruction.</p></div></div>
                 </div>
                 <div class="out-section">
                   <div class="out-title-row"><div class="prob-dot"></div><div class="out-section-title">Outcomes:</div></div>
@@ -1610,7 +2096,7 @@
             <div class="chal-img"><img id="etImpactImg" alt="Impact" /></div>
             <div class="chal-header">
               <div class="section-label">Impact</div>
-              <div class="problem-statement">Delivered classroom-comparable learning outcomes while unlocking scalable deployment, accelerating school adoption, and establishing a foundation for AI-native education.</div>
+              <div class="problem-statement cs-statement">Delivered classroom-comparable learning outcomes while unlocking scalable deployment, accelerating school adoption, and establishing a foundation for AI-native education.</div>
             </div>
           </div>
 
@@ -1688,7 +2174,7 @@
             </div>
             <div class="chal-header">
               <div class="section-label">Growth</div>
-              <div class="problem-statement">Revenue and learner growth weren't a straight line: a real dip from cohort churn in December, then sustained school-by-school compounding from January on.</div>
+              <div class="problem-statement cs-statement">Revenue and learner growth weren't a straight line: a real dip from cohort churn in December, then sustained school-by-school compounding from January on.</div>
             </div>
           </div>
 
@@ -1740,18 +2226,18 @@
               <text x="164" y="201" text-anchor="middle" class="growth-callout-badge-label">acquisition interest</text>
 
               <!-- value labels -->
-              <text x="64"  y="272" text-anchor="start"  class="growth-point-label" fill="#1C9C6D">$0</text>
-              <text x="268" y="231" text-anchor="middle" class="growth-point-label" fill="#1C9C6D">$20K</text>
+              <text x="66"  y="240" text-anchor="start"  class="growth-point-label gp-minor" fill="#1C9C6D">$0</text>
+              <text x="268" y="231" text-anchor="middle" class="growth-point-label gp-minor" fill="#1C9C6D">$20K</text>
               <text x="372" y="219" text-anchor="middle" class="growth-point-label" fill="#E0734C">↓ cohort churn</text>
               <text x="565" y="24"  text-anchor="end"     class="growth-point-label" fill="#1C9C6D">$500K+</text>
 
-              <text x="64"  y="286" text-anchor="start"  class="growth-point-label" fill="#4361EE">0 learners</text>
-              <text x="268" y="271" text-anchor="middle" class="growth-point-label" fill="#4361EE">40</text>
+              <text x="66"  y="249" text-anchor="start"  class="growth-point-label gp-minor" fill="#4361EE">0 learners</text>
+              <text x="268" y="271" text-anchor="middle" class="growth-point-label gp-minor" fill="#4361EE">40</text>
               <text x="565" y="55"  text-anchor="end"    class="growth-point-label" fill="#4361EE">2,000+ learners</text>
 
               <!-- x-axis month labels -->
               <text x="60"  y="296" text-anchor="start"  class="growth-axis-label">Mar '25</text>
-              <text x="268" y="296" text-anchor="middle" class="growth-axis-label">Sep '25</text>
+              <text x="268" y="296" text-anchor="middle" class="growth-axis-label gp-minor">Sep '25</text>
               <text x="372" y="296" text-anchor="middle" class="growth-axis-label">Dec '25</text>
               <text x="580" y="296" text-anchor="end"    class="growth-axis-label">Jun '26</text>
             </svg>
@@ -1768,7 +2254,7 @@
             <div class="chal-img"><img id="etTeamImg" alt="Team" /></div>
             <div class="chal-header">
               <div class="section-label">Team &amp; Role</div>
-              <div class="problem-statement">Led the design and curriculum strengthening of the AI Tutor (Live) system in a lean team, partnering closely with the founder and PM, directing content designers through the tooling I built to deliver a real-time, voice-first tutoring experience in classrooms.</div>
+              <div class="problem-statement cs-statement">Led the design and curriculum strengthening of the AI Tutor (Live) system in a lean team, partnering closely with the founder and PM, directing content designers through the tooling I built to deliver a real-time, voice-first tutoring experience in classrooms.</div>
             </div>
           </div>
 
@@ -1806,8 +2292,13 @@
         </div>
       </div>
 
-    <footer class="thankyou-footer">
-      <span class="ty-text">✦ Thank_you</span>
+    <footer class="thankyou-footer cs-close">
+      <div class="cs-scene close-scene" aria-hidden="true"><img class="cs-scene-img" data-scene="city/layers/chapters/et-live-kitchen" alt="" decoding="async" loading="lazy"><script src="case-study-v6.js"></script></div>
+      <h2 class="cs-h2 cs-close-line">Thanks for reading.</h2>
+      <div class="cs-close-ctas">
+        <a class="cs-glass" href="evertutor-studio.html">Next case study <span aria-hidden="true">→</span></a>
+        <a class="cs-glass" href="index.html">Back home</a>
+      </div>
     </footer>
 
     </div>
@@ -1822,7 +2313,7 @@
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       etScreenVid.removeAttribute('autoplay');
     } else {
-      etScreenVid.src = 'images/et-live.mp4';
+      etScreenVid.src = 'images/et-live-960.mp4';   // (12 Nov) 960w, 1.2 MB: it plays at ~450px on the painted laptop (was the 10.6 MB 1080p master)
       etScreenVid.play().catch(() => {});
     }
     document.getElementById('etChalImg').src   = 'ET Live Case Study/Section 3 Images/Section hero image.png';
@@ -1856,7 +2347,7 @@
       document.documentElement.classList.add('cc-active');
 
       const BLUE      = '#4361EE';
-      const DOT_COLOR = 'rgba(37,37,37,0.7)';
+      const DOT_COLOR = 'rgba(255,252,248,0.85)';   /* v6: warm-white ink — the old charcoal dot vanished on the night ground */
       const CTA_SEL   = 'a[href]:not(.op-card), button, [role="button"], .op-card-cta';
       const TEXT_SEL  = [
         'p','h1','h2','h3','h4','h5','h6','li',
@@ -2004,7 +2495,7 @@
         if (!e.isIntersecting) return;
         navBtns.forEach(b => b.classList.toggle('active', b.dataset.section === e.target.id));
       });
-    }, { threshold: 0.35 });
+    }, { rootMargin: '-40% 0px -55% 0px' });   /* v6: a band mid-viewport, so tall sections (System) still activate */
     document.querySelectorAll('#overview, #problem, #challenges, #system, #impact, #team').forEach(el => navObs.observe(el));
 
     /* ── WORD-BY-WORD HEADING ────────────────────────────────── */
@@ -2033,17 +2524,7 @@
     const words = heading.querySelectorAll('.word');
 
     setTimeout(() => document.getElementById('desigRow').classList.add('visible'), 40);
-    words.forEach((w, i) => {
-      setTimeout(() => {
-        w.classList.add('visible');
-        w.addEventListener('animationend', () => {
-          w.style.opacity = '1';
-          w.style.transform = 'none';
-          w.style.animation = 'none';
-          w.style.willChange = 'auto';
-        }, { once: true });
-      }, 130 + i * 22);
-    });
+    words.forEach((w, i) => w.style.setProperty('--d', ((130 + i * 22) / 1000).toFixed(3) + 's'));   // CSS runs the stagger
     const subtextDelay = 130 + (words.length - 1) * 22 + 275 + 40;
     setTimeout(() => document.getElementById('heroSubtext').classList.add('visible'), subtextDelay);
     setTimeout(() => document.getElementById('liveFrame').classList.add('visible'), subtextDelay + 490);
@@ -2303,7 +2784,7 @@
         if (ph !== _nudgeRenderedPhase) {
           _nudgeRenderedPhase = ph;
           if (ph < 4) {
-            nudge.innerHTML = `<button class="nudge-btn" aria-label="Go to Phase ${ph+1}">Continue to Phase ${ph+1}<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3.5l3.5 3.5L8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+            nudge.innerHTML = `<button class="nudge-btn cs-glass is-small" aria-label="Go to Phase ${ph+1}">Continue to Phase ${ph+1}<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3.5l3.5 3.5L8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
             nudge.querySelector('.nudge-btn').onclick = () =>
               document.querySelector(`.phase-item[data-phase="${ph+1}"]`)?.click();
           } else {
@@ -2392,6 +2873,44 @@
       window.addEventListener('resize', update);
       update();
     });
+  </script>
+
+  <script>
+  /* v6: the live product plays ON the painted laptop. Same screen quad the homepage maps its
+     EverTutor Live film onto (754,433 1089,417 1132,651 791,692 in the 1672×941 plate), carried
+     through the scene img's object-fit:cover + object-position, then a square-to-quad homography
+     (index.html quad()). The video box is contain-fit, so its pixels are never cropped or squashed. */
+  (function placeLiveScreen() {
+    var hero = document.querySelector('.cs-hero'), img = hero && hero.querySelector('.cs-scene-img'),
+        vid = document.getElementById('etScreenImg'), copy = hero && hero.querySelector('.hero-copy');
+    if (!img || !vid) return;
+    var Q = [[754,433],[1089,417],[1132,651],[791,692]], PW = 1672, PH = 941, BW = 1000, BH = 740;
+    function place() {
+      var W = img.clientWidth, H = img.clientHeight; if (!W || !H) return;
+      var op = getComputedStyle(img).objectPosition.split(' ').map(parseFloat);
+      var s = Math.max(W / PW, H / PH), ox = img.offsetLeft + (W - PW * s) * op[0] / 100, oy = img.offsetTop + (H - PH * s) * op[1] / 100;
+      var q = Q.map(function (p) { return [ox + p[0] * s, oy + p[1] * s]; });
+      var x0 = q[0][0], y0 = q[0][1], x1 = q[1][0], y1 = q[1][1], x2 = q[2][0], y2 = q[2][1], x3 = q[3][0], y3 = q[3][1];
+      var dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3, dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
+      var den = dx1 * dy2 - dx2 * dy1, a13 = (dx3 * dy2 - dx2 * dy3) / den, a23 = (dx1 * dy3 - dx3 * dy1) / den;
+      var a11 = x1 - x0 + a13 * x1, a21 = x3 - x0 + a23 * x3, a12 = y1 - y0 + a13 * y1, a22 = y3 - y0 + a23 * y3;
+      vid.style.width = BW + 'px'; vid.style.height = BH + 'px';
+      vid.style.transform = 'matrix3d(' + [a11 / BW, a12 / BW, 0, a13 / BW, a21 / BH, a22 / BH, 0, a23 / BH, 0, 0, 1, 0, x0, y0, 0, 1].join(',') + ')';
+      /* desktop: the copy never runs into the laptop */
+      if (copy) {
+        if (window.innerWidth > 900) {
+          var cl = copy.getBoundingClientRect().left - hero.getBoundingClientRect().left;
+          copy.style.maxWidth = Math.max(340, Math.min(x0, x3) - cl - 48) + 'px';
+        } else copy.style.maxWidth = '';
+      }
+    }
+    place();
+    window.addEventListener('resize', place);
+    img.addEventListener('load', place);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    window.addEventListener('load', place); document.addEventListener('visibilitychange', function () { if (!document.hidden) place(); });
+    if (window.ResizeObserver) new ResizeObserver(function () { place(); }).observe(hero);
+  })();
   </script>
 
   <script>

@@ -6489,8 +6489,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       function playWhenVisible(stage) { var v = stage.querySelector('video'); if (!v) return;
         if (reduce) { v.removeAttribute('autoplay'); return; }
         new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && !document.documentElement.classList.contains('motion-paused')) { v.play().catch(function () {}); } else v.pause(); }); }, { threshold: 0.3 }).observe(stage); }
-      [['evertutor-live.html', '<div class="mbp"><div class="lid"><video src="images/et-live.mp4" poster="images/et-live.png" muted loop playsinline preload="metadata"></video></div><div class="base"></div></div>'],
-       ['evertutor-studio.html', '<div class="mbp"><div class="lid"><video src="images/et-studio.mp4" poster="images/et-studio.png" muted loop playsinline preload="metadata"></video></div><div class="base"></div></div>'],
+      [['evertutor-live.html', '<div class="mbp"><div class="lid"><video src="images/et-live.mp4" poster="images/et-live.png" muted loop playsinline preload="none"></video></div><div class="base"></div></div>'],
+       ['evertutor-studio.html', '<div class="mbp"><div class="lid"><video src="images/et-studio.mp4" poster="images/et-studio.png" muted loop playsinline preload="none"></video></div><div class="base"></div></div>'],
        ['https://dearly-rho.vercel.app', '<div class="bwin"><div class="bar"><i></i><i></i><i></i><span>dearly-rho.vercel.app</span></div><video src="images/thumbs/dearly.mp4" poster="images/card-dearly.webp" muted loop playsinline preload="metadata"></video></div>']
       ].forEach(function (d) { var card = document.querySelector('.wk-card[href="' + d[0] + '"]'); if (!card) return; var st = mount(card, d[1]); if (st) playWhenVisible(st); });
 
@@ -7096,7 +7096,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <button class="reel-card" type="button" data-reel="labor-illusion"
                 aria-label="Play short: The Labor Illusion" aria-haspopup="dialog">
           <img src="shorts/labor-illusion-poster-wide.webp" alt="" loading="lazy" width="1280" height="720">
-          <video muted loop playsinline preload="metadata" src="shorts/labor-illusion.mp4"
+          <video muted loop playsinline preload="none" src="shorts/labor-illusion.mp4"
                  poster="shorts/labor-illusion-poster-wide.webp" aria-hidden="true" tabindex="-1"></video>
           <span class="reel-card-shade" aria-hidden="true"></span>
           <span class="reel-card-t">The Labor Illusion</span>
@@ -7114,7 +7114,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <button class="reel-card" type="button" data-reel="endowment-effect"
                 aria-label="Play short: The Endowment Effect" aria-haspopup="dialog">
           <img src="shorts/endowment-effect-poster.webp" alt="" loading="lazy" width="720" height="1290">
-          <video muted loop playsinline preload="metadata" src="shorts/endowment-effect.mp4"
+          <video muted loop playsinline preload="none" src="shorts/endowment-effect.mp4"
                  poster="shorts/endowment-effect-poster.webp" aria-hidden="true" tabindex="-1"></video>
           <span class="reel-card-shade" aria-hidden="true"></span>
           <span class="reel-card-t">The Endowment Effect</span>
@@ -7440,7 +7440,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <source media="(max-width:767px)" srcset="shorts/labor-illusion-poster.webp">
       <img src="shorts/labor-illusion-poster-wide.webp" alt="" width="1280" height="720">
     </picture>
-    <video id="reelFabVid" muted loop playsinline preload="metadata"
+    <!-- preload="none" (12 Nov): Safari/WebKit treats "metadata" as "download it all" (~47 MB of off-screen film on the homepage); play() fetches on demand -->
+    <video id="reelFabVid" muted loop playsinline preload="none"
            src="shorts/labor-illusion-preview-wide.mp4" poster="shorts/labor-illusion-poster-wide.webp"
            aria-hidden="true" tabindex="-1"></video>
     <span class="reel-fab-shade" aria-hidden="true"></span>
@@ -8608,7 +8609,8 @@ var topNav = document.getElementById('topNav');
   /* 1.35 over the Engine's 1.1 — the longer glide is the plushness; the
      easing stays Lenis's own expo-out */
   // (owner, 12 Nov: "the scroll is very rigid") continuous follow instead of a fixed 1.35 s ease: tracks trackpads closely, settles smoothly
-  var lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true });
+  // (12 Nov, measured) lerp .1 lagged the wheel: half the distance at 0.5 s and 2.3 s to settle vs ~1 s native; .14 keeps the glide, settles ~1/3 sooner
+  var lenis = new Lenis({ lerp: 0.14, wheelMultiplier: 1, smoothWheel: true });
   /* THE LOADER TRAP: while the title sequence holds html at
      overflow:hidden, scrollHeight collapses to one viewport — any limit
      measured under the lock reads 0 and every wheel afterwards clamps to
