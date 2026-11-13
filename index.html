@@ -7263,6 +7263,14 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <!-- (12 Nov 2026, owner: footer "not consistent with the whole page") the page closes where it opened: the hero's Golden Gate, at night.
          The old silhouette video, grain and geometry are kept but hidden; src moved to data-src so the 4.6 MB clip never loads. -->
     <img class="ft-night" src="city/layers/gg_ai/plate_night.webp" alt="" aria-hidden="true" decoding="async" loading="lazy">
+    <!-- the night scene's life (owner: "the last section is not animating" / "bring in clouds") -->
+    <div class="ft-life" aria-hidden="true">
+      <canvas class="ft-stars"></canvas>
+      <img class="ft-cloud ft-cloud-hi" src="city/layers/vc/cloud_a.webp" alt="" loading="lazy">
+      <img class="ft-cloud ft-cloud-fog" src="city/layers/vc/cloud_a.webp" alt="" loading="lazy">
+      <img class="ft-cloud ft-cloud-fog2" src="city/layers/vc/cloud_a.webp" alt="" loading="lazy">
+      <div class="ft-shimmer"></div>
+    </div>
     <div class="ft-shade" aria-hidden="true"></div>
     <div class="ft-vig" aria-hidden="true"></div>
 
@@ -11106,5 +11114,39 @@ html.nav-away .top-nav{transform:translateY(calc(-100% - 24px))!important}
 .chp-go::before,.chp-pause::before{display:none!important}
 .chp-go:hover,.chp-pause:hover,footer.ft .ft-mail:hover,footer.ft .ft-soc:hover{background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.04)),rgba(16,18,26,.18)!important}
 </style>
+<style>
+/* footer night life: stars, a high cloud bank, fog drifting under the bridge, light shimmering on the bay */
+footer.ft .ft-life{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+footer.ft .ft-stars{position:absolute;left:0;top:0;width:100%;height:38%}
+footer.ft .ft-cloud{position:absolute;max-width:none;mix-blend-mode:screen;filter:brightness(.5) saturate(.55) hue-rotate(200deg)}
+footer.ft .ft-cloud-hi{top:-14%;width:max(120vw,1500px);opacity:.16;animation:ftCloud 140s linear infinite}
+footer.ft .ft-cloud-fog{top:44%;width:max(150vw,1800px);opacity:.18;animation:ftCloud 90s linear infinite reverse}
+footer.ft .ft-cloud-fog2{top:52%;width:max(130vw,1600px);opacity:.12;transform:scaleX(-1);animation:ftCloud2 120s linear infinite}
+@keyframes ftCloud{from{translate:-35% 0}to{translate:10% 0}}
+@keyframes ftCloud2{from{translate:5% 0}to{translate:-40% 0}}
+footer.ft .ft-shimmer{position:absolute;left:0;right:0;top:56%;bottom:0;mix-blend-mode:screen;opacity:.55;
+  background:repeating-linear-gradient(180deg,rgba(255,196,120,0) 0 9px,rgba(255,196,120,.14) 11px,rgba(255,196,120,0) 13px);
+  -webkit-mask:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent),linear-gradient(180deg,#000,transparent);mask:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent);
+  animation:ftShimmer 3.2s ease-in-out infinite alternate}
+@keyframes ftShimmer{from{background-position:0 0;opacity:.4}to{background-position:0 6px;opacity:.62}}
+html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){footer.ft .ft-cloud,footer.ft .ft-shimmer{animation:none}}
+</style>
+<script>
+(function () {   // twinkling stars over the footer's night sky; drawn only while the footer is on screen
+  var ft = document.getElementById('contactSection'), cv = ft && ft.querySelector('.ft-stars'); if (!cv) return;
+  var g = cv.getContext('2d'), stars = [], on = false, W = 0, H = 0, dpr = Math.min(2, devicePixelRatio || 1);
+  function size() { W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    stars = []; for (var i = 0; i < Math.round(W * H / 9000); i++) stars.push({ x: Math.random() * W, y: Math.random() * H, r: .5 + Math.random() * 1.1, p: Math.random() * 6.28, s: .6 + Math.random() * 1.6 }); }
+  function draw(t) { if (!on) return; requestAnimationFrame(draw);
+    if (document.documentElement.classList.contains('motion-paused')) return;
+    g.clearRect(0, 0, W, H);
+    for (var i = 0; i < stars.length; i++) { var st = stars[i], a = .35 + .45 * (.5 + .5 * Math.sin(st.p + t / 1000 * st.s));
+      g.beginPath(); g.arc(st.x, st.y, st.r, 0, 6.283); g.fillStyle = 'rgba(255,248,236,' + (a * (1 - st.y / H * .6)).toFixed(3) + ')'; g.fill(); } }
+  size(); addEventListener('resize', size);
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { on = true; draw(0); on = false; return; }
+  new IntersectionObserver(function (es) { var v = es[0].isIntersecting; if (v && !on) { on = true; requestAnimationFrame(draw); } on = v; }).observe(ft);
+})();
+</script>
 </body>
 </html>
