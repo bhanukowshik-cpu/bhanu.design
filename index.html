@@ -5261,7 +5261,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .hero .hero-building:hover svg{transform:translate(2px,-2px)}
       @media (max-width:767px){ .hero .hero-building{top:16vh;font-size:10px;letter-spacing:.08em} }
     </style>
-    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=17" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
+    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=18" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
             tabindex="-1" loading="eager"></iframe>
     <style>
       .hero .hero-city{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:0;background:#0A1430}
@@ -5820,7 +5820,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="chp-stage" aria-hidden="true">
         <img class="chp-plate" src="city/layers/chapters/stressie-park.webp" data-night="city/layers/chapters/stressie-park-night.webp" data-day="city/layers/chapters/stressie-park-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" style="width:900px;height:1950px;border-radius:118px" data-quad="871,151 1154,151 1154,791 871,791"><iframe src="films/stressie-launch.html" title="Stressie launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-screen" style="width:900px;height:1950px;border-radius:118px" data-quad="860,146 1165,146 1165,795 860,795"><iframe src="films/stressie-launch.html" title="Stressie launch film" loading="lazy" tabindex="-1"></iframe></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Founding designer · Figma to SwiftUI</p>
@@ -5932,6 +5932,19 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   html.chp-inview .chp-pause,.chp-pause:focus-visible{opacity:1;pointer-events:auto;transform:none}
   .chp-pause:focus-visible,.chp-go:focus-visible{outline:2px solid #FFFCF8;outline-offset:3px}
   html.motion-paused .chp-lamp,html.motion-paused .chp-steam i,html.motion-paused .chp-bay{animation-play-state:paused}
+  /* liquid-glass CTAs (owner, 12 Nov): clear glass that bends the painting behind it, a bright specular rim on top, a soft
+     caustic glow along the bottom edge, no drop shadow. Same family as the nav bar and the hero's chat lens. */
+  .chp-go,.chp-pause{position:relative;isolation:isolate;overflow:hidden;color:#FFFCF8;border:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.07) 48%,rgba(255,255,255,.12) 100%)!important;
+    -webkit-backdrop-filter:blur(10px) saturate(1.9) brightness(1.08) contrast(1.05);backdrop-filter:blur(10px) saturate(1.9) brightness(1.08) contrast(1.05);
+    box-shadow:inset 0 1.5px .5px rgba(255,255,255,.85),inset 0 -1px 1px rgba(255,255,255,.3),inset 0 0 0 1px rgba(255,255,255,.22),
+      inset 0 -14px 18px -12px rgba(255,255,255,.42),inset 0 12px 16px -14px rgba(255,255,255,.55)!important;
+    transition:transform .25s cubic-bezier(.2,.8,.2,1),background .3s,opacity .3s}
+  .chp-go::before,.chp-pause::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+    background:radial-gradient(60% 90% at 22% 0%,rgba(255,255,255,.38),rgba(255,255,255,0) 60%),radial-gradient(50% 80% at 85% 110%,rgba(255,236,210,.22),rgba(255,236,210,0) 70%)}
+  .chp-go:hover,.chp-pause:hover{background:linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.1) 48%,rgba(255,255,255,.16) 100%)!important}
+  .chp-go:active,.chp-pause:active{transform:scale(.97)}
+  html.chp-inview .chp-pause:active{transform:scale(.97)}
   .am-section[hidden],.sec-divider[hidden]{display:none!important}   /* How I work skipped (owner, 12 Nov) */
   </style>
   <script>
@@ -6047,7 +6060,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       btn.setAttribute('aria-pressed', on ? 'true' : 'false'); btn.textContent = on ? 'Play motion' : 'Pause motion';
       apply();
     });
-    if (wrap && 'IntersectionObserver' in window) new IntersectionObserver(function (es) { root.classList.toggle('chp-inview', es[0].isIntersecting); apply(); }, { threshold: 0 }).observe(wrap);
+    // shown only once the chapters own the middle of the screen, so it never sits on the hero's chat bar (real iPhone check)
+    if (wrap && 'IntersectionObserver' in window) new IntersectionObserver(function (es) { root.classList.toggle('chp-inview', es[0].isIntersecting); apply(); }, { threshold: 0, rootMargin: '-45% 0px -45% 0px' }).observe(wrap);
     if (reduce) apply();
     window.__motionApply = apply;
   })();
