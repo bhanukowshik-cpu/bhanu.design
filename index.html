@@ -5775,7 +5775,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <video class="chp-loop" src="city/layers/chapters/loops/vc-office.mp4?v=13" poster="city/layers/chapters/vc-office.webp" data-quad="1090,393 1476,372 1420,683 1029,651" muted loop playsinline preload="auto"></video>
         <canvas class="chp-birds" width="1672" height="941"></canvas>
         <div class="chp-bay"></div>
-        <div class="chp-screen" data-quad="1104,411 1496,388 1438,705 1047,673"><iframe src="films/vc-launch.html?v=14" title="Verified Call launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-screen" data-quad="1104,411 1496,388 1438,705 1047,673"><iframe src="films/vc-launch.html?v=15" title="Verified Call launch film" loading="lazy" tabindex="-1"></iframe></div>
         <div class="chp-steam"><i></i><i></i><i></i></div>
         <div class="chp-lamp"></div>
       </div>
@@ -5850,7 +5850,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="chp-stage" aria-hidden="true">
         <img class="chp-plate" src="city/layers/chapters/stressie-park.webp" data-night="city/layers/chapters/stressie-park-night.webp" data-day="city/layers/chapters/stressie-park-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" style="width:900px;height:1950px;border-radius:118px" data-quad="860,146 1165,146 1165,795 860,795"><iframe src="films/stressie-launch.html?v=13" title="Stressie launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-screen" style="width:900px;height:1950px;border-radius:118px" data-quad="860,146 1165,146 1165,795 860,795"><iframe src="films/stressie-launch.html?v=14" title="Stressie launch film" loading="lazy" tabindex="-1"></iframe></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Founding designer · Figma to SwiftUI</p>
@@ -7333,7 +7333,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
           <h2 class="ft-cta">
             <span class="ft-line">Looking for a designer who moves&nbsp;fast?</span>
-            <a class="ft-line serif ft-mailto" href="mailto:kowshikbhanu1000@gmail.com">Email me.</a>
+            <span class="ft-line serif">Email me.</span>
           </h2>
 
           <!-- the hero's own button, so the page closes on the same invitation
@@ -11222,7 +11222,7 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
     if (first) box.style.setProperty('--cl-night', getComputedStyle(first).getPropertyValue('--night') || 0);
     if (!mv) { mv = document.createElement('div'); mv.className = 'cl-move'; [].slice.call(box.children).forEach(function (c) { if (!c.classList.contains('cl-title')) mv.appendChild(c); }); box.insertBefore(mv, box.firstChild); }
     var seam = vh * (1 - p), swell = cl((p - .25) / .3), sw = swell * swell * (3 - 2 * swell);
-    mv.style.transform = 'translateY(' + (seam - (band ? 165 : 175) - sw * (seam + 40)).toFixed(1) + 'px)';   // tops ride just under the hero's chat bar, then swell to fill the screen
+    mv.style.transform = 'translateY(' + (seam - (band ? 140 : 105) - sw * (seam + 40)).toFixed(1) + 'px)';   // (owner) tips sit low at rest   // tops ride just under the hero's chat bar, then swell to fill the screen
     L[0].style.transform = 'translate(calc(-50% - ' + (pe * vw * .7).toFixed(1) + 'px),0px) scale(' + (1 + pe * .35).toFixed(3) + ')';   // no lift: the tops stay under the hero's chat bar
     L[1].style.transform = 'translate(calc(-50% + ' + (pe * vw * .75).toFixed(1) + 'px),0px) scaleX(-1) scale(' + (1 + pe * .35).toFixed(3) + ')';
     L[2].style.transform = 'translate(-50%,' + (pe * vh * .55).toFixed(1) + 'px) scale(' + (1.1 + pe * .5).toFixed(3) + ')';
@@ -11233,7 +11233,11 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
     // the hero chat bar's glass is drawn inside the hero painting, beneath this layer: cut a bar-shaped window so the
     // clouds always pass BEHIND the chat bar (owner)
     var bar = document.querySelector('.hero .cta-dock .cta'), br = bar && bar.getBoundingClientRect();
-    if (br && br.bottom > 0 && br.top < vh && br.width) {
+    // as the bank swells the chat bar dissolves into it (and its window in the clouds closes), never floating over the clouds
+    var dock = bar && bar.parentElement, fade = 1 - Math.min(1, sw * 2.2);
+    if (dock) dock.style.opacity = fade < .999 ? fade.toFixed(3) : '';
+    if (dock) dock.style.pointerEvents = fade < .2 ? 'none' : '';
+    if (br && br.bottom > 0 && br.top < vh && br.width && fade > .02) {
       var bb = box.getBoundingClientRect(), BW = Math.round(bb.width), BH = Math.round(bb.height);
       var R = Math.min(parseFloat(getComputedStyle(bar).borderTopLeftRadius) || 0, br.height / 2), x = br.left - bb.left, y = br.top - bb.top, w = br.width, h = br.height;
       var d = 'M0 0H' + BW + 'V' + BH + 'H0Z M' + (x + R) + ' ' + y + 'H' + (x + w - R) + 'A' + R + ' ' + R + ' 0 0 1 ' + (x + w) + ' ' + (y + R) + 'V' + (y + h - R) + 'A' + R + ' ' + R + ' 0 0 1 ' + (x + w - R) + ' ' + (y + h) + 'H' + (x + R) + 'A' + R + ' ' + R + ' 0 0 1 ' + x + ' ' + (y + h - R) + 'V' + (y + R) + 'A' + R + ' ' + R + ' 0 0 1 ' + (x + R) + ' ' + y + 'Z';

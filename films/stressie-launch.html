@@ -49,7 +49,9 @@
   .stat span{display:block;margin-top:22px;font-weight:500;font-size:52px;line-height:1.25;color:#A9B0BE}
 
   .end .big{font-size:150px}
-  .pop{display:none!important}   /* the real reward screen already says "+10 reset coins" */
+  .pop{display:none!important}
+  /* (owner: "I want the video visual") the check-in is the real simulator recording: the slider drags, the shape answers, the reward sheet rises */
+  .scr video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#F6F1E8}   /* the real reward screen already says "+10 reset coins" */
 </style>
 </head>
 <body>
@@ -57,7 +59,7 @@
   <section class="sc" id="s1"><p class="big"><span class="w">A</span> <span class="w acc">stress</span><br><span class="w acc">check-in</span> <span class="w">that</span><br><span class="w">pays</span> <span class="w">for</span> <span class="w">your</span><br><span class="w">evening.</span></p></section>
 
   <section class="sc" id="s2">
-    <div class="scr" id="p1"><img data-n="checkin-shape" src="../images/stressie-v4/real-checkin.webp" alt=""><img data-n="checkin-reward" src="../images/stressie-v4/real-reward.webp" alt=""><i class="finger"></i><span class="pop">+10 coins</span></div>
+    <div class="scr" id="p1"><video id="v1" src="../images/stressie-v4/hero-loop.mp4" poster="../images/stressie-v4/hero-poster.webp" muted playsinline preload="auto"></video></div>
   </section>
 
   <section class="sc" id="s3"><p class="big"><span class="w">Spent</span><br><span class="w acc">after</span> <span class="w acc">work.</span></p></section>
@@ -90,27 +92,22 @@
   function finger(box, x, y, vis) { var f = $(box).querySelector('.finger'); f.style.left = x + '%'; f.style.top = y + '%'; f.style.opacity = vis ? 1 : 0; }
   function tap(box) { var f = $(box).querySelector('.finger'); f.classList.add('press'); setTimeout(function () { f.classList.remove('press'); }, 180); }
   function reset() {
-    $('p1').querySelector('.pop').classList.remove('on');
     [].forEach.call(document.querySelectorAll('.scr img'), function (i) { i.classList.remove('on', 'out'); });
     [].forEach.call(document.querySelectorAll('.finger'), function (f) { f.style.transition = 'none'; f.style.opacity = 0; void f.offsetWidth; f.style.transition = ''; });
-    finger('p1', 4, 72, false); finger('p2', 60, 40, false);
+    finger('p2', 60, 40, false); var v = $('v1'); if (v) { v.pause(); try { v.currentTime = 0; } catch (e) {} }
   }
   function run() {
     T.forEach(clearTimeout); T = []; reset();
     show('s1');
-    at(2800, function () { img('p1', 'checkin-shape'); show('s2'); });
-    at(3300, function () { finger('p1', 4, 72, true); });
-    at(3900, function () { finger('p1', 70, 72, true); });
-    at(5600, function () { finger('p1', 72, 55, false); img('p1', 'checkin-reward'); });
-    at(6000, function () { $('p1').querySelector('.pop').classList.add('on'); });
-    at(8400, function () { show('s3'); });
-    at(10200, function () { img('p2', 'offwork-map'); show('s4'); });
-    at(10800, function () { finger('p2', 60, 40, true); });
-    at(11800, function () { tap('p2'); });
-    at(12200, function () { img('p2', 'offwork-redeem'); finger('p2', 60, 40, false); });
-    at(14800, function () { show('s5'); });
-    at(18800, function () { show('s6'); });
-    at(21200, run);
+    at(2800, function () { show('s2'); var v = $('v1'); if (v) { try { v.currentTime = 0; } catch (e) {} var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } });
+    at(10700, function () { show('s3'); });
+    at(12500, function () { img('p2', 'offwork-map'); show('s4'); });
+    at(13100, function () { finger('p2', 60, 40, true); });
+    at(14100, function () { tap('p2'); });
+    at(14500, function () { img('p2', 'offwork-redeem'); finger('p2', 60, 40, false); });
+    at(17100, function () { show('s5'); });
+    at(21100, function () { show('s6'); });
+    at(23500, run);
   }
   // a11y: hold still on the proof frame when the visitor prefers reduced motion or the page's motion is paused
   var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -120,7 +117,7 @@
   addEventListener('message', function (e) {
     if (!e.data || e.data.type !== 'film') return;
     if (e.data.play && !playing) { playing = true; run(); }
-    else if (!e.data.play && playing) { playing = false; T.forEach(clearTimeout); T = []; }
+    else if (!e.data.play && playing) { playing = false; T.forEach(clearTimeout); T = []; var v = $('v1'); if (v) v.pause(); }
   });
 })();
 </script>
