@@ -667,11 +667,11 @@ const FS_FX = /* glsl */`
         float fade = exp(-u / 260.0);
         float foam = smoothstep(w, 0.0, abs(abs(v) - arm)) * step(thr, n);
         float inner = smoothstep(w, 0.0, abs(abs(v) - arm * 0.5)) * step(thr + 0.05, fbm(vec2(u * 0.06 - uTime * 1.4, v * 0.4 + 5.0)));
-        aL += (foam + 0.7 * inner) * fade * uFerryA;
+        aL += (foam + 0.7 * inner) * fade * uFerryA * mix(0.35, 1.0, uDayK);   // (12 Nov) a faint cool trail at night, not pale blobs
       }
       vec2 q = P - uBow * vec2(1920.0, 1080.0);
       float ub = dot(q, dir), vb = dot(q, vec2(-dir.y, dir.x));
-      aL += 0.8 * smoothstep(6.0, 0.0, length(vec2(ub + 2.0, 2.0 * vb)) - 2.0) * uFerryA;   // bow crescent
+      aL += 0.8 * smoothstep(6.0, 0.0, length(vec2(ub + 2.0, 2.0 * vb)) - 2.0) * uFerryA * mix(0.35, 1.0, uDayK);   // bow crescent
     }
 
     vec3 col = mix(RING_LIGHT, uSkyHor, 0.2) * mix(0.4, 1.0, uDayK);
@@ -729,8 +729,9 @@ const FS_GULLS = /* glsl */`
       a = max(a, smoothstep(0.10, 0.04, d - (1.0 - p.x) * 0.03));
     }
     if (a < 0.003) discard;
-    vec3 col = mix(vec3(0.16, 0.18, 0.26), uSkyHor, 0.25);
-    gl_FragColor = vec4(col, a * mix(0.4, 0.9, uDayK));
+    // (12 Nov, owner: birds invisible in the dark) dark ink by day, pale moonlit silver at night, never fading out
+    vec3 col = mix(vec3(0.78, 0.80, 0.90), mix(vec3(0.16, 0.18, 0.26), uSkyHor, 0.25), uDayK);
+    gl_FragColor = vec4(col, a * 0.85);
   }`;
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -1479,7 +1480,7 @@ function makeTextPass() {
   // (12 Nov, owner: "Hi" was cut out by the tower) a faint second copy of the text drawn OVER everything, so a letter behind a tower
   // still reads through it like glass; the towers stay visibly in front
   const ghostMat = mat.clone(); ghostMat.uniforms = { tText: { value: textTex }, uA: { value: 0.36 } };
-  const ghost = new THREE.Mesh(QUAD, ghostMat); ghost.frustumCulled = false; ghost.renderOrder = 9000; ghost.name = 'hero-text-ghost'; scene.add(ghost);
+  // (12 Nov) ghost retired: the cut-out is now tower-only with solid steel (no cables slicing the letters), so the text sits cleanly behind
   document.documentElement.classList.add('text-in-scene');
   document.fonts?.ready.then(() => { textKey = ''; });
   return { mesh, mat, ghostMat };
