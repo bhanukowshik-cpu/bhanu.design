@@ -5796,7 +5796,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <img class="chp-plate" src="city/layers/chapters/et-live-kitchen.webp" data-night="city/layers/chapters/et-live-kitchen-night.webp" data-day="city/layers/chapters/et-live-kitchen-day.webp" alt="">
         <video class="chp-loop" src="city/layers/chapters/loops/et-live.mp4?v=13" poster="city/layers/chapters/et-live-kitchen.webp" data-quad="741,418 1073,403 1114,629 778,669" muted loop playsinline preload="auto"></video>
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" data-quad="754,433 1089,417 1132,651 791,692"><iframe src="films/et-live-launch.html?v=13" title="EverTutor Live launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-screen" data-quad="754,433 1089,417 1132,651 791,692"><iframe src="films/et-live-launch.html?v=14" title="EverTutor Live launch film" loading="lazy" tabindex="-1"></iframe></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Sole product designer · EverTutor</p>
@@ -5814,7 +5814,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="chp-stage" aria-hidden="true">
         <img class="chp-plate" src="city/layers/chapters/et-studio-classroom.webp" data-night="city/layers/chapters/et-studio-classroom-night.webp" data-day="city/layers/chapters/et-studio-classroom-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" data-quad="793,372 1241,348 1224,654 771,639"><iframe src="films/et-studio-launch.html?v=13" title="EverTutor Studio launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-screen" data-quad="793,372 1241,348 1224,654 771,639"><iframe src="films/et-studio-launch.html?v=14" title="EverTutor Studio launch film" loading="lazy" tabindex="-1"></iframe></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Sole product designer · EverTutor</p>
@@ -5832,7 +5832,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="chp-stage" aria-hidden="true">
         <img class="chp-plate" src="city/layers/chapters/et-analytics-office.webp" data-night="city/layers/chapters/et-analytics-office-night.webp" data-day="city/layers/chapters/et-analytics-office-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" data-quad="790,366 1245,341 1228,659 768,643"><iframe src="films/et-analytics-launch.html?v=1" title="EverTutor Analytics launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-screen" data-quad="790,366 1245,341 1228,659 768,643"><iframe src="films/et-analytics-launch.html?v=2" title="EverTutor Analytics launch film" loading="lazy" tabindex="-1"></iframe></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Sole product designer · EverTutor</p>
@@ -11462,6 +11462,110 @@ footer.ft::before{content:'';position:absolute;left:0;right:0;top:0;height:min(2
 /* chat prompts: one line or two, always vertically centred in the bar */
 .hero .cta-dock .cta-text{align-items:center!important}
 .hero .cta-dock .cta-text span{align-self:center!important;height:auto!important}
+</style>
+<style>
+/* living paintings (12 Nov, owner: "moving plants, coffee, water"): a WebGL layer per chapter that gently displaces the
+   painting's own pixels inside soft regions (hanging plants sway from their hook, potted plants and trees from their base,
+   the bay ripples). Furniture, devices and people never move. Steam rises from the cups. */
+.chp-stage > canvas.chp-life{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.chp-stage > .chp-bay{display:none!important}                       /* the CSS stripe stand-in retires: the water is real now */
+.chp-stage.has-loop > .chp-steam{display:block!important;opacity:calc(1 - var(--lo,0))}
+@media (prefers-reduced-motion:reduce){.chp-stage > canvas.chp-life{display:none}}
+</style>
+<script>
+(function () {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // regions in painting px [x0,y0,x1,y1], kind 0 = hangs from the top, 1 = grows from the base, 2 = water; amp px, speed, phase
+  var R = {
+    'vc-office':           [[990,0,1200,370,0,5,.9,0],[0,650,380,941,1,6,.8,1.3],[60,530,890,665,2,1.1,1,0]],
+    'et-live-kitchen':     [[900,0,1200,350,0,5,.85,.4],[1530,200,1672,380,1,3.5,1,2],[40,385,330,495,2,.9,1,0]],
+    'et-studio-classroom': [[905,0,1175,350,0,5,.9,.8],[735,225,865,505,1,3,.7,2.2],[40,385,345,485,2,.9,1,0]],
+    'et-analytics-office': [[905,0,1185,335,0,5,.9,.2],[1445,0,1672,225,0,4,1,1.7],[495,525,695,665,1,3.5,1.1,2.6],[30,415,560,485,2,1,1,0]],
+    'stressie-park':       [[860,0,1330,125,0,4,.8,.5],[0,185,345,525,1,5,.7,1.1],[245,375,355,545,1,3.5,.8,2.4],[0,575,205,805,1,4,1,.3]],
+    'dearly-alamo':        [[575,0,885,125,0,4,.8,.6],[1195,0,1405,205,0,4,.9,1.9],[255,495,505,625,1,2.5,.7,2.8],[525,535,735,685,1,3,1,1.2]]
+  };
+  var STEAM = { 'et-analytics-office': [742, 668], 'dearly-alamo': [1192, 690] };
+  var VS = 'attribute vec2 p;varying vec2 v;void main(){v=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}';
+  var FS = 'precision mediump float;uniform sampler2D uG,uD,uN;uniform vec3 uW;uniform float uT,uA;uniform vec4 uR[6];uniform vec4 uK[6];uniform int uC;varying vec2 v;' +
+    'void main(){vec2 S=vec2(1672.,941.),p=v*S,d=vec2(0.);float a=0.;' +
+    'for(int i=0;i<6;i++){if(i>=uC)break;vec4 r=uR[i],k=uK[i];float f=min(min(p.x-r.x,r.z-p.x),min(p.y-r.y,r.w-p.y));float w=smoothstep(0.,36.,f);if(w<=0.)continue;' +
+    'float ty=clamp((p.y-r.y)/(r.w-r.y),0.,1.);' +
+    'if(k.x<.5){float g=pow(ty,1.4);d.x+=w*k.y*g*sin(uT*k.z+k.w+p.y*.012);d.y+=w*k.y*.2*g*sin(uT*k.z*1.3+k.w);}' +
+    'else if(k.x<1.5){float g=pow(1.-ty,1.4);d.x+=w*k.y*g*sin(uT*k.z+k.w+p.x*.01);}' +
+    'else{d.y+=w*k.y*(sin(p.x*.09+uT*1.7+k.w)*.6+sin(p.x*.031-uT*1.1)*.4);d.x+=w*k.y*.3*sin(p.y*.2+uT*1.3);}' +
+    'a=max(a,w);}' +
+    'if(a<=0.){gl_FragColor=vec4(0.);return;}vec2 uv=(p-d)/S;' +
+    'vec3 c=texture2D(uG,uv).rgb*uW.x+texture2D(uD,uv).rgb*uW.y+texture2D(uN,uv).rgb*uW.z;a*=uA;gl_FragColor=vec4(c*a,a);}';
+  var L = [];
+  [].forEach.call(document.querySelectorAll('#chapters .chp'), function (ch) {
+    var stage = ch.querySelector('.chp-stage'), plate = stage && stage.querySelector('img.chp-plate'); if (!plate) return;
+    var m = (plate.getAttribute('src') || '').match(/\/([a-z-]+?)(?:-bg)?\.webp/); if (!m || !R[m[1]]) return;
+    var n = m[1];
+    if (STEAM[n] && !stage.querySelector('.chp-steam')) {
+      var st = document.createElement('div'); st.className = 'chp-steam'; st.innerHTML = '<i></i><i></i><i></i>';
+      st.style.left = (STEAM[n][0] / 16.72) + '%'; st.style.top = (STEAM[n][1] / 9.41) + '%'; stage.appendChild(st);
+    }
+    var cv = document.createElement('canvas'); cv.className = 'chp-life'; cv.width = 1672; cv.height = 941;
+    stage.insertBefore(cv, stage.querySelector('canvas.chp-birds') || stage.querySelector('.chp-near'));
+    L.push({ ch: ch, stage: stage, plate: plate, cv: cv, regions: R[n], gl: null, ready: false });
+  });
+  if (!L.length) return;
+  function setup(o) {
+    var gl = o.cv.getContext('webgl', { premultipliedAlpha: true, alpha: true, antialias: false }); if (!gl) return false;
+    function sh(t, src) { var s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s); return s; }
+    var pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return false;
+    gl.useProgram(pr);
+    var b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    var lp = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp, 2, gl.FLOAT, false, 0, 0);
+    o.tex = {}; ['uG', 'uD', 'uN'].forEach(function (u, i) { var t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + i); gl.bindTexture(gl.TEXTURE_2D, t);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+      gl.uniform1i(gl.getUniformLocation(pr, u), i); o.tex[u] = { t: t, unit: i, src: '' }; });
+    var rr = [], kk = []; o.regions.forEach(function (r) { rr.push(r[0], r[1], r[2], r[3]); kk.push(r[4], r[5], r[6], r[7]); });
+    gl.uniform4fv(gl.getUniformLocation(pr, 'uR'), new Float32Array(rr.concat(new Array(24 - rr.length).fill(0))));
+    gl.uniform4fv(gl.getUniformLocation(pr, 'uK'), new Float32Array(kk.concat(new Array(24 - kk.length).fill(0))));
+    gl.uniform1i(gl.getUniformLocation(pr, 'uC'), o.regions.length);
+    o.uW = gl.getUniformLocation(pr, 'uW'); o.uT = gl.getUniformLocation(pr, 'uT'); o.uA = gl.getUniformLocation(pr, 'uA');
+    gl.viewport(0, 0, 1672, 941); o.gl = gl; return true;
+  }
+  function bind(o, u, img) {   // upload the image that is actually on screen for that time of day (once per source)
+    var T = o.tex[u], gl = o.gl, src = img ? img.currentSrc || img.src : '';
+    if (!img || !img.complete || !img.naturalWidth || T.src === src) return;
+    gl.activeTexture(gl.TEXTURE0 + T.unit); gl.bindTexture(gl.TEXTURE_2D, T.t);
+    try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img); T.src = src; } catch (e) {}
+  }
+  var t0 = performance.now(), raf = 0;
+  function frame() {
+    raf = 0; var vh = innerHeight, any = false, paused = document.documentElement.classList.contains('motion-paused');
+    L.forEach(function (o) {
+      var r = o.ch.getBoundingClientRect(); if (r.bottom < -40 || r.top > vh + 40) return;
+      any = true; if (!o.gl && !setup(o)) { o.cv.remove(); return; }
+      var td = o.stage.querySelector('img.chp-tod-day'), tn = o.stage.querySelector('img.chp-tod-night'), lp = o.stage.querySelector('video.chp-loop');
+      bind(o, 'uG', o.plate); bind(o, 'uD', td || o.plate); bind(o, 'uN', tn || o.plate);
+      var wD = td ? +td.style.opacity || 0 : 0, wN = tn ? +tn.style.opacity || 0 : 0, lo = lp ? +(lp.style.opacity || 0) : 0;
+      o.stage.style.setProperty('--lo', lo.toFixed(3));
+      var gl = o.gl; gl.uniform3f(o.uW, (1 - wN) * (1 - wD), wD, wN * (1 - wD)); gl.uniform1f(o.uA, 1 - lo);
+      gl.uniform1f(o.uT, paused ? 0 : (performance.now() - t0) / 1000);
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    });
+    if (any && !document.hidden) raf = requestAnimationFrame(frame);
+  }
+  function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+  addEventListener('scroll', kick, { passive: true }); addEventListener('resize', kick); document.addEventListener('visibilitychange', kick);
+  setInterval(kick, 1000); kick();
+  window.__chpLife = frame;
+})();
+</script>
+<style>
+/* phones (owner): the chat bar hugs its prompt, text left-aligned, and resizes with each prompt; a long prompt wraps to two lines */
+@media (max-width:480px){
+  .hero .cta-dock .cta{width:auto!important;max-width:calc(100vw - 32px)!important;justify-content:flex-start!important;padding:0 20px 0 12px!important}
+  .hero .cta-dock .cta-text{display:block!important;position:relative!important;text-align:left!important;flex:0 1 auto!important}
+  .hero .cta-dock .cta-text span{text-align:left!important}
+  .hero .cta-dock .cta-text span:not(.on){position:absolute!important;left:0;top:0;width:100%}
+  .hero .cta-dock .cta-text span.on{position:relative!important;display:block!important}
+}
 </style>
 </body>
 </html>
