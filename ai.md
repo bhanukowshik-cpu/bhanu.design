@@ -12,6 +12,8 @@ Primary sources to read alongside this brief:
   false alarms, confidence bounds and date; the numbers below are quoted from it).
 - The Verified Call case study, including how the evaluation system works and where the product doesn't work yet:
   https://bhanu.build/verified-call.html#evidence
+- Code for three of the evaluation rules (exact confidence bounds, rules pinned before results, the claim guard for
+  product copy), public and tested: https://github.com/bhanukowshik-cpu/verified-call-eval-kit
 - Rendered screenshots and clips of every page: https://bhanu.build/review/
 
 Highlights, each from his case studies:
@@ -139,6 +141,11 @@ The call he owned: in-person events wait for human approval, against the founder
 
 Role: sole product designer; he owned interaction design, voice UX and the curriculum tooling system, end to end.
 $9.5M seed-funded, ~2,000 learners, 8+ schools.
+
+He designed it; EverTutor's engineers built it. The core idea was his: teach the way a tutor at a whiteboard does. The
+lesson builds on a board in handwriting-style visuals while the tutor, in a corner of the screen, talks, listens and
+adapts, at a time when most AI tutors he studied were chat windows. With no tool that could prototype a tutor that
+writes while it speaks, he prototyped it by hand (a whiteboard canvas and the handwriting-style Shantell Sans typeface), and that layout became the foundation of every later phase.
 
 A voice-first AI tutor that makes 1:1 tutoring (worth ~2 standard deviations in outcomes, but $50–$250 a session)
 scalable. Built in four phases: a whiteboard-style interface with handwritten visuals and "hold to speak" voice
