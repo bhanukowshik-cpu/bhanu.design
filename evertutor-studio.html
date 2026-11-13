@@ -2060,7 +2060,7 @@
             <!-- Top: image + label + description -->
             <div class="tr-top tr-anim">
               <div class="tr-image-frame">
-                <img src="cs-team-image.jpg" alt="Team" />
+                <img src="images/cs-thumbs/cs-team-192.webp" width="96" height="96" loading="lazy" decoding="async" alt="Team" />
               </div>
               <div class="tr-top-text">
                 <p class="tr-label">Team &amp; Role</p>
@@ -2112,7 +2112,7 @@
             <div class="imp-top">
               <div class="imp-header tr-anim">
                 <div class="imp-image-frame">
-                  <img src="cs-impact-image.jpg" alt="Impact" />
+                  <img src="images/cs-thumbs/cs-impact-192.webp" width="96" height="96" loading="lazy" decoding="async" alt="Impact" />
                 </div>
                 <div class="imp-header-text">
                   <p class="imp-label">IMPACT</p>
@@ -2220,7 +2220,7 @@
             <!-- Header -->
             <div class="ug-header tr-anim">
               <div class="ug-image-frame">
-                <img src="cs-users-image.jpg" alt="Users & Goals" />
+                <img src="images/cs-thumbs/cs-users-192.webp" width="96" height="96" loading="lazy" decoding="async" alt="Users & Goals" />
               </div>
               <div class="ug-header-text">
                 <p class="ug-label">USERS &amp; GOALS</p>
@@ -2284,7 +2284,7 @@
 
             <div class="tr-top tr-anim">
               <div class="cd-image-frame">
-                <img src="cs-constraints-image.jpg" alt="Constraints" />
+                <img src="images/cs-thumbs/cs-constraints-192.webp" width="96" height="96" loading="lazy" decoding="async" alt="Constraints" />
               </div>
               <div class="tr-top-text">
                 <p class="tr-label">Constraints &amp; Design Tradeoffs</p>
@@ -2352,7 +2352,7 @@
 
             <div class="tr-top tr-anim">
               <div class="cd-image-frame">
-                <img src="cs-design-image.jpg" alt="Design Approach" />
+                <img src="images/cs-thumbs/cs-design-192.webp" width="96" height="96" loading="lazy" decoding="async" alt="Design Approach" />
               </div>
               <div class="tr-top-text">
                 <p class="tr-label">Design Approach</p>
@@ -2423,7 +2423,7 @@
 
             <div class="oc-header tr-anim">
               <div class="oc-image-frame">
-                <img src="cs-outcomes-image.jpg" alt="Outcomes" />
+                <img src="images/cs-thumbs/cs-outcomes-192.webp" width="96" height="96" loading="lazy" decoding="async" alt="Outcomes" />
               </div>
               <div class="oc-header-text">
                 <p class="oc-label">Outcomes</p>
@@ -2612,7 +2612,7 @@
     });
   }
 
-  document.getElementById('etBgImg').src = 'images/hero-bg-studio.png';
+  // (13 Nov) the aurora plate is hidden in the v6 hero (painted classroom instead): no longer downloaded (was 1.5 MB)
 
   const csHeading  = document.getElementById('csHeading');
   const csSubtitle = document.getElementById('csSubtitle');
@@ -2780,6 +2780,8 @@
 
   hamburger.addEventListener('click', () => toggleMenu());
   backdrop.addEventListener('click', () => toggleMenu(false));
+  // (13 Nov QA) Escape closes the menu from anywhere and hands focus back to the menu button, like the other case studies
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && hamburger.classList.contains('open')) { e.preventDefault(); toggleMenu(false); hamburger.focus(); } });
 
   // Close on link click then smooth scroll
   mobileMenu.querySelectorAll('a').forEach(a => {
