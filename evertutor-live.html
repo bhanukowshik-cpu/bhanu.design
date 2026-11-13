@@ -1662,8 +1662,20 @@
     [data-theme="dark"] .nav .nav-sections { position: static; transform: none; margin: 0 auto; }
     [data-theme="dark"] .nav-home img { width: 36px; height: 36px; }
     [data-theme="dark"] .nav-home span { font: 600 15px/1 var(--font-heading); letter-spacing: 0; }
-    @media (min-width: 1024px) and (max-width: 1360px) { [data-theme="dark"] .nav .nav-btn { padding: 10px 12px; font-size: 13px; } }
-    .mobile-menu a.mcta { color: #A6CBFF; }
+    [data-theme="dark"] .nav .nav-btn { font-size: 13px; padding: 9px 14px; }   /* 31px tabs, as on Verified Call */
+    @media (min-width: 1024px) and (max-width: 1360px) { [data-theme="dark"] .nav .nav-btn { padding: 9px 10px; } }
+    /* eight tabs now: the menu takes over up to 1180px, and Copy stays icon-only up to 1300px */
+    @media (min-width: 1024px) and (max-width: 1180px) {
+      [data-theme="dark"] .nav .nav-sections { display: none; } .nav-hamburger { display: flex; }
+      .nav-end { margin-left: auto; margin-right: 10px; }
+    }
+    @media (min-width: 1241px) and (max-width: 1300px) {
+      .nav-end .aai-idle { display: none; } .nav-end .aai-done { font-size: 0; gap: 0; }
+      .nav-end .aai-copy { padding: 0 6px 0 12px; } .nav-end .aai-pick { width: 30px; }
+    }
+    [data-theme="dark"] .mobile-menu a.mcta { margin-top: 20px; align-self: flex-start; width: fit-content; padding: 12px 22px; border: 1px solid rgba(255,255,255,.28); border-radius: 16px; color: #fff; }
+    /* eyebrows: one ink on all four case studies, 12px on phones too */
+    [data-theme="dark"] .section-label { color: rgba(255,252,248,.62); font-size: 12px; }
     /* column: the shared gutter — content edge 148px at 1440, 1144px column (the .card sits at --cs-edge, so subtract it) */
     [data-theme="dark"] .cs-section-wrap {
       padding-left: calc(max(var(--cs-gutter), (100vw - var(--cs-col)) / 2) - var(--cs-edge));
@@ -1672,12 +1684,13 @@
     [data-theme="dark"] .thankyou-footer.cs-close { padding-left: max(var(--cs-gutter), (100vw - var(--cs-col)) / 2); padding-right: max(var(--cs-gutter), (100vw - var(--cs-col)) / 2); }
     [data-theme="dark"] .chal-body, [data-theme="dark"] .st-lead, [data-theme="dark"] .prob-body, [data-theme="dark"] .team-role-body { max-width: var(--cs-measure); }
     /* hero: a 4-line headline, not 6 */
-    [data-theme="dark"] .cs-hero .cs-heading { font-size: clamp(44px, 4.2vw, 64px); text-wrap: balance; }
+    [data-theme="dark"] .cs-hero .cs-heading { font-size: clamp(44px, 4.45vw, 72px); text-wrap: balance; }   /* 64px at 1440 */
+    @media (min-width: 901px) { [data-theme="dark"] .cs-hero > .cs-scene-img { object-position: 5% 50%; } }   /* laptop ~40px further right, so the 64px headline keeps its 4 lines (placeLiveScreen reads this) */
     /* section headlines on the shared H2 scale (54.72px/800 at 1440); words and case unchanged */
     [data-theme="dark"] .st-head,
     [data-theme="dark"] .chal-header .problem-statement { font: 800 clamp(34px, 3.8vw, 56px)/1.04 var(--font-display); letter-spacing: -.035em; color: var(--cs-ink); max-width: 24ch; text-wrap: balance; }
     /* headlines over ~60 characters (now real h2s) take the statement scale; short ones keep the H2 scale above */
-    [data-theme="dark"] .chal-header .problem-statement.is-statement { font: 700 clamp(26px, 2.5vw, 38px)/1.22 var(--font-display, 'Montserrat', sans-serif); letter-spacing: -.02em; max-width: 30ch; }
+    [data-theme="dark"] .chal-header .problem-statement.is-statement { font: 700 clamp(26px, 2.5vw, 38px)/1.22 var(--font-display, 'Montserrat', sans-serif); letter-spacing: -.02em; max-width: 38ch; }
     @media (max-width: 767px) { [data-theme="dark"] .chal-header .problem-statement.is-statement { font-size: 24px; } }
     /* system accordion: the open phase keeps its icon (+ turns to −) and its title + body start on the label's x */
     [data-theme="dark"] .phase-plus-circle { transition: transform .42s cubic-bezier(0.16,1,0.3,1), border-color .3s ease; }
@@ -1707,8 +1720,10 @@
       <a href="#overview"    class="nav-btn active" data-section="overview">Overview</a>
       <a href="#problem"     class="nav-btn"        data-section="problem">The Problem</a>
       <a href="#challenges"  class="nav-btn"        data-section="challenges">Challenges</a>
+      <a href="#core-idea"   class="nav-btn"        data-section="core-idea">Core idea</a>
       <a href="#system"      class="nav-btn"        data-section="system">System</a>
       <a href="#impact"      class="nav-btn"        data-section="impact">Impact</a>
+      <a href="#growth"      class="nav-btn"        data-section="growth">Growth</a>
       <a href="#team"        class="nav-btn"        data-section="team">Team</a>
     </div>
     <div class="nav-end"><div data-ask-ai data-phone-compact data-focus="his EverTutor Live case study"></div><a class="nav-cta cs-glass" href="mailto:kowshikbhanu1000@gmail.com">Email me</a></div>
@@ -1722,8 +1737,10 @@
     <a href="#overview"   data-section="overview">Overview</a>
     <a href="#problem"    data-section="problem">The Problem</a>
     <a href="#challenges" data-section="challenges">Challenges</a>
+    <a href="#core-idea"  data-section="core-idea">Core idea</a>
     <a href="#system"     data-section="system">System</a>
     <a href="#impact"     data-section="impact">Impact</a>
+    <a href="#growth"     data-section="growth">Growth</a>
     <a href="#team"       data-section="team">Team</a>
     <a class="mcta" href="mailto:kowshikbhanu1000@gmail.com">Email me</a>
   </div>
@@ -2593,7 +2610,7 @@
         navBtns.forEach(b => b.classList.toggle('active', b.dataset.section === e.target.id));
       });
     }, { rootMargin: '-40% 0px -55% 0px' });   /* v6: a band mid-viewport, so tall sections (System) still activate */
-    document.querySelectorAll('#overview, #problem, #challenges, #system, #impact, #team').forEach(el => navObs.observe(el));
+    document.querySelectorAll('#overview, #problem, #challenges, #core-idea, #system, #impact, #growth, #team').forEach(el => navObs.observe(el));
 
     /* ── WORD-BY-WORD HEADING ────────────────────────────────── */
     /* Walks text nodes instead of innerHTML so inline markup inside the
