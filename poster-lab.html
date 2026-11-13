@@ -1200,7 +1200,7 @@ const SOUNDS = {        // src: an audio URL (or a list of variants, one picked 
 };
 const Audio_ = (() => {
   let ctx = null, master, oceanG, oceanLP, hissG, windG, windBP, verb, started = false;
-  const buffers = {}, lastPick = {}, LOOP_S = 45;
+  const buffers = {}, lastPick = {}, LOOP_S = 45, MASTER_GAIN = 4;     // was 0.8 (see the limiter in init)
   const EMBED = Q.has('embed');                    // on the homepage the nav's sound toggle drives this engine via host()
   let want = CFG.soundEnabled && !EMBED, hostLevel = 1;
   try { const v = localStorage.getItem('posterSound'); if (v != null && CFG.soundEnabled && !EMBED) want = v === '1'; } catch (e) {}
@@ -1237,7 +1237,11 @@ const Audio_ = (() => {
   function init() {
     if (ctx) return;
     ctx = new (window.AudioContext || window.webkitAudioContext)();
-    master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+    master = ctx.createGain(); master.gain.value = 0;
+    // (13 Nov, owner couldn't hear it) the files sit at -24 LUFS and the slot gains below 1, so the bed measured -38 dB:
+    // inaudible on laptop speakers. MASTER_GAIN lifts it ~14 dB to ~-24 dB; a limiter catches the barks and horns.
+    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -6; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.003; lim.release.value = 0.25;
+    master.connect(lim).connect(ctx.destination);
     // a cheap "distance" echo for horns
     verb = ctx.createDelay(1); verb.delayTime.value = 0.33; const fb = ctx.createGain(); fb.gain.value = 0.32;
     const vlp = ctx.createBiquadFilter(); vlp.type = 'lowpass'; vlp.frequency.value = 900;
@@ -1268,7 +1272,7 @@ const Audio_ = (() => {
   function applyMaster(tc) {
     if (!master) return;
     const on = want && !document.hidden && hostLevel > 0;
-    master.gain.setTargetAtTime(on ? 0.8 * hostLevel : 0, ctx.currentTime, tc ?? (on ? 0.6 : 0.15));
+    master.gain.setTargetAtTime(on ? MASTER_GAIN * hostLevel : 0, ctx.currentTime, tc ?? (on ? 0.6 : 0.15));
   }
   // the host's toggle / visibility / ducking. Called synchronously from the click when possible (same origin), so Safari
   // counts the gesture; the postMessage below is the fallback. level 0..1 = how much of this painting is on screen, x0.3 ducked.

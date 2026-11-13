@@ -491,6 +491,19 @@
   .nav-sound[aria-pressed="true"] .mute{opacity:0;}
   .nav-sound:focus-visible{outline:2px solid var(--ember);outline-offset:2px;}
   @media (max-width:374px){ .top-nav .nav-links{margin-left:0;} }   /* no room for the balance on the narrowest phones */
+  /* ── ASK AI (13 Nov 2026): "Copy for ChatGPT ▾" top right on the gutter (the links keep their centring); compact on
+     tablets; on phones a bare icon that takes the links' left balance slot, mirroring the sound icon. ── */
+  .top-nav > .aai{position:absolute;right:10%;top:50%;transform:translateY(-50%);}
+  .top-nav.scrolled > .aai{right:28px;}
+  @media (min-width:768px) and (max-width:1023px){
+    .top-nav > .aai .aai-idle{display:none;} .top-nav > .aai .aai-done{font-size:0;gap:0;}
+    .top-nav > .aai .aai-copy{padding:0 6px 0 12px;} .top-nav > .aai .aai-pick{width:30px;}
+  }
+  @media (max-width:767px){
+    .top-nav > .aai{position:relative;right:auto;top:auto;transform:none;order:-1;}
+    .top-nav .nav-links{margin-left:0;}
+  }
+  @media (max-width:374px){ .top-nav > .aai{display:none;} }
 
   /* ── MOBILE NAV — the row collapses into a burger under 900px ───────────
      Below that the link row outgrew its gutter, and the old fix simply
@@ -4865,6 +4878,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
   })(window, document, "clarity", "script", "xt8r81h0gs");
 </script>
+<link rel="stylesheet" href="ask-ai.css">
+<script src="ask-ai.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#chapters">Skip to work</a>
@@ -5310,7 +5325,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .hero .hero-building:hover svg{transform:translate(2px,-2px)}
       @media (max-width:767px){ .hero .hero-building{top:16vh;font-size:10px;letter-spacing:.08em} }
     </style>
-    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=33" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
+    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=34" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
             tabindex="-1" loading="eager"></iframe>
     <!-- ENTRANCE (12 Nov, owner: "the first entrance is not dramatic"): the site opens inside the same cloud bank the visitor later
          flies through between sections; when the painting is ready the clouds part and the view descends from an aerial vantage
@@ -5469,6 +5484,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <g class="mute"><path d="M16 9.5l5 5M21 9.5l-5 5"/></g>
         </svg>
       </button>
+      <div data-ask-ai data-icon-only-phone></div>   <!-- Ask AI: ask-ai.js / ask-ai.css, brief in ai.md -->
       <button class="nav-burger" id="navBurger" aria-label="Open menu"
               aria-expanded="false" aria-controls="navSheet">
         <span aria-hidden="true"></span><span aria-hidden="true"></span>
@@ -7408,7 +7424,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <img class="ft-night" src="city/layers/gg_ai/plate_night.webp" alt="" aria-hidden="true" decoding="async" loading="lazy">
     <!-- (12 Nov, owner: "implement the same thing you have in section 1 in the footer") the hero's living painting itself, at night:
          rippling bay, gulls, layered towers. The still above stays as the poster underneath while it loads. -->
-    <iframe class="ft-live" id="ftCity" data-src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=33" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
+    <iframe class="ft-live" id="ftCity" data-src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=34" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
     <!-- the night scene's life (owner: "the last section is not animating" / "bring in clouds") -->
     <div class="ft-life" aria-hidden="true">
       <canvas class="ft-stars"></canvas>
@@ -11378,7 +11394,8 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
 (function () {
   var btn = document.getElementById('sndToggle'); if (!btn) return;
   var AC = window.AudioContext || window.webkitAudioContext; if (!AC) { btn.hidden = true; return; }
-  var LOOP_S = 45, CH_GAIN = 0.55, WHOOSH_GAIN = 0.4, TC = 0.5;          // TC: setTarget time constant, ~1.5 s to settle
+  var LOOP_S = 45, CH_GAIN = 1.6, WHOOSH_GAIN = 1, TC = 0.5;             // TC: setTarget time constant, ~1.5 s to settle
+  // (13 Nov, owner couldn't hear it) CH_GAIN was 0.55: room tones measured -33 dB. Now ~-24 dB, with a limiter on the master.
   var CH = { chVC: 'vc', chST: 'stressie', chETL: 'etlive', chETS: 'etstudio', chETA: 'etanalytics', chDL: 'dearly' };
   var chs = [].slice.call(document.querySelectorAll('#chapters .chp')).filter(function (c) { return CH[c.id]; });
   var frames = ['heroCity', 'ftCity'], chatEl = document.getElementById('chat'), root = document.documentElement;
@@ -11442,7 +11459,9 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
     on = v; btn.setAttribute('aria-pressed', String(on));
     if (on) {
       if (!ctx) {
-        ctx = new AC(); master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+        ctx = new AC(); master = ctx.createGain(); master.gain.value = 0;
+        var lim = ctx.createDynamicsCompressor(); lim.threshold.value = -6; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.003; lim.release.value = 0.25;
+        master.connect(lim); lim.connect(ctx.destination);
         whoosh = load('audio/whoosh.m4a').then(function (b) { whoosh = b; return b; }, function () { whoosh = null; });
       }
       if (ctx.state !== 'running') ctx.resume();
