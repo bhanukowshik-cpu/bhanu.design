@@ -7,15 +7,18 @@
   font:600 13.5px/1 inherit;font-family:inherit;color:#FFFCF8;letter-spacing:.005em}
 .aai button,.aai a{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
 .aai svg{flex:none}
-.aai-copy{display:inline-flex;align-items:center;gap:8px;padding:0 10px 0 14px;border:0;background:none;cursor:pointer;border-radius:999px 0 0 999px;white-space:nowrap}
+.aai-copy{display:inline-flex;align-items:center;gap:8px;padding:0 10px 0 14px;border:0;background:none;cursor:pointer;border-radius:999px 0 0 999px;white-space:nowrap;transition:opacity .2s ease}
 .aai-copy > svg{width:14px;height:14px}
 .aai-pick{display:grid;place-items:center;width:36px;padding:0 4px 0 0;border:0;background:none;cursor:pointer;border-radius:0 999px 999px 0;position:relative}
 .aai-pick::before{content:'';position:absolute;left:0;top:10px;bottom:10px;width:1px;background:rgba(255,255,255,.22)}
 .aai-pick svg{width:14px;height:14px;opacity:.8;transition:transform .25s ease}
 .aai-pick[aria-expanded="true"] .aai-chev{transform:rotate(180deg)}
-.aai-pick .aai-ico,.aai-main{display:none}
-.aai-copy:hover,.aai-pick:hover{background:rgba(255,255,255,.1)}
-.aai-copy:focus-visible,.aai-pick:focus-visible{outline:2px solid #A6CBFF;outline-offset:2px}
+.aai-pick .aai-ico{display:none}
+/* hover: the whole pill brightens as one shape (owner: a per-half highlight read as a second shape poking out) */
+.aai{transition:background .25s ease,box-shadow .25s ease}
+.aai:hover{background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.08)),rgba(14,11,18,.4)}
+.aai-copy:focus-visible,.aai-pick:focus-visible{outline:none}
+.aai:has(.aai-copy:focus-visible),.aai:has(.aai-pick:focus-visible){box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 0 0 2px #A6CBFF}
 .aai-done{display:none;align-items:center;gap:6px}
 .aai-done svg{width:14px;height:14px}
 .aai[data-state="done"] .aai-idle{display:none}
@@ -47,15 +50,5 @@
   .aai[data-phone-compact] .aai-done{font-size:0;gap:0}
   .aai[data-phone-compact] .aai-copy{padding:0 6px 0 12px}
   .aai[data-phone-compact] .aai-pick{width:30px}
-}
-/* data-icon-only-phone: one bare icon on phones (the homepage nav, beside its sound icon); the menu's first row copies */
-@media (max-width:767px){
-  .aai[data-icon-only-phone]{height:44px;width:44px;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;color:rgba(255,252,248,.75)}
-  .aai[data-icon-only-phone] .aai-copy,.aai[data-icon-only-phone] .aai-chev,.aai[data-icon-only-phone] .aai-pick::before{display:none}
-  .aai[data-icon-only-phone] .aai-pick{width:44px;padding:0;border-radius:50%}
-  .aai[data-icon-only-phone] .aai-ico{display:block;width:19px;height:19px;opacity:1}
-  .aai[data-icon-only-phone] .aai-main{display:flex;background:rgba(255,255,255,.06)}
-  .aai[data-icon-only-phone] .aai-menu{right:auto;left:0}
-  .aai[data-icon-only-phone][data-state="done"] .aai-pick{color:#9BE7B0}
 }
 @media (prefers-reduced-motion:reduce){.aai-pick svg,.aai-row{transition:none}}

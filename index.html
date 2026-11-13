@@ -478,32 +478,33 @@
   /* the section you're in keeps its underline, at a whisper */
   .nav-links a.is-here{color:var(--ink);}
   .nav-links a.is-here::after{transform:scaleX(1);transform-origin:left;opacity:.35;}
-  /* ── SOUND (13 Nov 2026): the one opt-in toggle for the ambient soundscape (script: search SOUNDSCAPE). Off on every
-     visit. Sits just after the links; the links take an equal 52px on their left so they stay exactly centred (owner's nav). ── */
-  .top-nav .nav-links{margin-left:44px;}
-  .nav-sound{flex-shrink:0;width:44px;height:44px;margin:0;padding:0;display:grid;place-items:center;
-    background:none;border:0;border-radius:50%;cursor:pointer;color:rgba(255,252,248,.7);-webkit-tap-highlight-color:transparent;
-    transition:color .25s var(--ease);}                               /* the nav links' warm white (owner, 12 Nov), a step quieter when off */
-  .nav-sound:hover,.nav-sound[aria-pressed="true"]{color:#FFFCF8;}
+  /* ── ASK AI (13 Nov 2026, owner): "Copy for ChatGPT ▾" right next to the nav links; the group stays centred ── */
+  .top-nav > .aai{margin-left:14px;}
+  @media (max-width:767px){ .top-nav > .aai{margin-left:4px;} }
+  /* ── SOUND toggle (13 Nov 2026, owner: bottom right; script: search SOUNDSCAPE). A glass button floating in the corner
+     on the hero; it steps left of the chat orb once the orb is out, and stands down while the chat is open or the
+     entrance plays. ── */
+  .nav-sound{position:fixed;z-index:70;right:clamp(16px,2.4vw,32px);bottom:calc(clamp(16px,2.4vw,32px) + 17px);
+    width:44px;height:44px;margin:0;padding:0;display:grid;place-items:center;border:0;border-radius:50%;cursor:pointer;
+    color:rgba(255,252,248,.75);-webkit-tap-highlight-color:transparent;
+    background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.04)),rgba(14,11,18,.34);
+    -webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 0 0 1px rgba(255,255,255,.16),0 10px 30px -12px rgba(0,0,0,.55);
+    transition:right .6s var(--ease),opacity .4s ease,color .25s ease,background .25s ease;}
+  .nav-sound:hover{color:#FFFCF8;background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.08)),rgba(14,11,18,.4);}
+  .nav-sound[aria-pressed="true"]{color:#FFFCF8;}
   .nav-sound svg{width:20px;height:20px;overflow:visible;}
   .nav-sound .waves,.nav-sound .mute{transition:opacity .3s var(--ease);}
   .nav-sound[aria-pressed="false"] .waves{opacity:0;}
   .nav-sound[aria-pressed="true"] .mute{opacity:0;}
-  .nav-sound:focus-visible{outline:2px solid var(--ember);outline-offset:2px;}
-  @media (max-width:374px){ .top-nav .nav-links{margin-left:0;} }   /* no room for the balance on the narrowest phones */
-  /* ── ASK AI (13 Nov 2026): "Copy for ChatGPT ▾" top right on the gutter (the links keep their centring); compact on
-     tablets; on phones a bare icon that takes the links' left balance slot, mirroring the sound icon. ── */
-  .top-nav > .aai{position:absolute;right:10%;top:50%;transform:translateY(-50%);}
-  .top-nav.scrolled > .aai{right:28px;}
-  @media (min-width:768px) and (max-width:1023px){
-    .top-nav > .aai .aai-idle{display:none;} .top-nav > .aai .aai-done{font-size:0;gap:0;}
-    .top-nav > .aai .aai-copy{padding:0 6px 0 12px;} .top-nav > .aai .aai-pick{width:30px;}
-  }
+  .nav-sound:focus-visible{outline:2px solid #A6CBFF;outline-offset:3px;}
+  html:has(.orb-fab.show) .nav-sound{right:calc(clamp(16px,2.4vw,32px) + 92px);}
+  html:has(#chat.open) .nav-sound,html.hero-wait .nav-sound,body.nav-open .nav-sound{opacity:0;pointer-events:none;}
   @media (max-width:767px){
-    .top-nav > .aai{position:relative;right:auto;top:auto;transform:none;order:-1;}
-    .top-nav .nav-links{margin-left:0;}
+    .nav-sound{right:12px;bottom:calc(18px + env(safe-area-inset-bottom));}
+    html:has(.orb-fab.show) .nav-sound{right:78px;}
   }
-  @media (max-width:374px){ .top-nav > .aai{display:none;} }
+  @media print{ .nav-sound{display:none;} }
 
   /* ── MOBILE NAV — the row collapses into a burger under 900px ───────────
      Below that the link row outgrew its gutter, and the old fix simply
@@ -5477,14 +5478,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <a href="#chapters">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé<span class="sr-only"> (opens in a new tab)</span></a>
         <a href="#contactSection">Contact</a>
       </div>
-      <button class="nav-sound" id="sndToggle" type="button" aria-pressed="false" aria-label="Ambient sound" title="Ambient sound">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke="none"/>
-          <g class="waves"><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></g>
-          <g class="mute"><path d="M16 9.5l5 5M21 9.5l-5 5"/></g>
-        </svg>
-      </button>
-      <div data-ask-ai data-icon-only-phone></div>   <!-- Ask AI: ask-ai.js / ask-ai.css, brief in ai.md -->
+      <div data-ask-ai data-phone-compact></div>   <!-- Ask AI, next to the nav links: ask-ai.js / ask-ai.css, brief in ai.md -->
       <button class="nav-burger" id="navBurger" aria-label="Open menu"
               aria-expanded="false" aria-controls="navSheet">
         <span aria-hidden="true"></span><span aria-hidden="true"></span>
@@ -5886,7 +5880,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <video class="chp-loop" src="city/layers/chapters/loops/vc-office.mp4?v=13" poster="city/layers/chapters/vc-office.webp" data-quad="1090,393 1476,372 1420,683 1029,651" muted loop playsinline preload="none"></video>
         <canvas class="chp-birds" width="1672" height="941"></canvas>
         <div class="chp-bay"></div>
-        <div class="chp-screen" data-quad="1104,411 1496,388 1438,705 1047,673"><video class="chp-film" muted loop playsinline preload="none" poster="films/video/vc-launch-poster.webp" data-src="films/video/vc-launch.mp4" aria-label="Verified Call launch film"></video></div>
+        <div class="chp-screen" data-quad="1104,411 1496,388 1438,705 1047,673"><video class="chp-film" style="position:absolute;width:113.12%;height:122.85%;left:-6.56%;top:-11.43%" muted loop playsinline preload="none" poster="films/video/vc-launch-poster.webp" data-src="films/video/vc-launch.mp4" aria-label="Verified Call launch film"></video></div>
         <div class="chp-steam"><i></i><i></i><i></i></div>
         <div class="chp-lamp"></div>
       </div>
@@ -5925,7 +5919,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <img class="chp-plate" loading="lazy" src="city/layers/chapters/et-live-kitchen.webp" data-night="city/layers/chapters/et-live-kitchen-night.webp" data-day="city/layers/chapters/et-live-kitchen-day.webp" alt="">
         <video class="chp-loop" src="city/layers/chapters/loops/et-live.mp4?v=13" poster="city/layers/chapters/et-live-kitchen.webp" data-quad="741,418 1073,403 1114,629 778,669" muted loop playsinline preload="none"></video>
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" data-quad="754,433 1089,417 1132,651 791,692"><video class="chp-film" muted loop playsinline preload="none" poster="films/video/et-live-launch-poster.webp" data-src="films/video/et-live-launch.mp4" aria-label="EverTutor Live launch film"></video></div>
+        <div class="chp-screen" data-quad="754,433 1089,417 1132,651 791,692"><video class="chp-film" style="position:absolute;height:111.11%;top:-5.56%" muted loop playsinline preload="none" poster="films/video/et-live-launch-poster.webp" data-src="films/video/et-live-launch.mp4" aria-label="EverTutor Live launch film"></video></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Sole product designer · EverTutor</p>
@@ -5943,7 +5937,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="chp-stage" aria-hidden="true">
         <img class="chp-plate" loading="lazy" src="city/layers/chapters/et-studio-classroom.webp" data-night="city/layers/chapters/et-studio-classroom-night.webp" data-day="city/layers/chapters/et-studio-classroom-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" data-quad="793,372 1241,348 1224,654 771,639"><video class="chp-film" muted loop playsinline preload="none" poster="films/video/et-studio-launch-poster.webp" data-src="films/video/et-studio-launch.mp4" aria-label="EverTutor Studio launch film"></video></div>
+        <div class="chp-screen" data-quad="793,372 1241,348 1224,654 771,639"><video class="chp-film" style="position:absolute;height:111.11%;top:-5.56%" muted loop playsinline preload="none" poster="films/video/et-studio-launch-poster.webp" data-src="films/video/et-studio-launch.mp4" aria-label="EverTutor Studio launch film"></video></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Sole product designer · EverTutor</p>
@@ -5961,7 +5955,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="chp-stage" aria-hidden="true">
         <img class="chp-plate" loading="lazy" src="city/layers/chapters/et-analytics-office.webp" data-night="city/layers/chapters/et-analytics-office-night.webp" data-day="city/layers/chapters/et-analytics-office-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" data-quad="790,366 1245,341 1228,659 768,643"><video class="chp-film" muted loop playsinline preload="none" poster="films/video/et-analytics-launch-poster.webp" data-src="films/video/et-analytics-launch.mp4" aria-label="EverTutor Analytics launch film"></video></div>
+        <div class="chp-screen" data-quad="790,366 1245,341 1228,659 768,643"><video class="chp-film" style="position:absolute;height:111.11%;top:-5.56%" muted loop playsinline preload="none" poster="films/video/et-analytics-launch-poster.webp" data-src="films/video/et-analytics-launch.mp4" aria-label="EverTutor Analytics launch film"></video></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Sole product designer · EverTutor</p>
@@ -6008,7 +6002,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   html.chp-gate #chapters .chp .chp-stage{transition:opacity .7s ease}
   html.chp-gate #chapters .chp:not(.chp-ready) .chp-stage{opacity:.001}   /* the scene appears whole, never layer by layer (.001, not 0: stays rastered) */
   #chapters .chp + .chp .chp-pin{background:#0E0B12}   /* each chapter slides over the last as a solid sheet, even before its painting is in */
-  /* the launch film, mapped onto the painted screen's four corners in true perspective (matrix3d from JS) */
+  /* the launch film, mapped onto the painted screen's four corners in true perspective (matrix3d from JS).
+     (13 Nov, owner: "the interface is not covering the whole screen") the films were recorded with the UI inset on a dark
+     canvas (Verified Call: a framed Meet window; EverTutor: 5% letterbox bars), so each film's inline style oversizes it
+     to crop to its UI (measured per film); .chp-screen clips to the painted glass */
   .chp-screen{position:absolute;left:0;top:0;width:1600px;height:1000px;transform-origin:0 0;overflow:hidden;background:#0A0B0F}
   .chp-screen iframe,.chp-screen video.chp-film{width:100%;height:100%;border:0;display:block;pointer-events:none;object-fit:fill}
   /* (12 Nov) the launch films are pre-rendered videos (films/video/*.mp4, recorded from films/*.html, one exact loop each). As live
@@ -11382,8 +11379,9 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
 })();
 </script>
 <script>
-/* ── SOUNDSCAPE (13 Nov 2026). Opt-in through the nav's #sndToggle: off on every visit and never remembered (a returning
-   visitor's first click must not start sound). Nothing is fetched until it's on. It drives
+/* ── SOUNDSCAPE (13 Nov 2026). ON by default (owner, 13 Nov; was opt-in): browsers allow no sound before a user gesture,
+   so it starts on the visitor's first click, tap or key press anywhere. Muting with the nav's #sndToggle is remembered
+   (localStorage siteSound = '0'), so a visitor who muted stays muted on return. Nothing is fetched until it starts. It drives
    · the hero and footer paintings' own engine (poster-lab: ocean, wind, sea lions, gulls, horns) at a level = how much
      of that painting is on screen;
    · one quiet room-tone loop per work chapter, crossfaded by scroll (the chapter filling ~60% of the screen at full,
@@ -11391,7 +11389,7 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
    · a soft whoosh as the cloud bank swells (and on the entrance, if sound is already on by then).
    Silent while the tab is hidden; ducked to 30% while the chat or any video with its own sound is playing.
    Recordings: Epidemic Sound, see audio/CREDITS.md. Files built by audio/build.py. ── */
-(function () {
+(function (run) { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run(); })(function () {   // the toggle sits at the end of <body>
   var btn = document.getElementById('sndToggle'); if (!btn) return;
   var AC = window.AudioContext || window.webkitAudioContext; if (!AC) { btn.hidden = true; return; }
   var LOOP_S = 45, CH_GAIN = 1.6, WHOOSH_GAIN = 1, TC = 0.5;             // TC: setTarget time constant, ~1.5 s to settle
@@ -11399,7 +11397,9 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
   var CH = { chVC: 'vc', chST: 'stressie', chETL: 'etlive', chETS: 'etstudio', chETA: 'etanalytics', chDL: 'dearly' };
   var chs = [].slice.call(document.querySelectorAll('#chapters .chp')).filter(function (c) { return CH[c.id]; });
   var frames = ['heroCity', 'ftCity'], chatEl = document.getElementById('chat'), root = document.documentElement;
-  var on = false, ctx = null, master = null, ch = {}, whoosh = null, raf = 0, armed = true;
+  var on = true, ctx = null, master = null, ch = {}, whoosh = null, raf = 0, armed = true;
+  try { on = localStorage.getItem('siteSound') !== '0'; } catch (e) {}
+  btn.setAttribute('aria-pressed', String(on));
 
   function cl(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
   function cover(el, over) {                                               // share of the screen the element shows
@@ -11469,7 +11469,18 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
     tick();                                                                   // synchronous: the paintings start inside this click
     if (!on && ctx) setTimeout(function () { if (!on && ctx.state === 'running') ctx.suspend(); }, 900);   // after the fade out
   }
-  btn.addEventListener('click', function () { set(!on); });
+  btn.addEventListener('click', function () { set(!on); try { localStorage.setItem('siteSound', on ? '1' : '0'); } catch (e) {} });
+  // on by default: the first gesture anywhere starts it (inside the gesture, so every browser allows it). The toggle's own
+  // click is left to the toggle (a first click on it means "off").
+  function firstGesture(e) {
+    if (!e.isTrusted || !on || (e.target && e.target.closest && e.target.closest('#sndToggle'))) return;   // real input only
+    if (ctx && ctx.state === 'running') {             // started: stand down (iOS counts touchend/click, not pointerdown)
+      ['pointerdown', 'keydown', 'touchend', 'click'].forEach(function (ev) { removeEventListener(ev, firstGesture, true); });
+      return;
+    }
+    if (!ctx) set(true); else { ctx.resume(); tick(); }
+  }
+  ['pointerdown', 'keydown', 'touchend', 'click'].forEach(function (ev) { addEventListener(ev, firstGesture, true); });
   addEventListener('scroll', req, { passive: true }); addEventListener('resize', req);
   document.addEventListener('visibilitychange', function () { if (ctx) tick(); });
   // ducking: the chat opening/closing, and any video starting, stopping or unmuting (media events don't bubble: capture)
@@ -11487,7 +11498,7 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
     mo.observe(root, { attributes: true, attributeFilter: ['class'] });
   }
   window.__snd = { get on() { return on; }, get ctx() { return ctx; }, ch: ch, tick: tick, set: set };   // for checks
-})();
+});
 </script>
 <style>/* (owner, 12 Nov) clouds back, but they rise from BELOW the hero chat bar and part before the chapter settles (no veil over the work) */
 #chapters .chp-clouds{top:-11vh!important}</style>
@@ -11639,6 +11650,10 @@ footer.ft .ft-mailto:hover span{transform:translateX(6px)}
 </style>
 <script>
 (function () {
+  // (13 Nov, owner: "why is there this blurry layer around the screen") OFF. The cut-out's feathered edge over the in-painted
+  // room drew a soft halo round every device, and since the planes stopped moving (amp = 0 below) the split bought nothing.
+  // Each chapter shows its original single painting again. Set SPLIT = true to bring the planes back.
+  var SPLIT = false; if (!SPLIT) return;
   var FG = 'city/layers/chapters/fg/';
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var chs = [].slice.call(document.querySelectorAll('#chapters .chp')), L = [];
@@ -11985,5 +12000,13 @@ footer.ft.ft-lens .ft-mail::before,footer.ft.ft-lens .ft-mail::after{display:non
     box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 -1px 1px rgba(255,255,255,.3)!important;min-height:56px}
 }
 </style>
+<!-- sound on/off, floating bottom right (owner, 13 Nov). Outside the nav on purpose: the nav slides away on scroll -->
+<button class="nav-sound" id="sndToggle" type="button" aria-pressed="true" aria-label="Ambient sound" title="Ambient sound">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke="none"/>
+    <g class="waves"><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></g>
+    <g class="mute"><path d="M16 9.5l5 5M21 9.5l-5 5"/></g>
+  </svg>
+</button>
 </body>
 </html>
