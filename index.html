@@ -478,6 +478,19 @@
   /* the section you're in keeps its underline, at a whisper */
   .nav-links a.is-here{color:var(--ink);}
   .nav-links a.is-here::after{transform:scaleX(1);transform-origin:left;opacity:.35;}
+  /* ── SOUND (13 Nov 2026): the one opt-in toggle for the ambient soundscape (script: search SOUNDSCAPE). Off on every
+     visit. Sits just after the links; the links take an equal 52px on their left so they stay exactly centred (owner's nav). ── */
+  .top-nav .nav-links{margin-left:44px;}
+  .nav-sound{flex-shrink:0;width:44px;height:44px;margin:0;padding:0;display:grid;place-items:center;
+    background:none;border:0;border-radius:50%;cursor:pointer;color:rgba(255,252,248,.7);-webkit-tap-highlight-color:transparent;
+    transition:color .25s var(--ease);}                               /* the nav links' warm white (owner, 12 Nov), a step quieter when off */
+  .nav-sound:hover,.nav-sound[aria-pressed="true"]{color:#FFFCF8;}
+  .nav-sound svg{width:20px;height:20px;overflow:visible;}
+  .nav-sound .waves,.nav-sound .mute{transition:opacity .3s var(--ease);}
+  .nav-sound[aria-pressed="false"] .waves{opacity:0;}
+  .nav-sound[aria-pressed="true"] .mute{opacity:0;}
+  .nav-sound:focus-visible{outline:2px solid var(--ember);outline-offset:2px;}
+  @media (max-width:374px){ .top-nav .nav-links{margin-left:0;} }   /* no room for the balance on the narrowest phones */
 
   /* ── MOBILE NAV — the row collapses into a burger under 900px ───────────
      Below that the link row outgrew its gutter, and the old fix simply
@@ -5297,7 +5310,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .hero .hero-building:hover svg{transform:translate(2px,-2px)}
       @media (max-width:767px){ .hero .hero-building{top:16vh;font-size:10px;letter-spacing:.08em} }
     </style>
-    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=32" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
+    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=33" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
             tabindex="-1" loading="eager"></iframe>
     <!-- ENTRANCE (12 Nov, owner: "the first entrance is not dramatic"): the site opens inside the same cloud bank the visitor later
          flies through between sections; when the painting is ready the clouds part and the view descends from an aerial vantage
@@ -5449,6 +5462,13 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <a href="#chapters">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé<span class="sr-only"> (opens in a new tab)</span></a>
         <a href="#contactSection">Contact</a>
       </div>
+      <button class="nav-sound" id="sndToggle" type="button" aria-pressed="false" aria-label="Ambient sound" title="Ambient sound">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke="none"/>
+          <g class="waves"><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></g>
+          <g class="mute"><path d="M16 9.5l5 5M21 9.5l-5 5"/></g>
+        </svg>
+      </button>
       <button class="nav-burger" id="navBurger" aria-label="Open menu"
               aria-expanded="false" aria-controls="navSheet">
         <span aria-hidden="true"></span><span aria-hidden="true"></span>
@@ -5874,11 +5894,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       </div>
       <div class="chp-copy">
         <p class="chp-role">Founding designer · Figma to SwiftUI</p>
-        <h3 class="chp-title" id="chSTt">Stressie V4</h3>
+        <h3 class="chp-title" id="chSTt">Stressie</h3>
         <p class="chp-line">A stress check-in that pays for your evening.</p>
         <ul class="chp-proof"><li><b>12% → 56%</b><span>daily engagement</span></li><li><b>$600K</b><span>funding unlocked</span></li></ul>
         <ul class="chp-tech" aria-label="Built with"><li>Figma</li><li>SwiftUI</li><li>Metal</li></ul>
-        <a class="chp-go" href="stressie-v4.html" aria-label="Read the Stressie V4 case study">Read case study <span aria-hidden="true">→</span></a>
+        <a class="chp-go" href="stressie-v4.html" aria-label="Read the Stressie case study">Read case study <span aria-hidden="true">→</span></a>
       </div>
     </div>
   </section>
@@ -6356,7 +6376,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </div>
         <div class="wk-body">
           <p class="wk-meta"><span>Founding designer</span></p>
-          <h3 class="wk-name" id="wk-n5">Stressie V4</h3>
+          <h3 class="wk-name" id="wk-n5">Stressie</h3>
           <p class="wk-line">A stress check-in that pays for your evening.</p>
           <p class="cm-pills"><span><b>12% → 56%</b> daily engagement</span><span><b>$600K</b> funding unlocked</span><span><b>171 Swift files</b> built solo</span></p>
           <ul class="wk-tools" aria-label="Built with"><li>Figma</li><li>SwiftUI</li><li>Swift</li><li>Metal</li><li>Localization</li><li>AI coding agents</li></ul>
@@ -7388,7 +7408,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <img class="ft-night" src="city/layers/gg_ai/plate_night.webp" alt="" aria-hidden="true" decoding="async" loading="lazy">
     <!-- (12 Nov, owner: "implement the same thing you have in section 1 in the footer") the hero's living painting itself, at night:
          rippling bay, gulls, layered towers. The still above stays as the poster underneath while it loads. -->
-    <iframe class="ft-live" id="ftCity" data-src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=32" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
+    <iframe class="ft-live" id="ftCity" data-src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=33" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
     <!-- the night scene's life (owner: "the last section is not animating" / "bring in clouds") -->
     <div class="ft-life" aria-hidden="true">
       <canvas class="ft-stars"></canvas>
@@ -7460,6 +7480,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
               </a>
             </div>
             <span class="ft-clock">Currently <time id="ftTime">—:—</time> for me in San&nbsp;Francisco</span>
+            <span class="ft-clock ft-sfx">Ambient sound courtesy of <a href="https://www.epidemicsound.com" target="_blank" rel="noopener">Epidemic&nbsp;Sound<span class="sr-only"> (opens in a new tab)</span></a></span>
           </div>
         </div>
 
@@ -8843,7 +8864,7 @@ var REC_MAP = [
   { re: /verified call|verifiedcall/i, name: 'Verified Call', href: 'verified-call.html', img: 'images/card-verified.webp' },
   { re: /evertutor live/i,    name: 'EverTutor Live',      href: 'evertutor-live.html',   img: 'images/card-et-live.webp' },
   { re: /evertutor studio/i,  name: 'EverTutor Studio',    href: 'evertutor-studio.html', img: 'images/card-et-studio.webp' },
-  { re: /stressie v4/i,       name: 'Stressie V4',         href: 'stressie-v4.html',      img: 'images/card-stressie-v4.webp' },
+  { re: /stressie v4/i,       name: 'Stressie',            href: 'stressie-v4.html',      img: 'images/card-stressie-v4.webp' },
   { re: /stressie/i,          name: 'Stressie',            href: 'stressie-studio.html',  img: 'images/card-stressie.webp' },
   { re: /dearly/i,            name: 'Dearly',              href: 'https://www.producthunt.com/products/dearly-notes-that-feel-personal?launch=dearly-notes-that-feel-personal', img: 'images/card-dearly.webp' }
 ];
@@ -10306,8 +10327,8 @@ addEventListener('load', function () {
         href: 'stressie-studio.html'
       },
       {
-        tab: 'Stressie V4',
-        title: 'Stressie V4',
+        tab: 'Stressie',
+        title: 'Stressie',
 
         /* no invented numbers: V4 is in validation, so the tiles say what
            is true today and the case study carries the V2 bar to beat */
@@ -11166,6 +11187,9 @@ footer.ft .ft-cta .serif{font-weight:800!important}
 footer.ft .ft-k{font:600 13px/1 'Montserrat',sans-serif!important;letter-spacing:.02em;text-transform:none!important;color:rgba(255,252,248,.82)!important}
 footer.ft .ft-clock{font:500 14px 'Montserrat',sans-serif!important;color:rgba(255,252,248,.82)!important}
 footer.ft .ft-clock time{color:#FFFCF8;font-weight:700}
+footer.ft .ft-sfx{margin-top:6px;font-size:12px!important;color:rgba(255,252,248,.6)!important}   /* licence credit for the soundscape (audio/CREDITS.md) */
+footer.ft .ft-sfx a{color:inherit;text-decoration:underline;text-decoration-color:rgba(255,252,248,.35);text-underline-offset:.16em}
+footer.ft .ft-sfx a:hover,footer.ft .ft-sfx a:focus-visible{color:#FFFCF8}
 /* liquid glass (same recipe as .chp-go and the nav) */
 footer.ft .ft-status,footer.ft .ft-mail,footer.ft .ft-soc{position:relative;isolation:isolate;color:#FFFCF8!important;border:0!important;
   background:linear-gradient(180deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.06) 50%,rgba(255,255,255,.12) 100%)!important;
@@ -11320,6 +11344,7 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
     var target = cl((vh - top) / (vh * (band ? .8 : 1)));   // 1 exactly when the chapter reaches the top (phones: the painting band scrolls, it doesn't pin, so the clouds part sooner)
     cur += (target - cur) * (band ? .3 : .16); if (Math.abs(target - cur) > .0005) req(); else cur = target;   // eased, never snaps to scroll jumps
     var p = cur, e = p * p * (3 - 2 * p);
+    if (window.__sndClouds) window.__sndClouds(p);                     // SOUNDSCAPE: a soft whoosh as the bank swells
     var part = cl((p - .5) / .45), pe = part * part * (3 - 2 * part);   // parted before the chapter settles
     if (first) box.style.setProperty('--cl-night', getComputedStyle(first).getPropertyValue('--night') || 0);
     if (!mv) { mv = document.createElement('div'); mv.className = 'cl-move'; [].slice.call(box.children).forEach(function (c) { if (!c.classList.contains('cl-title')) mv.appendChild(c); }); box.insertBefore(mv, box.firstChild); }
@@ -11338,6 +11363,111 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
   var raf = 0, cur = 0, mv = null; function req() { if (!raf) raf = requestAnimationFrame(function () { raf = 0; frame(); }); }
   addEventListener('scroll', req, { passive: true });
   addEventListener('resize', frame); frame(); setTimeout(frame, 1200); setTimeout(frame, 3000); setTimeout(frame, 6000);   // the chat bar settles after the hero intro
+})();
+</script>
+<script>
+/* ── SOUNDSCAPE (13 Nov 2026). Opt-in through the nav's #sndToggle: off on every visit and never remembered (a returning
+   visitor's first click must not start sound). Nothing is fetched until it's on. It drives
+   · the hero and footer paintings' own engine (poster-lab: ocean, wind, sea lions, gulls, horns) at a level = how much
+     of that painting is on screen;
+   · one quiet room-tone loop per work chapter, crossfaded by scroll (the chapter filling ~60% of the screen at full,
+     neighbours fading over ~1.5 s), each fetched only as its chapter arrives;
+   · a soft whoosh as the cloud bank swells (and on the entrance, if sound is already on by then).
+   Silent while the tab is hidden; ducked to 30% while the chat or any video with its own sound is playing.
+   Recordings: Epidemic Sound, see audio/CREDITS.md. Files built by audio/build.py. ── */
+(function () {
+  var btn = document.getElementById('sndToggle'); if (!btn) return;
+  var AC = window.AudioContext || window.webkitAudioContext; if (!AC) { btn.hidden = true; return; }
+  var LOOP_S = 45, CH_GAIN = 0.55, WHOOSH_GAIN = 0.4, TC = 0.5;          // TC: setTarget time constant, ~1.5 s to settle
+  var CH = { chVC: 'vc', chST: 'stressie', chETL: 'etlive', chETS: 'etstudio', chETA: 'etanalytics', chDL: 'dearly' };
+  var chs = [].slice.call(document.querySelectorAll('#chapters .chp')).filter(function (c) { return CH[c.id]; });
+  var frames = ['heroCity', 'ftCity'], chatEl = document.getElementById('chat'), root = document.documentElement;
+  var on = false, ctx = null, master = null, ch = {}, whoosh = null, raf = 0, armed = true;
+
+  function cl(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function cover(el, over) {                                               // share of the screen the element shows
+    if (!el) return 0; var r = el.getBoundingClientRect(), vh = innerHeight || 1;
+    var bottom = Math.min(r.bottom, vh, over ? over.getBoundingClientRect().top : Infinity);   // the next chapter slides up OVER this one
+    return cl((bottom - Math.max(r.top, 0)) / vh);
+  }
+  function ducked() {
+    if (chatEl && chatEl.classList.contains('open')) return true;
+    var vs = document.getElementsByTagName('video');
+    for (var i = 0; i < vs.length; i++) { var v = vs[i]; if (!v.paused && !v.ended && !v.muted && v.volume > 0) return true; }
+    return false;
+  }
+  function load(url) {
+    return fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+      .then(function (b) { return new Promise(function (ok, no) { ctx.decodeAudioData(b, ok, no); }); });   // callback form: older Safari
+  }
+  function startLoop(id) {
+    if (ch[id]) return; var c = ch[id] = { g: ctx.createGain(), src: null };
+    c.g.gain.value = 0; c.g.connect(master);
+    load('audio/chapters/' + CH[id] + '.m4a').then(function (buf) {
+      var s = ctx.createBufferSource(); s.buffer = buf; s.loop = true;
+      s.loopEnd = Math.min(buf.duration, LOOP_S);                          // exact 45 s loops (audio/build.py); drops any AAC tail padding
+      s.connect(c.g); s.start(0, Math.random() * s.loopEnd); c.src = s;    // random start point: no two visits open on the same breath
+    }).catch(function () { delete ch[id]; });
+  }
+  function frameLevel(id, lvl) {
+    var f = document.getElementById(id); if (!f || !f.getAttribute('src')) return;
+    var a = null; try { a = f.contentWindow.__poster && f.contentWindow.__poster.audio; } catch (e) {}
+    if (a && a.host) { try { a.host(on, lvl); return; } catch (e) {} }    // same origin, synchronous: Safari counts the click
+    try { f.contentWindow.postMessage({ type: 'sound', on: on, level: lvl }, location.origin); } catch (e) {}
+  }
+  function tick() {
+    raf = 0; if (!ctx) return;
+    var duck = ducked() ? 0.3 : 1, hidden = document.hidden, now = ctx.currentTime;
+    master.gain.setTargetAtTime(on && !hidden ? duck : 0, now, hidden ? 0.05 : 0.25);
+    chs.forEach(function (c, i) {
+      var k = cl((cover(c, chs[i + 1]) - 0.2) / 0.4);                        // nothing at a fifth of the screen, full at ~60%
+      if (on && k > 0) startLoop(c.id);                                      // fetched only as the chapter arrives
+      if (ch[c.id]) ch[c.id].g.gain.setTargetAtTime(on ? CH_GAIN * k : 0, now, TC);
+    });
+    frames.forEach(function (id) {
+      var f = document.getElementById(id);
+      frameLevel(id, on && !hidden ? duck * cl((cover(f && (f.closest('footer, .hero') || f)) - 0.1) / 0.5) : 0);
+    });
+  }
+  function req() { if (!raf && ctx) raf = requestAnimationFrame(tick); }
+  function playWhoosh() {
+    if (!on || !ctx || document.hidden || !whoosh) return;
+    var go = function (buf) {
+      var s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = buf; g.gain.value = WHOOSH_GAIN;
+      s.connect(g); g.connect(master); s.start();
+    };
+    if (whoosh.then) whoosh.then(go, function () {}); else go(whoosh);
+  }
+  function set(v) {
+    on = v; btn.setAttribute('aria-pressed', String(on));
+    if (on) {
+      if (!ctx) {
+        ctx = new AC(); master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+        whoosh = load('audio/whoosh.m4a').then(function (b) { whoosh = b; return b; }, function () { whoosh = null; });
+      }
+      if (ctx.state !== 'running') ctx.resume();
+    }
+    tick();                                                                   // synchronous: the paintings start inside this click
+    if (!on && ctx) setTimeout(function () { if (!on && ctx.state === 'running') ctx.suspend(); }, 900);   // after the fade out
+  }
+  btn.addEventListener('click', function () { set(!on); });
+  addEventListener('scroll', req, { passive: true }); addEventListener('resize', req);
+  document.addEventListener('visibilitychange', function () { if (ctx) tick(); });
+  // ducking: the chat opening/closing, and any video starting, stopping or unmuting (media events don't bubble: capture)
+  ['play', 'pause', 'ended', 'volumechange'].forEach(function (ev) { document.addEventListener(ev, req, true); });
+  if (chatEl && 'MutationObserver' in window) new MutationObserver(req).observe(chatEl, { attributes: true, attributeFilter: ['class'] });
+  // the footer painting loads later: hand it the current state once it's up
+  frames.forEach(function (id) { var f = document.getElementById(id); f && f.addEventListener('load', function () { setTimeout(req, 300); }); });
+  // a painting woken outside a gesture (the footer, loaded later) may sit suspended: the next tap or key wakes it
+  ['pointerdown', 'keydown'].forEach(function (ev) { addEventListener(ev, function () { if (on) tick(); }, true); });
+  // the cloud pass: one soft whoosh as the bank swells, re-armed only after scrolling back above it
+  window.__sndClouds = function (p) { if (p > 0.3 && armed) { armed = false; playWhoosh(); } else if (p < 0.08) armed = true; };
+  // the entrance: the clouds part on 'scene-on' (only audible if sound was switched on before then)
+  if ('MutationObserver' in window && !root.classList.contains('scene-on')) {
+    var mo = new MutationObserver(function () { if (root.classList.contains('scene-on')) { mo.disconnect(); playWhoosh(); } });
+    mo.observe(root, { attributes: true, attributeFilter: ['class'] });
+  }
+  window.__snd = { get on() { return on; }, get ctx() { return ctx; }, ch: ch, tick: tick, set: set };   // for checks
 })();
 </script>
 <style>/* (owner, 12 Nov) clouds back, but they rise from BELOW the hero chat bar and part before the chapter settles (no veil over the work) */
