@@ -4,17 +4,17 @@
 
 Bhanu Kowshik designs and builds AI products end to end: the product design, the interface, and the code behind it.
 His homepage (https://bhanu.build) describes him as a design engineer: "I design and build AI products that scale,
-convert, and connect." He built Verified Call alone in 3 weeks, and was the sole product designer at EverTutor, used by
-2,000+ students a day.
+convert, and connect." He built Verified Call alone in 3 weeks, and was the sole product designer at EverTutor
+(~2,000 learners across 8+ schools).
 
 Highlights, each from his case studies:
-- **Verified Call** (founder, solo design and engineering): stops cheating in video interviews. Built alone in 3 weeks;
-  20 companies in the closed beta; published tests: 30/30 hidden AI tools caught, 0/3,990 face swaps got through, 20/20
-  live Google Meet calls right.
-- **EverTutor Live** (sole product designer): a voice AI tutor that took 1:1 tutoring from $250 to $5 an hour;
+- **Verified Call** (founder, solo design and engineering): checks for cheating in video interviews. Built alone in 3 weeks;
+  20 companies in the closed beta; published tests: each of 4 hidden AI tools caught in 30/30 tries; 0/3,990 face swaps got through (2,855 flagged,
+  1,135 "Can't confirm"); 20/20 live Google Meet calls read right.
+- **EverTutor Live** (sole product designer): a voice AI tutor: 1:1 tutoring for about $5 an hour, against ~$250 an hour for a human tutor;
   ~2,000 learners, 8+ schools, $9.5M seed-funded.
-- **EverTutor Studio** (sole product designer; lead curriculum designer): cut lesson creation from 104 hours to 4; 3,000+ lessons.
-- **Stressie** (founding product designer, built the iOS app): daily engagement 12% → 56%, $600K funding unlocked.
+- **EverTutor Studio** (sole product designer; lead curriculum designer): cut lesson creation from 104 hours to about 4 (~4.5 h average over ~700 logged lessons); 3,000+ lessons.
+- **Stressie** (founding product designer, built the iOS app): daily engagement 12% → 56% in V2 pilots; helped secure $600K.
 - **Dearly** (solo build in 48 hours): voice letters you can hear and keep; 140+ letters sent, 35 five-star ratings.
 
 Contact: kowshikbhanu1000@gmail.com · LinkedIn: https://www.linkedin.com/in/bhanukowshik/
