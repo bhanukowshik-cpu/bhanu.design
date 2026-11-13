@@ -6122,6 +6122,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     });
   }
   addEventListener('resize', cover); cover();
+  // (13 Nov QA) cover() read the phone band before the file's last CSS (the band's real padding) was parsed: on phones the painting
+  // came out 1.2x to 8x over-zoomed with the film filling the band. Recompute whenever the layout settles or the band changes size.
+  document.addEventListener('DOMContentLoaded', cover); addEventListener('load', cover);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(cover);
+  if (window.ResizeObserver) { var pin0 = document.querySelector('#chapters .chp-pin'); if (pin0) new ResizeObserver(function () { cover(); }).observe(pin0); }
   // the copy column always stops 40px short of the painted device, whatever the window (a11y/usability pass)
   function copyFit() {
     if (innerWidth <= 767 || (innerHeight > innerWidth && innerWidth <= 1100)) { chs.forEach(function (ch) { ch.style.removeProperty('--copyw'); }); return; }

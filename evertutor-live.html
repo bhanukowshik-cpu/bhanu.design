@@ -2306,7 +2306,7 @@
 
   <script>
     /* ── IMAGES — set src via JS to handle spaces in filenames ── */
-    document.getElementById('etBgImg').src     = 'images/hero-bg-a.png';
+    // (13 Nov) the aurora plate is hidden in the v6 hero (painted kitchen instead): no longer downloaded (was 1.1 MB)
     /* Hero screen is a video; the old still stays as the poster so nothing flashes empty */
     const etScreenVid = document.getElementById('etScreenImg');
     etScreenVid.poster = 'ET Live Case Study/Section 1 Images/New Student home page.png';
@@ -2454,6 +2454,8 @@
     }
     hamburger.addEventListener('click', () => toggleMenu());
     backdrop.addEventListener('click', () => toggleMenu(false));
+    // (13 Nov QA) Escape closes the menu from anywhere and hands focus back to the menu button, like the other case studies
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && hamburger.classList.contains('open')) { e.preventDefault(); toggleMenu(false); hamburger.focus(); } });
     mobileMenu.querySelectorAll('a').forEach(a => {
       a.addEventListener('click', e => {
         e.preventDefault();
