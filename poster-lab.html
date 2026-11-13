@@ -132,7 +132,9 @@
       if (embed && !footer) {
         try { parent.postMessage({ type: 'hero-painted', still: true }, location.origin); } catch (e) {}
         // the live scene gets a moment to arrive and play its own title drop; if it doesn't, the title rises in over the still
-        setTimeout(function () { if (!d.classList.contains('gl-on')) d.classList.add('dom-title-in'); }, 1200);
+        // (12 Nov) the homepage's cloud entrance holds the title until it clears (parent html.hero-go): wait for that too
+        setTimeout(function tryIn() { var go = true; try { go = parent === window || parent.document.documentElement.classList.contains('hero-go'); } catch (e) {}
+          if (!go) return setTimeout(tryIn, 150); if (!d.classList.contains('gl-on')) d.classList.add('dom-title-in'); }, 1200);
       }
     };
     im.src = src;

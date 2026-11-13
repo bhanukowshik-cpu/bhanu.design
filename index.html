@@ -14,14 +14,14 @@
     var painted = false, parsed = false;
     function go() { if (done || !painted || !parsed) return; done = true; var f; while ((f = q.shift())) try { f(); } catch (e) { console.error(e); } }
     // the scene (still or live) shows the moment it can; the nav, chat bar and the rest wait for the file's last style rules
-    addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.type === 'hero-painted') { d.classList.add('scene-on'); painted = true; go(); } });
+    addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.type === 'hero-painted') { if (!window.__sceneAt) window.__sceneAt = performance.now(); d.classList.add('scene-on'); painted = true; go(); } });
     // parsed = every style rule in this (long) file has been read; readyState leaves 'loading' before deferred scripts run
     function chk() { if (document.readyState !== 'loading') { parsed = true; go(); } }
     document.addEventListener('readystatechange', chk); chk();
     // reloads start at the top: the browser's restore landed mid-page in the clouds and the smooth scroller then dragged it
     // back (owner, 12 Nov: "reload the whole page several times and see where it's breaking"). #links still jump.
     try { if (!location.hash && 'scrollRestoration' in history) { history.scrollRestoration = 'manual'; scrollTo(0, 0); } } catch (e) {}
-    setTimeout(function () { d.classList.add('scene-on'); painted = true; go(); }, 6000);
+    setTimeout(function () { if (!window.__sceneAt) window.__sceneAt = performance.now(); d.classList.add('scene-on'); painted = true; go(); }, 6000);
     window.whenHero = function (f) { done ? f() : q.push(f); };
     window.afterHero = function (f) { window.whenHero(function () { (window.requestIdleCallback || setTimeout)(f, { timeout: 1500 }); }); };
   })();
@@ -34,6 +34,8 @@
     if (f != null) a = +f;
     var l = document.createElement('link'); l.rel = 'preload'; l.as = 'image'; l.setAttribute('fetchpriority', 'high');
     l.href = 'city/layers/gg_ai/poster-' + (a < -4 ? 'night' : a > 12 ? 'day' : 'golden') + '.webp'; document.head.appendChild(l);
+    document.documentElement.setAttribute('data-sf', a < -4 ? 'night' : a > 12 ? 'day' : 'golden');   // the entrance clouds take the sky's tint
+    var c = document.createElement('link'); c.rel = 'preload'; c.as = 'image'; c.setAttribute('fetchpriority', 'high'); c.href = 'city/layers/vc/cloud_a.webp'; document.head.appendChild(c);
   })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -5295,16 +5297,41 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .hero .hero-building:hover svg{transform:translate(2px,-2px)}
       @media (max-width:767px){ .hero .hero-building{top:16vh;font-size:10px;letter-spacing:.08em} }
     </style>
-    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=31" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
+    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=32" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
             tabindex="-1" loading="eager"></iframe>
+    <!-- ENTRANCE (12 Nov, owner: "the first entrance is not dramatic"): the site opens inside the same cloud bank the visitor later
+         flies through between sections; when the painting is ready the clouds part and the view descends from an aerial vantage
+         onto the bridge, then the title drops. ~2.5 s, any wheel/key/tap skips it, off for reduced motion. -->
+    <div class="hero-entry" aria-hidden="true"><div class="he-fill"></div>
+      <img class="he he-c" src="city/layers/vc/cloud_a.webp" alt="" decoding="async"><img class="he he-b" src="city/layers/vc/cloud_a.webp" alt="" decoding="async"><img class="he he-a" src="city/layers/vc/cloud_a.webp" alt="" decoding="async"></div>
     <style>
       .hero .hero-city{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:0;background:#0A1430}
       /* the opening (12 Nov): night-blue until the painting has its first frame, then it fades up and settles from a slight
          push-in while the title drops in (poster-lab) and the nav + chat bar follow (hero-go keyframes) */
       .hero{background:#0A1430}
       html:not(.scene-on) .hero .hero-city{opacity:0;transform:scale(1.045)}
-      html.scene-on .hero .hero-city{animation:heroCityIn 1.6s cubic-bezier(.16,1,.3,1) both}
-      @keyframes heroCityIn{from{opacity:0;transform:scale(1.045)}to{opacity:1;transform:none}}
+      /* the descent: from a closer, higher aerial framing down onto the bridge view while the clouds part */
+      html.scene-on .hero .hero-city{animation:heroCityIn 2.6s cubic-bezier(.22,.7,.12,1) both}
+      @keyframes heroCityIn{from{opacity:.35;transform:scale(1.32) translateY(6%)}to{opacity:1;transform:none}}
+      .hero .hero-entry{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;--n:0;
+        filter:brightness(calc(1 - .18 * var(--n))) saturate(calc(1 - .8 * var(--n))) hue-rotate(calc(var(--n) * 200deg))}
+      html[data-sf="night"] .hero .hero-entry{--n:1}
+      .hero .he-fill{position:absolute;inset:-5%;background:radial-gradient(120% 90% at 50% 45%,#F2E6DE 0%,#E9DCD6 55%,#D9CCC8 100%)}
+      .hero .he{position:absolute;left:50%;top:50%;max-width:none;will-change:transform,opacity}
+      .hero .he-a{width:max(200vw,1900px);transform:translate(-50%,-62%)}
+      .hero .he-b{width:max(185vw,1750px);transform:translate(-50%,-30%) scaleX(-1)}
+      .hero .he-c{width:max(230vw,2200px);transform:translate(-50%,-48%)}
+      html.scene-on .hero .he-fill{animation:heFill .9s ease .15s both}
+      html.scene-on .hero .he-a{animation:heA 2.5s cubic-bezier(.62,0,.18,1) both}
+      html.scene-on .hero .he-b{animation:heB 2.5s cubic-bezier(.62,0,.18,1) .05s both}
+      html.scene-on .hero .he-c{animation:heC 2.3s cubic-bezier(.5,0,.2,1) both}
+      @keyframes heFill{to{opacity:0}}
+      @keyframes heA{to{transform:translate(-118%,-80%) scale(1.55);opacity:0}}
+      @keyframes heB{to{transform:translate(18%,-12%) scaleX(-1) scale(1.55);opacity:0}}
+      @keyframes heC{to{transform:translate(-50%,-30%) scale(2.4);opacity:0}}
+      html.entry-done .hero .hero-entry{display:none}
+      html.entry-skip .hero .hero-entry{opacity:0;transition:opacity .35s ease}
+      @media (prefers-reduced-motion:reduce){ .hero .hero-entry{display:none} html.scene-on .hero .hero-city{animation:none} }
       html.hero-wait .chp-clouds{opacity:0!important}
       @media (prefers-reduced-motion:reduce){ html.scene-on .hero .hero-city{animation:none} html:not(.scene-on) .hero .hero-city{transform:none} }
       /* the scene carries the greeting (HI, I'M BHANU + line); the hero keeps only the nav + chat bar */
@@ -5515,8 +5542,21 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       }
 
       var fired = false;
-      function reveal() {
-        if (fired) return; fired = true;
+      var entryOn = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches), skip = false;
+      function endEntry() { doc.classList.add('entry-done'); }
+      if (entryOn) {
+        var EV = ['wheel', 'touchstart', 'keydown', 'pointerdown'];
+        function onSkip() { if (skip || doc.classList.contains('entry-done') || !doc.classList.contains('scene-on')) return;   // only once the painting is there
+          skip = true; EV.forEach(function (t) { removeEventListener(t, onSkip); }); doc.classList.add('entry-skip'); setTimeout(endEntry, 400); reveal(true); }
+        EV.forEach(function (t) { addEventListener(t, onSkip, { passive: true }); });
+        var ec = document.querySelector('.hero .he-a'); if (ec) ec.addEventListener('animationend', endEntry);
+      } else endEntry();
+      function reveal(now) {
+        if (fired) return;
+        // the title drops as the clouds clear: ~1.1 s after the scene arrives (skipped by any input)
+        var wait = entryOn && !now && window.__sceneAt ? Math.max(0, window.__sceneAt + 1100 - performance.now()) : 0;
+        if (wait > 16) { if (!reveal.t) reveal.t = setTimeout(function () { reveal(true); }, wait); return; }
+        fired = true;
         doc.classList.remove('hero-wait');
         doc.classList.add('hero-go');
         try { var hc = document.getElementById('heroCity'); hc && hc.contentWindow.postMessage({ type: 'hero-intro' }, location.origin); } catch (e) {}
@@ -7343,7 +7383,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <img class="ft-night" src="city/layers/gg_ai/plate_night.webp" alt="" aria-hidden="true" decoding="async" loading="lazy">
     <!-- (12 Nov, owner: "implement the same thing you have in section 1 in the footer") the hero's living painting itself, at night:
          rippling bay, gulls, layered towers. The still above stays as the poster underneath while it loads. -->
-    <iframe class="ft-live" id="ftCity" data-src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=31" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
+    <iframe class="ft-live" id="ftCity" data-src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=32" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
     <!-- the night scene's life (owner: "the last section is not animating" / "bring in clouds") -->
     <div class="ft-life" aria-hidden="true">
       <canvas class="ft-stars"></canvas>
