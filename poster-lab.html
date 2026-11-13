@@ -121,6 +121,11 @@
       d.style.setProperty('--poster-x', x.toFixed(2) + '%');
     }
     fit(); addEventListener('resize', fit);
+    // the title over the still is fitted exactly like fitTitle() in the scene (CFG.titleFit .62), so the handover never resizes it
+    function fitT() { var t = document.getElementById('title'); if (!t) return; t.style.fontSize = '';
+      var fs = parseFloat(getComputedStyle(t).fontSize), w = t.getBoundingClientRect().width;
+      if (w > 0) t.style.fontSize = Math.min(fs * ((innerWidth || 1600) * 0.62) / w, 150) + 'px'; }
+    document.addEventListener('DOMContentLoaded', fitT); if (document.fonts) document.fonts.ready.then(fitT); addEventListener('resize', fitT);
     var im = new Image(); im.fetchPriority = 'high'; im.decoding = 'async';
     im.onload = function () {
       d.classList.add('still-on');
