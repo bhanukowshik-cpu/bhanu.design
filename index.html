@@ -7256,8 +7256,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <!-- no autoplay: autoplay overrides preload="none" and fetched ~4.6 MB at
          load. The script below starts it when the footer comes into view. -->
     <video class="ft-plate" id="ftPlate" muted loop playsinline preload="none"
-           poster="images/footer-silhouette-poster.webp" src="images/footer-silhouette.mp4"
-           aria-hidden="true"></video>
+           poster="images/footer-silhouette-poster.webp" data-src="images/footer-silhouette.mp4"
+           aria-hidden="true" hidden></video>
+    <!-- (12 Nov 2026, owner: footer "not consistent with the whole page") the page closes where it opened: the hero's Golden Gate, at night.
+         The old silhouette video, grain and geometry are kept but hidden; src moved to data-src so the 4.6 MB clip never loads. -->
+    <img class="ft-night" src="city/layers/gg_ai/plate_night.webp" alt="" aria-hidden="true" decoding="async" loading="lazy">
+    <div class="ft-shade" aria-hidden="true"></div>
     <div class="ft-vig" aria-hidden="true"></div>
 
     <div class="ft-grain" aria-hidden="true">
@@ -10989,6 +10993,44 @@ html.motion-paused #work .wf-plate,html.motion-paused #work .wf-rays,html.motion
   .top-nav .nav-links{padding:4px!important}
   .top-nav .nav-links a{white-space:nowrap;padding:10px 15px;font-size:14px}   /* 38px tall tap targets, one line each */
 }
+</style>
+<style>
+/* ══ FOOTER as the hero's bookend (12 Nov 2026) ═══════════════════════════════════════════════════════════════
+   Same painting as the hero, at night; copy in the chapters' voice (Montserrat, off-white, no serif italic); status, email,
+   copy button and socials are liquid glass like the nav and the chapter CTAs. No drop shadows, no text shadows. */
+footer.ft{background:#0B0C14!important}
+footer.ft > .ft-vig,footer.ft > .ft-grain,footer.ft > .geo-ft{display:none!important}
+footer.ft .ft-night{position:absolute;inset:-3%;width:106%;height:106%;object-fit:cover;object-position:50% 45%;z-index:0;pointer-events:none;
+  animation:ftDrift 40s ease-in-out infinite alternate}
+@keyframes ftDrift{from{transform:scale(1) translate3d(0,0,0)}to{transform:scale(1.04) translate3d(-1%,-.6%,0)}}
+html.motion-paused footer.ft .ft-night{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){footer.ft .ft-night{animation:none}}
+footer.ft .ft-shade{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(70% 80% at 18% 42%,rgba(8,8,20,.66) 0%,rgba(8,8,20,.4) 45%,rgba(8,8,20,0) 78%),linear-gradient(0deg,rgba(8,8,20,.55),rgba(8,8,20,0) 35%)}
+footer.ft .ft-inner{z-index:2}
+footer.ft .ft-cta,footer.ft .ft-cta .ft-line,footer.ft .ft-cta .serif{font-family:'Montserrat',sans-serif!important;font-style:normal!important;color:#FFFCF8!important;text-shadow:none!important}
+footer.ft .ft-cta{gap:0;max-width:13.5em}
+footer.ft .ft-cta .ft-line{text-wrap:balance}
+footer.ft .ft-cta .ft-line{font-weight:800!important;font-size:clamp(34px,4.4vw,72px)!important;line-height:1.02!important;letter-spacing:-.04em!important}
+footer.ft .ft-cta .serif{font-weight:800!important}
+footer.ft .ft-k{font:600 13px/1 'Montserrat',sans-serif!important;letter-spacing:.02em;text-transform:none!important;color:rgba(255,252,248,.82)!important}
+footer.ft .ft-clock{font:500 14px 'Montserrat',sans-serif!important;color:rgba(255,252,248,.82)!important}
+footer.ft .ft-clock time{color:#FFFCF8;font-weight:700}
+/* liquid glass (same recipe as .chp-go and the nav) */
+footer.ft .ft-status,footer.ft .ft-mail,footer.ft .ft-soc{position:relative;isolation:isolate;color:#FFFCF8!important;border:0!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.06) 50%,rgba(255,255,255,.12) 100%)!important;
+  -webkit-backdrop-filter:blur(12px) saturate(1.9) brightness(1.06) contrast(1.05)!important;backdrop-filter:blur(12px) saturate(1.9) brightness(1.06) contrast(1.05)!important;
+  box-shadow:inset 0 1.5px .5px rgba(255,255,255,.85),inset 0 -1px 1px rgba(255,255,255,.3),inset 0 0 0 1px rgba(255,255,255,.22),
+    inset 0 -14px 18px -12px rgba(255,255,255,.4),inset 0 12px 16px -14px rgba(255,255,255,.55)!important}
+footer.ft .ft-status{font:600 13px 'Montserrat',sans-serif!important;letter-spacing:.01em!important;text-transform:none!important;padding:9px 16px!important;border-radius:999px!important}
+footer.ft .ft-mail{border-radius:999px!important;padding:6px 6px 6px 22px!important;display:inline-flex!important;align-items:center;gap:10px}
+footer.ft .ft-mail a{font:700 clamp(17px,1.5vw,22px) 'Montserrat',sans-serif!important;color:#FFFCF8!important;text-decoration:none}
+footer.ft .ft-copy{width:40px;height:40px;border-radius:999px!important;border:0!important;color:#FFFCF8!important;background:rgba(255,255,255,.14)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)!important}
+footer.ft .ft-copy:hover{background:rgba(255,255,255,.24)!important}
+footer.ft .ft-soc{width:46px!important;height:46px!important;border-radius:999px!important;display:inline-grid!important;place-items:center}
+footer.ft .ft-soc:hover,footer.ft .ft-mail:hover{background:linear-gradient(180deg,rgba(255,255,255,.32) 0%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.16) 100%)!important}
+footer.ft .ft-status:focus-visible,footer.ft .ft-mail a:focus-visible,footer.ft .ft-copy:focus-visible,footer.ft .ft-soc:focus-visible{outline:2px solid #FFFCF8;outline-offset:3px}
+@media (max-width:767px){ footer.ft .ft-mail a{font-size:15px!important} footer.ft .ft-mail{padding-left:16px!important} }
 </style>
 </body>
 </html>

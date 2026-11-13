@@ -105,7 +105,7 @@
   function count(el, from, to, dur, fmt) {
     cancelAnimationFrame(raf); var t0 = performance.now();
     (function f(t) {
-      var p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      var p = Math.max(0, Math.min(1, (t - t0) / dur)), e = 1 - Math.pow(1 - p, 3);
       el.innerHTML = fmt(Math.round(from + (to - from) * e));
       if (p < 1) raf = requestAnimationFrame(f);
     })(t0);
