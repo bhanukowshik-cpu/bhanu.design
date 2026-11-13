@@ -2,6 +2,40 @@
 <html lang="en" data-theme="dark" class="anno-off">
 <head>
 <meta charset="UTF-8" />
+<script>
+  /* FIRST SCREEN FIRST (12 Nov, cold-load fix). On a slow first visit the hero painting reached the screen at ~18 s because
+     ~10 MB of off-screen chapters, films, the footer painting and the orb all downloaded at once, and the opening waited
+     for window 'load' (all of it). Now: the hero holds its pre-state (hero-wait) until the painting reports its first
+     frame ('hero-painted'), then the opening plays; off-screen work queued with whenHero() starts only after that.
+     Backstop: 6 s, so the page never waits on a scene that can't arrive. */
+  (function () {
+    var q = [], done = false, d = document.documentElement;
+    d.classList.add('hero-wait');
+    var painted = false, parsed = false;
+    function go() { if (done || !painted || !parsed) return; done = true; var f; while ((f = q.shift())) try { f(); } catch (e) { console.error(e); } }
+    // the scene (still or live) shows the moment it can; the nav, chat bar and the rest wait for the file's last style rules
+    addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.type === 'hero-painted') { d.classList.add('scene-on'); painted = true; go(); } });
+    // parsed = every style rule in this (long) file has been read; readyState leaves 'loading' before deferred scripts run
+    function chk() { if (document.readyState !== 'loading') { parsed = true; go(); } }
+    document.addEventListener('readystatechange', chk); chk();
+    // reloads start at the top: the browser's restore landed mid-page in the clouds and the smooth scroller then dragged it
+    // back (owner, 12 Nov: "reload the whole page several times and see where it's breaking"). #links still jump.
+    try { if (!location.hash && 'scrollRestoration' in history) { history.scrollRestoration = 'manual'; scrollTo(0, 0); } } catch (e) {}
+    setTimeout(function () { d.classList.add('scene-on'); painted = true; go(); }, 6000);
+    window.whenHero = function (f) { done ? f() : q.push(f); };
+    window.afterHero = function (f) { window.whenHero(function () { (window.requestIdleCallback || setTimeout)(f, { timeout: 1500 }); }); };
+  })();
+  (function () {   // the hero's instant still (poster-lab.html picks the same file): requested from the first bytes of this page
+    var R = Math.PI / 180, d = Date.now() / 864e5 + 2440587.5 - 2451545, g = (357.529 + .98560028 * d) * R, q = 280.459 + .98564736 * d;
+    var L = (q + 1.915 * Math.sin(g) + .02 * Math.sin(2 * g)) * R, e = (23.439 - .00000036 * d) * R;
+    var RA = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e) * Math.sin(L));
+    var GMST = ((18.697374558 + 24.06570982441908 * d) % 24 + 24) % 24, HA = (GMST * 15 - 122.4194) * R - RA, p = 37.7749 * R;
+    var a = Math.asin(Math.sin(p) * Math.sin(dec) + Math.cos(p) * Math.cos(dec) * Math.cos(HA)) / R, f = new URLSearchParams(location.search).get('alt');
+    if (f != null) a = +f;
+    var l = document.createElement('link'); l.rel = 'preload'; l.as = 'image'; l.setAttribute('fetchpriority', 'high');
+    l.href = 'city/layers/gg_ai/poster-' + (a < -4 ? 'night' : a > 12 ? 'day' : 'golden') + '.webp'; document.head.appendChild(l);
+  })();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Bhanu Kowshik · Design Engineer and Founder, Verified Call</title>
 <meta name="description" content="Design engineer who designs and builds AI products. Founder of Verified Call. Sole designer at EverTutor, used by 2,000+ students a day. San Francisco." />
@@ -5261,10 +5295,18 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .hero .hero-building:hover svg{transform:translate(2px,-2px)}
       @media (max-width:767px){ .hero .hero-building{top:16vh;font-size:10px;letter-spacing:.08em} }
     </style>
-    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=29" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
+    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=31" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
             tabindex="-1" loading="eager"></iframe>
     <style>
       .hero .hero-city{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:0;background:#0A1430}
+      /* the opening (12 Nov): night-blue until the painting has its first frame, then it fades up and settles from a slight
+         push-in while the title drops in (poster-lab) and the nav + chat bar follow (hero-go keyframes) */
+      .hero{background:#0A1430}
+      html:not(.scene-on) .hero .hero-city{opacity:0;transform:scale(1.045)}
+      html.scene-on .hero .hero-city{animation:heroCityIn 1.6s cubic-bezier(.16,1,.3,1) both}
+      @keyframes heroCityIn{from{opacity:0;transform:scale(1.045)}to{opacity:1;transform:none}}
+      html.hero-wait .chp-clouds{opacity:0!important}
+      @media (prefers-reduced-motion:reduce){ html.scene-on .hero .hero-city{animation:none} html:not(.scene-on) .hero .hero-city{transform:none} }
       /* the scene carries the greeting (HI, I'M BHANU + line); the hero keeps only the nav + chat bar */
       /* !important: the hero's own rules load later in the file and would otherwise win */
       .hero .copy .eyebrow, .hero .copy h1, .hero .copy .proof, .hero .stack{display:none!important}
@@ -5314,8 +5356,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         -webkit-mask-composite:xor;mask-composite:exclude;
       }
       .hero .cta-dock .cta::after{      /* the sheen across the upper half */
-        content:'';position:absolute;left:6%;right:6%;top:1px;height:48%;border-radius:999px;pointer-events:none;z-index:0;
-        background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0));
+        content:'';position:absolute;left:1px;right:1px;top:1px;height:55%;border-radius:inherit;border-bottom-left-radius:0;border-bottom-right-radius:0;pointer-events:none;z-index:0;
+        background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,0));
       }
       .hero .cta-dock .cta>*{position:relative;z-index:2}
       .hero .cta-dock .cta .cta-text span{color:#fff;font-weight:600}
@@ -5480,15 +5522,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         try { var hc = document.getElementById('heroCity'); hc && hc.contentWindow.postMessage({ type: 'hero-intro' }, location.origin); } catch (e) {}
       }
       window.addEventListener('v6loaderhidden', reveal);
-
-      // no loader on the page (or it never armed): perform on load instead
-      if (!doc.classList.contains('hero-wait')) {
-        if (document.readyState === 'complete') reveal();
-        else window.addEventListener('load', reveal);
-      }
-      // backstop, well past the loader's own 8.9s ceiling — the hero must
-      // never be left sitting invisible behind a loader that failed to go
-      setTimeout(reveal, 12000);
+      // the painting's first frame starts the opening (whenHero, in <head>: backstop 6 s), not the whole page's load
+      window.whenHero(reveal);
     })();
   </script>
 
@@ -5769,10 +5804,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <section class="chp" id="chVC" data-sky="40,30,840,165" aria-labelledby="chVCt">
     <div class="chp-pin">
       <div class="chp-stage" aria-hidden="true">
-        <img class="chp-plate" src="city/layers/chapters/vc-office.webp" data-night="city/layers/chapters/vc-office-night.webp" data-day="city/layers/chapters/vc-office-day.webp" alt="">
+        <img class="chp-plate" loading="lazy" src="city/layers/chapters/vc-office.webp" data-night="city/layers/chapters/vc-office-night.webp" data-day="city/layers/chapters/vc-office-day.webp" alt="">
         <!-- the living golden-hour scene: a locked-camera Higgsfield (Seedance 2.5) loop of this painting, crossfaded to loop seamlessly;
              Seedance reframed it a few px, so it carries its own screen quad -->
-        <video class="chp-loop" src="city/layers/chapters/loops/vc-office.mp4?v=13" poster="city/layers/chapters/vc-office.webp" data-quad="1090,393 1476,372 1420,683 1029,651" muted loop playsinline preload="auto"></video>
+        <video class="chp-loop" src="city/layers/chapters/loops/vc-office.mp4?v=13" poster="city/layers/chapters/vc-office.webp" data-quad="1090,393 1476,372 1420,683 1029,651" muted loop playsinline preload="none"></video>
         <canvas class="chp-birds" width="1672" height="941"></canvas>
         <div class="chp-bay"></div>
         <div class="chp-screen" data-quad="1104,411 1496,388 1438,705 1047,673"><iframe src="films/vc-launch.html?v=15" title="Verified Call launch film" loading="lazy" tabindex="-1"></iframe></div>
@@ -5793,7 +5828,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <section class="chp" id="chST" data-focus="1180" data-sky="40,15,840,160" aria-labelledby="chSTt">
     <div class="chp-pin">
       <div class="chp-stage" aria-hidden="true">
-        <img class="chp-plate" src="city/layers/chapters/stressie-park.webp" data-night="city/layers/chapters/stressie-park-night.webp" data-day="city/layers/chapters/stressie-park-day.webp" alt="">
+        <img class="chp-plate" loading="lazy" src="city/layers/chapters/stressie-park.webp" data-night="city/layers/chapters/stressie-park-night.webp" data-day="city/layers/chapters/stressie-park-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
         <div class="chp-screen" style="width:900px;height:1950px;border-radius:118px" data-quad="860,146 1165,146 1165,795 860,795"><iframe src="films/stressie-launch.html?v=16" title="Stressie launch film" loading="lazy" tabindex="-1"></iframe></div>
       </div>
@@ -5811,8 +5846,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <section class="chp" id="chETL" data-focus="1130" data-sky="40,20,800,160" aria-labelledby="chETLt">
     <div class="chp-pin">
       <div class="chp-stage" aria-hidden="true">
-        <img class="chp-plate" src="city/layers/chapters/et-live-kitchen.webp" data-night="city/layers/chapters/et-live-kitchen-night.webp" data-day="city/layers/chapters/et-live-kitchen-day.webp" alt="">
-        <video class="chp-loop" src="city/layers/chapters/loops/et-live.mp4?v=13" poster="city/layers/chapters/et-live-kitchen.webp" data-quad="741,418 1073,403 1114,629 778,669" muted loop playsinline preload="auto"></video>
+        <img class="chp-plate" loading="lazy" src="city/layers/chapters/et-live-kitchen.webp" data-night="city/layers/chapters/et-live-kitchen-night.webp" data-day="city/layers/chapters/et-live-kitchen-day.webp" alt="">
+        <video class="chp-loop" src="city/layers/chapters/loops/et-live.mp4?v=13" poster="city/layers/chapters/et-live-kitchen.webp" data-quad="741,418 1073,403 1114,629 778,669" muted loop playsinline preload="none"></video>
         <canvas class="chp-birds" width="1672" height="941"></canvas>
         <div class="chp-screen" data-quad="754,433 1089,417 1132,651 791,692"><iframe src="films/et-live-launch.html?v=14" title="EverTutor Live launch film" loading="lazy" tabindex="-1"></iframe></div>
       </div>
@@ -5830,7 +5865,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <section class="chp" id="chETS" data-focus="1180" data-sky="40,20,680,160" aria-labelledby="chETSt">
     <div class="chp-pin">
       <div class="chp-stage" aria-hidden="true">
-        <img class="chp-plate" src="city/layers/chapters/et-studio-classroom.webp" data-night="city/layers/chapters/et-studio-classroom-night.webp" data-day="city/layers/chapters/et-studio-classroom-day.webp" alt="">
+        <img class="chp-plate" loading="lazy" src="city/layers/chapters/et-studio-classroom.webp" data-night="city/layers/chapters/et-studio-classroom-night.webp" data-day="city/layers/chapters/et-studio-classroom-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
         <div class="chp-screen" data-quad="793,372 1241,348 1224,654 771,639"><iframe src="films/et-studio-launch.html?v=14" title="EverTutor Studio launch film" loading="lazy" tabindex="-1"></iframe></div>
       </div>
@@ -5848,7 +5883,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <section class="chp" id="chETA" data-focus="1010" data-sky="40,20,720,150" aria-labelledby="chETAt">
     <div class="chp-pin">
       <div class="chp-stage" aria-hidden="true">
-        <img class="chp-plate" src="city/layers/chapters/et-analytics-office.webp" data-night="city/layers/chapters/et-analytics-office-night.webp" data-day="city/layers/chapters/et-analytics-office-day.webp" alt="">
+        <img class="chp-plate" loading="lazy" src="city/layers/chapters/et-analytics-office.webp" data-night="city/layers/chapters/et-analytics-office-night.webp" data-day="city/layers/chapters/et-analytics-office-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
         <div class="chp-screen" data-quad="790,366 1245,341 1228,659 768,643"><iframe src="films/et-analytics-launch.html?v=2" title="EverTutor Analytics launch film" loading="lazy" tabindex="-1"></iframe></div>
       </div>
@@ -5866,7 +5901,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   <section class="chp" id="chDL" data-focus="1150" data-sky="60,15,800,160" aria-labelledby="chDLt">
     <div class="chp-pin">
       <div class="chp-stage" aria-hidden="true">
-        <img class="chp-plate" src="city/layers/chapters/dearly-alamo.webp" data-night="city/layers/chapters/dearly-alamo-night.webp" data-day="city/layers/chapters/dearly-alamo-day.webp" alt="">
+        <img class="chp-plate" loading="lazy" src="city/layers/chapters/dearly-alamo.webp" data-night="city/layers/chapters/dearly-alamo-night.webp" data-day="city/layers/chapters/dearly-alamo-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
         <div class="chp-screen" style="width:1600px;height:1200px;border-radius:24px" data-quad="715,458 1040,451 1103,712 775,739"><iframe src="films/dearly-launch-v2.html?v=1" title="Dearly launch film" loading="lazy" tabindex="-1"></iframe></div>
       </div>
@@ -6014,7 +6049,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       ['day', 'night'].forEach(function (k) {
         var src = plate.dataset[k]; if (!src) return;
         var im = stage.querySelector('img.chp-tod-' + k);
-        if (!im) { im = document.createElement('img'); im.className = 'chp-tod chp-tod-' + k; im.alt = ''; im.src = src; stage.insertBefore(im, (loop || plate).nextSibling); }
+        if (!im) { im = document.createElement('img'); im.className = 'chp-tod chp-tod-' + k; im.alt = ''; im.loading = 'lazy'; stage.insertBefore(im, (loop || plate).nextSibling); im.src = src; }
         im.style.opacity = (k === 'day' ? wD : wN).toFixed(3);
       });
       // the screen follows whichever painting dominates (variants are separate paintings, the laptop can shift a few px)
@@ -6454,8 +6489,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       function playWhenVisible(stage) { var v = stage.querySelector('video'); if (!v) return;
         if (reduce) { v.removeAttribute('autoplay'); return; }
         new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && !document.documentElement.classList.contains('motion-paused')) { v.play().catch(function () {}); } else v.pause(); }); }, { threshold: 0.3 }).observe(stage); }
-      [['evertutor-live.html', '<div class="mbp"><div class="lid"><video src="images/et-live.mp4" poster="images/et-live.png" muted loop playsinline preload="metadata"></video></div><div class="base"></div></div>'],
-       ['evertutor-studio.html', '<div class="mbp"><div class="lid"><video src="images/et-studio.mp4" poster="images/et-studio.png" muted loop playsinline preload="metadata"></video></div><div class="base"></div></div>'],
+      [['evertutor-live.html', '<div class="mbp"><div class="lid"><video src="images/et-live.mp4" poster="images/et-live.png" muted loop playsinline preload="none"></video></div><div class="base"></div></div>'],
+       ['evertutor-studio.html', '<div class="mbp"><div class="lid"><video src="images/et-studio.mp4" poster="images/et-studio.png" muted loop playsinline preload="none"></video></div><div class="base"></div></div>'],
        ['https://dearly-rho.vercel.app', '<div class="bwin"><div class="bar"><i></i><i></i><i></i><span>dearly-rho.vercel.app</span></div><video src="images/thumbs/dearly.mp4" poster="images/card-dearly.webp" muted loop playsinline preload="metadata"></video></div>']
       ].forEach(function (d) { var card = document.querySelector('.wk-card[href="' + d[0] + '"]'); if (!card) return; var st = mount(card, d[1]); if (st) playWhenVisible(st); });
 
@@ -6969,7 +7004,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     /* the work peeks into the first screen on laptops and desktops: the
        hero gives up a band at the bottom, and the film moves up with it */
     @media (min-width:1024px) and (min-height:700px){
-      .hero{--hero-cut:clamp(170px,28vh,260px);height:calc(100svh - var(--hero-cut));min-height:540px;}
+      .hero{--hero-cut:0px;height:100svh;min-height:600px;}   /* (12 Nov) full screen from the first byte: the old 'work peeks in' cut held until the file's last rules arrived */
       .copy{padding-bottom:clamp(76px,9vh,110px);}
       .reel-fab{bottom:calc(var(--hero-cut, 0px) + clamp(16px,2.4vw,32px) + 30px);}
       .wk{padding-top:clamp(40px,4vw,72px);}
@@ -7061,7 +7096,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <button class="reel-card" type="button" data-reel="labor-illusion"
                 aria-label="Play short: The Labor Illusion" aria-haspopup="dialog">
           <img src="shorts/labor-illusion-poster-wide.webp" alt="" loading="lazy" width="1280" height="720">
-          <video muted loop playsinline preload="metadata" src="shorts/labor-illusion.mp4"
+          <video muted loop playsinline preload="none" src="shorts/labor-illusion.mp4"
                  poster="shorts/labor-illusion-poster-wide.webp" aria-hidden="true" tabindex="-1"></video>
           <span class="reel-card-shade" aria-hidden="true"></span>
           <span class="reel-card-t">The Labor Illusion</span>
@@ -7079,7 +7114,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <button class="reel-card" type="button" data-reel="endowment-effect"
                 aria-label="Play short: The Endowment Effect" aria-haspopup="dialog">
           <img src="shorts/endowment-effect-poster.webp" alt="" loading="lazy" width="720" height="1290">
-          <video muted loop playsinline preload="metadata" src="shorts/endowment-effect.mp4"
+          <video muted loop playsinline preload="none" src="shorts/endowment-effect.mp4"
                  poster="shorts/endowment-effect-poster.webp" aria-hidden="true" tabindex="-1"></video>
           <span class="reel-card-shade" aria-hidden="true"></span>
           <span class="reel-card-t">The Endowment Effect</span>
@@ -7299,7 +7334,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <img class="ft-night" src="city/layers/gg_ai/plate_night.webp" alt="" aria-hidden="true" decoding="async" loading="lazy">
     <!-- (12 Nov, owner: "implement the same thing you have in section 1 in the footer") the hero's living painting itself, at night:
          rippling bay, gulls, layered towers. The still above stays as the poster underneath while it loads. -->
-    <iframe class="ft-live" id="ftCity" src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=29" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
+    <iframe class="ft-live" id="ftCity" data-src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=31" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
     <!-- the night scene's life (owner: "the last section is not animating" / "bring in clouds") -->
     <div class="ft-life" aria-hidden="true">
       <canvas class="ft-stars"></canvas>
@@ -7405,7 +7440,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <source media="(max-width:767px)" srcset="shorts/labor-illusion-poster.webp">
       <img src="shorts/labor-illusion-poster-wide.webp" alt="" width="1280" height="720">
     </picture>
-    <video id="reelFabVid" muted loop playsinline preload="metadata"
+    <!-- preload="none" (12 Nov): Safari/WebKit treats "metadata" as "download it all" (~47 MB of off-screen film on the homepage); play() fetches on demand -->
+    <video id="reelFabVid" muted loop playsinline preload="none"
            src="shorts/labor-illusion-preview-wide.mp4" poster="shorts/labor-illusion-poster-wide.webp"
            aria-hidden="true" tabindex="-1"></video>
     <span class="reel-fab-shade" aria-hidden="true"></span>
@@ -8573,7 +8609,8 @@ var topNav = document.getElementById('topNav');
   /* 1.35 over the Engine's 1.1 — the longer glide is the plushness; the
      easing stays Lenis's own expo-out */
   // (owner, 12 Nov: "the scroll is very rigid") continuous follow instead of a fixed 1.35 s ease: tracks trackpads closely, settles smoothly
-  var lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true });
+  // (12 Nov, measured) lerp .1 lagged the wheel: half the distance at 0.5 s and 2.3 s to settle vs ~1 s native; .14 keeps the glide, settles ~1/3 sooner
+  var lenis = new Lenis({ lerp: 0.14, wheelMultiplier: 1, smoothWheel: true });
   /* THE LOADER TRAP: while the title sequence holds html at
      overflow:hidden, scrollHeight collapses to one viewport — any limit
      measured under the lock reads 0 and every wheel afterwards clamps to
@@ -10671,12 +10708,12 @@ addEventListener('load', function () {
   })();
 </script>
 
-<script src="vendor/three.min.js"></script>
+<script>window.afterHero(function () { var s = document.createElement('script'); s.src = 'vendor/three.min.js'; document.body.appendChild(s); });   // was parser-blocking: held the whole page in 'loading' for 12+ s on a slow line</script>
 <!-- the ?v= is a cache-bust: this file is edited often and browsers hold on
      to it hard. Bump it whenever spiral.js changes. -->
 <!-- spiral.js removed: the work section is a card grid now -->
 
-<script type="module" src="orb/bhanu-orb.js?v=15"></script>
+<script>window.whenHero(function () { var s = document.createElement('script'); s.type = 'module'; s.src = 'orb/bhanu-orb.js?v=15'; document.body.appendChild(s); });   // 1.1 MB: after the painting; its mounts poll for it</script>
 
 <!-- ── AGENTATION — visual feedback for agents (agentation.com) ─────────
      Dev-only: loads ONLY on localhost, never in production. Click the
@@ -11316,7 +11353,8 @@ footer.ft .ft-mailto:hover span{transform:translateX(6px)}
   addEventListener('scroll', check, { passive: true }); addEventListener('resize', check);
   ['heroCity', 'ftCity'].forEach(function (id) { var f = document.getElementById(id); f && f.addEventListener('load', function () { delete last[id]; check(); }); });
   addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.type === 'ft-ready') document.getElementById('ftCity').classList.add('on'); });
-  if (/[?&]rafshim/.test(location.search)) { var fc = document.getElementById('ftCity'); fc && (fc.src += '&rafshim'); }
+  if (/[?&]rafshim/.test(location.search)) { var fc = document.getElementById('ftCity'); fc && (fc.dataset.src += '&rafshim'); }
+  window.afterHero(function () { var fc = document.getElementById('ftCity'); if (fc && fc.dataset.src) fc.src = fc.dataset.src; });   // second painting: after the hero
 })();
 </script>
 <style>
@@ -11340,10 +11378,10 @@ footer.ft .ft-mailto:hover span{transform:translateX(6px)}
     // the subject plane
     var near = document.createElement('div'); near.className = 'chp-near';
     var g = new Image(), d = new Image(), nt = new Image();
-    g.src = FG + n + '-fg.webp'; d.src = FG + n + '-fg-day.webp'; nt.src = FG + n + '-fg-night.webp';
-    [g, d, nt].forEach(function (im) { im.alt = ''; im.decoding = 'async'; near.appendChild(im); });
+    [g, d, nt].forEach(function (im) { im.alt = ''; im.decoding = 'async'; im.loading = 'lazy'; near.appendChild(im); });   // lazy: fetched as the chapter nears
     var scr = stage.querySelector('.chp-screen'); if (scr && !keepScreen) near.appendChild(scr);
     stage.appendChild(near);
+    g.src = FG + n + '-fg.webp'; d.src = FG + n + '-fg-day.webp'; nt.src = FG + n + '-fg-night.webp';
     L.push({ ch: ch, stage: stage, near: near, g: g, d: d, n: nt, loop: stage.querySelector('video.chp-loop'), x: 0, y: 0 });
   });
   if (!L.length) return;

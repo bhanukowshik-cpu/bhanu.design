@@ -16,7 +16,7 @@
   <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..600&family=Instrument+Serif:ital@0;1&family=Urbanist:wght@600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="verified-call/glass-cta.css" />
   <link rel="stylesheet" href="verified-call/icons.css" />
   <link rel="stylesheet" href="images/vc/vc-demo.css" />
@@ -440,14 +440,198 @@
     @media (max-width: 1100px) { .sum.sum-trim > div:nth-child(2) { grid-column: auto; order: 0; border-top: 0; border-left: 1px solid var(--hair); padding-left: 30px; } }
     @media (max-width: 860px) { .sum.sum-trim { grid-template-columns: 1fr; } .sum.sum-trim > div:nth-child(2) { border-left: 0; padding-left: 0; border-top: 1px solid var(--hair); } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+
+    /* ══ v6 homepage language (12 Nov 2026): Montserrat roles, no italic serif, night ground, glass CTAs.
+       case-study-v6.css (linked after this block) re-points the font tokens; these rules fix the roles. ══ */
+    :root { --bg: #0E0B12; --ink: #FFFCF8; --ink-2: rgba(255,252,248,.74); --ink-3: rgba(255,252,248,.62); --ink-4: rgba(255,252,248,.52); --hair: rgba(255,252,248,.12); --card: #141019; }
+    body { font-weight: 500; }
+    /* display + headings: Montserrat 800, tight */
+    .hero-title { font-weight: 800; font-size: clamp(52px, 5.6vw, 88px); line-height: .95; letter-spacing: -.04em; }
+    @media (min-width: 901px) { .hero-title { white-space: nowrap; } }
+    .hero-line { font-family: var(--font-body); font-style: normal; font-weight: 600; font-size: clamp(18px, 1.4vw, 23px); line-height: 1.4; color: var(--ink); letter-spacing: -.005em; }
+    .h2 { font-weight: 800; font-size: clamp(34px, 3.8vw, 64px); line-height: 1; letter-spacing: -.035em; max-width: 22ch; }
+    .h3 { font-weight: 700; font-size: clamp(22px, 1.9vw, 30px); line-height: 1.2; letter-spacing: -.02em; }
+    .close-line { font-weight: 800; font-size: clamp(36px, 4.8vw, 80px); line-height: .98; letter-spacing: -.04em; max-width: 18ch; }
+    .h2 em, .h3 em, .hero-title em, .close-line em, .story blockquote em { font-style: normal; color: inherit; }
+    .threat h4, .learn h4, .reel-head h4 { font-weight: 700; font-size: 20px; line-height: 1.25; letter-spacing: -.015em; }
+    .dcard h3 { font-weight: 700; font-size: clamp(22px, 1.8vw, 26px); line-height: 1.2; letter-spacing: -.02em; }
+    .next strong { font-weight: 800; font-size: clamp(28px, 2.6vw, 38px); letter-spacing: -.035em; line-height: 1; }
+    .dlinks a { font-weight: 600; font-size: 18px; letter-spacing: -.01em; }
+    .story blockquote { font-family: var(--font-body); font-weight: 600; font-size: clamp(20px, 1.7vw, 26px); line-height: 1.4; letter-spacing: -.01em; color: var(--ink); max-width: 36ch; }
+    /* numbers: Montserrat 700 */
+    .kpi b { font-weight: 700; font-size: clamp(34px, 3vw, 52px); letter-spacing: -.03em; }
+    .kpi b i { color: var(--ink-4); }
+    /* reading text: Montserrat 500 */
+    .lede, .hero-lede { font-weight: 500; font-size: clamp(16px, 1.08vw, 18px); line-height: 1.65; }
+    .sum dd, .dcard dd, .own p, .learn p, .facts span, .note { font-weight: 500; }
+    /* labels: JetBrains Mono, small uppercase */
+    .eyebrow, .sum dt, .dcard .num, .dcard dt, .lbl, .own h4, .tag, .dlinks a::before { font-weight: 500; }
+    .menu a { font-family: var(--font-heading); font-weight: 600; font-size: 17px; text-transform: none; letter-spacing: -.005em; }
+    /* nav: links in the homepage glass pill, Email me as the chat-bar glass */
+    .nav { background: rgba(14,11,18,.55); }
+    .nav-sections { flex: 0 1 auto; margin: 0 auto; }
+    .nav-sections.cs-navpill { gap: 2px; }
+    .nav-sections.cs-navpill .nav-btn { font-size: 13px; padding: 9px 14px; color: #fff; }
+    .nav-sections.cs-navpill .nav-btn.active { background: rgba(255,255,255,.2); color: #fff; }
+    .nav-sections.cs-navpill .nav-btn:hover:not(.active) { background: rgba(255,255,255,.14); }
+    .nav { height: 64px; }
+    .nav-cta.cs-glass { min-height: 44px; padding: 0 18px; border-radius: 16px; font-size: 14px; color: #fff; }
+    .nav-cta.cs-glass:hover { background: linear-gradient(180deg,rgba(255,255,255,.3) 0%,rgba(255,255,255,.1) 100%),linear-gradient(rgba(120,140,190,.14),rgba(120,140,190,.14)); }
+    /* CTAs: chat-bar glass replaces the blue pill and the hairline ghost */
+    .btn.cs-glass, .ghost.cs-glass { color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 -1px 1px rgba(255,255,255,.22), 0 12px 32px -12px rgba(0,0,0,.5); }
+    .btn.cs-glass { background: linear-gradient(180deg,rgba(255,255,255,.3) 0%,rgba(255,255,255,.1) 100%),linear-gradient(rgba(120,140,190,.18),rgba(120,140,190,.18)); }
+    .btn.cs-glass svg, .ghost.cs-glass svg { width: 14px; height: 14px; }
+    /* segment + state toggles: one glass track, the selected state lit */
+    .seg.cs-glass, .vtabs.cs-glass { display: inline-flex; min-height: 0; padding: 4px; gap: 2px; border-radius: 18px; cursor: default; }
+    .seg.cs-glass:hover, .vtabs.cs-glass:hover { transform: none; }
+    .seg.cs-glass [role="tab"], .vtabs.cs-glass [role="tab"] { color: rgba(255,252,248,.78); box-shadow: none; border-radius: 14px; }
+    .seg.cs-glass [role="tab"][aria-selected="true"], .vtabs.cs-glass [role="tab"][aria-selected="true"] { background: rgba(255,255,255,.92); color: #0E0B12; }
+    .vtabs.cs-glass { flex-wrap: wrap; }
+    .lbx button { font-family: var(--font-heading); }
+    .dcard .vis, pre.code { background: #0B090F; }
+    .close p.lede { margin-top: 24px; }
+    @media (max-width: 860px) {
+      .hero-title { font-size: clamp(48px, 13vw, 72px); }
+      .h2 { font-size: clamp(30px, 8.4vw, 40px); }
+      .close-line { font-size: clamp(32px, 9vw, 48px); }
+    }
+
+    /* ══ round 2 (12 Nov 2026): painted hero + close bookend, homepage proof figures, card surfaces ══ */
+    /* hero: the vc-office painting full-bleed behind the first fold */
+    .hero { position: relative; isolation: isolate; padding-top: 0; }
+    .cs-scene { position: absolute; left: 0; right: 0; top: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+    .cs-scene img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .hero-scene { height: 100svh; min-height: 640px; }
+    .hero-scene img { object-position: 78% 50%; }
+    .hero-scene::before, .hero-scene::after { content: ''; position: absolute; inset: 0; }
+    .hero-scene::before { background: linear-gradient(90deg, rgba(10,20,48,.85) 0, rgba(10,20,48,.4) 45%, transparent 70%); }
+    .hero-scene::after { background: linear-gradient(180deg, transparent 62%, var(--bg) 100%); }
+    .hero-grid { min-height: 100svh; padding: 112px 0 64px; }
+    .hero .eyebrow + .hero-line-top { margin-top: 16px; }
+    .hero-line-top + .hero-title { margin-top: 16px; }
+    .hero-title + .hero-lede { margin-top: 20px; }
+    .hero-cta { margin-top: 32px; }
+    .hero .eyebrow { color: rgba(255,252,248,.8); }
+    .hero-lede { color: rgba(255,252,248,.86); }
+    #heroLive .shot { box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), 0 0 0 1px rgba(255,255,255,.32), 0 40px 80px -36px rgba(0,0,0,.75); }
+    #heroLive .cap { color: rgba(255,252,248,.86); text-shadow: 0 1px 10px rgba(0,0,0,.85); }
+    #heroLive .live-top .eyebrow { color: #FFFCF8; text-shadow: 0 1px 10px rgba(0,0,0,.85); }
+    #heroLive .seg.cs-glass { background: linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.04) 100%), rgba(14,11,18,.55); }
+    #heroLive .seg.cs-glass [role="tab"]:not([aria-selected="true"]) { color: #FFFCF8; }
+    .hero .sum { margin-top: 0; }
+    /* summary figures: set like the homepage .chp-proof */
+    .kpis { gap: clamp(20px, 2.4vw, 40px); }
+    .kpi b { font: 700 clamp(28px, 2.6vw, 44px)/1 var(--font-display); letter-spacing: -.03em; color: var(--ink); }
+    .kpi b i { color: inherit; font-weight: inherit; }
+    .kpi > span { font: 600 15px/1.3 var(--font-body); color: var(--ink); margin-top: 8px; }
+    /* section heads: one rhythm */
+    .sec { padding-top: clamp(96px, 12vh, 160px); }
+    .eyebrow b { color: var(--ink); }
+    .h2 { max-width: 18ch; }
+    /* problem: glass icon tiles, the quote as a 700 lead */
+    .threat .ic { border-radius: 16px; background: linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.04) 100%), rgba(120,140,190,.08); -webkit-backdrop-filter: blur(14px) saturate(1.6); backdrop-filter: blur(14px) saturate(1.6); box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 -1px 1px rgba(255,255,255,.18), inset 0 0 0 1px rgba(255,255,255,.14); }
+    .story blockquote { font: 700 clamp(24px, 2.2vw, 34px)/1.25 var(--font-display); letter-spacing: -.02em; max-width: 30ch; }
+    /* interfaces: state tabs in the nav pill */
+    .vtabs.cs-navpill { display: inline-flex; flex-wrap: nowrap; gap: 2px; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+    .vtabs.cs-navpill::-webkit-scrollbar { display: none; }
+    .vtabs.cs-navpill [role="tab"] { flex: none; min-height: 0; box-shadow: none; color: #fff; font: 600 14px/1 var(--font-heading); padding: 10px 16px; }
+    .vtabs.cs-navpill [role="tab"][aria-selected="true"] { background: rgba(255,255,255,.2); color: #fff; }
+    .vtabs.cs-navpill [role="tab"]:hover:not([aria-selected="true"]) { background: rgba(255,255,255,.14); }
+    /* decisions, build cards, archive reels: one quiet card surface */
+    .dcard, .own > div, .reel { background: rgba(255,255,255,.04); border: 1px solid var(--cs-line); border-radius: 22px; box-shadow: none; }
+    .dcard .vis { background: rgba(0,0,0,.22); border-right-color: var(--cs-line); }
+    .reel { padding: 22px 24px 14px; }
+    .reel .track-wrap::after { display: none; }
+    .dcard .num { color: var(--ink-3); }
+    .own h4 { color: var(--ink-3); }
+    details.dd summary { font: 600 15px/1.3 var(--font-heading); color: var(--ink); }
+    details.dd summary:hover { text-decoration: underline; text-underline-offset: 4px; }
+    details.more summary::before { color: var(--ink); }
+    .note { border-left-color: var(--cs-line); }
+    /* build diagram: titles in the h3 role, sublines as labels; arrows in ink, not azure */
+    .arch { border-radius: 22px; background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px var(--cs-line); }
+    .arch text { font-family: var(--font-display); }
+    .arch g[font-size="18"] text { font-weight: 700; letter-spacing: -.015em; fill: #FFFCF8; }
+    .arch g[font-size="12"] text { font-family: var(--font-mono); font-weight: 500; letter-spacing: 1.4px; fill: rgba(255,252,248,.52); }
+    .arch g[font-size="14"] text { font-weight: 500; fill: rgba(255,252,248,.74); }
+    .arch g[stroke="#8CC5FF"] { stroke: rgba(255,252,248,.6); }
+    .arch marker path { fill: rgba(255,252,248,.6); }
+    pre.code { font-family: var(--font-mono); }
+    pre.code .k { color: #FFFCF8; }
+    /* brand: only the outer heading takes the h2 role */
+    .brand-sec > .wrap > .h3 { font: 800 clamp(34px, 3.8vw, 64px)/1 var(--font-display); letter-spacing: -.035em; }
+    /* close: the painting again, heavily dimmed */
+    .close { position: relative; isolation: isolate; margin-top: 80px; }
+    .close-scene { bottom: 0; }
+    .close-scene img { opacity: .32; object-position: 70% 50%; }
+    .close-scene::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, var(--bg) 0, rgba(14,11,18,.35) 30%, rgba(14,11,18,.55) 60%, var(--bg) 92%); }
+    .next strong { font: 700 clamp(20px, 1.5vw, 24px)/1.2 var(--font-display); letter-spacing: -.015em; }
+    .next:hover strong { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+    @media (max-width: 860px) {
+      .hero-scene { height: 70svh; min-height: 0; }
+      .hero-scene img { object-position: 70% 50%; }
+      .hero-scene::before { background: linear-gradient(180deg, rgba(10,20,48,.55) 0, rgba(10,20,48,.7) 55%, rgba(10,20,48,.4) 80%); }
+      .hero-scene::after { background: linear-gradient(180deg, transparent 55%, var(--bg) 100%); }
+      .hero-grid { min-height: 0; padding: 92px 0 48px; }
+      .hero-title { font-size: clamp(44px, 12vw, 56px); }
+      .kpis { grid-template-columns: 1fr 1fr; gap: 22px 18px; }
+      .kpi b { font-size: 28px; }
+      .reel { padding: 18px 16px 10px; }
+    }
+    @media (max-width: 480px) {
+      .hero .eyebrow { font-size: 11px; letter-spacing: .1em; }
+    }
+
+    /* ══ round 3 (12 Nov 2026): review fixes ══ */
+    /* phone menu: hamburger (an X while open) stays above the drawer */
+    .nav:has(.nav-hamburger[aria-expanded="true"]) { z-index: 970; background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .nav:has(.nav-hamburger[aria-expanded="true"]) .nav-home { visibility: hidden; }
+    .menu a.mcta.cs-glass { align-self: flex-start; margin-top: 28px; padding: 0 24px; border-bottom: 0; color: #fff; font-size: 16px; }
+    /* hero order like the homepage chapter: kicker, title, lead */
+    .hero-kicker { font: 600 clamp(15px, 1.1vw, 17px)/1.3 var(--font-heading); color: rgba(255,252,248,.86); letter-spacing: -.005em; }
+    .hero-kicker + .hero-title { margin-top: 16px; }
+    .hero-title + .hero-line { margin-top: 16px; max-width: 30ch; }
+    .hero-line + .hero-lede { margin-top: 20px; }
+    .hero-lede { text-wrap: pretty; }
+    .hero-scene::before { background: linear-gradient(90deg, rgba(10,20,48,.9) 0, rgba(10,20,48,.62) 38%, rgba(10,20,48,.25) 56%, transparent 72%); }
+    /* links: warm-white ink, 600, soft underline */
+    a.inline, .credit a { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(255,252,248,.4); text-underline-offset: 3px; }
+    a.inline:hover, .credit a:hover { text-decoration-color: currentColor; }
+    /* one active-tab style everywhere (the nav pill's) */
+    .seg.cs-glass [role="tab"][aria-selected="true"], #heroLive .seg.cs-glass [role="tab"][aria-selected="true"] { background: rgba(255,255,255,.2); color: #fff; }
+    .seg [role="tab"]::after { background: rgba(255,255,255,.55); }
+    /* brand joins the section rhythm */
+    .brand-sec { margin-top: 0; padding-top: clamp(96px, 12vh, 160px); }
+    .brand-sec .eyebrow + .h3 { margin-top: 16px; }
+    /* quote in about three lines */
+    .story blockquote { font: 600 clamp(22px, 1.8vw, 26px)/1.4 var(--font-display); letter-spacing: -.01em; max-width: 46ch; }
+    /* archive tracks show they scroll */
+    .track { -webkit-mask-image: linear-gradient(90deg, #000 90%, transparent); mask-image: linear-gradient(90deg, #000 90%, transparent); }
+    .close p.lede { text-wrap: balance; }
+    /* the middle: borderless glass-tint panels, ink version tags */
+    .dcard, .own > div, .reel, .arch { background: rgba(255,255,255,.05); border: 0; border-radius: 22px; box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+    .dcard .vis { background: rgba(0,0,0,.18); border-right: 0; }
+    .lbl em, .tag { color: var(--ink); }
+    .threat { border-top-color: var(--cs-line); }
+    @media (max-width: 860px) {
+      .dcard .vis { border-bottom: 0; }
+      .vtabs.cs-navpill { flex-wrap: wrap; overflow: visible; border-radius: 22px; }
+      .story blockquote { font-size: clamp(20px, 5.4vw, 24px); }
+    }
+    @media (max-width: 480px) {
+      .ext-row > :nth-child(3) { grid-column: span 2; width: calc(50% - 10px); justify-self: center; }
+      .close-cta { flex-direction: column; align-items: center; }
+      .close-cta .cs-glass { min-width: 240px; justify-content: center; }
+    }
   </style>
+  <link rel="stylesheet" href="case-study-v6.css" />
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
   <nav class="nav" aria-label="Case study">
     <a href="/" class="nav-home"><img src="cs-nav-logo.svg" alt="" width="36" height="36" /><span>Verified Call</span></a>
-    <div class="nav-sections">
+    <div class="nav-sections cs-navpill">
       <a href="#overview" class="nav-btn active" data-section="overview">Overview</a>
       <a href="#interfaces" class="nav-btn" data-section="interfaces">Interfaces</a>
       <a href="#decisions" class="nav-btn" data-section="decisions">Decisions</a>
@@ -455,32 +639,33 @@
       <a href="#archive" class="nav-btn" data-section="archive">Versions</a>
       <a href="#brand" class="nav-btn" data-section="brand">Brand</a>
     </div>
-    <a class="nav-cta" href="mailto:kowshikbhanu1000@gmail.com">Email me</a>
+    <a class="nav-cta cs-glass" href="mailto:kowshikbhanu1000@gmail.com">Email me</a>
     <button class="nav-hamburger" id="navHamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
   </nav>
   <div class="menu-bd" id="menuBackdrop"></div>
   <div class="menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menu">
-    <a href="#overview">Overview</a><a href="#interfaces">Interfaces</a><a href="#decisions">Decisions</a><a href="#build">Build</a><a href="#archive">Versions</a><a href="#brand">Brand</a><a class="mcta" href="mailto:kowshikbhanu1000@gmail.com">Email me</a>
+    <a href="#overview">Overview</a><a href="#interfaces">Interfaces</a><a href="#decisions">Decisions</a><a href="#build">Build</a><a href="#archive">Versions</a><a href="#brand">Brand</a><a class="mcta cs-glass" href="mailto:kowshikbhanu1000@gmail.com">Email me</a>
   </div>
 
   <main id="main">
     <!-- HERO -->
     <section id="overview" class="hero">
+      <div class="cs-scene hero-scene" aria-hidden="true"><img class="cs-scene-img" data-scene="city/layers/chapters/vc-office" alt="" decoding="async" fetchpriority="high"><script src="case-study-v6.js"></script></div>
       <div class="wrap">
         <div class="hero-grid">
           <div>
-            <p class="eyebrow in d1">Founder · solo designer and engineer · 2026</p>
-            <p class="hero-line hero-line-top in d2">Know who is on the other side of the call.</p>
-            <h1 class="hero-title in d2">Verified <em>Call</em></h1>
+            <p class="hero-kicker in d1">Founder · solo designer and engineer · 2026</p>
+            <h1 class="hero-title in d2">Verified Call</h1>
+            <p class="hero-line in d2">Know who is on the other side of the call.</p>
             <p class="hero-lede in d3">I designed and built Verified Call alone in 3 weeks: a Mac and Windows app that checks the candidate, and a panel inside Google Meet that shows the interviewer what it found.</p>
             <div class="hero-cta in d4">
-              <a class="ghost" href="https://verifiedcall.app" target="_blank" rel="noopener">verifiedcall.app <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a>
+              <a class="ghost cs-glass" href="https://verifiedcall.app" target="_blank" rel="noopener">verifiedcall.app <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a>
             </div>
           </div>
           <div class="live in d4" id="heroLive">
             <div class="live-top">
               <p class="eyebrow" id="heroLabel">The panel inside Meet</p>
-              <div class="seg" role="tablist" aria-labelledby="heroLabel">
+              <div class="seg cs-glass" role="tablist" aria-labelledby="heroLabel">
                 <button role="tab" id="ht0" aria-selected="true" aria-controls="heroPanel" tabindex="0">Checking</button>
                 <button role="tab" id="ht1" aria-selected="false" aria-controls="heroPanel" tabindex="-1">Verified</button>
                 <button role="tab" id="ht2" aria-selected="false" aria-controls="heroPanel" tabindex="-1">Needs a look</button>
@@ -543,7 +728,7 @@
         </div>
         <div class="story rv">
           <p class="eyebrow">Why I built it</p>
-          <blockquote>I was the founding designer at SigIQ, the team behind EverTutor. To be sure of who we hired, we flew candidates in and <em>sat next to them</em> during the interview. It worked, and it was slow and costly. Verified Call brings that check to remote calls.</blockquote>
+          <blockquote>Recruiting at SigIQ, the only way to be sure a candidate wasn't cheating was to fly them in. It worked, but it was slow and costly. Verified Call brings that check to remote calls.</blockquote>
         </div>
       </div>
     </section>
@@ -563,7 +748,7 @@
             <p class="note">It checks that the camera is real, that the face and voice stay the same person, and which apps are open. Then it runs quietly during the call.</p>
           </div>
           <div class="viewer rv" id="deskViewer">
-            <div class="vtabs" role="tablist" aria-label="Desktop app states">
+            <div class="vtabs cs-navpill" role="tablist" aria-label="Desktop app states">
               <button role="tab" id="dt0" aria-controls="dp0" aria-selected="true" tabindex="0">Home</button>
               <button role="tab" id="dt1" aria-controls="dp1" aria-selected="false" tabindex="-1">Setup check</button>
               <button role="tab" id="dt2" aria-controls="dp2" aria-selected="false" tabindex="-1">Hidden app open</button>
@@ -861,6 +1046,7 @@
     <!-- BRAND -->
     <section id="brand" class="brand-sec">
       <div class="wrap">
+        <p class="eyebrow rv"><b>06</b>Brand system</p>
         <h2 class="h3 rv">The brand system</h2>
         <div class="bento vds rv">
           <div class="b-flap"><span class="lb">Split-flap · the signature motion</span><div class="ctr"><div><div class="flap" id="brandFlap" data-text="Verified">Verified</div><figure class="anat-wrap"><div class="flap anat" id="anatFlap" data-text="V">V</div><figcaption class="spec-sub">One tile, slowed down</figcaption></figure></div></div></div>
@@ -883,7 +1069,7 @@
     <!-- LEARN + CLOSE -->
     <section class="sec" id="learn">
       <div class="wrap">
-        <div class="rv"><p class="eyebrow"><b>06</b>What I learned</p></div>
+        <div class="rv"><p class="eyebrow"><b>07</b>What I learned</p><h2 class="h2">Three rules I keep.</h2></div>
         <div class="learn">
           <div class="rv"><h4>Still concepts before motion</h4><p>The particle-face hero read as uncanny. Now I show two or three still options and pick one before anything moves.</p></div>
           <div class="rv"><h4>Calm is a feature</h4><p>The panel got better each time it did less. A signal that stays still is a signal people trust.</p></div>
@@ -893,14 +1079,15 @@
     </section>
 
     <section class="close">
+      <div class="cs-scene close-scene" aria-hidden="true"><img class="cs-scene-img" data-scene="city/layers/chapters/vc-office" alt="" decoding="async" loading="lazy"><script src="case-study-v6.js"></script></div>
       <div class="wrap">
         <div class="rv">
           <p class="close-line">I design and build the <em>whole</em> product.</p>
           <p class="lede">If your team needs a designer who ships the interface and the code behind it, I would like to hear from you.</p>
           <div class="close-cta">
-            <a class="btn" href="mailto:kowshikbhanu1000@gmail.com">Email me <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a>
-            <a class="ghost" href="https://verifiedcall.app" target="_blank" rel="noopener">verifiedcall.app <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a>
-            <a class="ghost" href="index.html#work">Back to work</a>
+            <a class="btn cs-glass" href="mailto:kowshikbhanu1000@gmail.com">Email me <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a>
+            <a class="ghost cs-glass" href="https://verifiedcall.app" target="_blank" rel="noopener">verifiedcall.app <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a>
+            <a class="ghost cs-glass" href="index.html#work">Back to work</a>
           </div>
         </div>
         <a class="next rv" href="evertutor-live.html">
@@ -1109,6 +1296,7 @@
     }
     ham.addEventListener('click', function () { setMenu(ham.getAttribute('aria-expanded') !== 'true'); });
     bd.addEventListener('click', function () { setMenu(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.classList.contains('open')) { e.preventDefault(); setMenu(false); } });
     menu.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') { e.preventDefault(); setMenu(false); return; }
       if (e.key === 'Tab') { var a = Array.prototype.slice.call(menu.querySelectorAll('a')), i = a.indexOf(document.activeElement); if (e.shiftKey && i === 0) { e.preventDefault(); a[a.length - 1].focus(); } else if (!e.shiftKey && i === a.length - 1) { e.preventDefault(); a[0].focus(); } }

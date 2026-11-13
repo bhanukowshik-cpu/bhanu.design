@@ -58,7 +58,7 @@
   #name{font-family:var(--font-mono);font-size:clamp(11px,.9vw,13px);letter-spacing:.12em;text-transform:uppercase;color:rgba(255,252,248,.85);margin-bottom:clamp(8px,1vw,14px)}
   #title{white-space:nowrap;font-weight:700;font-size:clamp(36px,7vw,150px);line-height:1;letter-spacing:-.02em;color:#FFFCF8}
   #name b{color:#FFFCF8;font-weight:500}
-  html.text-in-scene #title, html.text-in-scene #tagline{visibility:hidden}   /* drawn in WebGL behind the bridge */
+  html.text-in-scene.gl-on #title, html.text-in-scene.gl-on #tagline{opacity:0!important;visibility:hidden;transition:opacity .9s ease, visibility 0s .9s}   /* drawn in WebGL, in front of the bridge; the DOM copy fades as the scene fades in */
   #tagline{margin-top:clamp(10px,1.2vw,18px);max-width:min(860px,86vw);font-weight:500;font-size:clamp(16px,1.6vw,22px);
            line-height:1.5;color:rgba(255,252,248,.92)}
   #tagline b{color:#FFFCF8;font-weight:700}
@@ -92,6 +92,67 @@
     #sndHint{position:absolute;right:0;bottom:calc(100% + 8px);white-space:nowrap}   /* keep clear of the clock line */
   }
 </style>
+<!-- FIRST PAINT FIRST (12 Nov, cold-load fix: on a slow first visit three.module was only requested after the classic scripts
+     below ran, and the layers only after the manifest, so the painting arrived at ~18 s). Everything the first frame needs now
+     starts with the first bytes of this page, at high priority. -->
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }
+</script>
+<script>
+  /* INSTANT STILL (12 Nov): a ~70-130 KB still of this exact framing, for SF's sun right now, paints the scene within a
+     second; the live WebGL scene fades in over it when its first frame is ready (html.gl-on). Rendered from this page:
+     poster-lab.html?embed&alt=-14 | 3 | 30 at 1920x1080 → city/layers/gg_ai/poster-{night,golden,day}.webp (cwebp -q 62, 1600w).
+     Re-render them whenever the painting changes. */
+  (function () {
+    var d = document.documentElement, Q = new URLSearchParams(location.search), embed = Q.has('embed'), footer = Q.has('footer');
+    function sunAlt(ms) {
+    var R = Math.PI / 180, d = ms / 864e5 + 2440587.5 - 2451545, g = (357.529 + .98560028 * d) * R, q = 280.459 + .98564736 * d;
+    var L = (q + 1.915 * Math.sin(g) + .02 * Math.sin(2 * g)) * R, e = (23.439 - .00000036 * d) * R;
+    var RA = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e) * Math.sin(L));
+    var GMST = ((18.697374558 + 24.06570982441908 * d) % 24 + 24) % 24, HA = (GMST * 15 - 122.4194) * R - RA, p = 37.7749 * R;
+    return Math.asin(Math.sin(p) * Math.sin(dec) + Math.cos(p) * Math.cos(dec) * Math.cos(HA)) / R;
+  }
+    var a = Q.get('alt') != null ? +Q.get('alt') : sunAlt(Date.now());
+    var src = 'city/layers/gg_ai/poster-' + (a < -4 ? 'night' : a > 12 ? 'day' : 'golden') + '.webp';
+    d.style.setProperty('--poster', 'url("' + src + '")');
+    function fit() {   // same crop as the scene's viewFor(): centred cover, portrait centred on the bridge (CFG.portraitCenterX)
+      var A = innerWidth / Math.max(1, innerHeight), S = 16 / 9, x = 50;
+      if (A < 1) { var sx = A / S, cx = Math.min(1 - sx / 2, Math.max(sx / 2, 0.835)); x = (cx - sx / 2) / (1 - sx) * 100; }
+      d.style.setProperty('--poster-x', x.toFixed(2) + '%');
+    }
+    fit(); addEventListener('resize', fit);
+    // the title over the still is fitted exactly like fitTitle() in the scene (CFG.titleFit .62), so the handover never resizes it
+    function fitT() { var t = document.getElementById('title'); if (!t) return; t.style.fontSize = '';
+      var fs = parseFloat(getComputedStyle(t).fontSize), w = t.getBoundingClientRect().width;
+      if (w > 0) t.style.fontSize = Math.min(fs * ((innerWidth || 1600) * 0.62) / w, 150) + 'px'; }
+    document.addEventListener('DOMContentLoaded', fitT); if (document.fonts) document.fonts.ready.then(fitT); addEventListener('resize', fitT);
+    var im = new Image(); im.fetchPriority = 'high'; im.decoding = 'async';
+    im.onload = function () {
+      d.classList.add('still-on');
+      if (embed && !footer) {
+        try { parent.postMessage({ type: 'hero-painted', still: true }, location.origin); } catch (e) {}
+        // the live scene gets a moment to arrive and play its own title drop; if it doesn't, the title rises in over the still
+        setTimeout(function () { if (!d.classList.contains('gl-on')) d.classList.add('dom-title-in'); }, 1200);
+      }
+    };
+    im.src = src;
+  })();
+</script>
+<style>
+  #stage{background:#0A1430 var(--poster) var(--poster-x,50%) 50%/cover no-repeat!important}
+  #gl{transition:opacity .9s ease}
+  html:not(.gl-on) #gl{opacity:0}
+  html.embed:not(.footer-mode) #title, html.embed:not(.footer-mode) #tagline{transition:opacity .9s ease, transform .9s cubic-bezier(.16,1,.3,1), visibility 0s}
+  html.embed:not(.dom-title-in) #title, html.embed:not(.dom-title-in) #tagline{opacity:0;transform:translateY(-28px)}
+  html.dom-title-in #tagline{transition-delay:.12s}
+</style>
+<link rel="modulepreload" href="vendor/three/three.module.min.js">
+<script>(function () { var b = 'city/layers/' + (new URLSearchParams(location.search).get('scene') || 'gg_ai').replace(/[^a-z0-9_]/g, '') + '/';
+  window.__M = fetch(b + 'manifest.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }); window.__M.catch(function () {}); })();</script>
+<link rel="preload" as="image" href="city/layers/gg_ai/plate.webp" fetchpriority="high">
+<link rel="preload" as="image" href="city/layers/gg_ai/bridge_fg.webp" fetchpriority="high">
+<link rel="preload" as="image" href="city/layers/gg_ai/foreground.webp" fetchpriority="high">
+<link rel="preload" as="image" href="city/layers/gg_ai/redwoods.webp" fetchpriority="high">
 </head>
 <body>
 <div id="stage">
@@ -134,9 +195,6 @@
 <script src="vendor/gsap.min.js"></script>
 <script src="vendor/ScrollTrigger.min.js"></script>
 <script src="vendor/lenis.min.js"></script>
-<script type="importmap">
-{ "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }
-</script>
 
 <script type="module">
 import * as THREE from 'three';
@@ -825,7 +883,7 @@ let reflRT = null, colHTex = null;
 const gullData = Array.from({ length: 5 }, () => new THREE.Vector4(0, 0, 0, 0));
 
 async function build() {
-  M = await (await fetch(BASE + 'manifest.json', { cache: 'no-cache' })).json();
+  M = (window.__M && await window.__M.catch(() => null)) || await (await fetch(BASE + 'manifest.json', { cache: 'no-cache' })).json();
   U.uHorizon.value = M.horizon_y ?? 0.62;
   setupCamera(M);
   const layers = [...M.layers].sort((a, b) => a.order - b.order);
@@ -980,6 +1038,9 @@ async function build() {
     if (L.name === (layers.some(l => l.name === 'bridge_lights') ? 'bridge_lights' : layers.some(l => l.name === 'bridge') ? 'bridge' : 'bridge_fg')) {
       addFog(U.uHorizon.value + 0.004, 0.026, 0.016, 9.1, L.parallax, 1.0);
       gullPass = addPass(FS_GULLS, { uGulls: { value: gullData } }, { rect: [0, 0.02, 1, 0.62], par: 0.1, name: 'gulls' });
+      // (owner, 12 Nov: "I thought we're moving the name to the front") the title now draws right after the bridge and the
+      // gulls, so the towers no longer cut the letters; the trees and rocks further forward never reach the type
+      if (textPass) textPass.mesh.renderOrder = order++;
     }
   }
   if (!waterDone) insertWater();
@@ -1691,6 +1752,7 @@ function setupScroll() {
    ════════════════════════════════════════════════════════════════════════ */
 async function showFallback(reason) {
   console.warn('[poster-lab] fallback:', reason);
+  if (Q.has('embed') && !FOOTER) try { parent.postMessage({ type: 'hero-painted', fallback: true }, location.origin); } catch (e) {}
   canvas.style.display = 'none';
   const fb = document.getElementById('fallback'); fb.style.display = 'block';
   try {
@@ -1726,6 +1788,10 @@ async function showFallback(reason) {
   fetchWeather().then(renderOnce);
   setInterval(fetchWeather, 10 * 60 * 1000);
   loopStart();
+  // the title already rose in over the still: the scene takes it over in place (no second drop)
+  if (document.documentElement.classList.contains('dom-title-in')) introT0 = performance.now() - 5000;
+  requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.add('gl-on')));
+  if (Q.has('embed') && !FOOTER) requestAnimationFrame(() => requestAnimationFrame(() => { try { parent.postMessage({ type: 'hero-painted' }, location.origin); } catch (e) {} }));
   setTimeout(streamVariants, 700);   // other times of day arrive after first paint
 })();
 </script>
