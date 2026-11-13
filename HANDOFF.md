@@ -45,11 +45,11 @@ Netlify deploys `main` in about 30–40 s. Confirm by fetching a changed file fr
 
 ## 5. NEXT TASK: real sound from Epidemic Sound
 
-> **Status 13 Nov 2026: built, tested, NOT shippable yet.** Recordings encoded (`audio/build.py`, commit `7a75e21`) and
-> wired (nav toggle, hero engine, chapter loops, whoosh; `92bfb1a`), passing in headful Chrome and WebKit. Blocked on
-> licensing: Epidemic's Creator and Pro licences grant use "in video and podcast productions" and forbid standalone /
-> app-style access, so a live web soundscape needs Epidemic's written OK first. Details and every track in
-> `audio/CREDITS.md`. Do not merge to `main` until that's resolved.
+> **Status 13 Nov 2026: DONE and shipped (owner's decision).** Recordings encoded (`audio/build.py`, `7a75e21`), wired
+> (nav toggle, hero engine, chapter loops, whoosh; `92bfb1a`), footer credit to Epidemic Sound, tested in headful Chrome
+> and WebKit. The owner holds Epidemic Pro + Creator and chose to ship; the open licence questions (the plans' wording
+> covers "video and podcast productions") are recorded in `audio/CREDITS.md`. HANDOFF.md, audio/*.md and
+> audio/build.py are blocked from public serving in `netlify.toml`.
 
 **Goal:** a calm, opt-in soundscape that makes the paintings feel alive, built from licensed Epidemic Sound recordings. It must never autoplay, never surprise, and cost nothing until someone turns it on.
 

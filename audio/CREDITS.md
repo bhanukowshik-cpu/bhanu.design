@@ -4,9 +4,13 @@ All recordings are from the **Epidemic Sound** Sound Effects library, downloaded
 Epidemic Sound connector (WAV, 96 kHz / 24-bit; 192 kHz for the fireplace). Masters live in `audio/raw/` (gitignored);
 `audio/build.py` records every cut, and the IDs below re-download them.
 
-## ⚠️ Licence status: NOT CLEARED FOR SHIPPING (13 Nov 2026)
+## Licence status: shipped on the owner's decision (13 Nov 2026)
 
-Do not merge the soundscape to `main` until Epidemic Sound confirms in writing that the account's plan covers it.
+The owner holds Epidemic Sound **Pro and Creator** subscriptions and decided to ship, reading the plans as "royalty
+free, use anywhere". The site credits Epidemic Sound in the footer ("Ambient sound courtesy of Epidemic Sound",
+linked). This file is internal (Netlify serves it as a 404). Keep the subscription active while the site plays these
+files. The notes below are the open questions from the licence texts, kept in case Epidemic ever asks.
+
 What Epidemic's own licence texts say (read 13 Nov 2026):
 
 1. **Scope of the grant.** Both the Creator licence (updated 29 Apr 2025) and the Pro licence (updated 27 Apr 2026)
@@ -26,13 +30,13 @@ What Epidemic's own licence texts say (read 13 Nov 2026):
 5. **Commercial use.** The Sound Effects FAQ: "The Creator plan covers non-commercial publishing"; commercial and
    client work needs Pro or above. The homepage promotes the owner's company (Verified Call), so treat it as commercial.
 6. **Credits.** Required where reasonably possible, in the form "Artist / Title / courtesy of Epidemic Sound",
-   hyperlinked to epidemicsound.com. Once cleared, add a credit line to the footer (Epidemic gives no artist name for
-   these sound effects; use the title).
+   hyperlinked to epidemicsound.com. Done: footer line on the homepage (Epidemic gives no artist name for these
+   sound effects).
 7. **After cancelling.** Productions published during the subscription stay licensed; nothing new may be made after.
    Ask how that applies to a website that keeps serving the files.
 
-Plan on the account: **unknown** (the owner should check; Epidemic's current tiers are Creator / Pro / Pro Plus /
-Business / Business Plus / Enterprise, and older accounts may still be "Personal").
+Plans on the account (per the owner): **Pro and Creator**. Epidemic's current tiers are Creator / Pro / Pro Plus /
+Business / Business Plus / Enterprise.
 
 Sources: epidemicsound.com/policy/creator-subscription/ · epidemicsound.com/policy/pro-subscription/ ·
 epidemicsound.com/sound-effects/ (FAQ) · epidemicsound.com/pricing/
