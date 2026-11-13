@@ -5986,7 +5986,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       // the screen follows whichever painting dominates (variants are separate paintings, the laptop can shift a few px)
       if (scr) { var use = wN > .5 && scr.dataset.quadNight ? scr.dataset.quadNight : wD > .5 && scr.dataset.quadDay ? scr.dataset.quadDay : wG > .5 && loop ? loop.dataset.quad : scr.dataset.quadGold || scr.dataset.quad;
         if (!scr.dataset.quadGold) scr.dataset.quadGold = scr.dataset.quad; scr.dataset.quad = use; quad(scr); }
-      ch.style.setProperty('--night', wN.toFixed(3)); ch.style.setProperty('--shade', (1 + .25 * wD - .3 * wN).toFixed(3));
+      ch.style.setProperty('--night', wN.toFixed(3)); ch.style.setProperty('--shade', (1 + .25 * wD + .1 * wN).toFixed(3));   // night windows are bright and busy: shade a touch more, not less
     });
   }
   [].forEach.call(document.querySelectorAll('.chp-screen[data-quad]'), quad);
@@ -11148,5 +11148,14 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
   new IntersectionObserver(function (es) { var v = es[0].isIntersecting; if (v && !on) { on = true; requestAnimationFrame(draw); } on = v; }).observe(ft);
 })();
 </script>
+<style>
+/* (12 Nov, owner: "what happened to Dearly") over the paintings the supporting copy stays solid; the lighter 78% tone is only for
+   the phone story on the flat dark ground, where it still passes AA comfortably */
+@media (min-width:1101px), (orientation:landscape) and (min-width:768px){
+  .chp-role,.chp-proof span{color:#FFFCF8!important}
+  .chp-role{font-weight:600!important}
+  .chp-proof span{font-weight:600!important}
+}
+</style>
 </body>
 </html>
