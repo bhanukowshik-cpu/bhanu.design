@@ -230,7 +230,7 @@ const CFG = {
   useBlenderReflection: false, // false = reflections are built in the water shader from the above-water layers
   reflSquash: 1.25,        // reflection vertical compression (sample H - y*1.25)
   reflRtScale: 0.5,        // reflection render-target resolution vs the canvas
-  soundEnabled: false,     // SOUND PAUSED (owner decision): no audio plays, toggle hidden. Code kept for later.
+  soundEnabled: true,      // (13 Nov) real Epidemic Sound recordings (audio/hero, audio/CREDITS.md). Embedded, the homepage's nav toggle drives it (host()); never autoplays
   titleFit: 0.62,          // title width as a fraction of the viewport
   glowLike: /_lights$/,    // any layer named *_lights is treated as a glow layer, whatever its kind
   swayLike: /^(redwoods|ferns|flowers)/,
@@ -1189,20 +1189,21 @@ function updateLife(t, dt) {
 /* ════════════════════════════════════════════════════════════════════════
    10. SOUND — synthesized, swappable for real files via SOUNDS[*].src
    ════════════════════════════════════════════════════════════════════════ */
-const SOUNDS = {        // set src to an audio URL to replace a synth with a recording
-  ocean:     { src: null, gain: 0.55 },
-  wind:      { src: null, gain: 0.35 },
-  bark:      { src: null, gain: 0.45 },
-  plip:      { src: null, gain: 0.25 },
-  gull:      { src: null, gain: 0.22 },
-  foghorn:   { src: null, gain: 0.55 },
-  ferryHorn: { src: null, gain: 0.3 },
+const SOUNDS = {        // src: an audio URL (or a list of variants, one picked at random) replaces the synth; null = synth
+  ocean:     { src: 'audio/hero/ocean.m4a', gain: 0.55 },     // files: audio/build.py, all -24 LUFS; loops are exactly 45 s
+  wind:      { src: 'audio/hero/wind.m4a', gain: 0.35 },
+  bark:      { src: [1, 2, 3, 4].map(n => `audio/hero/bark-${n}.m4a`), gain: 0.45 },
+  plip:      { src: [1, 2, 3, 4].map(n => `audio/hero/plip-${n}.m4a`), gain: 0.25 },
+  gull:      { src: [1, 2, 3, 4].map(n => `audio/hero/gull-${n}.m4a`), gain: 0.22 },
+  foghorn:   { src: 'audio/hero/foghorn.m4a', gain: 0.55 },
+  ferryHorn: { src: 'audio/hero/ferryhorn.m4a', gain: 0.3 },
 };
 const Audio_ = (() => {
   let ctx = null, master, oceanG, oceanLP, hissG, windG, windBP, verb, started = false;
-  const buffers = {};
-  let want = CFG.soundEnabled;
-  try { const v = localStorage.getItem('posterSound'); if (v != null && CFG.soundEnabled) want = v === '1'; } catch (e) {}
+  const buffers = {}, lastPick = {}, LOOP_S = 45;
+  const EMBED = Q.has('embed');                    // on the homepage the nav's sound toggle drives this engine via host()
+  let want = CFG.soundEnabled && !EMBED, hostLevel = 1;
+  try { const v = localStorage.getItem('posterSound'); if (v != null && CFG.soundEnabled && !EMBED) want = v === '1'; } catch (e) {}
   const btn = document.getElementById('sndBtn'), hint = document.getElementById('sndHint');
   const reflect = () => {
     btn.setAttribute('aria-pressed', String(want)); btn.setAttribute('aria-label', want ? 'Sound on' : 'Sound off');
@@ -1214,14 +1215,22 @@ const Audio_ = (() => {
       if (brown) { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; } else d[i] = w; }
     return b;
   }
-  function loop(buf) { const s = ctx.createBufferSource(); s.buffer = buf; s.loop = true; s.start(); return s; }
+  function loop(buf, real) { const s = ctx.createBufferSource(); s.buffer = buf; s.loop = true;
+    if (real) s.loopEnd = Math.min(buf.duration, LOOP_S);   // decoders that keep the AAC end padding would leave a gap at the seam
+    s.start(); return s; }
   async function loadSrcs() {
-    for (const [k, v] of Object.entries(SOUNDS)) if (v.src) {
-      try { buffers[k] = await ctx.decodeAudioData(await (await fetch(v.src)).arrayBuffer()); } catch (e) {}
-    }
+    const one = async u => ctx.decodeAudioData(await (await fetch(u)).arrayBuffer());
+    await Promise.all(Object.entries(SOUNDS).filter(([, v]) => v.src).map(async ([k, v]) => {
+      try { buffers[k] = Array.isArray(v.src) ? await Promise.all(v.src.map(one)) : await one(v.src); } catch (e) {}   // a failed slot keeps its synth
+    }));
   }
   function playBuffer(k, pan = 0) {
-    const s = ctx.createBufferSource(); s.buffer = buffers[k];
+    let b = buffers[k];
+    if (Array.isArray(b)) {                          // a different variant each time, never the same one twice in a row
+      let i = Math.floor(Math.random() * b.length); if (b.length > 1 && i === lastPick[k]) i = (i + 1) % b.length;
+      lastPick[k] = i; b = b[i];
+    }
+    const s = ctx.createBufferSource(); s.buffer = b;
     const g = ctx.createGain(); g.gain.value = SOUNDS[k].gain; const p = ctx.createStereoPanner(); p.pan.value = pan;
     s.connect(g).connect(p).connect(master); s.start(); return true;
   }
@@ -1235,15 +1244,15 @@ const Audio_ = (() => {
     verb.connect(fb).connect(vlp).connect(verb); vlp.connect(master);
     loadSrcs().then(() => {
       // ocean: brown noise → lowpass, swells driven in update(); plus a thin hiss of foam
-      const oceanSrc = buffers.ocean ? loop(buffers.ocean) : loop(noiseBuf(4, true));
+      const oceanSrc = buffers.ocean ? loop(buffers.ocean, true) : loop(noiseBuf(4, true));
       oceanLP = ctx.createBiquadFilter(); oceanLP.type = 'lowpass'; oceanLP.frequency.value = 520;
       oceanG = ctx.createGain(); oceanG.gain.value = 0;
       oceanSrc.connect(oceanLP).connect(oceanG).connect(master);
       if (!buffers.ocean) { const h = loop(noiseBuf(2)); const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3000;
         hissG = ctx.createGain(); hissG.gain.value = 0; h.connect(hp).connect(hissG).connect(master); }
       // wind: band-passed noise; level follows the redwood sway gust
-      const windSrc = buffers.wind ? loop(buffers.wind) : loop(noiseBuf(3));
-      windBP = ctx.createBiquadFilter(); windBP.type = 'bandpass'; windBP.frequency.value = 600; windBP.Q.value = 0.8;
+      const windSrc = buffers.wind ? loop(buffers.wind, true) : loop(noiseBuf(3));
+      windBP = ctx.createBiquadFilter(); windBP.type = buffers.wind ? 'lowpass' : 'bandpass'; windBP.frequency.value = 600; windBP.Q.value = buffers.wind ? 0.5 : 0.8;   // a recording only needs its top softened in the lulls
       windG = ctx.createGain(); windG.gain.value = 0;
       windSrc.connect(windBP).connect(windG).connect(master);
       started = true;
@@ -1254,15 +1263,29 @@ const Audio_ = (() => {
     init();
     ctx.resume().then(reflect);
   }
-  if (CFG.soundEnabled) ['pointerdown', 'keydown', 'touchend'].forEach(ev => addEventListener(ev, unlock, { passive: true }));
-  else document.querySelector('.sound').style.display = 'none';
+  if (CFG.soundEnabled && !EMBED) ['pointerdown', 'keydown', 'touchend'].forEach(ev => addEventListener(ev, unlock, { passive: true }));
+  else document.querySelector('.sound').style.display = 'none';      // embedded: the homepage nav owns the one sound toggle
+  function applyMaster(tc) {
+    if (!master) return;
+    const on = want && !document.hidden && hostLevel > 0;
+    master.gain.setTargetAtTime(on ? 0.8 * hostLevel : 0, ctx.currentTime, tc ?? (on ? 0.6 : 0.15));
+  }
+  // the host's toggle / visibility / ducking. Called synchronously from the click when possible (same origin), so Safari
+  // counts the gesture; the postMessage below is the fallback. level 0..1 = how much of this painting is on screen, x0.3 ducked.
+  function host(on, level = 1) {
+    want = !!on && CFG.soundEnabled; hostLevel = Math.max(0, Math.min(1, +level || 0));
+    if (want) { init(); if (ctx.state !== 'running') ctx.resume().catch(() => {}); }
+    applyMaster(hostLevel > 0 ? 0.5 : 0.2);      // applied now: update() doesn't run while the host has this frame halted
+  }
+  addEventListener('message', e => { if (e.origin === location.origin && e.data && e.data.type === 'sound') host(e.data.on, e.data.level ?? 1); });
+  document.addEventListener('visibilitychange', () => applyMaster(0.05));   // tab hidden: silent at once (the render loop stops too)
   btn.addEventListener('click', e => {
     want = !want; try { localStorage.setItem('posterSound', want ? '1' : '0'); } catch (err) {}
     if (want) unlock(); reflect();
   });
   reflect();
 
-  const live = () => ctx && started && want && ctx.state === 'running' && !document.hidden;
+  const live = () => ctx && started && want && ctx.state === 'running' && !document.hidden && hostLevel > 0.05;
   const env = (g, t0, a, peak, d) => { g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(peak, t0 + a); g.gain.exponentialRampToValueAtTime(0.0001, t0 + a + d); };
   const panFor = x => THREE.MathUtils.clamp(x * 2 - 1, -1, 1);
   let nextGull = 6, nextHorn = 8, lastBark = -9;
@@ -1271,14 +1294,16 @@ const Audio_ = (() => {
     SOUNDS,
     update(t, dt) {
       if (!ctx || !started) return;
-      const now = ctx.currentTime, on = want && !document.hidden;
-      master.gain.setTargetAtTime(on ? 0.8 : 0, now, on ? 0.6 : 0.15);       // duck when hidden / off
+      const now = ctx.currentTime;
+      applyMaster();                                                           // off / hidden / scrolled away → silent
       const swell = 0.5 + 0.5 * Math.sin(t * 2 * Math.PI / 9.5) * (0.7 + 0.3 * Math.sin(t * 0.23));
-      oceanG.gain.setTargetAtTime(SOUNDS.ocean.gain * (0.35 + 0.65 * swell), now, 0.4);
-      oceanLP.frequency.setTargetAtTime(380 + 520 * swell, now, 0.4);
+      // a recording already has its waves and gusts: the scene only breathes on it a little (the synth needed the full shaping)
+      const realO = !!buffers.ocean, realW = !!buffers.wind;
+      oceanG.gain.setTargetAtTime(SOUNDS.ocean.gain * (realO ? 0.7 + 0.3 * swell : 0.35 + 0.65 * swell), now, 0.4);
+      oceanLP.frequency.setTargetAtTime(realO ? 2200 + 5000 * swell : 380 + 520 * swell, now, 0.4);
       if (hissG) hissG.gain.setTargetAtTime(0.02 * swell * swell, now, 0.4);
-      windG.gain.setTargetAtTime(SOUNDS.wind.gain * (0.08 + 0.5 * state.gust), now, 0.5);
-      windBP.frequency.setTargetAtTime(380 + 700 * state.gust, now, 0.5);
+      windG.gain.setTargetAtTime(SOUNDS.wind.gain * (realW ? 0.3 + 0.7 * state.gust : 0.08 + 0.5 * state.gust), now, 0.5);
+      windBP.frequency.setTargetAtTime(realW ? 900 + 3000 * state.gust : 380 + 700 * state.gust, now, 0.5);
       if (!live()) return;
       nextGull -= dt; if (nextGull < 0) { nextGull = 9 + Math.random() * 16; const g = gulls[Math.floor(Math.random() * gulls.length)]; this.gull(g.x); }
       nextHorn -= dt; if (nextHorn < 0) { nextHorn = 30; if (state.fog > 0.6) this.foghorn(); }
@@ -1350,7 +1375,9 @@ const Audio_ = (() => {
       g.gain.setValueAtTime(SOUNDS.ferryHorn.gain, t0 + 1.1); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.55);
       lp.connect(g).connect(p); p.connect(master); g.connect(verb);
     },
+    host,
     get ctx() { return ctx; },
+    get state() { return { want, hostLevel, started, ctx: ctx && ctx.state, real: Object.keys(buffers) }; },   // for checks
   };
 })();
 window.__poster.audio = Audio_;
