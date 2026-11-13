@@ -23,16 +23,16 @@
   .ch{position:relative;height:170vh}
   .ch-pin{position:sticky;top:0;height:100vh;overflow:hidden}
   /* the painting is cover-fitted with its aspect locked, so the screen overlay stays glued to the painted laptop */
-  .ch-stage{position:absolute;left:50%;top:50%;width:max(100vw,calc(100vh * 1672 / 941));aspect-ratio:1672/941;
-    transform:translate(-50%,-50%) scale(var(--push,1.06));transform-origin:62% 55%}
+  /* the painting is a fixed 1672x941 stage, cover-scaled by JS (--cover), so every overlay uses the painting's own pixels */
+  .ch-stage{position:absolute;left:50%;top:50%;width:1672px;height:941px;
+    transform:translate(-50%,-50%) scale(calc(var(--cover,1) * var(--push,1.06)));transform-origin:50% 50%}
   .ch-stage > img.plate{position:absolute;inset:0;width:100%;height:100%;display:block}
-  .ch-screen{position:absolute;left:calc(985 / 1672 * 100%);top:calc(402 / 941 * 100%);
-    width:calc(504 / 1672 * 100%);height:calc(307 / 941 * 100%);overflow:hidden;background:#0c0c0e;border-radius:.25%}
-  .ch-screen video{width:100%;height:100%;object-fit:cover;object-position:50% 38%;display:block;
-    filter:saturate(.9) brightness(.96)}
+  /* the launch film, mapped onto the painted screen's four corners in true perspective (matrix3d from JS) */
+  .ch-screen{position:absolute;left:0;top:0;width:1600px;height:1000px;transform-origin:0 0;overflow:hidden;background:#0A0B0F}
+  .ch-screen iframe{width:100%;height:100%;border:0;display:block;pointer-events:none}
   /* the screen sits in the painting's light: a faint warm sheen from the lamp, no glare */
   .ch-screen::after{content:'';position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(115deg,rgba(255,214,160,.10),rgba(255,214,160,0) 40%),linear-gradient(0deg,rgba(40,24,40,.10),rgba(40,24,40,0) 30%)}
+    background:linear-gradient(115deg,rgba(255,214,160,.10),rgba(255,214,160,0) 40%),linear-gradient(0deg,rgba(40,24,40,.12),rgba(40,24,40,0) 30%)}
 
   /* ambient life, painted-world only (no UI): lamp breath, steam over the mug, a shimmer on the bay */
   .lamp{position:absolute;left:calc(1532 / 1672 * 100%);top:calc(330 / 941 * 100%);width:30%;aspect-ratio:1;transform:translate(-50%,-30%);
@@ -67,7 +67,7 @@
   @media (max-width:767px){
     .ch{height:auto}
     .ch-pin{position:relative;height:auto;padding-top:62vh}
-    .ch-stage{top:0;left:0;width:calc(62vh * 1672 / 941);transform:translate(calc(-1236 / 1672 * 100% + 50vw),0) scale(var(--push,1.06));transform-origin:73.9% 70%}
+    .ch-stage{top:31vh;left:calc(50vw - (var(--fx,1270) - 836) * var(--cover,1) * 1px)}
     .ch-copy{position:relative;left:auto;top:auto;width:auto;padding:28px 20px 56px}
     .ch-line{max-width:none}
   }
@@ -82,7 +82,7 @@
       <div class="ch-stage" aria-hidden="true">
         <img class="plate" src="city/layers/chapters/vc-office.webp" alt="">
         <div class="bay"></div>
-        <div class="ch-screen"><video src="verified-call/screens/a2/panel-loop.mp4" poster="verified-call/screens/a2/panel-loop-poster.jpg" muted loop playsinline autoplay preload="auto"></video></div>
+        <div class="ch-screen" data-quad="1104,411 1496,388 1438,705 1047,673"><iframe src="films/vc-launch.html" title="Verified Call launch film" loading="lazy" tabindex="-1"></iframe></div>
         <div class="steam"><i></i><i></i><i></i></div>
         <div class="lamp"></div>
       </div>
@@ -102,6 +102,26 @@
 (function () {
   var chs = [].slice.call(document.querySelectorAll('.ch'));
   function cl(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  // map a w×h element onto a painted quad (TL TR BR BL, painting pixels) — square-to-quad homography as matrix3d
+  function quad(el) {
+    var q = el.dataset.quad.split(' ').map(function (p) { return p.split(',').map(Number); });
+    var w = el.offsetWidth, h = el.offsetHeight, x0 = q[0][0], y0 = q[0][1], x1 = q[1][0], y1 = q[1][1], x2 = q[2][0], y2 = q[2][1], x3 = q[3][0], y3 = q[3][1];
+    var dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3, dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
+    var den = dx1 * dy2 - dx2 * dy1, a13 = (dx3 * dy2 - dx2 * dy3) / den, a23 = (dx1 * dy3 - dx3 * dy1) / den;
+    var a11 = x1 - x0 + a13 * x1, a21 = x3 - x0 + a23 * x3, a12 = y1 - y0 + a13 * y1, a22 = y3 - y0 + a23 * y3;
+    el.style.transform = 'matrix3d(' + [a11 / w, a12 / w, 0, a13 / w, a21 / h, a22 / h, 0, a23 / h, 0, 0, 1, 0, x0, y0, 0, 1].join(',') + ')';
+  }
+  [].forEach.call(document.querySelectorAll('.ch-screen[data-quad]'), quad);
+  function cover() {
+    var phone = innerWidth <= 767;
+    chs.forEach(function (ch) {
+      var c = phone ? (innerHeight * .62) / 941 : Math.max(innerWidth / 1672, innerHeight / 941);
+      ch.style.setProperty('--cover', c.toFixed(4));
+      var s = ch.querySelector('.ch-screen[data-quad]');
+      if (s) { var q = s.dataset.quad.split(' ').map(function (p) { return +p.split(',')[0]; }); ch.style.setProperty('--fx', ((Math.min.apply(0, q) + Math.max.apply(0, q)) / 2).toFixed(0)); }
+    });
+  }
+  addEventListener('resize', cover); cover();
   function frame() {
     var vh = innerHeight;
     chs.forEach(function (ch) {
@@ -115,11 +135,13 @@
   }
   addEventListener('scroll', function () { requestAnimationFrame(frame); }, { passive: true });
   addEventListener('resize', frame); frame();
-  // play the product only while its chapter is on screen
-  var vids = document.querySelectorAll('.ch-screen video');
-  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) {
-    es.forEach(function (e) { var v = e.target; if (e.isIntersecting) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } else v.pause(); });
-  }, { threshold: .2 }).observe(vids[0]);
+  // the launch film runs only while its chapter is on screen
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { var f = e.target.querySelector('.ch-screen iframe'); if (f && f.contentWindow) f.contentWindow.postMessage({ type: 'film', play: e.isIntersecting }, '*'); });
+    }, { threshold: .2 });
+    chs.forEach(function (ch) { io.observe(ch); });
+  }
   window.__chFrame = frame;
 })();
 </script>

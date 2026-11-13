@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EverTutor Studio launch film</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&display=swap" rel="stylesheet">
+<!--
+  Launch film for EverTutor Studio. Same structure as vc-launch.html (fixed 1600x1000 stage scaled to fit, setTimeout loop, ~21 s).
+  Beats: One lesson took 104h → collapses to 4h → Meet EverTutor Studio → real product video → proof → end card
+  Facts (homepage card only): 104h to 4h to make a lesson; 3,000+ lessons made
+  Embed: <iframe src="films/et-studio-launch.html">. Parent may post {type:'film', play:true|false} to run/pause it.
+-->
+<style>
+  *{box-sizing:border-box;margin:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:#0A0B0F}
+  body{font-family:'Montserrat',sans-serif;color:#F7F5F0;-webkit-font-smoothing:antialiased}
+  #stage{position:absolute;left:50%;top:50%;width:1600px;height:1000px;transform:translate(-50%,-50%) scale(var(--s,1));overflow:hidden;
+    background:radial-gradient(90% 80% at 50% 0%,#1A1D27 0%,#0A0B0F 70%)}
+  .sc{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}
+  .sc.on{opacity:1}
+  .big{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-weight:800;font-size:104px;line-height:1.02;letter-spacing:-.045em}
+  .big .w{display:inline-block;opacity:0;transform:translateY(40px);transition:opacity .5s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+  .on .big .w{opacity:1;transform:none}
+  .on .big .w:nth-child(2){transition-delay:.08s}.on .big .w:nth-child(3){transition-delay:.16s}.on .big .w:nth-child(4){transition-delay:.24s}
+  .on .big .w:nth-child(5){transition-delay:.32s}.on .big .w:nth-child(6){transition-delay:.40s}.on .big .w:nth-child(7){transition-delay:.48s}
+  .muted{color:#8C93A3}
+  .red{color:#FF5A4E}.green{color:#2E9E6A}
+
+  /* the number that collapses */
+  .lead{position:absolute;left:0;right:0;top:170px;text-align:center;font-weight:700;font-size:56px;letter-spacing:-.03em;color:#A9B0BE}
+  .lead .w{display:inline-block;opacity:0;transform:translateY(30px);transition:opacity .5s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+  .on .lead .w{opacity:1;transform:none}.on .lead .w:nth-child(2){transition-delay:.08s}.on .lead .w:nth-child(3){transition-delay:.16s}.on .lead .w:nth-child(4){transition-delay:.24s}
+  .num{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-weight:800;font-size:360px;line-height:1;letter-spacing:-.06em;color:#FF5A4E;
+    font-variant-numeric:tabular-nums;opacity:0;transition:opacity .6s ease .5s,color .5s ease}
+  .on .num{opacity:1}
+  .num.low{color:#2E9E6A}
+  .num small{font-size:.5em;letter-spacing:-.04em}
+  .unit{position:absolute;left:0;right:0;top:calc(50% + 230px);text-align:center;font-weight:700;font-size:56px;letter-spacing:-.03em;color:#A9B0BE;opacity:0;transition:opacity .5s ease}
+  .unit.show{opacity:1}
+
+  /* the product reveal */
+  .logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:34px}
+  .mark{width:170px;height:170px;border-radius:44px;background:#2E9E6A;display:grid;place-items:center;transform:scale(.6);opacity:0;
+    transition:transform .9s cubic-bezier(.16,1,.3,1),opacity .5s ease}
+  .on .mark{transform:none;opacity:1}
+  .mark svg{width:96px;height:96px}
+  .wordmark{font-weight:800;font-size:110px;letter-spacing:-.045em;opacity:0;transform:translateY(24px);transition:opacity .6s ease .6s,transform .8s cubic-bezier(.16,1,.3,1) .6s}
+  .on .wordmark{opacity:1;transform:none}
+  .sub{font-weight:500;font-size:34px;color:#A9B0BE;opacity:0;transition:opacity .6s ease 1.2s}
+  .on .sub{opacity:1}
+  .meet{position:absolute;left:0;right:0;top:150px;text-align:center;font-weight:700;font-size:44px;letter-spacing:-.02em;color:#2E9E6A}
+
+  /* the real product, in a window (no shadow) */
+  .win{position:absolute;left:80px;top:70px;width:1440px;height:860px;border-radius:22px;background:#15171E;border:1px solid #2A2E3A;overflow:hidden;
+    transform:translateY(40px) scale(.96);opacity:0;transition:transform 1s cubic-bezier(.16,1,.3,1),opacity .6s ease}
+  .on .win{transform:none;opacity:1}
+  .wbar{height:50px;display:flex;align-items:center;gap:10px;padding:0 20px;background:#15171E;border-bottom:1px solid #2A2E3A}
+  .wbar i{width:14px;height:14px;border-radius:50%;background:#3A3F4D}
+  .wbar span{margin:0 auto;transform:translateX(-26px);padding:6px 28px;border-radius:10px;background:#0F1117;color:#8C93A3;font-weight:600;font-size:18px}
+  .win video{display:block;width:1440px;height:810px;object-fit:cover;background:#0F1117}
+
+  /* proof */
+  .stats{position:absolute;left:120px;right:120px;top:50%;transform:translateY(-50%);display:grid;grid-template-columns:repeat(2,1fr);gap:60px}
+  .stat{opacity:0;transform:translateY(30px);transition:opacity .5s ease,transform .8s cubic-bezier(.16,1,.3,1)}
+  .on .stat{opacity:1;transform:none}.on .stat:nth-child(2){transition-delay:.25s}.on .stat:nth-child(3){transition-delay:.5s}
+  .stat b{display:block;font-weight:800;font-size:150px;letter-spacing:-.05em;line-height:1}
+  .stat span{display:block;margin-top:18px;font-weight:500;font-size:36px;line-height:1.25;color:#A9B0BE}
+  .stat .of{color:#5B6170;display:inline;font-size:inherit;margin:0}
+  .stat .acc{color:#2E9E6A}
+
+  /* end card */
+  .end .big{font-size:104px}
+</style>
+</head>
+<body>
+<div id="stage" aria-hidden="true">
+  <section class="sc" id="s1"><p class="lead"><span class="w">One</span> <span class="w">lesson</span> <span class="w">took</span></p>
+    <p class="num" id="num">104<small>h</small></p><p class="unit" id="unit">to make.</p></section>
+  <section class="sc" id="s3"><div class="logo"><div class="mark"><svg viewBox="0 0 96 96"><g fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="14" width="68" height="68" rx="14"/><path d="M32 48h32M48 32v32"/></g></svg></div><div class="wordmark">EverTutor Studio</div><div class="sub">Where teachers build the lessons.</div></div></section>
+  <section class="sc" id="s4">
+    <div class="win"><div class="wbar"><i></i><i></i><i></i><span>EverTutor Studio</span></div>
+      <video src="../images/et-studio.mp4" poster="../images/thumbs/et-studio-poster.webp" muted loop playsinline autoplay preload="auto"></video></div>
+  </section>
+  <section class="sc" id="s5"><div class="stats">
+    <div class="stat"><b><span class="of">104h → </span><span class="acc">4h</span></b><span>to make a lesson</span></div>
+    <div class="stat"><b>3,000<span class="acc">+</span></b><span>lessons made</span></div></div></section>
+  <section class="sc end" id="s6"><p class="big"><span class="w">EverTutor</span> <span class="w green">Studio.</span></p></section>
+</div>
+<script>
+(function () {
+  var st = document.getElementById('stage');
+  function fit() { st.style.setProperty('--s', Math.min(innerWidth / 1600, innerHeight / 1000)); }
+  addEventListener('resize', fit); fit();
+  var $ = function (id) { return document.getElementById(id); }, T = [], playing = true, raf = 0;
+  var vid = document.querySelector('video');
+  function at(ms, fn) { T.push(setTimeout(fn, ms)); }
+  function show(id) { [].forEach.call(document.querySelectorAll('.sc'), function (s) { s.classList.toggle('on', s.id === id); }); }
+  /* tween a number into an element */
+  function count(el, from, to, dur, fmt) {
+    cancelAnimationFrame(raf); var t0 = performance.now();
+    (function f(t) {
+      var p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      el.innerHTML = fmt(Math.round(from + (to - from) * e));
+      if (p < 1) raf = requestAnimationFrame(f);
+    })(t0);
+  }
+  var num = $('num'), unit = $('unit');
+  function fmt(n) { return n + '<small>h</small>'; }
+  function reset() {
+    cancelAnimationFrame(raf); num.classList.remove('low'); unit.classList.remove('show'); num.innerHTML = fmt(104);
+  }
+  function stopVid() { if (vid) vid.pause(); }
+  function run() {
+    T.forEach(clearTimeout); T = []; reset(); stopVid();
+    show('s1');
+    at(3000, function () { count(num, 104, 4, 2000, fmt); });
+    at(5100, function () { cancelAnimationFrame(raf); num.innerHTML = fmt(4); num.classList.add('low'); unit.classList.add('show'); });
+    at(7000, function () { show('s3'); });
+    at(9600, function () { show('s4'); if (vid) { vid.currentTime = 0; vid.play(); } });
+    at(16000, function () { show('s5'); stopVid(); });
+    at(19000, function () { show('s6'); });
+    at(21400, run);
+  }
+  run();
+  addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'film') return;
+    if (e.data.play && !playing) { playing = true; run(); }
+    else if (!e.data.play && playing) { playing = false; T.forEach(clearTimeout); T = []; cancelAnimationFrame(raf); stopVid(); }
+  });
+})();
+</script>
+</body>
+</html>

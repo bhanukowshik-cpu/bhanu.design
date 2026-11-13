@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dearly launch film</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&display=swap" rel="stylesheet">
+<!--
+  Launch film for Dearly. Plays inside a painted landscape tablet screen. Fixed 1600x1200 (4:3) stage, scaled to fit.
+  ~16 s loop. Facts: 140+ letters sent, 35 five-star ratings, built solo in 48 hours. Footage: ../images/thumbs/dearly.mp4.
+  Same structure/API as films/vc-launch.html. Parent may post {type:'film', play:true|false}.
+-->
+<style>
+  *{box-sizing:border-box;margin:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:#0A0B0F}
+  body{font-family:'Montserrat',sans-serif;color:#F7F5F0;-webkit-font-smoothing:antialiased}
+  #stage{position:absolute;left:50%;top:50%;width:1600px;height:1200px;transform:translate(-50%,-50%) scale(var(--s,1));overflow:hidden;
+    background:radial-gradient(90% 80% at 50% 0%,#14263A 0%,#0A0B0F 70%)}
+  .sc{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}
+  .sc.on{opacity:1}
+  .big{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-weight:800;font-size:124px;line-height:1.04;letter-spacing:-.045em}
+  .big .w{display:inline-block;opacity:0;transform:translateY(40px);transition:opacity .5s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+  .on .big .w{opacity:1;transform:none}
+  .on .big .w:nth-child(2){transition-delay:.08s}.on .big .w:nth-child(3){transition-delay:.16s}.on .big .w:nth-child(4){transition-delay:.24s}
+  .on .big .w:nth-child(5){transition-delay:.32s}.on .big .w:nth-child(6){transition-delay:.40s}.on .big .w:nth-child(7){transition-delay:.48s}
+  .muted{color:#8C93A3}
+  .acc{color:#5CB8FF}
+
+  /* browser window around the real footage */
+  .win{position:absolute;left:100px;top:170px;width:1400px;border-radius:26px;background:#F7F5F0;overflow:hidden;border:2px solid #2A3A4C;
+    transform:scale(.94);opacity:0;transition:transform 1s cubic-bezier(.16,1,.3,1),opacity .6s ease}
+  .on .win{transform:none;opacity:1}
+  .chrome{height:70px;display:flex;align-items:center;gap:12px;padding:0 26px;background:#E9E5DC}
+  .chrome i{width:18px;height:18px;border-radius:50%;background:#C9C4B8}
+  .chrome em{margin-left:24px;flex:0 0 520px;height:36px;border-radius:18px;background:#F7F5F0;font-style:normal;font-weight:600;font-size:20px;color:#6B675E;display:grid;place-items:center}
+  .win video{display:block;width:100%;height:auto;background:#EDEAE2}
+
+  /* proof */
+  .stats{position:absolute;left:120px;right:120px;top:50%;transform:translateY(-50%);display:grid;grid-template-columns:repeat(3,1fr);gap:60px}
+  .stat{opacity:0;transform:translateY(30px);transition:opacity .5s ease,transform .8s cubic-bezier(.16,1,.3,1)}
+  .on .stat{opacity:1;transform:none}.on .stat:nth-child(2){transition-delay:.25s}.on .stat:nth-child(3){transition-delay:.5s}
+  .stat b{display:block;font-weight:800;font-size:150px;letter-spacing:-.05em;line-height:1}
+  .stat b i{font-style:normal;color:#5CB8FF}
+  .stat span{display:block;margin-top:18px;font-weight:500;font-size:40px;line-height:1.25;color:#A9B0BE}
+
+  .end .big{font-size:140px}
+</style>
+</head>
+<body>
+<div id="stage" aria-hidden="true">
+  <section class="sc" id="s1"><p class="big"><span class="w">Some</span> <span class="w">words</span> <span class="w">deserve</span><br><span class="w acc">more</span> <span class="w acc">than</span> <span class="w acc">a</span> <span class="w acc">text.</span></p></section>
+
+  <section class="sc" id="s2">
+    <div class="win"><div class="chrome"><i></i><i></i><i></i><em>dearly</em></div>
+      <video id="v" src="../images/thumbs/dearly.mp4" poster="../images/thumbs/dearly-poster.webp" muted loop playsinline autoplay preload="auto"></video></div>
+  </section>
+
+  <section class="sc" id="s3">
+    <div class="stats">
+      <div class="stat"><b>140<i>+</i></b><span>letters sent</span></div>
+      <div class="stat"><b>35</b><span>five-star ratings</span></div>
+      <div class="stat"><b>48<span style="display:inline;font-size:.4em;margin:0;color:#A9B0BE;font-weight:600;letter-spacing:-.02em"> hours</span></b><span>built solo</span></div>
+    </div>
+  </section>
+
+  <section class="sc end" id="s4"><p class="big"><span class="w acc">Dearly.</span></p></section>
+</div>
+<script>
+(function () {
+  var st = document.getElementById('stage');
+  function fit() { st.style.setProperty('--s', Math.min(innerWidth / 1600, innerHeight / 1200)); }
+  addEventListener('resize', fit); fit();
+  var $ = function (id) { return document.getElementById(id); }, T = [], playing = true, v = $('v');
+  function at(ms, fn) { T.push(setTimeout(fn, ms)); }
+  function show(id) { [].forEach.call(document.querySelectorAll('.sc'), function (s) { s.classList.toggle('on', s.id === id); }); }
+  function run() {
+    T.forEach(clearTimeout); T = [];
+    show('s1');
+    v.pause();
+    at(2800, function () { show('s2'); try { v.currentTime = 0; } catch (e) {} var p = v.play(); if (p && p.catch) p.catch(function () {}); });
+    at(10200, function () { show('s3'); });
+    at(13800, function () { show('s4'); v.pause(); });
+    at(16200, run);
+  }
+  run();
+  addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'film') return;
+    if (e.data.play && !playing) { playing = true; run(); }
+    else if (!e.data.play && playing) { playing = false; T.forEach(clearTimeout); T = []; v.pause(); }
+  });
+})();
+</script>
+</body>
+</html>

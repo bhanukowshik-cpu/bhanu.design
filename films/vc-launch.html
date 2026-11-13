@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verified Call launch film</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&display=swap" rel="stylesheet">
+<!--
+  Launch film for Verified Call (12 Nov 2026). Plays inside the painted laptop screen on the homepage chapter,
+  so a business reader gets the product in seconds: the problem → the product → it catching cheating → the proof.
+  Fixed 1600x1000 (16:10) stage, scaled to whatever box it is shown in. ~17 s loop. Facts from verified-call.html
+  (0 / 3,990 face swaps got through, 30 / 30 hidden AI tools caught, 20 companies in the closed beta, Mac + Windows
+  app with a panel inside Google Meet). This file is the TEMPLATE for the other chapter films (films/*.html).
+  Embed: <iframe src="films/vc-launch.html">. Parent may post {type:'film', play:true|false} to run/pause it.
+-->
+<style>
+  *{box-sizing:border-box;margin:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:#0A0B0F}
+  body{font-family:'Montserrat',sans-serif;color:#F7F5F0;-webkit-font-smoothing:antialiased}
+  #stage{position:absolute;left:50%;top:50%;width:1600px;height:1000px;transform:translate(-50%,-50%) scale(var(--s,1));overflow:hidden;
+    background:radial-gradient(90% 80% at 50% 0%,#1A1D27 0%,#0A0B0F 70%)}
+  .sc{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}
+  .sc.on{opacity:1}
+  /* type */
+  .big{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-weight:800;font-size:104px;line-height:1.02;letter-spacing:-.045em}
+  .big .w{display:inline-block;opacity:0;transform:translateY(40px);transition:opacity .5s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+  .on .big .w{opacity:1;transform:none}
+  .on .big .w:nth-child(2){transition-delay:.08s}.on .big .w:nth-child(3){transition-delay:.16s}.on .big .w:nth-child(4){transition-delay:.24s}
+  .on .big .w:nth-child(5){transition-delay:.32s}.on .big .w:nth-child(6){transition-delay:.40s}.on .big .w:nth-child(7){transition-delay:.48s}
+  .muted{color:#8C93A3}
+  .red{color:#FF5A4E}.green{color:#3DDC97}
+
+  /* the call (Google Meet-like) */
+  .call{position:absolute;left:90px;top:90px;width:1420px;height:820px;border-radius:28px;background:#1F2125;overflow:hidden;
+    transform:scale(.94);transition:transform 1s cubic-bezier(.16,1,.3,1)}
+  .on .call{transform:none}
+  .tile{position:absolute;border-radius:20px;overflow:hidden;background:#2A2C31}
+  .tile img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.05)}
+  .tile .nm{position:absolute;left:18px;bottom:16px;padding:6px 14px;border-radius:10px;background:rgba(0,0,0,.55);font-weight:600;font-size:22px}
+  .cand{left:24px;top:24px;width:1372px;height:700px}
+  .you{right:48px;top:48px;width:300px;height:200px;border:3px solid #1F2125}
+  .bar{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);display:flex;gap:18px}
+  .bar i{width:56px;height:56px;border-radius:50%;background:#3C4043}.bar i.end{background:#EA4335;width:84px;border-radius:28px}
+  /* the cheat */
+  .glitch{position:absolute;inset:0;opacity:0;mix-blend-mode:screen;
+    background:repeating-linear-gradient(0deg,rgba(255,60,90,.0) 0 6px,rgba(255,60,90,.35) 6px 8px,rgba(60,200,255,.0) 8px 14px);transition:opacity .2s}
+  .cheat .glitch{animation:gl 1.6s steps(8) infinite}
+  @keyframes gl{0%,100%{opacity:0}10%{opacity:.9;transform:translateX(-14px)}20%{opacity:0}45%{opacity:.7;transform:translateX(10px)}55%{opacity:0}}
+  .tag{position:absolute;padding:12px 22px;border-radius:14px;font-weight:700;font-size:30px;opacity:0;transform:translateY(16px) scale(.96);
+    transition:opacity .4s ease,transform .6s cubic-bezier(.16,1,.3,1)}
+  .tag.fs{left:560px;top:230px;background:#FF5A4E;color:#fff}
+  .tag.ai{left:70px;top:560px;background:#fff;color:#16171A;font-weight:600;font-size:28px;display:flex;align-items:center;gap:14px}
+  .tag.ai b{color:#10A37F}
+  .cheat .tag.fs{opacity:1;transform:none;transition-delay:.5s}
+  .cheat .tag.ai{opacity:1;transform:none;transition-delay:1.4s}
+
+  /* the product reveal */
+  .logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:34px}
+  .shield{width:150px;height:170px}
+  .shield path{fill:none;stroke:#3DDC97;stroke-width:9;stroke-linejoin:round;stroke-dasharray:640;stroke-dashoffset:640;transition:stroke-dashoffset 1.2s ease .1s}
+  .shield path.tick{stroke-dasharray:120;stroke-dashoffset:120;transition-delay:.9s;transition-duration:.6s}
+  .on .shield path{stroke-dashoffset:0}
+  .wordmark{font-weight:800;font-size:110px;letter-spacing:-.045em;opacity:0;transform:translateY(24px);transition:opacity .6s ease .7s,transform .8s cubic-bezier(.16,1,.3,1) .7s}
+  .on .wordmark{opacity:1;transform:none}
+  .sub{font-weight:500;font-size:34px;color:#A9B0BE;opacity:0;transition:opacity .6s ease 1.3s}
+  .on .sub{opacity:1}
+
+  /* the panel catching it */
+  .panel{position:absolute;right:48px;top:48px;width:560px;border-radius:26px;background:#F7F5F0;color:#16171A;padding:30px 34px 26px;
+    transform:translateX(640px);transition:transform .9s cubic-bezier(.16,1,.3,1)}
+  .catch .panel{transform:none}
+  .ph{display:flex;align-items:center;gap:14px;font-weight:700;font-size:30px;margin-bottom:18px}
+  .ph svg{width:30px;height:34px}
+  .row{display:flex;align-items:center;gap:18px;padding:16px 0;border-top:1px solid #E6E2DA;font-size:30px;font-weight:600}
+  .row em{width:38px;height:38px;border-radius:50%;border:3px solid #D2CDC3;flex:none;display:grid;place-items:center;font-style:normal;font-size:22px;color:#fff;transition:all .3s}
+  .row span{margin-left:auto;font-size:24px;font-weight:600;color:#9A958B;transition:color .3s}
+  .row.ok em{background:#16A36A;border-color:#16A36A}.row.ok em::after{content:'✓'}.row.ok span{color:#16A36A}
+  .row.bad em{background:#E5483D;border-color:#E5483D}.row.bad em::after{content:'✕'}.row.bad span{color:#E5483D}
+  .verdict{position:absolute;left:50%;bottom:150px;transform:translate(-50%,30px);padding:22px 40px;border-radius:20px;background:#E5483D;color:#fff;
+    font-weight:800;font-size:54px;letter-spacing:-.02em;opacity:0;transition:opacity .4s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+  .verdict.show{opacity:1;transform:translate(-50%,0)}
+  .catch .you{right:640px}
+
+  /* proof */
+  .stats{position:absolute;left:120px;right:120px;top:50%;transform:translateY(-50%);display:grid;grid-template-columns:repeat(3,1fr);gap:60px}
+  .stat{opacity:0;transform:translateY(30px);transition:opacity .5s ease,transform .8s cubic-bezier(.16,1,.3,1)}
+  .on .stat{opacity:1;transform:none}.on .stat:nth-child(2){transition-delay:.25s}.on .stat:nth-child(3){transition-delay:.5s}
+  .stat b{display:block;font-weight:800;font-size:120px;letter-spacing:-.05em;line-height:1}
+  .stat span{display:block;margin-top:18px;font-weight:500;font-size:36px;line-height:1.25;color:#A9B0BE}
+  .stat .of{color:#5B6170}
+
+  /* end card */
+  .end .big{font-size:92px}
+  .end .tiny{position:absolute;left:0;right:0;top:calc(50% + 110px);text-align:center;font-weight:600;font-size:32px;color:#8C93A3;opacity:0;transition:opacity .6s ease .7s}
+  .end.on .tiny{opacity:1}
+</style>
+</head>
+<body>
+<div id="stage" aria-hidden="true">
+  <!-- 1 · the problem -->
+  <section class="sc" id="s1"><p class="big"><span class="w">Hiring</span> <span class="w">calls</span> <span class="w">have</span> <span class="w">a</span><br><span class="w red">new</span> <span class="w red">problem.</span></p></section>
+
+  <!-- 2 · the cheat, shown -->
+  <section class="sc" id="s2">
+    <div class="call">
+      <div class="tile cand"><img src="../images/vc/face-cand.webp" alt=""><div class="glitch"></div><span class="nm">Alex · Candidate</span></div>
+      <div class="tile you"><img src="../images/vc/face-int.webp" alt=""><span class="nm">You</span></div>
+      <div class="bar"><i></i><i></i><i></i><i class="end"></i></div>
+      <span class="tag fs">Face swap</span>
+      <span class="tag ai">✦ <b>ChatGPT</b> hidden · whispering answers</span>
+    </div>
+  </section>
+
+  <!-- 3 · the product -->
+  <section class="sc" id="s3">
+    <div class="logo">
+      <svg class="shield" viewBox="0 0 150 170"><path d="M75 8 L136 30 V84 C136 122 110 150 75 162 C40 150 14 122 14 84 V30 Z"/><path class="tick" d="M46 86 L67 107 L106 64"/></svg>
+      <div class="wordmark">Verified Call</div>
+      <div class="sub">Checks the person on the call is real.</div>
+    </div>
+  </section>
+
+  <!-- 4 · it catches it -->
+  <section class="sc" id="s4">
+    <div class="call">
+      <div class="tile cand"><img src="../images/vc/face-cand.webp" alt=""><span class="nm">Alex · Candidate</span></div>
+      <div class="tile you"><img src="../images/vc/face-int.webp" alt=""><span class="nm">You</span></div>
+      <div class="bar"><i></i><i></i><i></i><i class="end"></i></div>
+      <div class="panel">
+        <div class="ph"><svg viewBox="0 0 150 170"><path d="M75 8 L136 30 V84 C136 122 110 150 75 162 C40 150 14 122 14 84 V30 Z" fill="#16A36A"/><path d="M46 86 L67 107 L106 64" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified Call</div>
+        <div class="row" data-r="ok"><em></em>Real camera<span>Checking</span></div>
+        <div class="row" data-r="bad"><em></em>Face match<span>Checking</span></div>
+        <div class="row" data-r="ok"><em></em>Same voice<span>Checking</span></div>
+        <div class="row" data-r="bad"><em></em>Hidden apps<span>Checking</span></div>
+      </div>
+      <div class="verdict">Cheating detected</div>
+    </div>
+  </section>
+
+  <!-- 5 · the proof -->
+  <section class="sc" id="s5">
+    <div class="stats">
+      <div class="stat"><b>0<span class="of" style="display:inline;font-size:inherit;margin:0"> / 3,990</span></b><span>face swaps got through</span></div>
+      <div class="stat"><b>30<span class="of" style="display:inline;font-size:inherit;margin:0"> / 30</span></b><span>hidden AI tools caught</span></div>
+      <div class="stat"><b>20</b><span>companies in the closed beta</span></div>
+    </div>
+  </section>
+
+  <!-- 6 · end card -->
+  <section class="sc end" id="s6"><p class="big"><span class="w">Verified</span> <span class="w green">Call.</span></p><p class="tiny">Mac and Windows app · panel inside Google Meet</p></section>
+</div>
+<script>
+(function () {
+  var st = document.getElementById('stage');
+  function fit() { st.style.setProperty('--s', Math.min(innerWidth / 1600, innerHeight / 1000)); }
+  addEventListener('resize', fit); fit();
+  var $ = function (id) { return document.getElementById(id); }, T = [], playing = true;
+  function at(ms, fn) { T.push(setTimeout(fn, ms)); }
+  function show(id) { [].forEach.call(document.querySelectorAll('.sc'), function (s) { s.classList.toggle('on', s.id === id); }); }
+  function reset() {
+    $('s2').classList.remove('cheat'); $('s4').classList.remove('catch');
+    [].forEach.call(document.querySelectorAll('.row'), function (r) { r.className = 'row'; r.querySelector('span').textContent = 'Checking'; });
+    document.querySelector('.verdict').classList.remove('show');
+  }
+  function run() {
+    T.forEach(clearTimeout); T = []; reset();
+    show('s1');
+    at(2600, function () { show('s2'); });
+    at(3000, function () { $('s2').classList.add('cheat'); });
+    at(6400, function () { show('s3'); });
+    at(8800, function () { show('s4'); });
+    at(9200, function () { $('s4').classList.add('catch'); });
+    var rows = document.querySelectorAll('.row');
+    [10200, 10800, 11400, 12000].forEach(function (t, i) {
+      at(t, function () { var r = rows[i], ok = r.dataset.r === 'ok'; r.classList.add(ok ? 'ok' : 'bad'); r.querySelector('span').textContent = ok ? 'Verified' : 'Needs a look'; });
+    });
+    at(12700, function () { document.querySelector('.verdict').classList.add('show'); });
+    at(14600, function () { show('s5'); });
+    at(18000, function () { show('s6'); });
+    at(20400, run);
+  }
+  run();
+  addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'film') return;
+    if (e.data.play && !playing) { playing = true; run(); }
+    else if (!e.data.play && playing) { playing = false; T.forEach(clearTimeout); T = []; }
+  });
+})();
+</script>
+</body>
+</html>
