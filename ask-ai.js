@@ -8,7 +8,7 @@
    brief is still loading; then writeText, then execCommand, then a select-it-yourself box. */
 (function () {
   'use strict';
-  var BRIEF_URL = '/ai.md', PUBLIC_BRIEF = 'https://bhanu.build/ai.md';
+  var BRIEF_URL = '/ai.md', PUBLIC_BRIEF = 'https://bhanu.build/ai.md', RESEARCH = 'https://verifiedcall.app/research';
   var LEAD = "If you can't open the link, here is the page:";
   var AIS = [
     { id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com/?q=' },
@@ -26,7 +26,7 @@
   var status = document.createElement('span'); status.className = 'aai-sr'; status.setAttribute('role', 'status'); document.body.appendChild(status);
 
   function prompt(focus) {
-    return 'Read ' + PUBLIC_BRIEF + ' and tell me who Bhanu Kowshik is, what he has designed and built' +
+    return 'Read ' + PUBLIC_BRIEF + ' and the published Verified Call test results at ' + RESEARCH + ', and tell me who Bhanu Kowshik is, what he has designed and built' +
       (focus ? ' (starting with ' + focus + ')' : '') + ", and whether he'd be a good fit for the role I'm hiring for.";
   }
   function getBrief() {
