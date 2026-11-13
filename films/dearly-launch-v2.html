@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dearly launch film</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=Gochi+Hand&display=swap" rel="stylesheet">
+<!--
+  Dearly launch film v2 (12 Nov 2026, owner: "Dearly doesn't feel like a product launch visual").
+  A keynote-style reveal built from Dearly's own design language (lined letter paper, handwriting, sky, voice note):
+  hook -> a letter writes itself -> a voice note records -> Send, the letter lifts away -> the recipient's moment ->
+  proof -> end card. Copy of the letter is the one on the live Dearly site. Stage 1600x1200 (the painted tablet is 4:3).
+  Same {type:'film', play} API and reduced-motion/paused still frame as the other films.
+-->
+<style>
+  *{box-sizing:border-box;margin:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:#0A0B0F}
+  body{font-family:'Montserrat',sans-serif;color:#F7F5F0;-webkit-font-smoothing:antialiased}
+  #stage{position:absolute;left:50%;top:50%;width:1600px;height:1200px;transform:translate(-50%,-50%) scale(var(--s,1));overflow:hidden;background:#0A0B0F}
+  .sc{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}
+  .sc.on{opacity:1}
+  .big{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-weight:800;font-size:124px;line-height:1.04;letter-spacing:-.045em}
+  .big .w{display:inline-block;opacity:0;transform:translateY(40px);transition:opacity .5s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+  .on .big .w{opacity:1;transform:none}
+  .on .big .w:nth-child(2){transition-delay:.08s}.on .big .w:nth-child(3){transition-delay:.16s}.on .big .w:nth-child(5){transition-delay:.3s}
+  .on .big .w:nth-child(6){transition-delay:.38s}.on .big .w:nth-child(7){transition-delay:.46s}.on .big .w:nth-child(8){transition-delay:.54s}
+  .acc{color:#5CB8FF}
+
+  /* Dearly's sky */
+  .sky{position:absolute;inset:0;background:
+    radial-gradient(28% 18% at 18% 22%,rgba(255,255,255,.75),rgba(255,255,255,0) 70%),
+    radial-gradient(34% 20% at 78% 16%,rgba(255,255,255,.7),rgba(255,255,255,0) 70%),
+    radial-gradient(40% 22% at 60% 86%,rgba(255,255,255,.65),rgba(255,255,255,0) 70%),
+    radial-gradient(30% 18% at 12% 78%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),
+    linear-gradient(180deg,#2F7FE0 0%,#5DA6F2 55%,#8CC4F7 100%)}
+  .sky::after{content:'';position:absolute;inset:0;background:inherit;filter:blur(18px);opacity:.6}
+  .drift .sky{animation:skyDrift 16s linear infinite}
+  @keyframes skyDrift{from{background-position:0 0}to{background-position:-160px 0}}
+
+  /* the letter */
+  .letter{position:absolute;left:50%;top:50%;width:1040px;height:720px;transform:translate(-50%,-52%) rotate(-1.6deg);
+    background:#FBF8F1;border-radius:6px;padding:70px 84px;
+    background-image:repeating-linear-gradient(180deg,transparent 0 63px,rgba(120,150,190,.22) 63px 65px);background-position:0 46px}
+  .letter p{font-family:'Gochi Hand',cursive;font-size:46px;line-height:64px;color:#1E1F24;white-space:pre-wrap;min-height:64px}
+  .letter mark{background:linear-gradient(transparent 30%,#F9D85A 30%,#F9D85A 88%,transparent 88%);color:inherit}
+  .caret{display:inline-block;width:3px;height:46px;background:#1E1F24;vertical-align:-8px;margin-left:2px;animation:blink .9s steps(2) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .vn{position:absolute;right:70px;bottom:62px;display:flex;align-items:center;gap:16px;padding:16px 26px;border-radius:999px;background:#FFF1E6;
+    opacity:0;transform:translateY(16px) scale(.96);transition:opacity .4s ease,transform .6s cubic-bezier(.16,1,.3,1)}
+  .vn.on{opacity:1;transform:none}
+  .vn .dot{width:20px;height:20px;border-radius:50%;background:#E5483D;animation:rec 1s ease-in-out infinite}
+  @keyframes rec{50%{transform:scale(.7);opacity:.6}}
+  .vn .bars{display:flex;align-items:center;gap:5px;height:44px}
+  .vn .bars i{width:6px;border-radius:3px;background:#F08A3E;height:10px;animation:wave .9s ease-in-out infinite}
+  .vn .bars i:nth-child(2n){animation-delay:.15s}.vn .bars i:nth-child(3n){animation-delay:.3s}.vn .bars i:nth-child(5n){animation-delay:.45s}
+  @keyframes wave{0%,100%{height:10px}50%{height:42px}}
+  .vn b{font:700 30px 'Montserrat',sans-serif;color:#C2621C;letter-spacing:-.01em;min-width:70px}
+  .send{position:absolute;left:50%;bottom:120px;transform:translate(-50%,20px);padding:24px 56px;border-radius:999px;background:#2F6FD6;color:#fff;
+    font:700 34px 'Montserrat',sans-serif;opacity:0;transition:opacity .35s ease,transform .5s cubic-bezier(.16,1,.3,1)}
+  .send.on{opacity:1;transform:translate(-50%,0)}
+  .send.press{transform:translate(-50%,0) scale(.94)}
+  .lift .letter{transition:transform 1.2s cubic-bezier(.6,0,.4,1),opacity 1.1s ease .2s;transform:translate(-50%,-160%) rotate(4deg) scale(.5);opacity:0}
+
+  /* the recipient */
+  .recv{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center}
+  .recv h3{font-family:'Gochi Hand',cursive;font-weight:400;font-size:120px;line-height:1;color:#fff;opacity:0;transform:translateY(30px);transition:opacity .6s ease .2s,transform .9s cubic-bezier(.16,1,.3,1) .2s}
+  .recv p{margin-top:26px;font:600 40px 'Montserrat',sans-serif;color:rgba(255,255,255,.92);opacity:0;transition:opacity .6s ease .7s}
+  .recv .open{display:inline-block;margin-top:48px;padding:22px 52px;border-radius:999px;background:#fff;color:#2F6FD6;font:700 32px 'Montserrat',sans-serif;opacity:0;transition:opacity .6s ease 1.1s}
+  .on .recv h3,.on .recv p,.on .recv .open{opacity:1;transform:none}
+
+  /* proof + end */
+  .stats{position:absolute;left:110px;right:110px;top:50%;transform:translateY(-50%);display:grid;grid-template-columns:repeat(3,1fr);gap:50px}
+  .stat{opacity:0;transform:translateY(30px);transition:opacity .5s ease,transform .8s cubic-bezier(.16,1,.3,1)}
+  .on .stat{opacity:1;transform:none}.on .stat:nth-child(2){transition-delay:.25s}.on .stat:nth-child(3){transition-delay:.5s}
+  .stat b{display:block;font-weight:800;font-size:140px;letter-spacing:-.05em;line-height:1;white-space:nowrap}
+  .stat b i{font-style:normal;color:#5CB8FF}
+  .stat span{display:block;margin-top:18px;font-weight:500;font-size:38px;color:#A9B0BE}
+  .end .big{font-size:150px}
+</style>
+</head>
+<body>
+<div id="stage" aria-hidden="true">
+  <section class="sc" id="s1"><p class="big"><span class="w">Some</span> <span class="w">words</span> <span class="w">deserve</span><br><span class="w acc">more</span> <span class="w acc">than</span> <span class="w acc">a</span> <span class="w acc">text.</span></p></section>
+
+  <section class="sc drift" id="s2">
+    <div class="sky"></div>
+    <div class="letter">
+      <p id="l1"></p><p id="l2"></p><p id="l3"></p><p id="l4"></p><p id="l5"></p>
+      <div class="vn" id="vn"><span class="dot"></span><span class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b id="vt">0:00</b></div>
+    </div>
+    <div class="send" id="send">Send letter</div>
+  </section>
+
+  <section class="sc drift" id="s3">
+    <div class="sky"></div>
+    <div class="recv"><h3>Hi James!</h3><p>Tom wrote you a letter.</p><span class="open">Open it</span></div>
+  </section>
+
+  <section class="sc" id="s4">
+    <div class="stats">
+      <div class="stat"><b>140<i>+</i></b><span>letters sent</span></div>
+      <div class="stat"><b>35</b><span>five-star ratings</span></div>
+      <div class="stat"><b>48h</b><span>built solo</span></div>
+    </div>
+  </section>
+
+  <section class="sc end" id="s5"><p class="big"><span class="w acc">Dearly.</span></p></section>
+</div>
+<script>
+(function () {
+  var st = document.getElementById('stage');
+  function fit() { st.style.setProperty('--s', Math.min(innerWidth / 1600, innerHeight / 1200)); }
+  addEventListener('resize', fit); fit();
+  var $ = function (id) { return document.getElementById(id); }, T = [], playing = true;
+  function at(ms, fn) { T.push(setTimeout(fn, ms)); }
+  function show(id) { [].forEach.call(document.querySelectorAll('.sc'), function (s) { s.classList.toggle('on', s.id === id); }); }
+  // the letter on the live Dearly site
+  var LINES = [['l1', 'Hi James,'], ['l2', 'Three years ago today we kicked off'], ['l3', 'this partnership. A lot has changed.'], ['l4', ''], ['l5', '<mark>That’s meant more than the work itself.</mark>']];
+  function type(id, html, dur) {
+    var el = $(id), plain = html.replace(/<[^>]+>/g, ''), n = plain.length, t0 = performance.now();
+    (function step() {
+      if (!playing) return;
+      var k = Math.min(1, (performance.now() - t0) / dur), c = Math.round(n * k);
+      el.innerHTML = (k < 1 ? plain.slice(0, c) : html) + (k < 1 ? '<span class="caret"></span>' : '');
+      if (k < 1) T.push(setTimeout(step, 30));
+    })();
+  }
+  function reset() {
+    LINES.forEach(function (l) { $(l[0]).innerHTML = ''; });
+    $('vn').classList.remove('on'); $('send').classList.remove('on', 'press'); $('s2').classList.remove('lift'); $('vt').textContent = '0:00';
+  }
+  function run() {
+    T.forEach(clearTimeout); T = []; reset();
+    show('s1');
+    at(2800, function () { show('s2'); });
+    var t = 3300;
+    LINES.forEach(function (l) { var d = Math.max(300, l[1].replace(/<[^>]+>/g, '').length * 34); (function (l, d, t) { at(t, function () { type(l[0], l[1], d); }); })(l, d, t); t += d + 120; });
+    at(t + 100, function () { $('vn').classList.add('on'); });
+    for (var s = 1; s <= 8; s++) (function (s) { at(t + 100 + s * 180, function () { $('vt').textContent = '0:0' + s; }); })(s);
+    at(t + 1900, function () { $('send').classList.add('on'); });
+    at(t + 2500, function () { $('send').classList.add('press'); });
+    at(t + 2700, function () { $('send').classList.remove('press'); $('s2').classList.add('lift'); });
+    at(t + 3900, function () { show('s3'); });
+    at(t + 7000, function () { show('s4'); });
+    at(t + 10400, function () { show('s5'); });
+    at(t + 12600, run);
+  }
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  try { still = still || parent.document.documentElement.classList.contains('motion-paused'); } catch (e) {}
+  if (still) { playing = false; show('s4'); } else run();
+  addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'film') return;
+    if (e.data.play && !playing) { playing = true; run(); }
+    else if (!e.data.play && playing) { playing = false; T.forEach(clearTimeout); T = []; }
+  });
+})();
+</script>
+</body>
+</html>

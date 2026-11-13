@@ -81,6 +81,7 @@
   #sndHint.show{opacity:1}
   html.embed .topbar, html.embed #spacer{display:none}
   @media (max-width:1099px){ html.embed .status{display:none} }
+  html.footer #hero, html.footer .status, html.footer #name{display:none!important}
   html.embed #name{visibility:hidden}                 /* the homepage draws this line itself, as a real link */  /* the host's centred chat bar would overlap it below ~1100px */
   html.embed, html.embed body{overflow:hidden}
   .badge{position:absolute;right:12px;top:56px;font-family:var(--font-mono);font-size:10px;color:#ffd;opacity:.7}
@@ -149,6 +150,8 @@ const LAT = 37.8199, LON = -122.4783, TZ = 'America/Los_Angeles';
 const REDUCED  = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const MOBILE   = matchMedia('(max-width: 767px), (pointer: coarse)').matches;
 const RAFSHIM  = Q.has('rafshim');
+const FOOTER   = Q.has('footer');   // homepage footer: the same living painting, no hero type (the footer sets its own copy)
+let HALT = false;                    // host says this frame is off-screen: skip rendering entirely
 const LIGHTONLY = Q.has('lightonly');  // test: ignore normal/depth maps (how AI-painted layers render)
 const DPR      = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.5 : 2);
 const TEX_SCALE = MOBILE ? 0.5 : 1;          // half-res layers on phones (GAPS.md #8)
@@ -971,7 +974,8 @@ async function build() {
     // fog bands + gulls are slotted between layers by name (fallbacks: by order)
     if (L.name === 'sf' || /city/.test(L.name)) addFog(U.uHorizon.value - 0.045, 0.035, 0.010, 1.7, L.parallax, 0.8);
     if (L.name === 'alcatraz') addFog(U.uHorizon.value - 0.012, 0.022, -0.006, 5.3, L.parallax, 0.55);
-    if (L.name === (layers.some(l => l.name === 'bridge_lights') ? 'bridge_lights' : 'bridge')) {
+    // (12 Nov, owner: birds flew over the redwoods) gulls slot in right after the bridge layer that exists, so trees, rocks and foreground stay in front
+    if (L.name === (layers.some(l => l.name === 'bridge_lights') ? 'bridge_lights' : layers.some(l => l.name === 'bridge') ? 'bridge' : 'bridge_fg')) {
       addFog(U.uHorizon.value + 0.004, 0.026, 0.016, 9.1, L.parallax, 1.0);
       gullPass = addPass(FS_GULLS, { uGulls: { value: gullData } }, { rect: [0, 0.02, 1, 0.62], par: 0.1, name: 'gulls' });
     }
@@ -1469,6 +1473,8 @@ addEventListener('message', e => { if (e.origin === location.origin && e.data &&
 // (12 Nov 2026) the homepage's Pause motion control (WCAG 2.2.2) freezes the scene's life: water, ferry, sea lions, clouds
 let PAUSED = false;
 addEventListener('message', e => { if (e.origin === location.origin && e.data && e.data.type === 'motion') PAUSED = !!e.data.paused; });
+addEventListener('message', e => { if (e.origin === location.origin && e.data && e.data.type === 'run') HALT = !e.data.on; });
+if (FOOTER) document.documentElement.classList.add('footer');
 function makeTextPass() {
   textCanvas = document.createElement('canvas'); textCtx = textCanvas.getContext('2d');
   textTex = new THREE.CanvasTexture(textCanvas); textTex.colorSpace = THREE.NoColorSpace;
@@ -1491,7 +1497,7 @@ function wrapLines(g, text, maxW) {
   if (line) out.push(line); return out;
 }
 function drawSceneText() {
-  if (!textPass) return;
+  if (!textPass || FOOTER) return;
   const W = state.vw, H = state.vh, k = DPR, tagEl = document.getElementById('tagline');
   const op = heroEl.style.opacity === '' ? 1 : +heroEl.style.opacity;
   textPass.mat.uniforms.uA.value = op; if (textPass.ghostMat) textPass.ghostMat.uniforms.uA.value = op * 0.36;
@@ -1524,7 +1530,7 @@ function drawSceneText() {
 }
 
 function frame() {
-  if (!state.ready) return;
+  if (!state.ready || HALT) return;
   drawSceneText();
   const now = performance.now();
   const t = (now - t0) / 1000;
@@ -1556,6 +1562,7 @@ function frame() {
   }
   if (!glassRender()) renderer.render(scene, camera);
   state.frames++;
+  if (FOOTER && state.frames === 3) try { parent.postMessage({ type: 'ft-ready' }, location.origin); } catch (e) {}
   if (fpsEl) fpsTick(now);
 }
 // ?fps — on-device frame-rate readout (avg fps + worst frame over the last second)
