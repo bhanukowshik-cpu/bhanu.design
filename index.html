@@ -5009,6 +5009,33 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .v6l-word { transform: none; filter: none; transition: opacity .45s ease; }
       .v6l-word.is-past { transform: none; }
     }
+
+    /* ══ v7 (12 Nov, owner: "designed with the previous design system"): the loader IS the hero, out of focus.
+       The painted Golden Gate plate fills the frame, blurred, and pulls into focus as the page REALLY loads
+       (--p = the honest bar); Montserrat bold words, a colourless glass track, then a crossfade onto the live hero.
+       Portrait, rings, ticks, azure bar and the wordmark are retired (hidden, not deleted). */
+    #v6Loader{background:#1a1622;--p:0}
+    #v6Loader .v6l-geo,#v6Loader .v6l-tick,#v6Loader .v6l-glow,#v6Loader .v6l-brand{display:none!important}
+    #v6Loader .v6l-portrait{left:0;top:0;width:100%;height:100%;aspect-ratio:auto;-webkit-mask-image:none;mask-image:none;
+      transform:scale(1.12);opacity:0;transition:opacity .6s ease}
+    #v6Loader.img-in .v6l-portrait{opacity:1;transform:scale(calc(1.12 - .12*var(--p)))}
+    #v6Loader .v6l-portrait img{-webkit-mask-image:none;mask-image:none;object-fit:cover;
+      filter:blur(calc(28px - 28px*var(--p))) brightness(calc(.62 + .38*var(--p))) saturate(1.1)}
+    #v6Loader .v6l-copy{top:50%;transform:translate(-50%,-40%)}
+    #v6Loader.copy-live .v6l-copy{transform:translate(-50%,-50%)}
+    #v6Loader .v6l-words{font-family:'Montserrat',var(--sans);font-weight:700;letter-spacing:-.035em;color:#FFFCF8;font-size:clamp(40px,6.4vw,92px)}
+    #v6Loader .v6l-words .serif{font-family:inherit;font-style:normal;font-weight:700;letter-spacing:inherit;font-size:1em}
+    #v6Loader .v6l-meta{margin-top:28px;gap:16px}
+    #v6Loader .v6l-track{width:200px;height:6px;padding:0;border-radius:999px;background:rgba(255,255,255,.14);
+      -webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,255,255,.18)}
+    #v6Loader .v6l-bar{background:#FFFCF8;box-shadow:none;border-radius:999px}
+    #v6Loader .v6l-count{font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(255,252,248,.8)}
+    #v6Loader .v6l-grain{opacity:.05}
+    #v6Loader{transition:opacity .9s ease}
+    #v6Loader.is-up{transform:none;opacity:0}
+    @media (max-width:760px){#v6Loader .v6l-portrait{height:100%}#v6Loader .v6l-copy{top:50%}#v6Loader .v6l-words{font-size:clamp(34px,10vw,48px)}}
+    @media (prefers-reduced-motion:reduce){#v6Loader .v6l-portrait,#v6Loader.img-in .v6l-portrait{transform:none}#v6Loader .v6l-portrait img{filter:blur(calc(14px - 14px*var(--p))) brightness(.8)}}
   </style>
 
   <div id="v6Loader" hidden role="status" aria-label="Loading portfolio">
@@ -5025,7 +5052,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <span class="v6l-tick v6l-tick--br" aria-hidden="true"></span>
     <div class="v6l-glow" aria-hidden="true"></div>
     <figure class="v6l-portrait" aria-hidden="true">
-      <img src="images/loader-portrait.webp?v=2" alt="" width="1050" height="1400"
+      <img src="city/layers/gg_ai/plate.webp" alt="" width="1672" height="941"
            fetchpriority="high" decoding="async">
     </figure>
     <div class="v6l-copy" aria-hidden="true">
@@ -5175,6 +5202,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
         if (barEl) barEl.style.transform = 'scaleX(' + shown.toFixed(4) + ')';
         if (pctEl) pctEl.textContent = Math.round(shown * 100);
+        loader.style.setProperty('--p', shown.toFixed(3));   // v7: the plate pulls into focus with the real progress
         setWord(shown);
 
         // leave only when the bar is truly full AND "Repeat." has landed
