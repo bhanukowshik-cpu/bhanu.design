@@ -5929,6 +5929,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   .chp-stage{position:absolute;left:50%;top:50%;width:1672px;height:941px;
     transform:translate(calc(-50% + var(--ox,0px)),-50%) scale(calc(var(--cover,1) * var(--push,1.06)));transform-origin:50% 50%}
   .chp-stage > img.chp-plate{position:absolute;inset:0;width:100%;height:100%;display:block}
+  html.chp-gate #chapters .chp .chp-stage{transition:opacity .7s ease}
+  html.chp-gate #chapters .chp:not(.chp-ready) .chp-stage{opacity:0}   /* the scene appears whole, never layer by layer */
+  #chapters .chp + .chp .chp-pin{background:#0E0B12}   /* each chapter slides over the last as a solid sheet, even before its painting is in */
   /* the launch film, mapped onto the painted screen's four corners in true perspective (matrix3d from JS) */
   .chp-screen{position:absolute;left:0;top:0;width:1600px;height:1000px;transform-origin:0 0;overflow:hidden;background:#0A0B0F}
   .chp-screen iframe{width:100%;height:100%;border:0;display:block;pointer-events:none}
@@ -11372,17 +11375,21 @@ footer.ft .ft-mailto:hover span{transform:translateX(6px)}
   // pinned chapter stages, so plates/time-of-day/foreground layers stayed empty (black holes, a plant floating in a box).
   // After the hero has painted, load chapter by chapter in page order: each chapter's layers all at once, the next
   // chapter as soon as this one is in. Everything is decoded long before a visitor scrolls there.
-  window.afterHero(function () {
+  // A chapter's painting only shows once ALL its layers are in (html.chp-gate + .chp-ready), so a slow line never sees loose pieces.
+  document.documentElement.classList.add('chp-gate');
+  window.whenHero(function () {
     var chs = [].slice.call(document.querySelectorAll('#chapters .chp')), i = 0;
     (function next() {
       var ch = chs[i++]; if (!ch) return;
-      var ims = [].slice.call(ch.querySelectorAll('img')), left = 0;
-      function done() { if (--left <= 0) { left = 1e9; next(); } }
+      var ims = [].slice.call(ch.querySelectorAll('img')), pending = 0, moved = false;
+      function advance() { if (!moved) { moved = true; next(); } }
+      function done() { if (--pending <= 0) { ch.classList.add('chp-ready'); advance(); } }   // ready whenever its own layers finish
       ims.forEach(function (im) {
         if (im.loading === 'lazy') im.loading = 'eager';
-        if (!(im.complete && im.naturalWidth) && im.getAttribute('src')) { left++; im.addEventListener('load', done, { once: true }); im.addEventListener('error', done, { once: true }); }
+        if (!(im.complete && im.naturalWidth) && im.getAttribute('src')) { pending++; im.addEventListener('load', done, { once: true }); im.addEventListener('error', done, { once: true }); }
       });
-      if (!left) next(); else setTimeout(function () { if (left < 1e9) { left = 1e9; next(); } }, 4000);   // never stall the queue
+      if (!pending) { ch.classList.add('chp-ready'); advance(); }
+      else setTimeout(advance, 4000);   // never stall the queue; this chapter still turns ready when its layers land
     })();
   });
 })();
