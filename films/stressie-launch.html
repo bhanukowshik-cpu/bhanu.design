@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- (12 Nov, owner: "these are not actually the screens") screens are the current build from the simulator (real-*.webp / hero-rewards.webp), never the old captures -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -48,6 +49,7 @@
   .stat span{display:block;margin-top:22px;font-weight:500;font-size:52px;line-height:1.25;color:#A9B0BE}
 
   .end .big{font-size:150px}
+  .pop{display:none!important}   /* the real reward screen already says "+10 reset coins" */
 </style>
 </head>
 <body>
@@ -55,13 +57,13 @@
   <section class="sc" id="s1"><p class="big"><span class="w">A</span> <span class="w acc">stress</span><br><span class="w acc">check-in</span> <span class="w">that</span><br><span class="w">pays</span> <span class="w">for</span> <span class="w">your</span><br><span class="w">evening.</span></p></section>
 
   <section class="sc" id="s2">
-    <div class="scr" id="p1"><img data-n="checkin-shape" src="../images/stressie-v4/checkin-shape.webp" alt=""><img data-n="checkin-reward" src="../images/stressie-v4/checkin-reward.webp" alt=""><i class="finger"></i><span class="pop">+10 coins</span></div>
+    <div class="scr" id="p1"><img data-n="checkin-shape" src="../images/stressie-v4/real-checkin.webp" alt=""><img data-n="checkin-reward" src="../images/stressie-v4/real-reward.webp" alt=""><i class="finger"></i><span class="pop">+10 coins</span></div>
   </section>
 
   <section class="sc" id="s3"><p class="big"><span class="w">Spent</span><br><span class="w acc">after</span> <span class="w acc">work.</span></p></section>
 
   <section class="sc" id="s4">
-    <div class="scr" id="p2"><img data-n="offwork-map" src="../images/stressie-v4/offwork-map.webp" alt=""><img data-n="offwork-redeem" src="../images/stressie-v4/offwork-redeem.webp" alt=""><i class="finger"></i></div>
+    <div class="scr" id="p2"><img data-n="offwork-map" src="../images/stressie-v4/real-map.webp" alt=""><img data-n="offwork-redeem" src="../images/stressie-v4/hero-rewards.webp" alt=""><i class="finger"></i></div>
   </section>
 
   <section class="sc" id="s5">
@@ -91,14 +93,14 @@
     $('p1').querySelector('.pop').classList.remove('on');
     [].forEach.call(document.querySelectorAll('.scr img'), function (i) { i.classList.remove('on', 'out'); });
     [].forEach.call(document.querySelectorAll('.finger'), function (f) { f.style.transition = 'none'; f.style.opacity = 0; void f.offsetWidth; f.style.transition = ''; });
-    finger('p1', 18, 55, false); finger('p2', 60, 40, false);
+    finger('p1', 4, 72, false); finger('p2', 60, 40, false);
   }
   function run() {
     T.forEach(clearTimeout); T = []; reset();
     show('s1');
     at(2800, function () { img('p1', 'checkin-shape'); show('s2'); });
-    at(3300, function () { finger('p1', 18, 55, true); });
-    at(3900, function () { finger('p1', 72, 55, true); });
+    at(3300, function () { finger('p1', 4, 72, true); });
+    at(3900, function () { finger('p1', 70, 72, true); });
     at(5600, function () { finger('p1', 72, 55, false); img('p1', 'checkin-reward'); });
     at(6000, function () { $('p1').querySelector('.pop').classList.add('on'); });
     at(8400, function () { show('s3'); });

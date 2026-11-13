@@ -5755,14 +5755,16 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        device's screen, the copy set into the scene like the hero title, birds crossing each sky. Replaces the redwood
        stacking cards, which are kept below, hidden. Classes are chp-* (the old cards use .ch). -->
   <section id="chapters" class="chp-wrap" aria-labelledby="chpTitle">
-    <button type="button" class="chp-pause" id="motionToggle" aria-pressed="false">Pause motion</button>
+    <!-- (12 Nov, owner) Pause motion control removed; prefers-reduced-motion still stills everything -->
     <h2 class="sr-only" id="chpTitle">Selected work</h2>
     <!-- (12 Nov, owner) cloud pass from the hero into the first chapter: the bank rises over the hero's foot, you pass through,
          it parts sideways onto the scene. Short, no text. Tinted to the time of day. -->
     <div class="chp-clouds" aria-hidden="true">
+      <div class="cl-fill"></div>
       <img class="cl cl-a" src="city/layers/vc/cloud_a.webp" alt="" decoding="async">
       <img class="cl cl-b" src="city/layers/vc/cloud_a.webp" alt="" decoding="async">
       <img class="cl cl-c" src="city/layers/vc/cloud_a.webp" alt="" decoding="async">
+      <p class="cl-title">Selected work</p>
     </div>
   <section class="chp" id="chVC" data-sky="40,30,840,165" aria-labelledby="chVCt">
     <div class="chp-pin">
@@ -5979,10 +5981,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   function ss(a, b, v) { var t = cl((v - a) / (b - a)); return t * t * (3 - 2 * t); }
   function tod() {
     var f = new URLSearchParams(location.search).get('alt'), alt = f != null ? +f : sunAlt(Date.now());
-    var wN = 1 - ss(-9, -2, alt), wD = ss(9, 24, alt);
+    var WN = 1 - ss(-9, -2, alt), WD = ss(9, 24, alt);
     chs.forEach(function (ch) {
       var plate = ch.querySelector('img.chp-plate'), stage = ch.querySelector('.chp-stage'), scr = ch.querySelector('.chp-screen[data-quad]');
-      var loop = stage.querySelector('video.chp-loop'), wG = (1 - wD) * (1 - wN);
+      var loop = stage.querySelector('video.chp-loop');
+      var wN = loop ? 0 : WN, wD = loop ? 0 : WD;   // (owner) a chapter with a living loop always shows it: alive beats a strict clock
+      var wG = (1 - wD) * (1 - wN);
       if (loop) { stage.classList.add('has-loop'); loop.style.opacity = wG.toFixed(3); }
       ['day', 'night'].forEach(function (k) {
         var src = plate.dataset[k]; if (!src) return;
@@ -11185,20 +11189,40 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
   function frame() {
     var vh = innerHeight, vw = innerWidth, top = wrap.getBoundingClientRect().top;
     // p: 0 while the chapters are a screen away, 1 once their top has scrolled a little past the viewport top
-    var p = cl((vh - top) / vh), e = p * p * (3 - 2 * p);   // 1 exactly when the chapter reaches the top
+    var target = cl((vh - top) / vh);   // 1 exactly when the chapter reaches the top
+    cur += (target - cur) * .16; if (Math.abs(target - cur) > .0005) req(); else cur = target;   // eased, never snaps to scroll jumps
+    var p = cur, e = p * p * (3 - 2 * p);
     var part = cl((p - .5) / .45), pe = part * part * (3 - 2 * part);   // parted before the chapter settles
     if (first) box.style.setProperty('--cl-night', getComputedStyle(first).getPropertyValue('--night') || 0);
     L[0].style.transform = 'translate(calc(-50% - ' + (pe * vw * .7).toFixed(1) + 'px),0px) scale(' + (1 + pe * .35).toFixed(3) + ')';   // no lift: the tops stay under the hero's chat bar
     L[1].style.transform = 'translate(calc(-50% + ' + (pe * vw * .75).toFixed(1) + 'px),0px) scaleX(-1) scale(' + (1 + pe * .35).toFixed(3) + ')';
     L[2].style.transform = 'translate(-50%,' + (pe * vh * .55).toFixed(1) + 'px) scale(' + (1.1 + pe * .5).toFixed(3) + ')';
     var a = String(Math.max(0, 1 - pe * 1.15)); for (var i = 0; i < 3; i++) L[i].style.opacity = a;
+    box.style.setProperty('--fill', String(Math.max(0, cl((p - .05) / .3) - pe * 1.2)));
+    var tin = cl((p - .2) / .25), tout = cl((part - .05) / .4); box.style.setProperty('--tt', (tin * (1 - tout)).toFixed(3)); box.style.setProperty('--ty', ((1 - tin) * 24 - tout * 30).toFixed(1) + 'px');
     box.style.visibility = pe >= .999 ? 'hidden' : '';
   }
-  var raf = 0; addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(function () { raf = 0; frame(); }); }, { passive: true });
+  var raf = 0, cur = 0; function req() { if (!raf) raf = requestAnimationFrame(function () { raf = 0; frame(); }); }
+  addEventListener('scroll', req, { passive: true });
   addEventListener('resize', frame); frame(); setTimeout(frame, 1200);
 })();
 </script>
 <style>/* (owner, 12 Nov) clouds back, but they rise from BELOW the hero chat bar and part before the chapter settles (no veil over the work) */
 #chapters .chp-clouds{top:-11vh!important}</style>
+<style>
+/* cloud pass: a soft fill so the hero/chapter seam never shows, and one quiet line as the curtain opens */
+#chapters .chp-clouds .cl-fill{position:absolute;left:0;right:0;top:9vh;height:70vh;opacity:var(--fill,0);
+  background:linear-gradient(180deg,rgba(244,232,222,0) 0%,rgba(244,232,222,.92) 28%,rgba(240,226,220,.95) 60%,rgba(240,226,220,0) 100%)}
+#chapters .chp-clouds .cl-title{position:absolute;left:0;right:0;top:36vh;margin:0;text-align:center;z-index:2;
+  font:800 clamp(40px,6vw,104px)/1 'Montserrat',sans-serif;letter-spacing:-.04em;color:#2A2230;
+  opacity:var(--tt,0);transform:translateY(var(--ty,24px))}
+</style>
+<style>
+/* (12 Nov, owner) the hero chat bar: rounder and roomier; the WebGL lens reads this size + radius live */
+.hero .cta-dock .cta{height:60px!important;border-radius:999px!important;padding:0 30px 0 10px!important;gap:14px}
+.hero .cta-dock .cta-orb{width:44px!important;height:44px!important}
+.hero .cta-dock .cta-text span{font-size:16px!important}
+@media (max-width:767px){ .hero .cta-dock .cta{height:56px!important;padding:0 22px 0 8px!important} .hero .cta-dock .cta-orb{width:40px!important;height:40px!important} }
+</style>
 </body>
 </html>
