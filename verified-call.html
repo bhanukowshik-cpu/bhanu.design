@@ -761,7 +761,7 @@
             <div class="vtabs cs-navpill" role="tablist" aria-label="Desktop app states">
               <button role="tab" id="dt0" aria-controls="dp0" aria-selected="true" tabindex="0">Home</button>
               <button role="tab" id="dt1" aria-controls="dp1" aria-selected="false" tabindex="-1">Setup check</button>
-              <button role="tab" id="dt2" aria-controls="dp2" aria-selected="false" tabindex="-1">Hidden app open</button>
+              <button role="tab" id="dt2" aria-controls="dp2" aria-selected="false" tabindex="-1" hidden>Hidden app open</button><!-- (14 Nov, owner) hidden: the shipped app does not ask the candidate to close anything; the host sees the flag at once (see "Tell the host, don't block the candidate") -->
               <button role="tab" id="dt3" aria-controls="dp3" aria-selected="false" tabindex="-1">Verified</button>
             </div>
             <div class="vpanel" id="dp0" role="tabpanel" aria-labelledby="dt0"><div class="shot"><div class="bar"><i></i><i></i><i></i><span>Verified</span></div><button class="zoom" data-group="desk" aria-label="Enlarge: home"><img src="verified-call/screens/a2/desk-home.webp" width="1800" height="1178" alt="Home with upcoming calls and a split-flap headline" loading="lazy" /></button></div><p class="cap"><b>Home</b><span>Calls arrive from the invite link. Each opens 5 minutes before it starts.</span></p></div>
@@ -1130,7 +1130,7 @@
 
     /* tabs: roving tabindex, arrow keys, Home/End */
     function tabs(list, onSelect) {
-      var t = Array.prototype.slice.call(list.querySelectorAll('[role="tab"]'));
+      var t = Array.prototype.slice.call(list.querySelectorAll('[role="tab"]')).filter(function (b) { return !b.hidden; });   // hidden tabs are out of the set
       function sel(i, focus, user) {
         t.forEach(function (b, k) { var on = k === i; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; });
         if (focus) t[i].focus();
@@ -1157,8 +1157,9 @@
 
     /* desktop key states */
     (function () {
-      var v = document.getElementById('deskViewer'), ps = v.querySelectorAll('.vpanel');
-      tabs(v.querySelector('[role="tablist"]'), function (i) { ps.forEach(function (p, k) { p.hidden = k !== i; if (k === i) load(p.querySelector('img')); }); });
+      var v = document.getElementById('deskViewer'), ps = v.querySelectorAll('.vpanel'), tl = v.querySelector('[role="tablist"]');
+      var vis = [].filter.call(tl.querySelectorAll('[role="tab"]'), function (b) { return !b.hidden; });
+      tabs(tl, function (i) { var id = vis[i].getAttribute('aria-controls'); ps.forEach(function (p) { var on = p.id === id; p.hidden = !on; if (on) load(p.querySelector('img')); }); });
     })();
     document.querySelectorAll('details.more').forEach(function (d) { d.addEventListener('toggle', function () { if (d.open) d.querySelectorAll('img[data-src]').forEach(load); }); });
 

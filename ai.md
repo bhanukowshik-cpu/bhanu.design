@@ -13,7 +13,7 @@ Highlights, each from his case studies:
   live Google Meet calls right.
 - **EverTutor Live** (sole product designer): a voice AI tutor that took 1:1 tutoring from $250 to $5 an hour;
   ~2,000 learners, 8+ schools, $9.5M seed-funded.
-- **EverTutor Studio** (lead product and curriculum designer): cut lesson creation from 104 hours to 4; 3,000+ lessons.
+- **EverTutor Studio** (sole product designer; lead curriculum designer): cut lesson creation from 104 hours to 4; 3,000+ lessons.
 - **Stressie** (founding product designer, built the iOS app): daily engagement 12% → 56%, $600K funding unlocked.
 - **Dearly** (solo build in 48 hours): voice letters you can hear and keep; 140+ letters sent, 35 five-star ratings.
 
@@ -124,7 +124,7 @@ He records his misses too: a gamified progress layer that didn't move engagement
 
 ## EverTutor Studio (2025 – mid 2026) · https://bhanu.build/evertutor-studio.html
 
-Role: lead product designer and lead curriculum designer, in a lean team (2–3 engineers, a founder/PM).
+Role: sole product designer and lead curriculum designer, in a lean team (2–3 engineers, a founder/PM).
 The tool teachers use to build EverTutor's lessons. Cut lesson creation from 104 hours to 4 (96% faster), onboarding
 from 40–50 hours to under 2, and replaced three disconnected tools with one. He designed the V0 system solo in about
 6 hours against a ~12-hour runway to developer handoff, using an "appearance order" flow system that controls what the
