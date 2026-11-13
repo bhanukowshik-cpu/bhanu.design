@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Bhanu Kowshik · The City</title>
+<meta name="robots" content="noindex" />
+<!--
+  CITY LAB — Section 1 of the city homepage (storyboard/DIRECTION.md).
+  Hero: the Golden Gate at San Francisco's REAL current time + weather, Bhanu
+  tiny on a far bench. First scroll swings the camera to the Verified Call tower
+  (placeholder geometry until the Blender build lands).
+
+  Fonts are LOCKED: Söhne (+ Breit for giant numbers, Mono for labels) and
+  Signifier Light Italic — Klim. Drop the woff2 files into fonts/klim/ with the
+  names below; until then the fallbacks render.
+
+  Debug: ?rafshim (preview pane pauses RAF) · ?time=night|dusk|golden|day or ?alt=-3
+  (sun altitude, degrees) · ?weather=fog|rain|clear · window.__city.{progress(p),state}
+-->
+<style>
+  @font-face{font-family:'Söhne';src:url('fonts/klim/soehne-buch.woff2') format('woff2');font-weight:400;font-display:swap}
+  @font-face{font-family:'Söhne';src:url('fonts/klim/soehne-kraftig.woff2') format('woff2');font-weight:500;font-display:swap}
+  @font-face{font-family:'Söhne Breit';src:url('fonts/klim/soehne-breit-leicht.woff2') format('woff2');font-weight:300;font-display:swap}
+  @font-face{font-family:'Söhne Mono';src:url('fonts/klim/soehne-mono-buch.woff2') format('woff2');font-weight:400;font-display:swap}
+  @font-face{font-family:'Signifier';src:url('fonts/klim/signifier-light-italic.woff2') format('woff2');font-weight:300;font-style:italic;font-display:swap}
+  :root{
+    --ink:#F2F5FB; --ink-2:rgba(236,242,252,.74); --ink-3:rgba(236,242,252,.5);
+    --line:rgba(190,210,245,.18); --glass:rgba(14,20,40,.42); --azure:#9CC9FF;
+    --sans:'Söhne','Helvetica Neue',Helvetica,Arial,sans-serif;
+    --wide:'Söhne Breit','Söhne','Helvetica Neue',sans-serif;
+    --mono:'Söhne Mono',ui-monospace,'SF Mono',Menlo,monospace;
+    --serif:'Signifier','Iowan Old Style','Times New Roman',serif;
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{box-sizing:border-box}
+  html{background:#070B16}
+  body{margin:0;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;background:#070B16}
+  #gl{position:fixed;inset:0;z-index:0}
+  #gl canvas{display:block;width:100%;height:100%}
+  #track{position:relative;height:360vh;z-index:1;pointer-events:none}
+  a{color:inherit}
+
+  .top{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:center;
+    padding:26px clamp(20px,4vw,56px)}
+  .who{display:flex;align-items:center;gap:12px;text-decoration:none;font-size:15px;letter-spacing:.01em}
+  .who img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+  .nav{display:flex;gap:clamp(16px,2.4vw,36px)}
+  .nav a{text-decoration:none;font-size:13px;letter-spacing:.06em;color:var(--ink-2);transition:color .25s}
+  .nav a:hover{color:var(--ink)}
+
+  .hero{position:fixed;left:clamp(20px,4vw,56px);top:clamp(110px,17vh,180px);z-index:4;max-width:min(1240px,90vw);
+    will-change:opacity,transform}
+  /* daytime SF: bright sky → dark ink so the type holds */
+  html.day{--ink:#0B1530;--ink-2:rgba(11,21,48,.72);--ink-3:rgba(11,21,48,.5);--azure:#1E56B8;--line:rgba(11,21,48,.14);--glass:rgba(255,255,255,.42)}
+  html.day .top,html.day .hero,html.day .card,html.day .clock,html.day .scroll{color:var(--ink)}
+  .label{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--azure);margin:0 0 22px}
+  .label a{text-decoration:none;border-bottom:1px solid rgba(156,201,255,.35);padding-bottom:2px}
+  h1{margin:0;font-weight:400;font-size:clamp(36px,4.6vw,76px);line-height:1.02;letter-spacing:-.035em}
+  h1 em{display:block;font-family:var(--serif);font-weight:300;font-style:italic;letter-spacing:-.02em}
+  .ask{margin-top:34px;display:inline-flex;align-items:center;gap:12px;padding:10px 22px 10px 10px;border-radius:999px;
+    background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    font-size:14px;color:var(--ink-2);pointer-events:auto;cursor:pointer}
+  .ask i{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#bfe0ff,#2f7bff 55%,#0b2a7a);
+    box-shadow:0 0 18px rgba(80,150,255,.7)}
+  .scroll{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:4;font-family:var(--mono);font-size:10px;
+    letter-spacing:.24em;text-transform:uppercase;color:var(--ink-3)}
+
+  .bubble{position:fixed;left:0;top:0;z-index:3;pointer-events:none;white-space:nowrap;padding:6px 11px;border-radius:12px 12px 12px 3px;
+    background:#fff;color:#0B1020;font-size:12px;font-weight:500;box-shadow:0 6px 18px rgba(0,0,0,.35);will-change:transform,opacity}
+
+  /* provisional — the glass card gets designed later (user, 12 Nov) */
+  .card{position:fixed;right:clamp(20px,5vw,80px);top:50%;z-index:4;width:min(440px,calc(100vw - 40px));padding:30px 32px;
+    border-radius:22px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    opacity:0;transform:translateY(-46%);pointer-events:none;will-change:opacity,transform}
+  .card .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--azure);margin:0 0 14px}
+  .card h2{margin:0;font-family:var(--serif);font-style:italic;font-weight:300;font-size:46px;letter-spacing:-.02em;line-height:1}
+  .card .big{margin:22px 0 4px;font-family:var(--wide);font-weight:300;font-size:58px;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+  .card .big-l{margin:0 0 20px;color:var(--ink-2);font-size:15px}
+  .card ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+  .card li{padding:12px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink-2)}
+  .card .go{display:inline-block;margin-top:18px;font-size:14px;text-decoration:none;pointer-events:auto}
+
+  .dots{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;gap:12px}
+  .dots i{width:5px;height:5px;border-radius:50%;background:rgba(236,242,252,.3);transition:background .3s,box-shadow .3s}
+  .dots i.on{background:#fff;box-shadow:0 0 10px rgba(156,201,255,.9)}
+
+  .clock{position:fixed;left:clamp(20px,4vw,56px);bottom:24px;z-index:4;font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-3)}
+
+  @media (max-width:767px){
+    .nav{display:none}
+    .hero{top:96px}
+    .card{top:auto;bottom:20px;right:16px;left:16px;width:auto;transform:none;padding:22px}
+    .card h2{font-size:34px}.card .big{font-size:42px}
+    .dots{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){ .hero,.card{transition:none} }
+</style>
+</head>
+<body>
+<div id="gl" aria-hidden="true"></div>
+
+<header class="top">
+  <a class="who" href="index.html"><img src="images/loader-portrait.webp?v=2" alt="">Bhanu Kowshik</a>
+  <nav class="nav" aria-label="Site">
+    <a href="index.html#work">Work</a><a href="index.html#shortsSection">Shorts</a><a href="index.html#aboutSection">About</a>
+    <a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a><a href="index.html#contact">Contact</a>
+  </nav>
+</header>
+
+<section class="hero" id="hero">
+  <p class="label">Design engineer · Currently building <a href="verified-call.html">Verified Call ↗</a></p>
+  <h1>I design and build AI products that <em>scale, convert, and connect.</em></h1>
+  <button class="ask" type="button"><i></i>Ask me anything</button>
+</section>
+<div class="scroll" id="scrollHint">Scroll</div>
+<div class="bubble" id="bubble">Hi, I'm Bhanu.</div>
+
+<aside class="card" id="vcCard" aria-label="Verified Call">
+  <p class="k">Now building · Founder &amp; CEO</p>
+  <h2>Verified Call</h2>
+  <p class="big">0 of 3,990</p>
+  <p class="big-l">deepfake face swaps got through. Not one.</p>
+  <ul><li>30/30 hidden AI tools caught</li><li>20 companies in the beta</li><li>Built solo in 3 weeks</li></ul>
+  <a class="go" href="verified-call.html">Read the case study →</a>
+</aside>
+
+<div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+<div class="clock" id="clock"></div>
+<div id="track"></div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis.min.js"></script>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const Q = new URLSearchParams(location.search);
+const RAFSHIM = Q.has('rafshim');
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MOBILE = matchMedia('(max-width: 767px)').matches;
+const W = () => innerWidth || document.documentElement.clientWidth || 1280;
+const H = () => innerHeight || document.documentElement.clientHeight || 800;
+const $ = (id) => document.getElementById(id);
+const lerp = THREE.MathUtils.lerp, clamp = THREE.MathUtils.clamp;
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+
+/* ══ SAN FRANCISCO: real sun position + weather ═════════════════════════ */
+const SF = { lat: 37.7749, lon: -122.4194 };
+function sunAltAz(date, lat, lon) {
+  const rad = Math.PI / 180, d = date.getTime() / 864e5 + 2440587.5 - 2451545.0;
+  const g = (357.529 + 0.98560028 * d) * rad, q = 280.459 + 0.98564736 * d;
+  const L = (q + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * rad;
+  const e = (23.439 - 0.00000036 * d) * rad;
+  const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e) * Math.sin(L));
+  const gmst = ((18.697374558 + 24.06570982441908 * d) % 24 + 24) % 24;
+  const ha = (gmst * 15 + lon) * rad - ra, la = lat * rad;
+  const alt = Math.asin(Math.sin(la) * Math.sin(dec) + Math.cos(la) * Math.cos(dec) * Math.cos(ha));
+  const az = Math.atan2(-Math.sin(ha), Math.tan(dec) * Math.cos(la) - Math.sin(la) * Math.cos(ha));
+  return { alt: alt / rad, az: az / rad };
+}
+const PRESET = { night: -18, dusk: -4, golden: 3, day: 35 };
+let sunAlt = Q.has('alt') ? +Q.get('alt') : Q.has('time') ? PRESET[Q.get('time')] ?? -4 : sunAltAz(new Date(), SF.lat, SF.lon).alt;
+const weather = { fog: 0.35, rain: 0 };              // SF default: a little fog is honest
+if (Q.get('weather') === 'fog') weather.fog = 1;
+if (Q.get('weather') === 'rain') weather.rain = 1;
+if (Q.get('weather') === 'clear') weather.fog = 0.1;
+if (!Q.has('weather')) {
+  // Open-Meteo: free, no key, no personal data — just SF's coordinates
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${SF.lat}&longitude=${SF.lon}&current=weather_code,visibility`)
+    .then((r) => r.json()).then((j) => {
+      const c = j.current || {}, code = c.weather_code ?? 0, vis = c.visibility ?? 20000;
+      weather.fog = code === 45 || code === 48 ? 1 : clamp(1 - vis / 24000, 0.12, 0.85);
+      weather.rain = (code >= 51 && code <= 67) || (code >= 80 && code <= 82) ? 1 : 0;
+    }).catch(() => {});
+}
+function sfClock() {
+  const t = new Date().toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit' });
+  $('clock').textContent = `San Francisco · ${t}`;
+}
+sfClock(); setInterval(sfClock, 30000);
+
+/* sky palette keyed to sun altitude */
+const PAL = [
+  [-18, '#03060E', '#0A1426', '#000000'],
+  [-9,  '#060C22', '#1C2347', '#3a2a55'],
+  [-3,  '#0E1A4A', '#5A3F6E', '#ff8a4c'],
+  [2,   '#1D3A7E', '#F0905A', '#ffb070'],
+  [9,   '#3A6DBA', '#F4C79A', '#ffe0b0'],
+  [30,  '#3F86D9', '#BFD9F2', '#fff6e0'],
+];
+function palette(alt) {
+  const c = (h) => new THREE.Color(h);
+  if (alt <= PAL[0][0]) return PAL[0].slice(1).map(c);
+  for (let i = 0; i < PAL.length - 1; i++) {
+    const [a0, ...p0] = PAL[i], [a1, ...p1] = PAL[i + 1];
+    if (alt <= a1) { const t = (alt - a0) / (a1 - a0); return p0.map((h, k) => c(h).lerp(c(p1[k]), t)); }
+  }
+  return PAL[PAL.length - 1].slice(1).map(c);
+}
+const night = () => 1 - smooth(-6, 6, sunAlt);       // 1 = lights fully on
+
+/* ══ RENDERER ═══════════════════════════════════════════════════════════ */
+const renderer = new THREE.WebGLRenderer({ antialias: !MOBILE, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, MOBILE ? 1.5 : 2));
+renderer.setSize(W(), H());
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+$('gl').appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(MOBILE ? 52 : 38, W() / H(), 0.5, 4000);
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(W(), H()), 0.75, 0.55, 0.72);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+addEventListener('resize', () => {
+  camera.aspect = W() / H(); camera.updateProjectionMatrix();
+  renderer.setSize(W(), H()); composer.setSize(W(), H());
+});
+
+/* ══ SKY DOME ═══════════════════════════════════════════════════════════ */
+const sunDir = new THREE.Vector3();
+const skyMat = new THREE.ShaderMaterial({
+  side: THREE.BackSide, depthWrite: false, fog: false,
+  uniforms: { top: { value: new THREE.Color() }, hor: { value: new THREE.Color() }, sun: { value: new THREE.Color() },
+              sunDir: { value: sunDir }, stars: { value: 0 } },
+  vertexShader: `varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+  fragmentShader: `uniform vec3 top,hor,sun,sunDir; uniform float stars; varying vec3 vP;
+    float h(vec3 p){ return fract(sin(dot(p,vec3(12.9898,78.233,37.719)))*43758.5453); }
+    void main(){
+      float y = clamp(vP.y,-0.2,1.);
+      vec3 c = mix(hor, top, pow(smoothstep(-0.02,0.55,y),0.7));
+      float s = max(dot(normalize(vP), normalize(sunDir)),0.);
+      c += sun*(pow(s,6.)*0.55 + pow(s,64.)*1.4) * smoothstep(-0.25,0.15,sunDir.y+0.2);
+      vec3 q = floor(vP*480.); float st = step(0.9975, h(q)) * smoothstep(0.08,0.5,y) * stars;
+      c += vec3(st);
+      gl_FragColor = vec4(c,1.);
+    }`,
+});
+const sky = new THREE.Mesh(new THREE.SphereGeometry(1800, 32, 16), skyMat);
+scene.add(sky);
+
+/* lights */
+const hemi = new THREE.HemisphereLight('#7a8fd0', '#0a0d18', 0.6); scene.add(hemi);
+const sunLight = new THREE.DirectionalLight('#ffd2a0', 1.2); scene.add(sunLight);
+const moon = new THREE.DirectionalLight('#8fb0ff', 0.5); moon.position.set(200, 300, 300); scene.add(moon);
+scene.fog = new THREE.FogExp2('#1a2347', 0.0016);
+
+/* ══ TERRAIN: Marin headlands (left), the strait, San Francisco (right) ══ */
+function landH(x, z) {
+  const marin = smooth(-112, -150, x), sf = smooth(116, 142, x);
+  const n1 = Math.sin(x * 0.021 + z * 0.017), n2 = Math.sin(z * 0.034 - x * 0.012), n3 = Math.sin(x * 0.07 + z * 0.05);
+  const marinH = 22 + 26 * Math.abs(n1) + 12 * n2 + 3 * n3;
+  const sfH = 9 + 9 * (n1 * 0.5 + 0.5) + 6 * n2 + 2 * n3;
+  // a small lookout headland in the hero's lower right — Bhanu's bench
+  const look = 17 * Math.exp(-((x - 66) ** 2 + (z - 128) ** 2) / (2 * 15 * 15));
+  return -8 * (1 - Math.max(marin, sf)) + marin * marinH + sf * sfH + look;
+}
+{
+  const g = new THREE.PlaneGeometry(1600, 1200, MOBILE ? 140 : 220, MOBILE ? 100 : 160); g.rotateX(-Math.PI / 2);
+  const p = g.attributes.position, col = [], c = new THREE.Color(), lo = new THREE.Color('#1b2a3e'), hi = new THREE.Color('#3b5a52'), city = new THREE.Color('#2a3348');
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), z = p.getZ(i), y = landH(x, z); p.setY(i, y);
+    c.copy(lo).lerp(x > 0 ? city : hi, clamp(y / 40, 0, 1)); col.push(c.r, c.g, c.b);
+  }
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.computeVertexNormals();
+  scene.add(new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1 })));
+}
+/* the bay */
+const water = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), new THREE.MeshStandardMaterial({ color: '#1a2a4a', roughness: 0.22, metalness: 0.85 }));
+water.rotation.x = -Math.PI / 2; scene.add(water);
+/* the bay mirrors the live sky: rebuild the environment map whenever the sun moves */
+const pmrem = new THREE.PMREMGenerator(renderer), envScene = new THREE.Scene();
+envScene.add(new THREE.Mesh(sky.geometry, skyMat));
+let envAlt = null;
+function refreshEnv() {
+  if (envAlt !== null && Math.abs(envAlt - sunAlt) < 0.5) return;
+  envAlt = sunAlt; const old = scene.environment;
+  scene.environment = pmrem.fromScene(envScene, 0, 1, 4000).texture; if (old) old.dispose();
+}
+
+/* ══ THE GOLDEN GATE ════════════════════════════════════════════════════
+   Stylised, not survey-accurate: deck at y=14, towers at x=±60, anchorages at ±130.
+   Two main cables per side, suspenders, art-deco portal struts, deck lights, traffic. */
+// emissive = the bridge's floodlighting, scaled by night() in the loop
+const ORANGE = new THREE.MeshStandardMaterial({ color: '#C0402C', roughness: 0.55, metalness: 0.15, emissive: '#ff5a32', emissiveIntensity: 0 });
+const bridge = new THREE.Group(); scene.add(bridge);
+const DECK_Y = 14, TOP_Y = 52, TX = 60, AX = 132, CZ = 3.4;
+const cableY = (x) => { const a = Math.abs(x); return a <= TX ? 17 + (TOP_Y - 17) * (a / TX) ** 2 : 16 + (TOP_Y - 16) * ((AX - a) / (AX - TX)) ** 2; };
+// deck + truss
+{
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(AX * 2 + 20, 1.3, 7.6), ORANGE); deck.position.y = DECK_Y; bridge.add(deck);
+  const truss = new THREE.Mesh(new THREE.BoxGeometry(AX * 2 + 20, 2.2, 7), new THREE.MeshStandardMaterial({ color: '#7d2a1e', roughness: 0.7 }));
+  truss.position.y = DECK_Y - 1.7; bridge.add(truss);
+}
+// towers
+for (const sx of [-TX, TX]) {
+  const t = new THREE.Group(); t.position.x = sx;
+  const pier = new THREE.Mesh(new THREE.BoxGeometry(9, 5, 12), new THREE.MeshStandardMaterial({ color: '#5d6270', roughness: 0.9 }));
+  pier.position.y = 1.5; t.add(pier);
+  for (const z of [-CZ, CZ]) {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(2.4, TOP_Y + 2, 2.8), ORANGE); leg.position.set(0, (TOP_Y + 2) / 2, z); t.add(leg);
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(2.8, 1.2, 3.2), ORANGE); cap.position.set(0, TOP_Y + 2.6, z); t.add(cap);
+  }
+  for (const y of [DECK_Y + 9, DECK_Y + 19, DECK_Y + 28, TOP_Y - 1]) {   // portal struts
+    const s = new THREE.Mesh(new THREE.BoxGeometry(2, 2.2, CZ * 2), ORANGE); s.position.y = y; t.add(s);
+  }
+  // tower beacon (aircraft light) — red, blooms at night
+  const b = new THREE.Mesh(new THREE.SphereGeometry(0.45, 8, 6), new THREE.MeshBasicMaterial({ color: '#ff3b2f' }));
+  b.position.y = TOP_Y + 3.6; t.add(b); t.userData.beacon = b;
+  bridge.add(t);
+}
+// main cables
+for (const z of [-CZ, CZ]) {
+  const pts = []; for (let x = -AX; x <= AX; x += 3) pts.push(new THREE.Vector3(x, cableY(x), z));
+  bridge.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 240, 0.42, 6), ORANGE));
+}
+// suspenders (instanced)
+{
+  const xs = []; for (let x = -AX + 4; x <= AX - 4; x += MOBILE ? 4 : 2.4) if (Math.abs(Math.abs(x) - TX) > 1.8) xs.push(x);
+  const geo = new THREE.CylinderGeometry(0.07, 0.07, 1, 4); geo.translate(0, 0.5, 0);
+  const inst = new THREE.InstancedMesh(geo, ORANGE, xs.length * 2), m = new THREE.Matrix4();
+  let i = 0;
+  for (const x of xs) for (const z of [-CZ, CZ]) {
+    const h = cableY(x) - DECK_Y; m.makeScale(1, h, 1).setPosition(x, DECK_Y + 0.5, z); inst.setMatrixAt(i++, m);
+  }
+  bridge.add(inst);
+}
+// deck lights + cable lights (warm sodium) — emissive, scale with night()
+const lampMat = new THREE.MeshBasicMaterial({ color: '#ffc27a' });
+{
+  const pts = [];
+  for (let x = -AX; x <= AX; x += 6) for (const z of [-4.1, 4.1]) pts.push([x, DECK_Y + 1.6, z]);
+  for (let x = -AX; x <= AX; x += 9) for (const z of [-CZ, CZ]) pts.push([x, cableY(x) + 0.6, z]);
+  const inst = new THREE.InstancedMesh(new THREE.SphereGeometry(0.15, 6, 4), lampMat, pts.length), m = new THREE.Matrix4();
+  pts.forEach((p, i) => inst.setMatrixAt(i, m.makeTranslation(...p))); bridge.add(inst);
+}
+// traffic: head-lights one way, tail-lights the other
+const cars = [];
+{
+  const geo = new THREE.BoxGeometry(1.3, 0.35, 0.5);
+  for (const [dir, color, z] of [[1, '#fff4dc', -1.3], [-1, '#ff3a2a', 1.3]]) {
+    const n = MOBILE ? 18 : 34, inst = new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({ color }), n);
+    const xs = Array.from({ length: n }, () => -AX - 10 + Math.random() * (AX * 2 + 20));
+    bridge.add(inst); cars.push({ inst, dir, z, xs, speed: 9 + Math.random() * 4 });
+  }
+}
+
+/* ══ FOG under the deck — drifting soft layers, density from live weather ══ */
+function fogTex() {
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  // wrap-safe blobs: draw each one 9× (tiled neighbours) so the repeat has no seams
+  for (let i = 0; i < 46; i++) {
+    const x = Math.random() * 256, y = Math.random() * 256, r = 26 + Math.random() * 60;
+    for (const ox of [-256, 0, 256]) for (const oy of [-256, 0, 256]) {
+      const gr = g.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, r);
+      gr.addColorStop(0, 'rgba(255,255,255,.2)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+    }
+  }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+}
+// edge mask: fog is a band hugging the strait, fading out toward the shores and the camera
+function bandMask() {
+  const c = document.createElement('canvas'); c.width = 4; c.height = 128; const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 128);
+  gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.35, '#fff'); gr.addColorStop(0.65, '#fff'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 4, 128); return new THREE.CanvasTexture(c);
+}
+const fogLayers = [], mask = bandMask();
+for (const [y, s, d] of [[4, 1, 70], [8, 1.3, 56], [12, 1.7, 40]]) {
+  const tex = fogTex(); tex.repeat.set(3 * s, 0.5);
+  const mat = new THREE.MeshBasicMaterial({ map: tex, alphaMap: mask, transparent: true, depthWrite: false, opacity: 0.4, color: '#c9d4f0', fog: false });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(620, d), mat); m.rotation.x = -Math.PI / 2; m.position.set(0, y, 0);
+  scene.add(m); fogLayers.push({ m, tex, mat, s });
+}
+
+/* ══ SAN FRANCISCO blocks — windows on a canvas texture, lit by night() ══ */
+function windowTex(seed) {
+  const c = document.createElement('canvas'); c.width = 64; c.height = 128; const g = c.getContext('2d');
+  g.fillStyle = '#000'; g.fillRect(0, 0, 64, 128);
+  let s = seed; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  for (let y = 4; y < 124; y += 8) for (let x = 4; x < 60; x += 8) if (rnd() < 0.55) {
+    g.fillStyle = `hsl(${32 + rnd() * 12},90%,${55 + rnd() * 20}%)`; g.fillRect(x, y, 4, 5);
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.magFilter = THREE.NearestFilter; return t;
+}
+function segDist(px, pz, ax, az, bx, bz) {
+  const dx = bx - ax, dz = bz - az, t = clamp(((px - ax) * dx + (pz - az) * dz) / (dx * dx + dz * dz), 0, 1);
+  return Math.hypot(px - (ax + t * dx), pz - (az + t * dz));
+}
+const blockMats = [11, 23, 37, 51].map((s) => new THREE.MeshStandardMaterial({ color: '#283149', roughness: 0.85, emissive: '#ffffff', emissiveMap: windowTex(s), emissiveIntensity: 1 }));
+{
+  const geo = new THREE.BoxGeometry(1, 1, 1); geo.translate(0, 0.5, 0);
+  const per = MOBILE ? 90 : 180, m = new THREE.Matrix4();
+  blockMats.forEach((mat, k) => {
+    const inst = new THREE.InstancedMesh(geo, mat, per); let n = 0;
+    for (let tries = 0; n < per && tries < per * 8; tries++) {
+      const x = 150 + Math.random() * 420, z = -120 + Math.random() * 420;
+      if (Math.hypot(x - 232, z - 48) < 22) continue;          // keep the tower's plot clear
+      if (Math.hypot(x - 150, z - 120) < 26) continue;          // the bench lookout
+      if (segDist(x, z, 205, 178, 232, 48) < 26) continue;      // nothing between the end camera and the tower
+      const w = 4 + Math.random() * 6, d = 4 + Math.random() * 6, h = 3 + Math.random() ** 2.2 * 22;
+      m.makeScale(w, h, d).setPosition(Math.round(x / 9) * 9, landH(x, z) - 0.5, Math.round(z / 9) * 9);
+      inst.setMatrixAt(n++, m);
+    }
+    inst.count = n; scene.add(inst);
+  });
+}
+
+/* ══ VERIFIED CALL TOWER — placeholder massing until the Blender build ══ */
+const tower = new THREE.Group(); scene.add(tower);
+const TOWER = new THREE.Vector3(232, landH(232, 48), 48);
+tower.position.copy(TOWER);
+const towerWin = windowTex(97); towerWin.wrapS = towerWin.wrapT = THREE.RepeatWrapping; towerWin.repeat.set(2, 6);
+const towerMat = new THREE.MeshStandardMaterial({ color: '#2b3a5c', metalness: 0.55, roughness: 0.25, emissive: '#ffffff', emissiveMap: towerWin, emissiveIntensity: 0 });
+{
+  let y = 0;
+  for (const [r0, r1, h] of [[11, 10, 46], [10, 8.6, 12], [8.6, 7, 10], [7, 5.2, 8]]) {   // stepped, faceted (6-sided)
+    const seg = new THREE.Mesh(new THREE.CylinderGeometry(r1, r0, h, 6), towerMat); seg.position.y = y + h / 2; seg.rotation.y = 0.3;
+    tower.add(seg); y += h;
+  }
+  tower.userData.h = y;
+  // the logo — your real SVG, flush on the facade just below the crown
+  const img = new Image(); img.src = 'images/vc/verified-badge.svg';
+  img.onload = () => {
+    const c = document.createElement('canvas'); c.width = c.height = 256; c.getContext('2d').drawImage(img, 28, 28, 200, 200);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    const logo = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 5.2), new THREE.MeshBasicMaterial({ map: t, transparent: true, toneMapped: false }));
+    logo.position.set(0, 52, 10.25); logo.lookAt(TOWER.x - 60, TOWER.y + 52, TOWER.z + 200); tower.add(logo); tower.userData.logo = logo;
+  };
+}
+
+/* ══ BHANU ON THE BENCH — tiny, part of the scenery ═════════════════════ */
+const BENCH = new THREE.Vector3(64, landH(64, 128) + 0.05, 128);
+const benchG = new THREE.Group(); benchG.position.copy(BENCH); benchG.rotation.y = 2.6; benchG.scale.setScalar(1.4); scene.add(benchG);   // faces the bridge
+{
+  const wood = new THREE.MeshStandardMaterial({ color: '#4a3326', roughness: 0.8 }), dark = new THREE.MeshStandardMaterial({ color: '#0d1018', roughness: 0.7 });
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.12, 0.5), wood); seat.position.y = 0.48; benchG.add(seat);
+  const back = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.45, 0.08), wood); back.position.set(0, 0.8, -0.22); benchG.add(back);
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.42, 4, 8), dark); body.position.set(0.2, 0.86, 0); benchG.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.14, 12, 8), dark); head.position.set(0.2, 1.33, 0.02); benchG.add(head);
+  const laptop = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.22), new THREE.MeshBasicMaterial({ color: '#cfe4ff', side: THREE.DoubleSide }));
+  laptop.position.set(0.2, 0.78, 0.28); laptop.rotation.x = -0.5; benchG.add(laptop);
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 3, 6), dark); post.position.set(-1.3, 1.5, 0); benchG.add(post);
+  const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8), lampMat); lamp.position.set(-1.3, 3.05, 0); benchG.add(lamp);
+  const pl = new THREE.PointLight('#ffc27a', 6, 9, 1.6); pl.position.set(-1.3, 2.9, 0); benchG.add(pl); benchG.userData.light = pl;
+}
+
+/* ══ CAMERA PATH — hero on the bridge, scroll swings to the tower ═══════ */
+const SHOTS = MOBILE ? [
+  { pos: [60, 24, 205], look: [-10, 28, 0] },
+  { pos: [262, 34, 128], look: [232, 46, 48] },
+] : [
+  { pos: [78, 21, 168], look: [-18, 27, 0] },
+  { pos: [205, 36, 178], look: [266, 42, 40] },          // tower sits left-of-centre; the card takes the right
+];
+const camP = new THREE.Vector3(), camL = new THREE.Vector3(), a = new THREE.Vector3(), b = new THREE.Vector3();
+let progress = 0, shown = 0;
+
+/* scroll: Lenis smooths, ScrollTrigger maps the track to 0..1 */
+if (!REDUCED && window.Lenis) {
+  const lenis = new Lenis({ lerp: 0.09 });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((t) => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0);
+}
+gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.create({ trigger: '#track', start: 'top top', end: 'bottom bottom', onUpdate: (s) => { progress = s.progress; } });
+
+/* ══ LOOP ═══════════════════════════════════════════════════════════════ */
+const v = new THREE.Vector3(), mtx = new THREE.Matrix4();
+let t = 0;
+function step(dt) {
+  t += dt;
+  // time of day
+  const [top, hor, sunC] = palette(sunAlt), nt = night();
+  skyMat.uniforms.top.value.copy(top); skyMat.uniforms.hor.value.copy(hor); skyMat.uniforms.sun.value.copy(sunC);
+  skyMat.uniforms.stars.value = smooth(-4, -14, sunAlt);
+  refreshEnv();
+  // stylised: sets behind the bridge (left); by day it rides high on the right, away from the headline
+  const dayK = smooth(4, 22, sunAlt);
+  sunDir.set(lerp(-0.75, 0.7, dayK), Math.sin(THREE.MathUtils.degToRad(sunAlt)) * 1.4 + 0.02, -0.65).normalize();
+  skyMat.uniforms.sun.value.multiplyScalar(1 - 0.6 * dayK);
+  document.documentElement.classList.toggle('day', sunAlt > 8);
+  sunLight.position.copy(sunDir).multiplyScalar(500); sunLight.color.copy(sunC); sunLight.intensity = 0.3 + 1.6 * smooth(-6, 12, sunAlt);
+  hemi.color.copy(top).lerp(new THREE.Color('#8aa0e0'), 0.4); hemi.intensity = 0.35 + 0.6 * smooth(-10, 20, sunAlt);
+  scene.fog.color.copy(hor).lerp(top, 0.55); scene.fog.density = 0.0011 + weather.fog * 0.0012;
+  lampMat.color.setRGB(1, 0.76, 0.48).multiplyScalar(0.35 + 1.6 * nt);
+  ORANGE.emissiveIntensity = 0.03 + 0.2 * nt;                                         // floodlit after sunset
+  blockMats.forEach((m) => { m.emissiveIntensity = 0.05 + 1.25 * nt; });
+
+  // fog drifts in from the Pacific (left → right)
+  fogLayers.forEach((f, i) => {
+    f.tex.offset.x -= dt * 0.006 * (1 + i * 0.4);
+    f.mat.opacity = (0.12 + 0.38 * weather.fog) * (0.9 - i * 0.2);
+    f.mat.color.copy(hor).lerp(top, 0.35).lerp(new THREE.Color('#cdd6ee'), 0.3);
+  });
+
+  // traffic
+  cars.forEach((c) => {
+    for (let i = 0; i < c.xs.length; i++) {
+      c.xs[i] += c.dir * c.speed * dt;
+      if (c.xs[i] > AX + 10) c.xs[i] = -AX - 10; if (c.xs[i] < -AX - 10) c.xs[i] = AX + 10;
+      c.inst.setMatrixAt(i, mtx.makeTranslation(c.xs[i], DECK_Y + 0.9, c.z));
+    }
+    c.inst.instanceMatrix.needsUpdate = true;
+  });
+  bridge.children.forEach((o) => { if (o.userData.beacon) o.userData.beacon.material.color.setRGB(1, 0.23, 0.18).multiplyScalar(0.4 + (Math.sin(t * 3) > 0.6 ? 2.2 : 0.3) * nt); });
+
+  // scroll → shot
+  shown += (progress - shown) * Math.min(1, dt * (REDUCED ? 30 : 5));
+  const k = smooth(0.05, 0.62, shown);
+  a.fromArray(SHOTS[0].pos).lerp(b.fromArray(SHOTS[1].pos), k);
+  camP.copy(a).add(v.set(0, Math.sin(k * Math.PI) * 26, 0));                         // arc up and over
+  camL.fromArray(SHOTS[0].look).lerp(v.fromArray(SHOTS[1].look), smooth(0.08, 0.7, shown));
+  camera.position.copy(camP); camera.lookAt(camL);
+
+  // the tower lights floor by floor as we arrive; logo comes on last
+  const lit = smooth(0.45, 0.85, shown);
+  towerMat.emissiveIntensity = (0.15 + 1.3 * Math.max(nt, 0.35)) * lit;
+  towerWin.offset.y = -1 + lit;                                                        // windows "fill" bottom → top
+  if (tower.userData.logo) tower.userData.logo.material.opacity = smooth(0.78, 0.95, shown);
+
+  // UI
+  const heroOut = smooth(0.02, 0.22, shown);
+  $('hero').style.opacity = 1 - heroOut; $('hero').style.transform = `translateY(${-heroOut * 40}px)`;
+  $('scrollHint').style.opacity = 1 - smooth(0, 0.06, shown);
+  const cardIn = smooth(0.78, 0.95, shown), card = $('vcCard');
+  card.style.opacity = cardIn; card.style.pointerEvents = cardIn > 0.5 ? 'auto' : 'none';
+  if (!MOBILE) card.style.transform = `translateY(calc(-50% + ${(1 - cardIn) * 24}px))`;
+  document.querySelectorAll('.dots i').forEach((d, i) => d.classList.toggle('on', i === (shown > 0.6 ? 1 : 0)));
+
+  composer.render();
+
+  // speech bubble follows the bench
+  v.copy(BENCH).add(new THREE.Vector3(0, 2.2, 0)).project(camera);
+  const bub = $('bubble'), vis = v.z < 1 && Math.abs(v.x) < 1 && Math.abs(v.y) < 1;
+  bub.style.opacity = vis ? (1 - smooth(0.04, 0.2, shown)) : 0;
+  bub.style.transform = `translate(${(v.x * 0.5 + 0.5) * W()}px,${(-v.y * 0.5 + 0.5) * H()}px) translate(-8px,-100%)`;
+}
+
+let last = performance.now();
+function frame(now) {
+  now = now || performance.now(); const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  step(dt); if (!RAFSHIM) requestAnimationFrame(frame);
+}
+if (RAFSHIM) setInterval(() => frame(performance.now()), 16); else requestAnimationFrame(frame);
+
+window.__city = {
+  progress: (p) => { progress = p; shown = p; step(0.016); },
+  setAlt: (d) => { sunAlt = d; step(0.016); },
+  get state() { return { sunAlt: +sunAlt.toFixed(1), weather: { ...weather }, progress: +shown.toFixed(3) }; },
+};
+</script>
+</body>
+</html>

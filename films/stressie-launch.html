@@ -1,0 +1,128 @@
+<!doctype html>
+<!-- (12 Nov, owner: "these are not actually the screens") screens are the current build from the simulator (real-*.webp / hero-rewards.webp), never the old captures -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stressie launch film</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&display=swap" rel="stylesheet">
+<!--
+  Launch film for Stressie V4 (iOS). Plays inside a painted portrait phone screen: the stage IS the screen, so real
+  SwiftUI captures fill it edge to edge (no phone frame). Fixed 900x1950 (9:19.5) stage, scaled to fit its box. ~21 s loop.
+  Facts: 12% -> 56% daily engagement, $600K funding unlocked. Same structure/API as films/vc-launch.html.
+  Parent may post {type:'film', play:true|false}.
+-->
+<style>
+  *{box-sizing:border-box;margin:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:#0A0B0F}
+  body{font-family:'Montserrat',sans-serif;color:#F7F5F0;-webkit-font-smoothing:antialiased}
+  #stage{position:absolute;left:50%;top:50%;width:900px;height:1950px;transform:translate(-50%,-50%) scale(var(--s,1));overflow:hidden;
+    background:radial-gradient(110% 60% at 50% 0%,#2A1C14 0%,#0A0B0F 70%)}
+  .sc{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}
+  .sc.on{opacity:1}
+  .big{position:absolute;left:60px;right:60px;top:50%;transform:translateY(-50%);text-align:center;font-weight:800;font-size:128px;line-height:1.04;letter-spacing:-.045em}
+  .big .w{display:inline-block;opacity:0;transform:translateY(40px);transition:opacity .5s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+  .on .big .w{opacity:1;transform:none}
+  .on .big .w:nth-child(2){transition-delay:.08s}.on .big .w:nth-child(3){transition-delay:.16s}.on .big .w:nth-child(4){transition-delay:.24s}
+  .on .big .w:nth-child(5){transition-delay:.32s}.on .big .w:nth-child(6){transition-delay:.40s}.on .big .w:nth-child(7){transition-delay:.48s}
+  .muted{color:#8C93A3}
+  .acc{color:#FF8A3D}
+
+  /* real screens, edge to edge */
+  .scr{position:absolute;inset:0;background:#F6F1E8}
+  .scr img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:translateX(6%);transition:opacity .45s,transform .55s cubic-bezier(.2,.8,.2,1)}
+  .scr img.on{opacity:1;transform:none}
+  .scr img.out{opacity:0;transform:translateX(-6%)}
+  .finger{position:absolute;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;background:rgba(30,30,30,.22);border:6px solid rgba(255,255,255,.95);z-index:4;opacity:0;
+    transition:left 1s cubic-bezier(.45,0,.25,1),top 1s cubic-bezier(.45,0,.25,1),opacity .3s,transform .18s}
+  .finger.press{transform:scale(.8)}
+  .pop{position:absolute;left:50%;top:27%;z-index:5;transform:translate(-50%,0) scale(.6);padding:26px 50px;border-radius:999px;background:#FF8A3D;color:#1A0F08;
+    font-weight:800;font-size:96px;letter-spacing:-.04em;white-space:nowrap;opacity:0;transition:opacity .4s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+  .pop.on{opacity:1;transform:translate(-50%,-60px) scale(1)}
+
+  /* proof */
+  .stats{position:absolute;left:70px;right:70px;top:50%;transform:translateY(-50%);display:grid;gap:130px}
+  .stat{opacity:0;transform:translateY(30px);transition:opacity .5s ease,transform .8s cubic-bezier(.16,1,.3,1)}
+  .on .stat{opacity:1;transform:none}.on .stat:nth-child(2){transition-delay:.3s}
+  .stat b{display:block;font-weight:800;font-size:200px;letter-spacing:-.055em;line-height:1}
+  .stat b i{font-style:normal;color:#FF8A3D}
+  .stat span{display:block;margin-top:22px;font-weight:500;font-size:52px;line-height:1.25;color:#A9B0BE}
+
+  .end .big{font-size:150px}
+  .pop{display:none!important}   /* the real reward screen already says "+10 reset coins" */
+</style>
+</head>
+<body>
+<div id="stage" aria-hidden="true">
+  <section class="sc" id="s1"><p class="big"><span class="w">A</span> <span class="w acc">stress</span><br><span class="w acc">check-in</span> <span class="w">that</span><br><span class="w">pays</span> <span class="w">for</span> <span class="w">your</span><br><span class="w">evening.</span></p></section>
+
+  <section class="sc" id="s2">
+    <div class="scr" id="p1"><img data-n="checkin-shape" src="../images/stressie-v4/real-checkin.webp" alt=""><img data-n="checkin-reward" src="../images/stressie-v4/real-reward.webp" alt=""><i class="finger"></i><span class="pop">+10 coins</span></div>
+  </section>
+
+  <section class="sc" id="s3"><p class="big"><span class="w">Spent</span><br><span class="w acc">after</span> <span class="w acc">work.</span></p></section>
+
+  <section class="sc" id="s4">
+    <div class="scr" id="p2"><img data-n="offwork-map" src="../images/stressie-v4/real-map.webp" alt=""><img data-n="offwork-redeem" src="../images/stressie-v4/hero-rewards.webp" alt=""><i class="finger"></i></div>
+  </section>
+
+  <section class="sc" id="s5">
+    <div class="stats">
+      <div class="stat"><b>12%<i> → </i>56%</b><span>daily engagement</span></div>
+      <div class="stat"><b>$600K</b><span>funding unlocked</span></div>
+    </div>
+  </section>
+
+  <section class="sc end" id="s6"><p class="big"><span class="w acc">Stressie.</span></p></section>
+</div>
+<script>
+(function () {
+  var st = document.getElementById('stage');
+  function fit() { st.style.setProperty('--s', Math.min(innerWidth / 900, innerHeight / 1950)); }
+  addEventListener('resize', fit); fit();
+  var $ = function (id) { return document.getElementById(id); }, T = [], playing = true;
+  function at(ms, fn) { T.push(setTimeout(fn, ms)); }
+  function show(id) { [].forEach.call(document.querySelectorAll('.sc'), function (s) { s.classList.toggle('on', s.id === id); }); }
+  function img(box, n) { [].forEach.call($(box).querySelectorAll('img'), function (im) {
+    var on = im.dataset.n === n;
+    if (im.classList.contains('on') && !on) { im.classList.add('out'); setTimeout(function () { im.classList.remove('out'); }, 500); }
+    im.classList.toggle('on', on); }); }
+  function finger(box, x, y, vis) { var f = $(box).querySelector('.finger'); f.style.left = x + '%'; f.style.top = y + '%'; f.style.opacity = vis ? 1 : 0; }
+  function tap(box) { var f = $(box).querySelector('.finger'); f.classList.add('press'); setTimeout(function () { f.classList.remove('press'); }, 180); }
+  function reset() {
+    $('p1').querySelector('.pop').classList.remove('on');
+    [].forEach.call(document.querySelectorAll('.scr img'), function (i) { i.classList.remove('on', 'out'); });
+    [].forEach.call(document.querySelectorAll('.finger'), function (f) { f.style.transition = 'none'; f.style.opacity = 0; void f.offsetWidth; f.style.transition = ''; });
+    finger('p1', 4, 72, false); finger('p2', 60, 40, false);
+  }
+  function run() {
+    T.forEach(clearTimeout); T = []; reset();
+    show('s1');
+    at(2800, function () { img('p1', 'checkin-shape'); show('s2'); });
+    at(3300, function () { finger('p1', 4, 72, true); });
+    at(3900, function () { finger('p1', 70, 72, true); });
+    at(5600, function () { finger('p1', 72, 55, false); img('p1', 'checkin-reward'); });
+    at(6000, function () { $('p1').querySelector('.pop').classList.add('on'); });
+    at(8400, function () { show('s3'); });
+    at(10200, function () { img('p2', 'offwork-map'); show('s4'); });
+    at(10800, function () { finger('p2', 60, 40, true); });
+    at(11800, function () { tap('p2'); });
+    at(12200, function () { img('p2', 'offwork-redeem'); finger('p2', 60, 40, false); });
+    at(14800, function () { show('s5'); });
+    at(18800, function () { show('s6'); });
+    at(21200, run);
+  }
+  // a11y: hold still on the proof frame when the visitor prefers reduced motion or the page's motion is paused
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  try { still = still || parent.document.documentElement.classList.contains('motion-paused'); } catch (e) {}
+  if (still) { playing = false; var scs = [].slice.call(document.querySelectorAll('.sc')); var pf = scs.filter(function (s) { return s.querySelector('.stat,.stats,.proof,[class*="stat"]'); })[0] || scs[0]; show(pf.id); }
+  else run();
+  addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'film') return;
+    if (e.data.play && !playing) { playing = true; run(); }
+    else if (!e.data.play && playing) { playing = false; T.forEach(clearTimeout); T = []; }
+  });
+})();
+</script>
+</body>
+</html>

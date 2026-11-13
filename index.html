@@ -22,6 +22,7 @@
 <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400..800;1,400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Urbanist:ital,wght@0,300..700;1,300..600&family=Caveat:wght@600&display=swap" rel="stylesheet" />
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -4817,6 +4818,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 </script>
 </head>
 <body>
+  <a class="skip-link" href="#chapters">Skip to work</a>
   <!-- The Dearly announcement strip is out. Its CSS and its dismiss/scroll
        IIFE both remain and both no-op without this element, and <html> now
        carries anno-off so --anno-h collapses to 0 — restoring the strip is
@@ -4951,7 +4953,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       position: absolute; left: 0; right: 0; top: 0; text-align: center;
       white-space: nowrap;
       transform: translateY(135%); opacity: 0; filter: blur(10px);
-      transition: transform .3s var(--ease-expo), opacity .22s ease, filter .25s ease;
+      transition: transform .45s var(--ease-expo), opacity .32s ease, filter .36s ease;
     }
     .v6l-word.is-on   { transform: translateY(0);      opacity: 1; filter: blur(0); }
     .v6l-word.is-past { transform: translateY(-135%);  opacity: 0; filter: blur(6px); }
@@ -5008,6 +5010,33 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .v6l-word { transform: none; filter: none; transition: opacity .45s ease; }
       .v6l-word.is-past { transform: none; }
     }
+
+    /* ══ v7 (12 Nov, owner: "designed with the previous design system"): the loader IS the hero, out of focus.
+       The painted Golden Gate plate fills the frame, blurred, and pulls into focus as the page REALLY loads
+       (--p = the honest bar); Montserrat bold words, a colourless glass track, then a crossfade onto the live hero.
+       Portrait, rings, ticks, azure bar and the wordmark are retired (hidden, not deleted). */
+    #v6Loader{background:#1a1622;--p:0}
+    #v6Loader .v6l-geo,#v6Loader .v6l-tick,#v6Loader .v6l-glow,#v6Loader .v6l-brand{display:none!important}
+    #v6Loader .v6l-portrait{left:0;top:0;width:100%;height:100%;aspect-ratio:auto;-webkit-mask-image:none;mask-image:none;
+      transform:scale(1.12);opacity:0;transition:opacity .6s ease}
+    #v6Loader.img-in .v6l-portrait{opacity:1;transform:scale(calc(1.12 - .12*var(--p)))}
+    #v6Loader .v6l-portrait img{-webkit-mask-image:none;mask-image:none;object-fit:cover;
+      filter:blur(calc(28px - 28px*var(--p))) brightness(calc(.62 + .38*var(--p))) saturate(1.1)}
+    #v6Loader .v6l-copy{top:50%;transform:translate(-50%,-40%)}
+    #v6Loader.copy-live .v6l-copy{transform:translate(-50%,-50%)}
+    #v6Loader .v6l-words{font-family:'Montserrat',var(--sans);font-weight:700;letter-spacing:-.035em;color:#FFFCF8;font-size:clamp(40px,6.4vw,92px)}
+    #v6Loader .v6l-words .serif{font-family:inherit;font-style:normal;font-weight:700;letter-spacing:inherit;font-size:1em}
+    #v6Loader .v6l-meta{margin-top:28px;gap:16px}
+    #v6Loader .v6l-track{width:200px;height:6px;padding:0;border-radius:999px;background:rgba(255,255,255,.14);
+      -webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,255,255,.18)}
+    #v6Loader .v6l-bar{background:#FFFCF8;box-shadow:none;border-radius:999px}
+    #v6Loader .v6l-count{font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(255,252,248,.8)}
+    #v6Loader .v6l-grain{opacity:.05}
+    #v6Loader{transition:opacity .9s ease}
+    #v6Loader.is-up{transform:none;opacity:0}
+    @media (max-width:760px){#v6Loader .v6l-portrait{height:100%}#v6Loader .v6l-copy{top:50%}#v6Loader .v6l-words{font-size:clamp(34px,10vw,48px)}}
+    @media (prefers-reduced-motion:reduce){#v6Loader .v6l-portrait,#v6Loader.img-in .v6l-portrait{transform:none}#v6Loader .v6l-portrait img{filter:blur(calc(14px - 14px*var(--p))) brightness(.8)}}
   </style>
 
   <div id="v6Loader" hidden role="status" aria-label="Loading portfolio">
@@ -5024,7 +5053,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <span class="v6l-tick v6l-tick--br" aria-hidden="true"></span>
     <div class="v6l-glow" aria-hidden="true"></div>
     <figure class="v6l-portrait" aria-hidden="true">
-      <img src="images/loader-portrait.webp?v=2" alt="" width="1050" height="1400"
+      <img src="city/layers/gg_ai/plate.webp" alt="" width="1672" height="941"
            fetchpriority="high" decoding="async">
     </figure>
     <div class="v6l-copy" aria-hidden="true">
@@ -5051,6 +5080,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
          which still plays its own word cascade on load */
       var seen = false;
       try { seen = sessionStorage.getItem('v6loaderPlayed') === '1'; } catch (e) {}
+      seen = true;   // (12 Nov, owner) loader switched off: the hero's own title drop is the opening; block kept, never shown
       if (seen) { loader.style.display = 'none'; return; }
       /* reduced motion: no title sequence at all, the hero shows on load */
       if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -5141,7 +5171,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
       // words appear only once the copy is live, and never faster than one
       // beat apiece — but their order is always progress-true
-      var WORD_AT = [0, 0.26, 0.52, 0.76], wordIdx = -1, WORD_BEAT = 150;
+      var WORD_AT = [0, 0.26, 0.52, 0.76], wordIdx = -1, WORD_BEAT = 500;   // ~½ s per word — 150 flashed past unread
       function setWord(p) {
         if (!copyT) return;
         var n = 0, j;
@@ -5156,7 +5186,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         wordIdx = n;
       }
 
-      var shown = 0, exiting = false, RAMP = 550;
+      var shown = 0, exiting = false, RAMP = 1800;   // bar sweep paced to the slower words, so "Repeat." holds before the lift
       (function step() {
         var elapsed  = performance.now() - t0;
         var assetsIn = collected && assetDone >= assetTarget;
@@ -5174,6 +5204,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
         if (barEl) barEl.style.transform = 'scaleX(' + shown.toFixed(4) + ')';
         if (pctEl) pctEl.textContent = Math.round(shown * 100);
+        loader.style.setProperty('--p', shown.toFixed(3));   // v7: the plate pulls into focus with the real progress
         setWord(shown);
 
         // leave only when the bar is truly full AND "Repeat." has landed
@@ -5185,17 +5216,152 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       })();
 
       // hard safety net — never leave the loader stuck
-      setTimeout(hideLoader, MAX_HOLD + 900);
+      setTimeout(hideLoader, 3400);   // > copy delay + 3 word beats + bar ramp, so it never cuts "Repeat." short
     })();
   </script>
 
+  <main id="main">
   <section class="hero">
-    <video class="hero-plate" id="heroPlate" autoplay muted loop playsinline
-           poster="images/silhouette-poster.webp" src="images/silhouette-1600.mp4"
-           aria-hidden="true"></video>
-    <div class="hero-scrim" aria-hidden="true"></div>
-    <div class="hero-vig" aria-hidden="true"></div>
-    <div class="hero-grain" aria-hidden="true"></div>
+    <!-- THE CITY: the living Golden Gate scene (poster-lab.html, embed mode) replaces the
+         silhouette video. Its own WebGL page in a frame, so it can't collide with this page's
+         scripts; pointer-events off so wheel/touch scroll the homepage. The host posts hero
+         scroll progress to it (poster-scroll) for the push-in. -->
+    <h1 class="sr-only">Hi, this is Bhanu Kowshik: product engineer shipping AI products from problem to code. Currently building Verified Call.</h1>
+    <!-- "Currently building Verified Call": plain status line over the scene; the chat bar is the one action -->
+    <a class="hero-building hero-pill" id="heroBuilding" href="verified-call.html"><span>Currently building <b>Verified Call</b></span> <i aria-hidden="true"><svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M3 9L9 3M4 3h5v5"/></svg></i></a>
+    <style>
+      .hero .hero-building{position:absolute;left:50%;top:16vh;transform:translateX(-50%);z-index:3;display:inline-flex;align-items:center;gap:6px;
+        font-family:'JetBrains Mono',monospace;font-size:clamp(11px,.9vw,13px);letter-spacing:.12em;text-transform:uppercase;line-height:1.2;
+        color:rgba(255,252,248,.88);text-decoration:none;white-space:nowrap;padding:4px 2px;transition:color .2s}
+      .hero .hero-building{display:none!important}   /* (12 Nov) cut: the first work card says it */
+      .hero .hero-building-old{margin:0;pointer-events:none}   /* status, not a CTA: the chat bar is the hero's one action (owner, 12 Nov) */
+      .hero .hero-building b{font-weight:500;color:#FFFCF8}
+      .hero .hero-building svg{width:1.1em;height:1.1em;transition:transform .25s}
+      /* nav (owner, 12 Nov): no name, no avatar; About me · Work · Résumé · Contact on the right in one deep, colourless liquid-glass bar */
+      .top-nav .nav-brand{display:none!important}
+      .top-nav,.top-nav.scrolled,.top-nav.is-scrolled,.top-nav.solid{justify-content:center!important;   /* centred (owner, 12 Nov) */background:none!important;box-shadow:none!important;
+        -webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:0!important}
+      /* the entrance animation must not hold its last frame: a filled opacity animation makes the nav a backdrop root and Chrome then blurs nothing (owner saw no glass, 12 Nov) */
+      html.hero-go .top-nav{animation-fill-mode:backwards!important}
+      .top-nav .nav-links{display:flex;align-items:center;gap:2px;padding:6px;border-radius:999px;
+        background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.04)),rgba(14,18,26,.30);
+        -webkit-backdrop-filter:blur(26px) saturate(1.9) brightness(1.02);backdrop-filter:blur(26px) saturate(1.9) brightness(1.02);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.12),inset 0 0 0 1px rgba(255,255,255,.16)}
+      .top-nav .nav-links a{color:#fff!important;font-weight:600;padding:9px 16px;border-radius:999px;transition:background .25s;text-shadow:none!important;filter:none!important}
+      .top-nav,.top-nav *{text-shadow:none!important}
+      .top-nav .nav-links a::after,.top-nav .nav-links a::before{display:none!important}   /* no hover underline: the glass highlight is the hover */
+      .top-nav .nav-links a:hover{background:rgba(255,255,255,.14)}
+      .top-nav .nav-burger{border-radius:999px;-webkit-backdrop-filter:blur(22px) saturate(1.9);backdrop-filter:blur(22px) saturate(1.9);
+        background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.03)),rgba(14,18,26,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 0 0 1px rgba(255,255,255,.16)}
+      html.hero-wait .hero .hero-building{opacity:0}
+      html.hero-go .hero .hero-building{animation:hbIn .9s cubic-bezier(.2,.8,.2,1) 1.5s both}
+      @keyframes hbIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+      @media (prefers-reduced-motion:reduce){ html.hero-go .hero .hero-building{animation:none} }
+      .hero .hero-building:hover b{border-bottom-color:#FFFCF8}
+      .hero .hero-building:hover svg{transform:translate(2px,-2px)}
+      @media (max-width:767px){ .hero .hero-building{top:16vh;font-size:10px;letter-spacing:.08em} }
+    </style>
+    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=26" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
+            tabindex="-1" loading="eager"></iframe>
+    <style>
+      .hero .hero-city{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:0;background:#0A1430}
+      /* the scene carries the greeting (HI, I'M BHANU + line); the hero keeps only the nav + chat bar */
+      /* !important: the hero's own rules load later in the file and would otherwise win */
+      .hero .copy .eyebrow, .hero .copy h1, .hero .copy .proof, .hero .stack{display:none!important}
+      .hero .copy{position:absolute!important;left:0!important;right:0!important;top:auto!important;
+                  bottom:clamp(14px,2.4vh,26px)!important;margin:0!important;padding:0!important;max-width:none!important;
+                  width:auto!important;height:auto!important;min-height:0!important;transform:none!important;
+                  display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;z-index:2}
+      .hero .copy .cta-dock{margin:0!important;justify-content:center!important}
+    </style>
+    <script>
+      (function () {   // hero scroll → the scene's camera push-in
+        var f = document.getElementById('heroCity'), hero = f && f.closest('.hero');
+        if (!f || !hero) return;
+        var raf = 0;
+        function send() { raf = 0;
+          var p = Math.min(1, Math.max(0, window.scrollY / Math.max(1, hero.offsetHeight)));
+          try { f.contentWindow.postMessage({ type: 'poster-scroll', p: p }, location.origin); } catch (e) {}
+          var hb = document.getElementById('heroBuilding');
+          if (hb) { var k = Math.min(1, p / 0.35);   }
+        }
+        addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(send); }, { passive: true });
+        f.addEventListener('load', send);
+      })();
+    </script>
+
+    <!-- Liquid glass chat bar (owner, 12 Nov: "proper liquid glass"). The glass itself is a real lens
+         rendered by the scene's WebGL engine (poster-lab.html, LIQUID GLASS): this page posts the bar's
+         rect every frame it moves, and once the scene answers 'glass-ready' the HTML bar goes clear
+         (html.lens-on) and keeps only the orb, the text and the click. Same in Chrome, Safari, iOS and
+         Android. The frosted CSS below is the fallback where the scene can't run WebGL. -->
+    <style>
+      .hero .cta-dock .cta{
+        position:relative;isolation:isolate;overflow:hidden;color:#fff;
+        background:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.05) 100%),
+                   linear-gradient(rgba(12,24,54,.2),rgba(12,24,54,.2))!important;   /* smoke keeps white text legible over bright water */
+        -webkit-backdrop-filter:blur(14px) saturate(1.8) brightness(1.05);
+                backdrop-filter:blur(14px) saturate(1.8) brightness(1.05);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 1px rgba(255,255,255,.22),
+                   0 12px 32px -10px rgba(10,20,48,.45),0 2px 8px rgba(10,20,48,.14)!important;
+        transition:transform .4s var(--ease),background .45s var(--ease),box-shadow .45s var(--ease);
+      }
+      .hero .cta-dock .cta::before{     /* the rim: bright where the light hits (top-left, bottom-right) */
+        content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:1;
+        background:linear-gradient(135deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.18) 30%,
+                   rgba(255,255,255,0) 55%,rgba(255,255,255,.18) 78%,rgba(255,255,255,.7) 100%);
+        -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+        -webkit-mask-composite:xor;mask-composite:exclude;
+      }
+      .hero .cta-dock .cta::after{      /* the sheen across the upper half */
+        content:'';position:absolute;left:6%;right:6%;top:1px;height:48%;border-radius:999px;pointer-events:none;z-index:0;
+        background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0));
+      }
+      .hero .cta-dock .cta>*{position:relative;z-index:2}
+      .hero .cta-dock .cta .cta-text span{color:#fff;font-weight:600}
+      .hero .cta-dock .cta:hover{
+        background:linear-gradient(180deg,rgba(255,255,255,.3) 0%,rgba(255,255,255,.1) 100%),
+                   linear-gradient(rgba(12,24,54,.16),rgba(12,24,54,.16))!important;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 1px rgba(255,255,255,.3),
+                   0 16px 38px -10px rgba(10,20,48,.5),0 2px 8px rgba(10,20,48,.16)!important}
+      .hero .cta-dock .cta:active{transform:translateY(0) scale(.98)}
+      html.lens-on .hero .cta-dock .cta,html.lens-on .hero .cta-dock .cta:hover{
+        background:transparent!important;box-shadow:none!important;
+        -webkit-backdrop-filter:none;backdrop-filter:none}
+      html.lens-on .hero .cta-dock .cta::before,html.lens-on .hero .cta-dock .cta::after{display:none}
+      @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+        .hero .cta-dock .cta{background:rgba(16,28,60,.55)!important}
+      }
+    </style>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {   // chat bar rect → the scene's glass lens
+        var f = document.getElementById('heroCity'), el = document.getElementById('cta');
+        if (!f || !el) return;
+        var dock = el.parentElement, hv = false, last = '', raf = 0, live = true;
+        function op(n) { var o = 1; for (var i = 0; n && i < 4; i++, n = n.parentElement) o *= +getComputedStyle(n).opacity; return o; }
+        function tick() {
+          raf = 0;
+          var fr = f.getBoundingClientRect(), r = el.getBoundingClientRect();
+          var onScreen = fr.bottom > 0 && fr.top < innerHeight;
+          var msg = { type: 'glass', x: r.left - fr.left, y: r.top - fr.top, w: r.width, h: r.height,
+                      r: parseFloat(getComputedStyle(el).borderTopLeftRadius) || 16,
+                      a: onScreen && r.width > 0 ? op(el) : 0, hv: hv };
+          var key = [msg.x, msg.y, msg.w, msg.h, msg.r, msg.a, hv].map(function (v) { return Math.round(+v * 100); }).join();
+          if (key !== last) { last = key; try { f.contentWindow.postMessage(msg, location.origin); } catch (e) {} }
+          if (live && onScreen) raf = requestAnimationFrame(tick);   // follows rise-in, width morphs, press
+        }
+        function kick() { if (!raf) raf = requestAnimationFrame(tick); }
+        el.addEventListener('mouseenter', function () { hv = true; kick(); });
+        el.addEventListener('mouseleave', function () { hv = false; kick(); });
+        addEventListener('scroll', kick, { passive: true }); addEventListener('resize', kick);
+        f.addEventListener('load', function () { last = ''; tick(); });
+        addEventListener('message', function (e) {
+          if (e.origin === location.origin && e.data && e.data.type === 'glass-ready' && e.source === f.contentWindow) document.documentElement.classList.add('lens-on');
+        });
+        window.__lensTick = tick;   // preview panes pause rAF; lets a test drive one update
+        tick();
+      });
+    </script>
 
     <nav class="top-nav" id="topNav">
       <a class="nav-brand" href="#top">
@@ -5211,7 +5377,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </span>
       </a>
       <div class="nav-links">
-        <a href="#work">Work</a><a href="#shortsSection">Shorts</a><a href="#aboutSection">About</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a>
+        <a href="#chapters">Work</a><a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé<span class="sr-only"> (opens in a new tab)</span></a>
         <a href="#contactSection">Contact</a>
       </div>
       <button class="nav-burger" id="navBurger" aria-label="Open menu"
@@ -5221,25 +5387,23 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     </nav>
 
     <div class="copy">
-      <p class="eyebrow role-line"><span class="role">Design engineer</span><span class="sep" aria-hidden="true"></span><span>Currently building <a href="verified-call.html"><img src="images/vc/verified-badge.svg" alt="" width="18" height="18">Verified Call</a> as a founder</span></p>
-      <h1>I design AI products that <span class="serif">scale, convert, and connect.</span></h1>
+      <p class="eyebrow role-line"><span class="role">Design engineer</span><span class="sep" aria-hidden="true"></span><span>Currently building <a href="verified-call.html">Verified Call<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></span></p>
+      <h1>I design and build AI products that <span class="serif">scale, convert, and connect.</span></h1>
       <div class="proof">
         <div><b>3 weeks</b><span>to design and build Verified Call, solo</span></div>
         <div><b>2,000+</b><span>students a day on EverTutor, where I was the sole designer</span></div>
       </div>
 
       <div class="cta-dock">
-        <!-- one plain action plus the chat bar; Contact lives in the nav -->
-        <a class="btn-primary hero-btn" href="#work">See the work
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a>
+        <!-- recruiter pass (12 Nov): the chat bar opens with pointed prompts (See work / Résumé pills tried, removed by owner) -->
 <!-- (orb canvas fill fix lives in CSS: the WebGL canvas keeps its
              mount-time pixel size, so it must stretch to the well) -->
-        <button class="cta" id="cta" aria-label="Chat with Bhanu AI" aria-haspopup="dialog">
+        <button class="cta" id="cta" aria-describedby="ctaHint" aria-haspopup="dialog"><span id="ctaHint" class="sr-only">Opens a chat with Bhanu AI</span>
           <span class="cta-orb" id="ctaOrb"><div id="ctaOrbMount"></div></span>
           <span class="cta-text" id="ctaText">
-            <span class="on" data-q="What should I know about you?">Ask me anything</span>
-            <span data-q="Tell me about your work">Ask me about my work</span>
-            <span data-q="What's a project you're proud of?">Ask me about a project I'm proud of</span>
+            <span class="on" data-q="How did you build Verified Call in 3 weeks?">Ask how I built Verified Call in 3 weeks</span>
+            <span data-q="How did you take tutoring from $250 to $5 an hour at EverTutor?">Ask how tutoring went from $250 to $5 an hour</span>
+            <span data-q="How do you use AI agents when you design and build?">Ask how I design and build with AI</span>
             <span data-q="Why should we hire you?">Ask me why you should hire me</span>
             <span data-q="Can we schedule a meeting next week?">Ask me to schedule a meeting</span>
           </span>
@@ -5313,6 +5477,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         if (fired) return; fired = true;
         doc.classList.remove('hero-wait');
         doc.classList.add('hero-go');
+        try { var hc = document.getElementById('heroCity'); hc && hc.contentWindow.postMessage({ type: 'hero-intro' }, location.origin); } catch (e) {}
       }
       window.addEventListener('v6loaderhidden', reveal);
 
@@ -5331,9 +5496,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
        and outside .hero's overflow:clip. -->
   <div class="nav-sheet" id="navSheet">
     <nav class="nav-sheet-inner" aria-label="Main menu">
-      <a href="#work">Work</a>
-      <a href="#shortsSection">Shorts</a>
-      <a href="#aboutSection">About</a>
+      <a href="#chapters">Work</a>
       <a href="./Bhanu-Kowshik-AI-Native-Designer.pdf" target="_blank" rel="noopener">Résumé</a>
       <a href="#contactSection">Contact</a>
     </nav>
@@ -5477,13 +5640,539 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     }
   </style>
 
-  <section class="wk" id="work" aria-labelledby="wkTitle">
+  <!-- ══ SECTION 2 · VERIFIED CALL (12 Nov) ══════════════════════════════════
+       Scrolling past the Golden Gate, the camera sinks through a cloud bank into downtown and settles
+       on the whole scene (no zoom into the building — owner, 12 Nov); people walk the plaza, the floors
+       light up, then the card lands. The scene is vc-lab.html in a frame (layers in city/layers/vc/), driven by this
+       page's scroll (postMessage vc-scroll, 0..1 across the pinned run). The card is real HTML here
+       so it stays clickable while the frame ignores the pointer. Bump v= when vc-lab.html changes. -->
+  <!-- (12 Nov, owner) the city idea is dropped: this section stays in the file but is switched off; the hero now hands
+       straight to the projects. To bring it back, remove `hidden` here and restore the iframe src from data-src. -->
+  <section class="vcs" id="verifiedCall" aria-labelledby="vcsTitle" hidden>
+    <!-- the cloud bank's crown swells up over the bottom of the Golden Gate, so the scroll enters cloud, not a seam -->
+    <img class="vcs-fringe" src="city/layers/vc/cloud_a.webp" alt="" aria-hidden="true" decoding="async">
+    <div class="vcs-pin">
+      <!-- (12 Nov) the scroll now flies into the isometric San Francisco city (sf-downtown.html); the painted
+           vc-lab scene and its card below are kept but hidden -->
+      <!-- the way in: the cloud bank from the hero fills the frame, then parts as the camera drops into the city -->
+      <div class="vcs-veil" id="vcsVeil" aria-hidden="true"><img class="vl" src="city/layers/vc/cloud_a.webp" alt=""><img class="vl" src="city/layers/vc/cloud_a.webp" alt=""><img class="vl" src="city/layers/vc/cloud_a.webp" alt=""></div>
+      <iframe class="vcs-scene" id="vcScene" src="about:blank" data-src="sf-downtown.html?embed&amp;v=12" title="San Francisco, with the Verified Call tower" loading="lazy"></iframe>
+      <aside class="vcs-card" id="vcsCard">
+        <p class="vcs-meta"><span>Founder</span><span>Design + build, solo</span><span>3 weeks</span></p>
+        <h2 class="vcs-title" id="vcsTitle">Verified Call</h2>
+        <p class="vcs-line">Confirms the person on a hiring call is real, is who they say they are, and isn't reading answers from a hidden AI tool.</p>
+        <div class="vcs-stats">
+          <div><b>0 / 3,990</b><small>face swaps got through</small></div>
+          <div><b>30 / 30</b><small>hidden AI tools caught</small></div>
+          <div><b>20</b><small>companies in the closed beta</small></div>
+        </div>
+        <a class="vcs-go" href="verified-call.html">Read case study <span aria-hidden="true">&rarr;</span></a>
+      </aside>
+    </div>
+  </section>
+  <style>
+    .vcs{position:relative;z-index:2;height:400svh;background:#6E9FA3}   /* ~75svh per project stop */
+    .vcs[hidden]{display:none!important}
+    .vcs-fringe{position:absolute;left:50%;top:0;width:max(170vw,1500px);height:auto;max-width:none;z-index:3;
+                transform:translate(-50%,0);will-change:transform;pointer-events:none;user-select:none}
+    .vcs-pin{position:sticky;top:0;height:100svh;overflow:hidden}
+    .vcs-scene{position:absolute;inset:0;width:100%;height:100%;border:0;background:#6E9FA3}
+    .vcs-card{display:none!important}                     /* the city's own glimpse replaces it */
+    .vcs-veil{position:absolute;inset:0;z-index:3;pointer-events:none}
+    .vcs-veil .vl{position:absolute;left:50%;top:50%;width:max(190vw,1700px);max-width:none;transform:translate(-50%,-50%);will-change:transform,opacity}
+    .vcs-card{position:absolute;right:clamp(16px,6vw,96px);top:50%;width:min(430px,calc(100vw - 32px));z-index:2;
+              padding:28px 28px 24px;border-radius:24px;color:#fff;font-family:var(--sans);
+              opacity:0;transform:translate(0,calc(-50% + 28px));pointer-events:none;
+              background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.04)),rgba(30,22,52,.3);
+              -webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);
+              box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 0 0 1px rgba(255,255,255,.14),0 24px 60px -20px rgba(30,16,48,.45);
+              transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+    .vcs-card.on{opacity:1;transform:translate(0,-50%);pointer-events:auto}
+    .vcs-meta{display:flex;flex-wrap:wrap;gap:10px;margin:0;font-family:var(--mono,'JetBrains Mono',monospace);font-size:11px;
+              letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+    .vcs-meta span+span::before{content:'·';margin-right:10px;opacity:.6}
+    .vcs-title{margin:14px 0 10px;font-size:clamp(28px,2.6vw,40px);font-weight:700;letter-spacing:-.01em;color:#fff}
+    .vcs-line{margin:0;font-size:15px;line-height:1.55;font-weight:500;color:rgba(255,255,255,.9)}
+    .vcs-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0;padding-top:18px;border-top:1px solid rgba(255,255,255,.2)}
+    .vcs-stats b{display:block;font-size:24px;font-weight:700;letter-spacing:-.01em}
+    .vcs-stats small{display:block;margin-top:4px;font-size:11.5px;line-height:1.35;color:rgba(255,255,255,.72);font-weight:500}
+    .vcs-go{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;color:#fff;text-decoration:none;
+            font-family:var(--mono,'JetBrains Mono',monospace);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+            background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.08));
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 0 0 1px rgba(255,255,255,.22);transition:background .3s}
+    .vcs-go:hover{background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.14))}
+    .vcs-go:focus-visible{outline:2px solid #fff;outline-offset:3px}
+    @media (max-width:767px){
+      .vcs-card{top:auto;bottom:16px;left:16px;right:16px;width:auto;padding:20px;transform:translate(0,28px)}
+      .vcs-card.on{transform:none}
+      .vcs-stats b{font-size:20px}
+    }
+    @media (prefers-reduced-motion:reduce){ .vcs-card{transition:none} }
+  </style>
+  <script>
+    (function () {   // pinned scroll → the scene (0..1) and the card
+      var sec = document.getElementById('verifiedCall'), f = document.getElementById('vcScene'),
+          card = document.getElementById('vcsCard'), fringe = sec && sec.querySelector('.vcs-fringe');
+      if (!sec || !f) return;
+      var raf = 0, last = -1;
+      function send() { raf = 0;
+        var r = sec.getBoundingClientRect(), run = Math.max(1, r.height - innerHeight);
+        var p = Math.min(1, Math.max(0, -r.top / run));
+        var veil = document.getElementById('vcsVeil');
+        if (veil) {   // clouds part sideways and lift away over the first ~12% of the run, while the city appears beneath
+          var k = Math.min(1, Math.max(0, p / 0.06)), e = k * k * (3 - 2 * k), vh = innerHeight, vw = innerWidth;   // parts within ~1/3 screen of scrolling
+          veil.style.background = 'linear-gradient(180deg,rgba(246,231,218,' + (1 - e) + '),rgba(239,217,204,' + (0.9 * (1 - e)) + ') 60%,rgba(239,217,204,0))';
+          var L = veil.children;
+          L[0].style.transform = 'translate(calc(-50% - ' + (e * vw * 0.8).toFixed(1) + 'px),calc(-50% - ' + (e * vh * 0.35).toFixed(1) + 'px)) scale(' + (1 + e * 0.6).toFixed(3) + ')';
+          L[1].style.transform = 'translate(calc(-50% + ' + (e * vw * 0.8).toFixed(1) + 'px),calc(-50% + ' + (e * vh * 0.1).toFixed(1) + 'px)) scaleX(-1) scale(' + (1 + e * 0.6).toFixed(3) + ')';
+          L[2].style.transform = 'translate(-50%,calc(-50% + ' + (vh * 0.3 + e * vh * 0.9).toFixed(1) + 'px)) scale(' + (1.2 + e * 0.8).toFixed(3) + ')';
+          for (var i = 0; i < 3; i++) L[i].style.opacity = String(Math.max(0, 1 - e * 1.15));
+          veil.style.visibility = e >= 0.999 ? 'hidden' : '';
+        }
+        // the crown starts tucked under the hero and swells up over the bay as the hero scrolls away
+        if (fringe) {
+          var k = Math.min(1, Math.max(0, 1 - r.top / innerHeight));
+          fringe.style.transform = 'translate(-50%,' + (-52 * (1 - Math.pow(1 - k, 2))).toFixed(2) + '%)';
+        }
+        if (Math.abs(p - last) < 0.0005) return; last = p;
+        try { f.contentWindow.postMessage({ type: 'vc-scroll', p: p }, location.origin); } catch (e) {}
+      }
+      addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(send); }, { passive: true });
+      addEventListener('resize', send);
+      f.addEventListener('load', function () { last = -1; send(); });
+    })();
+    addEventListener('message', function (e) {   // scrolling over the city scrolls the page
+      if (e.origin !== location.origin || !e.data || e.data.type !== 'world-wheel') return;
+      var l = window.__lenis, dy = +e.data.dy || 0;
+      if (l && l.scrollTo) l.scrollTo((l.targetScroll != null ? l.targetScroll : scrollY) + dy);
+      else window.scrollBy(0, dy);
+    });
+  </script>
+
+  <!-- ══ WORK as painted chapters (12 Nov 2026, owner-approved; built in chapters-lab.html) ══════════════════════
+       One painted San Francisco scene per project in the hero's hand (city/layers/chapters/, golden + day + night,
+       cross-faded by SF's real sun), the project's launch film (films/*.html) mapped in perspective onto the painted
+       device's screen, the copy set into the scene like the hero title, birds crossing each sky. Replaces the redwood
+       stacking cards, which are kept below, hidden. Classes are chp-* (the old cards use .ch). -->
+  <section id="chapters" class="chp-wrap" aria-labelledby="chpTitle">
+    <!-- (12 Nov, owner) Pause motion control removed; prefers-reduced-motion still stills everything -->
+    <h2 class="sr-only" id="chpTitle">Selected work</h2>
+    <!-- (12 Nov, owner) cloud pass from the hero into the first chapter: the bank rises over the hero's foot, you pass through,
+         it parts sideways onto the scene. Short, no text. Tinted to the time of day. -->
+    <div class="chp-clouds" aria-hidden="true">
+      <div class="cl-fill"></div>
+      <img class="cl cl-a" src="city/layers/vc/cloud_a.webp" alt="" decoding="async">
+      <img class="cl cl-b" src="city/layers/vc/cloud_a.webp" alt="" decoding="async">
+      <img class="cl cl-c" src="city/layers/vc/cloud_a.webp" alt="" decoding="async">
+      <p class="cl-title">Selected work</p>
+    </div>
+  <section class="chp" id="chVC" data-sky="40,30,840,165" aria-labelledby="chVCt">
+    <div class="chp-pin">
+      <div class="chp-stage" aria-hidden="true">
+        <img class="chp-plate" src="city/layers/chapters/vc-office.webp" data-night="city/layers/chapters/vc-office-night.webp" data-day="city/layers/chapters/vc-office-day.webp" alt="">
+        <!-- the living golden-hour scene: a locked-camera Higgsfield (Seedance 2.5) loop of this painting, crossfaded to loop seamlessly;
+             Seedance reframed it a few px, so it carries its own screen quad -->
+        <video class="chp-loop" src="city/layers/chapters/loops/vc-office.mp4?v=13" poster="city/layers/chapters/vc-office.webp" data-quad="1090,393 1476,372 1420,683 1029,651" muted loop playsinline preload="auto"></video>
+        <canvas class="chp-birds" width="1672" height="941"></canvas>
+        <div class="chp-bay"></div>
+        <div class="chp-screen" data-quad="1104,411 1496,388 1438,705 1047,673"><iframe src="films/vc-launch.html?v=14" title="Verified Call launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-steam"><i></i><i></i><i></i></div>
+        <div class="chp-lamp"></div>
+      </div>
+      <div class="chp-copy">
+        <p class="chp-role">Founder · design and build, solo</p>
+        <h3 class="chp-title" id="chVCt">Verified Call</h3>
+        <p class="chp-line">I'm building Verified Call solo, to remove cheating from video calls.</p>
+        <ul class="chp-proof"><li><b>20</b><span>companies in the closed beta</span></li><li><b>3 weeks</b><span>to build, solo</span></li></ul>
+        <ul class="chp-tech" aria-label="Built with"><li>Electron</li><li>React</li><li>Chrome extension</li><li>MediaPipe</li><li>Amazon Rekognition</li><li>Deepgram</li></ul>
+        <a class="chp-go" href="verified-call.html" aria-label="Read the Verified Call case study">Read case study <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="chp" id="chETL" data-focus="1130" data-sky="40,20,800,160" aria-labelledby="chETLt">
+    <div class="chp-pin">
+      <div class="chp-stage" aria-hidden="true">
+        <img class="chp-plate" src="city/layers/chapters/et-live-kitchen.webp" data-night="city/layers/chapters/et-live-kitchen-night.webp" data-day="city/layers/chapters/et-live-kitchen-day.webp" alt="">
+        <video class="chp-loop" src="city/layers/chapters/loops/et-live.mp4?v=13" poster="city/layers/chapters/et-live-kitchen.webp" data-quad="741,418 1073,403 1114,629 778,669" muted loop playsinline preload="auto"></video>
+        <canvas class="chp-birds" width="1672" height="941"></canvas>
+        <div class="chp-screen" data-quad="754,433 1089,417 1132,651 791,692"><iframe src="films/et-live-launch.html?v=14" title="EverTutor Live launch film" loading="lazy" tabindex="-1"></iframe></div>
+      </div>
+      <div class="chp-copy">
+        <p class="chp-role">Sole product designer · EverTutor</p>
+        <h3 class="chp-title" id="chETLt">EverTutor Live</h3>
+        <p class="chp-line">A voice AI tutor that took 1:1 tutoring from $250 to $5 an hour.</p>
+        <ul class="chp-proof"><li><b>2,000+</b><span>students a day</span></li><li><b>$9.5M</b><span>seed-funded</span></li></ul>
+        <ul class="chp-tech" aria-label="Built with"><li>Figma</li></ul>
+        <a class="chp-go" href="evertutor-live.html" aria-label="Read the EverTutor Live case study">Read case study <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="chp" id="chETS" data-focus="1180" data-sky="40,20,680,160" aria-labelledby="chETSt">
+    <div class="chp-pin">
+      <div class="chp-stage" aria-hidden="true">
+        <img class="chp-plate" src="city/layers/chapters/et-studio-classroom.webp" data-night="city/layers/chapters/et-studio-classroom-night.webp" data-day="city/layers/chapters/et-studio-classroom-day.webp" alt="">
+        <canvas class="chp-birds" width="1672" height="941"></canvas>
+        <div class="chp-screen" data-quad="793,372 1241,348 1224,654 771,639"><iframe src="films/et-studio-launch.html?v=14" title="EverTutor Studio launch film" loading="lazy" tabindex="-1"></iframe></div>
+      </div>
+      <div class="chp-copy">
+        <p class="chp-role">Sole product designer · EverTutor</p>
+        <h3 class="chp-title" id="chETSt">EverTutor Studio</h3>
+        <p class="chp-line">The studio teachers use to build EverTutor's lessons.</p>
+        <ul class="chp-proof"><li><b>104h → 4h</b><span>to make a lesson</span></li><li><b>3,000+</b><span>lessons made</span></li></ul>
+        <ul class="chp-tech" aria-label="Built with"><li>Figma</li><li>Next.js</li><li>Tailwind</li></ul>
+        <a class="chp-go" href="evertutor-studio.html" aria-label="Read the EverTutor Studio case study">Read case study <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="chp" id="chETA" data-focus="1010" data-sky="40,20,720,150" aria-labelledby="chETAt">
+    <div class="chp-pin">
+      <div class="chp-stage" aria-hidden="true">
+        <img class="chp-plate" src="city/layers/chapters/et-analytics-office.webp" data-night="city/layers/chapters/et-analytics-office-night.webp" data-day="city/layers/chapters/et-analytics-office-day.webp" alt="">
+        <canvas class="chp-birds" width="1672" height="941"></canvas>
+        <div class="chp-screen" data-quad="790,366 1245,341 1228,659 768,643"><iframe src="films/et-analytics-launch.html?v=2" title="EverTutor Analytics launch film" loading="lazy" tabindex="-1"></iframe></div>
+      </div>
+      <div class="chp-copy">
+        <p class="chp-role">Sole product designer · EverTutor</p>
+        <h3 class="chp-title" id="chETAt">EverTutor Analytics</h3>
+        <p class="chp-line">Dense student data, turned into a real-time decision tool for educators.</p>
+        <ul class="chp-proof"><li><b>Real-time</b><span>student insights</span></li><li><b>Live</b><span>in production</span></li></ul>
+        <ul class="chp-tech" aria-label="Built with"><li>Figma</li></ul>
+        <a class="chp-go" href="#contactSection" aria-label="Request an EverTutor Analytics walkthrough">Request a walkthrough <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="chp" id="chST" data-focus="1180" data-sky="40,15,840,160" aria-labelledby="chSTt">
+    <div class="chp-pin">
+      <div class="chp-stage" aria-hidden="true">
+        <img class="chp-plate" src="city/layers/chapters/stressie-park.webp" data-night="city/layers/chapters/stressie-park-night.webp" data-day="city/layers/chapters/stressie-park-day.webp" alt="">
+        <canvas class="chp-birds" width="1672" height="941"></canvas>
+        <div class="chp-screen" style="width:900px;height:1950px;border-radius:118px" data-quad="860,146 1165,146 1165,795 860,795"><iframe src="films/stressie-launch.html?v=13" title="Stressie launch film" loading="lazy" tabindex="-1"></iframe></div>
+      </div>
+      <div class="chp-copy">
+        <p class="chp-role">Founding designer · Figma to SwiftUI</p>
+        <h3 class="chp-title" id="chSTt">Stressie V4</h3>
+        <p class="chp-line">A stress check-in that pays for your evening.</p>
+        <ul class="chp-proof"><li><b>12% → 56%</b><span>daily engagement</span></li><li><b>$600K</b><span>funding unlocked</span></li></ul>
+        <ul class="chp-tech" aria-label="Built with"><li>Figma</li><li>SwiftUI</li><li>Metal</li></ul>
+        <a class="chp-go" href="stressie-v4.html" aria-label="Read the Stressie V4 case study">Read case study <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="chp" id="chDL" data-focus="1150" data-sky="60,15,800,160" aria-labelledby="chDLt">
+    <div class="chp-pin">
+      <div class="chp-stage" aria-hidden="true">
+        <img class="chp-plate" src="city/layers/chapters/dearly-alamo.webp" data-night="city/layers/chapters/dearly-alamo-night.webp" data-day="city/layers/chapters/dearly-alamo-day.webp" alt="">
+        <canvas class="chp-birds" width="1672" height="941"></canvas>
+        <div class="chp-screen" style="width:1600px;height:1200px;border-radius:24px" data-quad="715,458 1040,451 1103,712 775,739"><iframe src="films/dearly-launch-v2.html?v=1" title="Dearly launch film" loading="lazy" tabindex="-1"></iframe></div>
+      </div>
+      <div class="chp-copy">
+        <p class="chp-role">Solo build · 48 hours</p>
+        <h3 class="chp-title" id="chDLt">Dearly</h3>
+        <p class="chp-line">Voice letters you can hear and keep.</p>
+        <ul class="chp-proof"><li><b>140+</b><span>letters sent</span></li><li><b>35</b><span>five-star ratings</span></li></ul>
+        <ul class="chp-tech" aria-label="Built with"><li>React</li><li>Framer Motion</li><li>Supabase</li><li>Vercel</li></ul>
+        <a class="chp-go" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener">Visit Dearly <span aria-hidden="true">↗&#xFE0E;</span><span class="sr-only"> (opens in a new tab)</span></a>
+      </div>
+    </div>
+  </section>
+
+  </section>
+  <style>
+  #chapters{--ink:#FFFCF8;position:relative;z-index:2;background:#0E0B12;color:#FFFCF8;font-family:'Montserrat',sans-serif}
+
+
+  /* a chapter = one viewport, pinned for a short run so the scene can settle */
+  .chp{position:relative;height:170vh}
+  .chp-pin{position:sticky;top:0;height:100vh;overflow:hidden}
+  /* the painting is cover-fitted with its aspect locked, so the screen overlay stays glued to the painted laptop */
+  /* the painting is a fixed 1672x941 stage, cover-scaled by JS (--cover), so every overlay uses the painting's own pixels */
+  .chp-stage{position:absolute;left:50%;top:50%;width:1672px;height:941px;
+    transform:translate(calc(-50% + var(--ox,0px)),-50%) scale(calc(var(--cover,1) * var(--push,1.06)));transform-origin:50% 50%}
+  .chp-stage > img.chp-plate{position:absolute;inset:0;width:100%;height:100%;display:block}
+  /* the launch film, mapped onto the painted screen's four corners in true perspective (matrix3d from JS) */
+  .chp-screen{position:absolute;left:0;top:0;width:1600px;height:1000px;transform-origin:0 0;overflow:hidden;background:#0A0B0F}
+  .chp-screen iframe{width:100%;height:100%;border:0;display:block;pointer-events:none}
+  /* the screen sits in the painting's light: a faint warm sheen from the lamp, no glare */
+  .chp-screen::after{content:'';position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(115deg,rgba(255,214,160,.10),rgba(255,214,160,0) 40%),linear-gradient(0deg,rgba(40,24,40,.12),rgba(40,24,40,0) 30%)}
+
+  /* ambient life, painted-world only (no UI): lamp breath, steam over the mug, a shimmer on the bay */
+  .chp-lamp{position:absolute;left:calc(1532 / 1672 * 100%);top:calc(330 / 941 * 100%);width:30%;aspect-ratio:1;transform:translate(-50%,-30%);
+    background:radial-gradient(closest-side,rgba(255,196,120,.32),rgba(255,196,120,0));mix-blend-mode:screen;pointer-events:none;animation:chp-lamp 5.5s ease-in-out infinite alternate}
+  @keyframes chp-lamp{from{opacity:.75}to{opacity:1}}
+  .chp-steam{position:absolute;left:calc(738 / 1672 * 100%);top:calc(600 / 941 * 100%);width:4.5%;height:14%;pointer-events:none;transform:translate(-50%,-100%)}
+  .chp-steam i{position:absolute;bottom:0;left:50%;width:34%;height:100%;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(255,244,232,.55),rgba(255,244,232,0));filter:blur(4px);opacity:0;animation:chp-steam 4.2s ease-in infinite}
+  .chp-steam i:nth-child(2){animation-delay:1.4s;left:38%}.chp-steam i:nth-child(3){animation-delay:2.8s;left:60%}
+  @keyframes chp-steam{0%{opacity:0;transform:translate(-50%,10%) scale(.6)}25%{opacity:.7}100%{opacity:0;transform:translate(-30%,-90%) scale(1.5,1.9)}}
+  .chp-bay{position:absolute;left:4%;top:calc(470 / 941 * 100%);width:48%;height:9%;pointer-events:none;mix-blend-mode:screen;opacity:.5;
+    background:repeating-linear-gradient(90deg,rgba(255,220,180,0) 0 18px,rgba(255,220,180,.22) 24px,rgba(255,220,180,0) 30px);
+    -webkit-mask:linear-gradient(180deg,transparent,#000 40%,#000 60%,transparent);mask:linear-gradient(180deg,transparent,#000 40%,#000 60%,transparent);
+    animation:chp-bay 7s linear infinite}
+  @keyframes chp-bay{from{background-position:0 0}to{background-position:-120px 0}}
+
+  /* legibility (owner, 12 Nov): the painting dims softly behind the copy, like dusk gathering in that corner of the sky;
+     not a panel, no blur, no text shadow. Stronger by day (brighter sky), lighter at night. */
+  .chp-pin::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(62% 78% at 14% 34%,rgba(26,14,38,calc(.62 * var(--shade,1))) 0%,rgba(26,14,38,calc(.38 * var(--shade,1))) 45%,rgba(26,14,38,0) 75%)}
+  /* the plate's time-of-day variants (golden = base), cross-faded by SF's real sun like the hero */
+  .chp-stage > img.chp-tod{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.2s ease}
+  .chp-stage > video.chp-loop{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;transition:opacity 1.2s ease}
+  .chp-stage.has-loop > .chp-steam,.chp-stage.has-loop > .chp-bay{display:none}   /* the loop has real steam and water */
+  /* the copy lives in the window sky, set like the hero title: white Montserrat, no panel, no shadow */
+  .chp-copy{position:absolute;left:clamp(24px,6vw,110px);top:clamp(88px,16vh,170px);width:min(40vw,560px,var(--copyw,560px));z-index:2}   /* --copyw (JS): never reach the device */
+  .chp-role{margin:0 0 12px;font:600 clamp(15px,1.1vw,17px)/1.2 'Montserrat',sans-serif;color:#FFFCF8}
+  .chp-title{margin:0;font:800 clamp(44px,5.6vw,96px)/.95 'Montserrat',sans-serif;letter-spacing:-.04em;color:var(--ink)}
+  .chp-line{margin:16px 0 0;font:600 clamp(18px,1.4vw,23px)/1.4 'Montserrat',sans-serif;color:#FFFCF8;max-width:26ch}
+  .chp-proof{display:flex;gap:clamp(20px,2.4vw,40px);margin:26px 0 0;padding:0;list-style:none}
+  .chp-proof li{flex:none}
+  .chp-proof b{white-space:nowrap;display:block;font:700 clamp(28px,2.6vw,44px)/1 'Montserrat',sans-serif;letter-spacing:-.03em;color:var(--ink)}
+  .chp-proof span{display:block;margin-top:8px;font:600 15px/1.3 'Montserrat',sans-serif;color:#FFFCF8}
+  .chp-go{display:inline-flex;align-items:center;gap:10px;margin-top:28px;padding:13px 22px;border-radius:999px;color:var(--ink);text-decoration:none;
+    font:600 15px 'Montserrat',sans-serif;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.06));
+    -webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 0 0 1px rgba(255,255,255,.18)}
+  .chp-copy > *{opacity:var(--in,0);transform:translateY(calc((1 - var(--in,0)) * 18px))}
+
+  /* phones and portrait tablets: the scene becomes a band centred on the device; the story sits below it on the dark ground */
+  @media (max-width:767px), (orientation:portrait) and (max-width:1100px){
+    .chp{height:auto}
+    .chp-pin{position:relative;height:auto;padding-top:62vh}
+    .chp-stage{top:31vh;left:var(--bandx,50vw)}
+    .chp-proof{flex-wrap:wrap;row-gap:18px}.chp-proof li{flex:1 1 140px;min-width:0}   /* small phones: figures wrap, never clip */   /* JS: centred on the device, clamped so the painting always fills the width */
+    .chp-copy{position:relative;left:auto;top:auto;width:auto;padding:28px 20px 56px}
+    .chp-pin::before{display:none}
+    .chp-line{max-width:none}
+  }
+  @media (prefers-reduced-motion:reduce){.chp-lamp,.chp-steam i,.chp-bay{animation:none}}
+  .chp-stage > canvas.chp-birds{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+  .chp-stage > .chp-screen{z-index:2}
+  .wk[hidden]{display:none!important}
+  /* a11y pass (12 Nov 2026) */
+  .skip-link{position:fixed;left:16px;top:-80px;z-index:200;padding:12px 18px;border-radius:999px;background:#FFFCF8;color:#14100F;font:600 15px 'Montserrat',sans-serif;text-decoration:none;transition:top .2s}
+  .skip-link:focus{top:16px;outline:2px solid #14100F;outline-offset:2px}
+  /* Pause motion (WCAG 2.2.2): pinned while the chapters are on screen; freezes hero, films, living loops, birds */
+  .chp-pause{position:fixed;left:16px;bottom:16px;z-index:60;padding:10px 16px;border-radius:999px;border:0;cursor:pointer;
+    font:600 14px 'Montserrat',sans-serif;color:#FFFCF8;background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.06)),rgba(20,16,24,.55);
+    -webkit-backdrop-filter:blur(16px) saturate(1.5);backdrop-filter:blur(16px) saturate(1.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 0 0 1px rgba(255,255,255,.16);
+    opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .3s,transform .3s}
+  html.chp-inview .chp-pause,.chp-pause:focus-visible{opacity:1;pointer-events:auto;transform:none}
+  .chp-pause:focus-visible,.chp-go:focus-visible{outline:2px solid #FFFCF8;outline-offset:3px}
+  html.motion-paused .chp-lamp,html.motion-paused .chp-steam i,html.motion-paused .chp-bay{animation-play-state:paused}
+  /* liquid-glass CTAs (owner, 12 Nov): clear glass that bends the painting behind it, a bright specular rim on top, a soft
+     caustic glow along the bottom edge, no drop shadow. Same family as the nav bar and the hero's chat lens. */
+  .chp-go,.chp-pause{isolation:isolate;overflow:hidden;color:#FFFCF8;border:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.07) 48%,rgba(255,255,255,.12) 100%)!important;
+    -webkit-backdrop-filter:blur(10px) saturate(1.9) brightness(1.08) contrast(1.05);backdrop-filter:blur(10px) saturate(1.9) brightness(1.08) contrast(1.05);
+    box-shadow:inset 0 1.5px .5px rgba(255,255,255,.85),inset 0 -1px 1px rgba(255,255,255,.3),inset 0 0 0 1px rgba(255,255,255,.22),
+      inset 0 -14px 18px -12px rgba(255,255,255,.42),inset 0 12px 16px -14px rgba(255,255,255,.55)!important;
+    transition:transform .25s cubic-bezier(.2,.8,.2,1),background .3s,opacity .3s}
+  .chp-go{position:relative}
+  .chp-go::before,.chp-pause::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+    background:radial-gradient(60% 90% at 22% 0%,rgba(255,255,255,.38),rgba(255,255,255,0) 60%),radial-gradient(50% 80% at 85% 110%,rgba(255,236,210,.22),rgba(255,236,210,0) 70%)}
+  .chp-go:hover,.chp-pause:hover{background:linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.1) 48%,rgba(255,255,255,.16) 100%)!important}
+  .chp-go:active,.chp-pause:active{transform:scale(.97)}
+  html.chp-inview .chp-pause:active{transform:scale(.97)}
+  .am-section[hidden],.sec-divider[hidden]{display:none!important}   /* How I work skipped (owner, 12 Nov) */
+  </style>
+  <script>
+(function () {
+  var chs = [].slice.call(document.querySelectorAll('.chp'));
+  function cl(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  // map a w×h element onto a painted quad (TL TR BR BL, painting pixels) — square-to-quad homography as matrix3d
+  function quad(el) {
+    var q = el.dataset.quad.split(' ').map(function (p) { return p.split(',').map(Number); });
+    var w = el.offsetWidth, h = el.offsetHeight, x0 = q[0][0], y0 = q[0][1], x1 = q[1][0], y1 = q[1][1], x2 = q[2][0], y2 = q[2][1], x3 = q[3][0], y3 = q[3][1];
+    var dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3, dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
+    var den = dx1 * dy2 - dx2 * dy1, a13 = (dx3 * dy2 - dx2 * dy3) / den, a23 = (dx1 * dy3 - dx3 * dy1) / den;
+    var a11 = x1 - x0 + a13 * x1, a21 = x3 - x0 + a23 * x3, a12 = y1 - y0 + a13 * y1, a22 = y3 - y0 + a23 * y3;
+    el.style.transform = 'matrix3d(' + [a11 / w, a12 / w, 0, a13 / w, a21 / h, a22 / h, 0, a23 / h, 0, 0, 1, 0, x0, y0, 0, 1].join(',') + ')';
+  }
+  // ── time of day: SF's real sun (same formula and weights as the hero, poster-lab.html); ?alt=N forces it ──
+  function sunAlt(ms) {
+    var R = Math.PI / 180, d = ms / 864e5 + 2440587.5 - 2451545, g = (357.529 + .98560028 * d) * R, q = 280.459 + .98564736 * d;
+    var L = (q + 1.915 * Math.sin(g) + .02 * Math.sin(2 * g)) * R, e = (23.439 - .00000036 * d) * R;
+    var RA = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e) * Math.sin(L));
+    var GMST = ((18.697374558 + 24.06570982441908 * d) % 24 + 24) % 24, HA = (GMST * 15 - 122.4194) * R - RA, p = 37.7749 * R;
+    return Math.asin(Math.sin(p) * Math.sin(dec) + Math.cos(p) * Math.cos(dec) * Math.cos(HA)) / R;
+  }
+  function ss(a, b, v) { var t = cl((v - a) / (b - a)); return t * t * (3 - 2 * t); }
+  function tod() {
+    var f = new URLSearchParams(location.search).get('alt'), alt = f != null ? +f : sunAlt(Date.now());
+    var WN = 1 - ss(-9, -2, alt), WD = ss(9, 24, alt);
+    chs.forEach(function (ch) {
+      var plate = ch.querySelector('img.chp-plate'), stage = ch.querySelector('.chp-stage'), scr = ch.querySelector('.chp-screen[data-quad]');
+      var loop = stage.querySelector('video.chp-loop');
+      var wN = WN, wD = WD;   // time-true (owner, 12 Nov: evening must look like evening); the living loop plays at golden hour
+      var wG = (1 - wD) * (1 - wN);
+      if (loop) { stage.classList.add('has-loop'); loop.style.opacity = wG.toFixed(3); }
+      ['day', 'night'].forEach(function (k) {
+        var src = plate.dataset[k]; if (!src) return;
+        var im = stage.querySelector('img.chp-tod-' + k);
+        if (!im) { im = document.createElement('img'); im.className = 'chp-tod chp-tod-' + k; im.alt = ''; im.src = src; stage.insertBefore(im, (loop || plate).nextSibling); }
+        im.style.opacity = (k === 'day' ? wD : wN).toFixed(3);
+      });
+      // the screen follows whichever painting dominates (variants are separate paintings, the laptop can shift a few px)
+      if (scr) { var use = wN > .5 && scr.dataset.quadNight ? scr.dataset.quadNight : wD > .5 && scr.dataset.quadDay ? scr.dataset.quadDay : wG > .5 && loop ? loop.dataset.quad : scr.dataset.quadGold || scr.dataset.quad;
+        if (!scr.dataset.quadGold) scr.dataset.quadGold = scr.dataset.quad; scr.dataset.quad = use; quad(scr); }
+      ch.style.setProperty('--night', wN.toFixed(3)); ch.style.setProperty('--shade', (1 + .25 * wD + .1 * wN).toFixed(3));   // night windows are bright and busy: shade a touch more, not less
+    });
+  }
+  [].forEach.call(document.querySelectorAll('.chp-screen[data-quad]'), quad);
+  tod(); setInterval(tod, 60000);
+  function cover() {
+    var phone = innerWidth <= 767 || (innerHeight > innerWidth && innerWidth <= 1100);   // same test as the CSS band layout
+    chs.forEach(function (ch) {
+      var pin = ch.querySelector('.chp-pin'), band = phone ? parseFloat(getComputedStyle(pin).paddingTop) || innerHeight * .5 : 0;
+      var c = phone ? band / 941 : Math.max(innerWidth / 1672, innerHeight / 941);   // phones: the band's real height (iOS svh differs from innerHeight)
+      ch.style.setProperty('--cover', c.toFixed(4));
+      var s = ch.querySelector('.chp-screen[data-quad]');
+      if (s) { var q = s.dataset.quad.split(' ').map(function (p) { return +p.split(',')[0]; }); ch.style.setProperty('--fx', ((Math.min.apply(0, q) + Math.max.apply(0, q)) / 2).toFixed(0));
+        // keep the device in frame when the cover-crop would cut it: slide the painting left (never past its own edge)
+        if (!phone) { var vw = innerWidth, ovf = Math.max(0, 1672 * c - vw) / 2, right = vw / 2 + (Math.max.apply(0, q) + 60 - 836) * c;
+          ch.style.setProperty('--ox', (-Math.min(ovf, Math.max(0, right - vw))).toFixed(1) + 'px'); } else { ch.style.setProperty('--ox', '0px');
+          var fx = ch.dataset.focus ? +ch.dataset.focus : (Math.min.apply(0, q) + Math.max.apply(0, q)) / 2, half = 836 * c, cx = innerWidth / 2 - (fx - 836) * c;
+          ch.style.setProperty('--bandx', Math.min(half, Math.max(innerWidth - half, cx)).toFixed(1) + 'px'); } }
+    });
+  }
+  addEventListener('resize', cover); cover();
+  // the copy column always stops 40px short of the painted device, whatever the window (a11y/usability pass)
+  function copyFit() {
+    if (innerWidth <= 767 || (innerHeight > innerWidth && innerWidth <= 1100)) { chs.forEach(function (ch) { ch.style.removeProperty('--copyw'); }); return; }
+    chs.forEach(function (ch) {
+      var s = ch.querySelector('.chp-screen'), cp = ch.querySelector('.chp-copy'); if (!s || !cp) return;
+      var room = s.getBoundingClientRect().left - cp.getBoundingClientRect().left - 40;
+      ch.style.setProperty('--copyw', Math.max(260, Math.round(room)) + 'px');
+    });
+  }
+  addEventListener('resize', function () { requestAnimationFrame(copyFit); }); setTimeout(copyFit, 0); setTimeout(copyFit, 1500);
+  function frame() {
+    var vh = innerHeight;
+    chs.forEach(function (ch) {
+      var r = ch.getBoundingClientRect(), run = Math.max(1, r.height - vh);
+      var enter = cl(1 - r.top / vh);                 // 0 → 1 as the chapter slides up into view
+      var p = cl(-r.top / run);                        // 0 → 1 while pinned
+      var stage = ch.querySelector('.chp-stage'), copy = ch.querySelector('.chp-copy');
+      stage.style.setProperty('--push', (1.06 - .06 * cl(enter * .6 + p * .8)).toFixed(4));   // a slow settle onto the desk
+      var k = cl((enter - .55) / .45); copy.style.setProperty('--in', (k * k * (3 - 2 * k)).toFixed(3));
+    });
+  }
+  addEventListener('scroll', function () { requestAnimationFrame(frame); }, { passive: true });
+  addEventListener('resize', frame); frame();
+  // the launch film runs only while its chapter is on screen
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { var f = e.target.querySelector('.chp-screen iframe'); var ok = e.isIntersecting && !document.documentElement.classList.contains('motion-paused') && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (f && f.contentWindow) f.contentWindow.postMessage({ type: 'film', play: ok }, '*');
+        var lv = e.target.querySelector('video.chp-loop');   // the living scene plays only while on screen and motion is allowed
+        if (lv) { if (e.isIntersecting && !document.documentElement.classList.contains('motion-paused') && !matchMedia('(prefers-reduced-motion: reduce)').matches) { var pr = lv.play(); if (pr && pr.catch) pr.catch(function () {}); } else lv.pause(); } });
+    }, { threshold: .2 });
+    chs.forEach(function (ch) { io.observe(ch); });
+  }
+  window.__chFrame = frame;
+
+  // ── a11y (12 Nov 2026): one Pause motion control for everything that moves on its own (WCAG 2.2.2), and films that
+  // respect reduced motion. Paused state freezes the hero scene, the launch films, the living loops and the birds. ──
+  (function () {
+    var btn = document.getElementById('motionToggle'), root = document.documentElement, wrap = document.getElementById('chapters');
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function inview(ch) { var r = ch.getBoundingClientRect(); return r.bottom > innerHeight * .2 && r.top < innerHeight * .8; }
+    function apply() {
+      var paused = root.classList.contains('motion-paused') || reduce;
+      var hero = document.getElementById('heroCity'); try { hero && hero.contentWindow.postMessage({ type: 'motion', paused: paused }, location.origin); } catch (e) {}
+      chs.forEach(function (ch) {
+        var on = !paused && inview(ch), f = ch.querySelector('.chp-screen iframe'), lv = ch.querySelector('video.chp-loop');
+        if (f && f.contentWindow) f.contentWindow.postMessage({ type: 'film', play: on }, '*');
+        if (lv) { if (on) { var pr = lv.play(); if (pr && pr.catch) pr.catch(function () {}); } else lv.pause(); }
+      });
+    }
+    if (btn) btn.addEventListener('click', function () {
+      var on = root.classList.toggle('motion-paused');
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false'); btn.textContent = on ? 'Play motion' : 'Pause motion';
+      apply();
+    });
+    // shown only once the chapters own the middle of the screen, so it never sits on the hero's chat bar (real iPhone check)
+    if (wrap && 'IntersectionObserver' in window) new IntersectionObserver(function (es) { root.classList.toggle('chp-inview', es[0].isIntersecting); apply(); }, { threshold: 0, rootMargin: '-45% 0px -45% 0px' }).observe(wrap);
+    if (reduce) apply();
+    window.__motionApply = apply;
+  })();
+  // ── life in the sky: small flocks of birds cross each chapter's window/skyline (painting px, data-sky="x0,y0,x1,y1"),
+  // wings flapping, in the painting's dusky ink; they rest at night. One canvas per chapter, drawn only while on screen. ──
+  (function () {
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    chs.forEach(function (ch) {
+      var cv = ch.querySelector('canvas.chp-birds'), sky = (ch.dataset.sky || '').split(',').map(Number);
+      if (!cv || sky.length < 4 || reduce) return;
+      var g = cv.getContext('2d'), flocks = [], on = false, last = 0, x0 = sky[0], y0 = sky[1], x1 = sky[2], y1 = sky[3];
+      function flock(delay) {
+        var n = 3 + Math.floor(Math.random() * 4), dir = Math.random() < .7 ? -1 : 1, y = y0 + 30 + Math.random() * (y1 - y0 - 60);
+        var sp = 26 + Math.random() * 18, birds = [];
+        for (var i = 0; i < n; i++) birds.push({ dx: i * (18 + Math.random() * 14) * -dir, dy: (i % 2 ? 1 : -1) * Math.ceil(i / 2) * (8 + Math.random() * 6), s: 5 + Math.random() * 3, ph: Math.random() * 6.28, f: 7 + Math.random() * 3 });
+        return { x: dir < 0 ? x1 + 40 : x0 - 40, y: y, dir: dir, sp: sp, birds: birds, wait: delay };
+      }
+      flocks.push(flock(400), flock(6000));
+      function bird(x, y, s, wing) {
+        g.beginPath(); g.moveTo(x - s * 2, y - wing * s);
+        g.quadraticCurveTo(x - s * .9, y - s * .2 - wing * s * .5, x, y);
+        g.quadraticCurveTo(x + s * .9, y - s * .2 - wing * s * .5, x + s * 2, y - wing * s);
+        g.stroke();
+      }
+      function draw(t) {
+        if (!on) return; requestAnimationFrame(draw);
+        if (document.documentElement.classList.contains('motion-paused')) { last = t; return; }
+        var dt = last ? Math.min(60, t - last) / 1000 : .016; last = t;
+        var night = +(ch.style.getPropertyValue('--night') || 0);
+        g.clearRect(0, 0, 1672, 941);
+        g.save(); g.beginPath(); g.rect(x0, y0, x1 - x0, y1 - y0); g.clip();
+        g.lineWidth = 2.2; g.lineCap = 'round'; g.strokeStyle = 'rgba(46,32,52,' + (.72 * (1 - night)).toFixed(3) + ')';
+        flocks.forEach(function (fl, k) {
+          if (fl.wait > 0) { fl.wait -= dt * 1000; return; }
+          fl.x += fl.dir * fl.sp * dt; fl.y += Math.sin(t / 1400 + k) * 4 * dt;
+          fl.birds.forEach(function (b) { b.ph += dt * b.f; bird(fl.x + b.dx, fl.y + b.dy, b.s, Math.sin(b.ph) * .9); });
+          var gone = fl.dir < 0 ? fl.x < x0 - 260 : fl.x > x1 + 260;
+          if (gone) flocks[k] = flock(3000 + Math.random() * 7000);
+        });
+        g.restore();
+      }
+      new IntersectionObserver(function (es) { var v = es[0].isIntersecting; if (v && !on) { on = true; last = 0; requestAnimationFrame(draw); } on = v; }).observe(ch);
+    });
+  })();
+
+})();
+  </script>
+
+  <!-- (12 Nov) the redwood stacking cards, replaced by the painted chapters above: kept, hidden -->
+  <section class="wk" id="work" aria-labelledby="wkTitle" hidden>
+    <!-- (12 Nov, owner) the work lives in Muir Woods: a painted redwood forest (same hand as the Golden Gate hero,
+         city/layers/redwoods/plate.webp) stays pinned behind the stacking project cards and is always alive
+         (sunbeams breathe, fog drifts, dust drifts in the light). The scroll in from the hero passes through a fog bank
+         that carries one fact, then parts onto the forest. -->
+    <div class="wk-forest" aria-hidden="true">
+      <img class="wf-plate" src="city/layers/redwoods/plate.webp" srcset="city/layers/redwoods/plate-960.webp 960w, city/layers/redwoods/plate.webp 1672w" sizes="100vw" alt="" decoding="async">
+      <div class="wf-rays"></div>
+      <img class="wf-fog wf-fog1" src="city/layers/vc/cloud_a.webp" alt="" decoding="async">
+      <img class="wf-fog wf-fog2" src="city/layers/vc/cloud_a.webp" alt="" decoding="async">
+      <canvas class="wf-motes"></canvas>
+      <div class="wf-veil"></div>
+    </div>
+    <div class="rwf" id="rwFog">
+      <img class="rwf-crown" src="city/layers/vc/cloud_a.webp" alt="" aria-hidden="true" decoding="async">
+      <div class="rwf-pin">
+        <div class="rwf-bank" aria-hidden="true"><img src="city/layers/vc/cloud_a.webp" alt=""><img src="city/layers/vc/cloud_a.webp" alt=""><img src="city/layers/vc/cloud_a.webp" alt=""></div>
+        <p class="rwf-fact">Coast redwoods are the tallest living things on Earth, some over 380&nbsp;feet.</p>
+      </div>
+    </div>
     <header class="wk-head">
       <div>
         <p class="wk-eyebrow">Selected work</p>
-        <h2 class="wk-title" id="wkTitle">Shipped products, <span class="serif">real numbers.</span></h2>
+        <h2 class="wk-title" id="wkTitle">Selected work</h2>
+        <button type="button" class="cm-pause" id="cmPause" aria-pressed="false">Pause motion</button>
       </div>
-      <p class="wk-sub">I designed all six. I wrote the code for three.</p>
     </header>
 
     <div class="wk-grid">
@@ -5509,9 +6198,11 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <img class="wk-still" src="images/vc/meet-look.webp" alt="Verified Call panel inside Google Meet naming ChatGPT and when it used the microphone" loading="lazy" width="1200" height="1005">
         </div>
         <div class="wk-body">
-          <p class="wk-meta"><span>Founder</span><span>Design + build, solo</span><span>3 weeks</span></p>
+          <p class="wk-meta"><span>Founder</span></p>
           <h3 class="wk-name" id="wk-n1">Verified Call</h3>
-          <p class="wk-line">Confirms the person on a hiring call is real, is who they say they are, and is not reading answers from a hidden AI tool. Face, voice, camera and apps, checked the whole call. In testing, <b>0 of 3,990</b> face swaps got through and hidden AI tools were caught <b>30 of 30</b> times. <b>20 companies</b> in the closed beta.</p>
+          <p class="wk-line">I'm building Verified Call solo, to remove cheating from video calls.</p>
+          <p class="cm-pills"><span><b>20 companies</b> in the closed beta</span><span><b>3 weeks</b> to build, solo</span><span><i></i>Now in go-to-market</span></p>
+          <ul class="wk-tools" aria-label="Built with"><li>Figma</li><li>Electron</li><li>React</li><li>Next.js</li><li>TypeScript</li><li>Amazon Rekognition</li><li>AI coding agents</li></ul>
           <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
         </div>
       </a>
@@ -5526,7 +6217,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <div class="wk-body">
           <p class="wk-meta"><span>Sole product designer</span><span>EverTutor</span></p>
           <h3 class="wk-name" id="wk-n2">EverTutor Live</h3>
-          <p class="wk-line">A voice AI tutor that took 1:1 tutoring from <b>$250 to $5</b> an hour. <b>2,000+</b> students a day.</p>
+          <p class="wk-line">A voice AI tutor that took 1:1 tutoring from $250 to $5 an hour.</p>
+          <p class="cm-pills"><span><b>2,000+</b> students a day</span><span><b>8+</b> schools</span><span><b>$9.5M</b> seed-funded</span></p>
+          <ul class="wk-tools" aria-label="Built with"><li>Figma</li><li>Design system</li><li>AI coding agents</li></ul>
           <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
         </div>
       </a>
@@ -5541,12 +6234,14 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <div class="wk-body">
           <p class="wk-meta"><span>Sole product designer</span><span>EverTutor</span></p>
           <h3 class="wk-name" id="wk-n3">EverTutor Studio</h3>
-          <p class="wk-line">Cut lesson creation from <b>104 hours to 4</b>. <b>3,000+</b> lessons made with it.</p>
+          <p class="wk-line">The studio teachers use to build EverTutor's lessons.</p>
+          <p class="cm-pills"><span><b>104h → 4h</b> to make a lesson</span><span><b>3,000+</b> lessons made</span></p>
+          <ul class="wk-tools" aria-label="Built with"><li>Figma</li><li>Next.js</li><li>TypeScript</li><li>Tailwind</li><li>Design system</li><li>AI coding agents</li></ul>
           <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
         </div>
       </a>
 
-      <a class="wk-card wk-5" href="stressie-studio.html" aria-labelledby="wk-n4">
+      <a class="wk-card wk-5" href="stressie-studio.html" hidden aria-labelledby="wk-n4">
         <div class="wk-media wk-ss">
           <span class="wk-num">12% to 56% engagement</span>
           <span class="wk-go">Read case study &rarr;</span>
@@ -5561,7 +6256,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </div>
       </a>
 
-      <a class="wk-card wk-7" href="stressie-v4.html" aria-labelledby="wk-n5">
+      <a class="wk-card wk-5" href="stressie-v4.html" aria-labelledby="wk-n5">
         <div class="wk-media wk-v4">
           <span class="wk-num">Built in SwiftUI</span>
           <span class="wk-go">Read case study &rarr;</span>
@@ -5571,30 +6266,228 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <img class="coin" src="images/thumbs/coin.webp" alt="" loading="lazy">
         </div>
         <div class="wk-body">
-          <p class="wk-meta"><span>Founding designer</span><span>Design + build</span></p>
+          <p class="wk-meta"><span>Founding designer</span></p>
           <h3 class="wk-name" id="wk-n5">Stressie V4</h3>
-          <p class="wk-line">Designed in Figma, built in SwiftUI: a check-in that turns into plans after work, in <b>3 languages</b>.</p>
+          <p class="wk-line">A stress check-in that pays for your evening.</p>
+          <p class="cm-pills"><span><b>12% → 56%</b> daily engagement</span><span><b>$600K</b> funding unlocked</span><span><b>171 Swift files</b> built solo</span></p>
+          <ul class="wk-tools" aria-label="Built with"><li>Figma</li><li>SwiftUI</li><li>Swift</li><li>Metal</li><li>Localization</li><li>AI coding agents</li></ul>
           <p class="wk-links"><span>Read case study <i>&rarr;</i></span></p>
         </div>
       </a>
 
-      <a class="wk-card wk-12" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener" aria-labelledby="wk-n6">
+      <a class="wk-card wk-7" href="https://dearly-rho.vercel.app" target="_blank" rel="noopener" aria-labelledby="wk-n6">
         <div class="wk-media wk-dl">
           <span class="wk-num">140+ letters sent</span>
-          <span class="wk-go">Visit Dearly &#8599;</span>
+          <span class="wk-go">Visit Dearly &#8599;<span class="sr-only"> (opens in a new tab)</span></span>
           <img class="cover" src="images/card-dearly.webp" alt="" loading="lazy">
           <video data-wk-hover src="images/thumbs/dearly.mp4" muted loop playsinline preload="none"></video>
         </div>
         <div class="wk-body">
-          <p class="wk-meta"><span>Solo build</span><span>48 hours</span></p>
+          <p class="wk-meta"><span>Solo build</span></p>
           <h3 class="wk-name" id="wk-n6">Dearly</h3>
-          <p class="wk-line">Voice letters you can hear and keep. <b>140+</b> sent, <b>35</b> five-star ratings.</p>
+          <p class="wk-line">Voice letters you can hear and keep.</p>
+          <p class="cm-pills"><span><b>140+</b> letters sent</span><span><b>35</b> five-star ratings</span><span><b>48 hours</b>, built solo</span></p>
+          <ul class="wk-tools" aria-label="Built with"><li>React</li><li>Three.js</li><li>Supabase</li><li>ElevenLabs</li><li>Claude API</li><li>Vercel</li></ul>
           <p class="wk-links"><span>Visit Dearly <i>&#8599;</i></span></p>
         </div>
       </a>
 
     </div>
   </section>
+
+  <!-- ══ PROJECT COMMERCIALS (12 Nov, owner) ══════════════════════════════════════════
+       Each work card plays a short captioned "commercial" that explains the product in a few seconds:
+       Verified Call (remote interview → face swap + hidden AI → Verified Call flags it) and Stressie V4
+       (sign in → language → check in → coins → spend after work), on a phone. The old card media is hidden,
+       not deleted. Stages are drawn at a fixed design size and scaled to the card. -->
+  <style>
+    .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+    .cm-pause{align-self:flex-end;font:600 13px 'Montserrat',sans-serif;color:rgba(255,255,255,.7);background:none;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 14px;cursor:pointer}
+    .cm-pause:hover,.cm-pause:focus-visible{color:#fff;border-color:rgba(255,255,255,.4);outline:none}
+    html.motion-paused .cm *,html.motion-paused .cm *::before,html.motion-paused .cm *::after{animation-play-state:paused!important;transition:none!important}
+    /* content pass (12 Nov, owner-approved): hidden blocks stay in the file, one attribute to bring back */
+    .wk-card[hidden],#shortsSection[hidden],.dna2-tile[hidden],.ft-cta-dock[hidden],.ft-note[hidden]{display:none!important}
+    #work .wk-links{display:none!important}
+    #work .wk-eyebrow{display:none!important}   /* the heading now says it */
+    .reel-fab{display:none!important}           /* shorts are off the homepage */
+    .dna2-legend{display:none!important}
+    .ft-contact .ft-mail a{font-size:clamp(20px,2vw,28px);font-weight:600}
+    /* one type family with the hero (owner, 12 Nov) */
+    #work, #work .wk-title, #work .wk-title .serif, #work .wk-name, #work .wk-line, #work .wk-meta, #work .wk-links, #work .wk-eyebrow, #work .cm-pills{font-family:'Montserrat',sans-serif!important}
+    #work .wk-title{font-weight:700;letter-spacing:-.025em}
+    #work .wk-title .serif{font-style:normal;font-weight:700}
+    #work .wk-name{font-weight:700;letter-spacing:-.02em}
+    #work .wk-line{font-size:clamp(17px,1.3vw,20px);line-height:1.5}
+    .wk-media.cm-on > :not(.cm):not(.wk-go){display:none!important}
+    .wk-media.cm-on{background:#EDE5D8!important}
+    /* show, don't tell (owner, 12 Nov): no captions, no step lists, no drop shadows; the product carries the story */
+    .cm{position:absolute;left:50%;top:50%;width:720px;height:420px;transform:translate(-50%,-50%) scale(var(--cs,1));transform-origin:50% 50%;
+        display:grid;place-items:center;font-family:var(--sans);color:#1F1B24}
+    .cm > .vcm{width:100%}
+    .cm .beats{list-style:none;margin:0;padding:0;display:grid;gap:14px;counter-reset:b}
+    .cm .beats li{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;font-size:17px;line-height:1.3;font-weight:600;color:rgba(31,27,36,.32);transition:color .3s}
+    .cm .beats li::before{counter-increment:b;content:counter(b);display:grid;place-items:center;width:26px;height:26px;border-radius:50%;
+        background:rgba(31,27,36,.1);color:rgba(31,27,36,.45);font-size:12.5px;font-weight:700}
+    .cm .beats li.on{color:#1F1B24}.cm .beats li.on::before{background:#1F1B24;color:#fff}
+    .cm .beats li > span{grid-column:2}
+    .cm .beats li small{display:block;font-size:13px;font-weight:500;color:rgba(31,27,36,.55);margin-top:3px;grid-column:2}
+    .cm > *{min-height:0;max-height:420px}
+    .cm-pills{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 6px}
+    .cm-pills span{display:inline-flex;align-items:center;gap:8px;font-size:clamp(15px,1.1vw,17px);line-height:1;padding:11px 16px;border-radius:999px;
+      background:rgba(255,255,255,.08);color:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.12)}
+    .cm-pills b{color:#fff;font-weight:700}
+    .cm-pills i{width:7px;height:7px;border-radius:50%;background:#16845E}
+    /* — Verified Call call screen — */
+    .vcm{position:relative;height:100%;border-radius:16px;overflow:hidden;background:#14171D;color:#fff}
+    .vcm .tile{position:absolute;border-radius:12px;overflow:hidden;background:#222;transition:right .6s cubic-bezier(.2,.8,.2,1),opacity .4s}
+    .vcm .tile img{width:100%;height:100%;object-fit:cover;display:block}
+    .vcm .nm{position:absolute;left:8px;bottom:8px;font-size:12px;font-weight:600;background:rgba(0,0,0,.5);padding:3px 8px;border-radius:6px}
+    .vcm .cand{left:12px;top:12px;right:12px;bottom:12px}
+    .vcm .you{right:24px;top:24px;width:24%;aspect-ratio:1;border:2px solid #14171D;z-index:2}
+    .vcm .swap{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);font-size:13px;font-weight:800;padding:4px 10px;border-radius:6px;background:#E85D4A;opacity:0;transition:opacity .3s}
+    .vcm .flag{position:absolute;left:10px;right:10px;top:10px;text-align:center;font-size:15px;font-weight:800;padding:8px;border-radius:9px;background:#D93B30;opacity:0;transform:translateY(-6px);transition:all .4s}
+    .vcm .ai{position:absolute;left:24px;bottom:46px;display:flex;align-items:center;gap:8px;font-size:13px;background:#fff;color:#1F1B24;padding:8px 12px;border-radius:10px;
+        opacity:0;transform:translateY(8px);transition:all .4s;z-index:3}
+    .vcm .ai b{color:#10A37F}
+    .vcm .panel{position:absolute;right:12px;top:12px;bottom:12px;width:44%;background:#FAF8F4;color:#1F1B24;border-radius:12px;padding:14px;transform:translateX(115%);transition:transform .6s cubic-bezier(.2,.8,.2,1);z-index:4}
+    .vcm .panel h5{display:flex;align-items:center;gap:7px;margin:0 0 12px;font-size:14px}
+    .vcm .panel h5 i{width:14px;height:15px;background:#16845E;clip-path:polygon(50% 0,100% 18%,92% 70%,50% 100%,8% 70%,0 18%)}
+    .vcm .panel ul{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+    .vcm .panel li{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600}
+    .vcm .panel li em{width:20px;height:20px;border-radius:50%;border:2px solid #C9C3B8;flex:none;display:grid;place-items:center;font-style:normal;font-size:12px;color:#fff;transition:all .3s}
+    .vcm .panel li.ok em{background:#16845E;border-color:#16845E}.vcm .panel li.ok em::after{content:'✓'}
+    .vcm .panel li.bad em{background:#D93B30;border-color:#D93B30}.vcm .panel li.bad em::after{content:'✕'}
+    .vcm .panel li.bad{color:#C0392B}
+    .vcm[data-s="2"] .face{animation:cmGlitch 1.4s steps(1) 1}
+    .vcm[data-s="2"] .swap,.vcm[data-s="3"] .swap{opacity:1}
+    .vcm[data-s="2"] .ai,.vcm[data-s="3"] .ai{opacity:1;transform:none}
+    .vcm[data-s="3"] .panel{transform:none}
+    .vcm[data-s="3"] .cand{right:calc(44% + 22px)}.vcm[data-s="3"] .you{opacity:0}
+    .vcm.flagged .flag{opacity:1;transform:none}
+    @keyframes cmGlitch{0%{filter:none}15%{filter:hue-rotate(40deg) contrast(1.6);transform:translateX(5px) skewX(4deg)}30%{transform:translateX(-5px)}45%{filter:contrast(1.3);transform:none}60%{transform:translateX(3px)}75%,100%{filter:none;transform:none}}
+    /* — Stressie phone — */
+    .stm{position:relative;height:100%;display:grid;place-items:center}
+    .stm{height:100%}
+    /* the SwiftUI screenshots already include the rounded screen and Dynamic Island, so no drawn device frame */
+    .stm .iph{position:relative;height:100%;aspect-ratio:720/1565;background:none!important;padding:0!important}
+    .stm .iph::before,.stm .iph > i.b,.stm .isl{display:none!important}
+    .stm .scr{inset:0!important;border-radius:0!important;background:none!important;overflow:visible!important}
+    .stm .scr img{object-fit:cover!important;border-radius:13% / 6%;box-shadow:0 0 0 4px #161618,0 0 0 5px #8E8A84}   /* thin bezel + titanium hairline, no drop shadow */
+    .stm .iph-old{position:relative;height:100%;aspect-ratio:71.6/147.6;border-radius:44px;padding:3px;
+      background:linear-gradient(135deg,#8E8A84 0%,#D6D2CB 18%,#7C7873 40%,#B9B4AC 62%,#6E6A65 85%,#A9A49C 100%)}  /* natural titanium */
+    .stm .iph::before{content:'';position:absolute;inset:3px;border-radius:41px;background:#0B0B0C}               /* black bezel */
+    .stm .iph > i.b{position:absolute;width:3px;border-radius:2px;background:linear-gradient(90deg,#6E6A65,#B9B4AC)}
+    .stm .iph > i.b1{left:-3px;top:17%;height:5%}.stm .iph > i.b2{left:-3px;top:25%;height:9%}.stm .iph > i.b3{left:-3px;top:36%;height:9%}
+    .stm .iph > i.b4{right:-3px;top:28%;height:14%}
+    .stm .isl{position:absolute;left:50%;top:22px;width:31%;height:20px;border-radius:12px;background:#000;transform:translateX(-50%);z-index:3}
+    .stm .scr{position:absolute;inset:12px;border-radius:33px;overflow:hidden;background:#F6F1E8}
+    .stm .scr img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:translateX(18%);transition:opacity .45s,transform .55s cubic-bezier(.2,.8,.2,1)}
+    .stm .scr img.on{opacity:1;transform:none}.stm .scr img.out{opacity:0;transform:translateX(-18%)}
+    .stm .lang{position:absolute;top:22%;left:calc(100% + 18px);display:grid;gap:7px;opacity:0;transition:opacity .3s}
+    .stm .lang span{font:700 13px var(--sans);padding:7px 12px;border-radius:999px;background:#fff;color:#4A4450;transition:all .25s}
+    .stm .lang span.on{background:#1F1B24;color:#fff}
+    .stm[data-s="2"] .lang{opacity:1}
+    .stm .finger{position:absolute;width:30px;height:30px;border-radius:50%;background:rgba(30,30,30,.22);border:2.5px solid rgba(255,255,255,.95);z-index:4;opacity:0;
+        transition:left .9s cubic-bezier(.4,0,.2,1),top .9s cubic-bezier(.4,0,.2,1),opacity .3s,transform .15s}
+    .stm .finger.press{transform:scale(.8)}
+    .stm .pop{position:absolute;left:50%;top:40%;transform:translate(-50%,0) scale(.6);font:800 22px var(--sans);color:#B98A1E;opacity:0;transition:all .5s cubic-bezier(.2,.8,.2,1);z-index:4}
+    .stm .pop.on{opacity:1;transform:translate(-50%,-40px) scale(1)}
+    /* — MacBook (EverTutor) and browser window (Dearly): real product recordings, code-built frames, no shadows — */
+    .mbp{width:600px;display:flex;flex-direction:column;align-items:center}
+    .mbp .lid{width:100%;padding:12px 12px 16px;border-radius:18px 18px 4px 4px;background:#0B0B0C;position:relative;
+      box-shadow:inset 0 0 0 1.5px #3A3A3D}
+    .mbp .lid::before{content:'';position:absolute;left:50%;top:5px;width:5px;height:5px;border-radius:50%;background:#1E1E22;transform:translateX(-50%)}
+    .mbp video{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top;border-radius:4px;background:#fff}
+    .mbp .base{width:116%;height:14px;border-radius:0 0 14px 14px;background:linear-gradient(180deg,#E3E3E6 0%,#C9C9CD 55%,#A9A9AE 100%);position:relative}
+    .mbp .base::before{content:'';position:absolute;left:50%;top:0;width:15%;height:5px;border-radius:0 0 7px 7px;background:#B4B4B9;transform:translateX(-50%)}
+    .bwin{width:680px;border-radius:12px;overflow:hidden;background:#fff;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+    .bwin .bar{display:flex;align-items:center;gap:7px;height:30px;padding:0 12px;background:#F1EEE9;border-bottom:1px solid #E4DED4}
+    .bwin .bar i{width:10px;height:10px;border-radius:50%;background:#E0574F}.bwin .bar i:nth-child(2){background:#E6B33C}.bwin .bar i:nth-child(3){background:#5CB85C}
+    .bwin .bar span{margin-left:14px;flex:1;max-width:360px;font:500 12px var(--sans);color:#8B8478;background:#fff;border-radius:7px;padding:4px 10px;text-align:center}
+    .bwin video,.wk-dl .bwin video{display:block;position:static!important;inset:auto!important;opacity:1!important;transform:none!important;width:100%!important;height:auto!important;aspect-ratio:1280/592;object-fit:cover!important;object-position:50% 50%!important}
+    @media (max-width:900px){ .cm{grid-template-columns:1fr;width:420px;height:560px}.cm .beats{grid-template-columns:repeat(3,auto);gap:8px}.cm .beats li{font-size:13px}.cm .beats li small{display:none} }
+  </style>
+  <script>
+    (function () {
+      var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function fit(media, stage) {                                         // scale the fixed-size stage to the card
+        function f() { var r = media.getBoundingClientRect(), w = stage.offsetWidth, h = stage.offsetHeight;
+          stage.style.setProperty('--cs', Math.min(r.width * 0.9 / w, r.height * 0.86 / h).toFixed(3)); }
+        f(); if (window.ResizeObserver) new ResizeObserver(f).observe(media); addEventListener('resize', f);
+      }
+      function mount(card, html) { var m = card.querySelector('.wk-media'); if (!m) return null;
+        m.classList.add('cm-on'); var d = document.createElement('div'); d.className = 'cm'; d.setAttribute('aria-hidden', 'true'); d.innerHTML = html; m.appendChild(d); fit(m, d); return d; }
+      // play a timeline only while the card is on screen
+      function run(stage, steps, loopMs) {
+        var timers = [], live = false;
+        function clear() { timers.forEach(clearTimeout); timers = []; }
+        function play() { clear(); if (document.documentElement.classList.contains('motion-paused')) { timers.push(setTimeout(play, 600)); return; } steps.forEach(function (st) { timers.push(setTimeout(st[1], st[0])); }); timers.push(setTimeout(play, loopMs)); }
+        if (reduce) { steps.forEach(function (st) { st[1](); }); return; }
+        new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && !live) { live = true; play(); } else if (!e.isIntersecting && live) { live = false; clear(); } }); }, { threshold: 0.35 }).observe(stage);
+      }
+      function beat(stage, n) { stage.querySelectorAll('.beats li').forEach(function (li, i) { li.classList.toggle('on', i === n); }); }
+
+      // pause / play all project motion (WCAG 2.2.2)
+      var pb = document.getElementById('cmPause');
+      if (pb) pb.addEventListener('click', function () {
+        var on = document.documentElement.classList.toggle('motion-paused');
+        pb.setAttribute('aria-pressed', on ? 'true' : 'false'); pb.textContent = on ? 'Play motion' : 'Pause motion';
+        document.querySelectorAll('.cm video').forEach(function (v) { if (on) v.pause(); else if (v.getBoundingClientRect().top < innerHeight) v.play().catch(function () {}); });
+      });
+      // ── Verified Call ──
+      var vc = document.querySelector('.wk-card[href="verified-call.html"]');
+      if (vc) { var s1 = mount(vc, '<div class="vcm" data-s="1"><div class="tile cand"><img class="face" src="images/vc/face-cand.webp" alt=""><span class="nm">Alex · Candidate</span><span class="swap">Face swap</span><span class="flag">Cheating detected</span></div>' +
+          '<div class="tile you"><img src="images/vc/face-int.webp" alt=""><span class="nm">You</span></div>' +
+          '<div class="ai">✦ <span><b>ChatGPT</b> hidden · whispering answers</span></div>' +
+          '<div class="panel"><h5><i></i>Verified Call</h5><ul><li><em></em>Real camera</li><li><em></em>Face match</li><li><em></em>Same voice</li><li><em></em>Hidden apps</li></ul></div></div>');
+        if (s1) { var v = s1.querySelector('.vcm'), rows = v.querySelectorAll('.panel li');
+          run(s1, [
+            [0, function () { v.dataset.s = '1'; v.classList.remove('flagged'); rows.forEach(function (r) { r.className = ''; }); beat(s1, 0); }],
+            [2200, function () { v.dataset.s = '2'; beat(s1, 1); }],
+            [5200, function () { v.dataset.s = '3'; beat(s1, 2); }],
+            [6000, function () { rows[0].className = 'ok'; }], [6500, function () { rows[1].className = 'bad'; }],
+            [7000, function () { rows[2].className = 'ok'; }], [7500, function () { rows[3].className = 'bad'; }],
+            [8100, function () { v.classList.add('flagged'); }]
+          ], 11000); } }
+
+      // ── real recordings in device frames, playing only while on screen ──
+      function playWhenVisible(stage) { var v = stage.querySelector('video'); if (!v) return;
+        if (reduce) { v.removeAttribute('autoplay'); return; }
+        new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && !document.documentElement.classList.contains('motion-paused')) { v.play().catch(function () {}); } else v.pause(); }); }, { threshold: 0.3 }).observe(stage); }
+      [['evertutor-live.html', '<div class="mbp"><div class="lid"><video src="images/et-live.mp4" poster="images/et-live.png" muted loop playsinline preload="metadata"></video></div><div class="base"></div></div>'],
+       ['evertutor-studio.html', '<div class="mbp"><div class="lid"><video src="images/et-studio.mp4" poster="images/et-studio.png" muted loop playsinline preload="metadata"></video></div><div class="base"></div></div>'],
+       ['https://dearly-rho.vercel.app', '<div class="bwin"><div class="bar"><i></i><i></i><i></i><span>dearly-rho.vercel.app</span></div><video src="images/thumbs/dearly.mp4" poster="images/card-dearly.webp" muted loop playsinline preload="metadata"></video></div>']
+      ].forEach(function (d) { var card = document.querySelector('.wk-card[href="' + d[0] + '"]'); if (!card) return; var st = mount(card, d[1]); if (st) playWhenVisible(st); });
+
+      // ── Stressie V4 ──
+      var st = document.querySelector('.wk-card[href="stressie-v4.html"]');
+      if (st) { var P = 'images/stressie-v4/';
+        var s2 = mount(st, '<div class="stm" data-s="1"><div class="iph"><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="isl"></i><div class="scr">' +
+          ['real-welcome', 'lang-en', 'lang-es', 'lang-sw', 'checkin-shape', 'checkin-reward', 'offwork-map', 'offwork-redeem'].map(function (n) { return '<img data-n="' + n + '" src="' + P + n + '.webp" alt="">'; }).join('') +
+          '<span class="pop">+10</span><i class="finger"></i></div><div class="lang"><span data-l="en">English</span><span data-l="es">Español</span><span data-l="sw">Kiswahili</span></div></div></div>');
+        if (s2) { var ph = s2.querySelector('.stm'), fin = ph.querySelector('.finger'), pop = ph.querySelector('.pop');
+          ph.querySelector('.scr img').classList.add('on');
+          function show(n) { ph.querySelectorAll('.scr img').forEach(function (im) { var on = im.dataset.n === n; if (im.classList.contains('on') && !on) { im.classList.add('out'); setTimeout(function () { im.classList.remove('out'); }, 500); } im.classList.toggle('on', on); }); }
+          function lang(l) { ph.querySelectorAll('.lang span').forEach(function (x) { x.classList.toggle('on', x.dataset.l === l); }); }
+          function finger(x, y, vis) { fin.style.left = x + '%'; fin.style.top = y + '%'; fin.style.opacity = vis ? 1 : 0; }
+          function tap() { fin.classList.add('press'); setTimeout(function () { fin.classList.remove('press'); }, 180); }
+          run(s2, [
+            [0, function () { ph.dataset.s = '1'; beat(s2, 0); show('real-welcome'); pop.classList.remove('on'); finger(50, 86, false); }],
+            [700, function () { finger(50, 70, true); }], [1500, tap],
+            [1900, function () { ph.dataset.s = '2'; beat(s2, 1); show('lang-en'); lang('en'); finger(50, 70, false); }],
+            [2900, function () { show('lang-es'); lang('es'); }],
+            [3900, function () { show('lang-sw'); lang('sw'); }],
+            [4900, function () { ph.dataset.s = '3'; beat(s2, 2); show('checkin-shape'); finger(18, 55, true); }],
+            [5300, function () { finger(70, 55, true); }],
+            [6400, function () { finger(70, 55, false); beat(s2, 3); show('checkin-reward'); }],
+            [6700, function () { pop.classList.add('on'); }],
+            [7800, function () { pop.classList.remove('on'); beat(s2, 4); show('offwork-map'); finger(60, 40, true); }],
+            [8700, tap],
+            [9000, function () { show('offwork-redeem'); finger(60, 40, false); }]
+          ], 11500); } }
+    })();
+  </script>
+
   <script>
   /* tap cues: read data-taps on each loop, fire a ring at the recorded click time */
   (function(){
@@ -6043,7 +6936,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     .hero .role-line a{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:600;text-decoration:none;
       border-bottom:1px solid rgba(226,238,252,.35);padding-bottom:1px;transition:border-color .3s;}
     .hero .role-line a:hover{border-color:var(--ink);}
-    .hero .role-line a img{width:18px;height:18px;flex:none;}
+    .hero .role-line a svg{width:15px;height:15px;flex:none;transition:transform .3s var(--ease);}
+    .hero .role-line a:hover svg{transform:translate(2px,-2px);}
     @media (max-width:767px){
       .hero .eyebrow.role-line{justify-content:center;flex-direction:column;gap:6px;font-size:15px;text-align:center}
       .hero .role-line .sep{display:none}
@@ -6152,7 +7046,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     }
   </style>
 
-  <section class="reel-section" id="shortsSection" aria-label="Short-form films">
+  <section class="reel-section" id="shortsSection" aria-label="Short-form films" hidden>
     <div class="reel-head">
       <div>
         <h2 class="reel-title">Short films on the <span class="serif">psychology</span> behind products people trust.</h2>
@@ -6216,12 +7110,13 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   </section>
 
   <!-- ── shorts→about seam — the same breath the other sections get ── -->
-  <div class="sec-divider sec-divider--empty" aria-hidden="true"></div>
+  <div class="sec-divider sec-divider--empty" aria-hidden="true" hidden></div>
 
   <!-- ── 03 — ABOUT: the T ─────────────────────────────────────────────── -->
+  <!-- (12 Nov 2026, owner) "How I work" skipped: the chapters show the work, the page ends on the footer. Kept, hidden. -->
   <!-- ══ SECTION 3 — ported from index.html ══════════════════════════
        The DNA T-shape as it ships on the reference, not a rebuild. -->
-      <section class="am-section" id="aboutSection">
+      <section class="am-section" id="aboutSection" hidden>
         <div class="cinematic-wrap">
 
         <!-- (the "About Me" whisper is out — the DNA heading is the
@@ -6238,7 +7133,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <div class="abt-pane is-active" id="abt-dna">
             <div class="dna2">
               <div class="dna2-aside">
-                <h2 class="dna2-heading">The shape of how I <span class="circled serif">work.</span></h2>
+                <h2 class="dna2-heading">How I <span class="circled serif">work.</span></h2>
                 <p class="dna2-lede">Strategy and research up front, craft at the core,
                    and I build what I design.</p>
                 <div class="dna2-legend">
@@ -6257,7 +7152,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
                     <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Customer Dis&shy;covery</span>
                     <span class="dna2-q" hidden>I listen to what people <em>say</em>, then watch what they do. Most early calls are just listening.</span>
                   </button>
-                  <button class="dna2-tile" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Strategy.svg')">
+                  <button class="dna2-tile" data-cut hidden style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/product%20Strategy.svg')">
                     <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Product Strategy</span>
                     <span class="dna2-q" hidden>Beautiful work that ships the wrong thing is still wrong. I sweat <em>what</em> we build before <em>how</em> it looks.</span>
                   </button>
@@ -6269,22 +7164,22 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
                     <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Product Builder</span>
                     <span class="dna2-q" hidden>I don't hand off and walk away. I sit with engineers until it's <em>real and shipped</em>.</span>
                   </button>
-                  <button class="dna2-tile" style="--c1:#6FE0A0;--c2:#1FA55E;--lc:#34BE72;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg')">
+                  <button class="dna2-tile" data-cut hidden style="--c1:#6FE0A0;--c2:#1FA55E;--lc:#34BE72;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Engineering%20Collaboration.svg')">
                     <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Engi&shy;neering Collab</span>
                     <span class="dna2-q" hidden>I speak enough engineering to know what's cheap, what's pricey, and when &ldquo;it's complicated&rdquo; means <em>no</em>.</span>
                   </button>
                 </div>
                 <div class="dna2-lower">
                   <div class="dna2-stem">
-                      <button class="dna2-tile" style="--c1:#5FD9B4;--c2:#149E78;--lc:#1FC096;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg')">
+                      <button class="dna2-tile" data-cut hidden style="--c1:#5FD9B4;--c2:#149E78;--lc:#1FC096;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Research.svg')">
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Research</span>
                         <span class="dna2-q" hidden>I'd rather <em>kill my idea in a 20-minute interview</em> than defend it for six months in production.</span>
                       </button>
-                      <button class="dna2-tile" style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/First%20Principles.svg')">
+                      <button class="dna2-tile" data-cut hidden style="--c1:#6BB2F7;--c2:#2C6FD6;--lc:#4A90E8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/First%20Principles.svg')">
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">First Prin&shy;ciples</span>
                         <span class="dna2-q" hidden>I break problems down to what's <em>actually true</em>, then build back up. Best practices are someone else's constraints.</span>
                       </button>
-                      <button class="dna2-tile" style="--c1:#CD7CEE;--c2:#B0379E;--lc:#CB5AD0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg')">
+                      <button class="dna2-tile" data-cut hidden style="--c1:#CD7CEE;--c2:#B0379E;--lc:#CB5AD0;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Systems.svg')">
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Systems Thinking</span>
                         <span class="dna2-q" hidden>I design the <em>system</em>, not the screen. One component should answer ten questions you haven't asked yet.</span>
                       </button>
@@ -6292,7 +7187,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">AI Native</span>
                         <span class="dna2-q" hidden>AI isn't a feature I bolt on. It's a <em>material I design with</em>. I prototype, ship, and think AI-native.</span>
                       </button>
-                      <button class="dna2-tile" style="--c1:#5FE0CE;--c2:#12A38E;--lc:#1FC0A8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')">
+                      <button class="dna2-tile" data-cut hidden style="--c1:#5FE0CE;--c2:#12A38E;--lc:#1FC0A8;--icon:url('T%20shape%20designer%20Icons/SVG%20Icons/Goal.svg')">
                         <span class="dna2-tile-ic"></span><span class="dna2-tile-nm">Measured Impact</span>
                         <span class="dna2-q" hidden>If I can't tie it to a <em>number that moved</em>, it was decoration. I design for outcomes.</span>
                       </button>
@@ -6380,6 +7275,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         </div><!-- /cinematic-wrap -->
       </section>
 
+  </main>
+
   <!-- ── 05 — FOOTER ───────────────────────────────────────────────────── -->
   <footer class="ft" id="contactSection">
 
@@ -6395,8 +7292,23 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <!-- no autoplay: autoplay overrides preload="none" and fetched ~4.6 MB at
          load. The script below starts it when the footer comes into view. -->
     <video class="ft-plate" id="ftPlate" muted loop playsinline preload="none"
-           poster="images/footer-silhouette-poster.webp" src="images/footer-silhouette.mp4"
-           aria-hidden="true"></video>
+           poster="images/footer-silhouette-poster.webp" data-src="images/footer-silhouette.mp4"
+           aria-hidden="true" hidden></video>
+    <!-- (12 Nov 2026, owner: footer "not consistent with the whole page") the page closes where it opened: the hero's Golden Gate, at night.
+         The old silhouette video, grain and geometry are kept but hidden; src moved to data-src so the 4.6 MB clip never loads. -->
+    <img class="ft-night" src="city/layers/gg_ai/plate_night.webp" alt="" aria-hidden="true" decoding="async" loading="lazy">
+    <!-- (12 Nov, owner: "implement the same thing you have in section 1 in the footer") the hero's living painting itself, at night:
+         rippling bay, gulls, layered towers. The still above stays as the poster underneath while it loads. -->
+    <iframe class="ft-live" id="ftCity" src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=26" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
+    <!-- the night scene's life (owner: "the last section is not animating" / "bring in clouds") -->
+    <div class="ft-life" aria-hidden="true">
+      <canvas class="ft-stars"></canvas>
+      <img class="ft-cloud ft-cloud-hi" src="city/layers/vc/cloud_a.webp" alt="" loading="lazy">
+      <img class="ft-cloud ft-cloud-fog" src="city/layers/vc/cloud_a.webp" alt="" loading="lazy">
+      <img class="ft-cloud ft-cloud-fog2" src="city/layers/vc/cloud_a.webp" alt="" loading="lazy">
+      <div class="ft-shimmer"></div>
+    </div>
+    <div class="ft-shade" aria-hidden="true"></div>
     <div class="ft-vig" aria-hidden="true"></div>
 
     <div class="ft-grain" aria-hidden="true">
@@ -6421,12 +7333,12 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
 
           <h2 class="ft-cta">
             <span class="ft-line">Looking for a designer who moves&nbsp;fast?</span>
-            <span class="ft-line serif">Email me.</span>
+            <a class="ft-line serif ft-mailto" href="mailto:kowshikbhanu1000@gmail.com">Email me.</a>
           </h2>
 
           <!-- the hero's own button, so the page closes on the same invitation
                it opened with rather than on a floating orb in the corner -->
-          <div class="ft-cta-dock">
+          <div class="ft-cta-dock" hidden>
             <button class="cta" id="ftTalk" aria-label="Chat with Bhanu AI" aria-haspopup="dialog">
               <span class="cta-orb" id="ftCtaOrb"><div id="ftOrbMount"></div></span>
               <span class="cta-text" id="ftCtaText">
@@ -6440,7 +7352,6 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           </div>
 
           <div class="ft-contact">
-            <span class="ft-k">Email</span>
             <div class="ft-mail">
               <a href="mailto:kowshikbhanu1000@gmail.com">kowshikbhanu1000@gmail.com</a>
               <button class="ft-copy" id="ftCopy" type="button" data-copy="kowshikbhanu1000@gmail.com" aria-label="Copy email address">
@@ -6463,7 +7374,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           </div>
         </div>
 
-        <div class="ft-note" id="ftNote">
+        <div class="ft-note" id="ftNote" hidden>
           <span class="ft-k">A small note for you</span>
           <div class="ft-paper">
             <p class="ft-letter">You&rsquo;ve probably noticed the pattern.<br>I like messy problems with no obvious answer. Give me one.<br>I&rsquo;ll find what matters, make it simple, and ship it.</p>
@@ -6931,6 +7842,48 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <span class="orb-fab-mount" id="fabOrbMount"></span>
   </button>
 
+  <!-- the rail (owner, 12 Nov): About me · Work · Résumé · Contact stacked in one vertical liquid-glass frame on the
+       right, with the chat blob at the bottom. Built from the existing nav links + orb button (moved, not copied). -->
+  <nav class="rail" id="rail" aria-label="Main"></nav>
+  <style>
+    .rail{display:none!important}
+    .rail--retired{position:fixed;right:clamp(14px,1.8vw,26px);top:50%;transform:translateY(-50%);z-index:calc(var(--z-fab) + 1);
+      display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:8px;border-radius:26px;
+      background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.03)),rgba(14,18,26,.18);
+      -webkit-backdrop-filter:blur(22px) saturate(1.9) brightness(1.05);backdrop-filter:blur(22px) saturate(1.9) brightness(1.05);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.12),inset 0 0 0 1px rgba(255,255,255,.16)}
+    html.hero-wait .rail{opacity:0}
+    html.hero-go .rail{animation:railIn .9s cubic-bezier(.2,.8,.2,1) .4s both}
+    @keyframes railIn{from{opacity:0;transform:translate(16px,-50%)}to{opacity:1;transform:translate(0,-50%)}}
+    .rail a{display:block;color:#fff;text-decoration:none;text-shadow:none;font:600 14.5px var(--sans);letter-spacing:-.005em;
+      padding:11px 16px;border-radius:18px;text-align:center;white-space:nowrap;transition:background .25s}
+    .rail a::after,.rail a::before{display:none!important}
+    .rail a:hover,.rail a:focus-visible{background:rgba(255,255,255,.14);outline:none}
+    .rail .rail-sep{height:1px;margin:6px 10px;background:rgba(255,255,255,.22)}
+    .rail .orb-fab{position:relative!important;right:auto!important;bottom:auto!important;opacity:1!important;transform:none!important;
+      pointer-events:auto!important;width:100%!important;height:64px!important;display:grid;place-items:center;border-radius:18px}
+    .rail .orb-fab:hover{background:rgba(255,255,255,.1);filter:brightness(1.08)}
+    .rail .orb-fab-mount{width:52px!important;height:52px!important}
+    @media (max-width:767px){
+      .rail{top:auto;bottom:14px;left:14px;right:14px;transform:none;flex-direction:row;align-items:center;justify-content:space-between;padding:6px;border-radius:22px}
+      html.hero-go .rail{animation:none}
+      .rail a{padding:10px 8px;font-size:13px;flex:1}
+      .rail .rail-sep{width:1px;height:28px;margin:0 4px}
+      .rail .orb-fab{width:52px!important;height:46px!important;flex:none}
+      .rail .orb-fab-mount{width:40px!important;height:40px!important}
+      .top-nav .nav-burger{display:none!important}
+    }
+  </style>
+  <script>
+    (function () {
+      return;   // (12 Nov, owner) back to the top nav bar; the vertical rail is retired
+      var rail = document.getElementById('rail'), links = document.querySelector('.top-nav .nav-links'), fab = document.getElementById('orbFab');
+      if (!rail || !links) return;
+      Array.prototype.forEach.call(links.querySelectorAll('a'), function (a) { rail.appendChild(a); });
+      if (fab) { var sep = document.createElement('i'); sep.className = 'rail-sep'; sep.setAttribute('aria-hidden', 'true'); rail.appendChild(sep); rail.appendChild(fab); }
+    })();
+  </script>
+
   <div class="chat-backdrop" id="chatBackdrop"></div>
   <aside class="chat" id="chat" data-view="voice" role="dialog" aria-label="Ask me anything" aria-modal="true">
     <header class="chat-head">
@@ -7270,6 +8223,8 @@ initPromptCycler('ftTalk', 'ftCtaText');
 
 /* ═══ CHAT PANEL ═══ */
 var chat = document.getElementById('chat');
+// a11y (12 Nov 2026): while the chat/voice dialog is closed (slid off-screen) its controls must not take keyboard focus
+(function () { function sync() { chat.inert = !chat.classList.contains('open'); } sync(); new MutationObserver(sync).observe(chat, { attributes: true, attributeFilter: ['class'] }); })();
 var backdrop = document.getElementById('chatBackdrop');
 var input = document.getElementById('chatInput');
 var thread = document.getElementById('thread');
@@ -8185,7 +9140,7 @@ if (ORB_DEBUG === '') ORB_DEBUG = 'cta';
   document.documentElement.classList.add('cc-active');
 
   var DOT = 'rgba(239,243,248,0.9)';
-  var CARET = '#FFDA00';   /* the caret yellow the user picked */
+  var CARET = '#FFFFFF';   /* white text caret (was yellow #FFDA00) */
   var mx = -300, my = -300, visible = false;
   var mode = 'dot', magnetEl = null, origCX = 0, origCY = 0, snapW = 0, snapH = 0;
 
@@ -9798,5 +10753,885 @@ addEventListener('load', function () {
     }
     @media (max-width:360px){.dna2{overflow-x:clip}.ft-cta-dock .cta{max-width:100%;}.ft-cta-dock .cta-text{min-width:0}.ft-cta-dock .cta-text span{white-space:normal}}
   </style>
+<style>
+/* ══ WORK: premium pass (12 Nov; design-director spec): golden-hour stages, editorial text block (role → title → pitch → pills → tools), staggered reveal ══ */
+#work .wk-grid{row-gap:clamp(80px,9vw,144px)}
+#work .wk-card{gap:clamp(22px,2.2vw,32px)}
+#work .wk-card .wk-media.cm-on{border-radius:clamp(20px,2vw,28px);background-color:#2A2E45!important}
+#work .wk-card .wk-media.cm-on::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.32;mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:160px 160px}
+#work .wk-card .wk-media.cm-on::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:inherit;border:1px solid rgba(255,255,255,.16)}
+#work .wk-card .wk-media.cm-on > .cm{z-index:1}
+#work .wk-card .wk-media.cm-on.wk-vc{background:radial-gradient(60% 55% at 50% 100%,rgba(246,185,138,.55),transparent 70%),linear-gradient(180deg,#232741 0%,#4A4772 38%,#9A7A9E 72%,#E7A08A 100%)!important}
+#work .wk-card .wk-media.cm-on.wk-live{background:radial-gradient(55% 50% at 70% 18%,rgba(255,236,190,.85),transparent 70%),linear-gradient(180deg,#F7DCA9 0%,#F2BC8C 55%,#D98E7A 100%)!important}
+#work .wk-card .wk-media.cm-on.wk-studio{background:radial-gradient(60% 45% at 30% 15%,rgba(255,226,214,.8),transparent 70%),linear-gradient(180deg,#F1CFC8 0%,#D9B3C6 50%,#A9A6CC 100%)!important}
+#work .wk-card .wk-media.cm-on.wk-v4{background:radial-gradient(50% 45% at 50% 100%,rgba(247,206,170,.75),transparent 70%),linear-gradient(180deg,#8FA6CC 0%,#B4BFD8 45%,#EBCDB8 100%)!important}
+#work .wk-card .wk-media.cm-on.wk-dl{background:radial-gradient(55% 50% at 20% 85%,rgba(250,214,176,.7),transparent 70%),linear-gradient(180deg,#6F86B5 0%,#9DB0D2 50%,#F0C9A9 100%)!important}
+#work .wk-card .wk-body,#work .wk-12 .wk-body{display:flex!important;flex-direction:column;gap:0;max-width:820px}
+#work .wk-card .wk-meta{font-family:'JetBrains Mono',monospace!important;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#E6F28D;margin:0 0 14px;gap:6px 18px}
+#work .wk-card .wk-meta span+span{color:var(--ink-3)}
+#work .wk-card .wk-name{font-size:clamp(28px,2.8vw,48px);font-weight:700;letter-spacing:-.03em;line-height:1.02;color:var(--ink);margin:0}
+#work .wk-5 .wk-name,#work .wk-7 .wk-name{font-size:clamp(26px,2.2vw,38px)}
+#work .wk-card .wk-line{font-size:clamp(18px,1.4vw,22px);line-height:1.45;color:rgba(239,243,248,.74);max-width:52ch;margin:12px 0 0}
+#work .wk-card .cm-pills{margin:22px 0 0;gap:10px}
+#work .wk-card .cm-pills span{font-size:clamp(14px,1vw,16px);padding:10px 16px;background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14);color:rgba(239,243,248,.72)}
+#work .wk-card .cm-pills b{color:#E6F28D;font-weight:700}
+#work .wk-tools{list-style:none;margin:20px 0 0;padding:16px 0 0;border-top:1px solid rgba(255,255,255,.09);display:flex;flex-wrap:wrap;gap:6px 0;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.04em;line-height:1.5;color:rgba(239,243,248,.5)}
+#work .wk-tools li+li::before{content:'·';margin:0 10px;color:rgba(239,243,248,.28)}
+#work .wk-card:hover .wk-tools{color:rgba(239,243,248,.66)}
+#work .wk-head{margin-bottom:clamp(40px,4.5vw,72px);padding-bottom:clamp(20px,2vw,28px);border-bottom:1px solid rgba(255,255,255,.1)}
+#work .wk-head>div{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;width:100%}
+#work .wk-title{font-size:clamp(40px,4.6vw,76px);letter-spacing:-.035em;line-height:1;margin:0}
+#work .cm-pause{align-self:flex-end;margin-bottom:.4em;font:500 12px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:rgba(239,243,248,.72);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);padding:9px 14px;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+#work .cm-pause:hover,#work .cm-pause:focus-visible{color:#fff;border-color:rgba(255,255,255,.4)}
+#work.wk-rv .wk-card{opacity:0;transform:translateY(32px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform 1.1s cubic-bezier(.16,1,.3,1)}
+#work.wk-rv .wk-card.in{opacity:1;transform:none}
+#work.wk-rv .wk-card .wk-body>*{opacity:0;transform:translateY(12px);transition:opacity .7s ease,transform .8s cubic-bezier(.16,1,.3,1)}
+#work.wk-rv .wk-card.in .wk-body>*{opacity:1;transform:none}
+#work.wk-rv .wk-card.in .wk-body>:nth-child(1){transition-delay:.25s}
+#work.wk-rv .wk-card.in .wk-body>:nth-child(2){transition-delay:.31s}
+#work.wk-rv .wk-card.in .wk-body>:nth-child(3){transition-delay:.37s}
+#work.wk-rv .wk-card.in .wk-body>:nth-child(4){transition-delay:.43s}
+#work.wk-rv .wk-card.in .wk-body>:nth-child(n+5){transition-delay:.49s}
+#work.wk-rv .wk-5.in{transition-delay:.12s}
+html.motion-paused #work.wk-rv .wk-card,html.motion-paused #work.wk-rv .wk-card .wk-body>*{opacity:1!important;transform:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){#work.wk-rv .wk-card,#work.wk-rv .wk-card .wk-body>*{opacity:1!important;transform:none!important;transition:none!important}}
+@media (max-width:767px){
+  #work .wk-grid{row-gap:64px}
+  #work .wk-card{gap:20px}
+  #work .wk-card .wk-media.cm-on{border-radius:18px}
+  #work .wk-card .wk-media.cm-on.wk-vc,#work .wk-card .wk-media.cm-on.wk-v4{aspect-ratio:4/5;height:auto;min-height:0}
+  #work .wk-head{flex-direction:row;align-items:flex-end}
+  #work .wk-title{font-size:clamp(34px,10vw,44px)}
+  #work .cm-pause{font-size:11px;padding:8px 12px;margin-bottom:.25em;flex:none}
+  #work .wk-card .wk-meta{font-size:11px;margin-bottom:10px}
+  #work .wk-card .wk-name,#work .wk-5 .wk-name,#work .wk-7 .wk-name{font-size:clamp(26px,7.4vw,32px)}
+  #work .wk-card .wk-line{font-size:17px;margin-top:10px}
+  #work .wk-card .cm-pills{margin-top:18px;gap:8px}
+  #work .wk-card .cm-pills span{font-size:13.5px;padding:9px 13px}
+  #work .wk-tools{font-size:11px;margin-top:16px;padding-top:14px}
+  #work .wk-tools li+li::before{margin:0 8px}
+}
+</style>
+<script>
+/* work cards rise in once; armed only with IO, never under reduced motion */
+(function () {
+  var w = document.getElementById('work');
+  if (!w || !('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  w.classList.add('wk-rv');
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+  w.querySelectorAll('.wk-card:not([hidden])').forEach(function (c) { io.observe(c); });
+})();
+</script>
+<style>
+/* ══ WORK: reviewer fixes (12 Nov). Stages use the hero's own painting (plate.webp, already cached by the hero), cropped
+   per card and softened, instead of CSS sky gradients; full-width stages shorter with the device inset so the sky reads;
+   role line quiet; tools row readable without hover; header bigger, Pause demoted to text. Pitch stays under the title (owner). ══ */
+#work .wk-card .wk-media.cm-on::before{content:'';inset:-8%;opacity:1;mix-blend-mode:normal;
+  background:url(city/layers/gg_ai/plate.webp) var(--sp,50% 30%)/cover no-repeat;filter:blur(22px) saturate(1.08) brightness(.92);transform:scale(1.06)}
+#work .wk-card .wk-media.cm-on.wk-vc{--sp:50% 8%}
+#work .wk-card .wk-media.cm-on.wk-live{--sp:96% 18%}
+#work .wk-card .wk-media.cm-on.wk-studio{--sp:28% 52%}
+#work .wk-card .wk-media.cm-on.wk-v4{--sp:55% 86%}
+#work .wk-card .wk-media.cm-on.wk-dl{--sp:6% 24%}
+#work .wk-card .wk-media.cm-on::before{background-size:220% auto}   /* zoom into the painting so each card gets its own passage, not the same bridge */
+#work .wk-5 .wk-media.cm-on::before,#work .wk-7 .wk-media.cm-on::before{background-size:auto 200%}
+#work .wk-12 .wk-media.cm-on{height:min(64vh,46vw)}
+#work .wk-12 .wk-media.cm-on > .cm{transform:translate(-50%,-50%) scale(calc(var(--cs,1) * .84))}
+#work .wk-card .wk-meta{font-family:'Montserrat',sans-serif!important;font-size:15px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink-2);margin:0 0 8px}
+#work .wk-card .wk-meta span+span{color:var(--ink-3)}
+#work .wk-tools{font-size:13px;letter-spacing:0;color:#8A95A3;border-top:0;padding-top:0;margin-top:18px}
+#work .wk-card:hover .wk-tools{color:#8A95A3}
+#work .wk-title{font-size:clamp(48px,7vw,124px);letter-spacing:-.04em}
+#work .cm-pause{font:500 13px 'Montserrat',sans-serif;letter-spacing:0;text-transform:none;color:var(--ink-3);background:none;border:0;padding:6px 0;
+  -webkit-backdrop-filter:none;backdrop-filter:none;text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(239,243,248,.25)}
+#work .cm-pause:hover{color:var(--ink)}
+#work .cm-pause:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+@media (max-width:767px){
+  #work .wk-12 .wk-media.cm-on{height:auto}
+  #work .wk-12 .wk-media.cm-on > .cm{transform:translate(-50%,-50%) scale(var(--cs,1))}
+  #work .wk-card .wk-meta{font-size:14px}
+  #work .wk-tools{font-size:12.5px;margin-top:14px;padding-top:0}
+  #work .wk-title{font-size:clamp(40px,12vw,52px)}
+  #work .cm-pause{font-size:13px;padding:6px 0}
+}
+</style>
+<style>
+/* ══ WORK (12 Nov, owner): no painted/gradient sky behind the projects; devices sit on a quiet graphite stage lit from above.
+   Stressie V4 is a tall card paired with Dearly (one phone no longer floats in a landscape stage). ══ */
+#work .wk-card .wk-media.cm-on::before{content:none!important}
+#work .wk-card .wk-media.cm-on.cm-on{background:radial-gradient(90% 70% at 50% 0%,#262A33 0%,#181B21 55%,#121419 100%)!important}
+#work .wk-5 .cm:has(.stm){width:400px;height:620px;grid-template-rows:100%;grid-template-columns:100%}
+#work .wk-5 .cm .stm{height:620px;max-height:none}
+@media (max-width:900px){#work .wk-5 .wk-media.cm-on:has(.stm){aspect-ratio:4/5;height:auto}}   /* stacked: the phone stays tall */
+</style>
+<style>
+/* ══ WORK in the redwoods + stacking cards + fog transition (12 Nov, owner) ══════════════════════════════
+   Section: full-bleed, the forest is a sticky 100vh layer under everything; the fog overlay (.rwf) sits over
+   the section's first 220vh and parts onto the forest; the header arrives as the fog clears; then each
+   project is one wide glass card (animation left, story right) that pins and is covered by the next. */
+#work{position:relative;z-index:2;padding:0 5vw clamp(80px,12vh,160px)!important;background:#14100F;overflow-x:clip}   /* clip, not hidden: sticky keeps working; the crown may still rise over the hero */
+#work .wk-forest{position:sticky;top:0;height:100vh;height:100lvh;margin:0 -5vw -100vh;margin-bottom:calc(-100vh);overflow:hidden;z-index:0;pointer-events:none}
+#work .wf-plate{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;max-width:none;
+  transform:translate3d(0,calc(var(--wfp,0) * -3%),0) scale(1.02);animation:wfBreathe 26s ease-in-out infinite alternate}
+@keyframes wfBreathe{from{scale:1}to{scale:1.035}}
+#work .wf-rays{position:absolute;inset:-20% -10% 0 0;mix-blend-mode:screen;opacity:.55;
+  background:repeating-linear-gradient(118deg,rgba(255,226,170,0) 0 70px,rgba(255,226,170,.16) 110px,rgba(255,226,170,0) 170px,rgba(255,226,170,0) 230px);
+  -webkit-mask:radial-gradient(70% 80% at 85% 0%,#000 0%,rgba(0,0,0,.6) 45%,transparent 80%);mask:radial-gradient(70% 80% at 85% 0%,#000 0%,rgba(0,0,0,.6) 45%,transparent 80%);
+  animation:wfRays 9s ease-in-out infinite alternate}
+@keyframes wfRays{0%{opacity:.35;transform:translateX(0)}50%{opacity:.6}100%{opacity:.42;transform:translateX(40px)}}
+#work .wf-fog{position:absolute;left:0;bottom:-10%;width:max(160vw,1400px);max-width:none;opacity:.32;pointer-events:none;mix-blend-mode:screen;animation:wfDrift 70s linear infinite}
+#work .wf-fog2{bottom:6%;opacity:.18;transform:scaleX(-1);animation-duration:110s;animation-direction:reverse}
+@keyframes wfDrift{from{translate:-40vw 0}to{translate:0 0}}
+#work .wf-motes{position:absolute;inset:0;width:100%;height:100%}
+#work .wf-veil{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%,rgba(10,8,12,.08),rgba(10,8,12,.5))}
+
+/* the fog bank: over the top of the section, parts onto the forest */
+#work .rwf{position:relative;z-index:5;height:220vh;margin:0 -5vw -220vh;pointer-events:none;overflow-x:clip}
+#work .rwf-crown{position:absolute;left:50%;top:0;width:max(170vw,1500px);max-width:none;transform:translate(-50%,-8%);pointer-events:none;z-index:2}   /* the image is cloud mass from 20% to 87% of its height with a ragged top 8-20%: only that fringe rises above the seam (JS), over the fog so no straight line shows */
+#work .rwf-pin{position:sticky;top:0;height:100vh;overflow:hidden}
+#work .rwf-bank{position:absolute;inset:0;background:linear-gradient(180deg,#F4E6DA 0%,#EBD6CB 55%,#E2CBC4 100%);opacity:var(--fogA,1)}
+#work .rwf-bank img{position:absolute;left:50%;top:50%;width:max(190vw,1700px);max-width:none;transform:translate(-50%,-50%);will-change:transform,opacity}
+#work .rwf-fact{position:absolute;left:50%;top:50%;width:min(88vw,15.5em);margin:0;text-align:center;
+  font:600 clamp(26px,3.4vw,52px)/1.18 'Montserrat',sans-serif;letter-spacing:-.025em;color:#2A2230;
+  opacity:var(--factA,0);transform:translate(-50%,calc(-50% + var(--factY,14px)));filter:blur(var(--factB,6px))}
+#work .wk-head{position:relative;z-index:1;margin-top:120vh;padding-top:clamp(40px,8vh,96px)}
+#work .wk-title{color:#FFFCF8}
+
+/* stacking cards */
+#work .wk-grid{display:block!important;position:relative;z-index:1}
+#work .wk-grid > .wk-card:not([hidden]){position:sticky;top:calc(clamp(84px,12vh,120px) + var(--i,0) * 14px);
+  display:grid!important;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:center;gap:clamp(24px,3.4vw,56px);
+  height:min(74vh,720px);margin:0 0 22vh;padding:clamp(12px,1.2vw,18px) clamp(28px,3.6vw,60px) clamp(12px,1.2vw,18px) clamp(12px,1.2vw,18px);
+  border-radius:clamp(24px,2.4vw,36px);transform-origin:50% 0;transition:opacity .9s ease;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),rgba(16,14,18,.74);
+  -webkit-backdrop-filter:blur(26px) saturate(1.4);backdrop-filter:blur(26px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 0 1px rgba(255,255,255,.08)}
+#work .wk-grid > .wk-card:not([hidden]):last-of-type{margin-bottom:6vh}
+#work .wk-grid > .wk-card::after{content:'';position:absolute;inset:0;border-radius:inherit;background:#0B0A0D;opacity:var(--dim,0);pointer-events:none;z-index:3}
+#work .wk-grid > .wk-card .wk-media{height:100%!important;aspect-ratio:auto!important;min-height:0!important;border-radius:clamp(16px,1.8vw,26px)}
+#work .wk-grid > .wk-card .wk-body{max-width:none;align-self:center}
+#work .wk-grid > .wk-card .wk-name{font-size:clamp(30px,3vw,54px)}
+#work .wk-grid > .wk-card .wk-line{font-size:clamp(17px,1.25vw,21px)}
+#work .wk-grid > .wk-card:hover .wk-media{transform:none}
+#work.wk-rv .wk-card{transform:none}
+#work .wk-tools li+li::before{content:none}#work .wk-tools li:not(:last-child)::after{content:'\00B7';margin:0 10px;color:rgba(239,243,248,.28)}   /* a wrapped line never starts with a dot */
+
+@media (max-width:900px){
+  #work .wk-grid > .wk-card:not([hidden]){position:relative;top:auto;display:flex!important;flex-direction:column;align-items:stretch;height:auto;margin-bottom:28px;padding:12px 12px 24px}
+  #work .wk-grid > .wk-card .wk-media{height:auto!important;aspect-ratio:4/3!important}
+  #work .wk-grid > .wk-card .wk-media:has(.stm),#work .wk-grid > .wk-card .wk-media.wk-vc{aspect-ratio:4/5!important}
+  #work .wk-grid > .wk-card .wk-body{padding:0 10px}
+}
+@media (prefers-reduced-motion:reduce){
+  #work .wf-plate,#work .wf-rays,#work .wf-fog{animation:none}
+}
+html.motion-paused #work .wf-plate,html.motion-paused #work .wf-rays,html.motion-paused #work .wf-fog{animation-play-state:paused}
+</style>
+<script>
+(function () {
+  var work = document.getElementById('work'); if (!work) return;
+  var fog = document.getElementById('rwFog'), pin = fog && fog.querySelector('.rwf-pin'), bank = fog && fog.querySelector('.rwf-bank');
+  var crown = fog && fog.querySelector('.rwf-crown'), plate = work.querySelector('.wf-plate');
+  var cards = [].slice.call(work.querySelectorAll('.wk-grid > .wk-card:not([hidden])'));
+  cards.forEach(function (c, i) { c.style.setProperty('--i', i); });
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function cl(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function sm(a, b, v) { var t = cl((v - a) / (b - a)); return t * t * (3 - 2 * t); }
+  var raf = 0;
+  function frame() {
+    raf = 0; var vh = innerHeight, vw = innerWidth;
+    if (fog) {
+      var r = fog.getBoundingClientRect(), run = Math.max(1, r.height - vh), p = cl(-r.top / run);
+      // the crown rises over the bottom of the hero as the fog bank arrives
+      if (crown) { var k = cl(1 - r.top / vh); crown.style.transform = 'translate(-50%,calc(' + (-8 - 12 * k).toFixed(2) + '% - ' + (k * vh * .18).toFixed(1) + 'px))'; crown.style.opacity = String(1 - sm(.04, .14, p)); }   // (owner, 12 Nov) never over the title: at most 22vh into the hero, and only while it scrolls away
+      // the fact: in .12→.32, hold, out .56→.68
+      var fin = sm(.15, .34, p), fout = sm(.56, .68, p), fa = fin * (1 - fout);
+      pin.style.setProperty('--factA', fa.toFixed(3));
+      pin.style.setProperty('--factY', ((1 - fin) * 14 - fout * 14).toFixed(1) + 'px');
+      pin.style.setProperty('--factB', ((1 - fin) * 6 + fout * 6).toFixed(2) + 'px');
+      // the bank parts sideways and lifts, .62 → .98
+      var e = sm(.62, .98, p), L = bank.children;
+      bank.style.setProperty('--fogA', (1 - e).toFixed(3));
+      L[0].style.transform = 'translate(calc(-50% - ' + (e * vw * .8).toFixed(1) + 'px),calc(-50% - ' + (e * vh * .3).toFixed(1) + 'px)) scale(' + (1 + e * .5).toFixed(3) + ')';
+      L[1].style.transform = 'translate(calc(-50% + ' + (e * vw * .8).toFixed(1) + 'px),calc(-50% + ' + (e * vh * .1).toFixed(1) + 'px)) scaleX(-1) scale(' + (1 + e * .5).toFixed(3) + ')';
+      L[2].style.transform = 'translate(-50%,calc(-50% + ' + (vh * .25 + e * vh * .9).toFixed(1) + 'px)) scale(' + (1.2 + e * .7).toFixed(3) + ')';
+      for (var j = 0; j < 3; j++) L[j].style.opacity = String(Math.max(0, 1 - e * 1.1));
+      pin.style.visibility = e >= .999 ? 'hidden' : '';
+    }
+    // forest parallax across the whole section
+    if (plate) { var wr = work.getBoundingClientRect(); work.style.setProperty('--wfp', cl(-wr.top / Math.max(1, wr.height - vh)).toFixed(3)); }
+    // stacking: as the next card climbs to its pin, the one beneath recedes
+    if (innerWidth > 900) for (var i = 0; i < cards.length; i++) {
+      var c = cards[i], n = cards[i + 1], kk = 0;
+      if (n) { var top = parseFloat(getComputedStyle(n).top) || 0, nt = n.getBoundingClientRect().top; kk = cl((vh - nt) / Math.max(1, vh - top)); }
+      c.style.transform = kk ? 'scale(' + (1 - .055 * kk).toFixed(4) + ')' : '';
+      c.style.setProperty('--dim', (kk * .55).toFixed(3));
+    } else for (var q = 0; q < cards.length; q++) { cards[q].style.transform = ''; cards[q].style.setProperty('--dim', 0); }
+  }
+  function req() { if (!raf) raf = requestAnimationFrame(frame); }
+  addEventListener('scroll', req, { passive: true }); addEventListener('resize', req); frame();
+  window.__workFrame = frame;
+
+  // dust in the sunbeams: always alive while the forest is on screen
+  var cv = work.querySelector('.wf-motes'), ctx = cv && cv.getContext('2d');
+  if (!ctx) return;
+  var motes = [], W = 0, H = 0, dpr = Math.min(2, devicePixelRatio || 1), on = false, last = 0;
+  function size() { W = cv.clientWidth || innerWidth; H = cv.clientHeight || innerHeight; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+  function seed() { motes = []; var n = Math.round(Math.min(90, W * H / 16000)); for (var i = 0; i < n; i++) motes.push({ x: Math.random() * W, y: Math.random() * H, r: .6 + Math.random() * 1.8, vx: -.08 - Math.random() * .18, vy: .04 + Math.random() * .12, ph: Math.random() * 6.28, a: .25 + Math.random() * .55 }); }
+  function draw(t) {
+    if (!on) return; requestAnimationFrame(draw);
+    if (document.documentElement.classList.contains('motion-paused')) return;
+    var dt = last ? Math.min(50, t - last) : 16; last = t;
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < motes.length; i++) { var m = motes[i];
+      m.x += m.vx * dt * .06; m.y += m.vy * dt * .06; m.ph += dt * .0016;
+      if (m.x < -10) m.x = W + 10; if (m.y > H + 10) { m.y = -10; m.x = Math.random() * W; }
+      var beam = Math.max(0, 1 - Math.hypot((m.x / W) - .82, (m.y / H) - .1) * 1.1);   // brighter in the shafts, upper right
+      var a = m.a * (.35 + .65 * beam) * (.6 + .4 * Math.sin(m.ph));
+      ctx.beginPath(); ctx.arc(m.x, m.y + Math.sin(m.ph * .7) * 4, m.r, 0, 6.283);
+      ctx.fillStyle = 'rgba(255,232,190,' + a.toFixed(3) + ')'; ctx.fill(); }
+  }
+  size(); seed(); addEventListener('resize', function () { size(); seed(); });
+  if (reduce) return;
+  new IntersectionObserver(function (es) { var v = es[0].isIntersecting; if (v && !on) { on = true; last = 0; requestAnimationFrame(draw); } on = v; }).observe(work);
+})();
+</script>
+<style>
+/* ══ stacking cards, right column composed to its full height (12 Nov, owner: "not using the space on the right") ══
+   top: role, title, pitch · middle: the proof as large figures (metrics lead) · bottom: tools + one clear link.
+   The animation side gets more of the card and its device is no longer shrunk. */
+@media (min-width:901px){
+  #work .wk-grid > .wk-card:not([hidden]){grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:clamp(28px,3.4vw,60px)}
+  #work .wk-grid > .wk-card .wk-media.cm-on > .cm{transform:translate(-50%,-50%) scale(var(--cs,1))!important}
+  #work .wk-grid > .wk-card .wk-go{display:none!important}
+  #work .wk-grid > .wk-card .wk-body{display:flex!important;flex-direction:column;height:100%;padding:clamp(20px,3.2vh,40px) 0}
+  #work .wk-grid > .wk-card .wk-name{font-size:clamp(34px,3.4vw,60px)}
+  #work .wk-grid > .wk-card .cm-pills{display:flex;flex-direction:column;gap:0;margin:auto 0}
+  #work .wk-grid > .wk-card .cm-pills span{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:clamp(12px,1.9vh,20px) 0;border:0;border-top:1px solid rgba(255,255,255,.1);
+    border-radius:0;background:none;font-size:clamp(14px,1vw,16px);color:rgba(239,243,248,.62)}
+  #work .wk-grid > .wk-card .cm-pills span:last-child{border-bottom:1px solid rgba(255,255,255,.1)}
+  #work .wk-grid > .wk-card .cm-pills b{font:700 clamp(26px,2.4vw,42px)/1 'Montserrat',sans-serif;letter-spacing:-.03em;color:#E6F28D}
+  #work .wk-grid > .wk-card .cm-pills span i{align-self:center}
+  #work .wk-grid > .wk-card .wk-tools{margin-top:0}
+  #work .wk-grid > .wk-card .wk-links{display:flex!important;margin-top:clamp(16px,2.4vh,26px)}
+  #work .wk-grid > .wk-card .wk-links span{display:inline-flex;align-items:center;gap:10px;padding:13px 22px;border-radius:999px;font:600 15px 'Montserrat',sans-serif;color:#FFFCF8;
+    background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05));box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 0 0 1px rgba(255,255,255,.14);transition:background .3s}
+  #work .wk-grid > .wk-card:hover .wk-links span{background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.09))}
+}
+</style>
+<style>
+/* nav as liquid glass at every size (owner, 12 Nov: "the nav on mobile is so bad / not liquid glass"). An old phone rule pinned the
+   pill to 16px tall, so the glass was a sliver behind 32px links; height is now from content, and the pill uses the same glass
+   recipe as the chapter CTAs: clear, bends the scene, bright specular rim, soft caustic glow, no drop shadow. */
+.top-nav .nav-links{height:auto!important;min-height:0!important;align-items:center;padding:5px!important;gap:2px;position:relative;isolation:isolate;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.06) 50%,rgba(255,255,255,.12) 100%)!important;
+  -webkit-backdrop-filter:blur(12px) saturate(1.9) brightness(1.06) contrast(1.05)!important;backdrop-filter:blur(12px) saturate(1.9) brightness(1.06) contrast(1.05)!important;
+  box-shadow:inset 0 1.5px .5px rgba(255,255,255,.85),inset 0 -1px 1px rgba(255,255,255,.3),inset 0 0 0 1px rgba(255,255,255,.22),
+    inset 0 -14px 18px -12px rgba(255,255,255,.4),inset 0 12px 16px -14px rgba(255,255,255,.55)!important}
+.top-nav .nav-links::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(55% 100% at 22% 0%,rgba(255,255,255,.34),rgba(255,255,255,0) 60%),radial-gradient(45% 90% at 85% 110%,rgba(255,236,210,.2),rgba(255,236,210,0) 70%)}
+.top-nav .nav-links a{line-height:1.2;border-radius:999px;margin:0!important}   /* an old phone rule gave links -14px margins, collapsing the pill */
+.top-nav .nav-links a:hover{background:rgba(255,255,255,.16)}
+@media (max-width:480px){
+  .top-nav .nav-links{padding:4px!important}
+  .top-nav .nav-links a{white-space:nowrap;padding:10px 15px;font-size:14px}   /* 38px tall tap targets, one line each */
+}
+</style>
+<style>
+/* ══ FOOTER as the hero's bookend (12 Nov 2026) ═══════════════════════════════════════════════════════════════
+   Same painting as the hero, at night; copy in the chapters' voice (Montserrat, off-white, no serif italic); status, email,
+   copy button and socials are liquid glass like the nav and the chapter CTAs. No drop shadows, no text shadows. */
+footer.ft{background:#0B0C14!important}
+footer.ft > .ft-vig,footer.ft > .ft-grain,footer.ft > .geo-ft{display:none!important}
+footer.ft .ft-night{position:absolute;inset:-3%;width:106%;height:106%;object-fit:cover;object-position:50% 45%;z-index:0;pointer-events:none;
+  animation:ftDrift 40s ease-in-out infinite alternate}
+@keyframes ftDrift{from{transform:scale(1) translate3d(0,0,0)}to{transform:scale(1.04) translate3d(-1%,-.6%,0)}}
+html.motion-paused footer.ft .ft-night{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){footer.ft .ft-night{animation:none}}
+footer.ft .ft-shade{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(70% 80% at 18% 42%,rgba(8,8,20,.66) 0%,rgba(8,8,20,.4) 45%,rgba(8,8,20,0) 78%),linear-gradient(0deg,rgba(8,8,20,.55),rgba(8,8,20,0) 35%)}
+footer.ft .ft-inner{z-index:2}
+footer.ft .ft-cta,footer.ft .ft-cta .ft-line,footer.ft .ft-cta .serif{font-family:'Montserrat',sans-serif!important;font-style:normal!important;color:#FFFCF8!important;text-shadow:none!important}
+footer.ft .ft-cta{gap:0;max-width:none}
+footer.ft .ft-cta .ft-line{text-wrap:balance;max-width:12em}   /* em of the 72px line, not of the small parent (it wrapped one word per line) */
+footer.ft .ft-spread{justify-content:flex-start!important;flex-direction:row!important}   /* the old layout was row-reverse (copy on the right of a note that is now hidden) */
+footer.ft .ft-left{margin-left:0!important;max-width:none!important}   /* on the page gutter, like the chapters */
+footer.ft .ft-cta .ft-line{font-weight:800!important;font-size:clamp(34px,4.4vw,72px)!important;line-height:1.02!important;letter-spacing:-.04em!important}
+footer.ft .ft-cta .serif{font-weight:800!important}
+footer.ft .ft-k{font:600 13px/1 'Montserrat',sans-serif!important;letter-spacing:.02em;text-transform:none!important;color:rgba(255,252,248,.82)!important}
+footer.ft .ft-clock{font:500 14px 'Montserrat',sans-serif!important;color:rgba(255,252,248,.82)!important}
+footer.ft .ft-clock time{color:#FFFCF8;font-weight:700}
+/* liquid glass (same recipe as .chp-go and the nav) */
+footer.ft .ft-status,footer.ft .ft-mail,footer.ft .ft-soc{position:relative;isolation:isolate;color:#FFFCF8!important;border:0!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.06) 50%,rgba(255,255,255,.12) 100%)!important;
+  -webkit-backdrop-filter:blur(12px) saturate(1.9) brightness(1.06) contrast(1.05)!important;backdrop-filter:blur(12px) saturate(1.9) brightness(1.06) contrast(1.05)!important;
+  box-shadow:inset 0 1.5px .5px rgba(255,255,255,.85),inset 0 -1px 1px rgba(255,255,255,.3),inset 0 0 0 1px rgba(255,255,255,.22),
+    inset 0 -14px 18px -12px rgba(255,255,255,.4),inset 0 12px 16px -14px rgba(255,255,255,.55)!important}
+footer.ft .ft-status{font:600 13px 'Montserrat',sans-serif!important;letter-spacing:.01em!important;text-transform:none!important;padding:9px 16px!important;border-radius:999px!important}
+footer.ft .ft-mail{border-radius:999px!important;padding:6px 6px 6px 22px!important;display:inline-flex!important;align-items:center;gap:10px}
+footer.ft .ft-mail a{font:700 clamp(17px,1.5vw,22px) 'Montserrat',sans-serif!important;color:#FFFCF8!important;text-decoration:none}
+footer.ft .ft-copy{width:40px;height:40px;border-radius:999px!important;border:0!important;color:#FFFCF8!important;background:rgba(255,255,255,.14)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)!important}
+footer.ft .ft-copy:hover{background:rgba(255,255,255,.24)!important}
+footer.ft .ft-soc{width:46px!important;height:46px!important;border-radius:999px!important;display:inline-grid!important;place-items:center}
+footer.ft .ft-soc:hover,footer.ft .ft-mail:hover{background:linear-gradient(180deg,rgba(255,255,255,.32) 0%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.16) 100%)!important}
+footer.ft .ft-status:focus-visible,footer.ft .ft-mail a:focus-visible,footer.ft .ft-copy:focus-visible,footer.ft .ft-soc:focus-visible{outline:2px solid #FFFCF8;outline-offset:3px}
+@media (max-width:767px){ footer.ft .ft-mail a{font-size:15px!important} footer.ft .ft-mail{padding-left:16px!important} }
+</style>
+<style>
+/* ══ design review pass (12 Nov 2026): rhythm, hierarchy, control heights, phone band, nav, FAB ══ */
+.chp-pause{position:fixed!important;left:max(16px,env(safe-area-inset-left))!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;
+  min-height:44px;padding:0 18px!important;display:inline-flex!important;align-items:center}
+.chp-role{font-weight:500!important;color:rgba(255,252,248,.78)!important}
+.chp-line{font-weight:500!important;margin-top:20px!important;max-width:30ch!important;text-wrap:balance}
+.chp-title,.chp-proof span{text-wrap:balance}
+.chp-proof{margin-top:32px!important}
+.chp-proof span{margin-top:6px!important;font:500 14px/1.35 'Montserrat',sans-serif!important;color:rgba(255,252,248,.78)!important}
+.chp-go{margin-top:36px!important;min-height:48px;padding:0 22px 0 24px!important}
+@media (min-width:1101px), (orientation:landscape) and (min-width:768px){ .chp-copy{left:var(--gutter,clamp(24px,6vw,110px))!important} }
+@media (max-width:767px), (orientation:portrait) and (max-width:1100px){
+  .chp-pin{padding-top:min(50svh,118vw)!important}
+  .chp-stage{top:min(25svh,59vw)!important}
+  .chp-copy{padding:24px var(--gutter,20px) 48px!important;z-index:2;background:#0E0B12}   /* the story sits on the ground; any scene overflow tucks behind it */
+  .chp-pin::after{content:'';position:absolute;left:0;right:0;top:calc(min(50svh,118vw) - 88px);height:88px;z-index:1;pointer-events:none;
+    background:linear-gradient(180deg,rgba(14,11,18,0),#0E0B12)}   /* the scene dissolves into the ground, never a hard crop */
+}
+@media (max-width:767px){
+  .chp-proof b{font-size:24px!important}
+  .chp-title{letter-spacing:-.03em!important}
+  .orb-fab{width:56px!important;height:56px!important;right:12px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important}
+  .chp-copy{padding-right:calc(var(--gutter,20px) + 56px)!important}   /* the chat orb keeps its own column, never over copy */
+  .top-nav .nav-links{background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.05)),rgba(14,11,18,.45)!important;
+    -webkit-backdrop-filter:blur(22px) saturate(1.8)!important;backdrop-filter:blur(22px) saturate(1.8)!important}
+  .top-nav .nav-links a{min-height:44px;display:inline-flex!important;align-items:center;padding:0 16px!important}
+  .top-nav,.top-nav.scrolled{top:var(--anno-h,0px)!important;height:62px!important;padding-top:10px!important}
+}
+/* nav steps aside while reading down, returns on the first scroll up */
+.top-nav{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+html.nav-away .top-nav{transform:translateY(calc(-100% - 24px))!important}
+</style>
+<script>
+(function () {
+  var last = scrollY, root = document.documentElement, nav = document.querySelector('.top-nav');
+  addEventListener('scroll', function () {
+    var y = scrollY;
+    if (y < 160 || y < last - 6) root.classList.remove('nav-away');
+    else if (y > last + 6 && !document.body.classList.contains('nav-open') && !(nav && nav.contains(document.activeElement))) root.classList.add('nav-away');
+    last = y;
+  }, { passive: true });
+  if (nav) nav.addEventListener('focusin', function () { root.classList.remove('nav-away'); });
+})();
+</script>
+<style>
+/* phones: Pause motion becomes a 44px glass icon in the right-hand control column (above the chat orb), never over copy or CTAs */
+@media (max-width:767px){
+  .chp-pause{left:auto!important;right:18px!important;bottom:calc(80px + env(safe-area-inset-bottom))!important;width:44px;height:44px;min-height:44px;padding:0!important;
+    justify-content:center;font-size:0!important;border-radius:999px!important}
+  .chp-pause::after{content:'';width:12px;height:14px;background:linear-gradient(90deg,#FFFCF8 0 4px,transparent 4px 8px,#FFFCF8 8px 12px)}
+  body:has(> #agentation-root) .chp-pause{margin-bottom:64px}   /* localhost only: the dev toolbar lifts the orb 64px; keep the stack */
+  .chp-pause[aria-pressed="true"]::after{width:0;height:0;background:none;border-style:solid;border-width:8px 0 8px 13px;border-color:transparent transparent transparent #FFFCF8;margin-left:3px}
+}
+</style>
+<style>
+/* ══ (12 Nov, owner) nav = text only; every CTA = the hero chat bar's glass ═══════════════════════════════════════ */
+.top-nav .nav-links{background:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important;padding:0!important}
+.top-nav .nav-links::before{display:none!important}
+.top-nav .nav-links a{color:rgba(255,252,248,.86)!important;font-weight:600;letter-spacing:.01em;background:none!important;transition:color .2s}
+.top-nav .nav-links a:hover,.top-nav .nav-links a:focus-visible{color:#FFFCF8!important;background:none!important}
+.top-nav .nav-links a:focus-visible{outline:2px solid #FFFCF8;outline-offset:4px}
+/* the hero chat bar's lens: barely tinted clear glass, the scene sharp through it, a thin bright rim that catches light top-left */
+.chp-go,.chp-pause,footer.ft .ft-status,footer.ft .ft-mail,footer.ft .ft-soc{
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02)),rgba(16,18,26,.22)!important;
+  -webkit-backdrop-filter:blur(4px) saturate(1.6) brightness(1.04)!important;backdrop-filter:blur(4px) saturate(1.6) brightness(1.04)!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.30),inset 1.5px 1.5px 1px -1px rgba(255,255,255,.95),inset -1.5px -1.5px 1px -1px rgba(255,255,255,.6),
+    inset 0 10px 14px -10px rgba(255,255,255,.35),inset 0 -12px 16px -12px rgba(255,255,255,.22)!important}
+.chp-go::before,.chp-pause::before{display:none!important}
+.chp-go:hover,.chp-pause:hover,footer.ft .ft-mail:hover,footer.ft .ft-soc:hover{background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.04)),rgba(16,18,26,.18)!important}
+</style>
+<style>
+/* footer night life: stars, a high cloud bank, fog drifting under the bridge, light shimmering on the bay */
+footer.ft .ft-life{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+footer.ft .ft-stars{position:absolute;left:0;top:0;width:100%;height:38%}
+footer.ft .ft-cloud{position:absolute;max-width:none;mix-blend-mode:screen;filter:brightness(.5) saturate(.55) hue-rotate(200deg)}
+footer.ft .ft-cloud-hi{top:-14%;width:max(120vw,1500px);opacity:.16;animation:ftCloud 140s linear infinite}
+footer.ft .ft-cloud-fog{top:44%;width:max(150vw,1800px);opacity:.18;animation:ftCloud 90s linear infinite reverse}
+footer.ft .ft-cloud-fog2{top:52%;width:max(130vw,1600px);opacity:.12;transform:scaleX(-1);animation:ftCloud2 120s linear infinite}
+@keyframes ftCloud{from{translate:-35% 0}to{translate:10% 0}}
+@keyframes ftCloud2{from{translate:5% 0}to{translate:-40% 0}}
+footer.ft .ft-shimmer{position:absolute;left:0;right:0;top:56%;bottom:0;mix-blend-mode:screen;opacity:.55;
+  background:repeating-linear-gradient(180deg,rgba(255,196,120,0) 0 9px,rgba(255,196,120,.14) 11px,rgba(255,196,120,0) 13px);
+  -webkit-mask:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent),linear-gradient(180deg,#000,transparent);mask:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent);
+  animation:ftShimmer 3.2s ease-in-out infinite alternate}
+@keyframes ftShimmer{from{background-position:0 0;opacity:.4}to{background-position:0 6px;opacity:.62}}
+html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){footer.ft .ft-cloud,footer.ft .ft-shimmer{animation:none}}
+</style>
+<script>
+(function () {   // twinkling stars over the footer's night sky; drawn only while the footer is on screen
+  var ft = document.getElementById('contactSection'), cv = ft && ft.querySelector('.ft-stars'); if (!cv) return;
+  var g = cv.getContext('2d'), stars = [], on = false, W = 0, H = 0, dpr = Math.min(2, devicePixelRatio || 1);
+  function size() { W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    stars = []; for (var i = 0; i < Math.round(W * H / 9000); i++) stars.push({ x: Math.random() * W, y: Math.random() * H, r: .5 + Math.random() * 1.1, p: Math.random() * 6.28, s: .6 + Math.random() * 1.6 }); }
+  function draw(t) { if (!on) return; requestAnimationFrame(draw);
+    if (document.documentElement.classList.contains('motion-paused')) return;
+    g.clearRect(0, 0, W, H);
+    for (var i = 0; i < stars.length; i++) { var st = stars[i], a = .35 + .45 * (.5 + .5 * Math.sin(st.p + t / 1000 * st.s));
+      g.beginPath(); g.arc(st.x, st.y, st.r, 0, 6.283); g.fillStyle = 'rgba(255,248,236,' + (a * (1 - st.y / H * .6)).toFixed(3) + ')'; g.fill(); } }
+  size(); addEventListener('resize', size);
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { on = true; draw(0); on = false; return; }
+  new IntersectionObserver(function (es) { var v = es[0].isIntersecting; if (v && !on) { on = true; requestAnimationFrame(draw); } on = v; }).observe(ft);
+})();
+</script>
+<style>
+/* (12 Nov, owner: "what happened to Dearly") over the paintings the supporting copy stays solid; the lighter 78% tone is only for
+   the phone story on the flat dark ground, where it still passes AA comfortably */
+@media (min-width:1101px), (orientation:landscape) and (min-width:768px){
+  .chp-role,.chp-proof span{color:#FFFCF8!important}
+  .chp-role{font-weight:600!important}
+  .chp-proof span{font-weight:600!important}
+}
+</style>
+<style>footer.ft .ft-cloud{display:none!important}   /* (owner, 12 Nov) the borrowed day-cloud image read as grey smudges on the night painting; its painted fog stays */</style>
+<style>
+/* hero → chapters cloud pass */
+#chapters{overflow-x:clip}
+#chapters .chp-clouds{position:absolute;left:0;right:0;top:-46vh;height:130vh;z-index:6;pointer-events:none;
+  filter:brightness(calc(1 - .18 * var(--cl-night,0))) saturate(calc(1 - .8 * var(--cl-night,0))) hue-rotate(calc(var(--cl-night,0) * 200deg))}   /* night: pale moonlit silver, never a grey smog */
+#chapters .chp-clouds .cl{position:absolute;left:50%;max-width:none;will-change:transform,opacity}
+#chapters .cl-a{top:0;width:max(170vw,1600px)}
+#chapters .cl-b{top:18vh;width:max(160vw,1500px)}
+#chapters .cl-c{top:30vh;width:max(190vw,1800px)}
+@media (prefers-reduced-motion:reduce){#chapters .chp-clouds{display:none}}
+</style>
+<script>
+(function () {
+  var wrap = document.getElementById('chapters'), box = wrap && wrap.querySelector('.chp-clouds'); if (!box) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var L = box.querySelectorAll('.cl'), first = wrap.querySelector('section.chp');
+  function cl(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function frame() {
+    var vh = innerHeight, vw = innerWidth, top = wrap.getBoundingClientRect().top;
+    // p: 0 while the chapters are a screen away, 1 once their top has scrolled a little past the viewport top
+    var band = innerWidth <= 767 || (innerHeight > innerWidth && innerWidth <= 1100);
+    var target = cl((vh - top) / (vh * (band ? .8 : 1)));   // 1 exactly when the chapter reaches the top (phones: the painting band scrolls, it doesn't pin, so the clouds part sooner)
+    cur += (target - cur) * (band ? .3 : .16); if (Math.abs(target - cur) > .0005) req(); else cur = target;   // eased, never snaps to scroll jumps
+    var p = cur, e = p * p * (3 - 2 * p);
+    var part = cl((p - .5) / .45), pe = part * part * (3 - 2 * part);   // parted before the chapter settles
+    if (first) box.style.setProperty('--cl-night', getComputedStyle(first).getPropertyValue('--night') || 0);
+    if (!mv) { mv = document.createElement('div'); mv.className = 'cl-move'; [].slice.call(box.children).forEach(function (c) { if (!c.classList.contains('cl-title')) mv.appendChild(c); }); box.insertBefore(mv, box.firstChild); }
+    var seam = vh * (1 - p), swell = cl((p - .25) / .3), sw = swell * swell * (3 - 2 * swell);
+    mv.style.transform = 'translateY(' + (seam - (band ? 165 : 175) - sw * (seam + 40)).toFixed(1) + 'px)';   // tops ride just under the hero's chat bar, then swell to fill the screen
+    L[0].style.transform = 'translate(calc(-50% - ' + (pe * vw * .7).toFixed(1) + 'px),0px) scale(' + (1 + pe * .35).toFixed(3) + ')';   // no lift: the tops stay under the hero's chat bar
+    L[1].style.transform = 'translate(calc(-50% + ' + (pe * vw * .75).toFixed(1) + 'px),0px) scaleX(-1) scale(' + (1 + pe * .35).toFixed(3) + ')';
+    L[2].style.transform = 'translate(-50%,' + (pe * vh * .55).toFixed(1) + 'px) scale(' + (1.1 + pe * .5).toFixed(3) + ')';
+    var a = String(Math.max(0, 1 - pe * 1.7));   // parted clouds clear fast: no lingering veil (owner: no frost) for (var i = 0; i < 3; i++) L[i].style.opacity = a;
+    box.style.setProperty('--fill', String(Math.max(0, cl((p - .05) / .3) - pe * 2.4)));
+    var tin = cl((p - .2) / .25), tout = cl((part - .05) / .4); box.style.setProperty('--tt', (tin * (1 - tout)).toFixed(3)); box.style.setProperty('--ty', ((1 - tin) * 24 - tout * 30).toFixed(1) + 'px');
+    box.style.visibility = pe >= .999 ? 'hidden' : '';   // (owner) at rest the tips of the cloud bank peek over the bottom of the hero
+    // the hero chat bar's glass is drawn inside the hero painting, beneath this layer: cut a bar-shaped window so the
+    // clouds always pass BEHIND the chat bar (owner)
+    var bar = document.querySelector('.hero .cta-dock .cta'), br = bar && bar.getBoundingClientRect();
+    if (br && br.bottom > 0 && br.top < vh && br.width) {
+      var bb = box.getBoundingClientRect(), BW = Math.round(bb.width), BH = Math.round(bb.height);
+      var R = Math.min(parseFloat(getComputedStyle(bar).borderTopLeftRadius) || 0, br.height / 2), x = br.left - bb.left, y = br.top - bb.top, w = br.width, h = br.height;
+      var d = 'M0 0H' + BW + 'V' + BH + 'H0Z M' + (x + R) + ' ' + y + 'H' + (x + w - R) + 'A' + R + ' ' + R + ' 0 0 1 ' + (x + w) + ' ' + (y + R) + 'V' + (y + h - R) + 'A' + R + ' ' + R + ' 0 0 1 ' + (x + w - R) + ' ' + (y + h) + 'H' + (x + R) + 'A' + R + ' ' + R + ' 0 0 1 ' + x + ' ' + (y + h - R) + 'V' + (y + R) + 'A' + R + ' ' + R + ' 0 0 1 ' + (x + R) + ' ' + y + 'Z';
+      var m = 'url("data:image/svg+xml,' + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='" + BW + "' height='" + BH + "'><path fill-rule='evenodd' d='" + d + "'/></svg>") + '") 0 0/100% 100% no-repeat';
+      box.style.webkitMask = m; box.style.mask = m;
+    } else if (box.style.mask || box.style.webkitMask) { box.style.webkitMask = box.style.mask = ''; }
+  }
+  var raf = 0, cur = 0, mv = null; function req() { if (!raf) raf = requestAnimationFrame(function () { raf = 0; frame(); }); }
+  addEventListener('scroll', req, { passive: true });
+  addEventListener('resize', frame); frame(); setTimeout(frame, 1200); setTimeout(frame, 3000); setTimeout(frame, 6000);   // the chat bar settles after the hero intro
+})();
+</script>
+<style>/* (owner, 12 Nov) clouds back, but they rise from BELOW the hero chat bar and part before the chapter settles (no veil over the work) */
+#chapters .chp-clouds{top:-11vh!important}</style>
+<style>
+/* cloud pass: a soft fill so the hero/chapter seam never shows, and one quiet line as the curtain opens */
+#chapters .chp-clouds .cl-fill{position:absolute;left:0;right:0;top:9vh;height:70vh;opacity:var(--fill,0);
+  background:linear-gradient(180deg,rgba(244,232,222,0) 0%,rgba(244,232,222,.92) 28%,rgba(240,226,220,.95) 60%,rgba(240,226,220,0) 100%)}
+#chapters .chp-clouds .cl-title{position:absolute;left:0;right:0;top:36vh;margin:0;text-align:center;z-index:2;
+  font:800 clamp(40px,6vw,104px)/1 'Montserrat',sans-serif;letter-spacing:-.04em;color:#2A2230;
+  opacity:var(--tt,0);transform:translateY(var(--ty,24px))}
+</style>
+<style>
+/* (12 Nov, owner) the hero chat bar: rounder and roomier; the WebGL lens reads this size + radius live */
+.hero .cta-dock .cta{height:64px!important;border-radius:22px!important;padding:0 36px 0 14px!important;gap:18px}   /* (owner) softer corners, real breathing room around the orb and the text */
+.hero .cta-dock .cta-orb{width:44px!important;height:44px!important}
+.hero .cta-dock .cta-text span{font-size:16px!important}
+@media (max-width:767px){ .hero .cta-dock .cta{height:56px!important;padding:0 22px 0 8px!important} .hero .cta-dock .cta-orb{width:40px!important;height:40px!important} }
+</style>
+<style>
+/* (12 Nov, owner) "Currently building Verified Call" under the tagline, as a hyperlinked stroke pill. The hero (poster-lab) posts
+   where its tagline lands ({type:'hero-layout'}); the pill sits just below it and follows the title's drop-in. */
+.hero .hero-building.hero-pill{display:inline-flex!important;position:absolute;left:var(--hp-x,50%);top:var(--hp-y,52vh);transform:translate(-50%,0);z-index:4;
+  align-items:center;gap:10px;padding:10px 20px;border-radius:999px;border:1.5px solid rgba(255,252,248,.75);background:none!important;
+  font:600 15px/1 'Montserrat',sans-serif!important;letter-spacing:0!important;text-transform:none!important;color:#FFFCF8!important;text-decoration:none;white-space:nowrap;
+  opacity:var(--hp-a,0);transition:border-color .2s,background .2s;pointer-events:auto}
+.hero .hero-building.hero-pill{width:auto!important;max-width:none!important;height:auto!important;min-width:0!important;overflow:visible!important}
+.hero .hero-building.hero-pill span{display:inline!important}
+.hero .hero-building.hero-pill b{font-weight:800;color:#FFFCF8}
+.hero .hero-building.hero-pill i{font-style:normal;transition:transform .25s}
+.hero .hero-building.hero-pill:hover{border-color:#FFFCF8;background:rgba(255,252,248,.08)!important}
+.hero .hero-building.hero-pill:hover i{transform:translateX(3px)}
+.hero .hero-building.hero-pill:focus-visible{outline:2px solid #FFFCF8;outline-offset:3px}
+@media (max-width:767px){ .hero .hero-building.hero-pill{font-size:13px!important;padding:9px 16px} }
+</style>
+<script>
+addEventListener('message', function (e) {
+  if (e.origin !== location.origin || !e.data || e.data.type !== 'hero-layout') return;
+  var f = document.getElementById('heroCity'), pill = document.getElementById('heroBuilding'); if (!f || !pill) return;
+  var fr = f.getBoundingClientRect(), hr = pill.parentElement.getBoundingClientRect();
+  pill.style.setProperty('--hp-x', (fr.left - hr.left + e.data.cx) + 'px');
+  pill.style.setProperty('--hp-y', (fr.top - hr.top + e.data.bottom + 18) + 'px');
+  pill.style.setProperty('--hp-a', String(e.data.a));
+});
+</script>
+<style>
+/* cloud pass v3: a fixed full-screen layer while the hand-off happens, so you pass THROUGH the bank */
+#chapters .chp-clouds{position:fixed!important;inset:0!important;top:0!important;height:auto!important;overflow:hidden}
+#chapters .chp-clouds .cl-move{position:absolute;left:0;right:0;top:0;height:170vh;will-change:transform}
+#chapters .chp-clouds .cl-fill{top:12vh!important;height:150vh!important;
+  background:linear-gradient(180deg,rgba(244,232,222,0) 0%,rgba(244,232,222,.95) 14%,rgba(240,226,220,.97) 80%,rgba(240,226,220,0) 100%)!important}
+#chapters .chp-clouds .cl-title{position:fixed!important;top:50%!important;margin-top:-.5em!important}
+</style>
+<style>
+/* footer = the hero's living painting at night (WebGL iframe); the CSS stand-ins (stars, shimmer lines, clouds) retire */
+footer.ft .ft-live{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:0;pointer-events:none;background:transparent;opacity:0;transition:opacity 1.2s ease}
+footer.ft .ft-live.on{opacity:1}
+footer.ft .ft-life{display:none!important}
+footer.ft .ft-night{animation:none!important}
+footer.ft .ft-mailto{display:inline-block;color:#FFFCF8!important;text-decoration:underline;text-decoration-thickness:.06em;text-underline-offset:.14em;text-decoration-color:rgba(255,252,248,.45);transition:text-decoration-color .3s ease}
+footer.ft .ft-mailto:hover,footer.ft .ft-mailto:focus-visible{text-decoration-color:#FFFCF8}
+footer.ft .ft-mailto span{display:inline-block;transition:transform .35s cubic-bezier(.16,1,.3,1)}
+footer.ft .ft-mailto:hover span{transform:translateX(6px)}
+</style>
+<script>
+/* only the painting on screen renders: the hero and footer WebGL frames halt while off-screen */
+(function () {
+  var last = {};
+  function check() {
+    ['heroCity', 'ftCity'].forEach(function (id) {
+      var f = document.getElementById(id); if (!f) return;
+      var r = (f.closest('footer, .hero') || f).getBoundingClientRect(), on = r.top < innerHeight + 200 && r.bottom > -200;
+      if (last[id] === on) return; last[id] = on;
+      try { f.contentWindow.postMessage({ type: 'run', on: on }, location.origin); } catch (x) {}
+    });
+  }
+  addEventListener('scroll', check, { passive: true }); addEventListener('resize', check);
+  ['heroCity', 'ftCity'].forEach(function (id) { var f = document.getElementById(id); f && f.addEventListener('load', function () { delete last[id]; check(); }); });
+  addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.type === 'ft-ready') document.getElementById('ftCity').classList.add('on'); });
+  if (/[?&]rafshim/.test(location.search)) { var fc = document.getElementById('ftCity'); fc && (fc.src += '&rafshim'); }
+})();
+</script>
+<style>
+/* chapters, layered like the hero (12 Nov, owner: "do the same layering for the work section"): the subject (person, device)
+   is lifted from each painting onto its own plane; the room behind is in-painted, so the planes can slide apart in depth */
+.chp-stage > .chp-near{position:absolute;inset:0;z-index:2;pointer-events:none;will-change:transform}
+.chp-near > img{position:absolute;inset:0;width:100%;height:100%;display:block;transition:opacity 1.2s ease}
+</style>
+<script>
+(function () {
+  var FG = 'city/layers/chapters/fg/';
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var chs = [].slice.call(document.querySelectorAll('#chapters .chp')), L = [];
+  chs.forEach(function (ch) {
+    var stage = ch.querySelector('.chp-stage'), plate = stage && stage.querySelector('img.chp-plate'); if (!plate) return;
+    var m = (plate.getAttribute('src') || '').match(/chapters\/([a-z-]+)\.webp/); if (!m) return;
+    var n = m[1], keepScreen = n === 'dearly-alamo' || n === 'et-analytics-office';   // Dearly's tablet and the Analytics monitor sit on the desk, behind the person: they stay in the room   // Dearly's tablet stands on the table, behind her: it stays in the room
+    // the room plane: same painting with the subject in-painted away
+    plate.src = FG + n + '-bg.webp'; plate.dataset.day = FG + n + '-bg-day.webp'; plate.dataset.night = FG + n + '-bg-night.webp';
+    ['day', 'night'].forEach(function (k) { var im = stage.querySelector('img.chp-tod-' + k); if (im) im.src = plate.dataset[k]; });
+    // the subject plane
+    var near = document.createElement('div'); near.className = 'chp-near';
+    var g = new Image(), d = new Image(), nt = new Image();
+    g.src = FG + n + '-fg.webp'; d.src = FG + n + '-fg-day.webp'; nt.src = FG + n + '-fg-night.webp';
+    [g, d, nt].forEach(function (im) { im.alt = ''; im.decoding = 'async'; near.appendChild(im); });
+    var scr = stage.querySelector('.chp-screen'); if (scr && !keepScreen) near.appendChild(scr);
+    stage.appendChild(near);
+    L.push({ ch: ch, stage: stage, near: near, g: g, d: d, n: nt, loop: stage.querySelector('video.chp-loop'), x: 0, y: 0 });
+  });
+  if (!L.length) return;
+  var mx = 0, my = 0;
+  if (matchMedia('(pointer: fine)').matches) addEventListener('pointermove', function (e) { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; }, { passive: true });
+  function cl(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  var raf = 0;
+  function tick() {
+    raf = 0; var vh = innerHeight, live = false;
+    L.forEach(function (o) {
+      var r = o.ch.getBoundingClientRect(); if (r.bottom < -50 || r.top > vh + 50) return;
+      // planes follow the room's time-of-day mix
+      var td = o.stage.querySelector('img.chp-tod-day'), tn = o.stage.querySelector('img.chp-tod-night');
+      var lo = o.loop ? +(o.loop.style.opacity || 0) : 0;            // the golden living loop has its own moving subject: the cut-out steps aside
+      o.g.style.opacity = (1 - lo).toFixed(3);
+      o.d.style.opacity = td ? td.style.opacity : 0; o.n.style.opacity = tn ? tn.style.opacity : 0;
+      var amp = 0;   // (owner, 12 Nov: "why is the laptop hovering?") things resting on the desk never move against the room; depth lives in the window view instead
+      var run = Math.max(1, r.height - vh), enter = cl(1 - r.top / vh), p = cl(-r.top / run);
+      var depth = (1 - enter) * 46 + (.5 - p) * 26;                  // the subject rises into place faster than the room, then keeps drifting
+      var tx = -mx * 16 * amp, ty = (depth - my * 10) * amp;
+      o.x += (tx - o.x) * .12; o.y += (ty - o.y) * .12;
+      var sc = 1 + .03 * (1 - enter) * amp;
+      o.near.style.transform = 'translate3d(' + o.x.toFixed(2) + 'px,' + o.y.toFixed(2) + 'px,0) scale(' + sc.toFixed(4) + ')';
+      if (Math.abs(tx - o.x) > .05 || Math.abs(ty - o.y) > .05) live = true;
+    });
+    if (live) raf = requestAnimationFrame(tick);
+  }
+  function kick() { if (!raf) raf = requestAnimationFrame(tick); }
+  addEventListener('scroll', function () { kick(); tick(); }, { passive: true }); addEventListener('pointermove', kick, { passive: true }); addEventListener('resize', kick);
+  setInterval(kick, 1500); kick();
+  window.__chpNear = tick;
+})();
+</script>
+<style>
+/* chapter hand-off (12 Nov, owner: "smoother transition between Verified Call and EverTutor Live"): each chapter now
+   overlaps the one before by a screen. The next painting slides up OVER the previous one, which holds still, and its top
+   edge is feathered, so the two scenes dissolve into each other instead of meeting at a hard seam. Total scroll length unchanged. */
+@media (min-width:768px) and (orientation:landscape), (min-width:1101px){
+  #chapters .chp:has(+ .chp){height:270vh}
+  #chapters .chp + .chp{margin-top:-100vh}
+}
+</style>
+<script>
+(function () {
+  var chs = [].slice.call(document.querySelectorAll('#chapters .chp')).slice(1);
+  function band() { return !(innerWidth <= 767 || (innerHeight > innerWidth && innerWidth <= 1100)); }
+  function run() {
+    var on = band(), vh = innerHeight;
+    chs.forEach(function (ch) {
+      var pin = ch.querySelector('.chp-pin'); if (!pin) return;
+      if (!on) { pin.style.webkitMaskImage = pin.style.maskImage = ''; return; }
+      var top = ch.getBoundingClientRect().top, k = top / vh;                    // 1 → 0 while it slides in
+      if (k <= 0.001 || k >= 1) { pin.style.webkitMaskImage = pin.style.maskImage = ''; return; }
+      var f = (k * 60).toFixed(1);                                               // feather: 60vh wide at the start, closes to nothing as it lands
+      var m = 'linear-gradient(180deg,rgba(0,0,0,0) 0,rgba(0,0,0,.35) ' + (f * .35).toFixed(1) + 'vh,#000 ' + f + 'vh)';
+      pin.style.webkitMaskImage = m; pin.style.maskImage = m;
+    });
+  }
+  addEventListener('scroll', run, { passive: true }); addEventListener('resize', run); run();
+})();
+</script>
+<style>
+/* what each project was built with (owner: "show what technologies we used") */
+.chp-tech{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0;padding:0;list-style:none;max-width:34em}
+.chp-tech li{padding:6px 12px;border-radius:999px;font:600 13px/1.2 'Montserrat',sans-serif;letter-spacing:.01em;color:#FFFCF8;
+  border:1px solid rgba(255,252,248,.32);background:rgba(255,252,248,.06);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+</style>
+<style>
+/* phones: the chat bar's rotating prompts always fit on one line */
+@media (max-width:480px){
+  .hero .cta-dock .cta{width:calc(100vw - 32px)!important;max-width:420px!important;padding:0 20px 0 12px!important;gap:12px}
+  .hero .cta-dock .cta{justify-content:center!important}
+  .hero .cta-dock .cta-text{font-size:15px!important;min-width:0;flex:0 1 auto;white-space:normal!important;overflow:visible!important}   /* orb + prompt sit centred as one group */
+  .hero .cta-dock .cta-text{grid-template-columns:minmax(0,1fr)!important;width:auto!important;max-width:none!important}
+  .hero .cta-dock .cta-text{justify-items:center!important;text-align:center!important}
+  .hero .cta-dock .cta-text span{max-width:100%!important;min-width:0;text-align:center!important}
+  .hero .cta-dock .cta{padding:0 18px 0 12px!important}
+  .hero .cta-dock .cta-text span{font-size:15px!important;letter-spacing:-.01em;white-space:normal!important;line-height:1.25!important}   /* the longest prompt wraps to two lines, never clips */
+}
+</style>
+<style>
+/* phones/portrait tablets: chapters don't pin, so the hand-off is a soft dusk at the top of each painting band
+   (its bottom already fades into the ground), the same dissolve as desktop in a scrolling layout */
+@media (max-width:767px), (orientation:portrait) and (max-width:1100px){
+  #chapters .chp + .chp .chp-pin::after{content:'';position:absolute;left:0;right:0;top:0;height:min(14svh,30vw);z-index:1;pointer-events:none;
+    background:linear-gradient(180deg,#0E0B12 0%,rgba(14,11,18,.75) 35%,rgba(14,11,18,0) 100%)}
+}
+</style>
+<style>
+/* phones: the footer headline's 12em measure is wider than a phone column; cap it so nothing overflows or clips */
+@media (max-width:767px){
+  footer.ft .ft-left{min-width:0;width:100%;max-width:100%}
+  footer.ft .ft-cta,footer.ft .ft-cta .ft-line{max-width:100%!important;overflow-wrap:break-word}
+}
+</style>
+<style>
+/* the last chapter hands off to the footer through the same soft dusk, never a hard edge */
+footer.ft::before{content:'';position:absolute;left:0;right:0;top:0;height:min(22vh,180px);z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,#0E0B12 0%,rgba(14,11,18,.7) 40%,rgba(14,11,18,0) 100%)}
+</style>
+<style>
+/* the hero's copy layer (title, pill, chat bar) always sits above the cloud bank: the clouds pass BEHIND the chat bar */
+.hero > .copy{z-index:3!important}
+/* prompt rotation: the old line leaves before the new one arrives, so two prompts never overlap */
+.hero .cta-dock .cta-text span{transition:opacity .22s ease,transform .5s cubic-bezier(.16,1,.3,1)!important}
+.hero .cta-dock .cta-text span.on{transition:opacity .4s ease .24s,transform .6s cubic-bezier(.16,1,.3,1) .24s!important}
+</style>
+<style>
+/* chat prompts: one line or two, always vertically centred in the bar */
+.hero .cta-dock .cta-text{align-items:center!important}
+.hero .cta-dock .cta-text span{align-self:center!important;height:auto!important}
+</style>
+<style>
+/* living paintings (12 Nov, owner: "moving plants, coffee, water"): a WebGL layer per chapter that gently displaces the
+   painting's own pixels inside soft regions (hanging plants sway from their hook, potted plants and trees from their base,
+   the bay ripples). Furniture, devices and people never move. Steam rises from the cups. */
+.chp-stage > canvas.chp-life{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.chp-stage > .chp-bay{display:none!important}                       /* the CSS stripe stand-in retires: the water is real now */
+.chp-stage.has-loop > .chp-steam{display:block!important;opacity:calc(1 - var(--lo,0))}
+@media (prefers-reduced-motion:reduce){.chp-stage > canvas.chp-life{display:none}}
+</style>
+<script>
+(function () {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // regions in painting px [x0,y0,x1,y1], kind 0 = hangs from the top, 1 = grows from the base, 2 = water; amp px, speed, phase
+  var R = {
+    'vc-office':           [[990,0,1200,370,0,5,.9,0],[0,650,380,941,1,6,.8,1.3],[60,530,890,665,2,1.1,1,0]],
+    'et-live-kitchen':     [[900,0,1200,350,0,5,.85,.4],[1530,200,1672,380,1,3.5,1,2],[40,385,330,495,2,.9,1,0]],
+    'et-studio-classroom': [[905,0,1175,350,0,5,.9,.8],[735,225,865,505,1,3,.7,2.2],[40,385,345,485,2,.9,1,0]],
+    'et-analytics-office': [[905,0,1185,335,0,5,.9,.2],[1445,0,1672,225,0,4,1,1.7],[495,525,695,665,1,3.5,1.1,2.6],[30,415,560,485,2,1,1,0]],
+    'stressie-park':       [[860,0,1330,125,0,4,.8,.5],[0,185,345,525,1,5,.7,1.1],[245,375,355,545,1,3.5,.8,2.4],[0,575,205,805,1,4,1,.3]],
+    'dearly-alamo':        [[575,0,885,125,0,4,.8,.6],[1195,0,1405,205,0,4,.9,1.9],[255,495,505,625,1,2.5,.7,2.8],[525,535,735,685,1,3,1,1.2]]
+  };
+  var STEAM = { 'et-analytics-office': [742, 668], 'dearly-alamo': [1192, 690] };
+  var VS = 'attribute vec2 p;varying vec2 v;void main(){v=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}';
+  var FS = 'precision highp float;uniform sampler2D uG,uD,uN;uniform vec3 uW;uniform float uT,uA;uniform vec4 uR[6];uniform vec4 uK[6];uniform int uC;' +
+    'uniform vec4 uL;uniform float uLr,uLa,uLh,uLk;varying vec2 v;const vec2 S=vec2(1672.,941.);' +
+    'vec3 smp(vec2 px){vec2 uv=clamp(px/S,vec2(.0005),vec2(.9995));return texture2D(uG,uv).rgb*uW.x+texture2D(uD,uv).rgb*uW.y+texture2D(uN,uv).rgb*uW.z;}' +
+    'float sdRR(vec2 p,vec2 b,float r){vec2 q=abs(p)-b+r;return length(max(q,0.))+min(max(q.x,q.y),0.)-r;}' +
+    // liquid glass: the hero chat bar's lens, ported (squircle bezel refraction, dispersion, frost, smoke, sheen, top-left rim light)
+    'vec4 lens(vec2 p){vec2 q=p-uL.xy;float d=sdRR(q,uL.zw,uLr);if(d>=uLk)return vec4(0.);float k=uLk,t=-d,w=min(uL.w*1.9,22.*k),x=clamp(t/w,0.,1.);' +
+    'vec2 n=vec2(sdRR(q+vec2(1.,0.),uL.zw,uLr)-sdRR(q-vec2(1.,0.),uL.zw,uLr),sdRR(q+vec2(0.,1.),uL.zw,uLr)-sdRR(q-vec2(0.,1.),uL.zw,uLr));n/=max(length(n),1e-4);' +
+    'float bend=pow(1.-x,2.4);vec2 off=-n*bend*w*.9;float br=(.9+2.8*bend)*k;vec3 g=vec3(0.);' +
+    'for(int i=0;i<8;i++){float an=float(i)*.7853982+.3927;vec2 o=vec2(cos(an),sin(an))*br;g.r+=smp(p+off+o).r;g.g+=smp(p+off*1.08+o).g;g.b+=smp(p+off*1.16+o).b;}g/=8.;' +
+    'float l=dot(g,vec3(.299,.587,.114));g=mix(vec3(l),g,1.28);g=g*(.8-.03*uLh)+.045+.05*uLh;' +
+    'g+=smoothstep(.05,1.,-q.y/uL.w)*.075*(1.-.4*x);vec2 L=normalize(vec2(-.55,-.85));float fa=max(dot(n,L),0.),bk=max(dot(n,-L),0.);' +
+    'float rim=1.-smoothstep(0.,2.*k,t);g+=rim*(.62*fa+.3*bk+.1);g+=(1.-smoothstep(1.5*k,9.*k,t))*(1.-rim)*.08*fa;' +
+    'float aa=(1.-smoothstep(-.7*k,.7*k,d))*uLa;return vec4(clamp(g,0.,1.)*aa,aa);}' +
+    'void main(){vec2 p=v*S,d=vec2(0.);float a=0.;' +
+    'if(uLa>.002){vec4 G=lens(p);if(G.a>0.){gl_FragColor=G;return;}}' +
+    'for(int i=0;i<6;i++){if(i>=uC)break;vec4 r=uR[i],k=uK[i];float f=min(min(p.x-r.x,r.z-p.x),min(p.y-r.y,r.w-p.y));float w=smoothstep(0.,36.,f);if(w<=0.)continue;' +
+    'float ty=clamp((p.y-r.y)/(r.w-r.y),0.,1.);' +
+    'if(k.x<.5){float g=pow(ty,1.4);d.x+=w*k.y*g*sin(uT*k.z+k.w+p.y*.012);d.y+=w*k.y*.2*g*sin(uT*k.z*1.3+k.w);}' +
+    'else if(k.x<1.5){float g=pow(1.-ty,1.4);d.x+=w*k.y*g*sin(uT*k.z+k.w+p.x*.01);}' +
+    'else{d.y+=w*k.y*(sin(p.x*.09+uT*1.7+k.w)*.6+sin(p.x*.031-uT*1.1)*.4);d.x+=w*k.y*.3*sin(p.y*.2+uT*1.3);}' +
+    'a=max(a,w);}' +
+    'if(a<=0.){gl_FragColor=vec4(0.);return;}vec2 uv=(p-d)/S;' +
+    'vec3 c=texture2D(uG,uv).rgb*uW.x+texture2D(uD,uv).rgb*uW.y+texture2D(uN,uv).rgb*uW.z;a*=uA;gl_FragColor=vec4(c*a,a);}';
+  var L = [];
+  [].forEach.call(document.querySelectorAll('#chapters .chp'), function (ch) {
+    var stage = ch.querySelector('.chp-stage'), plate = stage && stage.querySelector('img.chp-plate'); if (!plate) return;
+    var m = (plate.getAttribute('src') || '').match(/\/([a-z-]+?)(?:-bg)?\.webp/); if (!m || !R[m[1]]) return;
+    var n = m[1];
+    if (STEAM[n] && !stage.querySelector('.chp-steam')) {
+      var st = document.createElement('div'); st.className = 'chp-steam'; st.innerHTML = '<i></i><i></i><i></i>';
+      st.style.left = (STEAM[n][0] / 16.72) + '%'; st.style.top = (STEAM[n][1] / 9.41) + '%'; stage.appendChild(st);
+    }
+    var cv = document.createElement('canvas'); cv.className = 'chp-life'; cv.width = 1672; cv.height = 941;
+    stage.insertBefore(cv, stage.querySelector('canvas.chp-birds') || stage.querySelector('.chp-near'));
+    L.push({ ch: ch, stage: stage, plate: plate, cv: cv, regions: R[n], gl: null, ready: false });
+  });
+  if (!L.length) return;
+  function setup(o) {
+    var gl = o.cv.getContext('webgl', { premultipliedAlpha: true, alpha: true, antialias: false }); if (!gl) return false;
+    function sh(t, src) { var s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s); return s; }
+    var pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return false;
+    gl.useProgram(pr);
+    var b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    var lp = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp, 2, gl.FLOAT, false, 0, 0);
+    o.tex = {}; ['uG', 'uD', 'uN'].forEach(function (u, i) { var t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + i); gl.bindTexture(gl.TEXTURE_2D, t);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+      gl.uniform1i(gl.getUniformLocation(pr, u), i); o.tex[u] = { t: t, unit: i, src: '' }; });
+    var rr = [], kk = []; o.regions.forEach(function (r) { rr.push(r[0], r[1], r[2], r[3]); kk.push(r[4], r[5], r[6], r[7]); });
+    gl.uniform4fv(gl.getUniformLocation(pr, 'uR'), new Float32Array(rr.concat(new Array(24 - rr.length).fill(0))));
+    gl.uniform4fv(gl.getUniformLocation(pr, 'uK'), new Float32Array(kk.concat(new Array(24 - kk.length).fill(0))));
+    gl.uniform1i(gl.getUniformLocation(pr, 'uC'), o.regions.length);
+    o.uW = gl.getUniformLocation(pr, 'uW'); o.uT = gl.getUniformLocation(pr, 'uT'); o.uA = gl.getUniformLocation(pr, 'uA');
+    ['uL', 'uLr', 'uLa', 'uLh', 'uLk'].forEach(function (u) { o[u] = gl.getUniformLocation(pr, u); });
+    gl.viewport(0, 0, 1672, 941); o.gl = gl; return true;
+  }
+  function bind(o, u, img) {   // upload the image that is actually on screen for that time of day (once per source)
+    var T = o.tex[u], gl = o.gl, src = img ? img.currentSrc || img.src : '';
+    if (!img || !img.complete || !img.naturalWidth || T.src === src) return;
+    gl.activeTexture(gl.TEXTURE0 + T.unit); gl.bindTexture(gl.TEXTURE_2D, T.t);
+    try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img); T.src = src; } catch (e) {}
+  }
+  var t0 = performance.now(), raf = 0;
+  function frame() {
+    raf = 0; var vh = innerHeight, any = false, paused = document.documentElement.classList.contains('motion-paused');
+    L.forEach(function (o) {
+      var r = o.ch.getBoundingClientRect(); if (r.bottom < -40 || r.top > vh + 40) return;
+      any = true; if (!o.gl && !setup(o)) { o.cv.remove(); return; }
+      var td = o.stage.querySelector('img.chp-tod-day'), tn = o.stage.querySelector('img.chp-tod-night'), lp = o.stage.querySelector('video.chp-loop');
+      bind(o, 'uG', o.plate); bind(o, 'uD', td || o.plate); bind(o, 'uN', tn || o.plate);
+      var wD = td ? +td.style.opacity || 0 : 0, wN = tn ? +tn.style.opacity || 0 : 0, lo = lp ? +(lp.style.opacity || 0) : 0;
+      o.stage.style.setProperty('--lo', lo.toFixed(3));
+      var gl = o.gl; gl.uniform3f(o.uW, (1 - wN) * (1 - wD), wD, wN * (1 - wD)); gl.uniform1f(o.uA, 1 - lo);
+      gl.uniform1f(o.uT, paused ? 0 : (performance.now() - t0) / 1000);
+      var go = o.go || (o.go = o.ch.querySelector('.chp-go')), la = 0;
+      if (go && !(innerWidth <= 767 || (innerHeight > innerWidth && innerWidth <= 1100))) {
+        if (!o.hvBound) { o.hvBound = 1; o.hv = 0; o.hvS = 0; go.addEventListener('mouseenter', function () { o.hv = 1; kick(); }); go.addEventListener('mouseleave', function () { o.hv = 0; kick(); }); }
+        var sr = o.stage.getBoundingClientRect(), gr = go.getBoundingClientRect(), K = 1672 / sr.width;
+        la = Math.max(0, Math.min(1, parseFloat(getComputedStyle(go).opacity) || 0));
+        o.hvS += (o.hv - o.hvS) * .15;
+        gl.uniform4f(o.uL, (gr.left + gr.width / 2 - sr.left) * K, (gr.top + gr.height / 2 - sr.top) * K, gr.width / 2 * K, gr.height / 2 * K);
+        gl.uniform1f(o.uLr, Math.min(parseFloat(getComputedStyle(go).borderTopLeftRadius) || 0, gr.height / 2) * K);
+        gl.uniform1f(o.uLh, o.hvS); gl.uniform1f(o.uLk, K);
+      }
+      gl.uniform1f(o.uLa, la); o.ch.classList.toggle('lens-on', la > 0.002);
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    });
+    if (any && !document.hidden) raf = requestAnimationFrame(frame);
+  }
+  function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+  addEventListener('scroll', kick, { passive: true }); addEventListener('resize', kick); document.addEventListener('visibilitychange', kick);
+  setInterval(kick, 1000); kick();
+  window.__chpLife = frame;
+})();
+</script>
+<style>
+/* phones (owner): the chat bar hugs its prompt, text left-aligned, and resizes with each prompt; a long prompt wraps to two lines */
+@media (max-width:480px){
+  .hero .cta-dock .cta{width:auto!important;max-width:calc(100vw - 32px)!important;justify-content:flex-start!important;padding:0 20px 0 12px!important}
+  .hero .cta-dock .cta-text{display:block!important;position:relative!important;text-align:left!important;flex:0 1 auto!important}
+  .hero .cta-dock .cta-text span{text-align:left!important}
+  .hero .cta-dock .cta-text span:not(.on){position:absolute!important;left:0;top:0;width:100%}
+  .hero .cta-dock .cta-text span.on{position:relative!important;display:block!important}
+}
+</style>
+<style>
+/* tablets in portrait: the figures stay together with the copy instead of stretching across the screen */
+@media (min-width:768px) and (orientation:portrait) and (max-width:1100px){ #chapters .chp-proof{max-width:34em} #chapters .chp-copy{max-width:760px} }
+</style>
+<style>
+/* chapter CTAs: real liquid glass. The lens is drawn into the painting by the living-painting layer, so the HTML button
+   keeps only its label (same contract as the hero chat bar's html.lens-on). */
+#chapters .chp.lens-on .chp-go,#chapters .chp.lens-on .chp-go:hover{background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-color:transparent!important}
+#chapters .chp.lens-on .chp-go::before,#chapters .chp.lens-on .chp-go::after{display:none!important}
+#chapters .chp-go{position:relative;z-index:3}
+</style>
+<style>
+/* footer email pill: real liquid glass, drawn by the footer's own living painting (same lens as the hero chat bar) */
+footer.ft.ft-lens .ft-mail{background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-color:transparent!important}
+footer.ft.ft-lens .ft-mail::before,footer.ft.ft-lens .ft-mail::after{display:none!important}
+</style>
+<script>
+(function () {
+  var f = document.getElementById('ftCity'), el = document.querySelector('footer.ft .ft-mail'), ft = document.getElementById('contactSection');
+  if (!f || !el || !ft) return;
+  var hv = false, last = '', raf = 0;
+  function tick() {
+    raf = 0;
+    var fr = f.getBoundingClientRect(), r = el.getBoundingClientRect(), on = fr.bottom > 0 && fr.top < innerHeight;
+    var o = 1; for (var n = el, i = 0; n && i < 5; i++, n = n.parentElement) o *= +getComputedStyle(n).opacity;
+    var msg = { type: 'glass', x: r.left - fr.left, y: r.top - fr.top, w: r.width, h: r.height,
+                r: parseFloat(getComputedStyle(el).borderTopLeftRadius) || 16, a: on && r.width ? o : 0, hv: hv };
+    var key = [msg.x, msg.y, msg.w, msg.h, msg.a, hv].map(function (v) { return Math.round(+v * 100); }).join();
+    if (key !== last) { last = key; try { f.contentWindow.postMessage(msg, location.origin); } catch (e) {} }
+    if (on) raf = requestAnimationFrame(tick);
+  }
+  function kick() { if (!raf) raf = requestAnimationFrame(tick); }
+  el.addEventListener('mouseenter', function () { hv = true; kick(); }); el.addEventListener('mouseleave', function () { hv = false; kick(); });
+  addEventListener('scroll', kick, { passive: true }); addEventListener('resize', kick);
+  f.addEventListener('load', function () { last = ''; tick(); });
+  addEventListener('message', function (e) {
+    if (e.origin === location.origin && e.data && e.data.type === 'glass-ready' && e.source === f.contentWindow) ft.classList.add('ft-lens');
+  });
+  window.__ftLensTick = tick; tick();
+})();
+</script>
 </body>
 </html>
