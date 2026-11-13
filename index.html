@@ -5759,6 +5759,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <div class="chp-pin">
       <div class="chp-stage" aria-hidden="true">
         <img class="chp-plate" src="city/layers/chapters/vc-office.webp" data-night="city/layers/chapters/vc-office-night.webp" data-day="city/layers/chapters/vc-office-day.webp" alt="">
+        <!-- the living golden-hour scene: a locked-camera Higgsfield (Seedance 2.5) loop of this painting, crossfaded to loop seamlessly;
+             Seedance reframed it a few px, so it carries its own screen quad -->
+        <video class="chp-loop" src="city/layers/chapters/loops/vc-office.mp4" poster="city/layers/chapters/vc-office.webp" data-quad="1090,393 1476,372 1420,683 1029,651" muted loop playsinline preload="auto"></video>
         <canvas class="chp-birds" width="1672" height="941"></canvas>
         <div class="chp-bay"></div>
         <div class="chp-screen" data-quad="1104,411 1496,388 1438,705 1047,673"><iframe src="films/vc-launch.html" title="Verified Call launch film" loading="lazy" tabindex="-1"></iframe></div>
@@ -5884,6 +5887,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     background:radial-gradient(62% 78% at 14% 34%,rgba(26,14,38,calc(.62 * var(--shade,1))) 0%,rgba(26,14,38,calc(.38 * var(--shade,1))) 45%,rgba(26,14,38,0) 75%)}
   /* the plate's time-of-day variants (golden = base), cross-faded by SF's real sun like the hero */
   .chp-stage > img.chp-tod{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.2s ease}
+  .chp-stage > video.chp-loop{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;transition:opacity 1.2s ease}
+  .chp-stage.has-loop > .chp-steam,.chp-stage.has-loop > .chp-bay{display:none}   /* the loop has real steam and water */
   /* the copy lives in the window sky, set like the hero title: white Montserrat, no panel, no shadow */
   .chp-copy{position:absolute;left:clamp(24px,6vw,110px);top:clamp(88px,16vh,170px);width:min(40vw,560px);z-index:2}
   .chp-role{margin:0 0 12px;font:600 clamp(15px,1.1vw,17px)/1.2 'Montserrat',sans-serif;color:#FFFCF8}
@@ -5940,14 +5945,16 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     var wN = 1 - ss(-9, -2, alt), wD = ss(9, 24, alt);
     chs.forEach(function (ch) {
       var plate = ch.querySelector('img.chp-plate'), stage = ch.querySelector('.chp-stage'), scr = ch.querySelector('.chp-screen[data-quad]');
+      var loop = stage.querySelector('video.chp-loop'), wG = (1 - wD) * (1 - wN);
+      if (loop) { stage.classList.add('has-loop'); loop.style.opacity = wG.toFixed(3); }
       ['day', 'night'].forEach(function (k) {
         var src = plate.dataset[k]; if (!src) return;
         var im = stage.querySelector('img.chp-tod-' + k);
-        if (!im) { im = document.createElement('img'); im.className = 'chp-tod chp-tod-' + k; im.alt = ''; im.src = src; stage.insertBefore(im, plate.nextSibling); }
+        if (!im) { im = document.createElement('img'); im.className = 'chp-tod chp-tod-' + k; im.alt = ''; im.src = src; stage.insertBefore(im, (loop || plate).nextSibling); }
         im.style.opacity = (k === 'day' ? wD : wN).toFixed(3);
       });
       // the screen follows whichever painting dominates (variants are separate paintings, the laptop can shift a few px)
-      if (scr) { var use = wN > .5 && scr.dataset.quadNight ? scr.dataset.quadNight : wD > .5 && scr.dataset.quadDay ? scr.dataset.quadDay : scr.dataset.quadGold || scr.dataset.quad;
+      if (scr) { var use = wN > .5 && scr.dataset.quadNight ? scr.dataset.quadNight : wD > .5 && scr.dataset.quadDay ? scr.dataset.quadDay : wG > .5 && loop ? loop.dataset.quad : scr.dataset.quadGold || scr.dataset.quad;
         if (!scr.dataset.quadGold) scr.dataset.quadGold = scr.dataset.quad; scr.dataset.quad = use; quad(scr); }
       ch.style.setProperty('--night', wN.toFixed(3)); ch.style.setProperty('--shade', (1 + .25 * wD - .3 * wN).toFixed(3));
     });
@@ -5983,7 +5990,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   // the launch film runs only while its chapter is on screen
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { var f = e.target.querySelector('.chp-screen iframe'); if (f && f.contentWindow) f.contentWindow.postMessage({ type: 'film', play: e.isIntersecting }, '*'); });
+      es.forEach(function (e) { var f = e.target.querySelector('.chp-screen iframe'); if (f && f.contentWindow) f.contentWindow.postMessage({ type: 'film', play: e.isIntersecting }, '*');
+        var lv = e.target.querySelector('video.chp-loop');   // the living scene plays only while on screen and motion is allowed
+        if (lv) { if (e.isIntersecting && !document.documentElement.classList.contains('motion-paused') && !matchMedia('(prefers-reduced-motion: reduce)').matches) { var pr = lv.play(); if (pr && pr.catch) pr.catch(function () {}); } else lv.pause(); } });
     }, { threshold: .2 });
     chs.forEach(function (ch) { io.observe(ch); });
   }
