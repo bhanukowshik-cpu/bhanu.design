@@ -10472,7 +10472,7 @@ html.motion-paused #work.wk-rv .wk-card,html.motion-paused #work.wk-rv .wk-card 
 
 /* the fog bank: over the top of the section, parts onto the forest */
 #work .rwf{position:relative;z-index:5;height:220vh;margin:0 -5vw -220vh;pointer-events:none;overflow-x:clip}
-#work .rwf-crown{position:absolute;left:50%;top:0;width:max(170vw,1500px);max-width:none;transform:translate(-50%,-48%);pointer-events:none}
+#work .rwf-crown{position:absolute;left:50%;top:0;width:max(170vw,1500px);max-width:none;transform:translate(-50%,-8%);pointer-events:none;z-index:2}   /* the image is cloud mass from 20% to 87% of its height with a ragged top 8-20%: only that fringe rises above the seam (JS), over the fog so no straight line shows */
 #work .rwf-pin{position:sticky;top:0;height:100vh;overflow:hidden}
 #work .rwf-bank{position:absolute;inset:0;background:linear-gradient(180deg,#F4E6DA 0%,#EBD6CB 55%,#E2CBC4 100%);opacity:var(--fogA,1)}
 #work .rwf-bank img{position:absolute;left:50%;top:50%;width:max(190vw,1700px);max-width:none;transform:translate(-50%,-50%);will-change:transform,opacity}
@@ -10528,9 +10528,9 @@ html.motion-paused #work .wf-plate,html.motion-paused #work .wf-rays,html.motion
     if (fog) {
       var r = fog.getBoundingClientRect(), run = Math.max(1, r.height - vh), p = cl(-r.top / run);
       // the crown rises over the bottom of the hero as the fog bank arrives
-      if (crown) { var k = cl(1 - r.top / vh); crown.style.transform = 'translate(-50%,' + (-48 - 10 * k).toFixed(2) + '%)'; crown.style.opacity = String(1 - sm(.05, .3, p)); }
+      if (crown) { var k = cl(1 - r.top / vh); crown.style.transform = 'translate(-50%,calc(' + (-8 - 12 * k).toFixed(2) + '% - ' + (k * vh * .18).toFixed(1) + 'px))'; crown.style.opacity = String(1 - sm(.04, .14, p)); }   // (owner, 12 Nov) never over the title: at most 22vh into the hero, and only while it scrolls away
       // the fact: in .12→.32, hold, out .56→.68
-      var fin = sm(.12, .32, p), fout = sm(.56, .68, p), fa = fin * (1 - fout);
+      var fin = sm(.15, .34, p), fout = sm(.56, .68, p), fa = fin * (1 - fout);
       pin.style.setProperty('--factA', fa.toFixed(3));
       pin.style.setProperty('--factY', ((1 - fin) * 14 - fout * 14).toFixed(1) + 'px');
       pin.style.setProperty('--factB', ((1 - fin) * 6 + fout * 6).toFixed(2) + 'px');
