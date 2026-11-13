@@ -6093,7 +6093,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       var enter = cl(1 - r.top / vh);                 // 0 → 1 as the chapter slides up into view
       var p = cl(-r.top / run);                        // 0 → 1 while pinned
       var stage = ch.querySelector('.chp-stage'), copy = ch.querySelector('.chp-copy');
-      stage.style.setProperty('--push', (1.06 - .06 * cl(enter * .6 + p * .8)).toFixed(4));   // a slow settle onto the desk
+      // (12 Nov, owner: "shimmer, glitter while scrolling, across all sections") the per-frame push-in re-scaled each 1672px painting
+      // by a hair every frame (0.8838 → 0.8834 …), so the GPU re-sampled the fine detail (lights, leaves) at a new scale each frame
+      // and it twinkled. The paintings now hold one scale; the slide-in and the copy fade carry the motion.
+      stage.style.setProperty('--push', '1');
       var k = cl((enter - .55) / .45); copy.style.setProperty('--in', (k * k * (3 - 2 * k)).toFixed(3));
     });
   }
@@ -8610,7 +8613,17 @@ var topNav = document.getElementById('topNav');
      easing stays Lenis's own expo-out */
   // (owner, 12 Nov: "the scroll is very rigid") continuous follow instead of a fixed 1.35 s ease: tracks trackpads closely, settles smoothly
   // (12 Nov, measured) lerp .1 lagged the wheel: half the distance at 0.5 s and 2.3 s to settle vs ~1 s native; .14 keeps the glide, settles ~1/3 sooner
-  var lenis = new Lenis({ lerp: 0.14, wheelMultiplier: 1, smoothWheel: true });
+  // (12 Nov, measured on GPU Chrome) Lenis smoothing the wheel fought Chrome's compositor on the pinned (sticky) chapters: 39 of 120
+  // frames jumped ~8px forward and back = the shimmer/glitter the owner saw on every section (native: 9/132, the page's own
+  // animations). Wheel and trackpad now scroll natively (Chrome/Safari already smooth the wheel; no lag behind the input);
+  // Lenis stays for programmatic scrolls (nav links, back to top) and keeps driving ScrollTrigger.
+  var lenis = new Lenis({ lerp: 0.14, wheelMultiplier: 1, smoothWheel: false });
+  /* (12 Nov, owner: "shimmer/glitter while scrolling") lenis.css was never loaded. Over an embedded film (the launch films on the
+     painted laptops/phones are iframes, mid-screen) the wheel went into the iframe, the browser scrolled the page natively,
+     then Lenis pulled it back next frame: the whole scene jumped ~8px and back. Lenis's own required rules fix it. */
+  (function () { var st = document.createElement('style');
+    st.textContent = '.lenis.lenis-smooth{scroll-behavior:auto!important}.lenis.lenis-smooth iframe{pointer-events:none}';
+    document.head.appendChild(st); })();
   /* THE LOADER TRAP: while the title sequence holds html at
      overflow:hidden, scrollHeight collapses to one viewport — any limit
      measured under the lock reads 0 and every wheel afterwards clamps to
@@ -11355,6 +11368,23 @@ footer.ft .ft-mailto:hover span{transform:translateX(6px)}
   addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.type === 'ft-ready') document.getElementById('ftCity').classList.add('on'); });
   if (/[?&]rafshim/.test(location.search)) { var fc = document.getElementById('ftCity'); fc && (fc.dataset.src += '&rafshim'); }
   window.afterHero(function () { var fc = document.getElementById('ftCity'); if (fc && fc.dataset.src) fc.src = fc.dataset.src; });   // second painting: after the hero
+  // CHAPTER ART LOADER (12 Nov, owner saw half-drawn chapters live): native loading="lazy" never fires for images inside the
+  // pinned chapter stages, so plates/time-of-day/foreground layers stayed empty (black holes, a plant floating in a box).
+  // After the hero has painted, load chapter by chapter in page order: each chapter's layers all at once, the next
+  // chapter as soon as this one is in. Everything is decoded long before a visitor scrolls there.
+  window.afterHero(function () {
+    var chs = [].slice.call(document.querySelectorAll('#chapters .chp')), i = 0;
+    (function next() {
+      var ch = chs[i++]; if (!ch) return;
+      var ims = [].slice.call(ch.querySelectorAll('img')), left = 0;
+      function done() { if (--left <= 0) { left = 1e9; next(); } }
+      ims.forEach(function (im) {
+        if (im.loading === 'lazy') im.loading = 'eager';
+        if (!(im.complete && im.naturalWidth) && im.getAttribute('src')) { left++; im.addEventListener('load', done, { once: true }); im.addEventListener('error', done, { once: true }); }
+      });
+      if (!left) next(); else setTimeout(function () { if (left < 1e9) { left = 1e9; next(); } }, 4000);   // never stall the queue
+    })();
+  });
 })();
 </script>
 <style>
