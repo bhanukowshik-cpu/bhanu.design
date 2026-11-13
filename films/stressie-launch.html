@@ -110,7 +110,11 @@
     at(18800, function () { show('s6'); });
     at(21200, run);
   }
-  run();
+  // a11y: hold still on the proof frame when the visitor prefers reduced motion or the page's motion is paused
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  try { still = still || parent.document.documentElement.classList.contains('motion-paused'); } catch (e) {}
+  if (still) { playing = false; var scs = [].slice.call(document.querySelectorAll('.sc')); var pf = scs.filter(function (s) { return s.querySelector('.stat,.stats,.proof,[class*="stat"]'); })[0] || scs[0]; show(pf.id); }
+  else run();
   addEventListener('message', function (e) {
     if (!e.data || e.data.type !== 'film') return;
     if (e.data.play && !playing) { playing = true; run(); }
