@@ -1505,6 +1505,8 @@ function drawSceneText() {
   const tr = titleEl.getBoundingClientRect(), gr = tagEl.getBoundingClientRect();
   const key = [W, H, tr.left, tr.top, tr.width, tr.height, gr.top, gr.width, gr.height, titleEl.style.fontSize, ik * 400].map(v => Math.round(parseFloat(v) || 0)).join(',');
   if (key === textKey) return; textKey = key;
+  // tell the homepage where the tagline settles, so its 'Currently building' pill sits right under it (follows the drop-in)
+  try { if (Q.has('embed')) { const kk = Math.max(0, Math.min(1, (ik - 0.14) / 0.86)); parent.postMessage({ type: 'hero-layout', cx: gr.left + gr.width / 2, bottom: gr.bottom - (1 - (1 - Math.pow(1 - kk, 3))) * H * 0.5, a: Math.min(1, 0.25 + kk * 1.5) * (heroEl.style.opacity === '' ? 1 : +heroEl.style.opacity) }, location.origin); } } catch (e) {}
   textCanvas.width = Math.max(1, Math.round(W * k)); textCanvas.height = Math.max(1, Math.round(H * k));
   const g = textCtx; g.setTransform(k, 0, 0, k, 0, 0); g.clearRect(0, 0, W, H);
   g.textAlign = 'center'; g.textBaseline = 'middle';
