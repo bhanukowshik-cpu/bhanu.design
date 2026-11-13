@@ -140,6 +140,11 @@ The call he owned: in-person events wait for human approval, against the founder
 Role: sole product designer; he owned interaction design, voice UX and the curriculum tooling system, end to end.
 $9.5M seed-funded, ~2,000 learners, 8+ schools.
 
+He designed it; EverTutor's engineers built it. The core idea was his: teach the way a tutor at a whiteboard does. The
+lesson builds on a board in handwriting-style visuals while the tutor, in a corner of the screen, talks, listens and
+adapts, at a time when most AI tutors he studied were chat windows. With no tool that could prototype a tutor that
+writes while it speaks, he prototyped it by hand (a whiteboard canvas and the handwriting-style Shantell Sans typeface), and that layout became the foundation of every later phase.
+
 A voice-first AI tutor that makes 1:1 tutoring (worth ~2 standard deviations in outcomes, but $50–$250 a session)
 scalable. Built in four phases: a whiteboard-style interface with handwritten visuals and "hold to speak" voice
 (~25% higher completion in controlled sessions); personalised tutor voices and a production pipeline that cut content
