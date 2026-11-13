@@ -1593,6 +1593,7 @@ function drawSceneText() {
 
 function frame() {
   if (!state.ready || HALT) return;
+  if (innerWidth && (innerWidth !== state.vw || innerHeight !== state.vh)) { resize(); fitTitle(); textKey = ''; }   // never draw the title for a stale window size (it squashes)
   drawSceneText();
   const now = performance.now();
   const t = (now - t0) / 1000;
