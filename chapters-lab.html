@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work chapters lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!--
+  Chapter prototype (12 Nov 2026, owner: "continue section 1's style into sections 2-5").
+  One painted scene per project, same hand as the hero (ChatGPT, "Create City Storyboard" chat),
+  the REAL product playing inside a device painted straight-on, the copy set into the scene like the hero title.
+  Scene: city/layers/chapters/vc-office.webp (1672x941). Laptop screen measured at x 985-1488, y 402-708.
+  Ambient life is code for now (lamp breath, steam, bay shimmer); a locked-camera Higgsfield loop can replace it.
+-->
+<style>
+  :root{--ink:#FFFCF8}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#0E0B12;color:var(--ink);font-family:'Montserrat',sans-serif}
+  .spacer{height:60vh;display:grid;place-items:center;color:#7C8794;font:500 13px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+
+  /* a chapter = one viewport, pinned for a short run so the scene can settle */
+  .ch{position:relative;height:170vh}
+  .ch-pin{position:sticky;top:0;height:100vh;overflow:hidden}
+  /* the painting is cover-fitted with its aspect locked, so the screen overlay stays glued to the painted laptop */
+  .ch-stage{position:absolute;left:50%;top:50%;width:max(100vw,calc(100vh * 1672 / 941));aspect-ratio:1672/941;
+    transform:translate(-50%,-50%) scale(var(--push,1.06));transform-origin:62% 55%}
+  .ch-stage > img.plate{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .ch-screen{position:absolute;left:calc(985 / 1672 * 100%);top:calc(402 / 941 * 100%);
+    width:calc(504 / 1672 * 100%);height:calc(307 / 941 * 100%);overflow:hidden;background:#0c0c0e;border-radius:.25%}
+  .ch-screen video{width:100%;height:100%;object-fit:cover;object-position:50% 38%;display:block;
+    filter:saturate(.9) brightness(.96)}
+  /* the screen sits in the painting's light: a faint warm sheen from the lamp, no glare */
+  .ch-screen::after{content:'';position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(115deg,rgba(255,214,160,.10),rgba(255,214,160,0) 40%),linear-gradient(0deg,rgba(40,24,40,.10),rgba(40,24,40,0) 30%)}
+
+  /* ambient life, painted-world only (no UI): lamp breath, steam over the mug, a shimmer on the bay */
+  .lamp{position:absolute;left:calc(1532 / 1672 * 100%);top:calc(330 / 941 * 100%);width:30%;aspect-ratio:1;transform:translate(-50%,-30%);
+    background:radial-gradient(closest-side,rgba(255,196,120,.32),rgba(255,196,120,0));mix-blend-mode:screen;pointer-events:none;animation:lamp 5.5s ease-in-out infinite alternate}
+  @keyframes lamp{from{opacity:.75}to{opacity:1}}
+  .steam{position:absolute;left:calc(738 / 1672 * 100%);top:calc(600 / 941 * 100%);width:4.5%;height:14%;pointer-events:none;transform:translate(-50%,-100%)}
+  .steam i{position:absolute;bottom:0;left:50%;width:34%;height:100%;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(255,244,232,.55),rgba(255,244,232,0));filter:blur(4px);opacity:0;animation:steam 4.2s ease-in infinite}
+  .steam i:nth-child(2){animation-delay:1.4s;left:38%}.steam i:nth-child(3){animation-delay:2.8s;left:60%}
+  @keyframes steam{0%{opacity:0;transform:translate(-50%,10%) scale(.6)}25%{opacity:.7}100%{opacity:0;transform:translate(-30%,-90%) scale(1.5,1.9)}}
+  .bay{position:absolute;left:4%;top:calc(470 / 941 * 100%);width:48%;height:9%;pointer-events:none;mix-blend-mode:screen;opacity:.5;
+    background:repeating-linear-gradient(90deg,rgba(255,220,180,0) 0 18px,rgba(255,220,180,.22) 24px,rgba(255,220,180,0) 30px);
+    -webkit-mask:linear-gradient(180deg,transparent,#000 40%,#000 60%,transparent);mask:linear-gradient(180deg,transparent,#000 40%,#000 60%,transparent);
+    animation:bay 7s linear infinite}
+  @keyframes bay{from{background-position:0 0}to{background-position:-120px 0}}
+
+  /* the copy lives in the window sky, set like the hero title: white Montserrat, no panel, no shadow */
+  .ch-copy{position:absolute;left:clamp(24px,6vw,110px);top:clamp(88px,16vh,170px);width:min(40vw,560px);z-index:2}
+  .ch-role{margin:0 0 10px;font:500 clamp(13px,1vw,15px)/1 'Montserrat',sans-serif;color:rgba(255,252,248,.82)}
+  .ch-title{margin:0;font:800 clamp(44px,5.6vw,96px)/.95 'Montserrat',sans-serif;letter-spacing:-.04em;color:var(--ink)}
+  .ch-line{margin:16px 0 0;font:500 clamp(17px,1.35vw,22px)/1.4 'Montserrat',sans-serif;color:rgba(255,252,248,.92);max-width:26ch}
+  .ch-proof{display:flex;gap:clamp(20px,2.4vw,40px);margin:26px 0 0;padding:0;list-style:none}
+  .ch-proof b{display:block;font:700 clamp(28px,2.6vw,44px)/1 'Montserrat',sans-serif;letter-spacing:-.03em;color:var(--ink)}
+  .ch-proof span{display:block;margin-top:6px;font:500 13px/1.3 'Montserrat',sans-serif;color:rgba(255,252,248,.8)}
+  .ch-go{display:inline-flex;align-items:center;gap:10px;margin-top:28px;padding:13px 22px;border-radius:999px;color:var(--ink);text-decoration:none;
+    font:600 15px 'Montserrat',sans-serif;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.06));
+    -webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 0 0 1px rgba(255,255,255,.18)}
+  .ch-copy > *{opacity:var(--in,0);transform:translateY(calc((1 - var(--in,0)) * 18px))}
+
+  /* phones: the scene becomes a band centred on the laptop; the story sits below it on the dark ground */
+  @media (max-width:767px){
+    .ch{height:auto}
+    .ch-pin{position:relative;height:auto;padding-top:62vh}
+    .ch-stage{top:0;left:0;width:calc(62vh * 1672 / 941);transform:translate(calc(-1236 / 1672 * 100% + 50vw),0) scale(var(--push,1.06));transform-origin:73.9% 70%}
+    .ch-copy{position:relative;left:auto;top:auto;width:auto;padding:28px 20px 56px}
+    .ch-line{max-width:none}
+  }
+  @media (prefers-reduced-motion:reduce){.lamp,.steam i,.bay{animation:none}}
+</style>
+</head>
+<body>
+  <div class="spacer">↓ scroll: hero would be above</div>
+
+  <section class="ch" id="chVC" aria-labelledby="chVCt">
+    <div class="ch-pin">
+      <div class="ch-stage" aria-hidden="true">
+        <img class="plate" src="city/layers/chapters/vc-office.webp" alt="">
+        <div class="bay"></div>
+        <div class="ch-screen"><video src="verified-call/screens/a2/panel-loop.mp4" poster="verified-call/screens/a2/panel-loop-poster.jpg" muted loop playsinline autoplay preload="auto"></video></div>
+        <div class="steam"><i></i><i></i><i></i></div>
+        <div class="lamp"></div>
+      </div>
+      <div class="ch-copy">
+        <p class="ch-role">Founder · design and build, solo</p>
+        <h2 class="ch-title" id="chVCt">Verified Call</h2>
+        <p class="ch-line">I'm building Verified Call solo, to remove cheating from video calls.</p>
+        <ul class="ch-proof"><li><b>20</b><span>companies in the closed beta</span></li><li><b>3 weeks</b><span>to build, solo</span></li></ul>
+        <a class="ch-go" href="verified-call.html">Read case study <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <div class="spacer">next chapter: EverTutor Live</div>
+
+<script>
+(function () {
+  var chs = [].slice.call(document.querySelectorAll('.ch'));
+  function cl(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function frame() {
+    var vh = innerHeight;
+    chs.forEach(function (ch) {
+      var r = ch.getBoundingClientRect(), run = Math.max(1, r.height - vh);
+      var enter = cl(1 - r.top / vh);                 // 0 → 1 as the chapter slides up into view
+      var p = cl(-r.top / run);                        // 0 → 1 while pinned
+      var stage = ch.querySelector('.ch-stage'), copy = ch.querySelector('.ch-copy');
+      stage.style.setProperty('--push', (1.06 - .06 * cl(enter * .6 + p * .8)).toFixed(4));   // a slow settle onto the desk
+      var k = cl((enter - .55) / .45); copy.style.setProperty('--in', (k * k * (3 - 2 * k)).toFixed(3));
+    });
+  }
+  addEventListener('scroll', function () { requestAnimationFrame(frame); }, { passive: true });
+  addEventListener('resize', frame); frame();
+  // play the product only while its chapter is on screen
+  var vids = document.querySelectorAll('.ch-screen video');
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) {
+    es.forEach(function (e) { var v = e.target; if (e.isIntersecting) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } else v.pause(); });
+  }, { threshold: .2 }).observe(vids[0]);
+  window.__chFrame = frame;
+})();
+</script>
+</body>
+</html>
