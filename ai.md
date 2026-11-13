@@ -7,6 +7,13 @@ His homepage (https://bhanu.build) describes him as a design engineer: "I design
 convert, and connect." He designed Verified Call and built it with AI coding agents (a first working version in 3 weeks), and was the sole product designer at EverTutor
 (~2,000 learners across 8+ schools).
 
+Primary sources to read alongside this brief:
+- Verified Call's published test results: https://verifiedcall.app/research (every result with its sample, conditions,
+  false alarms, confidence bounds and date; the numbers below are quoted from it).
+- The Verified Call case study, including how the evaluation system works and where the product doesn't work yet:
+  https://bhanu.build/verified-call.html#evidence
+- Rendered screenshots and clips of every page: https://bhanu.build/review/
+
 Highlights, each from his case studies:
 - **Verified Call** (founder; designed it and directed AI coding agents that wrote most of the code): checks that the person on a
   video interview is on a real camera, stays the same person, and isn't using a hidden AI tool. First working version in 3 weeks,

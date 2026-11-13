@@ -1,6 +1,6 @@
 # bhanu.build — visual review pack
 
-This pack shows the rendered portfolio at bhanu.build (https://bhanu.build) for a reviewer who has only read its text. Every image is a real render of the site (the same files that are live), captured in Google Chrome on 13 November 2026 (Pacific time; Verified Call pages and the homepage Verified Call chapter re-shot at about 12:10 PM after the Evidence section was added); nothing is mocked up or retouched. Viewports: desktop 1440×900 (case-study pages rendered at 2x and scaled to 1440 wide; homepage at 1x), phone 390×844 at 2x (iPhone user agent, touch). Clips are 1280×800 recordings of headless Chrome (software rendering, so frame pacing is rougher than in a GPU browser). Each shot was taken after loading and animation had finished: entrance done, chapter paintings decoded, films playing for 2+ s, count-up numbers at their final values. Captions describe what is on screen and the design decision it shows.
+This pack shows the rendered portfolio at bhanu.build (https://bhanu.build) for a reviewer who has only read its text. Every image is a real render of the site (the same files that are live), captured in Google Chrome on 13 November 2026 (Pacific time; homepage re-shot at about 12:25 PM after Verified Call became the lead chapter); nothing is mocked up or retouched. Viewports: desktop 1440×900 (case-study pages rendered at 2x and scaled to 1440 wide; homepage at 1x), phone 390×844 at 2x (iPhone user agent, touch). Clips are 1280×800 recordings of headless Chrome (software rendering, so frame pacing is rougher than in a GPU browser). Each shot was taken after loading and animation had finished: entrance done, chapter paintings decoded, films playing for 2+ s, count-up numbers at their final values. Captions describe what is on screen and the design decision it shows.
 
 Live pages: https://bhanu.build/, https://bhanu.build/verified-call.html, https://bhanu.build/stressie-v4.html, https://bhanu.build/evertutor-live.html, https://bhanu.build/evertutor-studio.html
 
@@ -34,7 +34,7 @@ verified-call.html hero, 1280×800, 8 s. The live replay cycles on its own: chec
 
 ## Homepage
 
-index.html. One painted San Francisco world: a cloud entrance into the Golden Gate hero, six pinned work chapters (each a painted room with the product's launch film mapped onto the painted device), then a night footer. The paintings follow the real sun position in San Francisco; these captures were made at about 11:15–11:30 AM PST, so they show the day variants (the footer is always the night plate).
+index.html. One painted San Francisco world: a cloud entrance into the Golden Gate hero, five pinned work chapters (each a painted room with the product's launch film mapped onto the painted device), then a night footer. The paintings follow the real sun position in San Francisco; these captures were made at about 11:15–11:30 AM PST, so they show the day variants (the footer is always the night plate).
 
 Live: https://bhanu.build/
 
@@ -48,13 +48,13 @@ Live: https://bhanu.build/
 
 ![Homepage, Desktop 1440×900: Hero after the entrance has finished (html.entry-done + hero-go)](https://bhanu.build/review/home-desk-02-hero.webp)
 
-*Desktop 1440×900.* Hero after the entrance has finished (html.entry-done + hero-go). Painted Golden Gate scene; centred nav (Work, Résumé, Contact, "Copy for ChatGPT" picker); title "Hi, this is Bhanu"; line "Product engineer shipping AI products from problem → code."; a "Currently building Verified Call" pill; an Ask-AI bar at the bottom with a suggested question; San Francisco time/weather ticker bottom left; sound toggle bottom right. Decision shown: the hero carries only a greeting, one line, one link and the chat bar over the painting; there are no stats or project cards above the fold.
+*Desktop 1440×900.* Hero after the entrance has finished (html.entry-done + hero-go). Painted Golden Gate scene; centred nav (Work, Résumé, Contact, "Copy for ChatGPT" picker); title "Hi, this is Bhanu"; line "Design engineer building AI products from problem → code."; a "Currently building Verified Call · see how I test it" pill that opens the case study at its Evidence section; an Ask-AI bar at the bottom with a suggested question; San Francisco time/weather ticker bottom left; sound toggle bottom right. Decision shown: the hero carries only a greeting, one line, one link and the chat bar over the painting; there are no stats or project cards above the fold.
 
 ### home-desk-03-chapter-verified-call.webp
 
 ![Homepage, Desktop 1440×900: Work chapter 1, Verified Call](https://bhanu.build/review/home-desk-03-chapter-verified-call.webp)
 
-*Desktop 1440×900.* Work chapter 1, Verified Call: painted home office; the Verified Call launch film plays on the painted laptop (a Meet call labelled with a face swap and a hidden ChatGPT overlay). Left column: "Founder · design and build, solo", title, the line "I'm building Verified Call solo: it checks that the person on a video interview is on a real camera, stays the same person, and isn't using a hidden AI tool.", proof "5 hiring teams in talks" / "3 weeks to a first working version", stack chips (Electron, React, Chrome extension, MediaPipe, Amazon Rekognition, Deepgram), "Read case study". Decision shown: each chapter is one pinned viewport with the same left-column template (role, title, one line, two numbers, stack, one CTA); the product appears as a film inside the painting, not as a screenshot card. The blue sphere bottom right is the persistent voice/chat orb.
+*Desktop 1440×900.* Work chapter 1, Verified Call: painted home office; the Verified Call launch film plays on the painted laptop (a Meet call labelled with a face swap and a hidden ChatGPT overlay). Left column: "Founder · design and build, solo", title, the line "I'm building Verified Call solo: it checks that the person on a video interview is on a real camera, stays the same person, and isn't using a hidden AI tool.", proof "30/30 caught, each of 4 hidden AI tools" / "6 of 17 attacks still open, published", a quieter line "5 hiring teams in talks · 3 weeks to a first working version", stack chips (Electron, React, Chrome extension, MediaPipe, Amazon Rekognition, Deepgram), "Read case study" and a second link "How I know it works" to the Evidence section. Decision shown: Verified Call leads and holds the screen ~50% longer than the other chapters; each chapter is one pinned viewport with the same left-column template (role, title, one line, two numbers, stack, one CTA); the product appears as a film inside the painting, not as a screenshot card. The blue sphere bottom right is the persistent voice/chat orb.
 
 ### home-desk-04-chapter-stressie.webp
 
@@ -64,31 +64,25 @@ Live: https://bhanu.build/
 
 ### home-desk-05-chapter-evertutor-live.webp
 
-![Homepage, Desktop 1440×900: Work chapter 3, EverTutor Live](https://bhanu.build/review/home-desk-05-chapter-evertutor-live.webp)
+![Homepage, Desktop 1440×900: Work chapter 3, EverTutor (Live and Studio together)](https://bhanu.build/review/home-desk-05-chapter-evertutor-live.webp)
 
-*Desktop 1440×900.* Work chapter 3, EverTutor Live: painted kitchen table, a student with a headset; the launch film on the painted laptop shows the student dashboard ("Hey there, Mark!", assigned lessons). Line: "A voice AI tutor: 1:1 tutoring for about $5 an hour, against ~$250 an hour for a human tutor." Proof "~2,000 learners, 8+ schools", "$9.5M seed-funded". The film was paused on a product-UI frame for this still; it opens with price title cards ("$250" → "$5").
+*Desktop 1440×900.* Work chapter 3, EverTutor (Live and Studio together): painted kitchen table, a student with a headset; the launch film on the painted laptop opens with price title cards ("Before EverTutor Live, 1:1 tutoring cost $250" → "$5"). Kicker "Sole product designer · EverTutor"; line "A voice AI tutor: 1:1 tutoring for about $5 an hour, against ~$250 an hour for a human tutor."; proof "~2,000 learners, 8+ schools", "104h → 4h to make a lesson, with Studio"; chips Figma, Product design, Curriculum design; two links: "Live: the tutor" and "Studio: how lessons get made". Decision shown: the two EverTutor products share one chapter, and the chips state the role (designed, not engineered).
 
-### home-desk-06-chapter-evertutor-studio.webp
+### home-desk-06-chapter-evertutor-analytics.webp
 
-![Homepage, Desktop 1440×900: Work chapter 4, EverTutor Studio](https://bhanu.build/review/home-desk-06-chapter-evertutor-studio.webp)
+![Homepage, Desktop 1440×900: Work chapter 4, EverTutor Analytics](https://bhanu.build/review/home-desk-06-chapter-evertutor-analytics.webp)
 
-*Desktop 1440×900.* Work chapter 4, EverTutor Studio: painted classroom, a teacher at a monitor; the film shows the Studio "Select a Curriculum" screen. Proof "104h → 4h to make a lesson", "3,000+ lessons made"; chips Figma, Next.js, Tailwind. Film paused on a product-UI frame; it opens with a "One lesson took 104h" count title card.
+*Desktop 1440×900.* Work chapter 4, EverTutor Analytics: painted study, an educator at a monitor showing the analytics dashboard (overview metrics, lesson-mastery grid per student). Proof "Real-time student insights", "Live in production"; CTA "Request a walkthrough" (no public case study). The CTA changes with what can be shown: a walkthrough request instead of a case study link.
 
-### home-desk-07-chapter-evertutor-analytics.webp
+### home-desk-07-chapter-dearly.webp
 
-![Homepage, Desktop 1440×900: Work chapter 5, EverTutor Analytics](https://bhanu.build/review/home-desk-07-chapter-evertutor-analytics.webp)
+![Homepage, Desktop 1440×900: Work chapter 5, Dearly](https://bhanu.build/review/home-desk-07-chapter-dearly.webp)
 
-*Desktop 1440×900.* Work chapter 5, EverTutor Analytics: painted study, an educator at a monitor showing the analytics dashboard (overview metrics, lesson-mastery grid per student). Proof "Real-time student insights", "Live in production"; CTA "Request a walkthrough" (no public case study). The CTA changes with what can be shown: a walkthrough request instead of a case study link.
+*Desktop 1440×900.* Work chapter 5, Dearly: painted bay-window room with Victorian houses outside; the film on the painted iPad shows a handwritten-style letter with a highlighted line, a voice-note chip and "Send letter". Proof "140+ letters sent", "35 five-star ratings"; CTA "Visit Dearly" (external). Film paused on the letter-composer frame.
 
-### home-desk-08-chapter-dearly.webp
+### home-desk-08-footer.webp
 
-![Homepage, Desktop 1440×900: Work chapter 6, Dearly](https://bhanu.build/review/home-desk-08-chapter-dearly.webp)
-
-*Desktop 1440×900.* Work chapter 6, Dearly: painted bay-window room with Victorian houses outside; the film on the painted iPad shows a handwritten-style letter with a highlighted line, a voice-note chip and "Send letter". Proof "140+ letters sent", "35 five-star ratings"; CTA "Visit Dearly" (external). Film paused on the letter-composer frame.
-
-### home-desk-09-footer.webp
-
-![Homepage, Desktop 1440×900: Footer / contact](https://bhanu.build/review/home-desk-09-footer.webp)
+![Homepage, Desktop 1440×900: Footer / contact](https://bhanu.build/review/home-desk-08-footer.webp)
 
 *Desktop 1440×900.* Footer / contact: the hero's bridge view repainted at night. Status pill "Open to the right team", headline "Looking for a design engineer who moves fast? Email me.", email address with a copy button, LinkedIn, a 'P' profile icon and GitHub, "Currently [time] for me in San Francisco", and the Epidemic Sound credit for the ambient audio. Decision shown: the footer mirrors the hero composition (same viewpoint, night) so the page closes where it opened.
 
