@@ -5,11 +5,11 @@
 <link rel="alternate" type="text/markdown" href="/ai.md" title="Brief for AI assistants: every project, role and result, with how each claim was measured">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Verified Call · Bhanu Kowshik</title>
-  <meta name="description" content="Verified Call case study. I designed and built it alone in 3 weeks: a Mac and Windows app that checks the candidate, and a panel inside Google Meet for the interviewer." />
+  <meta name="description" content="Verified Call case study. I designed it and built it with AI coding agents: a first working version in 3 weeks, a Mac and Windows app that checks the candidate, and a panel inside Google Meet for the interviewer." />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Bhanu Kowshik" />
   <meta property="og:title" content="Verified Call · Bhanu Kowshik" />
-  <meta property="og:description" content="I designed and built Verified Call alone in 3 weeks. 20 companies joined the closed beta." />
+  <meta property="og:description" content="I designed Verified Call and built it with AI coding agents: a first working version in 3 weeks. Closed beta open to 20 companies." />
   <meta property="og:url" content="https://bhanu.build/verified-call.html" />
   <meta property="og:image" content="https://bhanu.build/images/og-verified-call.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -667,7 +667,7 @@
             <p class="hero-kicker in d1">Founder · solo designer and engineer · 2026</p>
             <h1 class="hero-title in d2">Verified Call</h1>
             <p class="hero-line in d2">Know who is on the other side of the call.</p>
-            <p class="hero-lede in d3">I designed and built Verified Call alone in 3 weeks: a Mac and Windows app that checks the candidate, and a panel inside Google Meet that shows the interviewer what it found.</p>
+            <p class="hero-lede in d3">I designed Verified Call and built it with AI coding agents, a first working version in 3 weeks: a Mac and Windows app that checks the candidate, and a panel inside Google Meet that shows the interviewer what it found.</p>
             <div class="hero-cta in d4">
               <a class="ghost cs-glass" href="https://verifiedcall.app" target="_blank" rel="noopener">verifiedcall.app <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a>
             </div>
@@ -708,8 +708,9 @@
           <div>
             <dl>
               <div><dt>Role</dt><dd>Founder, solo design and engineering</dd></div>
-              <div><dt>Timeline</dt><dd>3 weeks, October 2026</dd></div>
+              <div><dt>Timeline</dt><dd>3 weeks to a first working version; ~6 weeks to today (Sep–Nov 2026)</dd></div>
               <div><dt>Shipped</dt><dd>5 surfaces, one design system</dd></div>
+              <div><dt>Stack</dt><dd>Electron, React, TypeScript, Vite · Chrome extension · Next.js with Amazon Rekognition · MediaPipe · Swift (Mac) and Python (Windows, Linux) probes</dd></div>
             </dl>
           </div>
           <div>
@@ -951,6 +952,39 @@
       </div>
     </section>
 
+    <!-- HOW I KNOW IT WORKS (14 Nov 2026): every number is from verifiedcall.app/research or the project's verifier-checked reports, published with the owner's OK; categories only for the red-team gaps, no recipes -->
+    <section id="evidence" class="sec">
+      <div class="wrap">
+        <div class="rv">
+          <p class="eyebrow">Evidence</p>
+          <h2 class="h2">How I know it works, and where it doesn't.</h2>
+          <p class="lede">A detector graded by the person who built it will flatter itself. So I set up the evaluation before writing the checks, and I publish where they fail.</p>
+        </div>
+        <div class="learn">
+          <div class="rv"><h4>Rules before results</h4><p>Every pass/fail rule is written down and fingerprinted (sha256) before a test runs. Once pinned it can't change; a new idea means a new version, tested again.</p></div>
+          <div class="rv"><h4>Sealed test data</h4><p>Development, sealed and held-out sets are split by a salted rule. Checks are built on development data only; nobody tunes against the sealed set.</p></div>
+          <div class="rv"><h4>A separate verifier</h4><p>A fresh agent with no build context is the only one allowed to open sealed data and mark a result. The builder can't grade their own work.</p></div>
+          <div class="rv"><h4>Honest statistics</h4><p>Results carry exact 95% lower bounds. 29 tries per attack family before claiming 90%. Failed and invalid runs stay on record, like a camera rule that scored 14 of 17 before it was rewritten.</p></div>
+          <div class="rv"><h4>The copy is tested too</h4><p>A check fails the build if the product's own words claim more than the tests support, such as "verified human" or "deepfake-proof".</p></div>
+          <div class="rv"><h4>One command to attack it</h4><p>The red team is pre-registered and re-runs with a single command, so every fix is checked against every known attack.</p></div>
+        </div>
+        <div class="rv" style="margin-top:56px"><h3 class="h3" style="font-size:clamp(22px,1.8vw,28px)">What it measured</h3></div>
+        <div class="learn">
+          <div class="rv"><h4>Hidden AI tools</h4><p>Each of 4 tools (Interview Coder, OpenCluely, Pluely, Cheating Daddy) found in 30 of 30 tries; 0 false alarms in 60 clean runs. Own testing, October 4, 2026.</p></div>
+          <div class="rv"><h4>Camera software</h4><p>29 of 29 tries for each of 9 kinds of camera software and 7 direct cameras (September 30); 20 of 20 live Google Meet calls read right (October 2).</p></div>
+          <div class="rv"><h4>Face swaps</h4><p>0 of 3,990 swap sessions got through: 2,855 flagged, 1,135 ended "Can't confirm". The real person was cleared in 962 of 970. Recordings of 70 people, October 1.</p></div>
+          <div class="rv"><h4>Speed and cost</h4><p>A switch to camera software in the middle of a call is caught within 4.66 s on Mac and 5.34 s on Windows (95th percentile). The camera check uses 1.27% and 0.57% of the CPU.</p></div>
+          <div class="rv"><h4>Records that can't be forged</h4><p>Every result from the candidate's computer is signed and chained. 80 of 80 forged or altered records were rejected; 4 of 4 genuine sessions accepted.</p></div>
+          <div class="rv"><h4>Full method</h4><p>Conditions, samples, false alarms and confidence bounds for every published number: <a href="https://verifiedcall.app/research" target="_blank" rel="noopener">verifiedcall.app/research</a>.</p></div>
+        </div>
+        <div class="learn" style="margin-top:56px">
+          <div class="rv"><h4>Where it doesn't work yet</h4><p>I attacked my own system 17 ways (October 17). Six still get through: a capture card that copies a real camera's full identity; video relayed as a built-in camera; a second computer beside the first; joining with the camera off; a copied Windows signing key; and a renamed helper app that doesn't hide. Linux has a known camera spoof, and voice is measured offline only, not in live calls.</p></div>
+          <div class="rv"><h4>What early conversations told me</h4><p>The closed beta is open to 20 companies. I've talked with 5 hiring teams; no live interviews have run through it yet. Their reaction was consistent: if it works as tested, they'd use it.</p></div>
+          <div class="rv"><h4>The one change a customer made</h4><p>My first customer conversation asked to see every app open on the candidate's computer. That collides with the candidate's privacy, so I drew a line: the interviewer always sees an app used during the call, and the full list only if the candidate agrees. Next: the first live interviews, and a field false-alarm rate published beside the lab one.</p></div>
+        </div>
+      </div>
+    </section>
+
     <!-- FAIR TO THE CANDIDATE (14 Nov 2026): every statement is from verifiedcall.app's public brief and trust page, or confirmed by the owner -->
     <section id="fair" class="sec">
       <div class="wrap">
@@ -1025,7 +1059,26 @@
         <div class="own">
           <div class="rv"><h4>Mine</h4><p>All product design, the brand and the design system. All the engineering: the Mac and Windows app, the Chrome extension, the server and web app, and the website.</p></div>
           <div class="rv"><h4>Borrowed</h4><p>MediaPipe for face landmarks, Amazon Rekognition for face match, Deepgram for speech to text, GSAP for site motion, and two open fonts, Turret Road and Manrope.</p></div>
-          <div class="rv"><h4>AI as a tool</h4><p>I designed and engineered it myself, with AI coding agents as tools under my direction. I wrote the specs and made every design call. Agents drafted code to them, and a separate fresh agent checked each result before I accepted it.</p></div>
+          <div class="rv"><h4>AI as a tool</h4><p>AI coding agents wrote most of the code; I directed it. I wrote the specs, the evaluation rules and every product and design decision (about 100 of them, logged with dates), reviewed each change, tested it on real machines, and caught what the agents got wrong. A separate fresh agent checked each result before I accepted it.</p></div>
+        </div>
+        <!-- TWO HARD PROBLEMS (14 Nov 2026): excerpts from the production code, no secrets -->
+        <div class="rv" style="margin-top:72px"><p class="eyebrow">Engineering</p><h3 class="h3" style="font-size:clamp(24px,2.2vw,32px)">Two hard problems.</h3></div>
+        <div class="rv" style="margin-top:28px;max-width:72ch">
+          <h4>Catching camera software without trusting its name</h4>
+          <p>A face swap has to enter the call somewhere, and on a laptop that is almost always camera software: a virtual camera between the swap tool and the meeting. Names don't help, because a virtual camera can call itself "FaceTime HD Camera". So the check never reads names. A small native probe (Swift on Mac, Python on Windows and Linux) asks the operating system what actually backs each camera: a signed camera extension, a legacy plug-in, a virtual transport, or a USB or built-in device. It works out which apps are reading each camera from the capture stack's own log lines, because a virtual camera that is only running proves nothing. A pure, version-pinned rule then gives one of three answers, and "unresolved" is a real answer, not a guess. It took one failed rule version (14 of 17) and a 178-trial name-scramble test to get there; the sealed result was 29 of 29 per attack family on Mac and Windows, at about 1% of one CPU core.</p>
+          <pre class="code" tabindex="0" role="region" aria-label="Code sample: the camera rule">function classify(d: ProbeDevice): { cls: DeviceClass; reason: string } {
+  const kind = d.backing?.kind ?? &quot;unknown&quot;;
+  if (kind === &quot;camera-extension&quot;) return { cls: &quot;software&quot;, reason: &quot;device-backed-by-camera-extension&quot; };
+  if (kind === &quot;dal-plugin&quot;) return { cls: &quot;software&quot;, reason: &quot;device-backed-by-dal-plugin&quot; };
+  if (d.transport === &quot;virtual&quot;) return { cls: &quot;software&quot;, reason: &quot;device-transport-virtual&quot; };
+  if (PHYSICAL_BACKING.has(kind)) return { cls: &quot;physical&quot;, reason: `device-backed-by-${kind}` };
+  return { cls: &quot;unknown&quot;, reason: `device-backing-${kind}` };
+}</pre>
+          <h4 style="margin-top:40px">A Google Meet panel that survives Meet's redesigns</h4>
+          <p>Building inside someone else's app means building on ground that moves. Meet's class names are generated and change without notice, so the extension never reads them. It finds the control bar the way a person does: the leave button, by its accessible name in 8 languages or by the icon Meet draws the same way in every language, then the nearest group of buttons around it. Placement is idempotent and self-healing: put back when Meet re-renders, moved when the layout changes, and a floating badge if Meet changes beyond recognition, never a silent failure. Saved Meet page fixtures (2, 4 and 8 tiles, pinned, presenting, camera off) turn a Meet redesign into a red test before an interviewer ever sees it.</p>
+          <pre class="code" tabindex="0" role="region" aria-label="Code sample: finding Meet's control bar">// Meet&#x27;s class names and jsname values are generated and change between releases, so this file never reads them. It
+// finds the bar the way a person would: the leave-call button (its accessible name, or Meet&#x27;s &quot;call_end&quot; icon, which
+// does not change with the page language), visible, in the lower half of the window and not inside a dialog or menu.</pre>
         </div>
       </div>
     </section>

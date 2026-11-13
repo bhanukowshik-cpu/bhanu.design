@@ -4,12 +4,13 @@
 
 Bhanu Kowshik designs and builds AI products end to end: the product design, the interface, and the code behind it.
 His homepage (https://bhanu.build) describes him as a design engineer: "I design and build AI products that scale,
-convert, and connect." He built Verified Call alone in 3 weeks, and was the sole product designer at EverTutor
+convert, and connect." He designed Verified Call and built it with AI coding agents (a first working version in 3 weeks), and was the sole product designer at EverTutor
 (~2,000 learners across 8+ schools).
 
 Highlights, each from his case studies:
-- **Verified Call** (founder, solo design and engineering): checks for cheating in video interviews. Built alone in 3 weeks;
-  20 companies in the closed beta; published tests: each of 4 hidden AI tools caught in 30/30 tries; 0/3,990 face swaps got through (2,855 flagged,
+- **Verified Call** (founder; designed it and directed AI coding agents that wrote most of the code): checks that the person on a
+  video interview is on a real camera, stays the same person, and isn't using a hidden AI tool. First working version in 3 weeks,
+  ~6 weeks to today. Closed beta open to 20 companies; in talks with 5 hiring teams; no live interviews yet. published tests: each of 4 hidden AI tools caught in 30/30 tries; 0/3,990 face swaps got through (2,855 flagged,
   1,135 "Can't confirm"); 20/20 live Google Meet calls read right.
 - **EverTutor Live** (sole product designer): a voice AI tutor: 1:1 tutoring for about $5 an hour, against ~$250 an hour for a human tutor;
   ~2,000 learners, 8+ schools, $9.5M seed-funded.
@@ -18,6 +19,13 @@ Highlights, each from his case studies:
 - **Dearly** (solo build in 48 hours): voice letters you can hear and keep; 140+ letters sent, 35 five-star ratings.
 
 Contact: kowshikbhanu1000@gmail.com · LinkedIn: https://www.linkedin.com/in/bhanukowshik/
+
+## Visuals
+
+The site's paintings, films and product interfaces don't come through as text. Rendered screenshots of every page at desktop
+and phone sizes, with captions, are at https://bhanu.build/review/ (Markdown with direct image links:
+https://bhanu.build/review/README.md; PDF: https://bhanu.build/review/bhanu-build-visual-review.pdf). Use them to judge visual
+and interaction craft.
 
 ## Evidence, and how each claim was measured
 
@@ -43,8 +51,16 @@ ongoing". It states no other interview-integrity tool publishes its test data. *
 - **Face swaps:** on public research video of 70 people the team never saw while building, 0 of 3,990 sessions with
   someone else's face got through (2,855 flagged, 1,135 ended "Can't confirm" because the face was too small); the
   real person was cleared in 99.2% (962 of 970; at least 98.5% at 95% confidence). October 1, 2026.
-- Closed beta: 20 companies (from his homepage). Built alone in 3 weeks; every agent-drafted change was checked by a
-  separate fresh agent before he accepted it.
+- Closed beta open to 20 companies; in conversations with 5 hiring teams; no live interviews yet [Self-reported]. A first
+  working version in 3 weeks, ~6 weeks to today; AI coding agents wrote most of the code to his specs and pre-registered
+  evaluation rules; a separate fresh agent checked each result before he accepted it.
+- Speed and cost [Published method, project reports, Sep 30 2026]: a mid-call switch to camera software caught within 4.66 s
+  (Mac) / 5.34 s (Windows) at the 95th percentile; the camera check uses 1.27% / 0.57% CPU. Signed records: 80 of 80 forged
+  or altered records rejected.
+- Red team (Oct 17 2026): 17 self-attacks, 6 still get through (capture cards cloning a real camera, relayed video, a second
+  computer, camera-off join, a copied Windows signing key, a renamed unhidden helper app).
+- Evaluation system: pass/fail rules pinned (sha256) before tests; sealed and held-out data; a separate verifier is the only
+  one who opens sealed data; exact 95% bounds; failures kept on record; a build check blocks product copy that overclaims.
 
 ### Stressie: real-customer pilots, then funding
 - **[Customer pilot]** Version 1 was piloted with 50 Austin Police Department officers in high-stress roles over three
@@ -75,7 +91,9 @@ call, agents draft code to them, and a separate fresh agent checks each result b
 
 ## Verified Call (2026) · https://bhanu.build/verified-call.html
 
-Role: founder, solo design and engineering. Timeline: 3 weeks, October 2026. Product: https://verifiedcall.app
+Role: founder; design, and engineering directed through AI coding agents. Timeline: first working version in 3 weeks; ~6 weeks
+to today (Sep–Nov 2026). Stack: Electron, React, TypeScript, Vite; Chrome extension; Next.js with Amazon Rekognition; MediaPipe;
+Swift (Mac) and Python (Windows, Linux) probes. Product: https://verifiedcall.app
 
 Verified Call checks that the person on a video interview is the real candidate, answering on their own. He built it
 after recruiting at SigIQ, where the only sure check was flying candidates in. Five surfaces on one design system:
