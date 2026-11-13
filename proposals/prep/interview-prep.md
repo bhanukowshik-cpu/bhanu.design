@@ -19,6 +19,52 @@ How to use it:
 
 ---
 
+## 0. Your answers so far (13 Nov 2026) and how to say them
+
+These override the matching `[NEED FROM BHANU]` items below (N1, N2 partly, N3, N33 partly).
+
+**What you told me**
+- **Daily engagement (N1):** a user counted as engaged on a day when they opened the app and engaged more than once
+  that day. The share of users who did that went from 12% to 56%.
+- **Pilot size (N2):** about 130 users. The ~2% retention base rate comes from published research on wellness apps.
+- **What moved it (N3):** in your judgment, notifications, and how the app felt and resonated with people.
+- **Metric up, didn't ship (N33):** early prototype testers loved the gamification, but you didn't ship it. The bar
+  you were aiming for was Duolingo-level, and you didn't have the time to understand properly why it works and how,
+  so you held it back rather than ship a shallow version.
+
+**Still open (ask yourself these before the interview)**
+- Was 12% the V1 pilot (Austin PD) and 56% the V2 pilot (Amazon hardware, InKind), or both inside V2? This decides
+  how you answer "how did you isolate it".
+- 17.4% retention: over what window (week 1, day 30, whole pilot)?
+- Which research gives the ~2% base rate? Know the name or the source, in case they ask.
+- The gamification story: which product (Stressie or EverTutor)? What exactly did testers love, and how did you
+  know (what they said, how often they used it)?
+
+**Say it like this: "What caused 12% to 56%?"** (about 45 seconds)
+> "We defined engaged as opening the app and coming back more than once that day, so a real habit signal, not a
+> single tap. Across about 130 people in the pilots, that went from 12% to 56% of users.
+> I want to be straight about attribution: this was pilot-to-pilot, not an A/B test, and several things changed
+> together: notifications, crash fixes, and the redesign. My read is that notifications plus how the app felt did
+> most of the work, because [what you saw: e.g. when people opened it, what they said]. If I had to prove it, I'd
+> hold notifications constant and test the redesign alone, then the reverse, and watch day-7 return rather than
+> opens."
+
+Why this works for a Growth interviewer: you define the metric precisely, size the sample, name the confound
+before they do, give a point of view, and show how you'd isolate it. Note that 130 users is small; never say
+"statistically significant" about it.
+
+**Say it like this: "A metric went up and you didn't ship."** (about 40 seconds)
+> "Early prototype testers loved the gamification, so on the surface it was a win. We didn't ship it. Gamification
+> that builds a habit, Duolingo-level, comes from understanding why each mechanic works, and we didn't have the time
+> to learn that properly. A shallow version risked teaching people to chase points instead of [the real behaviour,
+> e.g. checking in when stressed]. So we held it and put the effort into [what you prioritised instead]."
+
+Fill the brackets with what really happened. If the product was EverTutor, connect it to the gamified progress layer
+the case study says was cut because it didn't move engagement. That's a strong pair: liked in testing, didn't move
+the behaviour, cut.
+
+---
+
 ## 1. The one-minute story
 
 ### One minute (~150 words, to be spoken)
