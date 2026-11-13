@@ -67,4 +67,20 @@ body{font-family:var(--font-body);font-weight:500;color:var(--cs-ink);background
 .cs-navpill a:hover,.cs-navpill button:hover{background:rgba(255,255,255,.14)}
 .cs-navpill [aria-current="true"],.cs-navpill .is-active,.cs-navpill .active{background:rgba(255,255,255,.2)}
 
+/* ══ ONE SHELL (craft pass, 13 Nov 2026) — shared by Verified Call, Stressie V4, EverTutor Live, EverTutor Studio ══
+   · one gutter: content's left edge = Verified Call's (148px at 1440); 1144px column, centred beyond 1440
+     use: padding-inline: max(var(--cs-gutter), calc((100% - var(--cs-col)) / 2))
+   · reading measure 68ch on text blocks (not on the column)
+   · eyebrows: mono 12px label led by a bold zero-padded number <b>01</b> (Verified Call's pattern)
+   · nav: 64px; right slot = Copy for ChatGPT + Email me (Email me hides ≤860px and lives in the menu, as on Verified Call) */
+:root{ --cs-gutter:clamp(20px,10.3vw,148px); --cs-col:1144px; --cs-measure:68ch; }
+@media (max-width:767px){ :root{ --cs-gutter:20px; } }   /* phones keep Verified Call's 20px edge */
+:is(.eyebrow,.section-label,.tr-label,.imp-label,.ug-label,.oc-label) > b{font-weight:600;color:var(--cs-ink);margin-right:10px}
+.nav-end{gap:10px}
+.nav-end > .nav-cta.cs-glass{align-items:center;min-height:44px;padding:0 18px;border-radius:16px;font-size:14px;color:#fff;white-space:nowrap;text-decoration:none}
+@media (max-width:860px){ .nav-end > .nav-cta.cs-glass{display:none} }
+/* widows: balanced headings, no orphaned last words (zero specificity, so a page's own text-wrap still wins) */
+:where(main,.page,article) :where(h1,h2,h3){text-wrap:balance}
+:where(main,.page,article) :where(p,li){text-wrap:pretty}
+
 @media (prefers-reduced-motion:reduce){ .cs-glass,.cs-glass:hover{transition:none;transform:none} }
