@@ -5749,6 +5749,25 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   </script>
 
   <section class="wk" id="work" aria-labelledby="wkTitle">
+    <!-- (12 Nov, owner) the work lives in Muir Woods: a painted redwood forest (same hand as the Golden Gate hero,
+         city/layers/redwoods/plate.webp) stays pinned behind the stacking project cards and is always alive
+         (sunbeams breathe, fog drifts, dust drifts in the light). The scroll in from the hero passes through a fog bank
+         that carries one fact, then parts onto the forest. -->
+    <div class="wk-forest" aria-hidden="true">
+      <img class="wf-plate" src="city/layers/redwoods/plate.webp" srcset="city/layers/redwoods/plate-960.webp 960w, city/layers/redwoods/plate.webp 1672w" sizes="100vw" alt="" decoding="async">
+      <div class="wf-rays"></div>
+      <img class="wf-fog wf-fog1" src="city/layers/vc/cloud_a.webp" alt="" decoding="async">
+      <img class="wf-fog wf-fog2" src="city/layers/vc/cloud_a.webp" alt="" decoding="async">
+      <canvas class="wf-motes"></canvas>
+      <div class="wf-veil"></div>
+    </div>
+    <div class="rwf" id="rwFog">
+      <img class="rwf-crown" src="city/layers/vc/cloud_a.webp" alt="" aria-hidden="true" decoding="async">
+      <div class="rwf-pin">
+        <div class="rwf-bank" aria-hidden="true"><img src="city/layers/vc/cloud_a.webp" alt=""><img src="city/layers/vc/cloud_a.webp" alt=""><img src="city/layers/vc/cloud_a.webp" alt=""></div>
+        <p class="rwf-fact">Coast redwoods are the tallest living things on Earth, some over 380&nbsp;feet.</p>
+      </div>
+    </div>
     <header class="wk-head">
       <div>
         <p class="wk-eyebrow">Selected work</p>
@@ -10430,5 +10449,161 @@ html.motion-paused #work.wk-rv .wk-card,html.motion-paused #work.wk-rv .wk-card 
 #work .wk-5 .cm .stm{height:620px;max-height:none}
 @media (max-width:900px){#work .wk-5 .wk-media.cm-on:has(.stm){aspect-ratio:4/5;height:auto}}   /* stacked: the phone stays tall */
 </style>
+<style>
+/* ══ WORK in the redwoods + stacking cards + fog transition (12 Nov, owner) ══════════════════════════════
+   Section: full-bleed, the forest is a sticky 100vh layer under everything; the fog overlay (.rwf) sits over
+   the section's first 220vh and parts onto the forest; the header arrives as the fog clears; then each
+   project is one wide glass card (animation left, story right) that pins and is covered by the next. */
+#work{position:relative;z-index:2;padding:0 5vw clamp(80px,12vh,160px)!important;background:#14100F;overflow-x:clip}   /* clip, not hidden: sticky keeps working; the crown may still rise over the hero */
+#work .wk-forest{position:sticky;top:0;height:100vh;height:100lvh;margin:0 -5vw -100vh;margin-bottom:calc(-100vh);overflow:hidden;z-index:0;pointer-events:none}
+#work .wf-plate{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;max-width:none;
+  transform:translate3d(0,calc(var(--wfp,0) * -3%),0) scale(1.02);animation:wfBreathe 26s ease-in-out infinite alternate}
+@keyframes wfBreathe{from{scale:1}to{scale:1.035}}
+#work .wf-rays{position:absolute;inset:-20% -10% 0 0;mix-blend-mode:screen;opacity:.55;
+  background:repeating-linear-gradient(118deg,rgba(255,226,170,0) 0 70px,rgba(255,226,170,.16) 110px,rgba(255,226,170,0) 170px,rgba(255,226,170,0) 230px);
+  -webkit-mask:radial-gradient(70% 80% at 85% 0%,#000 0%,rgba(0,0,0,.6) 45%,transparent 80%);mask:radial-gradient(70% 80% at 85% 0%,#000 0%,rgba(0,0,0,.6) 45%,transparent 80%);
+  animation:wfRays 9s ease-in-out infinite alternate}
+@keyframes wfRays{0%{opacity:.35;transform:translateX(0)}50%{opacity:.6}100%{opacity:.42;transform:translateX(40px)}}
+#work .wf-fog{position:absolute;left:0;bottom:-10%;width:max(160vw,1400px);max-width:none;opacity:.32;pointer-events:none;mix-blend-mode:screen;animation:wfDrift 70s linear infinite}
+#work .wf-fog2{bottom:6%;opacity:.18;transform:scaleX(-1);animation-duration:110s;animation-direction:reverse}
+@keyframes wfDrift{from{translate:-40vw 0}to{translate:0 0}}
+#work .wf-motes{position:absolute;inset:0;width:100%;height:100%}
+#work .wf-veil{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%,rgba(10,8,12,.08),rgba(10,8,12,.5))}
+
+/* the fog bank: over the top of the section, parts onto the forest */
+#work .rwf{position:relative;z-index:5;height:220vh;margin:0 -5vw -220vh;pointer-events:none;overflow-x:clip}
+#work .rwf-crown{position:absolute;left:50%;top:0;width:max(170vw,1500px);max-width:none;transform:translate(-50%,-48%);pointer-events:none}
+#work .rwf-pin{position:sticky;top:0;height:100vh;overflow:hidden}
+#work .rwf-bank{position:absolute;inset:0;background:linear-gradient(180deg,#F4E6DA 0%,#EBD6CB 55%,#E2CBC4 100%);opacity:var(--fogA,1)}
+#work .rwf-bank img{position:absolute;left:50%;top:50%;width:max(190vw,1700px);max-width:none;transform:translate(-50%,-50%);will-change:transform,opacity}
+#work .rwf-fact{position:absolute;left:50%;top:50%;width:min(88vw,15.5em);margin:0;text-align:center;
+  font:600 clamp(26px,3.4vw,52px)/1.18 'Montserrat',sans-serif;letter-spacing:-.025em;color:#2A2230;
+  opacity:var(--factA,0);transform:translate(-50%,calc(-50% + var(--factY,14px)));filter:blur(var(--factB,6px))}
+#work .wk-head{position:relative;z-index:1;margin-top:120vh;padding-top:clamp(40px,8vh,96px)}
+#work .wk-title{color:#FFFCF8}
+
+/* stacking cards */
+#work .wk-grid{display:block!important;position:relative;z-index:1}
+#work .wk-grid > .wk-card:not([hidden]){position:sticky;top:calc(clamp(84px,12vh,120px) + var(--i,0) * 14px);
+  display:grid!important;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:center;gap:clamp(24px,3.4vw,56px);
+  height:min(74vh,720px);margin:0 0 22vh;padding:clamp(12px,1.2vw,18px) clamp(28px,3.6vw,60px) clamp(12px,1.2vw,18px) clamp(12px,1.2vw,18px);
+  border-radius:clamp(24px,2.4vw,36px);transform-origin:50% 0;transition:opacity .9s ease;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),rgba(16,14,18,.74);
+  -webkit-backdrop-filter:blur(26px) saturate(1.4);backdrop-filter:blur(26px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 0 1px rgba(255,255,255,.08)}
+#work .wk-grid > .wk-card:not([hidden]):last-of-type{margin-bottom:6vh}
+#work .wk-grid > .wk-card::after{content:'';position:absolute;inset:0;border-radius:inherit;background:#0B0A0D;opacity:var(--dim,0);pointer-events:none;z-index:3}
+#work .wk-grid > .wk-card .wk-media{height:100%!important;aspect-ratio:auto!important;min-height:0!important;border-radius:clamp(16px,1.8vw,26px)}
+#work .wk-grid > .wk-card .wk-body{max-width:none;align-self:center}
+#work .wk-grid > .wk-card .wk-name{font-size:clamp(30px,3vw,54px)}
+#work .wk-grid > .wk-card .wk-line{font-size:clamp(17px,1.25vw,21px)}
+#work .wk-grid > .wk-card:hover .wk-media{transform:none}
+#work.wk-rv .wk-card{transform:none}
+#work .wk-tools li+li::before{content:none}#work .wk-tools li:not(:last-child)::after{content:'\00B7';margin:0 10px;color:rgba(239,243,248,.28)}   /* a wrapped line never starts with a dot */
+
+@media (max-width:900px){
+  #work .wk-grid > .wk-card:not([hidden]){position:relative;top:auto;display:flex!important;flex-direction:column;align-items:stretch;height:auto;margin-bottom:28px;padding:12px 12px 24px}
+  #work .wk-grid > .wk-card .wk-media{height:auto!important;aspect-ratio:4/3!important}
+  #work .wk-grid > .wk-card .wk-media:has(.stm),#work .wk-grid > .wk-card .wk-media.wk-vc{aspect-ratio:4/5!important}
+  #work .wk-grid > .wk-card .wk-body{padding:0 10px}
+}
+@media (prefers-reduced-motion:reduce){
+  #work .wf-plate,#work .wf-rays,#work .wf-fog{animation:none}
+}
+html.motion-paused #work .wf-plate,html.motion-paused #work .wf-rays,html.motion-paused #work .wf-fog{animation-play-state:paused}
+</style>
+<script>
+(function () {
+  var work = document.getElementById('work'); if (!work) return;
+  var fog = document.getElementById('rwFog'), pin = fog && fog.querySelector('.rwf-pin'), bank = fog && fog.querySelector('.rwf-bank');
+  var crown = fog && fog.querySelector('.rwf-crown'), plate = work.querySelector('.wf-plate');
+  var cards = [].slice.call(work.querySelectorAll('.wk-grid > .wk-card:not([hidden])'));
+  cards.forEach(function (c, i) { c.style.setProperty('--i', i); });
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function cl(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function sm(a, b, v) { var t = cl((v - a) / (b - a)); return t * t * (3 - 2 * t); }
+  var raf = 0;
+  function frame() {
+    raf = 0; var vh = innerHeight, vw = innerWidth;
+    if (fog) {
+      var r = fog.getBoundingClientRect(), run = Math.max(1, r.height - vh), p = cl(-r.top / run);
+      // the crown rises over the bottom of the hero as the fog bank arrives
+      if (crown) { var k = cl(1 - r.top / vh); crown.style.transform = 'translate(-50%,' + (-48 - 10 * k).toFixed(2) + '%)'; crown.style.opacity = String(1 - sm(.05, .3, p)); }
+      // the fact: in .12→.32, hold, out .56→.68
+      var fin = sm(.12, .32, p), fout = sm(.56, .68, p), fa = fin * (1 - fout);
+      pin.style.setProperty('--factA', fa.toFixed(3));
+      pin.style.setProperty('--factY', ((1 - fin) * 14 - fout * 14).toFixed(1) + 'px');
+      pin.style.setProperty('--factB', ((1 - fin) * 6 + fout * 6).toFixed(2) + 'px');
+      // the bank parts sideways and lifts, .62 → .98
+      var e = sm(.62, .98, p), L = bank.children;
+      bank.style.setProperty('--fogA', (1 - e).toFixed(3));
+      L[0].style.transform = 'translate(calc(-50% - ' + (e * vw * .8).toFixed(1) + 'px),calc(-50% - ' + (e * vh * .3).toFixed(1) + 'px)) scale(' + (1 + e * .5).toFixed(3) + ')';
+      L[1].style.transform = 'translate(calc(-50% + ' + (e * vw * .8).toFixed(1) + 'px),calc(-50% + ' + (e * vh * .1).toFixed(1) + 'px)) scaleX(-1) scale(' + (1 + e * .5).toFixed(3) + ')';
+      L[2].style.transform = 'translate(-50%,calc(-50% + ' + (vh * .25 + e * vh * .9).toFixed(1) + 'px)) scale(' + (1.2 + e * .7).toFixed(3) + ')';
+      for (var j = 0; j < 3; j++) L[j].style.opacity = String(Math.max(0, 1 - e * 1.1));
+      pin.style.visibility = e >= .999 ? 'hidden' : '';
+    }
+    // forest parallax across the whole section
+    if (plate) { var wr = work.getBoundingClientRect(); work.style.setProperty('--wfp', cl(-wr.top / Math.max(1, wr.height - vh)).toFixed(3)); }
+    // stacking: as the next card climbs to its pin, the one beneath recedes
+    if (innerWidth > 900) for (var i = 0; i < cards.length; i++) {
+      var c = cards[i], n = cards[i + 1], kk = 0;
+      if (n) { var top = parseFloat(getComputedStyle(n).top) || 0, nt = n.getBoundingClientRect().top; kk = cl((vh - nt) / Math.max(1, vh - top)); }
+      c.style.transform = kk ? 'scale(' + (1 - .055 * kk).toFixed(4) + ')' : '';
+      c.style.setProperty('--dim', (kk * .55).toFixed(3));
+    } else for (var q = 0; q < cards.length; q++) { cards[q].style.transform = ''; cards[q].style.setProperty('--dim', 0); }
+  }
+  function req() { if (!raf) raf = requestAnimationFrame(frame); }
+  addEventListener('scroll', req, { passive: true }); addEventListener('resize', req); frame();
+  window.__workFrame = frame;
+
+  // dust in the sunbeams: always alive while the forest is on screen
+  var cv = work.querySelector('.wf-motes'), ctx = cv && cv.getContext('2d');
+  if (!ctx) return;
+  var motes = [], W = 0, H = 0, dpr = Math.min(2, devicePixelRatio || 1), on = false, last = 0;
+  function size() { W = cv.clientWidth || innerWidth; H = cv.clientHeight || innerHeight; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+  function seed() { motes = []; var n = Math.round(Math.min(90, W * H / 16000)); for (var i = 0; i < n; i++) motes.push({ x: Math.random() * W, y: Math.random() * H, r: .6 + Math.random() * 1.8, vx: -.08 - Math.random() * .18, vy: .04 + Math.random() * .12, ph: Math.random() * 6.28, a: .25 + Math.random() * .55 }); }
+  function draw(t) {
+    if (!on) return; requestAnimationFrame(draw);
+    if (document.documentElement.classList.contains('motion-paused')) return;
+    var dt = last ? Math.min(50, t - last) : 16; last = t;
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < motes.length; i++) { var m = motes[i];
+      m.x += m.vx * dt * .06; m.y += m.vy * dt * .06; m.ph += dt * .0016;
+      if (m.x < -10) m.x = W + 10; if (m.y > H + 10) { m.y = -10; m.x = Math.random() * W; }
+      var beam = Math.max(0, 1 - Math.hypot((m.x / W) - .82, (m.y / H) - .1) * 1.1);   // brighter in the shafts, upper right
+      var a = m.a * (.35 + .65 * beam) * (.6 + .4 * Math.sin(m.ph));
+      ctx.beginPath(); ctx.arc(m.x, m.y + Math.sin(m.ph * .7) * 4, m.r, 0, 6.283);
+      ctx.fillStyle = 'rgba(255,232,190,' + a.toFixed(3) + ')'; ctx.fill(); }
+  }
+  size(); seed(); addEventListener('resize', function () { size(); seed(); });
+  if (reduce) return;
+  new IntersectionObserver(function (es) { var v = es[0].isIntersecting; if (v && !on) { on = true; last = 0; requestAnimationFrame(draw); } on = v; }).observe(work);
+})();
+</script>
+<style>
+/* ══ stacking cards, right column composed to its full height (12 Nov, owner: "not using the space on the right") ══
+   top: role, title, pitch · middle: the proof as large figures (metrics lead) · bottom: tools + one clear link.
+   The animation side gets more of the card and its device is no longer shrunk. */
+@media (min-width:901px){
+  #work .wk-grid > .wk-card:not([hidden]){grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:clamp(28px,3.4vw,60px)}
+  #work .wk-grid > .wk-card .wk-media.cm-on > .cm{transform:translate(-50%,-50%) scale(var(--cs,1))!important}
+  #work .wk-grid > .wk-card .wk-go{display:none!important}
+  #work .wk-grid > .wk-card .wk-body{display:flex!important;flex-direction:column;height:100%;padding:clamp(20px,3.2vh,40px) 0}
+  #work .wk-grid > .wk-card .wk-name{font-size:clamp(34px,3.4vw,60px)}
+  #work .wk-grid > .wk-card .cm-pills{display:flex;flex-direction:column;gap:0;margin:auto 0}
+  #work .wk-grid > .wk-card .cm-pills span{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:clamp(12px,1.9vh,20px) 0;border:0;border-top:1px solid rgba(255,255,255,.1);
+    border-radius:0;background:none;font-size:clamp(14px,1vw,16px);color:rgba(239,243,248,.62)}
+  #work .wk-grid > .wk-card .cm-pills span:last-child{border-bottom:1px solid rgba(255,255,255,.1)}
+  #work .wk-grid > .wk-card .cm-pills b{font:700 clamp(26px,2.4vw,42px)/1 'Montserrat',sans-serif;letter-spacing:-.03em;color:#E6F28D}
+  #work .wk-grid > .wk-card .cm-pills span i{align-self:center}
+  #work .wk-grid > .wk-card .wk-tools{margin-top:0}
+  #work .wk-grid > .wk-card .wk-links{display:flex!important;margin-top:clamp(16px,2.4vh,26px)}
+  #work .wk-grid > .wk-card .wk-links span{display:inline-flex;align-items:center;gap:10px;padding:13px 22px;border-radius:999px;font:600 15px 'Montserrat',sans-serif;color:#FFFCF8;
+    background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05));box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 0 0 1px rgba(255,255,255,.14);transition:background .3s}
+  #work .wk-grid > .wk-card:hover .wk-links span{background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.09))}
+}
+</style>
+<style>@media (max-width:480px){.top-nav .nav-links a{white-space:nowrap;padding:8px 11px;font-size:13px}}   /* phone nav: "About me" on one line */</style>
 </body>
 </html>
