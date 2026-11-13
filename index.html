@@ -14,14 +14,14 @@
     var painted = false, parsed = false;
     function go() { if (done || !painted || !parsed) return; done = true; var f; while ((f = q.shift())) try { f(); } catch (e) { console.error(e); } }
     // the scene (still or live) shows the moment it can; the nav, chat bar and the rest wait for the file's last style rules
-    addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.type === 'hero-painted') { d.classList.add('scene-on'); painted = true; go(); } });
+    addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.type === 'hero-painted') { if (!window.__sceneAt) window.__sceneAt = performance.now(); d.classList.add('scene-on'); painted = true; go(); } });
     // parsed = every style rule in this (long) file has been read; readyState leaves 'loading' before deferred scripts run
     function chk() { if (document.readyState !== 'loading') { parsed = true; go(); } }
     document.addEventListener('readystatechange', chk); chk();
     // reloads start at the top: the browser's restore landed mid-page in the clouds and the smooth scroller then dragged it
     // back (owner, 12 Nov: "reload the whole page several times and see where it's breaking"). #links still jump.
     try { if (!location.hash && 'scrollRestoration' in history) { history.scrollRestoration = 'manual'; scrollTo(0, 0); } } catch (e) {}
-    setTimeout(function () { d.classList.add('scene-on'); painted = true; go(); }, 6000);
+    setTimeout(function () { if (!window.__sceneAt) window.__sceneAt = performance.now(); d.classList.add('scene-on'); painted = true; go(); }, 6000);
     window.whenHero = function (f) { done ? f() : q.push(f); };
     window.afterHero = function (f) { window.whenHero(function () { (window.requestIdleCallback || setTimeout)(f, { timeout: 1500 }); }); };
   })();
@@ -34,6 +34,8 @@
     if (f != null) a = +f;
     var l = document.createElement('link'); l.rel = 'preload'; l.as = 'image'; l.setAttribute('fetchpriority', 'high');
     l.href = 'city/layers/gg_ai/poster-' + (a < -4 ? 'night' : a > 12 ? 'day' : 'golden') + '.webp'; document.head.appendChild(l);
+    document.documentElement.setAttribute('data-sf', a < -4 ? 'night' : a > 12 ? 'day' : 'golden');   // the entrance clouds take the sky's tint
+    var c = document.createElement('link'); c.rel = 'preload'; c.as = 'image'; c.setAttribute('fetchpriority', 'high'); c.href = 'city/layers/vc/cloud_a.webp'; document.head.appendChild(c);
   })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -5295,16 +5297,41 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .hero .hero-building:hover svg{transform:translate(2px,-2px)}
       @media (max-width:767px){ .hero .hero-building{top:16vh;font-size:10px;letter-spacing:.08em} }
     </style>
-    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=31" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
+    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=32" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
             tabindex="-1" loading="eager"></iframe>
+    <!-- ENTRANCE (12 Nov, owner: "the first entrance is not dramatic"): the site opens inside the same cloud bank the visitor later
+         flies through between sections; when the painting is ready the clouds part and the view descends from an aerial vantage
+         onto the bridge, then the title drops. ~2.5 s, any wheel/key/tap skips it, off for reduced motion. -->
+    <div class="hero-entry" aria-hidden="true"><div class="he-fill"></div>
+      <img class="he he-c" src="city/layers/vc/cloud_a.webp" alt="" decoding="async"><img class="he he-b" src="city/layers/vc/cloud_a.webp" alt="" decoding="async"><img class="he he-a" src="city/layers/vc/cloud_a.webp" alt="" decoding="async"></div>
     <style>
       .hero .hero-city{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:0;background:#0A1430}
       /* the opening (12 Nov): night-blue until the painting has its first frame, then it fades up and settles from a slight
          push-in while the title drops in (poster-lab) and the nav + chat bar follow (hero-go keyframes) */
       .hero{background:#0A1430}
       html:not(.scene-on) .hero .hero-city{opacity:0;transform:scale(1.045)}
-      html.scene-on .hero .hero-city{animation:heroCityIn 1.6s cubic-bezier(.16,1,.3,1) both}
-      @keyframes heroCityIn{from{opacity:0;transform:scale(1.045)}to{opacity:1;transform:none}}
+      /* the descent: from a closer, higher aerial framing down onto the bridge view while the clouds part */
+      html.scene-on .hero .hero-city{animation:heroCityIn 2.6s cubic-bezier(.22,.7,.12,1) both}
+      @keyframes heroCityIn{from{opacity:.35;transform:scale(1.32) translateY(6%)}to{opacity:1;transform:none}}
+      .hero .hero-entry{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;--n:0;
+        filter:brightness(calc(1 - .18 * var(--n))) saturate(calc(1 - .8 * var(--n))) hue-rotate(calc(var(--n) * 200deg))}
+      html[data-sf="night"] .hero .hero-entry{--n:1}
+      .hero .he-fill{position:absolute;inset:-5%;background:radial-gradient(120% 90% at 50% 45%,#F2E6DE 0%,#E9DCD6 55%,#D9CCC8 100%)}
+      .hero .he{position:absolute;left:50%;top:50%;max-width:none;will-change:transform,opacity}
+      .hero .he-a{width:max(200vw,1900px);transform:translate(-50%,-62%)}
+      .hero .he-b{width:max(185vw,1750px);transform:translate(-50%,-30%) scaleX(-1)}
+      .hero .he-c{width:max(230vw,2200px);transform:translate(-50%,-48%)}
+      html.scene-on .hero .he-fill{animation:heFill .9s ease .15s both}
+      html.scene-on .hero .he-a{animation:heA 2.5s cubic-bezier(.62,0,.18,1) both}
+      html.scene-on .hero .he-b{animation:heB 2.5s cubic-bezier(.62,0,.18,1) .05s both}
+      html.scene-on .hero .he-c{animation:heC 2.3s cubic-bezier(.5,0,.2,1) both}
+      @keyframes heFill{to{opacity:0}}
+      @keyframes heA{to{transform:translate(-118%,-80%) scale(1.55);opacity:0}}
+      @keyframes heB{to{transform:translate(18%,-12%) scaleX(-1) scale(1.55);opacity:0}}
+      @keyframes heC{to{transform:translate(-50%,-30%) scale(2.4);opacity:0}}
+      html.entry-done .hero .hero-entry{display:none}
+      html.entry-skip .hero .hero-entry{opacity:0;transition:opacity .35s ease}
+      @media (prefers-reduced-motion:reduce){ .hero .hero-entry{display:none} html.scene-on .hero .hero-city{animation:none} }
       html.hero-wait .chp-clouds{opacity:0!important}
       @media (prefers-reduced-motion:reduce){ html.scene-on .hero .hero-city{animation:none} html:not(.scene-on) .hero .hero-city{transform:none} }
       /* the scene carries the greeting (HI, I'M BHANU + line); the hero keeps only the nav + chat bar */
@@ -5515,8 +5542,21 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       }
 
       var fired = false;
-      function reveal() {
-        if (fired) return; fired = true;
+      var entryOn = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches), skip = false;
+      function endEntry() { doc.classList.add('entry-done'); }
+      if (entryOn) {
+        var EV = ['wheel', 'touchstart', 'keydown', 'pointerdown'];
+        function onSkip() { if (skip || doc.classList.contains('entry-done') || !doc.classList.contains('scene-on')) return;   // only once the painting is there
+          skip = true; EV.forEach(function (t) { removeEventListener(t, onSkip); }); doc.classList.add('entry-skip'); setTimeout(endEntry, 400); reveal(true); }
+        EV.forEach(function (t) { addEventListener(t, onSkip, { passive: true }); });
+        var ec = document.querySelector('.hero .he-a'); if (ec) ec.addEventListener('animationend', endEntry);
+      } else endEntry();
+      function reveal(now) {
+        if (fired) return;
+        // the title drops as the clouds clear: ~1.1 s after the scene arrives (skipped by any input)
+        var wait = entryOn && !now && window.__sceneAt ? Math.max(0, window.__sceneAt + 1100 - performance.now()) : 0;
+        if (wait > 16) { if (!reveal.t) reveal.t = setTimeout(function () { reveal(true); }, wait); return; }
+        fired = true;
         doc.classList.remove('hero-wait');
         doc.classList.add('hero-go');
         try { var hc = document.getElementById('heroCity'); hc && hc.contentWindow.postMessage({ type: 'hero-intro' }, location.origin); } catch (e) {}
@@ -5810,7 +5850,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <video class="chp-loop" src="city/layers/chapters/loops/vc-office.mp4?v=13" poster="city/layers/chapters/vc-office.webp" data-quad="1090,393 1476,372 1420,683 1029,651" muted loop playsinline preload="none"></video>
         <canvas class="chp-birds" width="1672" height="941"></canvas>
         <div class="chp-bay"></div>
-        <div class="chp-screen" data-quad="1104,411 1496,388 1438,705 1047,673"><iframe src="films/vc-launch.html?v=15" title="Verified Call launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-screen" data-quad="1104,411 1496,388 1438,705 1047,673"><video class="chp-film" muted loop playsinline preload="none" poster="films/video/vc-launch-poster.webp" data-src="films/video/vc-launch.mp4" aria-label="Verified Call launch film"></video></div>
         <div class="chp-steam"><i></i><i></i><i></i></div>
         <div class="chp-lamp"></div>
       </div>
@@ -5830,7 +5870,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="chp-stage" aria-hidden="true">
         <img class="chp-plate" loading="lazy" src="city/layers/chapters/stressie-park.webp" data-night="city/layers/chapters/stressie-park-night.webp" data-day="city/layers/chapters/stressie-park-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" style="width:900px;height:1950px;border-radius:118px" data-quad="860,146 1165,146 1165,795 860,795"><iframe src="films/stressie-launch.html?v=16" title="Stressie launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-screen" style="width:900px;height:1950px;border-radius:118px" data-quad="860,146 1165,146 1165,795 860,795"><video class="chp-film" muted loop playsinline preload="none" poster="films/video/stressie-launch-poster.webp" data-src="films/video/stressie-launch.mp4" aria-label="Stressie launch film"></video></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Founding designer · Figma to SwiftUI</p>
@@ -5849,7 +5889,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
         <img class="chp-plate" loading="lazy" src="city/layers/chapters/et-live-kitchen.webp" data-night="city/layers/chapters/et-live-kitchen-night.webp" data-day="city/layers/chapters/et-live-kitchen-day.webp" alt="">
         <video class="chp-loop" src="city/layers/chapters/loops/et-live.mp4?v=13" poster="city/layers/chapters/et-live-kitchen.webp" data-quad="741,418 1073,403 1114,629 778,669" muted loop playsinline preload="none"></video>
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" data-quad="754,433 1089,417 1132,651 791,692"><iframe src="films/et-live-launch.html?v=14" title="EverTutor Live launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-screen" data-quad="754,433 1089,417 1132,651 791,692"><video class="chp-film" muted loop playsinline preload="none" poster="films/video/et-live-launch-poster.webp" data-src="films/video/et-live-launch.mp4" aria-label="EverTutor Live launch film"></video></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Sole product designer · EverTutor</p>
@@ -5867,7 +5907,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="chp-stage" aria-hidden="true">
         <img class="chp-plate" loading="lazy" src="city/layers/chapters/et-studio-classroom.webp" data-night="city/layers/chapters/et-studio-classroom-night.webp" data-day="city/layers/chapters/et-studio-classroom-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" data-quad="793,372 1241,348 1224,654 771,639"><iframe src="films/et-studio-launch.html?v=14" title="EverTutor Studio launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-screen" data-quad="793,372 1241,348 1224,654 771,639"><video class="chp-film" muted loop playsinline preload="none" poster="films/video/et-studio-launch-poster.webp" data-src="films/video/et-studio-launch.mp4" aria-label="EverTutor Studio launch film"></video></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Sole product designer · EverTutor</p>
@@ -5885,7 +5925,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="chp-stage" aria-hidden="true">
         <img class="chp-plate" loading="lazy" src="city/layers/chapters/et-analytics-office.webp" data-night="city/layers/chapters/et-analytics-office-night.webp" data-day="city/layers/chapters/et-analytics-office-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" data-quad="790,366 1245,341 1228,659 768,643"><iframe src="films/et-analytics-launch.html?v=2" title="EverTutor Analytics launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-screen" data-quad="790,366 1245,341 1228,659 768,643"><video class="chp-film" muted loop playsinline preload="none" poster="films/video/et-analytics-launch-poster.webp" data-src="films/video/et-analytics-launch.mp4" aria-label="EverTutor Analytics launch film"></video></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Sole product designer · EverTutor</p>
@@ -5903,7 +5943,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       <div class="chp-stage" aria-hidden="true">
         <img class="chp-plate" loading="lazy" src="city/layers/chapters/dearly-alamo.webp" data-night="city/layers/chapters/dearly-alamo-night.webp" data-day="city/layers/chapters/dearly-alamo-day.webp" alt="">
         <canvas class="chp-birds" width="1672" height="941"></canvas>
-        <div class="chp-screen" style="width:1600px;height:1200px;border-radius:24px" data-quad="715,458 1040,451 1103,712 775,739"><iframe src="films/dearly-launch-v2.html?v=1" title="Dearly launch film" loading="lazy" tabindex="-1"></iframe></div>
+        <div class="chp-screen" style="width:1600px;height:1200px;border-radius:24px" data-quad="715,458 1040,451 1103,712 775,739"><video class="chp-film" muted loop playsinline preload="none" poster="films/video/dearly-launch-v2-poster.webp" data-src="films/video/dearly-launch-v2.mp4" aria-label="Dearly launch film"></video></div>
       </div>
       <div class="chp-copy">
         <p class="chp-role">Solo build · 48 hours</p>
@@ -5930,11 +5970,14 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     transform:translate(calc(-50% + var(--ox,0px)),-50%) scale(calc(var(--cover,1) * var(--push,1.06)));transform-origin:50% 50%}
   .chp-stage > img.chp-plate{position:absolute;inset:0;width:100%;height:100%;display:block}
   html.chp-gate #chapters .chp .chp-stage{transition:opacity .7s ease}
-  html.chp-gate #chapters .chp:not(.chp-ready) .chp-stage{opacity:0}   /* the scene appears whole, never layer by layer */
+  html.chp-gate #chapters .chp:not(.chp-ready) .chp-stage{opacity:.001}   /* the scene appears whole, never layer by layer (.001, not 0: stays rastered) */
   #chapters .chp + .chp .chp-pin{background:#0E0B12}   /* each chapter slides over the last as a solid sheet, even before its painting is in */
   /* the launch film, mapped onto the painted screen's four corners in true perspective (matrix3d from JS) */
   .chp-screen{position:absolute;left:0;top:0;width:1600px;height:1000px;transform-origin:0 0;overflow:hidden;background:#0A0B0F}
-  .chp-screen iframe{width:100%;height:100%;border:0;display:block;pointer-events:none}
+  .chp-screen iframe,.chp-screen video.chp-film{width:100%;height:100%;border:0;display:block;pointer-events:none;object-fit:fill}
+  /* (12 Nov) the launch films are pre-rendered videos (films/video/*.mp4, recorded from films/*.html, one exact loop each). As live
+     iframes in a matrix3d transform they were re-rastered at full size every animated frame: 2-3 at a chapter handover overloaded
+     the GPU and Chrome skipped tiles = the flicker. A video in the same transform is just a texture: one decode, no raster. */
   /* the screen sits in the painting's light: a faint warm sheen from the lamp, no glare */
   .chp-screen::after{content:'';position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(115deg,rgba(255,214,160,.10),rgba(255,214,160,0) 40%),linear-gradient(0deg,rgba(40,24,40,.12),rgba(40,24,40,0) 30%)}
@@ -5975,7 +6018,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     font:600 15px 'Montserrat',sans-serif;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.06));
     -webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 0 0 1px rgba(255,255,255,.18)}
-  .chp-copy > *{opacity:var(--in,0);transform:translateY(calc((1 - var(--in,0)) * 18px))}
+  .chp-copy > *{opacity:calc(var(--in,0) * .999 + .001);transform:translateY(calc((1 - var(--in,0)) * 18px))}
 
   /* phones and portrait tablets: the scene becomes a band centred on the device; the story sits below it on the dark ground */
   @media (max-width:767px), (orientation:portrait) and (max-width:1100px){
@@ -6108,10 +6151,10 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
   // the launch film runs only while its chapter is on screen
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { var f = e.target.querySelector('.chp-screen iframe'); var ok = e.isIntersecting && !document.documentElement.classList.contains('motion-paused') && !matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (f && f.contentWindow) f.contentWindow.postMessage({ type: 'film', play: ok }, '*');
+      es.forEach(function (e) { var f = e.target.querySelector('.chp-screen video.chp-film'); var ok = e.isIntersecting && !document.documentElement.classList.contains('motion-paused') && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (f) { if (ok && f.getAttribute('src')) { var fp = f.play(); if (fp && fp.catch) fp.catch(function () {}); } else f.pause(); }
         var lv = e.target.querySelector('video.chp-loop');   // the living scene plays only while on screen and motion is allowed
-        if (lv) { if (e.isIntersecting && !document.documentElement.classList.contains('motion-paused') && !matchMedia('(prefers-reduced-motion: reduce)').matches) { var pr = lv.play(); if (pr && pr.catch) pr.catch(function () {}); } else lv.pause(); } });
+        if (lv) { if (e.isIntersecting && +(lv.style.opacity || 0) > .01 && !document.documentElement.classList.contains('motion-paused') && !matchMedia('(prefers-reduced-motion: reduce)').matches) { var pr = lv.play(); if (pr && pr.catch) pr.catch(function () {}); } else lv.pause(); } });
     }, { threshold: .2 });
     chs.forEach(function (ch) { io.observe(ch); });
   }
@@ -6127,9 +6170,9 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       var paused = root.classList.contains('motion-paused') || reduce;
       var hero = document.getElementById('heroCity'); try { hero && hero.contentWindow.postMessage({ type: 'motion', paused: paused }, location.origin); } catch (e) {}
       chs.forEach(function (ch) {
-        var on = !paused && inview(ch), f = ch.querySelector('.chp-screen iframe'), lv = ch.querySelector('video.chp-loop');
-        if (f && f.contentWindow) f.contentWindow.postMessage({ type: 'film', play: on }, '*');
-        if (lv) { if (on) { var pr = lv.play(); if (pr && pr.catch) pr.catch(function () {}); } else lv.pause(); }
+        var on = !paused && inview(ch), f = ch.querySelector('.chp-screen video.chp-film'), lv = ch.querySelector('video.chp-loop');
+        if (f) { if (on && f.getAttribute('src')) { var fp = f.play(); if (fp && fp.catch) fp.catch(function () {}); } else f.pause(); }
+        if (lv) { if (on && +(lv.style.opacity || 0) > .01) { var pr = lv.play(); if (pr && pr.catch) pr.catch(function () {}); } else lv.pause(); }
       });
     }
     if (btn) btn.addEventListener('click', function () {
@@ -7340,7 +7383,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <img class="ft-night" src="city/layers/gg_ai/plate_night.webp" alt="" aria-hidden="true" decoding="async" loading="lazy">
     <!-- (12 Nov, owner: "implement the same thing you have in section 1 in the footer") the hero's living painting itself, at night:
          rippling bay, gulls, layered towers. The still above stays as the poster underneath while it loads. -->
-    <iframe class="ft-live" id="ftCity" data-src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=31" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
+    <iframe class="ft-live" id="ftCity" data-src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=32" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
     <!-- the night scene's life (owner: "the last section is not animating" / "bring in clouds") -->
     <div class="ft-life" aria-hidden="true">
       <canvas class="ft-stars"></canvas>
@@ -11371,27 +11414,67 @@ footer.ft .ft-mailto:hover span{transform:translateX(6px)}
   addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.type === 'ft-ready') document.getElementById('ftCity').classList.add('on'); });
   if (/[?&]rafshim/.test(location.search)) { var fc = document.getElementById('ftCity'); fc && (fc.dataset.src += '&rafshim'); }
   window.afterHero(function () { var fc = document.getElementById('ftCity'); if (fc && fc.dataset.src) fc.src = fc.dataset.src; });   // second painting: after the hero
-  // CHAPTER ART LOADER (12 Nov, owner saw half-drawn chapters live): native loading="lazy" never fires for images inside the
-  // pinned chapter stages, so plates/time-of-day/foreground layers stayed empty (black holes, a plant floating in a box).
-  // After the hero has painted, load chapter by chapter in page order: each chapter's layers all at once, the next
-  // chapter as soon as this one is in. Everything is decoded long before a visitor scrolls there.
-  // A chapter's painting only shows once ALL its layers are in (html.chp-gate + .chp-ready), so a slow line never sees loose pieces.
+  // CHAPTER ART LOADER (12 Nov; rebuilt after the owner's flicker recording). Root cause of the flicker: every chapter stacked six
+  // full-size paintings (golden/day/night × room + subject cut-out), ~6 MB each once decoded, ~40 bitmaps / ~250 MB in all, far
+  // over what Chrome keeps decoded; scrolling made it evict and re-decode, and a layer not ready that frame was skipped (one-frame
+  // black bands, the blurred room showing through where the person should be). SF's sun only ever shows ~2 of the 6, so:
+  //  · only the layers actually visible right now get a src; hidden variants keep theirs in data-wait (never fetched/decoded)
+  //  · each chapter's visible layers are fully decoded (img.decode) before its painting may show (html.chp-gate + .chp-ready)
+  //  · a watcher on the layers' opacity wakes a variant the moment the sun mix brings it into view (dusk/dawn)
+  // Native loading="lazy" is not used: it never fires inside the pinned stages.
   document.documentElement.classList.add('chp-gate');
-  window.whenHero(function () {
-    var chs = [].slice.call(document.querySelectorAll('#chapters .chp')), i = 0;
-    (function next() {
-      var ch = chs[i++]; if (!ch) return;
-      var ims = [].slice.call(ch.querySelectorAll('img')), pending = 0, moved = false;
-      function advance() { if (!moved) { moved = true; next(); } }
-      function done() { if (--pending <= 0) { ch.classList.add('chp-ready'); advance(); } }   // ready whenever its own layers finish
-      ims.forEach(function (im) {
-        if (im.loading === 'lazy') im.loading = 'eager';
-        if (!(im.complete && im.naturalWidth) && im.getAttribute('src')) { pending++; im.addEventListener('load', done, { once: true }); im.addEventListener('error', done, { once: true }); }
-      });
-      if (!pending) { ch.classList.add('chp-ready'); advance(); }
-      else setTimeout(advance, 4000);   // never stall the queue; this chapter still turns ready when its layers land
-    })();
-  });
+  (function () {
+    var root = document.getElementById('chapters'); if (!root) return;
+    var chs = [].slice.call(root.querySelectorAll('.chp'));
+    function op(el) { return el ? (el.style.opacity === '' ? 1 : +el.style.opacity) : 0; }
+    function needed(im, ch) {
+      var st = ch.querySelector('.chp-stage'), td = st && st.querySelector('img.chp-tod-day'), tn = st && st.querySelector('img.chp-tod-night'),
+          lp = st && st.querySelector('video.chp-loop'), wd = td ? op(td) : 0, wn = tn ? op(tn) : 0, lo = lp ? op(lp) : 0, covered = wd >= .999 || wn >= .999;
+      if (im === td) return wd > .001;
+      if (im === tn) return wn > .001;
+      if (im.classList.contains('chp-plate')) return !covered;
+      var near = im.closest('.chp-near');
+      if (near) { var ims = near.querySelectorAll(':scope > img'), k = [].indexOf.call(ims, im);   // order: golden, day, night
+        if (k === 1) return wd > .001; if (k === 2) return wn > .001; return !covered && (1 - lo) > .001; }
+      return true;   // anything else in the chapter (screens, props) always loads
+    }
+    function park(im) { var s = im.getAttribute('src'); if (s && !/^data:/.test(s)) { im.setAttribute('data-wait', s); im.removeAttribute('src'); } }   // the newest src always wins
+    function wake(im) { var s = im.getAttribute('data-wait'); if (s) { im.removeAttribute('data-wait'); im.loading = 'eager'; im.src = s; return true; } if (im.loading === 'lazy') im.loading = 'eager'; return false; }
+    // hidden variants never start downloading. Sorting waits until EVERY script has run: the fg/tod scripts further down read the
+    // plate's src to build the room/subject planes and give each variant its src (parking earlier broke that layering).
+    function sort(ch) { [].forEach.call(ch.querySelectorAll('img'), function (im) { if (needed(im, ch)) { if (ch.__go) wake(im); } else park(im); }); }
+    var sorted = false;
+    function init() { if (!sorted) { sorted = true; chs.forEach(sort); } }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+    // the sun mix changes (tod() runs every minute): wake what comes into view, before it is seen
+    new MutationObserver(function (ms) { var seen = []; ms.forEach(function (m) { var t = m.target; if (t.tagName !== 'IMG' && t.tagName !== 'VIDEO') return; var ch = t.closest('.chp'); if (ch && seen.indexOf(ch) < 0) seen.push(ch); }); seen.forEach(sort); })
+      .observe(root, { attributes: true, attributeFilter: ['style'], subtree: true });
+    window.whenHero(function () {
+      init(); var i = 0;
+      (function next() {
+        var ch = chs[i++]; if (!ch) return; ch.__go = true;
+        var ims = [].filter.call(ch.querySelectorAll('img'), function (im) { return needed(im, ch); }), moved = false;
+        ims.forEach(wake);
+        function advance() { if (!moved) { moved = true; next(); } }
+        // the launch film on the painted device loads with its chapter too (native lazy would load it in the frame it scrolls in)
+        var films = [].map.call(ch.querySelectorAll('.chp-screen video.chp-film'), function (v) {
+          return new Promise(function (r) { var done = false; function ok() { if (!done) { done = true; r(); } }
+            if (!v.getAttribute('src') && v.dataset.src) { v.preload = 'auto'; v.src = v.dataset.src; }
+            if (v.readyState >= 2) ok(); else { v.addEventListener('loadeddata', ok, { once: true }); v.addEventListener('error', ok, { once: true }); }
+            setTimeout(ok, 3000); });
+        });
+        Promise.all(films.concat(ims.map(function (im) {
+          return (im.complete && im.naturalWidth ? Promise.resolve() : new Promise(function (r) { im.addEventListener('load', r, { once: true }); im.addEventListener('error', r, { once: true }); }))
+            .then(function () { return im.decode ? im.decode().catch(function () {}) : null; });   // decoded before it may show
+        }))).then(function () {
+          // the chapter's living-painting WebGL (context, shaders, texture uploads) is built now, at idle, never on scroll-in
+          (window.requestIdleCallback || setTimeout)(function () { try { window.__chpPrep && window.__chpPrep(ch); } catch (e) {}
+            ch.classList.add('chp-ready'); advance(); }, { timeout: 1200 });
+        });
+        setTimeout(advance, 4000);   // never stall the queue; this chapter still turns ready when its own layers are in
+      })();
+    });
+  })();
 })();
 </script>
 <style>
@@ -11617,6 +11700,18 @@ footer.ft::before{content:'';position:absolute;left:0;right:0;top:0;height:min(2
     gl.activeTexture(gl.TEXTURE0 + T.unit); gl.bindTexture(gl.TEXTURE_2D, T.t);
     try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img); T.src = src; } catch (e) {}
   }
+  /* (12 Nov, owner's flicker recording) the context + shader compile + three ~6 MB texture uploads used to happen in the very frame
+     a chapter scrolled into view: a ~240 ms main-thread stall, during which the compositor showed the chapter's un-rastered tiles
+     (black bands, blank blocks). The chapter loader now calls this at idle, after the chapter's paintings are decoded, so entering
+     a chapter costs nothing. */
+  window.__chpPrep = function (ch) {
+    var o = null; for (var i = 0; i < L.length; i++) if (L[i].ch === ch) o = L[i];
+    if (!o || !o.cv.isConnected) return;
+    if (!o.gl && !setup(o)) { o.cv.remove(); return; }
+    var td = o.stage.querySelector('img.chp-tod-day'), tn = o.stage.querySelector('img.chp-tod-night');
+    bind(o, 'uG', o.plate); bind(o, 'uD', td || o.plate); bind(o, 'uN', tn || o.plate);
+    o.gl.clearColor(0, 0, 0, 0); o.gl.clear(o.gl.COLOR_BUFFER_BIT); o.gl.drawArrays(o.gl.TRIANGLE_STRIP, 0, 4);   // warms the pipeline
+  };
   var t0 = performance.now(), raf = 0;
   function frame() {
     raf = 0; var vh = innerHeight, any = false, paused = document.documentElement.classList.contains('motion-paused');
@@ -11639,7 +11734,9 @@ footer.ft::before{content:'';position:absolute;left:0;right:0;top:0;height:min(2
         gl.uniform1f(o.uLr, Math.min(parseFloat(getComputedStyle(go).borderTopLeftRadius) || 0, gr.height / 2) * K);
         gl.uniform1f(o.uLh, o.hvS); gl.uniform1f(o.uLk, K);
       }
-      gl.uniform1f(o.uLa, la); o.ch.classList.toggle('lens-on', la > 0.002);
+      // lens-on is a mode, not a per-frame state: toggling it switched the button's backdrop-filter on/off mid-scroll, which rebuilt the
+      // GPU layers under it (a one-frame re-raster flash of the whole painting). Set once per layout; the lens itself fades with la.
+      gl.uniform1f(o.uLa, la); o.ch.classList.toggle('lens-on', !!go && !(innerWidth <= 767 || (innerHeight > innerWidth && innerWidth <= 1100)));
       gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     });
     if (any && !document.hidden) raf = requestAnimationFrame(frame);
