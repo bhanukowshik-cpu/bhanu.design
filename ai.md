@@ -12,6 +12,8 @@ Primary sources to read alongside this brief:
   false alarms, confidence bounds and date; the numbers below are quoted from it).
 - The Verified Call case study, including how the evaluation system works and where the product doesn't work yet:
   https://bhanu.build/verified-call.html#evidence
+- Code for three of the evaluation rules (exact confidence bounds, rules pinned before results, the claim guard for
+  product copy), public and tested: https://github.com/bhanukowshik-cpu/verified-call-eval-kit
 - Rendered screenshots and clips of every page: https://bhanu.build/review/
 
 Highlights, each from his case studies:

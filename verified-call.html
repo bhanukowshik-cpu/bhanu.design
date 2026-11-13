@@ -632,7 +632,8 @@
     .ev-sys, .ev-gap, .hp-case, .fair-rules li.fair-open { padding: clamp(24px, 3vw, 40px); }
     /* 4.1 the evaluation system: one panel, numbered rail */
     .ev-sys { margin-top: 44px; }
-    .ev-sys-head { padding-bottom: 20px; border-bottom: 1px solid var(--cs-line); }
+    .ev-sys-head { padding-bottom: 20px; border-bottom: 1px solid var(--cs-line); display: flex; justify-content: space-between; align-items: baseline; gap: 8px 24px; flex-wrap: wrap; }
+    .ev-sys-head .ev-code { font: 500 15px/1.4 var(--font-body); }
     .ev-steps { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 28px; margin-top: 32px; counter-reset: ev; }
     .ev-steps li { position: relative; padding-top: 30px; counter-increment: ev; min-width: 0; }
     .ev-steps li::before { content: counter(ev, decimal-leading-zero); position: absolute; top: 0; left: 0; font: 500 12px/1 var(--font-mono); letter-spacing: .14em; color: var(--ink); }
@@ -1065,7 +1066,7 @@
           <p class="lede">A detector graded by the person who built it will flatter itself. So I set up the evaluation before writing the checks, and I publish where they fail.</p>
         </div>
         <div class="ev-sys rv">
-          <div class="ev-sys-head"><h3 class="eyebrow">4.1 · The evaluation system</h3></div>
+          <div class="ev-sys-head"><h3 class="eyebrow">4.1 · The evaluation system</h3><a class="inline ev-code" href="https://github.com/bhanukowshik-cpu/verified-call-eval-kit" target="_blank" rel="noopener">See the evaluation code ↗</a></div>
           <ol class="ev-steps" role="list">
             <li><span class="ev-stage">Pinned</span><h4>Rules before results</h4><p>Every pass/fail rule is written down and fingerprinted (sha256) before a test runs. Once pinned it can't change; a new idea means a new version, tested again.</p></li>
             <li><span class="ev-stage">Sealed</span><h4>Sealed test data</h4><p>Development, sealed and held-out sets are split by a salted rule. Checks are built on development data only; nobody tunes against the sealed set.</p></li>
