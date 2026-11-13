@@ -152,7 +152,8 @@ const REDUCED  = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const MOBILE   = matchMedia('(max-width: 767px), (pointer: coarse)').matches;
 const RAFSHIM  = Q.has('rafshim');
 const FOOTER   = Q.has('footer');   // homepage footer: the same living painting, no hero type (the footer sets its own copy)
-let HALT = false;                    // host says this frame is off-screen: skip rendering entirely
+let HALT = false;
+const FROST = !Q.has('nofrost');   // (owner, 12 Nov) the title sits IN FRONT of the bridge as frosted glass; the tagline in front, solid                    // host says this frame is off-screen: skip rendering entirely
 const LIGHTONLY = Q.has('lightonly');  // test: ignore normal/depth maps (how AI-painted layers render)
 const DPR      = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.5 : 2);
 const TEX_SCALE = MOBILE ? 0.5 : 1;          // half-res layers on phones (GAPS.md #8)
@@ -1453,16 +1454,75 @@ function glassSize() {
   glassRT.setSize(v.x, v.y); glassMat.uniforms.uRes.value.copy(v);
   glassMat.uniforms.uDpr.value = v.x / state.vw;
 }
-function glassRender() {           // returns true when it drew the frame
+function glassRender(composed) {   // returns true when it drew the frame (composed: glassRT already holds the scene)
   if (!glass.on || glass.a < 0.002) return false;
   if (!glassRT) glassSetup();
   const u = glassMat.uniforms, k = u.uDpr.value, H = u.uRes.value.y;
   glass.hvS += (glass.hv - glass.hvS) * 0.15;
   u.uRect.value.set((glass.x + glass.w / 2) * k, H - (glass.y + glass.h / 2) * k, glass.w / 2 * k, glass.h / 2 * k);
   u.uRad.value = Math.min(glass.r, glass.h / 2) * k; u.uA.value = glass.a; u.uHover.value = glass.hvS;
-  renderer.setRenderTarget(glassRT); renderer.render(scene, camera);
+  if (!composed) { renderer.setRenderTarget(glassRT); renderer.render(scene, camera); }
   renderer.setRenderTarget(null); renderer.render(glassScene, camera);
   return true;
+}
+
+/* ══════════════ frosted title (owner, 12 Nov): "move Hi, this is Bhanu to the front, glassmorphic frost" ══════════════
+   The scene renders without the text; a full-screen pass then frosts it through the title's letterforms: the bridge and
+   city behind are blurred, refracted at the letter edges, lifted milky, with a key-lit rim (top-left, like the chat bar). */
+let frostRT = null, frostMat = null, frostScene = null;
+const FS_FROST = /* glsl */`
+  precision highp float;
+  uniform sampler2D tScene, tText; uniform vec2 uRes; uniform float uDpr, uA; varying vec2 vUv;
+  void main(){
+    vec3 base = texture2D(tScene, vUv).rgb;
+    vec4 t = texture2D(tText, vUv);
+    float tm = t.a * t.r * uA, gm = t.a * t.g;
+    vec3 col = base;
+    if (tm > 0.001) {
+      vec2 px = 1.0 / uRes; float e = 2.0 * uDpr;
+      vec2 g = vec2(texture2D(tText, vUv + vec2(px.x * e, 0.0)).a - texture2D(tText, vUv - vec2(px.x * e, 0.0)).a,
+                    texture2D(tText, vUv + vec2(0.0, px.y * e)).a - texture2D(tText, vUv - vec2(0.0, px.y * e)).a);
+      vec2 off = -g * 16.0 * uDpr * px;                   // the letter edges bend the scene inward
+      vec3 b = vec3(0.0); float r = 10.0 * uDpr;
+      for (int i = 0; i < 12; i++) {
+        float an = float(i) * 0.5235988 + 0.26;
+        float rr = r * (0.4 + 0.6 * fract(float(i) * 0.618));
+        b += texture2D(tScene, vUv + off + vec2(cos(an), sin(an)) * rr * px).rgb;
+      }
+      b /= 12.0;
+      float l = dot(b, vec3(0.299, 0.587, 0.114)); b = mix(vec3(l), b, 1.3);
+      vec3 fr = b * 0.55 + vec3(0.43, 0.425, 0.44);       // frost: milky, still carrying the scene's colour
+      float gl = length(g);
+      vec2 n = -g / max(gl, 1e-4);                        // outward edge normal
+      vec2 L = normalize(vec2(-0.55, 0.85));              // key light top-left (GL space, y up)
+      fr += smoothstep(0.0, 0.6, gl) * (0.55 * max(dot(n, L), 0.0) + 0.18 * max(dot(n, -L), 0.0) + 0.06);
+      col = mix(base, clamp(fr, 0.0, 1.0), tm);
+    }
+    col = mix(col, vec3(1.0, 0.988, 0.973), gm);
+    gl_FragColor = vec4(col, 1.0);
+  }`;
+function frostSize() {
+  const v = renderer.getDrawingBufferSize(new THREE.Vector2());
+  if (!frostRT) {
+    frostRT = new THREE.WebGLRenderTarget(v.x, v.y, { depthBuffer: false });
+    frostMat = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false,
+      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }', fragmentShader: FS_FROST,
+      uniforms: { tScene: { value: frostRT.texture }, tText: { value: textTex }, uRes: { value: new THREE.Vector2() }, uDpr: { value: DPR }, uA: { value: 1 } } });
+    frostScene = new THREE.Scene(); frostScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), frostMat));
+  }
+  if (frostRT.width !== v.x || frostRT.height !== v.y) frostRT.setSize(v.x, v.y);
+  frostMat.uniforms.uRes.value.copy(v); frostMat.uniforms.uDpr.value = v.x / state.vw;
+}
+function renderFrame() {                 // scene → (frosted title) → (chat bar lens) → screen
+  if (!(FROST && textPass && !FOOTER)) { if (!glassRender()) renderer.render(scene, camera); return; }
+  frostSize(); textPass.mesh.visible = false;
+  frostMat.uniforms.uA.value = textPass.mat.uniforms.uA.value;
+  renderer.setRenderTarget(frostRT); renderer.render(scene, camera);
+  if (glass.on && glass.a >= 0.002) {
+    if (!glassRT) glassSetup();
+    renderer.setRenderTarget(glassRT); renderer.render(frostScene, camera);
+    glassRender(true);
+  } else { renderer.setRenderTarget(null); renderer.render(frostScene, camera); }
 }
 
 /* ══════════════ hero text inside the scene (behind the bridge) ══════════════ */
@@ -1522,7 +1582,8 @@ function drawSceneText() {
     const cs = getComputedStyle(el), fs = parseFloat(cs.fontSize), lh = parseFloat(cs.lineHeight) || fs * 1.2;
     g.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
     try { g.letterSpacing = cs.letterSpacing === 'normal' ? '0px' : cs.letterSpacing; } catch (e) {}
-    g.fillStyle = `rgba(255,252,248,${alpha * Math.min(1, 0.25 + kk * 1.5)})`;
+    g.fillStyle = FROST ? (el === titleEl ? `rgba(255,0,0,${Math.min(1, 0.25 + kk * 1.5)})` : `rgba(0,255,0,${alpha * Math.min(1, 0.25 + kk * 1.5)})`)
+                        : `rgba(255,252,248,${alpha * Math.min(1, 0.25 + kk * 1.5)})`;
     const lines = wrapLines(g, el.textContent.trim(), r.width + 2);
     const top = r.top + (r.height - lines.length * lh) / 2;
     lines.forEach((ln, i) => g.fillText(ln, r.left + r.width / 2, top + rise + lh * (i + 0.5)));
@@ -1561,7 +1622,7 @@ function frame() {
     renderer.setRenderTarget(null); renderer.setClearColor(0x0A1430, 1);
     for (const p of passes) p.mesh.visible = true;
   }
-  if (!glassRender()) renderer.render(scene, camera);
+  renderFrame();
   state.frames++;
   if (FOOTER && state.frames === 3) try { parent.postMessage({ type: 'ft-ready' }, location.origin); } catch (e) {}
   if (fpsEl) fpsTick(now);
