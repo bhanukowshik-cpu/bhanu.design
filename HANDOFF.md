@@ -4,6 +4,88 @@ For whoever picks this up next (a new Claude account or session). Read `CLAUDE.m
 
 ---
 
+## 0. LATEST: 13 Nov 2026, afternoon session (read this first; §1–§6 below are the morning's state)
+
+### 0.1 Live vs local
+
+- **Live:** https://bhanu.build serves `main` at **`e0de123`** (pushed 13 Nov ~10:45 PT, owner said "push it live"):
+  the soundscape (Epidemic Sound recordings, audible levels), the Epidemic Sound footer credit, "Stressie" (V4 dropped
+  from all visible titles), and **Ask AI** ("✦ Copy for ChatGPT ▾") in the nav of every page.
+- **Local only, NOT pushed:** `portfolio-v6` at **`caa2198`**, one commit on top of `main`. Ship it only when the owner
+  says "push it live" (method in §3). It contains:
+  1. **Chapter films fill their screens.** The films were recorded with the UI inset on a dark canvas (Verified Call: a
+     framed Meet window; EverTutor: 5% letterbox bars). Each `video.chp-film` now carries an inline style that
+     oversizes it to crop to its UI; `.chp-screen` clips to the painted glass. If a film is re-recorded, re-measure.
+  2. **No more blurry halo round the devices.** The subject/room plane split (feathered cut-out over an in-painted
+     room) is switched off: `var SPLIT = false` in the script after `CHAPTER ART LOADER`. The planes had not moved
+     since `amp = 0` ("why is the laptop hovering?"), so the split only added the halo.
+  3. **Sound ON by default** (owner's call; it was opt-in). Browsers allow no audio before a gesture, so it starts on
+     the first real click, tap or key (`e.isTrusted`; keeps trying until the context runs, for iOS). Muting is
+     remembered (`localStorage.siteSound = '0'`).
+  4. **Sound toggle floats bottom right** (glass button, `#sndToggle`, now at the end of `<body>`, outside the nav,
+     because the nav slides away on scroll). It steps left of the chat orb once the orb shows, and hides while the chat
+     is open or the entrance plays. The `SOUNDSCAPE` script waits for DOMContentLoaded for that reason.
+  5. **Homepage Ask AI sits right after the nav links** (the group is centred; compact icon on phones). The owner did
+     NOT want it floating; only the sound toggle floats. Hover now brightens the whole pill (a per-half highlight
+     "poked out").
+  6. **`ai.md` carries the evidence:** a section "Evidence, and how each claim was measured", labelling every claim
+     Published method / Customer pilot / Production / Self-reported (Verified Call research samples, false alarms,
+     95% bounds and dates; Stressie pilots with Amazon, InKind and Austin PD; EverTutor production data).
+  7. EverTutor Studio's counters now hold 104 / 4 in the HTML (text readers saw "0 hrs").
+
+### 0.2 How Ask AI works (shared by all five pages)
+
+`ask-ai.js` + `ask-ai.css`, mounted with `<div data-ask-ai data-phone-compact data-focus="…">`. One prompt points the
+assistant at the public brief **`/ai.md`**; Copy pastes the prompt plus the whole brief; ▾ picks ChatGPT, Claude,
+Gemini, Perplexity or Grok (remembered), "Copy text", or "Open in" (prompt pre-filled; Gemini copies first). Safari:
+copies via a pending `ClipboardItem` inside the click. **Keep `ai.md` in step with the case studies, facts only, no
+ranking claims** (the owner wants "top 1%"; the agreed approach is stronger, checkable evidence, not claims).
+
+### 0.3 Open requests (not started)
+
+1. **Footer is always night.** `#ftCity` loads `poster-lab.html?embed&footer&alt=-14`; `alt=-14` pins the sun below
+   the horizon (by design: "bridge at night"). The owner asked why it's evening when the header is morning. Removing
+   `&alt=-14` makes it follow SF's real sun, but check the footer's white copy stays legible in daylight first. Ask.
+2. **"More sounds" on the homepage, like https://www.danielyesung.com** (owner's reference). His site loads 30 files in
+   5 layers: UI (`ui-tap`, `ui-open`, `ui-close`), interactions (stamps, pins, footsteps on stone/wood), world
+   one-shots (gull, magpie, dog, pigeon, wings, cab horn, wind bell), one ambience per place, and an acoustic music
+   bed; sound on by default. Ours has the ambience + hero one-shots only. Plan offered: UI taps/opens on nav, buttons,
+   chat and Ask AI; a sound as each chapter painting arrives; more SF one-shots (cable-car bell, distant traffic,
+   birds); optional quiet music bed. Source via the Epidemic Sound connector, add slots to `audio/build.py`.
+3. **`robots.txt` + `llms.txt`.** bhanu.build has no robots.txt (404). Add one welcoming AI crawlers and an
+   `llms.txt` pointing to `/ai.md`, like verifiedcall.app. All pages already return 200 to AI user agents.
+4. **From the owner's pasted AI critique** (verdict: "advance to interview"; top-1% "unproven rather than disproven"):
+   positioning is still split (see §6); some copy oversells ("defensible moat", "classroom-comparable outcomes");
+   Verified Call should be defended from the candidate's side (false positives, disputes, accessibility tools). Facts
+   for that exist in https://verifiedcall.app/ai-context.md ("Fair to the candidate"): results are advice not a
+   verdict, a person can decline and still join, note-takers are listed not flagged, data deleted after ~7 days.
+   **Ask the owner before changing any case-study copy.**
+5. Nobody has listened to the soundscape by ear in real Safari or on an iPhone yet; the owner should.
+
+### 0.4 Gotchas from this session
+
+- **Testing:** Claude in Chrome was not connected. Playwright 1.64.1 is cached at
+  `~/.npm/_npx/e41f203b7505f1fb/node_modules/playwright`; drive the real Chrome with `channel: 'chrome', headless: false`
+  (add `ignoreDefaultArgs: ['--mute-audio']` to measure audio), and its WebKit build for Safari's engine.
+- **Measure sound, don't guess.** Tap an `AnalyserNode` onto every `AudioDestinationNode` (patch
+  `AudioNode.prototype.connect` in an init script) and read RMS. The first live version measured -38 dB (inaudible);
+  now ~-21 dB with a -6 dB limiter on both players. Gains: `MASTER_GAIN = 4` (poster-lab), `CH_GAIN = 1.6` (index).
+- **Bump `poster-lab.html?…&v=` in index.html (both iframes) whenever poster-lab changes** (now `v=34`).
+- **Epidemic Sound downloads:** the connector's signed URLs expire within minutes; fetch 3 URLs, download them at
+  once, repeat. Masters are 96 kHz/24-bit (~938 MB in `audio/raw/`, gitignored, deletable; IDs in `audio/CREDITS.md`).
+  Encode with `afconvert` (ffmpeg's `aac_at` wrapper padded every loop, an audible gap). Loops are exactly 45 s and the
+  players pin `loopEnd = 45`.
+- **Licence:** the owner holds Epidemic Pro + Creator and chose to ship. The open questions (the licence wording covers
+  "video and podcast productions") are recorded in `audio/CREDITS.md`, which, like this file, is blocked from public
+  serving in `netlify.toml`.
+- **localhost only:** the Agentation dev toolbar sits bottom right and intercepts clicks there; remove
+  `[data-agentation-portal]` in tests. It also makes failing `localhost:4747` requests (harmless).
+- **Chrome shows a video's poster until it has played;** seeking a never-played video still shows the poster. To
+  screenshot a chapter film, let it play to the moment you want.
+- Disk: ~20 GB free; keep captures in the scratchpad and delete them.
+
+---
+
 ## 1. Where things stand
 
 - **Live:** https://bhanu.build serves `main` at `576020c`. Everything below is live; nothing is half-done.
