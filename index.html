@@ -11188,8 +11188,8 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
     var p = cl((vh - top) / vh), e = p * p * (3 - 2 * p);   // 1 exactly when the chapter reaches the top
     var part = cl((p - .5) / .45), pe = part * part * (3 - 2 * part);   // parted before the chapter settles
     if (first) box.style.setProperty('--cl-night', getComputedStyle(first).getPropertyValue('--night') || 0);
-    L[0].style.transform = 'translate(calc(-50% - ' + (pe * vw * .7).toFixed(1) + 'px),' + (-e * vh * .12).toFixed(1) + 'px) scale(' + (1 + pe * .35).toFixed(3) + ')';
-    L[1].style.transform = 'translate(calc(-50% + ' + (pe * vw * .75).toFixed(1) + 'px),' + (-e * vh * .08).toFixed(1) + 'px) scaleX(-1) scale(' + (1 + pe * .35).toFixed(3) + ')';
+    L[0].style.transform = 'translate(calc(-50% - ' + (pe * vw * .7).toFixed(1) + 'px),0px) scale(' + (1 + pe * .35).toFixed(3) + ')';   // no lift: the tops stay under the hero's chat bar
+    L[1].style.transform = 'translate(calc(-50% + ' + (pe * vw * .75).toFixed(1) + 'px),0px) scaleX(-1) scale(' + (1 + pe * .35).toFixed(3) + ')';
     L[2].style.transform = 'translate(-50%,' + (pe * vh * .55).toFixed(1) + 'px) scale(' + (1.1 + pe * .5).toFixed(3) + ')';
     var a = String(Math.max(0, 1 - pe * 1.15)); for (var i = 0; i < 3; i++) L[i].style.opacity = a;
     box.style.visibility = pe >= .999 ? 'hidden' : '';
@@ -11199,6 +11199,6 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
 })();
 </script>
 <style>/* (owner, 12 Nov) clouds back, but they rise from BELOW the hero chat bar and part before the chapter settles (no veil over the work) */
-#chapters .chp-clouds{top:-9vh!important}</style>
+#chapters .chp-clouds{top:-11vh!important}</style>
 </body>
 </html>
