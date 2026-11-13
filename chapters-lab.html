@@ -25,7 +25,7 @@
   /* the painting is cover-fitted with its aspect locked, so the screen overlay stays glued to the painted laptop */
   /* the painting is a fixed 1672x941 stage, cover-scaled by JS (--cover), so every overlay uses the painting's own pixels */
   .ch-stage{position:absolute;left:50%;top:50%;width:1672px;height:941px;
-    transform:translate(-50%,-50%) scale(calc(var(--cover,1) * var(--push,1.06)));transform-origin:50% 50%}
+    transform:translate(calc(-50% + var(--ox,0px)),-50%) scale(calc(var(--cover,1) * var(--push,1.06)));transform-origin:50% 50%}
   .ch-stage > img.plate{position:absolute;inset:0;width:100%;height:100%;display:block}
   /* the launch film, mapped onto the painted screen's four corners in true perspective (matrix3d from JS) */
   .ch-screen{position:absolute;left:0;top:0;width:1600px;height:1000px;transform-origin:0 0;overflow:hidden;background:#0A0B0F}
@@ -61,7 +61,8 @@
   .ch-title{margin:0;font:800 clamp(44px,5.6vw,96px)/.95 'Montserrat',sans-serif;letter-spacing:-.04em;color:var(--ink)}
   .ch-line{margin:16px 0 0;font:600 clamp(18px,1.4vw,23px)/1.4 'Montserrat',sans-serif;color:#FFFCF8;max-width:26ch}
   .ch-proof{display:flex;gap:clamp(20px,2.4vw,40px);margin:26px 0 0;padding:0;list-style:none}
-  .ch-proof b{display:block;font:700 clamp(28px,2.6vw,44px)/1 'Montserrat',sans-serif;letter-spacing:-.03em;color:var(--ink)}
+  .ch-proof li{flex:none}
+  .ch-proof b{white-space:nowrap;display:block;font:700 clamp(28px,2.6vw,44px)/1 'Montserrat',sans-serif;letter-spacing:-.03em;color:var(--ink)}
   .ch-proof span{display:block;margin-top:8px;font:600 15px/1.3 'Montserrat',sans-serif;color:#FFFCF8}
   .ch-go{display:inline-flex;align-items:center;gap:10px;margin-top:28px;padding:13px 22px;border-radius:999px;color:var(--ink);text-decoration:none;
     font:600 15px 'Montserrat',sans-serif;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.06));
@@ -217,7 +218,10 @@
       var c = phone ? (innerHeight * .62) / 941 : Math.max(innerWidth / 1672, innerHeight / 941);
       ch.style.setProperty('--cover', c.toFixed(4));
       var s = ch.querySelector('.ch-screen[data-quad]');
-      if (s) { var q = s.dataset.quad.split(' ').map(function (p) { return +p.split(',')[0]; }); ch.style.setProperty('--fx', ((Math.min.apply(0, q) + Math.max.apply(0, q)) / 2).toFixed(0)); }
+      if (s) { var q = s.dataset.quad.split(' ').map(function (p) { return +p.split(',')[0]; }); ch.style.setProperty('--fx', ((Math.min.apply(0, q) + Math.max.apply(0, q)) / 2).toFixed(0));
+        // keep the device in frame when the cover-crop would cut it: slide the painting left (never past its own edge)
+        if (!phone) { var vw = innerWidth, ovf = Math.max(0, 1672 * c - vw) / 2, right = vw / 2 + (Math.max.apply(0, q) + 60 - 836) * c;
+          ch.style.setProperty('--ox', (-Math.min(ovf, Math.max(0, right - vw))).toFixed(1) + 'px'); } else ch.style.setProperty('--ox', '0px'); }
     });
   }
   addEventListener('resize', cover); cover();
