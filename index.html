@@ -5261,7 +5261,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       .hero .hero-building:hover svg{transform:translate(2px,-2px)}
       @media (max-width:767px){ .hero .hero-building{top:16vh;font-size:10px;letter-spacing:.08em} }
     </style>
-    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=28" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
+    <iframe class="hero-city" id="heroCity" src="poster-lab.html?embed&amp;v=29" title="Animated painting of the Golden Gate at golden hour" aria-hidden="true"
             tabindex="-1" loading="eager"></iframe>
     <style>
       .hero .hero-city{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:0;background:#0A1430}
@@ -7299,7 +7299,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
     <img class="ft-night" src="city/layers/gg_ai/plate_night.webp" alt="" aria-hidden="true" decoding="async" loading="lazy">
     <!-- (12 Nov, owner: "implement the same thing you have in section 1 in the footer") the hero's living painting itself, at night:
          rippling bay, gulls, layered towers. The still above stays as the poster underneath while it loads. -->
-    <iframe class="ft-live" id="ftCity" src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=28" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
+    <iframe class="ft-live" id="ftCity" src="poster-lab.html?embed&amp;footer&amp;alt=-14&amp;v=29" title="Animated painting of the Golden Gate at night" aria-hidden="true" tabindex="-1"></iframe>
     <!-- the night scene's life (owner: "the last section is not animating" / "bring in clouds") -->
     <div class="ft-life" aria-hidden="true">
       <canvas class="ft-stars"></canvas>
@@ -8572,7 +8572,8 @@ var topNav = document.getElementById('topNav');
   gsap.registerPlugin(ScrollTrigger);
   /* 1.35 over the Engine's 1.1 — the longer glide is the plushness; the
      easing stays Lenis's own expo-out */
-  var lenis = new Lenis({ duration: 1.35 });
+  // (owner, 12 Nov: "the scroll is very rigid") continuous follow instead of a fixed 1.35 s ease: tracks trackpads closely, settles smoothly
+  var lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true });
   /* THE LOADER TRAP: while the title sequence holds html at
      overflow:hidden, scrollHeight collapses to one viewport — any limit
      measured under the lock reads 0 and every wheel afterwards clamps to
@@ -11222,7 +11223,7 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
     if (first) box.style.setProperty('--cl-night', getComputedStyle(first).getPropertyValue('--night') || 0);
     if (!mv) { mv = document.createElement('div'); mv.className = 'cl-move'; [].slice.call(box.children).forEach(function (c) { if (!c.classList.contains('cl-title')) mv.appendChild(c); }); box.insertBefore(mv, box.firstChild); }
     var seam = vh * (1 - p), swell = cl((p - .25) / .3), sw = swell * swell * (3 - 2 * swell);
-    mv.style.transform = 'translateY(' + (seam - (band ? 140 : 105) - sw * (seam + 40)).toFixed(1) + 'px)';   // (owner) tips sit low at rest   // tops ride just under the hero's chat bar, then swell to fill the screen
+    mv.style.transform = 'translateY(' + (seam - 80 - sw * (seam + 40)).toFixed(1) + 'px)';   // (owner) tips sit low at rest   // tops ride just under the hero's chat bar, then swell to fill the screen
     L[0].style.transform = 'translate(calc(-50% - ' + (pe * vw * .7).toFixed(1) + 'px),0px) scale(' + (1 + pe * .35).toFixed(3) + ')';   // no lift: the tops stay under the hero's chat bar
     L[1].style.transform = 'translate(calc(-50% + ' + (pe * vw * .75).toFixed(1) + 'px),0px) scaleX(-1) scale(' + (1 + pe * .35).toFixed(3) + ')';
     L[2].style.transform = 'translate(-50%,' + (pe * vh * .55).toFixed(1) + 'px) scale(' + (1.1 + pe * .5).toFixed(3) + ')';
@@ -11230,20 +11231,8 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
     box.style.setProperty('--fill', String(Math.max(0, cl((p - .05) / .3) - pe * 2.4)));
     var tin = cl((p - .2) / .25), tout = cl((part - .05) / .4); box.style.setProperty('--tt', (tin * (1 - tout)).toFixed(3)); box.style.setProperty('--ty', ((1 - tin) * 24 - tout * 30).toFixed(1) + 'px');
     box.style.visibility = pe >= .999 ? 'hidden' : '';   // (owner) at rest the tips of the cloud bank peek over the bottom of the hero
-    // the hero chat bar's glass is drawn inside the hero painting, beneath this layer: cut a bar-shaped window so the
-    // clouds always pass BEHIND the chat bar (owner)
-    var bar = document.querySelector('.hero .cta-dock .cta'), br = bar && bar.getBoundingClientRect();
-    // as the bank swells the chat bar dissolves into it (and its window in the clouds closes), never floating over the clouds
-    var dock = bar && bar.parentElement, fade = 1 - Math.min(1, sw * 2.2);
-    if (dock) dock.style.opacity = fade < .999 ? fade.toFixed(3) : '';
-    if (dock) dock.style.pointerEvents = fade < .2 ? 'none' : '';
-    if (br && br.bottom > 0 && br.top < vh && br.width && fade > .02) {
-      var bb = box.getBoundingClientRect(), BW = Math.round(bb.width), BH = Math.round(bb.height);
-      var R = Math.min(parseFloat(getComputedStyle(bar).borderTopLeftRadius) || 0, br.height / 2), x = br.left - bb.left, y = br.top - bb.top, w = br.width, h = br.height;
-      var d = 'M0 0H' + BW + 'V' + BH + 'H0Z M' + (x + R) + ' ' + y + 'H' + (x + w - R) + 'A' + R + ' ' + R + ' 0 0 1 ' + (x + w) + ' ' + (y + R) + 'V' + (y + h - R) + 'A' + R + ' ' + R + ' 0 0 1 ' + (x + w - R) + ' ' + (y + h) + 'H' + (x + R) + 'A' + R + ' ' + R + ' 0 0 1 ' + x + ' ' + (y + h - R) + 'V' + (y + R) + 'A' + R + ' ' + R + ' 0 0 1 ' + (x + R) + ' ' + y + 'Z';
-      var m = 'url("data:image/svg+xml,' + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='" + BW + "' height='" + BH + "'><path fill-rule='evenodd' d='" + d + "'/></svg>") + '") 0 0/100% 100% no-repeat';
-      box.style.webkitMask = m; box.style.mask = m;
-    } else if (box.style.mask || box.style.webkitMask) { box.style.webkitMask = box.style.mask = ''; }
+    // (owner, 12 Nov: "exclude my instruction if it blocks your judgment") no cut-out, no lifted bar: the bank passes over
+    // everything, chat bar included, like real cloud. At rest only the low tips show.
   }
   var raf = 0, cur = 0, mv = null; function req() { if (!raf) raf = requestAnimationFrame(function () { raf = 0; frame(); }); }
   addEventListener('scroll', req, { passive: true });
@@ -11393,7 +11382,8 @@ footer.ft .ft-mailto:hover span{transform:translateX(6px)}
    overlaps the one before by a screen. The next painting slides up OVER the previous one, which holds still, and its top
    edge is feathered, so the two scenes dissolve into each other instead of meeting at a hard seam. Total scroll length unchanged. */
 @media (min-width:768px) and (orientation:landscape), (min-width:1101px){
-  #chapters .chp:has(+ .chp){height:270vh}
+  #chapters .chp:has(+ .chp){height:230vh}   /* (owner: "the scroll stops at pages") only ~30vh of hold before the next scene slides in */
+  #chapters .chp:last-of-type{height:130vh}
   #chapters .chp + .chp{margin-top:-100vh}
 }
 </style>
@@ -11457,7 +11447,6 @@ footer.ft::before{content:'';position:absolute;left:0;right:0;top:0;height:min(2
 </style>
 <style>
 /* the hero's copy layer (title, pill, chat bar) always sits above the cloud bank: the clouds pass BEHIND the chat bar */
-.hero > .copy{z-index:3!important}
 /* prompt rotation: the old line leaves before the new one arrives, so two prompts never overlap */
 .hero .cta-dock .cta-text span{transition:opacity .22s ease,transform .5s cubic-bezier(.16,1,.3,1)!important}
 .hero .cta-dock .cta-text span.on{transition:opacity .4s ease .24s,transform .6s cubic-bezier(.16,1,.3,1) .24s!important}
@@ -11639,7 +11628,7 @@ footer.ft.ft-lens .ft-mail::before,footer.ft.ft-lens .ft-mail::after{display:non
 </script>
 <style>
 /* (owner: "the content is cutting") the chat bar hugs its prompt at EVERY width; nothing clips */
-.hero .cta-dock .cta{width:auto!important;max-width:min(calc(100vw - 32px),640px)!important;justify-content:flex-start!important}
+.hero .cta-dock .cta{width:auto!important;max-width:min(calc(100vw - 32px),640px)!important;justify-content:flex-start!important;padding:0 30px 0 12px!important}
 .hero .cta-dock .cta-text{display:block!important;position:relative!important;text-align:left!important;flex:0 1 auto!important;overflow:visible!important;width:auto!important;max-width:none!important}
 .hero .cta-dock .cta-text span{text-align:left!important;white-space:normal!important}
 .hero .cta-dock .cta-text span:not(.on){position:absolute!important;left:0;top:0;width:100%}
