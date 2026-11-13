@@ -491,6 +491,19 @@
   .nav-sound[aria-pressed="true"] .mute{opacity:0;}
   .nav-sound:focus-visible{outline:2px solid var(--ember);outline-offset:2px;}
   @media (max-width:374px){ .top-nav .nav-links{margin-left:0;} }   /* no room for the balance on the narrowest phones */
+  /* ── ASK AI (13 Nov 2026): "Copy for ChatGPT ▾" top right on the gutter (the links keep their centring); compact on
+     tablets; on phones a bare icon that takes the links' left balance slot, mirroring the sound icon. ── */
+  .top-nav > .aai{position:absolute;right:10%;top:50%;transform:translateY(-50%);}
+  .top-nav.scrolled > .aai{right:28px;}
+  @media (min-width:768px) and (max-width:1023px){
+    .top-nav > .aai .aai-idle{display:none;} .top-nav > .aai .aai-done{font-size:0;gap:0;}
+    .top-nav > .aai .aai-copy{padding:0 6px 0 12px;} .top-nav > .aai .aai-pick{width:30px;}
+  }
+  @media (max-width:767px){
+    .top-nav > .aai{position:relative;right:auto;top:auto;transform:none;order:-1;}
+    .top-nav .nav-links{margin-left:0;}
+  }
+  @media (max-width:374px){ .top-nav > .aai{display:none;} }
 
   /* ── MOBILE NAV — the row collapses into a burger under 900px ───────────
      Below that the link row outgrew its gutter, and the old fix simply
@@ -4865,6 +4878,8 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
       y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
   })(window, document, "clarity", "script", "xt8r81h0gs");
 </script>
+<link rel="stylesheet" href="ask-ai.css">
+<script src="ask-ai.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#chapters">Skip to work</a>
@@ -5469,6 +5484,7 @@ html:not([data-theme="dark"]) .dna2-tile:hover .dna2-tile-nm,
           <g class="mute"><path d="M16 9.5l5 5M21 9.5l-5 5"/></g>
         </svg>
       </button>
+      <div data-ask-ai data-icon-only-phone></div>   <!-- Ask AI: ask-ai.js / ask-ai.css, brief in ai.md -->
       <button class="nav-burger" id="navBurger" aria-label="Open menu"
               aria-expanded="false" aria-controls="navSheet">
         <span aria-hidden="true"></span><span aria-hidden="true"></span>

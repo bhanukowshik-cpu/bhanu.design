@@ -1,0 +1,61 @@
+/* Ask AI (13 Nov 2026): the split "Copy for ChatGPT ▾" pill and its menu. Script: ask-ai.js. Dark glass in the same
+   language as the hero chat bar and the case-study nav buttons; works over the painted hero and the dark case-study nav. */
+.aai{position:relative;display:inline-flex;align-items:stretch;height:40px;flex-shrink:0;border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.04)),rgba(14,11,18,.34);
+  -webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 0 0 1px rgba(255,255,255,.16);
+  font:600 13.5px/1 inherit;font-family:inherit;color:#FFFCF8;letter-spacing:.005em}
+.aai button,.aai a{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+.aai svg{flex:none}
+.aai-copy{display:inline-flex;align-items:center;gap:8px;padding:0 10px 0 14px;border:0;background:none;cursor:pointer;border-radius:999px 0 0 999px;white-space:nowrap}
+.aai-copy > svg{width:14px;height:14px}
+.aai-pick{display:grid;place-items:center;width:36px;padding:0 4px 0 0;border:0;background:none;cursor:pointer;border-radius:0 999px 999px 0;position:relative}
+.aai-pick::before{content:'';position:absolute;left:0;top:10px;bottom:10px;width:1px;background:rgba(255,255,255,.22)}
+.aai-pick svg{width:14px;height:14px;opacity:.8;transition:transform .25s ease}
+.aai-pick[aria-expanded="true"] .aai-chev{transform:rotate(180deg)}
+.aai-pick .aai-ico,.aai-main{display:none}
+.aai-copy:hover,.aai-pick:hover{background:rgba(255,255,255,.1)}
+.aai-copy:focus-visible,.aai-pick:focus-visible{outline:2px solid #A6CBFF;outline-offset:2px}
+.aai-done{display:none;align-items:center;gap:6px}
+.aai-done svg{width:14px;height:14px}
+.aai[data-state="done"] .aai-idle{display:none}
+.aai[data-state="done"] .aai-done{display:inline-flex}
+.aai[data-state="done"] .aai-copy > svg:first-child{display:none}
+.aai-menu{position:absolute;top:calc(100% + 10px);right:0;z-index:1000;width:250px;padding:6px;border-radius:16px;text-align:left;
+  background:rgba(14,11,18,.92);-webkit-backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:blur(22px) saturate(1.6);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 18px 48px -16px rgba(0,0,0,.6)}
+.aai-menu[hidden]{display:none}
+.aai[data-align="left"] .aai-menu{right:auto;left:0}
+.aai-sub{margin:8px 10px 4px;font-size:10.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,252,248,.5)}
+.aai-row{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:40px;padding:0 10px;border:0;border-radius:10px;
+  background:none;text-decoration:none;cursor:pointer;font-size:14px;color:#FFFCF8;transition:background .2s ease}
+.aai-row:hover,.aai-row:focus-visible{background:rgba(255,255,255,.1);outline:none}
+.aai-row:focus-visible{box-shadow:inset 0 0 0 2px #A6CBFF}
+.aai-row svg{width:14px;height:14px;opacity:.75}
+.aai-ai svg{opacity:0}
+.aai-ai[aria-checked="true"] svg{opacity:1}
+.aai-row small{font-size:12px;font-weight:500;color:rgba(255,252,248,.55)}
+.aai-hr{margin:6px 4px;border:0;border-top:1px solid rgba(255,255,255,.12)}
+.aai-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.aai-fallback{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2000;width:min(560px,calc(100vw - 32px));padding:18px;border-radius:18px;
+  background:rgba(14,11,18,.96);color:#FFFCF8;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),0 24px 60px -20px rgba(0,0,0,.7);font:500 14px/1.45 system-ui,sans-serif}
+.aai-fallback textarea{width:100%;height:180px;margin:10px 0;padding:10px;border-radius:10px;border:0;background:rgba(255,255,255,.08);color:#fff;font:12px/1.4 ui-monospace,monospace}
+.aai-fallback button{min-height:40px;padding:0 16px;border-radius:12px;border:0;background:rgba(255,255,255,.16);color:#fff;font:600 14px system-ui,sans-serif;cursor:pointer}
+/* data-phone-compact: icon + chevron only on phones; a check replaces the icon while "Copied" */
+@media (max-width:767px){
+  .aai[data-phone-compact] .aai-idle{display:none}
+  .aai[data-phone-compact] .aai-done{font-size:0;gap:0}
+  .aai[data-phone-compact] .aai-copy{padding:0 6px 0 12px}
+  .aai[data-phone-compact] .aai-pick{width:30px}
+}
+/* data-icon-only-phone: one bare icon on phones (the homepage nav, beside its sound icon); the menu's first row copies */
+@media (max-width:767px){
+  .aai[data-icon-only-phone]{height:44px;width:44px;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;color:rgba(255,252,248,.75)}
+  .aai[data-icon-only-phone] .aai-copy,.aai[data-icon-only-phone] .aai-chev,.aai[data-icon-only-phone] .aai-pick::before{display:none}
+  .aai[data-icon-only-phone] .aai-pick{width:44px;padding:0;border-radius:50%}
+  .aai[data-icon-only-phone] .aai-ico{display:block;width:19px;height:19px;opacity:1}
+  .aai[data-icon-only-phone] .aai-main{display:flex;background:rgba(255,255,255,.06)}
+  .aai[data-icon-only-phone] .aai-menu{right:auto;left:0}
+  .aai[data-icon-only-phone][data-state="done"] .aai-pick{color:#9BE7B0}
+}
+@media (prefers-reduced-motion:reduce){.aai-pick svg,.aai-row{transition:none}}
