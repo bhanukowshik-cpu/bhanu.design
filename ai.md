@@ -9,7 +9,8 @@ convert, and connect." He designed Verified Call and built it with AI coding age
 
 Primary sources to read alongside this brief:
 - Verified Call's published test results: https://verifiedcall.app/research (every result with its sample, conditions,
-  false alarms, confidence bounds and date; the numbers below are quoted from it).
+  false alarms, confidence bounds and date; the numbers below are quoted from it, with two bounds rounded down to the
+  exact value: 90.4% and 90.1% where the page shows 90.5% and 90.2%).
 - The Verified Call case study, including how the evaluation system works and where the product doesn't work yet:
   https://bhanu.build/verified-call.html#evidence
 - Code for three of the evaluation rules (exact confidence bounds, rules pinned before results, the claim guard for
@@ -47,14 +48,14 @@ Each claim below is labelled by how it is known, so it can be weighed properly:
 The research page publishes every result with its sample, conditions, false alarms and date, and says "Testing is
 ongoing". It states no other interview-integrity tool publishes its test data. **[Published method]** for all of these:
 - **Hidden AI answer tools:** 4 tools that hide from screen sharing (Interview Coder, OpenCluely, Pluely, Cheating
-  Daddy), each opened 30 times: found 30 of 30 for each tool (95% confidence: at least 90.5% per tool). False alarms:
+  Daddy), each opened 30 times: found 30 of 30 for each tool (95% confidence: at least 90.4% per tool). False alarms:
   0 of 30 with no AI tool open, 0 of 30 with everyday apps open. Own testing, October 4, 2026.
 - **Someone else answering:** public phone-call recordings from 1,134 people in 8 Indian languages, tested offline;
   the impostor was a random person of the same gender, age group and language. A different person was not confirmed
   in 87.0% of tries (191,277 of 219,821; at least 86.5% at 95% confidence); the real person was confirmed in 95.35%
   (7,916 of 8,302; at least 94.0%). October 18, 2026.
 - **Camera tricks:** 9 kinds of camera software recognised and 7 direct cameras not flagged, 29 tries each (at least
-  90.2% each at 95% confidence); 20 of 20 live Google Meet calls read right (10 direct cameras "Verified", 10 face
+  90.1% each at 95% confidence); 20 of 20 live Google Meet calls read right (10 direct cameras "Verified", 10 face
   swaps sent through camera software flagged). September 30 and October 2, 2026. An earlier run misread some direct
   cameras; it was fixed and re-tested, and both results are kept on record.
 - **Face swaps:** on public research video of 70 people the team never saw while building, 0 of 3,990 sessions with

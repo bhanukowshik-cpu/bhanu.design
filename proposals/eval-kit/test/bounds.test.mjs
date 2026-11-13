@@ -5,8 +5,8 @@ import { clopperLower, trialsFor, describe, binomCdf } from '../src/bounds.mjs';
 const near = (a, b, eps = 5e-4) => assert.ok(Math.abs(a - b) < eps, `${a} vs ${b}`);
 
 test('all tries succeeded: the published Verified Call figures', () => {
-  near(clopperLower(30, 30), 0.9050); // 30 of 30 per hidden AI tool -> at least 90.5%
-  near(clopperLower(29, 29), 0.9019); // 29 of 29 per kind of camera software -> at least 90.2%
+  near(clopperLower(30, 30), 0.9050); // 30 of 30 per hidden AI tool -> at least 90.4% (exact: 0.90497)
+  near(clopperLower(29, 29), 0.9019); // 29 of 29 per kind of camera software -> at least 90.1% (exact: 0.90186)
 });
 
 test('some failures: the bound sits exactly where P(at least k successes) = 5%', () => {
