@@ -207,6 +207,12 @@
     details.dd[open] summary::after { content: '−'; }
     details.dd summary:focus-visible { outline: 2px solid var(--azure); outline-offset: 3px; border-radius: 4px; }
     details.dd dl { margin-top: 10px; }
+    /* (13 Nov) skim folds: longer explanation sits one click down; the text stays in the page */
+    .ev-steps details.fold, .fair-rules details.fold { margin-top: 6px; }
+    details.hp-more { margin-top: 12px; }
+    details.hp-more > .hp-dl { margin-top: 6px; }
+    details.build-more { margin-top: 40px; }
+    details.build-more > .build-grid { margin-top: 8px; }
     .dcard .txt { padding: 28px 30px 30px; display: flex; flex-direction: column; gap: 14px; }
     .dcard .num { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; color: var(--azure); text-transform: uppercase; }
     .dcard h3 { font-family: var(--font-display); font-weight: 400; font-size: 30px; line-height: 1.12; margin-top: -4px; text-wrap: balance; }
@@ -441,6 +447,11 @@
     }
     @media (max-width: 1100px) { .sum.sum-trim > div:nth-child(2) { grid-column: auto; order: 0; border-top: 0; border-left: 1px solid var(--hair); padding-left: 30px; } }
     @media (max-width: 860px) { .sum.sum-trim { grid-template-columns: 1fr; } .sum.sum-trim > div:nth-child(2) { border-left: 0; padding-left: 0; border-top: 1px solid var(--hair); } }
+    /* (13 Nov) skim card: the five-row card spans the column, the test results sit under it */
+    .sum.sum-card, .sum.sum-card.sum-trim { grid-template-columns: 1fr; border-top: 0; }
+    .sum.sum-card > div:first-child { padding: 0; }
+    .sum dl[hidden] { display: none; }
+    .sum.sum-card > div:nth-child(2), .sum.sum-card.sum-trim > div:nth-child(2) { grid-column: auto; order: 0; border-left: 0; border-top: 0; padding: 28px 0 0; }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 
     /* ══ v6 homepage language (12 Nov 2026): Montserrat roles, no italic serif, night ground, glass CTAs.
@@ -827,9 +838,18 @@
         </div>
 
         <!-- 30-second summary: the only place the numbers appear -->
-        <div class="sum sum-trim in d4" id="summary">
+        <div class="sum sum-trim sum-card in d4" id="summary">
           <div>
-            <dl>
+            <!-- (13 Nov) 60-second skim: the five-row card shared by all four case studies; every line shortened from this page -->
+            <dl class="cs-sum">
+              <div><dt>Role · Team · When</dt><dd>Founder, solo design and engineering · Sep–Nov 2026</dd></div>
+              <div><dt>Problem</dt><dd>The person on the call may not be the person you hire.</dd></div>
+              <div><dt>Key decision</dt><dd>Tell the host, don't block the candidate: no check waits on a click.</dd></div>
+              <div><dt>Outcome</dt><dd>3 weeks to a first working version: 5 surfaces, one design system</dd></div>
+              <div><dt>Stack</dt><dd>Electron, React, TypeScript · Chrome extension · Next.js · Swift and Python probes</dd></div>
+            </dl>
+            <!-- the original four rows, kept (hidden) — their content now lives in the card above -->
+            <dl hidden>
               <div><dt>Role</dt><dd>Founder, solo design and engineering</dd></div>
               <div><dt>Timeline</dt><dd>3 weeks to a first working version; ~6 weeks to today (Sep–Nov 2026)</dd></div>
               <div><dt>Shipped</dt><dd>5 surfaces, one design system</dd></div>
@@ -1086,12 +1106,12 @@
         <div class="ev-sys rv">
           <div class="ev-sys-head"><h3 class="eyebrow">4.1 · The evaluation system</h3><a class="inline ev-code" href="https://github.com/bhanukowshik-cpu/verified-call-eval-kit" target="_blank" rel="noopener">See the evaluation code ↗</a></div>
           <ol class="ev-steps" role="list">
-            <li><span class="ev-stage">Pinned</span><h4>Rules before results</h4><p>Every pass/fail rule is written down and fingerprinted (sha256) before a test runs. Once pinned it can't change; a new idea means a new version, tested again.</p></li>
-            <li><span class="ev-stage">Sealed</span><h4>Sealed test data</h4><p>Development, sealed and held-out sets are split by a salted rule. Checks are built on development data only; nobody tunes against the sealed set.</p></li>
-            <li><span class="ev-stage">Graded apart</span><h4>A separate verifier</h4><p>A fresh agent with no build context is the only one allowed to open sealed data and mark a result. The builder can't grade their own work.</p></li>
-            <li><span class="ev-stage">Bounded</span><h4>Honest statistics</h4><p>Results carry exact 95% lower bounds. 29 tries per attack family before claiming 90%. Failed and invalid runs stay on record, like a camera rule that scored 14 of 17 before it was rewritten.</p></li>
-            <li><span class="ev-stage">Copy-checked</span><h4>The copy is tested too</h4><p>A check fails the build if the product's own words claim more than the tests support, such as "verified human" or "deepfake-proof".</p></li>
-            <li><span class="ev-stage">Re-attacked</span><h4>One command to attack it</h4><p>The red team is pre-registered and re-runs with a single command, so every fix is checked against every known attack.</p></li>
+            <li><span class="ev-stage">Pinned</span><h4>Rules before results</h4><details class="dd fold"><summary>Read more</summary><p>Every pass/fail rule is written down and fingerprinted (sha256) before a test runs. Once pinned it can't change; a new idea means a new version, tested again.</p></details></li>
+            <li><span class="ev-stage">Sealed</span><h4>Sealed test data</h4><details class="dd fold"><summary>Read more</summary><p>Development, sealed and held-out sets are split by a salted rule. Checks are built on development data only; nobody tunes against the sealed set.</p></details></li>
+            <li><span class="ev-stage">Graded apart</span><h4>A separate verifier</h4><details class="dd fold"><summary>Read more</summary><p>A fresh agent with no build context is the only one allowed to open sealed data and mark a result. The builder can't grade their own work.</p></details></li>
+            <li><span class="ev-stage">Bounded</span><h4>Honest statistics</h4><details class="dd fold"><summary>Read more</summary><p>Results carry exact 95% lower bounds. 29 tries per attack family before claiming 90%. Failed and invalid runs stay on record, like a camera rule that scored 14 of 17 before it was rewritten.</p></details></li>
+            <li><span class="ev-stage">Copy-checked</span><h4>The copy is tested too</h4><details class="dd fold"><summary>Read more</summary><p>A check fails the build if the product's own words claim more than the tests support, such as "verified human" or "deepfake-proof".</p></details></li>
+            <li><span class="ev-stage">Re-attacked</span><h4>One command to attack it</h4><details class="dd fold"><summary>Read more</summary><p>The red team is pre-registered and re-runs with a single command, so every fix is checked against every known attack.</p></details></li>
           </ol>
         </div>
         <div class="sec-sub rv"><p class="eyebrow">4.2 · Results</p><h3 class="h3">What it measured</h3></div>
@@ -1145,12 +1165,12 @@
           <p class="lede">Verified Call decides what an interviewer sees about a person who may be hired or not. These are the rules that keep it fair to the person being checked.</p>
         </div>
         <ol class="fair-rules" role="list">
-          <li class="rv"><div><h3>What "Verified" means</h3><p>The camera is a real camera, the face and voice in the call match the same person's check minutes earlier, and no hidden AI tool was found on their computer. It does not check an ID, and it can't see a phone or a person off camera.</p></div></li>
-          <li class="rv"><div><h3>Events, not accusations</h3><p>The panel says what it saw and when: <span class="nw"><span class="fair-state"><span class="q">"</span>used during this call<span class="q">"</span></span>,</span> or <span class="fair-state"><span class="q">"</span>open in the background<span class="q">"</span></span> if an app was only open. Camera and face findings carry two stills as proof. Note-taking apps are listed, not flagged. What it means is the interviewer's call.</p></div></li>
-          <li class="rv"><div><h3>The host is told; the candidate isn't blocked</h3><p>When a hidden AI tool is used, the interviewer sees <span class="fair-state"><span class="q">"</span>Needs a look<span class="q">"</span></span> at once, with a suggested next step such as asking the candidate to close other apps. The product itself never stops the candidate or tells them to close anything: what to do is the interviewer's call.</p></div></li>
-          <li class="rv"><div><h3>When a check can't run</h3><p>A dropped connection or a check that can't start shows <span class="nw"><span class="fair-state"><span class="q">"</span>Can't confirm<span class="q">"</span></span>:</span> not done, not failed. The candidate can try again, and the other checks keep running.</p></div></li>
-          <li class="rv"><div><h3>The candidate can say no</h3><p>A consent screen comes first. They can decline and still join; the interviewer sees only that the check wasn't done. Their list of open apps reaches the interviewer only if they agree.</p></div></li>
-          <li class="rv"><div><h3>Kept for days, not forever</h3><p>No recording of the screen or the call. Face measurements are deleted when the call ends; check results after 7 days, or sooner on request.</p></div></li>
+          <li class="rv"><div><h3>What "Verified" means</h3><details class="dd fold"><summary>Read more</summary><p>The camera is a real camera, the face and voice in the call match the same person's check minutes earlier, and no hidden AI tool was found on their computer. It does not check an ID, and it can't see a phone or a person off camera.</p></details></div></li>
+          <li class="rv"><div><h3>Events, not accusations</h3><details class="dd fold"><summary>Read more</summary><p>The panel says what it saw and when: <span class="nw"><span class="fair-state"><span class="q">"</span>used during this call<span class="q">"</span></span>,</span> or <span class="fair-state"><span class="q">"</span>open in the background<span class="q">"</span></span> if an app was only open. Camera and face findings carry two stills as proof. Note-taking apps are listed, not flagged. What it means is the interviewer's call.</p></details></div></li>
+          <li class="rv"><div><h3>The host is told; the candidate isn't blocked</h3><details class="dd fold"><summary>Read more</summary><p>When a hidden AI tool is used, the interviewer sees <span class="fair-state"><span class="q">"</span>Needs a look<span class="q">"</span></span> at once, with a suggested next step such as asking the candidate to close other apps. The product itself never stops the candidate or tells them to close anything: what to do is the interviewer's call.</p></details></div></li>
+          <li class="rv"><div><h3>When a check can't run</h3><details class="dd fold"><summary>Read more</summary><p>A dropped connection or a check that can't start shows <span class="nw"><span class="fair-state"><span class="q">"</span>Can't confirm<span class="q">"</span></span>:</span> not done, not failed. The candidate can try again, and the other checks keep running.</p></details></div></li>
+          <li class="rv"><div><h3>The candidate can say no</h3><details class="dd fold"><summary>Read more</summary><p>A consent screen comes first. They can decline and still join; the interviewer sees only that the check wasn't done. Their list of open apps reaches the interviewer only if they agree.</p></details></div></li>
+          <li class="rv"><div><h3>Kept for days, not forever</h3><details class="dd fold"><summary>Read more</summary><p>No recording of the screen or the call. Face measurements are deleted when the call ends; check results after 7 days, or sooner on request.</p></details></div></li>
           <li class="fair-open rv"><div><h3>Open problems</h3><p>There is no way yet to contest a finding inside the product, and no written policy for assistive technology such as dictation software. The design I want: the candidate sees the same fact the interviewer saw, and can add one line of context that sits beside it.</p></div></li>
         </ol>
       </div>
@@ -1188,6 +1208,8 @@
             <g fill="#C7CFDA" font-size="13"><text x="180" y="180">check results</text><text x="180" y="390">status per guest</text></g>
           </svg>
         </div>
+        <details class="more build-more rv">
+          <summary>Show how it works</summary>
         <div class="build-grid">
           <div class="rv">
             <p class="lbl">From the code · the camera notice</p>
@@ -1207,6 +1229,7 @@
             <div><b>Nothing waits on a click</b><span>Every check starts on its own. A busy camera retries, then gives the host a plain line.</span></div>
           </div>
         </div>
+        </details>
         <div class="own">
           <div class="rv"><h4>Mine</h4><p>All product design, the brand and the design system. All the engineering: the Mac and Windows app, the Chrome extension, the server and web app, and the website.</p></div>
           <div class="rv"><h4>Borrowed</h4><p>MediaPipe for face landmarks, Amazon Rekognition for face match, Deepgram for speech to text, GSAP for site motion, and two open fonts, Turret Road and Manrope.</p></div>
@@ -1220,6 +1243,9 @@
             <h4 class="hp-title">Catching camera software without trusting its name</h4>
             <dl class="hp-dl">
               <div><dt>Problem</dt><dd>A face swap has to enter the call somewhere, and on a laptop that is almost always camera software: a virtual camera between the swap tool and the meeting. Names don't help, because a virtual camera can call itself "FaceTime HD Camera".</dd></div>
+            </dl>
+            <details class="dd fold hp-more"><summary>Show how it works</summary>
+            <dl class="hp-dl">
               <div><dt>Approach</dt><dd>So the check never reads names. A small native probe (Swift on Mac, Python on Windows and Linux) asks the operating system what actually backs each camera: a signed camera extension, a legacy plug-in, a virtual transport, or a USB or built-in device. It works out which apps are reading each camera from the capture stack's own log lines, because a virtual camera that is only running proves nothing. A pure, version-pinned rule then gives one of three answers, and "unresolved" is a real answer, not a guess.</dd></div>
               <div><dt>Result</dt><dd class="res">It took one failed rule version (14 of 17) and a 178-trial name-scramble test to get there; the sealed result was 29 of 29 per attack family on Mac and Windows, at about 1% of one CPU core.</dd></div>
             </dl>
@@ -1232,12 +1258,16 @@
   <span class="k">if</span> (PHYSICAL_BACKING.has(kind)) <span class="k">return</span> { cls: <span class="s">&quot;physical&quot;</span>, reason: <span class="s">`device-backed-by-${kind}`</span> };
   <span class="k">return</span> { cls: <span class="s">&quot;unknown&quot;</span>, reason: <span class="s">`device-backing-${kind}`</span> };
 }</pre></figure>
+            </details>
           </article>
           <article class="hp-case rv">
             <p class="hp-num">02 · Chrome extension</p>
             <h4 class="hp-title">A Google Meet panel that survives Meet's redesigns</h4>
             <dl class="hp-dl">
               <div><dt>Problem</dt><dd>Building inside someone else's app means building on ground that moves. Meet's class names are generated and change without notice, so the extension never reads them.</dd></div>
+            </dl>
+            <details class="dd fold hp-more"><summary>Show how it works</summary>
+            <dl class="hp-dl">
               <div><dt>Approach</dt><dd>It finds the control bar the way a person does: the leave button, by its accessible name in 8 languages or by the icon Meet draws the same way in every language, then the nearest group of buttons around it. Placement is idempotent and self-healing: put back when Meet re-renders, moved when the layout changes, and a floating badge if Meet changes beyond recognition, never a silent failure.</dd></div>
               <div><dt>Result</dt><dd class="res">Saved Meet page fixtures (2, 4 and 8 tiles, pinned, presenting, camera off) turn a Meet redesign into a red test before an interviewer ever sees it.</dd></div>
             </dl>
@@ -1245,6 +1275,7 @@
 <pre class="code wrap" tabindex="0" role="region" aria-label="Code sample: finding Meet's control bar"><span class="c">// Meet&#x27;s class names and jsname values are generated and change between releases, so this file never reads them. It</span>
 <span class="c">// finds the bar the way a person would: the leave-call button (its accessible name, or Meet&#x27;s &quot;call_end&quot; icon, which</span>
 <span class="c">// does not change with the page language), visible, in the lower half of the window and not inside a dialog or menu.</span></pre></figure>
+            </details>
           </article>
         </div>
       </div>
@@ -1401,6 +1432,8 @@
       var vis = [].filter.call(tl.querySelectorAll('[role="tab"]'), function (b) { return !b.hidden; });
       tabs(tl, function (i) { var id = vis[i].getAttribute('aria-controls'); ps.forEach(function (p) { var on = p.id === id; p.hidden = !on; if (on) load(p.querySelector('img')); }); });
     })();
+    /* (13 Nov) print and save-as-PDF show every fold open, then put them back */
+    (function () { var shut = []; addEventListener('beforeprint', function () { shut = Array.prototype.filter.call(document.querySelectorAll('details'), function (d) { return !d.open; }); shut.forEach(function (d) { d.open = true; }); }); addEventListener('afterprint', function () { shut.forEach(function (d) { d.open = false; }); shut = []; }); })();
     document.querySelectorAll('details.more').forEach(function (d) { d.addEventListener('toggle', function () { if (d.open) d.querySelectorAll('img[data-src]').forEach(load); }); });
 
     /* split-flap */
