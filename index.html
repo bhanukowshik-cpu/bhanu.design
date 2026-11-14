@@ -11490,6 +11490,10 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
   }
   ['pointerdown', 'keydown', 'touchend', 'click'].forEach(function (ev) { addEventListener(ev, firstGesture, true); });
   addEventListener('scroll', req, { passive: true }); addEventListener('resize', req);
+  // the button only makes sense where the sound is: hide it once the hero is mostly off screen (owner, 13 Nov)
+  var heroEl = document.querySelector('.hero');
+  function away() { btn.classList.toggle('snd-away', !!heroEl && cover(heroEl) < 0.15); }
+  addEventListener('scroll', away, { passive: true }); addEventListener('resize', away); away();
   document.addEventListener('visibilitychange', function () { if (ctx) tick(); });
   // ducking: the chat opening/closing, and any video starting, stopping or unmuting (media events don't bubble: capture)
   ['play', 'pause', 'ended', 'volumechange'].forEach(function (ev) { document.addEventListener(ev, req, true); });
@@ -11757,15 +11761,18 @@ footer.ft .ft-mailto:hover span{transform:translateX(6px)}
 .chp-tech{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0;padding:0;list-style:none;max-width:34em}
 .chp-tech li{padding:6px 12px;border-radius:999px;font:600 13px/1.2 'Montserrat',sans-serif;letter-spacing:.01em;color:#FFFCF8;
   border:1px solid rgba(255,252,248,.32);background:rgba(255,252,248,.06);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-/* (13 Nov, craft pass) the stack reads as one quiet mono line, "Electron · React · Chrome extension …": no pills, same items + order;
-   each name keeps its separator so a wrapped line never starts with a dot */
-.chp-tech{display:block;font-size:12px;line-height:1.65;max-width:none;text-wrap:balance}
-.chp-tech li{display:inline-block;padding:0;border:0;border-radius:0;background:none;-webkit-backdrop-filter:none;backdrop-filter:none;white-space:nowrap;
-  font:500 12px/1.65 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.02em;color:rgba(255,252,248,.9);text-shadow:0 1px 2px rgba(10,20,35,.6),0 0 12px rgba(10,20,35,.45)}
-.chp-tech li:not(:last-child)::after{content:'\00a0·';margin-right:.55em;color:rgba(255,252,248,.45)}
+/* (13 Nov, owner: "the tech stack is not even clear" / "keep the metrics and the stack") the stack as solid, readable chips:
+   dark glass so they hold over any painting, 13px Montserrat, full ink */
+.chp-tech{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0;max-width:36em}
+.chp-tech li{display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;white-space:nowrap;
+  font:600 13px/1.2 'Montserrat',sans-serif;letter-spacing:.01em;color:#FFFCF8;text-shadow:none;
+  background:rgba(10,16,30,.55);border:1px solid rgba(255,252,248,.22);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.chp-tech li::after{content:none!important}
+@media (max-width:767px){.chp-tech li{font-size:12px;padding:5px 10px}}
 /* (owner, 13 Nov) a quiet line under the figures (same voice as the figure captions) and a lighter second link beside the CTA */
 /* (13 Nov, owner: "too much content, who will even read this") chapters carry role, title, one line and the CTA; proof, note and stack are hidden, not deleted (they live in the case studies and ai.md) */
-#chapters .chp-proof,#chapters .chp-note,#chapters .chp-tech{display:none!important}
+#chapters .chp-note{display:none!important}   /* (owner, 13 Nov) metrics and stack are back; only the note stays hidden */
+.nav-sound.snd-away{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transition:opacity .3s,visibility 0s .3s!important}   /* sound lives in the hero only */
 .chp-note{margin:14px 0 0;font:500 14px/1.35 'Montserrat',sans-serif;color:rgba(255,252,248,.78)}
 .chp-note span{white-space:nowrap}   /* each half stays whole when the line wraps */
 .chp-go:has(+ .chp-go2){margin-right:22px}   /* the gap sits on the CTA, so a wrapped second link lines up flush left */
