@@ -1,6 +1,6 @@
 # bhanu.build — visual review pack
 
-This pack shows the rendered portfolio at bhanu.build (https://bhanu.build) for a reviewer who has only read its text. Every image is a real render of the site (the same files that are live), captured in Google Chrome on 13 November 2026 (Pacific time; homepage re-shot at about 12:25 PM after Verified Call became the lead chapter); nothing is mocked up or retouched. Viewports: desktop 1440×900 (case-study pages rendered at 2x and scaled to 1440 wide; homepage at 1x), phone 390×844 at 2x (iPhone user agent, touch). Clips are 1280×800 recordings of headless Chrome (software rendering, so frame pacing is rougher than in a GPU browser). Each shot was taken after loading and animation had finished: entrance done, chapter paintings decoded, films playing for 2+ s, count-up numbers at their final values. Captions describe what is on screen and the design decision it shows.
+This pack shows the rendered portfolio at bhanu.build (https://bhanu.build) for a reviewer who has only read its text. Every image is a real render of the site (the same files that are live), captured in Google Chrome on 13 November 2026 (Pacific time; every page re-shot in the afternoon after a site-wide visual craft pass); nothing is mocked up or retouched. Viewports: desktop 1440×900 (case-study pages rendered at 2x and scaled to 1440 wide; homepage at 1x), phone 390×844 at 2x (iPhone user agent, touch). Clips are 1280×800 recordings of headless Chrome (software rendering, so frame pacing is rougher than in a GPU browser). Each shot was taken after loading and animation had finished: entrance done, chapter paintings decoded, films playing for 2+ s, count-up numbers at their final values. Captions describe what is on screen and the design decision it shows.
 
 Live pages: https://bhanu.build/, https://bhanu.build/verified-call.html, https://bhanu.build/stressie-v4.html, https://bhanu.build/evertutor-live.html, https://bhanu.build/evertutor-studio.html
 
@@ -330,7 +330,7 @@ Live: https://bhanu.build/evertutor-live.html
 
 ![EverTutor Live, Desktop 1440×900: Hero](https://bhanu.build/review/etl-desk-01-hero.webp)
 
-*Desktop 1440×900.* Hero: "Sole product designer · EverTutor", headline "Designed a 0→1 voice AI tutor that reached ~2,000 learners.", "$9.5M seed-funded", "~2,000 learners", tags "Mar 2025 – May 2026" and "8+ schools"; painted kitchen scene with the product on the laptop.
+*Desktop 1440×900.* Hero: "Sole product designer · EverTutor" (painting shifted left so the headline fits in 4 lines), headline "Designed a 0→1 voice AI tutor that reached ~2,000 learners.", "$9.5M seed-funded", "~2,000 learners", tags "Mar 2025 – May 2026" and "8+ schools"; painted kitchen scene with the product on the laptop.
 
 ### etl-desk-02-problem-bloom-curve.webp
 

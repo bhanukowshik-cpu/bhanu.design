@@ -70,6 +70,9 @@
     #tagline{max-width:70vw} }
   .status{position:absolute;left:clamp(16px,3vw,44px);bottom:clamp(16px,2.6vw,34px);
           font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;color:var(--ink-dim)}
+  /* (13 Nov, craft pass) the clock line sat bare on the flowers: same glass chip as the homepage's pill */
+  html.embed .status{padding:7px 12px;border-radius:999px;background:rgba(10,25,50,.30);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+          color:rgba(255,252,248,.88);line-height:1}
   .sound{position:absolute;right:clamp(16px,3vw,44px);bottom:clamp(14px,2.4vw,30px);display:flex;align-items:center;gap:10px}
   #sndBtn{pointer-events:auto;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,252,248,.45);
           background:rgba(10,20,48,.22);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
@@ -152,7 +155,7 @@
 <script>(function () { var b = 'city/layers/' + (new URLSearchParams(location.search).get('scene') || 'gg_ai').replace(/[^a-z0-9_]/g, '') + '/';
   window.__M = fetch(b + 'manifest.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }); window.__M.catch(function () {}); })();</script>
 <link rel="preload" as="image" href="city/layers/gg_ai/plate.webp" fetchpriority="high">
-<link rel="preload" as="image" href="city/layers/gg_ai/bridge_fg.webp" fetchpriority="high">
+<link rel="preload" as="image" href="city/layers/gg_ai/bridge_fg_soft.webp" fetchpriority="high">
 <link rel="preload" as="image" href="city/layers/gg_ai/foreground.webp" fetchpriority="high">
 <link rel="preload" as="image" href="city/layers/gg_ai/redwoods.webp" fetchpriority="high">
 </head>
@@ -217,6 +220,7 @@ const FROST = Q.has('frost');      // (owner, 12 Nov: "never mind, bring back Hi
 const LIGHTONLY = Q.has('lightonly');  // test: ignore normal/depth maps (how AI-painted layers render)
 const DPR      = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.5 : 2);
 const TEX_SCALE = MOBILE ? 0.5 : 1;          // half-res layers on phones (GAPS.md #8)
+const litScale = L => TEX_SCALE;
 
 const CFG = {
   portraitCenterX: 0.835,   // portrait crop centre (scene UV) — the bridge sits centre-right
@@ -349,11 +353,11 @@ function occluded(box, dx) {           // box in scene uv (v down); 2-cell margi
   for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (OCC[y * w + x] > 24) return true;
   return false;
 }
-function makeTex(img) {
+function makeTex(img, premul = false, scale = TEX_SCALE) {
   let src = img;
-  if (TEX_SCALE !== 1) {           // downscale once on the CPU for phones
+  if (scale !== 1) {           // downscale once on the CPU for phones
     const c = document.createElement('canvas');
-    c.width = Math.round(img.naturalWidth * TEX_SCALE); c.height = Math.round(img.naturalHeight * TEX_SCALE);
+    c.width = Math.round(img.naturalWidth * scale); c.height = Math.round(img.naturalHeight * scale);
     c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); src = c;
   }
   const t = new THREE.Texture(src);
@@ -361,6 +365,10 @@ function makeTex(img) {
   t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter;
   t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
   t.colorSpace = THREE.NoColorSpace; // all maps used as raw display values (light/shadow are sRGB art colours)
+  // (13 Nov) cut-out layer art is uploaded PREMULTIPLIED (UNPACK_PREMULTIPLY_ALPHA_WEBGL) and FS_LIT divides the
+  // filtered sample by its alpha. Bilinear filtering then never mixes in the colour hidden under alpha 0 — on phones
+  // the canvas downscale above turns that colour black, which drew a stair-stepped black fringe round the bridge.
+  t.premultiplyAlpha = premul;
   t.needsUpdate = true;
   return t;
 }
@@ -490,6 +498,7 @@ const FS_LIT = /* glsl */`
 
     vec4 L = texture2D(tLight, uv);
     if (L.a < 0.004) discard;
+    L.rgb /= L.a;                             // un-premultiply after filtering (textures uploaded premultiplied)
     float D = uHasD > 0.5 ? texture2D(tDepth, uv).r : uDepthGuess;
     vec3 col; float lam;
     if (uHasN > 0.5) {
@@ -509,9 +518,9 @@ const FS_LIT = /* glsl */`
       float wN = 1.0 - smoothstep(-9.0, -2.0, uSunAlt), wD = smoothstep(9.0, 24.0, uSunAlt);
       vec3 base = L.rgb;
       vec3 lumL = vec3(dot(base, vec3(0.299, 0.587, 0.114)));
-      if (uHasDayL > 0.5) base = mix(base, texture2D(tLightDay, uv).rgb, wD);
+      if (uHasDayL > 0.5) { vec4 Dl = texture2D(tLightDay, uv); base = mix(base, Dl.a > 0.004 ? Dl.rgb / Dl.a : base, wD); }
       else base = mix(base, mix(base, lumL * vec3(0.92, 1.0, 1.08), 0.3) * 1.05, wD);
-      if (uHasNightL > 0.5) base = mix(base, texture2D(tLightNight, uv).rgb, wN);
+      if (uHasNightL > 0.5) { vec4 Nl = texture2D(tLightNight, uv); base = mix(base, Nl.a > 0.004 ? Nl.rgb / Nl.a : base, wN); }
       else base = mix(base, lumL * NIGHT_TINT * 0.42, wN * 0.85);
       col = base;
       lam = 0.72 + 0.2 * uDayK;               // stipple density only — AI art carries its own grain, keep ours light
@@ -908,6 +917,7 @@ async function build() {
   deferredLoad = load;
   if (imgs['foreground:light']) buildOcc(imgs['foreground:light']);
   const tex = (L, k) => imgs[L.name + ':' + k] ? makeTex(imgs[L.name + ':' + k]) : null;
+  const litTex = (L, k) => imgs[L.name + ':' + k] ? makeTex(imgs[L.name + ':' + k], true, litScale(L)) : null;   // FS_LIT colour maps: premultiplied
   const blank = new THREE.Texture(); // placeholder sampler for absent maps
 
   const maskL = layers.find(L => L.kind === 'water_mask');
@@ -937,10 +947,10 @@ async function build() {
   const litUniforms = (L, mode) => {
     const box = L.crop || (imgs[L.name + ':light'] ? alphaBox(imgs[L.name + ':light']) : [0, 0, 1, 1]);
     return { box, u: {
-      tLight: { value: tex(L, 'light') || blank }, tShadow: { value: tex(L, 'shadow') || blank },
+      tLight: { value: litTex(L, 'light') || blank }, tShadow: { value: tex(L, 'shadow') || blank },
       tNormal: { value: tex(L, 'normal') || blank }, tDepth: { value: tex(L, 'depth') || blank },
-      tLightNight: { value: tex(L, 'night') || blank }, uHasNightL: { value: imgs[L.name + ':night'] ? 1 : 0 },
-      tLightDay: { value: tex(L, 'day') || blank }, uHasDayL: { value: imgs[L.name + ':day'] ? 1 : 0 },
+      tLightNight: { value: litTex(L, 'night') || blank }, uHasNightL: { value: imgs[L.name + ':night'] ? 1 : 0 },
+      tLightDay: { value: litTex(L, 'day') || blank }, uHasDayL: { value: imgs[L.name + ':day'] ? 1 : 0 },
       uHasS: { value: imgs[L.name + ':shadow'] ? 1 : 0 }, uHasN: { value: imgs[L.name + ':normal'] && !LIGHTONLY ? 1 : 0 },
       uHasD: { value: imgs[L.name + ':depth'] && !LIGHTONLY ? 1 : 0 },
       ...maskU, uMode: { value: mode }, uAlpha: { value: 1 }, uClipY: { value: 9 }, uMirrorY: { value: 0 },
@@ -1055,7 +1065,7 @@ async function streamVariants() {
   for (const { L, k, f } of deferredVariants) {
     await new Promise(r => (window.requestIdleCallback || setTimeout)(r, { timeout: 1500 }));
     let img; try { img = await deferredLoad(f); } catch (e) { state.errors.push('missing ' + f); continue; }
-    const t = makeTex(img);
+    const t = L.kind === 'plate' ? makeTex(img) : makeTex(img, true, litScale(L));   // FS_LIT maps are premultiplied
     if (L.kind === 'plate' && platePass) {
       const u = platePass.mat.uniforms;
       if (k === 'day') { u.tPlateDay.value = t; u.uHasDay.value = 1; }
@@ -1670,6 +1680,17 @@ function drawSceneText() {
   try { if (Q.has('embed')) { const kk = Math.max(0, Math.min(1, (ik - 0.14) / 0.86)); parent.postMessage({ type: 'hero-layout', cx: gr.left + gr.width / 2, bottom: gr.bottom - (1 - (1 - Math.pow(1 - kk, 3))) * H * 0.5, a: Math.min(1, 0.25 + kk * 1.5) * (heroEl.style.opacity === '' ? 1 : +heroEl.style.opacity) }, location.origin); } } catch (e) {}
   textCanvas.width = Math.max(1, Math.round(W * k)); textCanvas.height = Math.max(1, Math.round(H * k));
   const g = textCtx; g.setTransform(k, 0, 0, k, 0, 0); g.clearRect(0, 0, W, H);
+  // (13 Nov, craft pass) a soft navy scrim behind the title block only — tagline + the homepage's pill sit on bright cables
+  // and skyline; drawn in this canvas so it lands BEHIND the type but over the scene, and never tints the rest of the frame
+  if (!FROST) {
+    const sk = ease((ik - 0.14) / 0.86), x0 = Math.min(tr.left, gr.left), x1 = Math.max(tr.right, gr.right);
+    const y0 = tr.top, y1 = gr.bottom + (W < 768 ? 64 : 72);         // + the 'Currently building' pill under the tagline
+    const rx = Math.max(160, (x1 - x0) * 0.72), ry = Math.max(90, (y1 - y0) * 0.85);
+    g.save(); g.translate((x0 + x1) / 2, (y0 + y1) / 2); g.scale(rx, ry);
+    const sg = g.createRadialGradient(0, 0, 0, 0, 0, 1);
+    sg.addColorStop(0, `rgba(10,30,60,${0.28 * sk})`); sg.addColorStop(0.45, `rgba(10,30,60,${0.17 * sk})`); sg.addColorStop(1, 'rgba(10,30,60,0)');
+    g.fillStyle = sg; g.fillRect(-1, -1, 2, 2); g.restore();
+  }
   g.textAlign = 'center'; g.textBaseline = 'middle';
   for (const [el, r, alpha, delay] of [[titleEl, tr, 1, 0], [tagEl, gr, 0.92, 0.14]]) {
     const kk = ease((ik - delay) / (1 - delay)), rise = -(1 - kk) * H * 0.5;   // drops in from above the frame and settles behind the towers (owner, 12 Nov)
