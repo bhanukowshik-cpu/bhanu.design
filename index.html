@@ -11401,8 +11401,10 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
   var LOOP_S = 45, CH_GAIN = 1.6, WHOOSH_GAIN = 1, TC = 0.5;             // TC: setTarget time constant, ~1.5 s to settle
   // (13 Nov, owner couldn't hear it) CH_GAIN was 0.55: room tones measured -33 dB. Now ~-24 dB, with a limiter on the master.
   var CH = { chVC: 'vc', chST: 'stressie', chETL: 'etlive', chETS: 'etstudio', chETA: 'etanalytics', chDL: 'dearly' };
-  var chs = [].slice.call(document.querySelectorAll('#chapters .chp')).filter(function (c) { return CH[c.id] && !c.hidden; });   // a hidden chapter's zero rect would mute the one before it
-  var frames = ['heroCity', 'ftCity'], chatEl = document.getElementById('chat'), root = document.documentElement;
+  // (13 Nov, owner: "only have sound for the first section, the rest we will not") the hero painting is the only source:
+  // no chapter room tones, no footer painting, no cloud-pass whoosh. Restore by putting the chapter filter and 'ftCity' back.
+  var chs = [];
+  var frames = ['heroCity'], chatEl = document.getElementById('chat'), root = document.documentElement;
   var on = true, ctx = null, master = null, ch = {}, whoosh = null, raf = 0, armed = true;
   try { on = localStorage.getItem('siteSound') !== '0'; } catch (e) {}
   btn.setAttribute('aria-pressed', String(on));
@@ -11497,7 +11499,7 @@ html.motion-paused footer.ft .ft-cloud,html.motion-paused footer.ft .ft-shimmer{
   // a painting woken outside a gesture (the footer, loaded later) may sit suspended: the next tap or key wakes it
   ['pointerdown', 'keydown'].forEach(function (ev) { addEventListener(ev, function () { if (on) tick(); }, true); });
   // the cloud pass: one soft whoosh as the bank swells, re-armed only after scrolling back above it
-  window.__sndClouds = function (p) { if (p > 0.3 && armed) { armed = false; playWhoosh(); } else if (p < 0.08) armed = true; };
+  window.__sndClouds = function () {};                                    // hero-only sound (owner, 13 Nov): no whoosh on the cloud pass
   // the entrance: the clouds part on 'scene-on' (only audible if sound was switched on before then)
   if ('MutationObserver' in window && !root.classList.contains('scene-on')) {
     var mo = new MutationObserver(function () { if (root.classList.contains('scene-on')) { mo.disconnect(); playWhoosh(); } });
