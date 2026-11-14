@@ -37,8 +37,8 @@ These override the matching `[NEED FROM BHANU]` items below (N1, N2 partly, N3, 
   how you answer "how did you isolate it".
 - 17.4% retention: over what window (week 1, day 30, whole pilot)?
 - Which research gives the ~2% base rate? Know the name or the source, in case they ask.
-- The gamification story: which product (Stressie or EverTutor)? What exactly did testers love, and how did you
-  know (what they said, how often they used it)?
+- Gamification: confirmed EverTutor (13 Nov). Still to recall: what exactly testers loved, and how you knew (what they
+  said, how often they used it).
 
 **Say it like this: "What caused 12% to 56%?"** (about 45 seconds)
 > "We defined engaged as opening the app and coming back more than once that day, so a real habit signal, not a
@@ -59,9 +59,16 @@ before they do, give a point of view, and show how you'd isolate it. Note that 1
 > to learn that properly. A shallow version risked teaching people to chase points instead of [the real behaviour,
 > e.g. checking in when stressed]. So we held it and put the effort into [what you prioritised instead]."
 
-Fill the brackets with what really happened. If the product was EverTutor, connect it to the gamified progress layer
-the case study says was cut because it didn't move engagement. That's a strong pair: liked in testing, didn't move
-the behaviour, cut.
+It was EverTutor. Tie it to what the case study already says (Phase 1, Trade-offs): "I bet on a gamified progress
+layer first. It didn't move engagement, so I cut it rather than iterate on it, and redirected the budget into
+interaction quality instead." So the full, consistent story is:
+> "In EverTutor's first phase, early testers loved a gamified progress layer, so on the surface it was a win. But
+> it didn't move the behaviour we cared about: engagement with the lesson itself. Doing gamification properly,
+> Duolingo-level, means understanding why each mechanic works, and we didn't have time to learn that. So I cut it
+> instead of shipping a shallow version, and put the budget into interaction quality: the whiteboard-first tutor
+> and hold-to-speak voice. That's where the ~25% completion gain in controlled sessions showed up."
+Watch the last clause: say "showed up", not "came from". The sessions weren't designed to isolate which change
+caused the gain.
 
 ---
 
