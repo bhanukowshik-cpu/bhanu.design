@@ -396,7 +396,7 @@ Live: https://bhanu.build/evertutor-studio.html
 
 ![EverTutor Studio, Desktop 1440×900: Hero](https://bhanu.build/review/ets-desk-01-hero.webp)
 
-*Desktop 1440×900.* Hero: kicker "Sole Product Designer · Lead Curriculum Designer · 2025 – Mid 2026", headline "Built the content creation tool that cut lesson production from 104 hours to 4", "104h → 4h to make a lesson", "3,000+ lessons made"; the Studio product video plays on the painted monitor ("Generate an interactive AI lesson in just one step").
+*Desktop 1440×900.* Hero: kicker "Sole Product Designer · Lead Curriculum Designer · 2025 – Mid 2026", headline "Designed the tool that cut lesson creation from 104 hours to 4", "104h → 4h to make a lesson", "3,000+ lessons made"; the Studio product video plays on the painted monitor ("Generate an interactive AI lesson in just one step").
 
 ### ets-desk-02-authoring-screen-lesson-editor.webp
 
