@@ -20,9 +20,7 @@
   --ink-3:#6b6f78;
   --rule:#d9dbe0;
   --link:#2b45ff;
-  --link-wash:#e6eaff;
   --mark:#fff06a;
-  --ghost:#9aa0aa;
   --screen:#0a0a0a;
   --serif:'STIX Two Text','STIX Two',Georgia,serif;
   --sans:'Schibsted Grotesk',system-ui,sans-serif;
@@ -71,28 +69,6 @@ main{padding:0 clamp(1rem,4vw,2.5rem)}
 figure{margin:2.5rem auto 0;padding:0}
 figcaption{margin-top:.75rem;font:400 .95rem/1.5 var(--serif);color:var(--ink-2);max-width:var(--measure)}
 figcaption b{color:var(--ink);font-weight:600;margin-right:.35em}
-.fig1{max-width:var(--wide)}
-.fig1 .stage{position:relative;aspect-ratio:2/1;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule)}
-.fig1 canvas,.fig1 svg.fallback{position:absolute;inset:0;width:100%;height:100%;display:block}
-.fig1 .lbl{position:absolute;transform:translate(-50%,0);background:rgba(255,255,255,.92);padding:.1rem .25rem;margin:0 -.25rem;border-radius:3px;font:500 .78rem/1.2 var(--sans);color:var(--ink);white-space:nowrap;pointer-events:none;transition:color .5s,opacity .5s}
-.fig1 .lbl.l{transform:translate(0,0)}
-.fig1 .lbl.r{transform:translate(-100%,0)}
-.fig1 .lbl small{display:block;font:400 .7rem/1.2 var(--mono);color:var(--ink-3);margin-top:.15rem}
-.fig1 .lbl.hub{font-weight:600}
-.fig1 .tag{position:absolute;transform:translate(-50%,-50%);font:500 .74rem/1 var(--mono);padding:.28rem .45rem;border-radius:3px;white-space:nowrap;opacity:0;transition:opacity .6s}
-.fig1 .tag.old{background:#f1f2f4;color:var(--ink-2)}
-.fig1 .tag.new{background:var(--link);color:#fff}
-.fig1.on .tag{opacity:1}
-.fig1 [data-k="ac"]{color:var(--ink-3)}
-.fig1.on [data-k="ac"]{color:var(--link)}
-.fig1.on [data-k="ng"]{color:var(--ink-3)}
-.fig1 .replay{position:absolute;right:.5rem;bottom:.5rem;font:500 .72rem/1 var(--mono);color:var(--ink-3);background:none;border:1px solid var(--rule);border-radius:999px;padding:.4rem .7rem;cursor:pointer}
-.fig1 .replay:hover{color:var(--ink);border-color:var(--ink-3)}
-@media (max-width:640px){
-  .fig1 .stage{aspect-ratio:4/5}
-  .fig1 .lbl{font-size:.72rem}
-  .fig1 .lbl small{display:none}
-}
 
 /* sections */
 section{margin-top:clamp(3rem,7vw,4.5rem)}
@@ -108,7 +84,7 @@ p{margin:0 0 1rem}
 .method th.t{text-align:right}
 .method mark{background:linear-gradient(transparent 55%,var(--mark) 55%,var(--mark) 92%,transparent 92%);color:inherit;padding:0 .1em}
 
-/* Fig. 2, their screen */
+/* Fig. 1 before: their screen */
 .fig2 .shot{position:relative;width:min(100%,472px);margin:0 auto;border-radius:10px;overflow:hidden;background:#0c0c0e;line-height:0}
 .fig2 img{width:100%;height:auto;display:block}
 .fig2 .hl{position:absolute;border:2px solid var(--mark);border-radius:4px;background:rgba(255,240,106,.12)}
@@ -130,7 +106,7 @@ p{margin:0 0 1rem}
 .fig3 .ca-card--prev{background:#242424;opacity:.95}
 .fig3 .ca{
   --ca-font:var(--sans);--ca-mono:var(--mono);
-  /* Graphon Playground colours, sampled from Fig. 2 */
+  /* Graphon Playground colours, sampled from their screenshot */
   --ca-card:#171717;--ca-ink:#ededed;--ca-mute:#a0a0a0;--ca-line:rgba(255,255,255,.08);
   --ca-mark:rgba(124,164,236,.16);--ca-mark-ink:#7ca4ec;--ca-chip:#7ca4ec;--ca-chip-ink:#0a0a0a;
   --ca-question:#a0a0a0;--ca-radius:12px}
@@ -245,30 +221,11 @@ p{margin:0 0 1rem}
       </ol>
     </section>
 
-    <section aria-labelledby="s3">
-      <h2 id="s3"><span class="n">3</span>The memory underneath</h2>
-      <p>The card only works if the graph keeps the old link. Replace a file, and the link moves; the old one stays, dated.</p>
-    </section>
   </div>
-
-  <figure class="fig1" id="graph">
-    <div class="stage">
-      <canvas aria-hidden="true"></canvas>
-      <span class="lbl hub" data-n="s14">Signal 14</span>
-      <span class="lbl l" data-n="ng" data-k="ng">Northgate Signals<small>service-contract v1 · 1 Mar</small></span>
-      <span class="lbl r" data-n="ac" data-k="ac">Arclight Signals<small>service-contract v2 · 3 Nov</small></span>
-      <span class="lbl l" data-n="inc">Incident 0412<small>4 Nov · 7:40 left 18 min late</small></span>
-      <span class="lbl r" data-n="mj">Mill Junction</span>
-      <span class="tag old" data-e="old">until 3 Nov</span>
-      <span class="tag new" data-e="new">since 3 Nov</span>
-      <button class="replay" type="button" hidden>Replay</button>
-    </div>
-    <figcaption><b>Fig. 2.</b>The memory underneath. When the contract changes, the link moves to Arclight, and the old link stays in the graph with its end date.</figcaption>
-  </figure>
 
   <div class="col">
     <section aria-labelledby="code">
-      <h2 id="code"><span class="n">4</span>Code release</h2>
+      <h2 id="code"><span class="n">3</span>Code release</h2>
       <p>It is yours, free to use (MIT). React and TypeScript, no dependencies, one CSS file themed with variables.</p>
       <div class="listing">
         <button class="copy" type="button" data-copy="snippet">Copy</button>
@@ -313,150 +270,6 @@ p{margin:0 0 1rem}
 </main>
 
 <script>
-/* Fig. 1: one fragment shader draws the graph; HTML labels sit on top. */
-(function () {
-  var fig = document.getElementById('graph');
-  var stage = fig.querySelector('.stage');
-  var canvas = stage.querySelector('canvas');
-  var replay = stage.querySelector('.replay');
-  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // Node layouts in 0..1 of the stage, one for wide and one for tall frames.
-  var WIDE = { s14:[.50,.50], ng:[.16,.20], ac:[.84,.20], inc:[.22,.82], mj:[.78,.82] };
-  var TALL = { s14:[.50,.50], ng:[.12,.12], ac:[.88,.28], inc:[.14,.84], mj:[.86,.80] };
-  var layout = WIDE;
-
-  function placeLabels() {
-    layout = stage.clientWidth / stage.clientHeight < 1.1 ? TALL : WIDE;
-    stage.querySelectorAll('.lbl').forEach(function (el) {
-      var p = layout[el.dataset.n];
-      // Top nodes label above (their edges run downward); the hub and bottom nodes label below.
-      var above = el.dataset.n !== 's14' && p[1] < .5;
-      el.style.left = (p[0] * 100) + '%';
-      el.style.top = 'calc(' + (p[1] * 100) + '% + 14px)';
-      el.style.transform = above ? (el.classList.contains('l') ? 'translate(0,calc(-100% - 28px))' : el.classList.contains('r') ? 'translate(-100%,calc(-100% - 28px))' : '') : '';
-    });
-    var s = layout.s14, ng = layout.ng, ac = layout.ac;
-    var old = stage.querySelector('[data-e="old"]'), neu = stage.querySelector('[data-e="new"]');
-    old.style.left = ((s[0] + ng[0]) / 2 * 100) + '%'; old.style.top = ((s[1] + ng[1]) / 2 * 100) + '%';
-    neu.style.left = ((s[0] + ac[0]) / 2 * 100) + '%'; neu.style.top = ((s[1] + ac[1]) / 2 * 100) + '%';
-  }
-
-  var gl = canvas.getContext('webgl', { antialias: false, premultipliedAlpha: false });
-  if (!gl) { fallbackSVG(); return; }
-
-  var vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
-  var fs = [
-    'precision highp float;',
-    'uniform vec2 R;uniform float T,D,TIME;',
-    'uniform vec2 S14,NG,AC,INC,MJ;',
-    'float seg(vec2 p,vec2 a,vec2 b,out float h){vec2 pa=p-a,ba=b-a;h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h);}',
-    'float ease(float x){return 1.-pow(1.-clamp(x,0.,1.),3.);}',
-    'void main(){',
-    '  float asp=R.x/R.y;',
-    '  vec2 p=vec2(gl_FragCoord.x,R.y-gl_FragCoord.y)/R.y;',
-    '  vec2 s=S14*vec2(asp,1.),ng=NG*vec2(asp,1.),ac=AC*vec2(asp,1.),inc=INC*vec2(asp,1.),mj=MJ*vec2(asp,1.);',
-    '  float px=D/R.y, aa=px*.9;',
-    '  vec3 col=vec3(1.);',
-    '  vec3 ink=vec3(.071), ghost=vec3(.62,.64,.67), blue=vec3(.169,.271,1.);',
-    '  float h; float d;',
-    /* faint dotted field, like plotting paper */
-    '  vec2 g=fract(p/(px*22.))-.5; float dt=1.-smoothstep(.5*px*1.4,.5*px*1.4+aa, length(g)*px*22.);',
-    '  col=mix(col,vec3(.86,.87,.89),dt*.8);',
-    /* context edges */
-    '  d=seg(p,s,inc,h); col=mix(col,ink*1.6,(1.-smoothstep(px*.6,px*.6+aa,d))*.55);',
-    '  d=seg(p,s,mj,h);  col=mix(col,ink*1.6,(1.-smoothstep(px*.6,px*.6+aa,d))*.55);',
-    /* old edge: solid ink, then dashed graphite */
-    '  float k=ease((T-.15)/.5);',
-    '  d=seg(p,s,ng,h);',
-    '  float L=length(ng-s); float dash=step(.45,fract(h*L/(px*9.)));',
-    '  vec2 q=mod(floor(gl_FragCoord.xy),4.);',
-    '  float bay=mod(q.x*8.+q.y*4.+mod(q.x+q.y,2.)*2.+q.x*q.y,16.)/16.;',
-    '  float fade=mix(1.,step(bay,.55),k*(1.-k)*4.);',
-    '  float oldA=mix(1.,dash*.95,k)*fade;',
-    '  vec3 oldC=mix(ink,ghost,k);',
-    '  col=mix(col,oldC,(1.-smoothstep(px*mix(1.1,.75,k),px*mix(1.1,.75,k)+aa,d))*oldA);',
-    /* new edge grows from Signal 14 to Arclight */
-    '  float g2=ease((T-.35)/.55);',
-    '  d=seg(p,s,ac,h);',
-    '  float grown=1.-smoothstep(g2-.004,g2,h);',
-    '  col=mix(col,blue,(1.-smoothstep(px*1.3,px*1.3+aa,d))*grown*step(.001,g2));',
-    /* a single pulse travels the new edge as it lands */
-    '  float pulse=exp(-pow((h-g2)/.035,2.))*step(.01,g2)*(1.-step(.999,g2));',
-    '  col=mix(col,blue,(1.-smoothstep(px*4.,px*4.+aa,d))*pulse*.35);',
-    /* nodes */
-    '  float r=px*5.5;',
-    '  d=length(p-inc); col=mix(col,ink,1.-smoothstep(r,r+aa,d)); col=mix(col,vec3(1.),1.-smoothstep(r-px*1.6,r-px*1.6+aa,d));',
-    '  d=length(p-mj);  col=mix(col,ink,1.-smoothstep(r,r+aa,d)); col=mix(col,vec3(1.),1.-smoothstep(r-px*1.6,r-px*1.6+aa,d));',
-    '  d=length(p-ng);  col=mix(col,mix(ink,ghost,k),1.-smoothstep(r,r+aa,d)); col=mix(col,vec3(1.),1.-smoothstep(r-px*1.6,r-px*1.6+aa,d));',
-    '  float arr=smoothstep(.96,1.,g2);',
-    '  float ra=r*(1.+.35*arr*(1.-step(1.,T)));',
-    '  d=length(p-ac);  col=mix(col,mix(ghost,blue,arr),1.-smoothstep(ra,ra+aa,d)); col=mix(col,vec3(1.),(1.-smoothstep(ra-px*1.6,ra-px*1.6+aa,d))*(1.-arr));',
-    '  float rs=px*8.; d=length(p-s); col=mix(col,ink,1.-smoothstep(rs,rs+aa,d));',
-    '  gl_FragColor=vec4(col,1.);',
-    '}'
-  ].join('\n');
-
-  function sh(type, src) { var o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o; }
-  var prog;
-  try {
-    prog = gl.createProgram();
-    gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
-  } catch (e) { canvas.remove(); fallbackSVG(); return; }
-  gl.useProgram(prog);
-  var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-  var loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  var U = {}; ['R', 'T', 'D', 'TIME', 'S14', 'NG', 'AC', 'INC', 'MJ'].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
-
-  var t = reduce ? 1 : 0, playing = false, start = 0, DUR = 2600;
-
-  function size() {
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var w = Math.round(stage.clientWidth * dpr), h = Math.round(stage.clientHeight * dpr);
-    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-    gl.viewport(0, 0, w, h);
-    placeLabels();
-    return dpr;
-  }
-  function draw() {
-    var dpr = size();
-    gl.uniform2f(U.R, canvas.width, canvas.height);
-    gl.uniform1f(U.T, t); gl.uniform1f(U.D, dpr); gl.uniform1f(U.TIME, performance.now() / 1000);
-    ['s14', 'ng', 'ac', 'inc', 'mj'].forEach(function (k) { var p = layout[k]; gl.uniform2f(U[k.toUpperCase()], p[0], p[1]); });
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-    fig.classList.toggle('on', t > .8);
-  }
-  function frame(now) {
-    t = Math.min(1, (now - start) / DUR);
-    draw();
-    if (t < 1) requestAnimationFrame(frame); else { playing = false; replay.hidden = false; }
-  }
-  function play() { if (playing) return; playing = true; replay.hidden = true; t = 0; start = performance.now(); requestAnimationFrame(frame); }
-
-  new ResizeObserver(function () { if (!playing) draw(); }).observe(stage);
-  draw();
-  if (!reduce) {
-    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); setTimeout(play, 350); } }, { threshold: .5 });
-    io.observe(stage);
-    replay.addEventListener('click', play);
-  }
-
-  function fallbackSVG() {
-    placeLabels(); fig.classList.add('on');
-    var L = layout, W = 1000, H = Math.round(1000 * stage.clientHeight / stage.clientWidth);
-    function P(k) { return [L[k][0] * W, L[k][1] * H]; }
-    function line(a, b, attrs) { var A = P(a), B = P(b); return '<line x1="' + A[0] + '" y1="' + A[1] + '" x2="' + B[0] + '" y2="' + B[1] + '" ' + attrs + '/>'; }
-    function node(k, fill, stroke, r) { var A = P(k); return '<circle cx="' + A[0] + '" cy="' + A[1] + '" r="' + r + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="2.5"/>'; }
-    stage.insertAdjacentHTML('afterbegin', '<svg class="fallback" viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' +
-      line('s14', 'inc', 'stroke="#555" stroke-width="1.5"') + line('s14', 'mj', 'stroke="#555" stroke-width="1.5"') +
-      line('s14', 'ng', 'stroke="#9aa0aa" stroke-width="1.5" stroke-dasharray="6 7"') + line('s14', 'ac', 'stroke="#2b45ff" stroke-width="2.5"') +
-      node('inc', '#fff', '#121212', 8) + node('mj', '#fff', '#121212', 8) + node('ng', '#fff', '#9aa0aa', 8) + node('ac', '#2b45ff', '#2b45ff', 8) + node('s14', '#121212', '#121212', 12) + '</svg>');
-  }
-})();
-
 /* Copy the embed snippet. */
 document.querySelectorAll('.copy').forEach(function (b) {
   b.addEventListener('click', function () {
