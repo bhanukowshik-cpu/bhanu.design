@@ -111,13 +111,14 @@ call, agents draft code to them, and a separate fresh agent checks each result b
 - **Evals before claims:** pass/fail rules pinned before each test, exact 95% bounds, failures kept on record, and a build
   check that blocks product copy that overclaims (results: https://verifiedcall.app/research).
 
-## Concept: How I'd show an AI's memory (Nov 2026) · https://bhanu.build/graphon-concept.html
+## Concept: By default, Graphon forgets what changed (Nov 2026) · https://bhanu.build/graphon.html
 
-An unsolicited concept for Graphon (graphonlabs.ai); not affiliated with or endorsed by Graphon Labs. One interactive screen:
-a person asks a question of their company's files and gets an answer where every sentence cites its source (the PDF page,
-the video second, the moment in a call, the spreadsheet row), while the sources the answer connected light up as a graph,
-in the order they were found. What the AI could not find gets its own plain line. The workspace, files and questions are
-made up; no customer data is shown.
+An unsolicited note to Graphon (graphonlabs.ai); not affiliated with or endorsed by Graphon Labs. He tested Graphon in his
+own free workspace on 18 Nov 2026 with made-up files: two files were searchable in about 25 s and a cross-file answer with
+sources came back in 6 s. When he replaced a contract with a new version, the answer lost the previous vendor and called
+its own earlier answer incorrect (object versioning is off by default on new buckets). The page shows his screen of that
+answer next to his fix: the new answer lands on top with "Changed 3 Nov", and the old one stays underneath with its end
+date. The fix is a free (MIT) React and TypeScript component, ChangedAnswer, with no dependencies.
 
 ## Verified Call (2026) · https://bhanu.build/verified-call.html
 
