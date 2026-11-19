@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-18T00:00:00Z",
-  "title": "Design System: Answers that remember",
+  "generatedAt": "2026-11-18T12:00:00Z",
+  "title": "Design System: By default, Graphon forgets what changed",
   "extensions": {
     "colorMeta": {
       "ink": {
@@ -109,34 +109,34 @@
           "#f7f1b6"
         ]
       },
-      "graphite-ghost": {
-        "role": "tertiary",
-        "displayName": "Graphite Ghost",
-        "canonical": "oklch(70.4% 0.016 260.7)",
+      "before-gray": {
+        "role": "neutral",
+        "displayName": "Before Gray",
+        "canonical": "oklch(93.4% 0.005 275.0)",
         "tonalRamp": [
-          "#070b12",
-          "#20242c",
-          "#3b4048",
-          "#585e67",
-          "#7b818a",
-          "#9fa5af",
-          "#c5cbd5",
-          "#e8effa"
+          "#0a0b0e",
+          "#232427",
+          "#3f4043",
+          "#5d5d61",
+          "#7f8084",
+          "#a3a4a8",
+          "#c9cace",
+          "#edeef2"
         ]
       },
       "plate-gray": {
         "role": "neutral",
         "displayName": "Plate Gray",
-        "canonical": "oklch(96.1% 0.003 264.5)",
+        "canonical": "oklch(96.1% 0.004 271.4)",
         "tonalRamp": [
-          "#0a0b0c",
-          "#232425",
-          "#3f4041",
-          "#5d5e5f",
-          "#7f8082",
-          "#a4a4a6",
-          "#c9cacc",
-          "#edeef0"
+          "#0a0b0d",
+          "#232426",
+          "#3f4042",
+          "#5d5d60",
+          "#7f8083",
+          "#a3a4a7",
+          "#c9cacd",
+          "#edeef1"
         ]
       },
       "listing-tint": {
@@ -315,9 +315,9 @@
         "displayName": "Label",
         "purpose": "Running head."
       },
-      "figure-label": {
-        "displayName": "Figure Label",
-        "purpose": "Diagram node names."
+      "state-tag": {
+        "displayName": "State Tag",
+        "purpose": "Before and After tags in the figure pair."
       },
       "data": {
         "displayName": "Data",
@@ -331,19 +331,14 @@
     "shadows": [],
     "motion": [
       {
-        "name": "ease-out-cubic",
-        "value": "1 - (1 - t)^3 over 2600ms",
-        "purpose": "Fig. 1 edge growth and Fig. 3 scrubber autoplay; plays once when the figure is in view (50% / 55% threshold)."
+        "name": "scrubber-autoplay",
+        "value": "ease-out cubic, 1 - (1 - t)^3 over 2600ms",
+        "purpose": "After-panel scrubber plays its timeline once when 55% in view; any drag takes over."
       },
       {
         "name": "ca-ease",
         "value": "cubic-bezier(0.2, 0.8, 0.2, 1)",
         "purpose": "ChangedAnswer change: land and recede 700ms, mark wipe 600ms at 450ms, chip fade 400ms at 550ms."
-      },
-      {
-        "name": "label-fade",
-        "value": "color .5s, opacity .5s / .6s",
-        "purpose": "Diagram labels and edge tags settling after the change."
       },
       {
         "name": "control-invert",
@@ -353,16 +348,26 @@
       {
         "name": "reduced-motion",
         "value": "end state, no animation",
-        "purpose": "Under prefers-reduced-motion both figures render their final state immediately and smooth scroll is off."
+        "purpose": "Under prefers-reduced-motion the scrubber starts at the end date, component animations are removed, and smooth scroll is off."
       }
     ],
     "breakpoints": [
       {
+        "name": "pair-stack",
+        "value": "860px",
+        "purpose": "At 860px and below the Before/After pair stacks into one column; 861px and up it is two columns (472px Before, flexible After)."
+      },
+      {
         "name": "phone",
         "value": "640px",
-        "purpose": "Running-head centre note hides; Fig. 1 switches to 4:5 tall layout, smaller labels without sub-lines."
+        "purpose": "Running-head centre note hides."
       }
-    ]
+    ],
+    "layout": {
+      "pairColumns": "minmax(0,472px) minmax(0,1fr)",
+      "pairGap": "clamp(1rem,3vw,1.75rem)",
+      "panelMinHeight": "14.25rem"
+    }
   },
   "components": [
     {
@@ -401,17 +406,17 @@
       "name": "Figure Caption",
       "kind": "custom",
       "refersTo": "figure-caption",
-      "description": "Serif caption under every figure, bold Fig. n. run-in, lettered evidence keys.",
-      "html": "<p class=\"ds-cap\"><b>Fig. 2.</b>Graphon Playground, my workspace. <span class=\"ds-key\">a</span> The previous vendor is lost.</p>",
+      "description": "Serif caption under the figure, bold Fig. n. run-in, lettered evidence keys.",
+      "html": "<p class=\"ds-cap\"><b>Fig. 1.</b>Before: my workspace, after replacing the contract: <span class=\"ds-key\">a</span> the previous vendor is lost.</p>",
       "css": ".ds-cap{margin:.75rem 0 0;font:400 .95rem/1.5 'STIX Two Text','STIX Two',Georgia,serif;color:#4a4d55;max-width:38rem}.ds-cap b{color:#121212;font-weight:600;margin-right:.35em}.ds-key{font:600 .78rem/1 'Spline Sans Mono',ui-monospace,Menlo,monospace;color:#121212;background:#fff06a;border-radius:999px;padding:.12rem .38rem;margin:0 .1rem}"
     },
     {
-      "name": "Edge Tags",
+      "name": "Before / After Tags",
       "kind": "chip",
-      "refersTo": "edge-tag-new",
-      "description": "Dated tags on diagram edges: superseded on plate gray, current on hyperref blue.",
-      "html": "<span class=\"ds-tag ds-tag-old\">until 3 Nov</span> <span class=\"ds-tag ds-tag-new\">since 3 Nov</span>",
-      "css": ".ds-tag{display:inline-block;font:500 .74rem/1 'Spline Sans Mono',ui-monospace,Menlo,monospace;padding:.28rem .45rem;border-radius:3px;white-space:nowrap}.ds-tag-old{background:#f1f2f4;color:#4a4d55}.ds-tag-new{background:#2b45ff;color:#fff}"
+      "refersTo": "state-tag-after",
+      "description": "State tags that open each column of the before/after figure, followed by an italic serif sub-line.",
+      "html": "<p class=\"ds-sub\"><span class=\"ds-ba ds-ba-before\">Before</span>Your Playground today</p><p class=\"ds-sub\"><span class=\"ds-ba ds-ba-after\">After</span>With the fix. Drag the date.</p>",
+      "css": ".ds-sub{display:flex;align-items:center;gap:.6rem;margin:0 0 .7rem;font:italic 400 .95rem/1.4 'STIX Two Text','STIX Two',Georgia,serif;color:#4a4d55}.ds-ba{font:600 .8rem/1 'Schibsted Grotesk',system-ui,sans-serif;font-style:normal;letter-spacing:.01em;padding:.38rem .6rem;border-radius:4px}.ds-ba-before{background:#e8e9ed;color:#121212}.ds-ba-after{background:#2b45ff;color:#fff}"
     },
     {
       "name": "Changed Answer (Playground skin)",
@@ -432,23 +437,24 @@
   ],
   "narrative": {
     "northStar": "The Short Paper",
-    "overview": "The surface is a preprint addressed to one reader. White paper, near-black ink, a serif carrying nearly every word, and the furniture of a paper doing the structural work: a running head, a centred title block with author, affiliation and correspondence lines, a run-in abstract, numbered sections, a booktabs table, numbered figures with bold \"Fig. n.\" captions, and numbered references. Hierarchy comes from typographic convention and hairline rules, not from cards, fills or shadows.\n\nColour is semantic, the way a typeset paper uses it. Hyperref blue means \"link\" and, in figures, \"the new fact\". Highlighter yellow means \"evidence, look here\". Graphite gray means \"superseded, but kept\". Ink is everything else.\n\nThe one deliberate exception is the product figure. When a figure shows the company's own product, it is set in that product's skin (a near-black screen, rounded cards, a cool blue accent) so the reader recognises their own interface. That dark island is a figure inside the paper, never a page style.",
+    "overview": "The surface is a preprint addressed to one reader. White paper, near-black ink, a serif carrying nearly every word, and the furniture of a paper doing the structural work: a running head, a centred title block with author and affiliation lines, a run-in abstract, numbered sections, a booktabs table, a numbered figure with a bold \"Fig. n.\" caption, and numbered references. Hierarchy comes from typographic convention and hairline rules, not from cards, fills or shadows.\n\nColour is semantic, the way a typeset paper uses it. Hyperref blue means \"link\" and \"after, with the fix\". Highlighter yellow means \"evidence, look here\". A pale gray plate means \"before\". Ink is everything else.\n\nThe one deliberate exception is the product. Fig. 1 sets the company's own screen (Before) beside the fix (After), and the After panel is drawn in that product's skin (a near-black screen, rounded cards, a cool blue accent) so the reader compares like with like. That dark panel lives inside the figure, never as a page style.",
     "keyCharacteristics": [
       "Serif-first: STIX Two Text for title, body, captions, table heads, signature and footer.",
-      "Grotesk only for interface-like labels (running head, graph node labels); mono only for data (times, dates, file names, code).",
+      "Grotesk only for interface-like labels (running head, Before/After tags); mono only for data (times, dates, file names, code).",
       "Hairline rules in place of containers; flat everywhere.",
-      "Three semantic colours on white: blue (link / new), yellow (evidence), graphite (superseded).",
+      "Semantic colour on white: blue (link / after), yellow (evidence), pale gray (before).",
+      "Proof is a before/after pair: their real screen at native size beside the working fix.",
       "Motion is explanatory and plays once; nothing ambient moves."
     ],
     "rules": [
       {
         "name": "The Semantic Ink Rule",
-        "body": "Blue means link or new, yellow means evidence, graphite means superseded. No colour appears for decoration, and no colour changes meaning between figures.",
+        "body": "Blue means link or after, yellow means evidence, pale gray means before. No colour appears for decoration, and no colour changes meaning across the page.",
         "section": "colors"
       },
       {
-        "name": "The One Dark Figure Rule",
-        "body": "The only dark surface is a figure that reproduces the subject company's product, in that product's own colours. The paper itself never goes dark.",
+        "name": "The One Dark Panel Rule",
+        "body": "The only dark surface is the panel that reproduces the subject company's product, in that product's own colours. The paper itself never goes dark.",
         "section": "colors"
       },
       {
@@ -458,7 +464,7 @@
       },
       {
         "name": "The Paper Run-in Rule",
-        "body": "Structural labels are run-ins inside the text they introduce (\"Abstract.\" in small caps, \"Fig. 1.\" in bold), never separate lines above it.",
+        "body": "Structural labels are run-ins inside the text they introduce (\"Abstract.\" in small caps, \"Fig. n.\" in bold), never separate lines above it.",
         "section": "typography"
       },
       {
@@ -474,19 +480,20 @@
     ],
     "dos": [
       "Do set every structural label as a paper run-in: small-caps \"Abstract.\", bold \"Fig. n.\", numbered section heads, bracketed reference numbers.",
-      "Do keep prose at the 38rem measure and let figures break out to 58rem.",
+      "Do keep prose at the 38rem measure and let the figure break out to 58rem.",
       "Do group with booktabs rules (1.5px ink top and bottom, 1px under heads) instead of boxes.",
-      "Do show superseded facts in graphite, dashed, and keep them on screen with their end date.",
+      "Do prove a fix as a pair: the real screen tagged Before, the working fix tagged After, side by side at 861px and up, stacked below.",
+      "Do keep a superseded answer on screen beneath the new one, with its end date.",
       "Do mark evidence with the highlighter and key it to the caption with lettered discs.",
-      "Do set a product figure in the product's own colours, and keep it the only dark surface.",
-      "Do play explanatory motion once on view, offer Replay or direct control, and show the end state immediately under reduced motion."
+      "Do set the product panel in the product's own colours, and keep it the only dark surface.",
+      "Do play explanatory motion once on view, hand control to the reader, and show the end state immediately under reduced motion."
     ],
     "donts": [
       "Don't use shadows of any kind; depth is rules and stacking.",
       "Don't put a sentence in mono or a measured value in serif.",
-      "Don't use blue, yellow or graphite decoratively; each has one meaning.",
-      "Don't use red anywhere, including errors or the \"broken\" state; evidence is yellow.",
-      "Don't round paper surfaces (tables, listings, diagram stages); radius is for controls, tags and product reproductions.",
+      "Don't use blue, yellow or the before gray decoratively; each has one meaning.",
+      "Don't use red anywhere, including the \"broken\" state; evidence is yellow.",
+      "Don't round paper surfaces (tables, listings); radius is for controls, tags and product reproductions.",
       "Don't upscale rasters past their native size.",
       "Don't add ambient or looping motion."
     ]
