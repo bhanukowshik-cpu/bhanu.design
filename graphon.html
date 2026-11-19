@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Graphon forgets what changed</title>
+<meta name="description" content="Graphon forgets what changed. A short note from Bhanu Kowshik: what I tried, what broke, and a free React component that fixes it. Unsolicited, not affiliated, made-up test data.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;1,400&family=Schibsted+Grotesk:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="graphon-memory/demo.css">
+<style>
+:root{
+  --paper:#ffffff;
+  --ink:#121212;
+  --ink-2:#4a4d55;
+  --ink-3:#6b6f78;
+  --rule:#d9dbe0;
+  --link:#2b45ff;
+  --link-wash:#e6eaff;
+  --mark:#fff06a;
+  --ghost:#9aa0aa;
+  --screen:#0a0a0a;
+  --serif:'STIX Two Text','STIX Two',Georgia,serif;
+  --sans:'Schibsted Grotesk',system-ui,sans-serif;
+  --mono:'Spline Sans Mono',ui-monospace,Menlo,monospace;
+  --measure:38rem;
+  --wide:58rem;
+}
+*{box-sizing:border-box}
+html{background:var(--paper);color:var(--ink);-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;font:400 1.125rem/1.6 var(--serif);font-variant-numeric:oldstyle-nums proportional-nums;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+::selection{background:var(--mark);color:var(--ink)}
+a{color:var(--link);text-decoration-thickness:1px;text-underline-offset:.18em}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--link);outline-offset:3px;border-radius:2px}
+html{scrollbar-color:#b9bcc4 transparent}
+
+/* running head, like a preprint */
+.head{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:.7rem clamp(1rem,4vw,2.5rem);background:rgba(255,255,255,.94);border-bottom:1px solid var(--rule);
+  font:500 .85rem/1.3 var(--sans);color:var(--ink-3)}
+.head a{color:var(--ink-2);text-decoration:none}
+.head a:hover{color:var(--ink)}
+.head .code-link{display:inline-flex;align-items:center;gap:.4rem;color:var(--link)}
+.head .code-link svg{width:.85rem;height:.85rem}
+.head .mid{flex:1;text-align:center}
+.head .acts{display:inline-flex;gap:1.1rem;align-items:center}
+@media (max-width:640px){.head .mid{display:none}}
+
+main{padding:0 clamp(1rem,4vw,2.5rem)}
+.col{max-width:var(--measure);margin:0 auto}
+.wide{max-width:var(--wide);margin-left:auto;margin-right:auto}
+
+/* title block */
+.title{max-width:var(--wide);margin:clamp(2rem,5vw,3.5rem) auto 0;text-align:center}
+.title h1{font:500 clamp(1.9rem,4.4vw,2.9rem)/1.1 var(--serif);letter-spacing:-.025em;margin:0;text-wrap:balance}
+.authors{margin:1.1rem 0 0;font:400 1.05rem/1.5 var(--serif)}
+.authors .to{font-style:italic;color:var(--ink-2)}
+.affil{margin:.3rem auto 0;max-width:34rem;font:italic 400 .95rem/1.45 var(--serif);color:var(--ink-3)}
+.corr{margin:.2rem 0 0;font:400 .95rem/1.45 var(--serif);color:var(--ink-3)}
+.abstract{max-width:34rem;margin:1.5rem auto 0;text-align:left}
+.abstract p{margin:0;font-size:1.05rem}
+.abstract b{font-weight:600;font-variant:small-caps;letter-spacing:.04em;margin-right:.4em}
+
+/* figures */
+figure{margin:2.5rem auto 0;padding:0}
+figcaption{margin-top:.75rem;font:400 .95rem/1.5 var(--serif);color:var(--ink-2);max-width:var(--measure)}
+figcaption b{color:var(--ink);font-weight:600;margin-right:.35em}
+.fig1{max-width:var(--wide)}
+.fig1 .stage{position:relative;aspect-ratio:2/1;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule)}
+.fig1 canvas,.fig1 svg.fallback{position:absolute;inset:0;width:100%;height:100%;display:block}
+.fig1 .lbl{position:absolute;transform:translate(-50%,0);background:rgba(255,255,255,.92);padding:.1rem .25rem;margin:0 -.25rem;border-radius:3px;font:500 .78rem/1.2 var(--sans);color:var(--ink);white-space:nowrap;pointer-events:none;transition:color .5s,opacity .5s}
+.fig1 .lbl.l{transform:translate(0,0)}
+.fig1 .lbl.r{transform:translate(-100%,0)}
+.fig1 .lbl small{display:block;font:400 .7rem/1.2 var(--mono);color:var(--ink-3);margin-top:.15rem}
+.fig1 .lbl.hub{font-weight:600}
+.fig1 .tag{position:absolute;transform:translate(-50%,-50%);font:500 .74rem/1 var(--mono);padding:.28rem .45rem;border-radius:3px;white-space:nowrap;opacity:0;transition:opacity .6s}
+.fig1 .tag.old{background:#f1f2f4;color:var(--ink-2)}
+.fig1 .tag.new{background:var(--link);color:#fff}
+.fig1.on .tag{opacity:1}
+.fig1 [data-k="ac"]{color:var(--ink-3)}
+.fig1.on [data-k="ac"]{color:var(--link)}
+.fig1.on [data-k="ng"]{color:var(--ink-3)}
+.fig1 .replay{position:absolute;right:.5rem;bottom:.5rem;font:500 .72rem/1 var(--mono);color:var(--ink-3);background:none;border:1px solid var(--rule);border-radius:999px;padding:.4rem .7rem;cursor:pointer}
+.fig1 .replay:hover{color:var(--ink);border-color:var(--ink-3)}
+@media (max-width:640px){
+  .fig1 .stage{aspect-ratio:4/5}
+  .fig1 .lbl{font-size:.72rem}
+  .fig1 .lbl small{display:none}
+}
+
+/* sections */
+section{margin-top:clamp(3rem,7vw,4.5rem)}
+h2{font:600 1.55rem/1.2 var(--serif);margin:0 0 .9rem;letter-spacing:-.01em}
+h2 .n{display:inline-block;min-width:1.6em;color:var(--ink-3);font-weight:500;font-variant-numeric:lining-nums}
+p{margin:0 0 1rem}
+
+/* booktabs table */
+.method{width:100%;border-collapse:collapse;font:400 1rem/1.45 var(--serif);border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+.method th{font:500 .95rem/1.3 var(--serif);font-variant:small-caps;letter-spacing:.04em;text-transform:lowercase;color:var(--ink-2);text-align:left;padding:.6rem .5rem;border-bottom:1px solid var(--ink)}
+.method td{padding:.55rem .5rem;vertical-align:top}
+.method td.t{font:500 .9rem/1.45 var(--mono);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums lining-nums}
+.method th.t{text-align:right}
+.method mark{background:linear-gradient(transparent 55%,var(--mark) 55%,var(--mark) 92%,transparent 92%);color:inherit;padding:0 .1em}
+
+/* Fig. 2, their screen */
+.fig2 .shot{position:relative;width:min(100%,472px);margin:0 auto;border-radius:10px;overflow:hidden;background:#0c0c0e;line-height:0}
+.fig2 img{width:100%;height:auto;display:block}
+.fig2 .hl{position:absolute;border:2px solid var(--mark);border-radius:4px;background:rgba(255,240,106,.12)}
+.fig2 .hl i{position:absolute;right:-.15rem;top:50%;transform:translate(100%,-50%);font:600 .72rem/1 var(--mono);font-style:normal;color:#121212;background:var(--mark);border-radius:999px;width:1.35rem;height:1.35rem;display:grid;place-items:center}
+.fig2 figcaption{margin-left:auto;margin-right:auto;width:min(100%,472px)}
+.fig2 .k{font:600 .78rem/1 var(--mono);color:var(--ink);background:var(--mark);border-radius:999px;padding:.12rem .38rem;margin:0 .1rem}
+
+/* discussion list */
+.points{list-style:none;padding:0;margin:0;counter-reset:pt}
+.points li{counter-increment:pt;display:grid;grid-template-columns:2.2rem 1fr;gap:.2rem;margin:0 0 1.1rem}
+.points li::before{content:"(" counter(pt,lower-roman) ")";font:italic 400 1rem/1.6 var(--serif);color:var(--ink-3)}
+.points b{font-weight:600}
+
+/* Fig. 3, the fix */
+.fig3wrap{max-width:var(--wide)}
+.fig3{background:var(--screen);border-radius:12px;padding:clamp(1rem,3vw,1.5rem) clamp(1rem,4vw,2.5rem) clamp(1rem,3vw,1.5rem);color:#ededed}
+/* Reserves the changed state's height so the scrubber never jumps. */
+.fig3-screen{display:flex;justify-content:center;align-items:flex-start;min-height:14.25rem}
+.fig3 .ca-card--prev{background:#242424;opacity:.95}
+.fig3 .ca{
+  --ca-font:var(--sans);--ca-mono:var(--mono);
+  /* Graphon Playground colours, sampled from Fig. 2 */
+  --ca-card:#171717;--ca-ink:#ededed;--ca-mute:#a0a0a0;--ca-line:rgba(255,255,255,.08);
+  --ca-mark:rgba(124,164,236,.16);--ca-mark-ink:#7ca4ec;--ca-chip:#7ca4ec;--ca-chip-ink:#0a0a0a;
+  --ca-question:#a0a0a0;--ca-radius:12px}
+.scrub{max-width:520px;margin:1.5rem auto 0;font:500 .78rem/1.3 var(--mono);color:#a0a0a0}
+.scrub-label output{color:#ededed}
+.scrub-track{position:relative;margin-top:.7rem;height:2.4rem}
+.scrub-track input{-webkit-appearance:none;appearance:none;width:100%;margin:0;height:2.4rem;background:transparent;cursor:pointer}
+.scrub-track input::-webkit-slider-runnable-track{height:3px;border-radius:3px;background:linear-gradient(90deg,#ededed var(--fill),#2e2e2e var(--fill))}
+.scrub-track input::-moz-range-track{height:3px;border-radius:3px;background:#2e2e2e}
+.scrub-track input::-moz-range-progress{height:3px;border-radius:3px;background:#ededed}
+.scrub-track input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-7.5px;border-radius:50%;background:#ededed;border:4px solid var(--screen)}
+.scrub-track input::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#ededed;border:4px solid var(--screen)}
+.scrub-track input:focus-visible{outline:2px solid #7ca4ec;outline-offset:4px}
+.scrub-mark{position:absolute;left:var(--change);top:0;transform:translateX(-80%);pointer-events:none;color:#7ca4ec;font-size:.72rem;white-space:nowrap}
+.scrub-mark::after{content:"";position:absolute;left:80%;top:1.15rem;width:1px;height:.75rem;background:#7ca4ec}
+.scrub-ends{display:flex;justify-content:space-between;font-size:.72rem;color:#7a7a7a}
+.fig3wrap figcaption{margin-left:auto;margin-right:auto}
+
+/* code release */
+.listing{position:relative;margin:1rem 0 0;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);background:#f7f8fa}
+.listing pre{margin:0;padding:2.6rem 1rem 1rem;overflow-x:auto;font:400 .82rem/1.65 var(--mono);color:#1b1d22;tab-size:2}
+.listing .c{color:#7a7f8a}.listing .s{color:#1f6b45}.listing .tg{color:var(--link)}
+.copy{position:absolute;top:.5rem;right:.5rem;font:500 .72rem/1 var(--mono);color:var(--ink-2);background:#fff;border:1px solid var(--rule);border-radius:6px;padding:.45rem .65rem;cursor:pointer}
+.copy:hover{color:var(--ink);border-color:var(--ink-3)}
+.copy[data-done]{color:#1f6b45;border-color:#1f6b45}
+.files{display:flex;flex-wrap:wrap;gap:.6rem;margin:1rem 0 0}
+.files a{display:inline-flex;align-items:center;gap:.5rem;font:500 .82rem/1 var(--mono);text-decoration:none;color:var(--ink);border:1px solid var(--ink);border-radius:999px;padding:.65rem .95rem;transition:background .2s,color .2s}
+.files a:hover{background:var(--ink);color:#fff}
+.files svg{width:.9rem;height:.9rem}
+:not(pre)>code{font:400 .86em var(--mono);background:#f1f2f5;border-radius:3px;padding:.05em .3em}
+
+/* close */
+.sign{margin-top:clamp(3rem,7vw,4.5rem);padding-top:1.5rem;border-top:1px solid var(--rule)}
+.sign .name{font:italic 400 1.6rem/1.2 var(--serif);margin:0 0 .4rem}
+.refs{margin-top:2.5rem;font-size:.95rem;color:var(--ink-2)}
+.refs h2{font-size:1.05rem}
+.refs ol{list-style:none;padding:0;margin:0}
+.refs li{display:grid;grid-template-columns:2.2rem 1fr;margin-bottom:.4rem}
+.foot{max-width:var(--measure);margin:3rem auto 0;padding:1.25rem 0 2.5rem;border-top:1px solid var(--rule);font:italic 400 .9rem/1.5 var(--serif);color:var(--ink-3)}
+</style>
+</head>
+<body>
+
+<header class="head">
+  <a href="index.html">bhanu.build/graphon</a>
+  <span class="mid">18 Nov 2026 · unsolicited, not affiliated with Graphon</span>
+  <span class="acts"><a href="mailto:kowshikbhanu1000@gmail.com?subject=Graphon%20forgets%20what%20changed">Reply</a>
+  <a class="code-link" href="#code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 2.5v8m0 0 3-3m-3 3-3-3M3 13.5h10"/></svg>Get the code</a></span>
+</header>
+
+<main>
+  <div class="title">
+    <h1>Graphon forgets what changed.</h1>
+    <p class="authors">Bhanu Kowshik <span class="to">for the Graphon team</span></p>
+    <p class="affil">Unsolicited, not affiliated with Graphon. Tested 18 Nov 2026 with made-up files. <a href="mailto:kowshikbhanu1000@gmail.com?subject=Graphon%20forgets%20what%20changed">kowshikbhanu1000@gmail.com</a></p>
+    <div class="abstract">
+      <p><b>Abstract.</b>Hi Graphon. I tried your product this week. When I replaced a contract, the answer lost the previous vendor and called its own earlier answer incorrect. Here is how I would fix it, and the code to do it.</p>
+    </div>
+  </div>
+
+  <figure class="fig1" id="fig1">
+    <div class="stage">
+      <canvas aria-hidden="true"></canvas>
+      <span class="lbl hub" data-n="s14">Signal 14</span>
+      <span class="lbl l" data-n="ng" data-k="ng">Northgate Signals<small>service-contract v1 · 1 Mar</small></span>
+      <span class="lbl r" data-n="ac" data-k="ac">Arclight Signals<small>service-contract v2 · 3 Nov</small></span>
+      <span class="lbl l" data-n="inc">Incident 0412<small>4 Nov · 7:40 left 18 min late</small></span>
+      <span class="lbl r" data-n="mj">Mill Junction</span>
+      <span class="tag old" data-e="old">until 3 Nov</span>
+      <span class="tag new" data-e="new">since 3 Nov</span>
+      <button class="replay" type="button" hidden>Replay</button>
+    </div>
+    <figcaption><b>Fig. 1.</b>The memory I would want. When the contract changes, the link moves to Arclight, and the old link stays in the graph with its end date.</figcaption>
+  </figure>
+
+  <div class="col">
+    <section aria-labelledby="s1">
+      <h2 id="s1"><span class="n">1</span>What I tried</h2>
+      <table class="method">
+        <thead><tr><th scope="col">Step</th><th scope="col">What happened</th><th scope="col" class="t">Time</th></tr></thead>
+        <tbody>
+          <tr><td>Upload an incident report and a service contract</td><td>Both searchable</td><td class="t">25 s</td></tr>
+          <tr><td>Ask why the 7:40 was late and who should fix it</td><td>Right answer, built from both files, with sources</td><td class="t">6.0 s</td></tr>
+          <tr><td>Replace the contract with version 2, ask again</td><td><mark>The old vendor is gone</mark> (<a href="#fig2">Fig. 2</a>)</td><td class="t">9.7 s</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <figure class="fig2 wide" id="fig2">
+    <div class="shot">
+      <img src="images/graphon/answer-forgot.png" width="472" height="348" alt="Graphon Playground answer: Arclight Signals now maintains Signal 14. That contract replaces version 1, though the provided source does not identify the previous vendor. My earlier answer naming Northgate Signals was incorrect.">
+      <span class="hl" style="left:3.4%;top:47.2%;width:84.5%;height:8%" aria-hidden="true"><i>a</i></span>
+      <span class="hl" style="left:3.4%;top:55.8%;width:86.5%;height:8%" aria-hidden="true"><i>b</i></span>
+    </div>
+    <figcaption><b>Fig. 2.</b>Graphon Playground, my workspace. <span class="k">a</span> The previous vendor is lost. <span class="k">b</span> An answer that was right on its day is now called incorrect.</figcaption>
+  </figure>
+
+  <div class="col">
+    <section aria-labelledby="s2">
+      <h2 id="s2"><span class="n">2</span>Why it is worth fixing</h2>
+      <ol class="points">
+        <li><span><b>It is the part search cannot do.</b> Search finds the page. Memory should know the page changed, and when.</span></li>
+        <li><span><b>People act on answers.</b> In this test, calling the old vendor means a stuck signal waits 4 hours instead of 90 minutes.</span></li>
+        <li><span><b>Trust.</b> An answer that changes quietly, then calls itself wrong, teaches people to check everything twice.</span></li>
+        <li><span><b>It is on your roadmap.</b> Your Agents page previews a renewal risk reviewer <a href="#r3">[3]</a>. Renewals are questions about what changed.</span></li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="s3">
+      <h2 id="s3"><span class="n">3</span>The fix</h2>
+      <p>Keep the old answer, show the date it changed, and put the new one on top. Drag the date.</p>
+    </section>
+  </div>
+
+  <figure class="fig3wrap wide" id="fig3">
+    <div id="fig3-root"></div>
+    <noscript><p>Fig. 3 needs JavaScript. The component is in graphon-memory/ChangedAnswer.tsx.</p></noscript>
+    <figcaption><b>Fig. 3.</b>The real component, running here in your Playground colours (compare Fig. 2). Before 3 Nov it answers Northgate. After, Arclight lands on top and Northgate stays underneath, dated.</figcaption>
+  </figure>
+
+  <div class="col">
+    <section aria-labelledby="code">
+      <h2 id="code"><span class="n">4</span>Code release</h2>
+      <p>It is yours, free to use (MIT). React and TypeScript, no dependencies, one CSS file themed with variables.</p>
+      <div class="listing">
+        <button class="copy" type="button" data-copy="snippet">Copy</button>
+<pre id="snippet"><code><span class="c">// 1. Drop ChangedAnswer.tsx and changed-answer.css into your app</span>
+<span class="tg">import</span> { ChangedAnswer } <span class="tg">from</span> <span class="s">"./ChangedAnswer"</span>;
+
+<span class="c">// 2. Pass the version you answer from, and the one it replaced</span>
+&lt;<span class="tg">ChangedAnswer</span>
+  question=<span class="s">"Who maintains Signal 14?"</span>
+  current={{ fact: <span class="s">"Arclight Signals"</span>, since: <span class="s">"2026-11-03"</span>,
+             source: { name: <span class="s">"service-contract.txt"</span>, version: <span class="s">"v2"</span> } }}
+  previous={{ fact: <span class="s">"Northgate Signals"</span>, since: <span class="s">"2026-03-01"</span>,
+              source: { name: <span class="s">"service-contract.txt"</span>, version: <span class="s">"v1"</span> } }}
+&gt;
+  {(fact) =&gt; &lt;&gt;{fact} maintains it.&lt;/&gt;}
+&lt;/<span class="tg">ChangedAnswer</span>&gt;</code></pre>
+      </div>
+      <div class="files">
+        <a href="graphon-memory/ChangedAnswer.tsx" download><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 2.5v8m0 0 3-3m-3 3-3-3M3 13.5h10"/></svg>ChangedAnswer.tsx</a>
+        <a href="graphon-memory/changed-answer.css" download><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 2.5v8m0 0 3-3m-3 3-3-3M3 13.5h10"/></svg>changed-answer.css</a>
+      </div>
+      <p style="margin-top:1.25rem">Where <code>previous</code> comes from: your search results already carry a <code>versionId</code> <a href="#r4">[4]</a>, but object versioning is off by default on new buckets <a href="#r3">[3]</a>, so the old version is gone when a file is replaced. Turning it on by default would make this work everywhere.</p>
+    </section>
+
+    <div class="sign">
+      <p class="name">Bhanu Kowshik</p>
+      <p>I designed, built and tested Verified Call end to end in three weeks with AI agents <a href="#r1">[1]</a>. I would like to do this kind of work with you. More at <a href="#r2">[2]</a>.</p>
+    </div>
+
+    <section class="refs" aria-labelledby="refs">
+      <h2 id="refs">References</h2>
+      <ol>
+        <li id="r1"><span>[1]</span><span>Verified Call. <a href="https://verifiedcall.app">verifiedcall.app</a></span></li>
+        <li id="r2"><span>[2]</span><span>Portfolio. <a href="https://bhanu.build">bhanu.build</a></span></li>
+        <li id="r3"><span>[3]</span><span>Graphon app, seen 18 Nov 2026 in my workspace: Agents page, and step 6 of Create bucket. <a href="https://app.graphon.ai">app.graphon.ai</a></span></li>
+        <li id="r4"><span>[4]</span><span>Graphon docs, Search objects. <a href="https://docs.graphon.ai/api/search/search-objects.md">docs.graphon.ai</a></span></li>
+      </ol>
+    </section>
+  </div>
+
+  <p class="foot">Unsolicited concept. Not affiliated with Graphon. Test run on 18 Nov 2026 in my own free Graphon workspace; the rail incident, contract and vendors are made-up data.</p>
+</main>
+
+<script>
+/* Fig. 1: one fragment shader draws the graph; HTML labels sit on top. */
+(function () {
+  var fig = document.getElementById('fig1');
+  var stage = fig.querySelector('.stage');
+  var canvas = stage.querySelector('canvas');
+  var replay = stage.querySelector('.replay');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Node layouts in 0..1 of the stage, one for wide and one for tall frames.
+  var WIDE = { s14:[.50,.50], ng:[.16,.20], ac:[.84,.20], inc:[.22,.82], mj:[.78,.82] };
+  var TALL = { s14:[.50,.50], ng:[.12,.12], ac:[.88,.28], inc:[.14,.84], mj:[.86,.80] };
+  var layout = WIDE;
+
+  function placeLabels() {
+    layout = stage.clientWidth / stage.clientHeight < 1.1 ? TALL : WIDE;
+    stage.querySelectorAll('.lbl').forEach(function (el) {
+      var p = layout[el.dataset.n];
+      // Top nodes label above (their edges run downward); the hub and bottom nodes label below.
+      var above = el.dataset.n !== 's14' && p[1] < .5;
+      el.style.left = (p[0] * 100) + '%';
+      el.style.top = 'calc(' + (p[1] * 100) + '% + 14px)';
+      el.style.transform = above ? (el.classList.contains('l') ? 'translate(0,calc(-100% - 28px))' : el.classList.contains('r') ? 'translate(-100%,calc(-100% - 28px))' : '') : '';
+    });
+    var s = layout.s14, ng = layout.ng, ac = layout.ac;
+    var old = stage.querySelector('[data-e="old"]'), neu = stage.querySelector('[data-e="new"]');
+    old.style.left = ((s[0] + ng[0]) / 2 * 100) + '%'; old.style.top = ((s[1] + ng[1]) / 2 * 100) + '%';
+    neu.style.left = ((s[0] + ac[0]) / 2 * 100) + '%'; neu.style.top = ((s[1] + ac[1]) / 2 * 100) + '%';
+  }
+
+  var gl = canvas.getContext('webgl', { antialias: false, premultipliedAlpha: false });
+  if (!gl) { fallbackSVG(); return; }
+
+  var vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+  var fs = [
+    'precision highp float;',
+    'uniform vec2 R;uniform float T,D,TIME;',
+    'uniform vec2 S14,NG,AC,INC,MJ;',
+    'float seg(vec2 p,vec2 a,vec2 b,out float h){vec2 pa=p-a,ba=b-a;h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h);}',
+    'float ease(float x){return 1.-pow(1.-clamp(x,0.,1.),3.);}',
+    'void main(){',
+    '  float asp=R.x/R.y;',
+    '  vec2 p=vec2(gl_FragCoord.x,R.y-gl_FragCoord.y)/R.y;',
+    '  vec2 s=S14*vec2(asp,1.),ng=NG*vec2(asp,1.),ac=AC*vec2(asp,1.),inc=INC*vec2(asp,1.),mj=MJ*vec2(asp,1.);',
+    '  float px=D/R.y, aa=px*.9;',
+    '  vec3 col=vec3(1.);',
+    '  vec3 ink=vec3(.071), ghost=vec3(.62,.64,.67), blue=vec3(.169,.271,1.);',
+    '  float h; float d;',
+    /* faint dotted field, like plotting paper */
+    '  vec2 g=fract(p/(px*22.))-.5; float dt=1.-smoothstep(.5*px*1.4,.5*px*1.4+aa, length(g)*px*22.);',
+    '  col=mix(col,vec3(.86,.87,.89),dt*.8);',
+    /* context edges */
+    '  d=seg(p,s,inc,h); col=mix(col,ink*1.6,(1.-smoothstep(px*.6,px*.6+aa,d))*.55);',
+    '  d=seg(p,s,mj,h);  col=mix(col,ink*1.6,(1.-smoothstep(px*.6,px*.6+aa,d))*.55);',
+    /* old edge: solid ink, then dashed graphite */
+    '  float k=ease((T-.15)/.5);',
+    '  d=seg(p,s,ng,h);',
+    '  float L=length(ng-s); float dash=step(.45,fract(h*L/(px*9.)));',
+    '  vec2 q=mod(floor(gl_FragCoord.xy),4.);',
+    '  float bay=mod(q.x*8.+q.y*4.+mod(q.x+q.y,2.)*2.+q.x*q.y,16.)/16.;',
+    '  float fade=mix(1.,step(bay,.55),k*(1.-k)*4.);',
+    '  float oldA=mix(1.,dash*.95,k)*fade;',
+    '  vec3 oldC=mix(ink,ghost,k);',
+    '  col=mix(col,oldC,(1.-smoothstep(px*mix(1.1,.75,k),px*mix(1.1,.75,k)+aa,d))*oldA);',
+    /* new edge grows from Signal 14 to Arclight */
+    '  float g2=ease((T-.35)/.55);',
+    '  d=seg(p,s,ac,h);',
+    '  float grown=1.-smoothstep(g2-.004,g2,h);',
+    '  col=mix(col,blue,(1.-smoothstep(px*1.3,px*1.3+aa,d))*grown*step(.001,g2));',
+    /* a single pulse travels the new edge as it lands */
+    '  float pulse=exp(-pow((h-g2)/.035,2.))*step(.01,g2)*(1.-step(.999,g2));',
+    '  col=mix(col,blue,(1.-smoothstep(px*4.,px*4.+aa,d))*pulse*.35);',
+    /* nodes */
+    '  float r=px*5.5;',
+    '  d=length(p-inc); col=mix(col,ink,1.-smoothstep(r,r+aa,d)); col=mix(col,vec3(1.),1.-smoothstep(r-px*1.6,r-px*1.6+aa,d));',
+    '  d=length(p-mj);  col=mix(col,ink,1.-smoothstep(r,r+aa,d)); col=mix(col,vec3(1.),1.-smoothstep(r-px*1.6,r-px*1.6+aa,d));',
+    '  d=length(p-ng);  col=mix(col,mix(ink,ghost,k),1.-smoothstep(r,r+aa,d)); col=mix(col,vec3(1.),1.-smoothstep(r-px*1.6,r-px*1.6+aa,d));',
+    '  float arr=smoothstep(.96,1.,g2);',
+    '  float ra=r*(1.+.35*arr*(1.-step(1.,T)));',
+    '  d=length(p-ac);  col=mix(col,mix(ghost,blue,arr),1.-smoothstep(ra,ra+aa,d)); col=mix(col,vec3(1.),(1.-smoothstep(ra-px*1.6,ra-px*1.6+aa,d))*(1.-arr));',
+    '  float rs=px*8.; d=length(p-s); col=mix(col,ink,1.-smoothstep(rs,rs+aa,d));',
+    '  gl_FragColor=vec4(col,1.);',
+    '}'
+  ].join('\n');
+
+  function sh(type, src) { var o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o; }
+  var prog;
+  try {
+    prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+  } catch (e) { canvas.remove(); fallbackSVG(); return; }
+  gl.useProgram(prog);
+  var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  var loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  var U = {}; ['R', 'T', 'D', 'TIME', 'S14', 'NG', 'AC', 'INC', 'MJ'].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
+
+  var t = reduce ? 1 : 0, playing = false, start = 0, DUR = 2600;
+
+  function size() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = Math.round(stage.clientWidth * dpr), h = Math.round(stage.clientHeight * dpr);
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    gl.viewport(0, 0, w, h);
+    placeLabels();
+    return dpr;
+  }
+  function draw() {
+    var dpr = size();
+    gl.uniform2f(U.R, canvas.width, canvas.height);
+    gl.uniform1f(U.T, t); gl.uniform1f(U.D, dpr); gl.uniform1f(U.TIME, performance.now() / 1000);
+    ['s14', 'ng', 'ac', 'inc', 'mj'].forEach(function (k) { var p = layout[k]; gl.uniform2f(U[k.toUpperCase()], p[0], p[1]); });
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    fig.classList.toggle('on', t > .8);
+  }
+  function frame(now) {
+    t = Math.min(1, (now - start) / DUR);
+    draw();
+    if (t < 1) requestAnimationFrame(frame); else { playing = false; replay.hidden = false; }
+  }
+  function play() { if (playing) return; playing = true; replay.hidden = true; t = 0; start = performance.now(); requestAnimationFrame(frame); }
+
+  new ResizeObserver(function () { if (!playing) draw(); }).observe(stage);
+  draw();
+  if (!reduce) {
+    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); setTimeout(play, 350); } }, { threshold: .5 });
+    io.observe(stage);
+    replay.addEventListener('click', play);
+  }
+
+  function fallbackSVG() {
+    placeLabels(); fig.classList.add('on');
+    var L = layout, W = 1000, H = Math.round(1000 * stage.clientHeight / stage.clientWidth);
+    function P(k) { return [L[k][0] * W, L[k][1] * H]; }
+    function line(a, b, attrs) { var A = P(a), B = P(b); return '<line x1="' + A[0] + '" y1="' + A[1] + '" x2="' + B[0] + '" y2="' + B[1] + '" ' + attrs + '/>'; }
+    function node(k, fill, stroke, r) { var A = P(k); return '<circle cx="' + A[0] + '" cy="' + A[1] + '" r="' + r + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="2.5"/>'; }
+    stage.insertAdjacentHTML('afterbegin', '<svg class="fallback" viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' +
+      line('s14', 'inc', 'stroke="#555" stroke-width="1.5"') + line('s14', 'mj', 'stroke="#555" stroke-width="1.5"') +
+      line('s14', 'ng', 'stroke="#9aa0aa" stroke-width="1.5" stroke-dasharray="6 7"') + line('s14', 'ac', 'stroke="#2b45ff" stroke-width="2.5"') +
+      node('inc', '#fff', '#121212', 8) + node('mj', '#fff', '#121212', 8) + node('ng', '#fff', '#9aa0aa', 8) + node('ac', '#2b45ff', '#2b45ff', 8) + node('s14', '#121212', '#121212', 12) + '</svg>');
+  }
+})();
+
+/* Copy the embed snippet. */
+document.querySelectorAll('.copy').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var text = document.getElementById(b.dataset.copy).innerText;
+    var done = function () { b.textContent = 'Copied'; b.setAttribute('data-done', ''); setTimeout(function () { b.textContent = 'Copy'; b.removeAttribute('data-done'); }, 1800); };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () { b.textContent = 'Select and copy'; });
+    else b.textContent = 'Select and copy';
+  });
+});
+</script>
+<script type="module" src="graphon-memory/demo.js"></script>
+</body>
+</html>
