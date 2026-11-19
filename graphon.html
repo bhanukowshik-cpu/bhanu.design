@@ -122,7 +122,7 @@ p{margin:0 0 1rem}
 .points li::before{content:"(" counter(pt,lower-roman) ")";font:italic 400 1rem/1.6 var(--serif);color:var(--ink-3)}
 .points b{font-weight:600}
 
-/* Fig. 3, the fix */
+/* the fix panel (Fig. 1b) */
 .fig3wrap{max-width:var(--wide)}
 .fig3{background:var(--screen);border-radius:12px;padding:clamp(1rem,3vw,1.5rem) clamp(1rem,4vw,2.5rem) clamp(1rem,3vw,1.5rem);color:#ededed}
 /* Reserves the changed state's height so the scrubber never jumps. */
@@ -148,6 +148,16 @@ p{margin:0 0 1rem}
 .scrub-mark::after{content:"";position:absolute;left:80%;top:1.15rem;width:1px;height:.75rem;background:#7ca4ec}
 .scrub-ends{display:flex;justify-content:space-between;font-size:.72rem;color:#7a7a7a}
 .fig3wrap figcaption{margin-left:auto;margin-right:auto}
+/* Fig. 1: before and after, side by side */
+.pair{max-width:var(--wide);margin-top:2.25rem}
+.pair .cols{display:grid;grid-template-columns:minmax(0,472px) minmax(0,1fr);gap:clamp(1rem,3vw,1.75rem);align-items:start}
+.pair .sub{display:flex;align-items:center;gap:.6rem;margin:0 0 .7rem;font:italic 400 .95rem/1.4 var(--serif);color:var(--ink-2)}
+.ba{font:600 .8rem/1 var(--sans);font-style:normal;letter-spacing:.01em;padding:.38rem .6rem;border-radius:4px}
+.ba.before{background:#e8e9ed;color:var(--ink)}
+.ba.after{background:var(--link);color:#fff}
+.pair .shot{width:100%}
+.pair figcaption{max-width:none;width:auto}
+@media (max-width:860px){.pair .cols{grid-template-columns:1fr}.pair .shot{max-width:472px}}
 
 /* code release */
 .listing{position:relative;margin:1rem 0 0;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);background:#f7f8fa}
@@ -191,19 +201,23 @@ p{margin:0 0 1rem}
     </div>
   </div>
 
-  <figure class="fig1" id="fig1">
-    <div class="stage">
-      <canvas aria-hidden="true"></canvas>
-      <span class="lbl hub" data-n="s14">Signal 14</span>
-      <span class="lbl l" data-n="ng" data-k="ng">Northgate Signals<small>service-contract v1 · 1 Mar</small></span>
-      <span class="lbl r" data-n="ac" data-k="ac">Arclight Signals<small>service-contract v2 · 3 Nov</small></span>
-      <span class="lbl l" data-n="inc">Incident 0412<small>4 Nov · 7:40 left 18 min late</small></span>
-      <span class="lbl r" data-n="mj">Mill Junction</span>
-      <span class="tag old" data-e="old">until 3 Nov</span>
-      <span class="tag new" data-e="new">since 3 Nov</span>
-      <button class="replay" type="button" hidden>Replay</button>
+  <figure class="pair fig2 wide" id="fig1">
+    <div class="cols">
+      <div class="side">
+        <p class="sub"><span class="ba before">Before</span>Your Playground today</p>
+        <div class="shot">
+          <img src="images/graphon/answer-forgot.png" width="472" height="348" alt="Graphon Playground answer: Arclight Signals now maintains Signal 14. That contract replaces version 1, though the provided source does not identify the previous vendor. My earlier answer naming Northgate Signals was incorrect.">
+          <span class="hl" style="left:3.4%;top:47.2%;width:84.5%;height:8%" aria-hidden="true"><i>a</i></span>
+          <span class="hl" style="left:3.4%;top:55.8%;width:86.5%;height:8%" aria-hidden="true"><i>b</i></span>
+        </div>
+      </div>
+      <div class="side">
+        <p class="sub"><span class="ba after">After</span>With the fix. Drag the date.</p>
+        <div id="fig3-root"></div>
+        <noscript><p>This figure needs JavaScript. The component is in graphon-memory/ChangedAnswer.tsx.</p></noscript>
+      </div>
     </div>
-    <figcaption><b>Fig. 1.</b>The memory I would want. When the contract changes, the link moves to Arclight, and the old link stays in the graph with its end date.</figcaption>
+    <figcaption><b>Fig. 1.</b>Before: my workspace, after replacing the contract: <span class="k">a</span> the previous vendor is lost, <span class="k">b</span> an answer that was right on its day is called incorrect. After: the real component, running in your Playground colours: the new answer lands on top, and the old one stays underneath with its end date.</figcaption>
   </figure>
 
   <div class="col">
@@ -214,20 +228,11 @@ p{margin:0 0 1rem}
         <tbody>
           <tr><td>Upload an incident report and a service contract</td><td>Both searchable</td><td class="t">25 s</td></tr>
           <tr><td>Ask why the 7:40 was late and who should fix it</td><td>Right answer, built from both files, with sources</td><td class="t">6.0 s</td></tr>
-          <tr><td>Replace the contract with version 2, ask again</td><td><mark>The old vendor is gone</mark> (<a href="#fig2">Fig. 2</a>)</td><td class="t">9.7 s</td></tr>
+          <tr><td>Replace the contract with version 2, ask again</td><td><mark>The old vendor is gone</mark> (<a href="#fig1">Fig. 1</a>, before)</td><td class="t">9.7 s</td></tr>
         </tbody>
       </table>
     </section>
   </div>
-
-  <figure class="fig2 wide" id="fig2">
-    <div class="shot">
-      <img src="images/graphon/answer-forgot.png" width="472" height="348" alt="Graphon Playground answer: Arclight Signals now maintains Signal 14. That contract replaces version 1, though the provided source does not identify the previous vendor. My earlier answer naming Northgate Signals was incorrect.">
-      <span class="hl" style="left:3.4%;top:47.2%;width:84.5%;height:8%" aria-hidden="true"><i>a</i></span>
-      <span class="hl" style="left:3.4%;top:55.8%;width:86.5%;height:8%" aria-hidden="true"><i>b</i></span>
-    </div>
-    <figcaption><b>Fig. 2.</b>Graphon Playground, my workspace. <span class="k">a</span> The previous vendor is lost. <span class="k">b</span> An answer that was right on its day is now called incorrect.</figcaption>
-  </figure>
 
   <div class="col">
     <section aria-labelledby="s2">
@@ -241,15 +246,24 @@ p{margin:0 0 1rem}
     </section>
 
     <section aria-labelledby="s3">
-      <h2 id="s3"><span class="n">3</span>The fix</h2>
-      <p>Keep the old answer, show the date it changed, and put the new one on top. Drag the date.</p>
+      <h2 id="s3"><span class="n">3</span>The memory underneath</h2>
+      <p>The card only works if the graph keeps the old link. Replace a file, and the link moves; the old one stays, dated.</p>
     </section>
   </div>
 
-  <figure class="fig3wrap wide" id="fig3">
-    <div id="fig3-root"></div>
-    <noscript><p>Fig. 3 needs JavaScript. The component is in graphon-memory/ChangedAnswer.tsx.</p></noscript>
-    <figcaption><b>Fig. 3.</b>The real component, running here in your Playground colours (compare Fig. 2). Before 3 Nov it answers Northgate. After, Arclight lands on top and Northgate stays underneath, dated.</figcaption>
+  <figure class="fig1" id="graph">
+    <div class="stage">
+      <canvas aria-hidden="true"></canvas>
+      <span class="lbl hub" data-n="s14">Signal 14</span>
+      <span class="lbl l" data-n="ng" data-k="ng">Northgate Signals<small>service-contract v1 · 1 Mar</small></span>
+      <span class="lbl r" data-n="ac" data-k="ac">Arclight Signals<small>service-contract v2 · 3 Nov</small></span>
+      <span class="lbl l" data-n="inc">Incident 0412<small>4 Nov · 7:40 left 18 min late</small></span>
+      <span class="lbl r" data-n="mj">Mill Junction</span>
+      <span class="tag old" data-e="old">until 3 Nov</span>
+      <span class="tag new" data-e="new">since 3 Nov</span>
+      <button class="replay" type="button" hidden>Replay</button>
+    </div>
+    <figcaption><b>Fig. 2.</b>The memory underneath. When the contract changes, the link moves to Arclight, and the old link stays in the graph with its end date.</figcaption>
   </figure>
 
   <div class="col">
@@ -301,7 +315,7 @@ p{margin:0 0 1rem}
 <script>
 /* Fig. 1: one fragment shader draws the graph; HTML labels sit on top. */
 (function () {
-  var fig = document.getElementById('fig1');
+  var fig = document.getElementById('graph');
   var stage = fig.querySelector('.stage');
   var canvas = stage.querySelector('canvas');
   var replay = stage.querySelector('.replay');
