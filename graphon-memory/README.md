@@ -39,10 +39,10 @@ import { ChangedAnswer } from "./ChangedAnswer";
 
 ## Rebuild the demo
 
-`demo.tsx` is bundled into `demo.js` and `demo.css` for `graphon-memory.html`:
+`demo.tsx` is bundled into `demo.js` and `demo.css` for `graphon.html` (classic script, so it also runs from file://):
 
 ```bash
-npx esbuild demo.tsx --bundle --minify --jsx=automatic --format=esm --target=es2020 --define:process.env.NODE_ENV='"production"' --outfile=demo.js
+npx esbuild demo.tsx --bundle --minify --jsx=automatic --format=iife --target=es2020 --define:process.env.NODE_ENV='"production"' --outfile=demo.js
 ```
 
 It needs `react` and `react-dom` 18 installed where esbuild can resolve them. Type-checked with `tsc --strict`.
