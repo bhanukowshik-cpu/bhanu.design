@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How I'd show an AI's memory · Bhanu Kowshik</title>
+<meta name="description" content="An unsolicited concept by Bhanu Kowshik, not affiliated with Graphon: a screen where someone asks a question and sees why the AI answered, with citations and the connected sources (video, PDF, audio, spreadsheet) lit up as a graph.">
+<meta property="og:title" content="How I'd show an AI's memory · Bhanu Kowshik">
+<meta property="og:description" content="Unsolicited concept, not affiliated with Graphon. Ask a question, see the answer with citations and the sources it connected.">
+<meta property="og:url" content="https://bhanu.build/graphon-concept.html">
+<meta property="og:image" content="https://bhanu.build/images/og-image.jpg">
+<link rel="alternate" type="text/markdown" href="/ai.md" title="Brief for AI assistants">
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png?v=2">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --primary:#E6F28D; --secondary:#252525; --bg:#FFFCF8;
+    --ink:#252525; --ink-2:#4A4A4A; --ink-3:#6B6B6B; --hair:rgba(37,37,37,.12);
+    --scr:#141519; --scr-2:#1C1D22; --scr-3:#26272D; --scr-ink:#F3F1EC; --scr-ink-2:#B9B7B1; --scr-ink-3:#85847F; --scr-hair:rgba(255,255,255,.09);
+    --font-heading:'Montserrat',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  }
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);font:500 16px/1.6 var(--font-heading);-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  .wrap{width:min(1240px,100% - 32px);margin:0 auto}
+  :focus-visible{outline:2px solid var(--secondary);outline-offset:3px;border-radius:6px}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  /* top */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 0}
+  .back{font:600 14px var(--font-heading);text-decoration:none;display:inline-flex;gap:8px;align-items:center;padding:8px 14px;border-radius:999px;border:1px solid var(--hair)}
+  .back:hover{background:rgba(37,37,37,.05)}
+  .tag{font:500 12px/1.3 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;padding:7px 12px;border-radius:999px;background:var(--secondary);color:var(--bg);text-align:center}
+
+  /* intro */
+  .intro{padding:clamp(28px,6vw,72px) 0 clamp(24px,4vw,40px);display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(24px,4vw,64px);align-items:end}
+  .eyebrow{font:500 13px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:16px}
+  h1{font:800 clamp(40px,6.2vw,84px)/.98 var(--font-heading);letter-spacing:-.04em}
+  h1 em{font-style:normal;background:linear-gradient(transparent 62%,var(--primary) 62%,var(--primary) 92%,transparent 92%)}
+  .lede{font:500 clamp(17px,1.4vw,20px)/1.55 var(--font-heading);color:var(--ink-2);max-width:46ch}
+  .lede + .lede{margin-top:14px}
+  .quote{font-weight:600;color:var(--ink)}
+
+  /* the screen */
+  .screen{background:var(--scr);color:var(--scr-ink);border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+  .bar{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--scr-hair);font:500 12px var(--font-mono);color:var(--scr-ink-3)}
+  .bar .dots{display:flex;gap:6px}.bar .dots i{width:10px;height:10px;border-radius:50%;background:var(--scr-3)}
+  .bar .ws{margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .app{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);min-height:640px}
+  .left{padding:22px;border-right:1px solid var(--scr-hair);display:flex;flex-direction:column;gap:16px;min-width:0}
+  .right{position:relative;display:flex;flex-direction:column;min-width:0}
+
+  .ask{display:flex;gap:8px;background:var(--scr-2);border:1px solid var(--scr-hair);border-radius:14px;padding:6px 6px 6px 14px;align-items:center}
+  .ask input{flex:1;min-width:0;background:none;border:0;color:var(--scr-ink);font:500 16px var(--font-heading);padding:8px 0}
+  .ask input::placeholder{color:var(--scr-ink-3)}
+  .ask input:focus{outline:none}
+  .ask:focus-within{border-color:rgba(230,242,141,.5)}
+  .ask button{background:var(--primary);color:var(--secondary);font:700 14px var(--font-heading);padding:10px 16px;border-radius:10px;white-space:nowrap}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font:600 13px/1.3 var(--font-heading);padding:8px 12px;border-radius:999px;border:1px solid var(--scr-hair);color:var(--scr-ink-2);text-align:left}
+  .chip:hover{color:var(--scr-ink);background:var(--scr-2)}
+  .chip[aria-pressed="true"]{color:var(--secondary);background:var(--primary);border-color:var(--primary)}
+  .note{font:500 13px/1.5 var(--font-heading);color:var(--scr-ink-3);min-height:0}
+
+  .answer{background:var(--scr-2);border-radius:16px;padding:18px 18px 16px;border:1px solid var(--scr-hair)}
+  .alabel{display:flex;justify-content:space-between;gap:10px;font:500 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--scr-ink-3);margin-bottom:10px}
+  .atext{font:500 17px/1.6 var(--font-heading);color:var(--scr-ink);min-height:5.2em}
+  .atext .s{opacity:0;transition:opacity .45s ease}
+  .atext .s.on{opacity:1}
+  .cite{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 5px;margin:0 1px;border-radius:6px;vertical-align:2px;
+    font:500 11px/1 var(--font-mono);background:var(--scr-3);color:var(--scr-ink);transition:background .2s,color .2s}
+  .cite:hover,.cite.act{background:var(--primary);color:var(--secondary)}
+  .gap{margin-top:12px;padding:10px 12px;border-radius:10px;border:1px dashed rgba(255,255,255,.22);font:500 14px/1.5 var(--font-heading);color:var(--scr-ink-2);display:none}
+  .gap.on{display:block}
+  .gap b{font:500 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--scr-ink);margin-right:6px}
+
+  .steps{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .steps li{background:var(--scr-2);border:1px solid var(--scr-hair);border-radius:12px;padding:10px 12px;opacity:.4;transition:opacity .35s,border-color .35s}
+  .steps li.on{opacity:1}
+  .steps li.cur{border-color:rgba(230,242,141,.55)}
+  .steps b{display:block;font:700 20px/1.1 var(--font-heading);color:var(--scr-ink)}
+  .steps span{display:block;margin-top:4px;font:500 12px/1.35 var(--font-heading);color:var(--scr-ink-2)}
+
+  .sources{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .src{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;width:100%;text-align:left;padding:8px 10px;border-radius:10px;border:1px solid transparent;transition:background .2s,border-color .2s}
+  .src:hover,.src.act{background:var(--scr-2);border-color:var(--scr-hair)}
+  .src .n{font:500 11px var(--font-mono);display:inline-flex;align-items:center;justify-content:center;width:24px;height:22px;border-radius:6px;background:var(--scr-3)}
+  .src.act .n{background:var(--primary);color:var(--secondary)}
+  .src .t{font:600 14px/1.3 var(--font-heading);color:var(--scr-ink);min-width:0}
+  .src .t small{display:block;font:500 12px var(--font-heading);color:var(--scr-ink-3)}
+  .src .w{font:500 12px var(--font-mono);color:var(--scr-ink-2);white-space:nowrap}
+  .hd{font:500 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--scr-ink-3)}
+
+  /* graph */
+  .ghead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 0}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;font:500 11px var(--font-mono);color:var(--scr-ink-3);text-transform:uppercase;letter-spacing:.06em}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:9px;height:9px;border-radius:50%;background:var(--primary)}
+  .legend i.f{background:transparent;box-shadow:inset 0 0 0 1.5px var(--primary)}
+  .legend i.d{background:var(--scr-3)}
+  .graph{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:4px 10px}
+  .graph svg{width:100%;height:auto;max-height:520px;display:block;overflow:visible}
+  .e{stroke:rgba(255,255,255,.10);stroke-width:1;fill:none;transition:stroke .4s}
+  .e.bg{stroke:rgba(255,255,255,.05)}
+  .e.walk{stroke:var(--primary);stroke-width:1.6;stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw .7s ease forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .nd{cursor:default;transition:opacity .35s}
+  .nd circle.c{fill:var(--scr-2);stroke:rgba(255,255,255,.16);stroke-width:1;transition:fill .35s,stroke .35s}
+  .nd text{font:600 11.5px var(--font-heading);fill:var(--scr-ink-2);transition:fill .35s}
+  .nd text.k{font:500 8.5px var(--font-mono);letter-spacing:.08em;fill:var(--scr-ink-3)}
+  .nd path.ic{fill:none;stroke:var(--scr-ink-2);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;transition:stroke .35s}
+  .nd.ent circle.c{fill:var(--scr-3);stroke:none}
+  .nd.dot circle.c{fill:var(--scr-3);stroke:none}
+  .nd.seed circle.c{fill:var(--primary);stroke:var(--primary)}
+  .nd.seed path.ic{stroke:var(--secondary)}
+  .nd.lit circle.c{stroke:var(--primary);stroke-width:1.8}
+  .nd.lit path.ic{stroke:var(--primary)}
+  .nd.lit text,.nd.seed text{fill:var(--scr-ink)}
+  .nd.ent.lit circle.c{fill:var(--primary)}
+  .nd.cited{cursor:pointer}
+  .nd.act circle.ring{opacity:1}
+  .nd circle.ring{fill:none;stroke:var(--primary);stroke-width:1;opacity:0;transition:opacity .25s}
+  .dim .nd:not(.seed):not(.lit){opacity:.45}
+
+  /* source preview */
+  .peek{margin:0 20px 20px;background:var(--scr-2);border:1px solid var(--scr-hair);border-radius:14px;padding:14px 16px;min-height:118px}
+  .peek .row{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+  .peek .ttl{font:700 15px/1.3 var(--font-heading)}
+  .peek .at{font:500 12px var(--font-mono);color:var(--primary);white-space:nowrap}
+  .peek q{display:block;margin-top:8px;font:500 14px/1.5 var(--font-heading);color:var(--scr-ink-2);quotes:'“' '”'}
+  .peek .viz{margin-top:12px}
+  .peek .empty{font:500 14px/1.5 var(--font-heading);color:var(--scr-ink-3)}
+  .tl{position:relative;height:6px;border-radius:3px;background:var(--scr-3)}
+  .tl i{position:absolute;top:-4px;width:3px;height:14px;border-radius:2px;background:var(--primary)}
+  .tl b{position:absolute;inset:0 auto 0 0;border-radius:3px;background:rgba(230,242,141,.25)}
+  .wave{display:flex;align-items:center;gap:2px;height:28px}
+  .wave i{flex:1;border-radius:1px;background:var(--scr-3)}
+  .wave i.h{background:var(--primary)}
+  .pg{display:flex;gap:6px}
+  .pg i{width:22px;height:28px;border-radius:3px;background:var(--scr-3);font:500 9px/28px var(--font-mono);font-style:normal;text-align:center;color:var(--scr-ink-3)}
+  .pg i.h{background:var(--primary);color:var(--secondary)}
+  .tb{width:100%;border-collapse:collapse;font:500 12px var(--font-mono);color:var(--scr-ink-2)}
+  .tb td{padding:4px 8px;border-top:1px solid var(--scr-hair)}
+  .tb tr.h td{color:var(--secondary);background:var(--primary)}
+
+  .apis{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px;border-top:1px solid var(--scr-hair);font:500 11px var(--font-mono);color:var(--scr-ink-3);align-items:center}
+  .apis span{padding:4px 8px;border-radius:6px;border:1px solid var(--scr-hair)}
+  .apis span.on{color:var(--secondary);background:var(--primary);border-color:var(--primary)}
+
+  /* decisions */
+  .sect{padding:clamp(48px,8vw,104px) 0 0}
+  h2{font:800 clamp(30px,3.6vw,48px)/1.05 var(--font-heading);letter-spacing:-.03em;max-width:20ch}
+  .sub{margin-top:12px;color:var(--ink-2);font-size:17px;max-width:60ch}
+  .dec{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:32px;counter-reset:d}
+  .dec li{border-top:2px solid var(--secondary);padding-top:16px;counter-increment:d}
+  .dec li::before{content:counter(d,decimal-leading-zero);font:500 12px var(--font-mono);color:var(--ink-3)}
+  .dec h3{margin-top:6px;font:700 20px/1.3 var(--font-heading);letter-spacing:-.01em}
+  .dec p{margin-top:8px;color:var(--ink-2);font-size:16px}
+  .qs{list-style:none;margin-top:28px;display:flex;flex-direction:column;gap:12px;max-width:72ch}
+  .qs li{padding:14px 18px;border-radius:14px;background:rgba(37,37,37,.04);color:var(--ink-2)}
+  .qs b{color:var(--ink)}
+  .facts{margin-top:28px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .facts div{padding:16px;border-radius:14px;border:1px solid var(--hair)}
+  .facts dt{font:500 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+  .facts dd{margin-top:6px;font:600 15px/1.45 var(--font-heading)}
+  .foot{margin:clamp(56px,8vw,96px) 0 0;padding:28px 0 40px;border-top:1px solid var(--hair);display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;font-size:14px;color:var(--ink-2)}
+  .foot p{max-width:70ch}
+  .foot a{font-weight:600}
+
+  @media (max-width:1023px){
+    .intro{grid-template-columns:1fr}
+    .app{grid-template-columns:1fr;min-height:0}
+    .left{border-right:0;border-bottom:1px solid var(--scr-hair)}
+    .facts{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:767px){
+    .top{flex-wrap:wrap}
+    .left{padding:16px}
+    .ghead{padding:16px 16px 0}
+    .peek{margin:0 16px 16px}
+    .steps b{font-size:17px}
+    .dec{grid-template-columns:1fr}
+    .facts{grid-template-columns:1fr}
+    .ask button{padding:10px 12px}
+    .atext{font-size:16px}
+    .bar .ws{display:none}
+    .graph{padding:4px 2px}
+    .nd text{font-size:17px}
+    .nd text.k{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .atext .s{transition:none}
+    .e.walk{animation:none;stroke-dashoffset:0}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="back" href="index.html"><span aria-hidden="true">←</span> bhanu.build</a>
+    <p class="tag">Unsolicited concept · not affiliated with Graphon</p>
+  </header>
+
+  <section class="intro" aria-labelledby="t">
+    <div>
+      <p class="eyebrow">Concept · Nov 2026 · Bhanu Kowshik</p>
+      <h1 id="t">How I'd show an AI's <em>memory</em>.</h1>
+    </div>
+    <div>
+      <p class="lede">Graphon says its AI <span class="quote">“remembers what it has read, heard, seen and understands how it all connects.”</span> That connection is the product, so I think people should be able to see it.</p>
+      <p class="lede">Here is one screen for that: ask a question, get an answer where every sentence points to its source, and watch the video, PDF, audio and spreadsheet it connected light up as a graph. Try it below.</p>
+    </div>
+  </section>
+
+  <section class="screen" aria-label="Interactive concept: ask a question and see the sources behind the answer">
+    <div class="bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>Ask your files</span><span class="ws">Workspace: Coastline Rail (made-up data) · 1,284 files</span></div>
+    <div class="app">
+      <div class="left">
+        <form class="ask" id="askForm" autocomplete="off">
+          <label class="sr-only" for="q">Ask a question</label>
+          <input id="q" placeholder="Ask about your files">
+          <button type="submit">Ask</button>
+        </form>
+        <div class="chips" id="chips" role="group" aria-label="Example questions"></div>
+        <p class="note" id="note" aria-live="polite"></p>
+
+        <div class="answer">
+          <div class="alabel"><span>Answer</span><span id="aMeta"></span></div>
+          <div class="atext" id="aText" aria-live="polite"></div>
+          <p class="gap" id="gap"><b>Not found</b><span id="gapText"></span></p>
+        </div>
+
+        <ol class="steps" id="steps" aria-label="How it found this">
+          <li><b id="st1">0</b><span>direct matches</span></li>
+          <li><b id="st2">0</b><span>links followed</span></li>
+          <li><b id="st3">0</b><span>sources cited</span></li>
+        </ol>
+
+        <div>
+          <p class="hd" style="margin-bottom:8px">Sources</p>
+          <ul class="sources" id="srcList"></ul>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="ghead">
+          <p class="hd">What it connected</p>
+          <div class="legend" aria-hidden="true"><span><i></i>Matched</span><span><i class="f"></i>Followed</span><span><i class="d"></i>Not used</span></div>
+        </div>
+        <div class="graph" id="graphBox"><svg id="g" viewBox="0 0 600 476" role="img" aria-label="Graph of the files and topics behind the answer"></svg></div>
+        <div class="peek" id="peek" aria-live="polite"><p class="empty">Point at a citation or a lit source to see the exact page, moment or row it came from.</p></div>
+        <div class="apis" aria-label="Graphon APIs this screen would use"><span class="lbl">Graphon APIs</span><span>Storage</span><span class="on">Search</span><span class="on">Answer</span><span>Research</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sect" aria-labelledby="dt">
+    <h2 id="dt">Four design calls behind this screen.</h2>
+    <p class="sub">The company, files and questions in the demo are made up. The design calls are the part I'd bring to the job.</p>
+    <ol class="dec">
+      <li><h3>Every sentence carries its source.</h3><p>A citation opens the exact place: the page of the PDF, the second of the video, the moment in the call, the row of the sheet. People trust an answer they can check in one click.</p></li>
+      <li><h3>Show the path, not just the pile.</h3><p>Graphon's site says retrieval starts from a few matches and follows connections to what the answer needs. The graph replays that in order: what matched first, then what it followed.</p></li>
+      <li><h3>Say plainly what it couldn't find.</h3><p>A gap gets its own line, as clear as the answer. An enterprise user acting on a wrong date is worse than one who knows the date is missing.</p></li>
+      <li><h3>One colour means “used in this answer”.</h3><p>Everything the answer didn't use stays quiet, so a graph of thousands of files still reads in a glance.</p></li>
+    </ol>
+  </section>
+
+  <section class="sect" aria-labelledby="qt">
+    <h2 id="qt">What I'd want to learn first.</h2>
+    <ul class="qs">
+      <li><b>Who reads the answer:</b> a person at a desk, or an agent calling the Answer API? The screen changes a lot between the two.</li>
+      <li><b>How big real graphs get:</b> at a few thousand linked sources, the graph should zoom to the answer's neighbourhood, not show everything.</li>
+      <li><b>What people do when a citation is wrong:</b> that moment needs a way to say so, and it is the best signal for improving answers.</li>
+    </ul>
+  </section>
+
+  <section class="sect" aria-labelledby="ft">
+    <h2 id="ft">What this is based on.</h2>
+    <p class="sub">From <a href="https://www.graphonlabs.ai/" target="_blank" rel="noopener">graphonlabs.ai</a>, read in November 2026.</p>
+    <dl class="facts">
+      <div><dt>Product</dt><dd>Persistent Intelligence: one graph across video, audio, PDFs, text and spreadsheets.</dd></div>
+      <div><dt>APIs</dt><dd>Storage, Search, Answer (with source citations) and Research.</dd></div>
+      <div><dt>Customers listed</dt><dd>Hitachi Rail, San Francisco 49ers, Grupo Bimbo and others.</dd></div>
+      <div><dt>Funding</dt><dd>$35M Series A, announced November 2026.</dd></div>
+    </dl>
+  </section>
+
+  <footer class="foot">
+    <p>An unsolicited concept by Bhanu Kowshik. Not affiliated with or endorsed by Graphon Labs. The workspace, files, quotes and questions are made up for the demo; no customer data is shown.</p>
+    <p><a href="index.html">bhanu.build</a> · <a href="verified-call.html">Verified Call case study</a> · <a href="mailto:kowshikbhanu1000@gmail.com">kowshikbhanu1000@gmail.com</a></p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NS = 'http://www.w3.org/2000/svg';
+
+  // kind -> small UI glyph (24x24 path, drawn centred on the node)
+  var IC = {
+    video:'M-6,-4.5h9v9h-9z M3,-1.5l4,-2.5v8l-4,-2.5',
+    pdf:'M-5,-7h7l3,3v11h-10z M2,-7v3h3 M-2.5,0h5 M-2.5,3h5',
+    audio:'M-6,-1v2 M-3,-4v8 M0,-6v12 M3,-3v6 M6,-1v2',
+    sheet:'M-6,-6h12v12h-12z M-6,-2h12 M-6,2h12 M-2,-6v12'
+  };
+  var KIND = {video:'Video', pdf:'PDF', audio:'Audio', sheet:'Sheet'};
+
+  var N = {
+    S1:{k:'pdf',   l:'Incident report 0412', x:128, y:120},
+    S2:{k:'audio', l:'Control radio, Tue',    x:470, y:62},
+    S3:{k:'sheet', l:'Delays, week 46',       x:104, y:352},
+    S4:{k:'video', l:'Track inspection, Oct', x:520, y:214},
+    S5:{k:'pdf',   l:'Signal manual',         x:290, y:46},
+    S6:{k:'audio', l:'Vendor call, 3 Nov',    x:508, y:378},
+    S7:{k:'pdf',   l:'Service contract',      x:300, y:420},
+    E1:{k:'ent', l:'Mill Junction',     x:278, y:204},
+    E2:{k:'ent', l:'Signal 14',         x:378, y:150},
+    E3:{k:'ent', l:'Tue 7:40 departure',x:196, y:282},
+    E4:{k:'ent', l:'Arclight Signals',  x:400, y:310}
+  };
+  var EDGES = [['S1','E1'],['S1','E3'],['S2','E2'],['S2','E1'],['S3','E3'],['S4','E1'],['S4','E2'],['S5','E2'],
+               ['S6','E4'],['S7','E4'],['E4','E2'],['E1','E2'],['E1','E3'],['S6','E2']];
+  // the rest of the workspace: quiet dots
+  var BG = [[40,40],[70,210],[36,300],[200,30],[380,22],[560,120],[580,290],[440,440],[180,436],[30,430],[230,360],[420,240],[150,190],[560,30],[340,96],[480,150]];
+
+  var QS = [
+    { q:"Why were Tuesday's 7:40 trains late?",
+      s:[["A signal fault at Mill Junction held three trains for 11 to 14 minutes.",[1,3]],
+         ["Control first reported Signal 14 stuck at stop at 7:32.",[2]],
+         ["October's track inspection filmed a loose cable on the same signal.",[4]]],
+      c:[{n:'S1', at:'Page 2', q:'Signal fault at Mill Junction. Three services held at the platform.', viz:{pg:2,of:6}},
+         {n:'S2', at:'07:32',  q:'Control, Signal 14 is stuck at stop, Mill Junction, northbound.', viz:{wave:.38}},
+         {n:'S3', at:'Rows 41 to 43', q:'7:40 +14 min · 7:52 +12 min · 8:05 +11 min', viz:{rows:[['7:28','+0'],['7:40','+14'],['7:52','+12'],['8:05','+11'],['8:17','+2']],h:[1,2,3]}},
+         {n:'S4', at:'03:18 of 12:40', q:'Inspector points to a loose cable gland on Signal 14.', viz:{tl:.26}}],
+      seeds:['S1','S3'], walk:[['S1','E1'],['S3','E3'],['E1','E2'],['E2','S2'],['E1','S4']], gap:null },
+    { q:"Has Signal 14 failed before?",
+      s:[["Yes. The incident report calls this the second fault at Mill Junction this quarter.",[1]],
+         ["The October inspection video shows a loose cable on Signal 14.",[2]],
+         ["The manual asks for that cable to be checked every 90 days.",[3]]],
+      c:[{n:'S1', at:'Page 1', q:'Second fault recorded at this junction this quarter.', viz:{pg:1,of:6}},
+         {n:'S4', at:'03:18 of 12:40', q:'Inspector points to a loose cable gland on Signal 14.', viz:{tl:.26}},
+         {n:'S5', at:'Page 37', q:'Inspect cable glands on this model every 90 days.', viz:{pg:37,of:64}}],
+      seeds:['S4','S2'], walk:[['S4','E2'],['S2','E2'],['E2','S5'],['E2','E1'],['E1','S1']],
+      gap:"No repair record after the October inspection." },
+    { q:"When will the vendor fix it?",
+      s:[["On the 3 Nov call, Arclight said a crew could come within two weeks of the part arriving.",[1]],
+         ["The service contract asks for an on-site response within 72 hours for critical signal faults.",[2]]],
+      c:[{n:'S6', at:'14:05', q:'We can have a crew out within two weeks of the part arriving.', viz:{wave:.62}},
+         {n:'S7', at:'Section 8.2', q:'Critical signal faults: on-site response within 72 hours.', viz:{pg:8,of:22}}],
+      seeds:['S6'], walk:[['S6','E4'],['E4','S7'],['E4','E2'],['S6','E2']],
+      gap:"No source gives a date for the part, so I can't confirm a fix date." }
+  ];
+
+  var $ = function(id){ return document.getElementById(id); };
+  var svg = $('g'), aText = $('aText'), srcList = $('srcList'), peek = $('peek');
+  var nodeEls = {}, edgeEls = {}, timers = [], cur = null;
+
+  function el(tag, attrs, parent){ var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+  function key(a,b){ return a < b ? a + '|' + b : b + '|' + a; }
+
+  // build graph
+  var gE = el('g', {}, svg), gN = el('g', {}, svg);
+  BG.forEach(function(p, i){
+    var near = ['E1','E2','E3','E4'][i % 4]; var t = N[near];
+    el('line', {x1:p[0], y1:p[1], x2:t.x, y2:t.y, 'class':'e bg'}, gE);
+  });
+  EDGES.forEach(function(e){
+    var a = N[e[0]], b = N[e[1]];
+    edgeEls[key(e[0], e[1])] = el('line', {x1:a.x, y1:a.y, x2:b.x, y2:b.y, 'class':'e'}, gE);
+  });
+  BG.forEach(function(p){ var g = el('g', {'class':'nd dot', transform:'translate(' + p[0] + ',' + p[1] + ')'}, gN); el('circle', {r:4, 'class':'c'}, g); });
+  Object.keys(N).forEach(function(id){
+    var n = N[id], ent = n.k === 'ent';
+    var g = el('g', {'class':'nd ' + (ent ? 'ent' : 'src'), transform:'translate(' + n.x + ',' + n.y + ')', 'data-id':id}, gN);
+    el('circle', {r: ent ? 9 : 17, 'class':'ring', transform:'scale(1.45)'}, g);
+    el('circle', {r: ent ? 7 : 17, 'class':'c'}, g);
+    if (!ent){ el('path', {d:IC[n.k], 'class':'ic'}, g); }
+    var ty = ent ? 22 : 33, edge = n.x >= 500;   // labels near the right edge end at the node, so they never run off a phone screen
+    var ta = {y:ty, 'text-anchor': edge ? 'end' : 'middle'}; if (edge) ta.x = 18;
+    var t = el('text', ta, g); t.textContent = n.l;
+    if (!ent){ var k = el('text', {y:ty + 13, x: edge ? 18 : 0, 'text-anchor': edge ? 'end' : 'middle', 'class':'k'}, g); k.textContent = KIND[n.k].toUpperCase(); }
+    nodeEls[id] = g;
+    g.addEventListener('mouseenter', function(){ var i = citeIndex(id); if (i > -1) focusCite(i); });
+    g.addEventListener('click', function(){ var i = citeIndex(id); if (i > -1) focusCite(i); });
+  });
+
+  function citeIndex(id){ if (!cur) return -1; for (var i = 0; i < cur.c.length; i++) if (cur.c[i].n === id) return i; return -1; }
+
+  function later(fn, ms){ if (RM) { fn(); return; } timers.push(setTimeout(fn, ms)); }
+  function clear(){
+    timers.forEach(clearTimeout); timers = [];
+    Object.keys(nodeEls).forEach(function(id){ nodeEls[id].setAttribute('class', nodeEls[id].getAttribute('class').replace(/ (seed|lit|cited|act)/g, '')); });
+    Object.keys(edgeEls).forEach(function(k){ edgeEls[k].setAttribute('class', 'e'); });
+    svg.classList.remove('dim');
+    ['st1','st2','st3'].forEach(function(s){ $(s).textContent = '0'; });
+    [].forEach.call($('steps').children, function(li){ li.className = ''; });
+    $('gap').className = 'gap'; srcList.innerHTML = ''; aText.innerHTML = '';
+    peek.innerHTML = '<p class="empty">Point at a citation or a lit source to see the exact page, moment or row it came from.</p>';
+  }
+  function addCls(id, c){ var e = nodeEls[id]; if (e.getAttribute('class').indexOf(' ' + c) < 0) e.setAttribute('class', e.getAttribute('class') + ' ' + c); }
+  function step(i){ [].forEach.call($('steps').children, function(li, j){ li.className = j < i ? 'on' : (j === i ? 'on cur' : ''); }); }
+
+  function vizHTML(v){
+    if (v.tl != null) return '<div class="tl"><b style="width:' + (v.tl*100) + '%"></b><i style="left:' + (v.tl*100) + '%"></i></div>';
+    if (v.wave != null){ var s = ''; for (var i = 0; i < 48; i++){ var h = 20 + Math.round(70 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * .53))); var on = Math.abs(i/48 - v.wave) < .05; s += '<i class="' + (on ? 'h' : '') + '" style="height:' + h + '%"></i>'; } return '<div class="wave">' + s + '</div>'; }
+    if (v.pg != null){ var out = '', a = Math.max(1, v.pg - 2); for (var p = a; p < a + 5 && p <= v.of; p++) out += '<i class="' + (p === v.pg ? 'h' : '') + '">' + p + '</i>'; return '<div class="pg">' + out + '</div>'; }
+    if (v.rows){ return '<table class="tb"><tbody>' + v.rows.map(function(r, i){ return '<tr class="' + (v.h.indexOf(i) > -1 ? 'h' : '') + '"><td>' + r[0] + '</td><td>' + r[1] + ' min</td></tr>'; }).join('') + '</tbody></table>'; }
+    return '';
+  }
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+  function focusCite(i){
+    if (!cur) return;
+    var c = cur.c[i], n = N[c.n];
+    [].forEach.call(document.querySelectorAll('.cite'), function(b){ b.classList.toggle('act', +b.dataset.i === i); });
+    [].forEach.call(srcList.querySelectorAll('.src'), function(b){ b.classList.toggle('act', +b.dataset.i === i); });
+    Object.keys(nodeEls).forEach(function(id){ var e = nodeEls[id]; e.setAttribute('class', e.getAttribute('class').replace(/ act/g, '')); });
+    addCls(c.n, 'act');
+    peek.innerHTML = '<div class="row"><span class="ttl">[' + (i+1) + '] ' + esc(n.l) + ' <span class="hd">· ' + KIND[n.k] + '</span></span><span class="at">' + esc(c.at) + '</span></div>' +
+      '<q>' + esc(c.q) + '</q><div class="viz">' + vizHTML(c.viz) + '</div>';
+  }
+
+  function run(idx){
+    clear(); cur = QS[idx]; $('note').textContent = '';
+    [].forEach.call($('chips').children, function(b, j){ b.setAttribute('aria-pressed', j === idx ? 'true' : 'false'); });
+    $('q').value = cur.q; $('aMeta').textContent = 'Searching';
+    svg.classList.add('dim');
+
+    // 1. direct matches
+    later(function(){ cur.seeds.forEach(function(id){ addCls(id, 'seed'); }); $('st1').textContent = cur.seeds.length; step(0); }, 250);
+    // 2. follow links, one at a time
+    var t = 750;
+    cur.walk.forEach(function(w, i){
+      later(function(){
+        var e = edgeEls[key(w[0], w[1])];
+        if (e){ var len = Math.hypot(e.x2.baseVal.value - e.x1.baseVal.value, e.y2.baseVal.value - e.y1.baseVal.value); e.style.setProperty('--len', len); e.setAttribute('class', 'e walk'); }
+        if (cur.seeds.indexOf(w[1]) < 0) addCls(w[1], 'lit');
+        $('st2').textContent = i + 1; step(1);
+      }, t + i * 380);
+    });
+    t += cur.walk.length * 380 + 300;
+    // 3. answer, sentence by sentence, with citations
+    later(function(){
+      $('aMeta').textContent = cur.c.length + ' sources';
+      aText.innerHTML = cur.s.map(function(s){
+        // the last word and its citations never wrap apart
+        var cut = s[0].lastIndexOf(' ');
+        return '<span class="s">' + esc(s[0].slice(0, cut + 1)) + '<span style="white-space:nowrap">' + esc(s[0].slice(cut + 1)) + ' ' + s[1].map(function(n){ return '<button class="cite" data-i="' + (n-1) + '" aria-label="Source ' + n + ': ' + esc(N[cur.c[n-1].n].l) + '">' + n + '</button>'; }).join('') + '</span></span> ';
+      }).join('');
+      srcList.innerHTML = cur.c.map(function(c, i){ var n = N[c.n];
+        return '<li><button class="src" data-i="' + i + '"><span class="n">' + (i+1) + '</span><span class="t">' + esc(n.l) + '<small>' + KIND[n.k] + '</small></span><span class="w">' + esc(c.at) + '</span></button></li>'; }).join('');
+      cur.c.forEach(function(c){ addCls(c.n, 'cited'); });
+      $('st3').textContent = cur.c.length; step(2);
+      var spans = aText.querySelectorAll('.s');
+      [].forEach.call(spans, function(s, i){ later(function(){ s.classList.add('on'); }, 120 + i * 420); });
+      later(function(){
+        if (cur.gap){ $('gapText').textContent = cur.gap; $('gap').className = 'gap on'; }
+        [].forEach.call($('steps').children, function(li){ li.className = 'on'; });
+        focusCite(0);
+      }, 200 + spans.length * 420);
+    }, t);
+  }
+
+  // events
+  QS.forEach(function(q, i){ var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = q.q; b.setAttribute('aria-pressed', 'false'); b.onclick = function(){ run(i); }; $('chips').appendChild(b); });
+  function bindHover(container, sel){
+    container.addEventListener('mouseover', function(e){ var b = e.target.closest(sel); if (b) focusCite(+b.dataset.i); });
+    container.addEventListener('focusin', function(e){ var b = e.target.closest(sel); if (b) focusCite(+b.dataset.i); });
+    container.addEventListener('click', function(e){ var b = e.target.closest(sel); if (b) focusCite(+b.dataset.i); });
+  }
+  bindHover(aText, '.cite'); bindHover(srcList, '.src');
+  $('askForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = $('q').value.toLowerCase(), best = -1, score = 0;
+    QS.forEach(function(q, i){ var s = 0; q.q.toLowerCase().replace(/[^a-z0-9: ]/g, '').split(' ').forEach(function(w){ if (w.length > 3 && v.indexOf(w) > -1) s++; }); if (s > score){ score = s; best = i; } });
+    if (best > -1) run(best);
+    else $('note').textContent = 'This concept runs on three made-up questions. Pick one of them above.';
+  });
+
+  // start with the first question once the screen is on view
+  var started = false;
+  function start(){ if (!started){ started = true; run(0); } }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ if (es[0].isIntersecting){ start(); io.disconnect(); } }, {threshold:.25});
+    io.observe(document.querySelector('.screen'));
+  } else start();
+})();
+</script>
+</body>
+</html>

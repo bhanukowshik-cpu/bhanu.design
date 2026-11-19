@@ -99,6 +99,27 @@ MediaPipe; Transformers.js; PyTorch; AWS Rekognition; the Claude API; ElevenLabs
 He designs and engineers with AI coding agents as tools under his direction: he writes the specs and makes every design
 call, agents draft code to them, and a separate fresh agent checks each result before he accepts it.
 
+### How he works with AI (as on his homepage)
+
+- **Claude Code and Cursor:** AI coding agents wrote most of Verified Call's code (Electron, React, Next.js) to his specs and
+  test rules; a first working version in 3 weeks. His portfolio site is built the same way.
+- **Figma:** Stressie was designed in Figma and built in SwiftUI; 13 of 13 frames matched in the build, with a lint that fails
+  it on raw colours or sizes.
+- **Lovart:** images and illustrations; he makes images there rather than drawing them in code.
+- **AI inside the product:** MediaPipe, Amazon Rekognition, PyTorch voice models trained on RunPod, the Claude API and
+  ElevenLabs. The chat on his homepage runs on Claude, voice-cloned with ElevenLabs.
+- **Evals before claims:** pass/fail rules pinned before each test, exact 95% bounds, failures kept on record, and a build
+  check that blocks product copy that overclaims (results: https://verifiedcall.app/research).
+
+## Concept: By default, Graphon forgets what changed (Nov 2026) · https://bhanu.build/graphon.html
+
+An unsolicited note to Graphon (graphonlabs.ai); not affiliated with or endorsed by Graphon Labs. He tested Graphon in his
+own free workspace on 18 Nov 2026 with made-up files: two files were searchable in about 25 s and a cross-file answer with
+sources came back in 6 s. When he replaced a contract with a new version, the answer lost the previous vendor and called
+its own earlier answer incorrect (object versioning is off by default on new buckets). The page shows his screen of that
+answer next to his fix: the new answer lands on top with "Changed 3 Nov", and the old one stays underneath with its end
+date. The fix is a free (MIT) React and TypeScript component, ChangedAnswer, with no dependencies.
+
 ## Verified Call (2026) · https://bhanu.build/verified-call.html
 
 Role: founder; design, and engineering directed through AI coding agents. Timeline: first working version in 3 weeks; ~6 weeks
